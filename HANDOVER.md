@@ -7,6 +7,14 @@ confirmed fixed by Tony. Shared community system editing is built, self-tested, 
 deployed — but the Edit/Report flow itself has still never been clicked through in a
 real browser, so that's the next real check.
 
+**The last two "never seen render" unknowns are now closed, confirmed by Tony's own
+screenshots:** the in-system 3D view renders correctly (textured planets, real corona
+on the star, orbit rings, a genuine third planet like Elyaketh sitting further out on
+a wider orbit than the framed crop shows — not a bug), and in-system labels work too
+(★ prefix on the star, ↳ prefix on moons, all matching the panel's body list) once the
+Labels button is actually toggled on (off by default on every load, same as galaxy/
+local view — not a bug either, first report of "missing" labels was just that).
+
 **Real-device mobile pass (S26), same session:** Tony's first phone screenshots surfaced
 real layout bugs that no amount of code-reading would have caught. Fixed: (1) the FPS/
 SHOWN/MODE stats box and the left-side Tweak/Filters/Telemetry stack were pinned at

@@ -461,8 +461,8 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
         <option value="Uninhabited">Uninhabited</option>
       </select>
     </div>
-    <div class="mfld"><div class="lb">Economy</div><input type="text" id="edEcon" maxlength="40" placeholder="e.g. Trading"></div>
-    <div class="mfld"><div class="lb">Conflict level</div><input type="text" id="edConflict" maxlength="40" placeholder="e.g. Low"></div>
+    <div class="mfld"><div class="lb">Economy</div><select id="edEcon"></select></div>
+    <div class="mfld"><div class="lb">Conflict level</div><select id="edConflict"></select></div>
     <div class="mfld"><div class="lb">Public notes <span style="color:var(--text-faint)">(visible to everyone, not your private surveyor log)</span></div>
       <textarea id="edNotes" maxlength="800" placeholder="Anything else worth knowing about this system..."></textarea>
     </div>
@@ -1953,6 +1953,39 @@ document.getElementById("bPanelMin").addEventListener("click",function(){
 function escAttr(s){
   return String(s==null?"":s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
 }
+/* Economy and conflict are, in the real game, always drawn from a fixed word
+   list (same ECON/CONFLICT tables the procedural generator itself uses) --
+   not free text -- so a dropdown is both easier to use and more accurate
+   than a text box a traveller has to type an exact match into by hand. */
+var CONFLICT_TIER_LB=["Low","Medium","High"];
+function buildEconConflictSelects(){
+  var econSel=document.getElementById("edEcon"), i,j;
+  var blank=document.createElement("option");
+  blank.value=""; blank.textContent="— uncharted / none —";
+  econSel.appendChild(blank);
+  for(i=0;i<ECON.length;i++){
+    var grp=document.createElement("optgroup");
+    grp.label=ECON[i][0];
+    for(j=0;j<ECON[i][1].length;j++){
+      var opt=document.createElement("option");
+      opt.value=ECON[i][1][j]; opt.textContent=ECON[i][1][j];
+      grp.appendChild(opt);
+    }
+    econSel.appendChild(grp);
+  }
+  var conSel=document.getElementById("edConflict");
+  for(i=0;i<CONFLICT.length;i++){
+    var cgrp=document.createElement("optgroup");
+    cgrp.label=CONFLICT_TIER_LB[i]||("Tier "+i);
+    for(j=0;j<CONFLICT[i].length;j++){
+      var copt=document.createElement("option");
+      copt.value=CONFLICT[i][j]; copt.textContent=CONFLICT[i][j];
+      cgrp.appendChild(copt);
+    }
+    conSel.appendChild(cgrp);
+  }
+}
+buildEconConflictSelects();
 var editBodies=[];
 function renderBodyEditList(){
   var el=document.getElementById("bodyEditList"), html="",i,k;
@@ -2077,7 +2110,7 @@ document.getElementById("edSubmit").addEventListener("click",function(){
   if(!selected) return;
   var err=clientPrecheck();
   var errEl=document.getElementById("editErr");
-  if(err){ errEl.textContent=err; errEl.style.display="block"; return; }
+  if(err){ errEl.textContent=err; errEl.style.display="block"; errEl.scrollIntoView({block:"nearest"}); return; }
   errEl.style.display="none";
   var payload={
     name:document.getElementById("edName").value.trim(),
@@ -2101,21 +2134,21 @@ document.getElementById("edSubmit").addEventListener("click",function(){
     spin.style.display="none"; btn.disabled=false;
     if(!res.body.ok){
       errEl.textContent=(res.body.error||"Could not save")+(res.body.details?"\n"+res.body.details.join("\n"):"");
-      errEl.style.display="block";
+      errEl.style.display="block"; errEl.scrollIntoView({block:"nearest"});
       return;
     }
     closeModal(); toast("System saved -- visible to everyone"); loadOverrides();
   }).catch(function(){
     spin.style.display="none"; btn.disabled=false;
     errEl.textContent="Could not reach the server. The shared-edit backend may not be set up yet (see Tony's setup notes).";
-    errEl.style.display="block";
+    errEl.style.display="block"; errEl.scrollIntoView({block:"nearest"});
   });
 });
 document.getElementById("repSubmit").addEventListener("click",function(){
   if(!selected) return;
   var reason=document.getElementById("repReason").value.trim();
   var errEl=document.getElementById("reportErr");
-  if(!reason){ errEl.textContent="Please describe what's wrong."; errEl.style.display="block"; return; }
+  if(!reason){ errEl.textContent="Please describe what's wrong."; errEl.style.display="block"; errEl.scrollIntoView({block:"nearest"}); return; }
   errEl.style.display="none";
   var spin=document.getElementById("reportSpin"), btn=document.getElementById("repSubmit");
   spin.style.display="block"; btn.disabled=true;
@@ -2124,11 +2157,11 @@ document.getElementById("repSubmit").addEventListener("click",function(){
   }).then(function(r){ return r.json().then(function(j){ return {status:r.status,body:j}; }); })
   .then(function(res){
     spin.style.display="none"; btn.disabled=false;
-    if(!res.body.ok){ errEl.textContent=res.body.error||"Could not send report"; errEl.style.display="block"; return; }
+    if(!res.body.ok){ errEl.textContent=res.body.error||"Could not send report"; errEl.style.display="block"; errEl.scrollIntoView({block:"nearest"}); return; }
     closeModal(); toast("Report sent -- thanks");
   }).catch(function(){
     spin.style.display="none"; btn.disabled=false;
-    errEl.textContent="Could not reach the server."; errEl.style.display="block";
+    errEl.textContent="Could not reach the server."; errEl.style.display="block"; errEl.scrollIntoView({block:"nearest"});
   });
 });
 
