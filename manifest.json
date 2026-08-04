@@ -1,0 +1,18 @@
+{
+  "name": "NMS Galactic Map",
+  "short_name": "Galactic Map",
+  "description": "Decode any No Man's Sky portal address into a true 3D galaxy position, fly the galaxy, enter systems, and log real in-game data for others to see.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#070b11",
+  "theme_color": "#070b11",
+  "orientation": "any",
+  "categories": ["games", "utilities", "navigation"],
+  "icons": [
+    { "src": "favicon/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "favicon/icon-maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "favicon/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "favicon/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

@@ -1,10 +1,11 @@
 # NMS Galactic Map — Handover
 
-**Last worked:** 2026-08-04 (Session 16)
-**Status:** Working prototype. Not deployed. Labels/camera-matrix/moon-orbit bugs from
-Session 15 are confirmed fixed by Tony. New this session: shared community system
-editing (see below) — built and self-tested, but **needs Tony's GitHub/Netlify setup
-before it's live**, and has never been clicked through in a real browser.
+**Last worked:** 2026-08-04 (Session 17)
+**Status:** LIVE at `nms-galaxy-map.netlify.app`, GitHub-connected deploy, cross-linked
+from NMS Hub, installable as a PWA. Labels/camera-matrix/moon-orbit bugs from Session 15
+confirmed fixed by Tony. Shared community system editing is built, self-tested, and
+deployed — but the Edit/Report flow itself has still never been clicked through in a
+real browser, so that's the next real check.
 **Folder:** `C:\Users\elegr\Claude\Projects\NMS Galactic Map`
 
 ---
@@ -238,12 +239,32 @@ warning toast fires above 45,000. 56 FPS at defaults on Tony's laptop.
 ## Not built yet
 
 - Share links (`?address=...`)
-- PWA manifest + service worker + install button
-- Netlify deploy (drag the folder **contents**, not the folder — same mistake as Session 7)
-- Cross-link from NMS Hub
 - Real named regions (Galactic Hub etc.) — currently all procedural
 - Note: `Icons/` and the source PNGs do not need deploying; only `glyphs/`,
-  `icons-web/` and `preview.html` are needed at runtime.
+  `icons-web/`, `favicon/`, `manifest.json`, `sw.js`, `netlify.toml`,
+  `netlify/functions/`, `data/` and `preview.html` are needed at runtime.
+
+## Done since the last handover revision
+
+- **Deployed.** Live at `nms-galaxy-map.netlify.app`, GitHub-connected (see
+  Session 16/17 notes above for the shared-edits backend and the repo-structure
+  mistake — folder uploaded instead of its contents, same lesson as every past
+  drag-and-drop deploy in this project family, just via GitHub's uploader this
+  time — plus a repo delete/recreate breaking Netlify's repo link, fixed by
+  unlinking and relinking).
+- **Cross-linked from NMS Hub** (`nms-command-network.netlify.app`) — a 4th
+  card (NODE 04 — Navigation Systems) added to the Hub's card grid, using
+  `assets/bg-glyphs.jpg` (the portal glyph grid photo) since it's the most
+  thematically fitting existing asset. Header node count bumped 3→4.
+- **Installable PWA**, matching the pattern from NMS Alphabet Translator /
+  Weather App: `manifest.json` (icons pulled from the existing `favicon/`
+  folder, plus two new maskable variants generated from the 1024px favicon
+  source with a padded safe zone), `sw.js` (cache-first for the app shell,
+  but explicitly **network-only, never cached, for anything under
+  `/.netlify/functions/`** — caching a shared-edit GET would risk serving a
+  visitor stale or another visitor's data), and an "Install app" button in
+  the top toolbar with the same `beforeinstallprompt` / iOS-fallback pattern
+  used elsewhere in this project family.
 
 ---
 

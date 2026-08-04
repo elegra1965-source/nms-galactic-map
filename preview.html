@@ -12,6 +12,12 @@
 <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="favicon/icon-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="favicon/icon-512.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#070b11">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Galactic Map">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -238,6 +244,8 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   <button class="btn" id="bKeys" title="Open the 16-key portal glyph keypad. Tap glyphs to build an address; it stays in sync with the hex box.">Glyphs</button>
   <button class="btn" id="bLbl" title="Show names on the nearest stars, or on planets and moons inside a system. Shortcut: H">Labels</button>
   <button class="btn on" id="bGrid" title="Show the region grid in Local view. Each cube is one region, roughly 400 light years across. Shortcut: G">Grid</button>
+  <div class="sep"></div>
+  <button class="btn" id="bInstall" title="Install this map as an app on your device." style="display:none">&#9672; Install app</button>
 </div>
 
 <div id="leftcol">
@@ -2025,6 +2033,40 @@ document.getElementById("repSubmit").addEventListener("click",function(){
     errEl.textContent="Could not reach the server."; errEl.style.display="block";
   });
 });
+
+/* ============ install as app ============ */
+var deferredInstallPrompt=null;
+var installBtn=document.getElementById("bInstall");
+function isStandalone(){
+  return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone===true;
+}
+if(!isStandalone()) installBtn.style.display="";
+window.addEventListener("beforeinstallprompt",function(e){
+  e.preventDefault();
+  deferredInstallPrompt=e;
+  installBtn.style.display="";
+});
+window.addEventListener("appinstalled",function(){
+  installBtn.style.display="none";
+  deferredInstallPrompt=null;
+  toast("Installed");
+});
+installBtn.addEventListener("click",function(){
+  if(deferredInstallPrompt){
+    deferredInstallPrompt.prompt();
+    deferredInstallPrompt.userChoice.then(function(){ deferredInstallPrompt=null; });
+    return;
+  }
+  var isiOS=/iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+  toast(isiOS?"Share button -> Add to Home Screen":"Use your browser menu's Install app / Add to Home Screen option");
+});
+if("serviceWorker" in navigator){
+  window.addEventListener("load",function(){
+    navigator.serviceWorker.register("sw.js").catch(function(err){
+      console.warn("SW registration failed",err);
+    });
+  });
+}
 
 /* ============ loop ============ */
 var _lastW=0, _lastH=0;
