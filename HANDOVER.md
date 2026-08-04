@@ -6,6 +6,34 @@ from NMS Hub, installable as a PWA. Labels/camera-matrix/moon-orbit bugs from Se
 confirmed fixed by Tony. Shared community system editing is built, self-tested, and
 deployed — but the Edit/Report flow itself has still never been clicked through in a
 real browser, so that's the next real check.
+
+**Real-device mobile pass (S26), same session:** Tony's first phone screenshots surfaced
+real layout bugs that no amount of code-reading would have caught. Fixed: (1) the FPS/
+SHOWN/MODE stats box and the left-side Tweak/Filters/Telemetry stack were pinned at
+hardcoded pixel offsets (`top:50px` / `top:150px`) assuming a short toolbar -- on his
+actual screen the toolbar wraps into 4+ rows and is taller than that, so stats rendered
+on top of the Glyphs button. Replaced with a `--top-h` CSS variable the page measures
+from the real toolbar height on every resize and once fonts finish loading (see
+`syncTopOffset()`), so it can't drift out of sync on any screen width again. (2) Enter
+system/Set course were buried below Race/Economy/Conflict/tags/body-list inside the
+scrollable panel, invisible without scrolling first -- pinned them to the top of the
+panel via a mobile-only `order:-1` + `position:sticky` combo, which required switching
+`#panel`'s show/hide from an inline `style.display` (JS) to a `.show` class (CSS), since
+an inline style would otherwise always beat the stylesheet's `display:flex`. (3) "Sensor
+telemetry" overflowed its collapsed 158px header box -- shortened to "Telemetry"
+(matches the existing "Tweak"/"Filters" one-word pattern). (4) Hid the FPS/SHOWN/MODE
+debug readout entirely on mobile per Tony's own "does it need to be there?" -- kept on
+desktop. (5) Landscape phones don't have room to stack toolbar + left boxes + a
+bottom-docked panel without overlap (confirmed: panel covered the Filters box) -- added
+an `orientation:landscape` rule that docks the panel to the right instead, like desktop
+already does, so it can't collide with the left-docked boxes at all. Also added, per
+Tony's request: a fan-made/procedural-data disclaimer modal (reuses the existing
+Edit/Report `#modalWrap` overlay), shown automatically once per browser via
+`localStorage`, reachable again anytime via a new "About" toolbar button. None of this
+has been seen on a real screen yet -- all reasoned from the actual CSS plus Tony's
+screenshots, verified with the usual `node --check`/tag-balance/ID-existence checks, not
+a live render. Next real step is Tony reloading on the S26 again (both orientations) to
+confirm.
 **Folder:** `C:\Users\elegr\Claude\Projects\NMS Galactic Map`
 
 ---

@@ -92,6 +92,7 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border:none;border-ra
 
 #panel{position:fixed;top:50px;right:10px;width:278px;z-index:25;padding:13px 14px;
   display:none;max-height:calc(100vh - 70px);overflow-y:auto;overflow-x:hidden}
+#panel.show{display:block}
 .phead{display:flex;gap:10px;align-items:flex-start;margin-bottom:8px}
 .stars{display:flex;gap:4px;flex:none;padding-top:2px}
 .starsw{width:20px;height:20px;border-radius:50%}
@@ -210,13 +211,29 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 
 @media(max-width:900px){
   #panel{width:auto;left:10px;right:10px;top:auto;bottom:10px;max-height:44vh}
+  #panel.show{display:flex;flex-direction:column}
+  /* Enter system / Set course are the buttons someone actually needs to act on. Buried
+     below Race/Economy/Conflict/tags/body-list, they scrolled out of sight on first
+     open (confirmed on Tony's S26 -- "missing unless scroll up"). Pulling them to the
+     top of the panel's flex order and pinning them there means they're always visible
+     the instant you tap a system, and the rest of the detail scrolls underneath. */
+  #prowEnter{order:-1;position:sticky;top:0;z-index:2;background:rgba(11,17,25,.97);
+    margin:0 -14px;padding:10px 14px 8px;border-bottom:1px solid var(--border-soft)}
   #course{top:50px;left:50%;transform:translateX(-50%);width:210px}
   #leftcol{bottom:auto;top:calc(var(--top-h,150px) + 10px);flex-direction:column;align-items:flex-start}
   #tweak,#filt,#tel{width:158px}
   #keys{bottom:auto;top:calc(var(--top-h,150px) + 10px);width:calc(100vw - 20px)}
-  #stats{bottom:auto;top:calc(var(--top-h,150px) + 10px);right:10px}
+  #stats{display:none}
   #flyhint{display:none!important}
   input[type=text]{width:110px}
+}
+@media(max-width:900px) and (orientation:landscape){
+  /* Short landscape screens don't have room to stack the toolbar, the left-side
+     Tweak/Filters/Telemetry boxes AND a bottom-docked panel without them overlapping
+     (confirmed on Tony's S26 in landscape -- panel covered the Filters box). Docking
+     the panel to the right instead, like desktop already does, keeps it clear of the
+     left-docked boxes entirely rather than fighting over the same vertical space. */
+  #panel{left:auto;right:10px;width:300px;top:calc(var(--top-h,60px) + 10px);bottom:10px;max-height:none}
 }
 </style>
 </head>
@@ -246,6 +263,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   <button class="btn on" id="bGrid" title="Show the region grid in Local view. Each cube is one region, roughly 400 light years across. Shortcut: G">Grid</button>
   <div class="sep"></div>
   <button class="btn" id="bInstall" title="Install this map as an app on your device." style="display:none">&#9672; Install app</button>
+  <button class="btn" id="bAbout" title="Fan-made disclaimer and a note on procedural vs. real system data.">&#9432; About</button>
 </div>
 
 <div id="leftcol">
@@ -307,7 +325,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   </div>
 
   <div id="tel" class="box fold min">
-    <div class="kicker fhead" id="telHead">&#9656; Sensor telemetry</div>
+    <div class="kicker fhead" id="telHead">&#9656; Telemetry</div>
     <div class="fbody">
       <div>X <b id="tX">0.00</b></div>
       <div>Y <b id="tY">0.00</b></div>
@@ -357,7 +375,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     <div class="row" style="margin-top:10px"><span id="icRes"></span>
       <div><div class="lb">Resources</div><div class="tags" id="bRes"></div></div></div>
   </div>
-  <div class="prow">
+  <div class="prow" id="prowEnter">
     <button class="btn" id="bEnter" title="Fly into this system and see its star, planets and moons in 3D.">Enter system</button>
     <button class="btn" id="bCourse" title="Plot a route from where you are to this system. Draws a line on the map and works out distance, bearing and how many hyperdrive jumps it takes.">Set course</button>
   </div>
@@ -440,6 +458,22 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     <div class="modalBtns">
       <button class="btn primary" id="repSubmit">Send report</button>
       <button class="btn" id="repCancel">Cancel</button>
+    </div>
+  </div>
+
+  <div class="box modal" id="disclaimerModal" style="max-width:380px;display:none">
+    <h3>Before you explore</h3>
+    <div class="msub" style="margin-bottom:12px">Two quick things:</div>
+    <div class="mfld">
+      <div class="lb">Fan-made project</div>
+      <div style="font-size:12px;color:var(--text-dim);line-height:1.55">This is an unofficial, fan-made tool. It is not affiliated with, endorsed by, or sponsored by Hello Games.</div>
+    </div>
+    <div class="mfld">
+      <div class="lb">Procedural data</div>
+      <div style="font-size:12px;color:var(--text-dim);line-height:1.55">Star systems are generated procedurally from their portal address, the same way the game does -- they are not scraped from anyone's real save. A system only reflects real in-game data once a traveller has entered it via <b>Edit system</b>, marked "Community edited".</div>
+    </div>
+    <div class="modalBtns">
+      <button class="btn primary" id="discOk">Got it</button>
     </div>
   </div>
 </div>
@@ -1332,7 +1366,7 @@ function distanceLY(s){
 }
 function updatePanel(s){
   selected=s;
-  document.getElementById("panel").style.display="block";
+  document.getElementById("panel").classList.add("show");
   document.getElementById("pSys").style.display="";
   document.getElementById("pBody").style.display="none";
   document.getElementById("pStars").innerHTML=starSwatches(s);
@@ -1390,7 +1424,7 @@ function updatePanel(s){
   updateRings();
 }
 function showBody(b,s){
-  document.getElementById("panel").style.display="block";
+  document.getElementById("panel").classList.add("show");
   document.getElementById("pSys").style.display="none";
   document.getElementById("pBody").style.display="";
   document.getElementById("pStars").innerHTML=
@@ -1869,7 +1903,7 @@ document.getElementById("fFile").addEventListener("change",function(e){
 });
 document.getElementById("tHead").addEventListener("click",function(){ toggleFold("tweak","tHead","Tweak"); });
 document.getElementById("fHead").addEventListener("click",function(){ toggleFold("filt","fHead","Filters"); });
-document.getElementById("telHead").addEventListener("click",function(){ toggleFold("tel","telHead","Sensor telemetry"); });
+document.getElementById("telHead").addEventListener("click",function(){ toggleFold("tel","telHead","Telemetry"); });
 
 /* ============ edit / report modal ============ */
 function escAttr(s){
@@ -1975,6 +2009,26 @@ document.getElementById("bReport").addEventListener("click",function(){
 document.getElementById("edCancel").addEventListener("click",closeModal);
 document.getElementById("repCancel").addEventListener("click",closeModal);
 document.getElementById("modalWrap").addEventListener("click",function(e){ if(e.target.id==="modalWrap") closeModal(); });
+
+/* ============ fan-made / procedural-data disclaimer ============ */
+var DISCLAIMER_KEY="nms-galmap-disclaimer-seen";
+function openDisclaimer(){
+  document.getElementById("editModal").style.display="none";
+  document.getElementById("reportModal").style.display="none";
+  document.getElementById("disclaimerModal").style.display="";
+  document.getElementById("modalWrap").classList.add("show");
+}
+document.getElementById("bAbout").addEventListener("click",openDisclaimer);
+document.getElementById("discOk").addEventListener("click",function(){
+  try{ localStorage.setItem(DISCLAIMER_KEY,"1"); }catch(e){}
+  closeModal();
+});
+try{
+  if(!localStorage.getItem(DISCLAIMER_KEY)) openDisclaimer();
+}catch(e){
+  /* localStorage blocked (private browsing etc) -- show it once per page load instead of never */
+  openDisclaimer();
+}
 document.getElementById("edSubmit").addEventListener("click",function(){
   if(!selected) return;
   var err=clientPrecheck();
