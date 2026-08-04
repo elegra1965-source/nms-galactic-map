@@ -2042,9 +2042,16 @@ function clientPrecheck(){
     "rape","cock","pussy","whore","slut","kike","chink","spic","tranny","bastard","dick","piss","asshole"];
   var LEET={"0":"o","1":"i","3":"e","4":"a","5":"s","@":"a","$":"s"};
   function bad(str){
-    var n=String(str||"").toLowerCase().replace(/[01345@$]/g,function(c){return LEET[c];})
-      .replace(/[^a-z]/g,"").replace(/(.)\1{2,}/g,"$1");
-    for(var i=0;i<CHECK_WORDS.length;i++) if(n.indexOf(CHECK_WORDS[i])>=0) return true;
+    // Whole-word match only, not substring -- avoids false positives like
+    // "skyscraper"/"grape" containing "rape", "classic" containing "ass",
+    // "cockpit" containing "cock", etc. Mirrors filter.mjs's containsBadWord.
+    var words=String(str||"").split(/\s+/).filter(Boolean);
+    for(var w=0;w<words.length;w++){
+      var n=words[w].toLowerCase().replace(/[01345@$]/g,function(c){return LEET[c];})
+        .replace(/[^a-z]/g,"").replace(/(.)\1{2,}/g,"$1");
+      if(!n) continue;
+      for(var i=0;i<CHECK_WORDS.length;i++) if(n===CHECK_WORDS[i]) return true;
+    }
     return false;
   }
   var fields=[document.getElementById("edName").value,document.getElementById("edEcon").value,

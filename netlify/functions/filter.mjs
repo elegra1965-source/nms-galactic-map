@@ -17,18 +17,37 @@ export const BAD_WORDS = [
 
 const LEET = {"0":"o","1":"i","3":"e","4":"a","5":"s","7":"t","@":"a","$":"s"};
 
-function normalize(str){
-  var s = String(str||"").toLowerCase();
+// Normalizes ONE token (no spaces left in it by the time this runs) --
+// leet-substitutes, strips stray punctuation stuck to a word (hyphens,
+// dots, apostrophes -- still catches "f-u-c-k" / "f.u.c.k" evasion since
+// those symbols sit *inside* a single whitespace-delimited token), and
+// collapses stretched letters ("fuuuuck" -> "fuck").
+function normalizeWord(word){
+  var s = String(word||"").toLowerCase();
   s = s.replace(/[01345 7@$]/g, function(ch){ return LEET[ch]!==undefined?LEET[ch]:ch; });
-  s = s.replace(/[^a-z]/g, "");            // strip everything but letters, closes gaps like "f u c k" or "f-u-c-k"
-  s = s.replace(/(.)\1{2,}/g, "$1");       // collapse "fuuuuck" -> "fuck" so stretched-letter evasion still matches
+  s = s.replace(/[^a-z]/g, "");
+  s = s.replace(/(.)\1{2,}/g, "$1");
   return s;
 }
 
+// Whole-word match only -- NOT a substring search. A raw substring search
+// flags real words that happen to contain a bad word as a fragment (e.g.
+// "skyscraper"/"grape" contain "rape", "classic"/"assassin"/"brass" contain
+// "ass", "cockpit"/"cockatoo" contain "cock") -- the classic "Scunthorpe
+// problem". Splitting on whitespace/punctuation first and requiring an
+// EXACT match per token avoids that while still catching the word typed
+// on its own, with leetspeak, or with letters stretched out.
 export function containsBadWord(str){
-  var n = normalize(str);
-  for(var i=0;i<BAD_WORDS.length;i++){
-    if(n.indexOf(BAD_WORDS[i]) !== -1) return BAD_WORDS[i];
+  // Split on WHITESPACE only (not all punctuation) so "f-u-c-k" / "f.u.c.k"
+  // typed as one token still gets caught by normalizeWord stripping the
+  // punctuation inside it -- only an actual space/newline separates words.
+  var words = String(str||"").split(/\s+/).filter(Boolean);
+  for(var w=0; w<words.length; w++){
+    var n = normalizeWord(words[w]);
+    if(!n) continue;
+    for(var i=0;i<BAD_WORDS.length;i++){
+      if(n === BAD_WORDS[i]) return BAD_WORDS[i];
+    }
   }
   return null;
 }
