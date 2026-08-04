@@ -844,7 +844,17 @@ function refreshAfterOverrides(){
   if(selected){
     var fresh=null;
     for(var i=0;i<allSystems.length;i++) if(allSystems[i].address===selected.address){ fresh=allSystems[i]; break; }
-    if(fresh){ selected=fresh; if(document.getElementById("pBody").style.display==="none") updatePanel(selected); }
+    if(fresh){
+      selected=fresh;
+      if(document.getElementById("pBody").style.display==="none") updatePanel(selected);
+      // buildSystemView() bakes star/planet names onto the 3D meshes at build
+      // time (userData.name etc) -- they don't live-follow `selected`, so if
+      // you're currently drilled into the very system you just edited, the
+      // floating star/planet labels and textures would otherwise keep
+      // showing the pre-edit data until you left and re-entered. Rebuild the
+      // system view in place so labels/textures pick up the save immediately.
+      if(mode==="system") buildSystemView(selected);
+    }
   }
 }
 

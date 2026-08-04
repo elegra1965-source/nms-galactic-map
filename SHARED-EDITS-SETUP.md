@@ -80,3 +80,18 @@ procedural-only. If edits stop saving after it WAS working, the most likely
 causes are: the `GITHUB_TOKEN` expired or was revoked, or the token's repo
 access got changed. Regenerate a token (step 2) and update the Netlify env
 var (step 4) if so.
+
+**Error says `GitHub write failed: 404 ...Not Found`** — the site can't find
+the repo at all. Check `GITHUB_OWNER`/`GITHUB_REPO` at the top of
+`netlify/functions/system-edit.mjs` match your actual github.com username
+and repo name exactly.
+
+**Error says `GitHub write failed: 403 ...Resource not accessible by
+personal access token`** — the repo was found but the token can't write to
+it. Fine-grained tokens bind to a *specific* repo, not just its name — if
+you ever delete and recreate the `nms-galactic-map` repo (e.g. to fix a
+Netlify link issue) after already creating the token, the old token won't
+carry over to the "new" repo even though the name matches. Fix: generate a
+fresh fine-grained token (step 2) pointed at the current repo with Contents
+set to Read and write, then update `GITHUB_TOKEN` in Netlify (step 4) and
+trigger a redeploy.
