@@ -1,0 +1,12 @@
+[build]
+  publish = "."
+  functions = "netlify/functions"
+
+# Serve preview.html at the site root without renaming it to index.html.
+[[redirects]]
+  from = "/"
+  to = "/preview.html"
+  status = 200
+
+[functions]
+  node_bundler = "esbuild"

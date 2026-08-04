@@ -1,0 +1,2129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>NMS Galactic Map — Preview v4</title>
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="48x48" href="favicon/favicon-48x48.png">
+<link rel="icon" type="image/png" sizes="96x96" href="favicon/favicon-96x96.png">
+<link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="favicon/icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="favicon/icon-512.png">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#f0a500; --gold-dim:#a06800; --cyan:#00e5ff; --cyan-dim:#0096a8;
+  --bg:#070b11; --bg2:#0b1119; --bg3:#0f1620;
+  --panel:rgba(255,255,255,0.035); --panel-2:rgba(0,229,255,0.05);
+  --border:rgba(0,229,255,0.16); --border-soft:rgba(255,255,255,0.07);
+  --text:#cfe0f0; --text-dim:rgba(207,224,240,0.6); --text-faint:rgba(207,224,240,0.4);
+  --white:#eaf6ff; --r-sm:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);
+  font-family:'Rajdhani',system-ui,sans-serif;-webkit-font-smoothing:antialiased;
+  -webkit-tap-highlight-color:transparent}
+canvas#c{display:block;position:fixed;inset:0;touch-action:none}
+
+.kicker{font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:.18em;
+  color:var(--gold);text-transform:uppercase}
+.box{background:rgba(11,17,25,.93);border:1px solid var(--border);border-radius:12px;
+  backdrop-filter:blur(6px);position:relative}
+.box::before,.box::after{content:'';position:absolute;width:9px;height:9px;pointer-events:none}
+.box::before{top:-1px;right:-1px;border-top:1px solid var(--cyan);border-right:1px solid var(--cyan);border-radius:0 12px 0 0}
+.box::after{bottom:-1px;left:-1px;border-bottom:1px solid var(--cyan);border-left:1px solid var(--cyan);border-radius:0 0 0 12px}
+
+#top{position:fixed;top:0;left:0;right:0;z-index:30;display:flex;align-items:center;
+  gap:6px;padding:8px 10px;background:linear-gradient(#070b11f2,#070b1100);flex-wrap:wrap}
+#title{font-family:'Orbitron',sans-serif;font-weight:700;font-size:12px;letter-spacing:.14em;
+  color:var(--white);text-shadow:0 0 18px rgba(0,229,255,.45);white-space:nowrap;margin-right:2px}
+.btn{font-family:'Orbitron',sans-serif;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;
+  background:var(--panel);border:1px solid var(--border);color:var(--text);
+  padding:6px 10px;border-radius:var(--r-sm);cursor:pointer;white-space:nowrap}
+.btn:hover{background:var(--panel-2);border-color:var(--gold)}
+.btn.on{border-color:var(--gold);color:var(--gold);background:rgba(240,165,0,.08)}
+.btn.off{opacity:.4;border-color:var(--border-soft);color:var(--text-faint)}
+.sep{width:1px;height:18px;background:var(--border-soft)}
+input[type=text]{font-family:'Orbitron',monospace;font-size:11px;letter-spacing:.12em;
+  background:#04070c;border:1px solid var(--border);color:var(--cyan);
+  padding:6px 8px;border-radius:var(--r-sm);width:140px;text-transform:uppercase;outline:none}
+input[type=text]:focus{border-color:var(--gold)}
+select{font-family:'Rajdhani',sans-serif;font-size:12px;background:#04070c;color:var(--text);
+  border:1px solid var(--border);border-radius:var(--r-sm);padding:5px 6px;outline:none;width:100%}
+#galSel{width:auto;max-width:168px;font-family:'Orbitron',sans-serif;font-size:10px;
+  letter-spacing:.06em;color:var(--gold)}
+
+#tel{width:190px;padding:10px 12px;font-family:'Orbitron',sans-serif;
+  font-size:10px;letter-spacing:.08em;line-height:1.75}
+#tel b{color:var(--cyan);font-weight:600}
+#gType{font-size:9px;margin-top:4px}
+#tCore{font-size:9px;color:var(--text-faint);margin-top:2px}
+
+#leftcol{position:fixed;left:10px;bottom:10px;z-index:25;display:flex;gap:8px;align-items:flex-end}
+#tweak{width:198px;padding:10px 12px}
+#filt{width:176px;padding:10px 12px}
+.fold.min .fbody{display:none}
+.fold.min{width:auto}
+.fhead{cursor:pointer;user-select:none;white-space:nowrap}
+.fbody{margin-top:8px}
+.sl{margin-bottom:8px}
+.sl label{display:flex;justify-content:space-between;font-size:9.5px;letter-spacing:.1em;
+  color:var(--text-faint);text-transform:uppercase;margin-bottom:3px}
+.sl label b{color:var(--cyan);font-weight:600;font-family:'Orbitron',sans-serif}
+input[type=range]{width:100%;height:4px;-webkit-appearance:none;appearance:none;
+  background:rgba(0,229,255,.18);border-radius:2px;outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;
+  border-radius:50%;background:var(--cyan);cursor:pointer;box-shadow:0 0 8px rgba(0,229,255,.7)}
+input[type=range]::-moz-range-thumb{width:14px;height:14px;border:none;border-radius:50%;background:var(--cyan)}
+.chk{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--text-dim);
+  margin-bottom:4px;cursor:pointer;letter-spacing:.04em}
+.chk input{accent-color:#00e5ff;width:13px;height:13px}
+.fld{margin-bottom:7px}
+.fld .lb{font-size:9px;letter-spacing:.12em;color:var(--text-faint);text-transform:uppercase;margin-bottom:3px}
+
+#panel{position:fixed;top:50px;right:10px;width:278px;z-index:25;padding:13px 14px;
+  display:none;max-height:calc(100vh - 70px);overflow-y:auto;overflow-x:hidden}
+.phead{display:flex;gap:10px;align-items:flex-start;margin-bottom:8px}
+.stars{display:flex;gap:4px;flex:none;padding-top:2px}
+.starsw{width:20px;height:20px;border-radius:50%}
+#panel h2{font-family:'Orbitron',sans-serif;font-size:13px;font-weight:600;color:var(--white);line-height:1.25}
+#panel .reg{font-size:11px;letter-spacing:.1em;color:var(--text-faint);text-transform:uppercase}
+#panel .cls{font-family:'Orbitron',sans-serif;font-size:11px;color:var(--gold);letter-spacing:.06em;margin-bottom:3px}
+#pCore{font-size:10.5px;color:var(--text-faint);letter-spacing:.04em;margin-bottom:10px}
+.row{display:flex;gap:9px;align-items:flex-start;margin-bottom:9px}
+.row svg{width:16px;height:16px;flex:none;margin-top:2px;color:var(--cyan);
+  stroke:currentColor;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.row .icimg{width:26px;height:26px;flex:none;margin-top:-2px;object-fit:contain}
+.row .icimg.tint{width:23px;height:23px}
+.row .lb{font-size:9.5px;letter-spacing:.12em;color:var(--text-faint);text-transform:uppercase}
+.row .vl{font-size:14px;color:var(--text);line-height:1.3}
+.row .sub{font-size:11px;color:var(--text-dim);margin-top:1px}
+.tags{display:flex;flex-wrap:wrap;gap:5px;border-top:1px solid var(--border-soft);padding-top:9px;margin-top:3px}
+.tag{font-family:'Orbitron',sans-serif;font-size:8.5px;letter-spacing:.1em;padding:3px 7px;
+  border-radius:var(--r-sm);border:1px solid var(--border);color:var(--text-dim);text-transform:uppercase}
+.tag.hot{border-color:var(--gold);color:var(--gold)}
+.tag.bh{border-color:#c78aff;color:#c78aff}
+.bodylist{margin-top:9px;border-top:1px solid var(--border-soft);padding-top:8px}
+.brow{display:flex;align-items:center;gap:7px;font-size:12px;padding:3px 0;cursor:pointer}
+.brow:hover{color:var(--white)}
+.bdot{width:12px;height:12px;border-radius:50%;flex:none;border:1px solid rgba(255,255,255,.22)}
+.brow .bn{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brow .bb{font-size:10px;color:var(--text-faint);letter-spacing:.05em}
+.seqbox{border:1px solid var(--border-soft);border-radius:var(--r-sm);padding:7px;margin-top:10px;background:#04070c}
+.seqbox .lb{font-size:9px;letter-spacing:.16em;color:var(--gold);text-align:center;margin-bottom:5px}
+.seq{display:grid;grid-template-columns:repeat(12,1fr);gap:2px}
+.seq img{width:100%;filter:drop-shadow(0 0 4px rgba(0,229,255,.5))}
+#pAddr{font-family:'Orbitron',monospace;font-size:10px;color:var(--cyan);letter-spacing:.14em;
+  text-align:center;margin-top:6px}
+textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(--text);
+  border-radius:var(--r-sm);padding:6px 7px;font-family:'Rajdhani',sans-serif;font-size:12px;
+  resize:vertical;min-height:50px;outline:none;margin-top:8px}
+.prow{display:flex;gap:5px;margin-top:6px}
+.prow .btn{flex:1;text-align:center}
+
+#course{position:fixed;left:50%;transform:translateX(-50%);top:50px;z-index:27;
+  width:246px;padding:10px 12px;display:none}
+#course.show{display:block}
+#course .cline{display:flex;justify-content:space-between;font-size:11.5px;padding:2px 0}
+#course .cline span:first-child{color:var(--text-faint)}
+#course .cline b{color:var(--cyan);font-family:'Orbitron',sans-serif;font-size:10.5px}
+#cTarget{font-family:'Orbitron',sans-serif;font-size:11px;color:var(--white);margin:5px 0 6px}
+
+#keys{position:fixed;left:50%;transform:translateX(-50%);bottom:10px;z-index:26;
+  width:min(560px,calc(100vw - 20px));padding:10px 12px;display:none}
+#keys.show{display:block}
+.kgrid{display:grid;grid-template-columns:repeat(16,1fr);gap:3px;margin-top:7px}
+.kbtn{background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:3px;cursor:pointer;line-height:0}
+.kbtn:hover{border-color:var(--gold);background:var(--panel-2)}
+.kbtn img{width:100%;filter:drop-shadow(0 0 4px rgba(0,229,255,.55))}
+.kseq{display:grid;grid-template-columns:repeat(12,1fr);gap:3px;margin-top:8px;
+  background:#04070c;border:1px solid var(--border-soft);border-radius:var(--r-sm);padding:5px}
+.kslot{aspect-ratio:1;border:1px dashed rgba(0,229,255,.14);border-radius:4px;line-height:0}
+.kslot img{width:100%;filter:drop-shadow(0 0 5px rgba(240,165,0,.6))}
+.krow{display:flex;gap:5px;margin-top:8px;align-items:center;flex-wrap:wrap}
+#kHex{font-family:'Orbitron',monospace;font-size:11px;color:var(--gold);letter-spacing:.16em;flex:1;min-width:110px}
+
+#stats{position:fixed;right:10px;bottom:10px;z-index:25;font-family:'Orbitron',sans-serif;
+  font-size:9.5px;letter-spacing:.1em;color:var(--text-faint);text-align:right;line-height:1.7}
+#stats b{color:var(--cyan);font-weight:600}
+#labels{position:fixed;inset:0;z-index:15;pointer-events:none;overflow:hidden}
+.lbl{position:absolute;font-family:'Orbitron',sans-serif;font-size:9.5px;letter-spacing:.1em;
+  color:var(--white);text-shadow:0 1px 2px #000,0 -1px 2px #000,1px 0 2px #000,-1px 0 2px #000,0 0 6px #000;
+  white-space:nowrap;transform:translate(-50%,-150%);opacity:.92;
+  background:rgba(4,6,10,0.55);padding:2px 6px;border-radius:4px}
+#toast{position:fixed;left:50%;top:48px;transform:translateX(-50%);z-index:40;
+  font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:.12em;color:var(--gold);
+  background:rgba(11,17,25,.95);border:1px solid var(--gold);border-radius:var(--r-sm);
+  padding:7px 13px;display:none}
+#err{position:fixed;left:10px;right:10px;bottom:10px;z-index:60;background:#2a0d0d;
+  border:1px solid #ff4a4a;color:#ffb0b0;border-radius:var(--r-sm);padding:9px 12px;
+  font-family:monospace;font-size:11px;display:none;white-space:pre-wrap;max-height:30vh;overflow:auto}
+#empty{position:fixed;left:50%;top:46%;transform:translate(-50%,-50%);z-index:18;display:none;
+  font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:.16em;color:var(--gold);
+  border:1px solid var(--gold);border-radius:var(--r-sm);padding:10px 16px;
+  background:rgba(11,17,25,.9);pointer-events:none;text-transform:uppercase}
+#flyhint{position:fixed;left:50%;transform:translateX(-50%);bottom:10px;z-index:20;
+  font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:.14em;color:var(--text-faint);
+  text-align:center;pointer-events:none;display:none}
+
+/* ============ edit / report modal ============ */
+#modalWrap{position:fixed;inset:0;z-index:80;display:none;background:rgba(2,4,7,.72);
+  align-items:flex-start;justify-content:center;overflow-y:auto;padding:50px 12px}
+#modalWrap.show{display:flex}
+.modal{width:100%;max-width:420px;padding:16px 16px 14px;margin-bottom:40px}
+.modal h3{font-family:'Orbitron',sans-serif;font-size:13px;letter-spacing:.1em;
+  color:var(--white);margin-bottom:2px;text-transform:uppercase}
+.modal .msub{font-size:11px;color:var(--text-faint);margin-bottom:12px}
+.mfld{margin-bottom:10px}
+.mfld .lb{font-size:9px;letter-spacing:.12em;color:var(--text-faint);text-transform:uppercase;margin-bottom:3px}
+.mfld input[type=text],.mfld input[type=number]{width:100%;text-transform:none;font-family:'Rajdhani',sans-serif;
+  letter-spacing:.02em;color:var(--text);font-size:12px}
+.mfld textarea{margin-top:0}
+.merr{background:#2a0d0d;border:1px solid #ff4a4a;color:#ffb0b0;border-radius:var(--r-sm);
+  padding:8px 10px;font-size:11px;margin-bottom:10px;display:none;white-space:pre-wrap}
+.bodyEdit{border:1px solid var(--border-soft);border-radius:var(--r-sm);padding:8px;margin-bottom:8px;
+  background:rgba(255,255,255,.02)}
+.bodyEdit .bhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.bodyEdit .bhead span{font-family:'Orbitron',sans-serif;font-size:9.5px;letter-spacing:.1em;color:var(--gold);
+  text-transform:uppercase}
+.bodyEdit .bx{cursor:pointer;color:var(--text-faint);font-size:14px;line-height:1;padding:2px 6px}
+.bodyEdit .bx:hover{color:#ff8080}
+.bodyEdit .brow2{display:flex;gap:6px;margin-bottom:6px}
+.bodyEdit .brow2>div{flex:1}
+.chk2{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-dim);cursor:pointer;
+  white-space:nowrap;padding-top:16px}
+.chk2 input{accent-color:#00e5ff;width:13px;height:13px}
+#bodyEditList{margin-bottom:8px}
+.modalBtns{display:flex;gap:6px;margin-top:12px}
+.modalBtns .btn{flex:1;text-align:center}
+.modalBtns .btn.primary{border-color:var(--gold);color:var(--gold)}
+#editSpin{display:none;font-size:10px;color:var(--text-faint);text-align:center;margin-top:6px}
+
+@media(max-width:900px){
+  #panel{width:auto;left:10px;right:10px;top:auto;bottom:10px;max-height:44vh}
+  #course{top:50px;left:50%;transform:translateX(-50%);width:210px}
+  #leftcol{bottom:auto;top:150px;flex-direction:column;align-items:flex-start}
+  #tweak,#filt,#tel{width:158px}
+  #keys{bottom:auto;top:150px;width:calc(100vw - 20px)}
+  #stats{bottom:auto;top:50px;right:10px}
+  #flyhint{display:none!important}
+  input[type=text]{width:110px}
+}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="labels"></div>
+<div id="toast"></div>
+<div id="err"></div>
+<div id="empty">No systems match these filters</div>
+<div id="flyhint">WASD / ARROWS MOVE · SHIFT BOOST · SPACE-Q UP · E DOWN · DRAG TO LOOK</div>
+
+<div id="top">
+  <div id="title">NMS GALACTIC MAP</div>
+  <select id="galSel"></select>
+  <div class="sep"></div>
+  <button class="btn on" id="mGal" title="Whole-galaxy view. Decorative starfield plus your focus marker, bookmarks and course target.">Galaxy</button>
+  <button class="btn" id="mLoc" title="The real star systems around your current voxel. This is where clicking, filters and labels work.">Local</button>
+  <div class="sep"></div>
+  <button class="btn on" id="cOrb" title="Orbit camera: drag to swing around the centre point, wheel or pinch to zoom in and out.">Orbit</button>
+  <button class="btn" id="cFly" title="Free flight: WASD or arrows to move, Shift to boost, Space/Q up, E down, drag to look. On touch, drag the left third as a thumbstick.">Fly</button>
+  <div class="sep"></div>
+  <input type="text" id="inAddr" value="1067FA5A9B2C" maxlength="12" spellcheck="false">
+  <button class="btn" id="bJump" title="Travel to the 12-glyph address in the box. Regenerates the local slice around it.">Jump</button>
+  <button class="btn" id="bRand" title="Roll a random valid portal address and jump there.">Random</button>
+  <button class="btn" id="bKeys" title="Open the 16-key portal glyph keypad. Tap glyphs to build an address; it stays in sync with the hex box.">Glyphs</button>
+  <button class="btn" id="bLbl" title="Show names on the nearest stars, or on planets and moons inside a system. Shortcut: H">Labels</button>
+  <button class="btn on" id="bGrid" title="Show the region grid in Local view. Each cube is one region, roughly 400 light years across. Shortcut: G">Grid</button>
+</div>
+
+<div id="leftcol">
+  <div id="tweak" class="box fold min">
+    <div class="kicker fhead" id="tHead">▸ Tweak</div>
+    <div class="fbody">
+      <div class="sl"><label>Nebula clouds <b id="vNeb">300</b></label>
+        <input type="range" id="sNeb" min="0" max="600" step="20" value="300"></div>
+      <div class="sl"><label>Cloud size <b id="vCsz">1.0</b></label>
+        <input type="range" id="sCsz" min="0.4" max="2.5" step="0.1" value="1.0"></div>
+      <div class="sl"><label>Galaxy stars <b id="vGal">24000</b></label>
+        <input type="range" id="sGal" min="2000" max="40000" step="1000" value="24000"></div>
+      <div class="sl"><label>Arms <b id="vArm">4</b></label>
+        <input type="range" id="sArm" min="2" max="6" step="1" value="4"></div>
+      <div class="sl"><label>Twist <b id="vTw">3.6</b></label>
+        <input type="range" id="sTw" min="0.5" max="6" step="0.1" value="3.6"></div>
+      <div class="sl"><label>Thickness <b id="vTh">0.8</b></label>
+        <input type="range" id="sTh" min="0.2" max="3" step="0.1" value="0.8"></div>
+      <div class="sl"><label>Slice radius <b id="vR">2</b></label>
+        <input type="range" id="sR" min="0" max="5" step="1" value="2"></div>
+      <div class="sl"><label>Systems / voxel <b id="vPer">22</b></label>
+        <input type="range" id="sPer" min="4" max="80" step="2" value="22"></div>
+      <div class="sl"><label>Star size <b id="vSz">1.5</b></label>
+        <input type="range" id="sSz" min="0.4" max="4" step="0.1" value="1.5"></div>
+    </div>
+  </div>
+
+  <div id="filt" class="box fold min">
+    <div class="kicker fhead" id="fHead">▸ Filters</div>
+    <div class="fbody">
+      <div style="font-size:10.5px;color:var(--text-faint);line-height:1.35;margin-bottom:7px">Applies to Local view — that is where the real systems are.</div>
+      <div class="fld"><div class="lb">Star colour</div>
+        <select id="fCol"><option value="">Any</option><option>yellow</option><option>red</option>
+        <option>green</option><option>blue</option><option>purple</option></select></div>
+      <div class="fld"><div class="lb">Race</div>
+        <select id="fRace"><option value="">Any</option><option>Gek</option><option>Vy'keen</option>
+        <option>Korvax</option><option>Uninhabited</option></select></div>
+      <div class="fld"><div class="lb">Economy</div>
+        <select id="fEco"><option value="">Any</option></select></div>
+      <label class="chk"><input type="checkbox" id="fBH">Black holes</label>
+      <label class="chk"><input type="checkbox" id="fAtl">Atlas interfaces</label>
+      <label class="chk"><input type="checkbox" id="fOut">Outlaw</label>
+      <label class="chk"><input type="checkbox" id="fMark">Bookmarked</label>
+      <div class="fld" style="margin-top:7px"><div class="lb">Hyperdrive range</div>
+        <select id="fHyper">
+          <option value="100">100 LY — base</option>
+          <option value="500">500 LY</option>
+          <option value="1000">1000 LY</option>
+          <option value="1500">1500 LY</option>
+          <option value="2200" selected>2200 LY — S upgrades</option>
+          <option value="3000">3000 LY — S explorer</option>
+          <option value="6000">6000 LY — freighter</option>
+        </select></div>
+      <div class="prow"><button class="btn" id="bReset" title="Clear all filters.">Reset</button>
+        <button class="btn" id="bExport" title="Download your notes and bookmarks as a JSON file.">Export</button></div>
+      <div class="prow"><button class="btn" id="bImport" title="Load notes and bookmarks from a previously exported JSON file.">Import logs</button></div>
+      <input type="file" id="fFile" accept="application/json" style="display:none">
+    </div>
+  </div>
+
+  <div id="tel" class="box fold min">
+    <div class="kicker fhead" id="telHead">&#9656; Sensor telemetry</div>
+    <div class="fbody">
+      <div>X <b id="tX">0.00</b></div>
+      <div>Y <b id="tY">0.00</b></div>
+      <div>Z <b id="tZ">0.00</b></div>
+      <div style="margin-top:4px;color:var(--text-faint)">VOXEL <b id="tV">&mdash;</b></div>
+      <div id="tCore">&mdash;</div>
+      <div id="gType">&mdash;</div>
+    </div>
+  </div>
+</div>
+
+<div id="course" class="box">
+  <div class="kicker">Course plotted</div>
+  <div id="cTarget">—</div>
+  <div class="cline"><span>Distance</span><b id="cDist">—</b></div>
+  <div class="cline"><span>Jumps</span><b id="cJumps">—</b></div>
+  <div class="cline"><span>Bearing</span><b id="cBear">—</b></div>
+  <div class="cline"><span>Target from centre</span><b id="cCore">—</b></div>
+  <div class="prow"><button class="btn" id="bGoCourse" title="Travel to the plotted target.">Jump to</button>
+    <button class="btn" id="bClrCourse" title="Cancel the plotted course.">Clear</button></div>
+</div>
+
+<div id="panel" class="box">
+  <div class="phead">
+    <div class="stars" id="pStars"></div>
+    <div style="min-width:0">
+      <h2 id="pName">—</h2>
+      <div class="reg" id="pReg">region</div>
+    </div>
+  </div>
+  <div class="cls" id="pCls">—</div>
+  <div id="pCore">—</div>
+  <div id="pSys">
+    <div class="row"><span id="icRace"></span>
+      <div><div class="lb">Race</div><div class="vl" id="pRace">—</div></div></div>
+    <div class="row"><span id="icEco"></span>
+      <div><div class="lb">Economy</div><div class="vl" id="pEco">—</div><div class="sub" id="pEcoSub">—</div></div></div>
+    <div class="row"><span id="icCon"></span>
+      <div><div class="lb">Conflict</div><div class="vl" id="pCon">—</div></div></div>
+    <div class="tags" id="pTags"></div>
+    <div class="bodylist" id="pBodies"></div>
+  </div>
+  <div id="pBody" style="display:none">
+    <div class="row"><span id="icBio"></span>
+      <div><div class="lb">Biome</div><div class="vl" id="bBiome">—</div><div class="sub" id="bTerr">—</div></div></div>
+    <div class="tags" id="bTags"></div>
+    <div class="row" style="margin-top:10px"><span id="icRes"></span>
+      <div><div class="lb">Resources</div><div class="tags" id="bRes"></div></div></div>
+  </div>
+  <div class="prow">
+    <button class="btn" id="bEnter" title="Fly into this system and see its star, planets and moons in 3D.">Enter system</button>
+    <button class="btn" id="bCourse" title="Plot a route from where you are to this system. Draws a line on the map and works out distance, bearing and how many hyperdrive jumps it takes.">Set course</button>
+  </div>
+  <div class="prow">
+    <button class="btn" id="bMark" title="Save this system to your device. Bookmarked systems turn cyan and show in Galaxy view.">Bookmark</button>
+    <button class="btn" id="bCopy" title="Copy the 12-glyph address to the clipboard.">Copy address</button>
+  </div>
+  <div class="prow">
+    <button class="btn" id="bEdit" title="Enter your real in-game data for this system -- name, race, economy, conflict, planets/moons and resources. Saved for every visitor to see.">Edit system</button>
+    <button class="btn" id="bReport" title="Flag this system's data as wrong or inappropriate so it can be reviewed.">Report</button>
+  </div>
+  <div id="pubNoteBox" style="display:none">
+    <div class="lb" style="font-size:9px;letter-spacing:.12em;color:var(--text-faint);text-transform:uppercase;margin:8px 0 3px">Community notes</div>
+    <div id="pubNote" style="font-size:12px;color:var(--text-dim);white-space:pre-wrap"></div>
+  </div>
+  <div class="seqbox">
+    <div class="lb">Portal sequence</div>
+    <div class="seq" id="pSeq"></div>
+    <div id="pAddr">—</div>
+  </div>
+  <textarea id="pNote" placeholder="Surveyor notes..."></textarea>
+  <div class="prow">
+    <button class="btn" id="bSave" title="Save your surveyor notes for this system to this device.">Save log</button>
+  </div>
+</div>
+
+<div id="keys" class="box">
+  <div class="kicker">Portal glyph keypad</div>
+  <div class="kgrid" id="kGrid"></div>
+  <div class="kseq" id="kSeq"></div>
+  <div class="krow">
+    <div id="kHex">————————————</div>
+    <button class="btn" id="kBack">Del</button>
+    <button class="btn" id="kClear">Clear</button>
+    <button class="btn" id="kJump">Jump</button>
+  </div>
+</div>
+
+<div id="modalWrap">
+  <div class="box modal" id="editModal">
+    <h3>Edit system</h3>
+    <div class="msub">Enter your real in-game data. This replaces the generated placeholder for everyone who visits this address, including you if you reload -- there's no undo button on the site itself, but every save is a git commit Tony can revert on GitHub.</div>
+    <div class="merr" id="editErr"></div>
+    <div class="mfld"><div class="lb">System name</div><input type="text" id="edName" maxlength="40"></div>
+    <div class="mfld"><div class="lb">Race</div>
+      <select id="edRace">
+        <option value="Gek">Gek</option>
+        <option value="Vy'keen">Vy'keen</option>
+        <option value="Korvax">Korvax</option>
+        <option value="Uninhabited">Uninhabited</option>
+      </select>
+    </div>
+    <div class="mfld"><div class="lb">Economy</div><input type="text" id="edEcon" maxlength="40" placeholder="e.g. Trading"></div>
+    <div class="mfld"><div class="lb">Conflict level</div><input type="text" id="edConflict" maxlength="40" placeholder="e.g. Low"></div>
+    <div class="mfld"><div class="lb">Public notes <span style="color:var(--text-faint)">(visible to everyone, not your private surveyor log)</span></div>
+      <textarea id="edNotes" maxlength="800" placeholder="Anything else worth knowing about this system..."></textarea>
+    </div>
+    <div class="mfld">
+      <div class="lb" style="display:flex;justify-content:space-between;align-items:center">
+        <span>Planets &amp; moons (in-game order, max 6)</span>
+        <button class="btn" id="edAddBody" type="button" style="padding:3px 8px">+ Add</button>
+      </div>
+      <div id="bodyEditList"></div>
+    </div>
+    <div id="editSpin">Saving...</div>
+    <div class="modalBtns">
+      <button class="btn primary" id="edSubmit">Save</button>
+      <button class="btn" id="edCancel">Cancel</button>
+    </div>
+  </div>
+
+  <div class="box modal" id="reportModal" style="max-width:340px;display:none">
+    <h3>Report this system</h3>
+    <div class="msub">Flags this system's current data for review.</div>
+    <div class="merr" id="reportErr"></div>
+    <div class="mfld"><div class="lb">What's wrong?</div>
+      <textarea id="repReason" maxlength="200" placeholder="e.g. Name field has an offensive word"></textarea>
+    </div>
+    <div id="reportSpin" style="display:none;font-size:10px;color:var(--text-faint);text-align:center;margin-top:6px">Sending...</div>
+    <div class="modalBtns">
+      <button class="btn primary" id="repSubmit">Send report</button>
+      <button class="btn" id="repCancel">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div id="stats">
+  <div>FPS <b id="fps">—</b></div>
+  <div>SHOWN <b id="nsys">0</b></div>
+  <div>MODE <b id="mstat">GALAXY</b></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+"use strict";
+
+/* ---- error surfacing so a runtime fault is visible, not a blank screen ---- */
+function showErr(msg){
+  var e=document.getElementById("err");
+  e.style.display="block";
+  e.textContent="ERROR: "+msg;
+}
+window.addEventListener("error",function(ev){
+  showErr((ev.message||"unknown")+"\n"+(ev.filename||"")+":"+(ev.lineno||""));
+});
+
+/* ============ constants ============ */
+var SIZE_XZ=0x1000, SIZE_Y=0x100;
+var GAL_R=200, GAL_H=13, CORE_R=14;
+var VOX_U=9, LY_PER_VOXEL=400;
+var HEXD="0123456789ABCDEF";
+
+var GALAXIES=["Euclid","Hilbert Dimension","Calypso","Hesperius Dimension","Hyades","Ickjamatew","Budullangr","Kikolgallr","Eltiensleen","Eissentam","Elkupalos","Aptarkaba","Ontiniangp","Odiwagiri","Ogtialabi","Muhacksonto","Hitonskyer","Rerasmutul","Isdoraijung","Doctinawyra","Loychazinq","Zukasizawa","Ekwathore","Yeberhahne","Twerbetek","Sivarates","Eajerandal","Aldukesci","Wotyarogii","Sudzerbal","Maupenzhay","Sugueziume","Brogoweldian","Ehbogdenbu","Ijsenufryos","Nipikulha","Autsurabin","Lusontrygiamh","Rewmanawa","Ethiophodhe","Urastrykle","Xobeurindj","Oniijialdu","Wucetosucc","Ebyeloof","Odyavanta","Milekistri","Waferganh","Agnusopwit","Teyaypilny","Zalienkosm","Ladgudiraf","Mushonponte","Amsentisz","Fladiselm","Laanawemb","Ilkerloor","Davanossi","Ploehrliou","Corpinyaya","Leckandmeram","Quulngais","Nokokipsechl","Rinblodesa","Loydporpen","Ibtrevskip","Elkowaldb","Heholhofsko","Yebrilowisod","Husalvangewi","Ovna'uesed","Bahibusey","Nuybeliaure","Doshawchuc","Ruckinarkh","Thorettac","Nuponoparau","Moglaschil","Uiweupose","Nasmilete","Ekdaluskin","Hakapanasy","Dimonimba","Cajaccari","Olonerovo","Umlanswick","Henayliszm","Utzenmate","Umirpaiya","Paholiang","Iaereznika","Yudukagath","Boealalosnj","Yaevarcko","Coellosipp","Wayndohalou","Smoduraykl","Apmaneessu","Hicanpaav","Akvasanta","Tuychelisaor","Rivskimbe","Daksanquix","Kissonlin","Aediabiel","Ulosaginyik","Roclaytonycar","Kichiaroa","Irceauffey","Nudquathsenfe","Getaizakaal","Hansolmien","Bloytisagra","Ladsenlay","Luyugoslasr","Ubredhatk","Cidoniana","Jasinessa","Torweierf","Saffneckm","Thnistner","Dotusingg","Luleukous","Jelmandan","Otimanaso","Enjaxusanto","Sezviktorew","Zikehpm","Bephembah","Broomerrai","Meximicka","Venessika","Gaiteseling","Zosakasiro","Drajayanes","Ooibekuar","Urckiansi","Dozivadido","Emiekereks","Meykinunukur","Kimycuristh","Roansfien","Isgarmeso","Daitibeli","Gucuttarik","Enlaythie","Drewweste","Akbulkabi","Homskiw","Zavainlani","Jewijkmas","Itlhotagra","Podalicess","Hiviusauer","Halsebenk","Puikitoac","Gaybakuaria","Grbodubhe","Rycempler","Indjalala","Fontenikk","Pasycihelwhee","Ikbaksmit","Telicianses","Oyleyzhan","Uagerosat","Impoxectin","Twoodmand","Hilfsesorbs","Ezdaranit","Wiensanshe","Ewheelonc","Litzmantufa","Emarmatosi","Mufimbomacvi","Wongquarum","Hapirajua","Igbinduina","Wepaitvas","Sthatigudi","Yekathsebehn","Ebedeagurst","Nolisonia","Ulexovitab","Iodhinxois","Irroswitzs","Bifredait","Beiraghedwe","Yeonatlak","Cugnatachh","Nozoryenki","Ebralduri","Evcickcandj","Ziybosswin","Heperclait","Sugiuniam","Aaseertush","Uglyestemaa","Horeroedsh","Drundemiso","Ityanianat","Purneyrine","Dokiessmat","Nupiacheh","Dihewsonj","Rudrailhik","Tweretnort","Snatreetze","Iwundaracos","Digarlewena","Erquagsta","Logovoloin","Boyaghosganh","Kuolungau","Pehneldept","Yevettiiqidcon","Sahliacabru","Noggalterpor","Chmageaki","Veticueca","Vittesbursul","Nootanore","Innebdjerah","Kisvarcini","Cuzcogipper","Pamanhermonsu","Brotoghek","Mibittara","Huruahili","Raldwicarn","Ezdartlic","Badesclema","Isenkeyan","Iadoitesu","Yagrovoisi","Ewcomechio","Inunnunnoda","Dischiutun","Yuwarugha","Ialmendra","Reponudrle","Rinjanagrbo","Zeziceloh","Oeileutasc","Zicniijinis","Dugnowarilda","Neuxoisan","Ilmenhorn","Rukwatsuku","Nepitzaspru","Chcehoemig","Haffneyrin","Uliciawai","Tuhgrespod","Iousongola"];
+
+var STAR_TYPES=[
+  {k:"yellow",w:55,cls:["F","G"],col:0xffe08a},
+  {k:"red",   w:25,cls:["K","M"],col:0xff7a4a},
+  {k:"green", w:6, cls:["E"],    col:0x6bffa8},
+  {k:"blue",  w:9, cls:["B","O"],col:0x6ba8ff},
+  {k:"purple",w:5, cls:["X","Y"],col:0xc78aff}
+];
+var ODDS={yellow:{out:.25,unc:0,aba:0},red:{out:.50,unc:.95,aba:0},
+  green:{out:.15,unc:.40,aba:.10},blue:{out:.15,unc:.40,aba:.10},purple:{out:.15,unc:.40,aba:.10}};
+var RACES=["Gek","Vy'keen","Korvax"];
+var ECON=[
+  ["Trading",["Mercantile","Trading","Shipping","Commercial"]],
+  ["Advanced Materials",["Material Fusion","Alchemical","Metal Processing","Ore Processing"]],
+  ["Scientific",["Research","Scientific","Experimental","Mathematical"]],
+  ["Mining",["Mining","Minerals","Ore Extraction","Prospecting"]],
+  ["Manufacturing",["Manufacturing","Industrial","Construction","Mass Production"]],
+  ["Technology",["High Tech","Technology","Nano-construction","Engineering"]],
+  ["Power Generation",["Power Generation","Energy Supply","Fuel Generation","High Voltage"]]
+];
+var ECON_S=[
+  ["Declining","Destitute","Failing","Fledgling","Low Supply","Struggling","Unsuccessful","Unpromising"],
+  ["Adequate","Balanced","Comfortable","Developing","Medium Supply","Promising","Satisfactory","Sustainable"],
+  ["Advanced","Affluent","Booming","Flourishing","High Supply","Opulent","Prosperous","Wealthy"]
+];
+var CONFLICT=[
+  ["Gentle","Low","Mild","Peaceful","Relaxed","Stable","Tranquil","Trivial","Unthreatening","Untroubled"],
+  ["Belligerent","Boisterous","Fractious","Intermittent","Medium","Rowdy","Sporadic","Testy","Unruly","Unstable"],
+  ["Aggressive","Alarming","At War","Critical","Dangerous","Destructive","Formidable","High","Lawless","Perilous","Pirate Controlled"]
+];
+
+/* original icon marks — drawn for this project, not lifted from the game */
+function svg(inner,col){
+  return '<svg viewBox="0 0 24 24" style="color:'+(col||"var(--cyan)")+'" stroke-width="1.7">'+inner+'</svg>';
+}
+var IC_RACE={
+  "Gek":"icons-web/race-gek.png",
+  "Vy'keen":"icons-web/race-vykeen.png",
+  "Korvax":"icons-web/race-korvax.png"
+};
+var IC_ECON={
+  "Trading":"icons-web/econ-trading.png",
+  "Advanced Materials":"icons-web/econ-advanced-materials.png",
+  "Scientific":"icons-web/econ-scientific.png",
+  "Mining":"icons-web/econ-mining.png",
+  "Manufacturing":"icons-web/econ-manufacturing.png",
+  "Technology":"icons-web/econ-technology.png",
+  "Power Generation":"icons-web/econ-power-generation.png"
+};
+var ECON_COL={
+  "Trading":"#00af50","Advanced Materials":"#7030a1","Scientific":"#0270c1",
+  "Mining":"#fd9900","Manufacturing":"#f0e900","Technology":"#94cdde",
+  "Power Generation":"#fe0000"
+};
+var IC_UNINHAB='<circle cx="12" cy="12" r="8.2" stroke-dasharray="2.6 3"/><path d="M8.4 12h7.2"/>';
+function raceIcon(race){
+  if(IC_RACE[race]) return '<img class="icimg" src="'+IC_RACE[race]+'" alt="'+race+'">';
+  return svg(IC_UNINHAB);
+}
+function econIcon(type){
+  var c=ECON_COL[type]||"#00e5ff";
+  return '<img class="icimg tint" style="filter:drop-shadow(0 0 5px '+c+')" src="'+
+         IC_ECON[type]+'" alt="'+type+'">';
+}
+var IC_CONFLICT='<path d="M4 4.2 14.4 14.6M20 4.2 9.6 14.6M4.6 19.4l4-4M19.4 19.4l-4-4"/><circle cx="12" cy="12" r="0.9" fill="currentColor" stroke="none"/>';
+var IC_BIOME='<circle cx="12" cy="12" r="8.4"/><path d="M3.6 12h16.8M12 3.6c2.7 2.7 2.7 14.1 0 16.8M12 3.6c-2.7 2.7-2.7 14.1 0 16.8"/>';
+var IC_RES='<path d="M12 3.4 20.2 9l-2.6 11.4H6.4L3.8 9Z"/><path d="M3.8 9h16.4M8.6 9 12 3.4l3.4 5.6M6.4 20.4 8.6 9M17.6 20.4 15.4 9"/>';
+var CONFLICT_COL=["#6bffa8","#f0a500","#ff5a4a"];
+
+var BIOMES={
+  "Lush":       {base:"#1d5f31",land:["#2f8f45","#3fa855","#256b30","#6f9438"],sea:"#12406e",cap:"#dce9f4",water:true, atmo:0x6fd8ff, res:["Paraffinium","Star Bulb","Nitrogen"]},
+  "Barren":     {base:"#8a6a42",land:["#a9834f","#7a5c39","#c19a63","#6b4f31"],sea:"#2b4c5c",cap:"#cdbb9c",water:true, atmo:0xffcf8a, res:["Pyrite","Cactus Flesh","Sulphurine"]},
+  "Dead":       {base:"#6a6a6a",land:["#7e7e7e","#5a5a5a","#909090","#4a4a4a"],sea:null,     cap:"#8a8a8a",water:false,atmo:0, res:["Rusted Metal"]},
+  "Exotic":     {base:"#3a2a55",land:["#5a3f7a","#2b1e40","#7a4f9a","#241a38"],sea:null,     cap:"#4a3a66",water:false,atmo:0, res:null},
+  "Mega Exotic":{base:"#7a2f2f",land:["#a34040","#5a2222","#c05a3a","#481919"],sea:"#3a2a4a",cap:"#c9a0a0",water:true, atmo:0xff8a6a, res:null},
+  "Scorched":   {base:"#4a2418",land:["#6b3320","#341a12","#8a4526","#26120c"],sea:"#3a2a1a",cap:"#7a4a2a",water:true, atmo:0xff9a4a,glow:"#ff7b2a", res:["Phosphorus","Solanium","Sulphurine"]},
+  "Frozen":     {base:"#c6dced",land:["#e8f4ff","#a9c8dd","#ffffff","#8fb4cc"],sea:"#3f6f8f",cap:"#ffffff",water:true, atmo:0xbfe6ff, res:["Dioxite","Frost Crystal","Radon"]},
+  "Toxic":      {base:"#49591f",land:["#6b7a2a","#333f18","#8a9a35","#232c10"],sea:"#3f4a1a",cap:"#9aa86a",water:true, atmo:0xc8ff4a,glow:"#c8ff4a", res:["Ammonia","Fungal Mould","Nitrogen"]},
+  "Irradiated": {base:"#2c5638",land:["#3f7a4a","#1e3f28","#5a9a5a","#16301d"],sea:"#20404a",cap:"#8fbf9a",water:true, atmo:0x7bff8a,glow:"#7bff8a", res:["Uranium","Gamma Root","Radon"]},
+  "Marsh":      {base:"#38473a",land:["#4f6b4a","#2a3a2a","#66805a","#1e2a1e"],sea:"#2f4a4a",cap:"#9aa89a",water:true, atmo:0x9ad8b0, res:null},
+  "Volcanic":   {base:"#241a18",land:["#3a2a24","#140f0e","#4a3028","#0d0908"],sea:"#2a1a14",cap:"#5a4a44",water:true, atmo:0xff6a3a,glow:"#ff4a1a", res:null}
+};
+var BIOME_KEYS=Object.keys(BIOMES);
+/* Sourced (nomanssky.fandom.com/wiki/Resource, wiki/Biome, /wiki/System_colours): Lush/Barren/Scorched/
+   Frozen/Toxic/Irradiated have fixed [local element, agricultural, atmospheric] resources; Dead has only
+   a local element, no agri/atmo. Exotic/Mega Exotic/Marsh/Volcanic are documented as inconsistent/
+   undocumented on the wiki -- res:null rather than guessing. Universal elements can appear on any planet.
+   Stellar element is set by the star's colour, confirmed per colour (purple = Quartzite). */
+var UNIVERSAL_EL=["Cobalt","Silver","Gold","Magnetised Ferrite","Salt","Sodium"];
+var STELLAR_EL={yellow:"Copper",red:"Cadmium",green:"Emeril",blue:"Indium",purple:"Quartzite"};
+var TERRAIN=["Pangean","Continental","Riverland","Wetlands","Swamp","Archipelago","Island Chains","Oceanic","Reef"];
+var SYL_A=["Ok","Ux","Ya","Ze","Hu","Ig","Ba","Vy","Ne","Qo","Ri","Ta","El","Mu","Su","Ka"];
+var SYL_B=["ra","lo","ni","tak","ves","mor","dun","phi","gal","ren","sup","yak","del","onu","cor","wex"];
+var SYL_C=["","-I","-II","-III","-IV","-IX","-XI","-XV","us","ar","on","ix","eth","um"];
+
+/* ============ rng ============ */
+var GALAXY=0;
+function h32(x,y,z,i){
+  var h=2166136261>>>0,v=[x|0,y|0,z|0,i|0],k,b;
+  for(k=0;k<4;k++) for(b=0;b<4;b++){ h^=((v[k]>>>(b*8))&0xff); h=Math.imul(h,16777619)>>>0; }
+  return h>>>0;
+}
+function gseed(x,y,z,i){ return (h32(x,y,z,i) ^ Math.imul(GALAXY+1,2654435761))>>>0; }
+function mulberry32(a){
+  return function(){
+    a|=0; a=(a+0x6D2B79F5)|0;
+    var t=Math.imul(a^(a>>>15),1|a);
+    t=(t+Math.imul(t^(t>>>7),61|t))^t;
+    return ((t^(t>>>14))>>>0)/4294967296;
+  };
+}
+function pickOne(r,arr){ return arr[Math.floor(r()*arr.length)]; }
+function galaxyType(n){
+  var m=(n+1)%20;
+  if(m===7||m===12) return {k:"Empty",c:"#6ba8ff",names:["Ancestral","Frozen","Exhausted","Silent"]};
+  if(m===3||m===15) return {k:"Harsh",c:"#ff7a4a",names:["Burning","Raging","Relentless","Ruthless"]};
+  if(m===10||m===19) return {k:"Lush",c:"#6bffa8",names:["Halcyon","Inspiring","Serene","Tranquil"]};
+  return {k:"Norm",c:"#00e5ff",names:["Imperfect","Improved","Parallel","Rebuilt"]};
+}
+
+/* ============ address maths ============ */
+function toSigned(v,size){ var half=size/2; return v<half?v:v-size; }
+function toRaw(s,size){ return s<0?s+size:s; }
+function hex(n,w){ var s=n.toString(16).toUpperCase(); while(s.length<w) s="0"+s; return s; }
+function cleanHex(str){ return (str||"").trim().toUpperCase().replace(/[^0-9A-F]/g,""); }
+function parseAddress(str){
+  var a=cleanHex(str);
+  if(a.length!==12) return null;
+  return {p:parseInt(a[0],16),idx:parseInt(a.slice(1,4),16),
+    y:toSigned(parseInt(a.slice(4,6),16),SIZE_Y),
+    z:toSigned(parseInt(a.slice(6,9),16),SIZE_XZ),
+    x:toSigned(parseInt(a.slice(9,12),16),SIZE_XZ)};
+}
+function formatAddress(p,idx,x,y,z){
+  return hex(p&0xF,1)+hex(idx&0xFFF,3)+hex(toRaw(y,SIZE_Y)&0xFF,2)+
+         hex(toRaw(z,SIZE_XZ)&0xFFF,3)+hex(toRaw(x,SIZE_XZ)&0xFFF,3);
+}
+function glyphSrc(ch){ return "glyphs/glyph-mask-"+ch+".png"; }
+/* every region is ~400 ly across, so voxel distance x 400 = light years */
+function coreLY(vx,vy,vz){ return Math.round(Math.sqrt(vx*vx+vy*vy+vz*vz)*LY_PER_VOXEL); }
+function commas(n){ return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g,","); }
+function bearingOf(dx,dz,dy){
+  /* wiki compass, clockwise: north, beta, east, delta, south, gamma, west, alpha */
+  var names=["north","beta","east","delta","south","gamma","west","alpha"];
+  var ang=Math.atan2(dx,-dz);
+  if(ang<0) ang+=Math.PI*2;
+  var oct=Math.round(ang/(Math.PI/4))%8;
+  var vert = dy>0.15 ? " majoris" : (dy<-0.15 ? " minoris" : "");
+  return names[oct]+vert;
+}
+
+/* ============ generators ============ */
+function nameFrom(seed){ var r=mulberry32(seed); return pickOne(r,SYL_A)+pickOne(r,SYL_B)+pickOne(r,SYL_C); }
+function regionName(vx,vy,vz){
+  var r=mulberry32(gseed(vx,vy,vz,0x5EED));
+  var tail=["Anomaly","Fringe","Mass","Conflux","Expanse","Void","Sector","Cluster","Nebula","Reach"];
+  return (pickOne(r,SYL_A)+pickOne(r,SYL_B)+" "+pickOne(r,tail)).toUpperCase();
+}
+function regionCount(vx,vy,vz){ var r=mulberry32(gseed(vx,vy,vz,0xC017)); return 122+Math.floor(r()*458); }
+function weightedStar(r){
+  var tot=0,i;
+  for(i=0;i<STAR_TYPES.length;i++) tot+=STAR_TYPES[i].w;
+  var v=r()*tot;
+  for(i=0;i<STAR_TYPES.length;i++){ v-=STAR_TYPES[i].w; if(v<=0) return STAR_TYPES[i]; }
+  return STAR_TYPES[0];
+}
+function generateSystem(vx,vy,vz,idx){
+  var r=mulberry32(gseed(vx,vy,vz,idx)), st=weightedStar(r), s={}, i;
+  s.vx=vx; s.vy=vy; s.vz=vz; s.idx=idx; s.galaxy=GALAXY;
+  s.blackHole=(idx===0x079); s.atlas=(idx===0x07A);
+  s.type=st.k; s.color=st.col;
+  s.spectral=pickOne(r,st.cls)+Math.floor(r()*10)+pickOne(r,["","","","f","p","pf"]);
+  s.water=r()<0.18; s.dissonant=r()<0.10;
+  var sc=r(); s.stars = sc<0.80?1:(sc<0.95?2:3);
+  /* binary and ternary systems: each star a different colour */
+  s.starColors=[st.col];
+  s.starTypes=[st.k];
+  var pool=[];
+  for(i=0;i<STAR_TYPES.length;i++) if(STAR_TYPES[i].k!==st.k) pool.push(STAR_TYPES[i]);
+  for(i=1;i<s.stars;i++){
+    var pi2=Math.floor(r()*pool.length);
+    var pick=pool.splice(pi2,1)[0];
+    s.starColors.push(pick.col); s.starTypes.push(pick.k);
+  }
+  s.name=nameFrom(gseed(vx,vy,vz,idx^0xABCD));
+  s.region=regionName(vx,vy,vz);
+  var o=ODDS[st.k];
+  s.uncharted=r()<o.unc;
+  s.abandoned=!s.uncharted&&(r()<o.aba);
+  s.outlaw=!s.uncharted&&(r()<o.out);
+  s.race=(s.uncharted||s.abandoned)?"Uninhabited":pickOne(r,RACES);
+  var e=pickOne(r,ECON);
+  s.econType=e[0]; s.econName=pickOne(r,e[1]);
+  var tr=r(); s.econTier=tr<0.45?0:(tr<0.85?1:2);
+  s.econDesc=pickOne(r,ECON_S[s.econTier]);
+  s.sell=Math.min(80,[5+r()*30,30+r()*30,55+r()*25][s.econTier]).toFixed(1);
+  s.buy=(-(5+r()*25)).toFixed(1);
+  var cr=r(); s.conTier=cr<0.45?0:(cr<0.82?1:2);
+  s.conflict=pickOne(r,CONFLICT[s.conTier]);
+
+  var total=2+Math.floor(r()*5); if(total>6) total=6;
+  s.bodies=[]; s.planets=0; s.moons=0;
+  for(var pi=0; pi<total; pi++){
+    var br=mulberry32(gseed(vx,vy,vz,(idx<<4)^(pi+7)));
+    var isMoon = pi>0 && br()<0.28 && s.bodies.length>0;
+    var biome=pickOne(br,BIOME_KEYS);
+    var bd=BIOMES[biome];
+    var canWater = bd.water && !isMoon;
+    var hasWater = canWater && br()<0.62;
+    var resUni=[UNIVERSAL_EL[Math.floor(br()*UNIVERSAL_EL.length)]];
+    var resU2=UNIVERSAL_EL[Math.floor(br()*UNIVERSAL_EL.length)];
+    if(resU2!==resUni[0]) resUni.push(resU2);
+    s.bodies.push({
+      index:pi+1, moon:isMoon,
+      parent:isMoon?s.bodies[s.bodies.length-1].index:0,
+      name:nameFrom(gseed(vx,vy,vz,(idx*31)+pi)),
+      biome:biome, terrain:hasWater?pickOne(br,TERRAIN.slice(1)):"Pangean", water:hasWater,
+      size:isMoon?(0.34+br()*0.22):(0.68+br()*0.62),
+      tilt:(br()-0.5)*0.7, spin:0.15+br()*0.5,
+      resUni:resUni,
+      seed:gseed(vx,vy,vz,(idx*57)+pi)
+    });
+    if(isMoon) s.moons++; else s.planets++;
+  }
+  s.address=formatAddress(1,idx,vx,vy,vz);
+  s.coreLY=coreLY(vx,vy,vz);
+  applyOverride(s);
+  return s;
+}
+
+/* ============ shared community overrides ============ */
+/* Loaded once from the Netlify Function (which itself reads a JSON file
+   kept in a GitHub repo -- see netlify/functions/system-edit.mjs). Layered
+   over the procedural output so a system a player has entered real
+   in-game data for shows that data to every visitor, not just locally. */
+var FUNC_URL="/.netlify/functions/system-edit";
+var OVERRIDES={systems:{}};
+function applyOverride(s){
+  var ov=OVERRIDES.systems && OVERRIDES.systems[s.address];
+  if(!ov || !ov.data) return s;
+  var d=ov.data;
+  s.override=true;
+  s.overrideAt=ov.editedAt;
+  if(d.name) s.name=d.name;
+  if(d.race) s.race=d.race;
+  if(d.econName) s.econName=d.econName;
+  if(d.conflict) s.conflict=d.conflict;
+  s.publicNotes=d.notes||"";
+  if(d.bodies && d.bodies.length){
+    var orig=s.bodies, out=[], planetIdx=0, lastPlanetIndex=0;
+    for(var i=0;i<d.bodies.length && i<6;i++){
+      var b=d.bodies[i]||{};
+      var o=orig[i]; /* reuse the procedural body's rendering-only fields (size/tilt/spin/seed) when one exists at this slot, purely cosmetic, never shown to the player */
+      var biome=BIOMES[b.biome]?b.biome:(o?o.biome:"Lush");
+      var isMoon=!!b.moon && i>0;
+      var idx1=i+1;
+      out.push({
+        index:idx1,
+        moon:isMoon,
+        parent:isMoon?lastPlanetIndex:0,
+        name:(b.name&&b.name.trim())||(o?o.name:"Unnamed"),
+        biome:biome,
+        terrain:o?o.terrain:"Pangean",
+        water:!!b.water,
+        size:o?o.size:(isMoon?0.42:0.85),
+        tilt:o?o.tilt:((i%2?1:-1)*(0.1+0.05*i)),
+        spin:o?o.spin:0.3,
+        resUni:(b.resources&&b.resources.length)?b.resources.slice(0,6):(o?o.resUni:[]),
+        seed:o?o.seed:gseed(s.vx,s.vy,s.vz,(s.idx*57)+i)
+      });
+      if(!isMoon) lastPlanetIndex=idx1;
+    }
+    s.bodies=out;
+    s.planets=0; s.moons=0;
+    for(i=0;i<out.length;i++){ if(out[i].moon) s.moons++; else s.planets++; }
+  }
+  return s;
+}
+function loadOverrides(){
+  fetch(FUNC_URL,{method:"GET"}).then(function(r){
+    if(!r.ok) throw new Error("status "+r.status);
+    return r.json();
+  }).then(function(data){
+    if(!data || !data.ok) return;
+    OVERRIDES.systems=data.systems||{};
+    if(Object.keys(OVERRIDES.systems).length) refreshAfterOverrides();
+  }).catch(function(){
+    /* Shared edits are a nice-to-have layer -- if the Function isn't set up yet
+       (no GITHUB_TOKEN, not deployed via GitHub yet, etc.) the map must still
+       work exactly as before with procedural-only data. Fail silently. */
+  });
+}
+/* Re-applies overrides to whatever is already generated, without disturbing
+   camera position, selection, or mode -- called once after loadOverrides()
+   resolves (normally within a second of page load). */
+function refreshAfterOverrides(){
+  if(focusSystem) focusSystem=generateSystem(focusSystem.vx,focusSystem.vy,focusSystem.vz,focusSystem.idx);
+  generateSlice(focusSystem?focusSystem.idx:null);
+  if(selected){
+    var fresh=null;
+    for(var i=0;i<allSystems.length;i++) if(allSystems[i].address===selected.address){ fresh=allSystems[i]; break; }
+    if(fresh){ selected=fresh; if(document.getElementById("pBody").style.display==="none") updatePanel(selected); }
+  }
+}
+
+/* ============ storage ============ */
+var STORE_K="nms-galmap-logs";
+var store={notes:{},marks:{}};
+function skey(s){ return s.galaxy+":"+s.address; }
+function loadStore(){
+  try{
+    var raw=localStorage.getItem(STORE_K);
+    if(raw){ var o=JSON.parse(raw); store.notes=o.notes||{}; store.marks=o.marks||{}; }
+  }catch(err){ store={notes:{},marks:{}}; }
+}
+function saveStore(){
+  try{ localStorage.setItem(STORE_K,JSON.stringify(store)); }
+  catch(err){ toast("Could not save locally"); }
+}
+function toast(msg){
+  var t=document.getElementById("toast");
+  t.textContent=msg; t.style.display="block";
+  clearTimeout(toast._t);
+  toast._t=setTimeout(function(){ t.style.display="none"; },1800);
+}
+
+/* ============ three setup ============ */
+var canvas=document.getElementById("c");
+var renderer=new THREE.WebGLRenderer({canvas:canvas,antialias:false,alpha:false});
+renderer.setClearColor(0x04060a,1);
+var scene=new THREE.Scene();
+var camera=new THREE.PerspectiveCamera(58,1,0.1,5000);
+var galaxyGroup=new THREE.Group(), localGroup=new THREE.Group(), systemGroup=new THREE.Group();
+scene.add(galaxyGroup); scene.add(localGroup); scene.add(systemGroup);
+var starLight=new THREE.PointLight(0xffffff,1.8,0,2);
+var ambient=new THREE.AmbientLight(0xffffff,0.16);
+scene.add(starLight); scene.add(ambient);
+
+function makeSprite(){
+  var cv=document.createElement("canvas"); cv.width=64; cv.height=64;
+  var g=cv.getContext("2d");
+  var grd=g.createRadialGradient(32,32,0,32,32,32);
+  grd.addColorStop(0,"rgba(255,255,255,1)");
+  grd.addColorStop(0.22,"rgba(255,255,255,0.8)");
+  grd.addColorStop(0.55,"rgba(255,255,255,0.2)");
+  grd.addColorStop(1,"rgba(255,255,255,0)");
+  g.fillStyle=grd; g.fillRect(0,0,64,64);
+  var t=new THREE.Texture(cv); t.needsUpdate=true; return t;
+}
+var SPRITE=makeSprite();
+
+/* corona with rays, used as the billboard glow around a star */
+function makeCorona(){
+  var S=256;
+  var cv=document.createElement("canvas"); cv.width=S; cv.height=S;
+  var g=cv.getContext("2d"), c=S/2, i;
+  var grd=g.createRadialGradient(c,c,0,c,c,c);
+  grd.addColorStop(0,"rgba(255,255,255,0.95)");
+  grd.addColorStop(0.10,"rgba(255,255,255,0.55)");
+  grd.addColorStop(0.30,"rgba(255,255,255,0.16)");
+  grd.addColorStop(0.65,"rgba(255,255,255,0.04)");
+  grd.addColorStop(1,"rgba(255,255,255,0)");
+  g.fillStyle=grd; g.fillRect(0,0,S,S);
+  g.globalCompositeOperation="lighter";
+  var r=mulberry32(4242);
+  for(i=0;i<28;i++){
+    var a=(i/28)*Math.PI*2+r()*0.12;
+    var len=c*(0.42+r()*0.55);
+    var wid=1.2+r()*3.2;
+    g.save(); g.translate(c,c); g.rotate(a);
+    var lg=g.createLinearGradient(0,0,len,0);
+    lg.addColorStop(0,"rgba(255,255,255,0.42)");
+    lg.addColorStop(1,"rgba(255,255,255,0)");
+    g.fillStyle=lg; g.fillRect(0,-wid/2,len,wid);
+    g.restore();
+  }
+  /* two long spikes for a lens-flare feel */
+  for(i=0;i<2;i++){
+    g.save(); g.translate(c,c); g.rotate(i*Math.PI/2);
+    var lg2=g.createLinearGradient(-c,0,c,0);
+    lg2.addColorStop(0,"rgba(255,255,255,0)");
+    lg2.addColorStop(0.5,"rgba(255,255,255,0.5)");
+    lg2.addColorStop(1,"rgba(255,255,255,0)");
+    g.fillStyle=lg2; g.fillRect(-c,-1.6,S,3.2);
+    g.restore();
+  }
+  var t=new THREE.Texture(cv); t.needsUpdate=true; return t;
+}
+var CORONA=makeCorona();
+
+function makeCloud(seed){
+  var cv=document.createElement("canvas"); cv.width=160; cv.height=160;
+  var g=cv.getContext("2d"), r=mulberry32(seed), i;
+  g.globalCompositeOperation="lighter";
+  for(i=0;i<16;i++){
+    var cx=40+r()*80, cy=40+r()*80, rad=18+r()*46;
+    var grd=g.createRadialGradient(cx,cy,0,cx,cy,rad);
+    var a=0.10+r()*0.16;
+    grd.addColorStop(0,"rgba(255,255,255,"+a.toFixed(3)+")");
+    grd.addColorStop(0.5,"rgba(255,255,255,"+(a*0.42).toFixed(3)+")");
+    grd.addColorStop(1,"rgba(255,255,255,0)");
+    g.fillStyle=grd; g.beginPath(); g.arc(cx,cy,rad,0,Math.PI*2); g.fill();
+  }
+  g.globalCompositeOperation="destination-in";
+  var fade=g.createRadialGradient(80,80,10,80,80,80);
+  fade.addColorStop(0,"rgba(255,255,255,1)");
+  fade.addColorStop(0.65,"rgba(255,255,255,0.85)");
+  fade.addColorStop(1,"rgba(255,255,255,0)");
+  g.fillStyle=fade; g.fillRect(0,0,160,160);
+  var t=new THREE.Texture(cv); t.needsUpdate=true; return t;
+}
+var CLOUDS=[makeCloud(11),makeCloud(29),makeCloud(47),makeCloud(83)];
+
+function makePlanetTexture(b){
+  var W=256,H=128;
+  var cv=document.createElement("canvas"); cv.width=W; cv.height=H;
+  var g=cv.getContext("2d"), r=mulberry32(b.seed), i, k;
+  var pal=BIOMES[b.biome];
+  g.fillStyle=(b.water&&pal.sea)?pal.sea:pal.base;
+  g.fillRect(0,0,W,H);
+  var blobs=b.water?90:150;
+  for(i=0;i<blobs;i++){
+    var x=r()*W, y=r()*H;
+    var rad=(4+r()*24)*(0.45+Math.sin(y/H*Math.PI)*0.85);
+    g.fillStyle=pal.land[Math.floor(r()*pal.land.length)];
+    g.globalAlpha=0.32+r()*0.5;
+    var rx=rad*(0.7+r()*0.9), ry=rad*(0.45+r()*0.5), rot=r()*Math.PI;
+    g.beginPath(); g.ellipse(x,y,rx,ry,rot,0,Math.PI*2); g.fill();
+    if(x<rx){ g.beginPath(); g.ellipse(x+W,y,rx,ry,rot,0,Math.PI*2); g.fill(); }
+    if(x>W-rx){ g.beginPath(); g.ellipse(x-W,y,rx,ry,rot,0,Math.PI*2); g.fill(); }
+  }
+  g.globalAlpha=1;
+  if(b.biome==="Dead"||b.biome==="Exotic"){
+    for(i=0;i<46;i++){
+      var cx=r()*W, cy=r()*H, cr=1.5+r()*7;
+      g.strokeStyle="rgba(0,0,0,0.42)"; g.lineWidth=1.4;
+      g.beginPath(); g.arc(cx,cy,cr,0,Math.PI*2); g.stroke();
+      g.fillStyle=(b.biome==="Exotic")?"rgba(0,0,0,0.5)":"rgba(255,255,255,0.09)";
+      g.beginPath(); g.arc(cx,cy,cr*0.8,0,Math.PI*2); g.fill();
+    }
+  }
+  if(pal.glow){
+    g.strokeStyle=pal.glow; g.lineWidth=1.2; g.globalAlpha=0.5;
+    for(i=0;i<26;i++){
+      var sx=r()*W, sy=r()*H;
+      g.beginPath(); g.moveTo(sx,sy);
+      for(k=0;k<5;k++){ sx+=(r()-0.5)*26; sy+=(r()-0.5)*14; g.lineTo(sx,sy); }
+      g.stroke();
+    }
+    if(b.biome==="Irradiated"){
+      for(i=0;i<14;i++){
+        var ax=r()*W, ay=r()*H, arr=3+r()*9;
+        g.beginPath(); g.arc(ax,ay,arr,0,Math.PI*1.6); g.stroke();
+      }
+    }
+    g.globalAlpha=1;
+  }
+  if(pal.cap){
+    var cg=g.createLinearGradient(0,0,0,H*0.19);
+    cg.addColorStop(0,pal.cap); cg.addColorStop(1,"rgba(255,255,255,0)");
+    g.fillStyle=cg; g.fillRect(0,0,W,H*0.19);
+    var cg2=g.createLinearGradient(0,H,0,H*0.81);
+    cg2.addColorStop(0,pal.cap); cg2.addColorStop(1,"rgba(255,255,255,0)");
+    g.fillStyle=cg2; g.fillRect(0,H*0.81,W,H*0.19);
+  }
+  var t=new THREE.CanvasTexture(cv); t.needsUpdate=true; return t;
+}
+
+var galPts=null, locPts=null, nebulaGroup=new THREE.Group(), coreMesh=null, courseLine=null;
+var voxGrid=null, galMarks=null, gridOn=true;
+var selRing=null, focusRing=null;
+galaxyGroup.add(nebulaGroup);
+var allSystems=[], shown=[];
+var focus={x:0,y:0,z:0}, focusSystem=null, courseTarget=null;
+var mode="galaxy", ctrl="orbit", selected=null, labelsOn=false;
+
+var marker=new THREE.Mesh(new THREE.RingGeometry(3.0,4.0,32),
+  new THREE.MeshBasicMaterial({color:0xf0a500,side:THREE.DoubleSide,transparent:true,opacity:0.95}));
+galaxyGroup.add(marker);
+function voxelToGalaxy(x,y,z){ return new THREE.Vector3((x/2048)*GAL_R,(y/128)*GAL_H,(z/2048)*GAL_R); }
+
+selRing=new THREE.Mesh(new THREE.RingGeometry(0.85,1.05,40),
+  new THREE.MeshBasicMaterial({color:0xf0a500,side:THREE.DoubleSide,transparent:true,
+    opacity:0.95,depthWrite:false,blending:THREE.AdditiveBlending}));
+selRing.visible=false; localGroup.add(selRing);
+focusRing=new THREE.Mesh(new THREE.RingGeometry(1.5,1.72,44),
+  new THREE.MeshBasicMaterial({color:0x00e5ff,side:THREE.DoubleSide,transparent:true,
+    opacity:0.75,depthWrite:false,blending:THREE.AdditiveBlending}));
+focusRing.visible=false; localGroup.add(focusRing);
+
+/* lattice of region boundaries — one cube per voxel, ~400 ly across */
+function buildVoxelGrid(){
+  if(voxGrid){ localGroup.remove(voxGrid); voxGrid.geometry.dispose(); voxGrid.material.dispose(); voxGrid=null; }
+  if(!gridOn) return;
+  var R=parseInt(document.getElementById("sR").value,10);
+  var lo=-(R+0.5)*VOX_U, n=2*R+2, pts=[], i, j, a, b;
+  for(i=0;i<n;i++) for(j=0;j<n;j++){
+    a=lo+i*VOX_U; b=lo+j*VOX_U;
+    pts.push(lo,a,b, lo+(n-1)*VOX_U,a,b);
+    pts.push(a,lo,b, a,lo+(n-1)*VOX_U,b);
+    pts.push(a,b,lo, a,b,lo+(n-1)*VOX_U);
+  }
+  var g=new THREE.BufferGeometry();
+  g.setAttribute("position",new THREE.BufferAttribute(new Float32Array(pts),3));
+  voxGrid=new THREE.LineSegments(g,new THREE.LineBasicMaterial({
+    color:0x00e5ff,transparent:true,opacity:0.10,depthWrite:false}));
+  localGroup.add(voxGrid);
+}
+
+/* galaxy view is a backdrop, so give it real markers to look at */
+function buildGalaxyMarks(){
+  if(galMarks){ galaxyGroup.remove(galMarks); galMarks.geometry.dispose(); galMarks.material.dispose(); galMarks=null; }
+  var keys=Object.keys(store.marks), pts=[], cols=[], i, v;
+  for(i=0;i<keys.length;i++){
+    var parts=keys[i].split(":");
+    if(parseInt(parts[0],10)!==GALAXY) continue;
+    var a=parseAddress(parts[1]);
+    if(!a) continue;
+    v=voxelToGalaxy(a.x,a.y,a.z);
+    pts.push(v.x,v.y,v.z); cols.push(0,0.9,1);
+  }
+  if(courseTarget){
+    v=voxelToGalaxy(courseTarget.vx,courseTarget.vy,courseTarget.vz);
+    pts.push(v.x,v.y,v.z); cols.push(1,0.65,0);
+  }
+  if(!pts.length) return;
+  var g=new THREE.BufferGeometry();
+  g.setAttribute("position",new THREE.BufferAttribute(new Float32Array(pts),3));
+  g.setAttribute("color",new THREE.BufferAttribute(new Float32Array(cols),3));
+  galMarks=new THREE.Points(g,new THREE.PointsMaterial({size:7,map:SPRITE,vertexColors:true,
+    transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,sizeAttenuation:false}));
+  galaxyGroup.add(galMarks);
+}
+
+/* ============ galaxy ============ */
+function armPos(r,arms,tw,t){
+  var arm=Math.floor(r()*arms);
+  var rad=CORE_R+t*(GAL_R-CORE_R);
+  var spread=(1-t)*0.5+0.09;
+  var jit=(r()+r()+r()-1.5)*spread;
+  return {ang:arm*(Math.PI*2/arms)+t*tw+jit, rad:rad};
+}
+function buildNebula(){
+  while(nebulaGroup.children.length){
+    var ch=nebulaGroup.children.pop();
+    if(ch.geometry) ch.geometry.dispose();
+    if(ch.material) ch.material.dispose();
+  }
+  var N=parseInt(document.getElementById("sNeb").value,10);
+  var csz=parseFloat(document.getElementById("sCsz").value);
+  var arms=parseInt(document.getElementById("sArm").value,10);
+  var tw=parseFloat(document.getElementById("sTw").value);
+  var th=parseFloat(document.getElementById("sTh").value);
+  var gt=galaxyType(GALAXY);
+  var r=mulberry32(0x51EB7A+GALAXY*7919), i;
+  var inner=[0xffb347,0xff8a3d,0xffd88a];
+  var mid = gt.k==="Harsh" ? [0xd94f2f,0xb03a2a,0xe07a3a,0xd9662a] :
+            gt.k==="Lush"  ? [0x3fd97a,0x2f9e5a,0x5ad98a,0x2a9e7a] :
+            gt.k==="Empty" ? [0x3a6fb0,0x2a4f80,0x4a8fd0,0x2f5f9a] :
+                             [0x2fd9c0,0x1f9e8f,0x3ad1a0,0x2a8fd9];
+  var outer=[0x4a6bd9,0x7a4ad9,0x9a5ad0,0x3a4a9a];
+  for(i=0;i<N;i++){
+    var t=Math.pow(r(),0.55);
+    var p=armPos(r,arms,tw,t);
+    var pal=(t<0.16)?inner:((t<0.62)?mid:outer);
+    var size=(26+r()*70)*csz*(0.55+t*0.9);
+    var m=new THREE.Mesh(new THREE.PlaneGeometry(size,size),
+      new THREE.MeshBasicMaterial({map:CLOUDS[Math.floor(r()*CLOUDS.length)],
+        color:pal[Math.floor(r()*pal.length)],transparent:true,opacity:0.085+r()*0.13,
+        blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide}));
+    m.position.set(Math.cos(p.ang)*p.rad,(r()+r()-1)*th*GAL_H*0.7,Math.sin(p.ang)*p.rad);
+    m.rotation.x=-Math.PI/2; m.rotation.z=r()*Math.PI*2;
+    nebulaGroup.add(m);
+  }
+  if(coreMesh){ galaxyGroup.remove(coreMesh); coreMesh.geometry.dispose(); coreMesh.material.dispose(); }
+  coreMesh=new THREE.Mesh(new THREE.PlaneGeometry(CORE_R*11,CORE_R*11),
+    new THREE.MeshBasicMaterial({map:CLOUDS[0],color:0xfff0c8,transparent:true,opacity:0.9,
+      blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide}));
+  coreMesh.rotation.x=-Math.PI/2;
+  galaxyGroup.add(coreMesh);
+}
+function buildGalaxy(){
+  if(galPts){ galaxyGroup.remove(galPts); galPts.geometry.dispose(); galPts.material.dispose(); galPts=null; }
+  var N=parseInt(document.getElementById("sGal").value,10);
+  var arms=parseInt(document.getElementById("sArm").value,10);
+  var tw=parseFloat(document.getElementById("sTw").value);
+  var th=parseFloat(document.getElementById("sTh").value);
+  var pos=new Float32Array(N*3), col=new Float32Array(N*3);
+  var r=mulberry32(0xC0FFEE+GALAXY*104729), c=new THREE.Color();
+  var palette=[0x9fe6ff,0xbfd4ff,0xffe9c0,0xffd08a,0xd8b8ff,0xa8ffd8,0xffffff];
+  for(var i=0;i<N;i++){
+    var t=Math.pow(r(),0.6);
+    var p=armPos(r,arms,tw,t);
+    pos[i*3]=Math.cos(p.ang)*p.rad+(r()-0.5)*2.5;
+    pos[i*3+1]=(r()+r()+r()-1.5)*th*GAL_H*(1-t*0.5);
+    pos[i*3+2]=Math.sin(p.ang)*p.rad+(r()-0.5)*2.5;
+    c.setHex(palette[Math.floor(r()*palette.length)]);
+    var b=0.4+(1-t)*0.6;
+    col[i*3]=c.r*b; col[i*3+1]=c.g*b; col[i*3+2]=c.b*b;
+  }
+  var g=new THREE.BufferGeometry();
+  g.setAttribute("position",new THREE.BufferAttribute(pos,3));
+  g.setAttribute("color",new THREE.BufferAttribute(col,3));
+  galPts=new THREE.Points(g,new THREE.PointsMaterial({size:1.25,map:SPRITE,vertexColors:true,
+    transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,sizeAttenuation:true,opacity:0.95}));
+  galaxyGroup.add(galPts);
+}
+
+/* ============ local slice ============ */
+function generateSlice(focusIdx){
+  var R=parseInt(document.getElementById("sR").value,10);
+  var per=parseInt(document.getElementById("sPer").value,10);
+  allSystems=[];
+  var dx,dy,dz,i;
+  for(dx=-R;dx<=R;dx++) for(dy=-R;dy<=R;dy++) for(dz=-R;dz<=R;dz++){
+    var vx=focus.x+dx, vy=focus.y+dy, vz=focus.z+dz;
+    var count=regionCount(vx,vy,vz);
+    var vr=mulberry32(gseed(vx,vy,vz,0xF00D));
+    var idxs=[0x079,0x07A];
+    /* the system you jumped to must always be in the slice, or nothing gets selected */
+    if(focusIdx!=null && dx===0 && dy===0 && dz===0 && idxs.indexOf(focusIdx)<0) idxs.push(focusIdx);
+    for(i=0;i<per;i++){
+      var pick=Math.floor(vr()*count);
+      if(idxs.indexOf(pick)<0) idxs.push(pick);
+    }
+    for(i=0;i<idxs.length;i++){
+      var idx=idxs[i];
+      var jr=mulberry32(gseed(vx,vy,vz,idx^0x9999));
+      var s=generateSystem(vx,vy,vz,idx);
+      s.px=(dx+jr()-0.5)*VOX_U; s.py=(dy+jr()-0.5)*VOX_U; s.pz=(dz+jr()-0.5)*VOX_U;
+      allSystems.push(s);
+    }
+  }
+  buildVoxelGrid();
+  if(allSystems.length>45000) toast("Heavy: "+allSystems.length.toLocaleString()+" systems");
+  applyFilter();
+}
+function passFilter(s){
+  var col=document.getElementById("fCol").value;
+  var race=document.getElementById("fRace").value;
+  var eco=document.getElementById("fEco").value;
+  if(col&&s.type!==col) return false;
+  if(race&&s.race!==race) return false;
+  if(eco&&s.econType!==eco) return false;
+  if(document.getElementById("fBH").checked&&!s.blackHole) return false;
+  if(document.getElementById("fAtl").checked&&!s.atlas) return false;
+  if(document.getElementById("fOut").checked&&!s.outlaw) return false;
+  if(document.getElementById("fMark").checked&&!store.marks[skey(s)]) return false;
+  return true;
+}
+function updateRings(){
+  if(focusSystem){ focusRing.position.set(focusSystem.px,focusSystem.py,focusSystem.pz); focusRing.visible=true; }
+  else focusRing.visible=false;
+  if(selected&&selected.px!==undefined){ selRing.position.set(selected.px,selected.py,selected.pz); selRing.visible=true; }
+  else selRing.visible=false;
+}
+function applyFilter(){
+  if(locPts){ localGroup.remove(locPts); locPts.geometry.dispose(); locPts.material.dispose(); locPts=null; }
+  shown=[];
+  var i;
+  for(i=0;i<allSystems.length;i++) if(passFilter(allSystems[i])) shown.push(allSystems[i]);
+  var n=shown.length;
+  document.getElementById("nsys").textContent=n;
+  document.getElementById("empty").style.display = (n===0&&mode==="local") ? "block" : "none";
+  if(n===0){ updateRings(); return; }
+  var pos=new Float32Array(n*3), col=new Float32Array(n*3), c=new THREE.Color();
+  for(i=0;i<n;i++){
+    var s=shown[i];
+    pos[i*3]=s.px; pos[i*3+1]=s.py; pos[i*3+2]=s.pz;
+    var hx=s.blackHole?0xffffff:(s.atlas?0xf0a500:s.color);
+    if(store.marks[skey(s)]) hx=0x00e5ff;
+    c.setHex(hx);
+    col[i*3]=c.r; col[i*3+1]=c.g; col[i*3+2]=c.b;
+  }
+  var g=new THREE.BufferGeometry();
+  g.setAttribute("position",new THREE.BufferAttribute(pos,3));
+  g.setAttribute("color",new THREE.BufferAttribute(col,3));
+  locPts=new THREE.Points(g,new THREE.PointsMaterial({
+    size:parseFloat(document.getElementById("sSz").value),map:SPRITE,vertexColors:true,
+    transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,sizeAttenuation:true}));
+  localGroup.add(locPts);
+  drawCourse();
+  updateRings();
+}
+
+/* ============ course plotting ============ */
+function clearCourseLine(){
+  if(courseLine){ localGroup.remove(courseLine); courseLine.geometry.dispose(); courseLine.material.dispose(); courseLine=null; }
+}
+function drawCourse(){
+  clearCourseLine();
+  if(!courseTarget||!focusSystem) return;
+  var g=new THREE.BufferGeometry();
+  g.setAttribute("position",new THREE.BufferAttribute(new Float32Array([
+    focusSystem.px,focusSystem.py,focusSystem.pz,
+    courseTarget.px,courseTarget.py,courseTarget.pz]),3));
+  courseLine=new THREE.Line(g,new THREE.LineDashedMaterial({
+    color:0xf0a500,dashSize:1.2,gapSize:0.8,transparent:true,opacity:0.85}));
+  courseLine.computeLineDistances();
+  localGroup.add(courseLine);
+}
+function setCourse(s){
+  if(!focusSystem){ toast("Jump somewhere first"); return; }
+  if(s.address===focusSystem.address){ toast("That is where you are — pick another star"); return; }
+  courseTarget=s;
+  var dvx=s.vx-focusSystem.vx, dvy=s.vy-focusSystem.vy, dvz=s.vz-focusSystem.vz;
+  var ly=Math.round(Math.sqrt(dvx*dvx+dvy*dvy+dvz*dvz)*LY_PER_VOXEL);
+  if(ly===0){
+    var dx=s.px-focusSystem.px, dy=s.py-focusSystem.py, dz=s.pz-focusSystem.pz;
+    ly=Math.round(Math.sqrt(dx*dx+dy*dy+dz*dz)/VOX_U*LY_PER_VOXEL);
+  }
+  var range=parseInt(document.getElementById("fHyper").value,10);
+  document.getElementById("cTarget").textContent=s.name;
+  document.getElementById("cDist").textContent=commas(ly)+" LY";
+  document.getElementById("cJumps").textContent=Math.max(1,Math.ceil(ly/range))+" @ "+commas(range)+" LY";
+  document.getElementById("cBear").textContent=(ly===0)?"—":bearingOf(dvx,dvz,dvy);
+  document.getElementById("cCore").textContent=commas(s.coreLY)+" LY";
+  document.getElementById("course").classList.add("show");
+  drawCourse();
+  buildGalaxyMarks();
+}
+
+/* ============ system view ============ */
+var bodyMeshes=[], pivots=[], starMeshes=[], coronas=[];
+function buildStar(s,i,pos){
+  var col=s.blackHole?0x1a0030:s.starColors[i%s.starColors.length];
+  var rad=s.blackHole?1.1:2.0;
+  var grp=new THREE.Group();
+  grp.position.copy(pos);
+  var core=new THREE.Mesh(new THREE.SphereGeometry(rad,30,22),
+    new THREE.MeshBasicMaterial({color:s.blackHole?0x050008:0xffffff}));
+  core.userData={star:true,name:s.name+(s.stars>1?(" "+String.fromCharCode(65+i)):""),sys:s};
+  grp.add(core); starMeshes.push(core);
+  if(!s.blackHole){
+    var tint=new THREE.Mesh(new THREE.SphereGeometry(rad*1.04,28,20),
+      new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:0.72,
+        blending:THREE.AdditiveBlending,depthWrite:false}));
+    grp.add(tint);
+  }
+  var sh1=new THREE.Mesh(new THREE.SphereGeometry(rad*1.5,24,18),
+    new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:0.22,
+      blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.BackSide}));
+  var sh2=new THREE.Mesh(new THREE.SphereGeometry(rad*2.3,20,16),
+    new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:0.10,
+      blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.BackSide}));
+  grp.add(sh1); grp.add(sh2);
+  var cor=new THREE.Mesh(new THREE.PlaneGeometry(rad*11,rad*11),
+    new THREE.MeshBasicMaterial({map:CORONA,color:col,transparent:true,
+      opacity:s.blackHole?0.55:0.95,blending:THREE.AdditiveBlending,depthWrite:false,
+      side:THREE.DoubleSide}));
+  grp.add(cor); coronas.push(cor);
+  if(s.blackHole){
+    var disc=new THREE.Mesh(new THREE.RingGeometry(rad*1.6,rad*3.4,72),
+      new THREE.MeshBasicMaterial({color:0xc78aff,transparent:true,opacity:0.42,
+        side:THREE.DoubleSide,depthWrite:false,blending:THREE.AdditiveBlending}));
+    disc.rotation.x=Math.PI/2.35;
+    grp.add(disc);
+  }
+  return grp;
+}
+function buildSystemView(s){
+  while(systemGroup.children.length){
+    var ch=systemGroup.children.pop();
+    ch.traverse(function(o){
+      if(o.geometry) o.geometry.dispose();
+      if(o.material){ if(o.material.map&&o.material.map!==CORONA) o.material.map.dispose(); o.material.dispose(); }
+    });
+  }
+  bodyMeshes=[]; pivots=[]; starMeshes=[]; coronas=[];
+  var si;
+  for(si=0; si<s.stars; si++){
+    var off=new THREE.Vector3(si*3.6-(s.stars-1)*1.8,0,0);
+    systemGroup.add(buildStar(s,si,off));
+  }
+  starLight.color.setHex(s.blackHole?0x9a7aff:s.starColors[0]);
+  starLight.position.set(0,0,0);
+  var planetIdx=0, moonIdx=0, moonAnchor=null, moonAnchorSize=0;
+  for(var bi=0; bi<s.bodies.length; bi++){
+    var b=s.bodies[bi];
+    var pal=BIOMES[b.biome];
+    if(!b.moon){
+      var pivot=new THREE.Object3D(); systemGroup.add(pivot);
+      var orbitR=8+planetIdx*3.7;
+      var mesh=new THREE.Mesh(new THREE.SphereGeometry(b.size,32,24),
+        new THREE.MeshLambertMaterial({map:makePlanetTexture(b)}));
+      mesh.position.set(orbitR,0,0);
+      mesh.rotation.z=b.tilt;
+      mesh.userData={body:b,sys:s};
+      pivot.add(mesh);
+      if(pal.atmo){
+        var atmo=new THREE.Mesh(new THREE.SphereGeometry(b.size*1.14,24,18),
+          new THREE.MeshBasicMaterial({color:pal.atmo,transparent:true,opacity:0.14,
+            blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.BackSide}));
+        atmo.position.copy(mesh.position);
+        pivot.add(atmo);
+      }
+      pivot.rotation.x=(planetIdx%2?0.13:-0.08);
+      pivot.rotation.y=planetIdx*1.1;
+      var ring=new THREE.Mesh(new THREE.RingGeometry(orbitR-0.03,orbitR+0.03,110),
+        new THREE.MeshBasicMaterial({color:0x00e5ff,transparent:true,opacity:0.12,
+          side:THREE.DoubleSide,depthWrite:false}));
+      ring.rotation.x=Math.PI/2; pivot.add(ring);
+      pivots.push({p:pivot,sp:0.10/(1+planetIdx*0.55),mesh:mesh,spin:b.spin});
+      bodyMeshes.push(mesh);
+      moonAnchor=new THREE.Object3D();
+      moonAnchor.position.set(orbitR,0,0);
+      pivot.add(moonAnchor);
+      moonAnchorSize=b.size;
+      moonIdx=0;
+      planetIdx++;
+    } else if(moonAnchor){
+      var mR=moonAnchorSize+b.size*1.9+moonIdx*1.5+1.4;
+      var mPivot=new THREE.Object3D(); moonAnchor.add(mPivot);
+      var mMesh=new THREE.Mesh(new THREE.SphereGeometry(b.size,24,18),
+        new THREE.MeshLambertMaterial({map:makePlanetTexture(b)}));
+      mMesh.position.set(mR,0,0);
+      mMesh.rotation.z=b.tilt;
+      mMesh.userData={body:b,sys:s};
+      mPivot.add(mMesh);
+      if(pal.atmo){
+        var mAtmo=new THREE.Mesh(new THREE.SphereGeometry(b.size*1.14,24,18),
+          new THREE.MeshBasicMaterial({color:pal.atmo,transparent:true,opacity:0.14,
+            blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.BackSide}));
+        mAtmo.position.copy(mMesh.position);
+        mPivot.add(mAtmo);
+      }
+      mPivot.rotation.x=(moonIdx%2?0.22:-0.16);
+      mPivot.rotation.y=moonIdx*2.1;
+      var mRing=new THREE.Mesh(new THREE.RingGeometry(mR-0.02,mR+0.02,64),
+        new THREE.MeshBasicMaterial({color:0x00e5ff,transparent:true,opacity:0.10,
+          side:THREE.DoubleSide,depthWrite:false}));
+      mRing.rotation.x=Math.PI/2; mPivot.add(mRing);
+      pivots.push({p:mPivot,sp:0.34/(1+moonIdx*0.4),mesh:mMesh,spin:b.spin});
+      bodyMeshes.push(mMesh);
+      moonIdx++;
+    }
+  }
+}
+
+/* ============ panel ============ */
+function renderSeq(el,addr){
+  var html="",i;
+  for(i=0;i<addr.length;i++) html+='<img alt="'+addr[i]+'" src="'+glyphSrc(addr[i])+'">';
+  el.innerHTML=html;
+}
+function starSwatches(s){
+  var html="",i;
+  for(i=0;i<s.stars;i++){
+    var c="#"+hex(s.blackHole?0x201030:s.starColors[i],6);
+    html+='<span class="starsw" style="background:radial-gradient(circle at 38% 34%,#fff 0%,'+c+
+          ' 46%,'+c+' 60%,rgba(0,0,0,0) 82%);box-shadow:0 0 10px '+c+'"></span>';
+  }
+  return html;
+}
+function distanceLY(s){
+  if(!focusSystem) return 0;
+  var dx=s.px-focusSystem.px, dy=s.py-focusSystem.py, dz=s.pz-focusSystem.pz;
+  return Math.round(Math.sqrt(dx*dx+dy*dy+dz*dz)/VOX_U*LY_PER_VOXEL);
+}
+function updatePanel(s){
+  selected=s;
+  document.getElementById("panel").style.display="block";
+  document.getElementById("pSys").style.display="";
+  document.getElementById("pBody").style.display="none";
+  document.getElementById("pStars").innerHTML=starSwatches(s);
+  document.getElementById("pName").textContent=s.name;
+  document.getElementById("pReg").textContent="REGION: "+s.region;
+  var here=(focusSystem&&s.address===focusSystem.address&&s.galaxy===focusSystem.galaxy);
+  var suffix=s.water?" // Water":(s.dissonant?" // Dissonant":"");
+  document.getElementById("pCls").textContent=
+    (here?"CURRENT LOCATION":(commas(distanceLY(s))+" LY"))+" // "+s.spectral+suffix;
+  document.getElementById("pCore").textContent=commas(s.coreLY)+" LY from galaxy centre";
+  document.getElementById("icRace").innerHTML=raceIcon(s.race);
+  document.getElementById("icEco").innerHTML=econIcon(s.econType);
+  document.getElementById("icCon").innerHTML=svg(IC_CONFLICT,CONFLICT_COL[s.conTier]);
+  document.getElementById("pRace").textContent=s.race;
+  document.getElementById("pEco").textContent=s.uncharted?"—":s.econName;
+  document.getElementById("pEcoSub").textContent=s.uncharted?"Uncharted system":
+    ("Sell: "+s.sell+"% / Buy: "+s.buy+"% / "+s.econDesc);
+  document.getElementById("pCon").textContent=s.conflict;
+
+  var tags=[["",["","Single","Binary","Ternary"][s.stars]+" star"]];
+  tags.push(["",s.planets+(s.planets===1?" planet":" planets")]);
+  if(s.moons>0) tags.push(["",s.moons+(s.moons===1?" moon":" moons")]);
+  if(s.blackHole) tags.push(["bh","Black hole"]);
+  if(s.atlas) tags.push(["hot","Atlas interface"]);
+  if(s.outlaw) tags.push(["hot","Outlaw"]);
+  if(s.uncharted) tags.push(["","Uncharted"]);
+  if(s.abandoned) tags.push(["","Abandoned"]);
+  if(store.marks[skey(s)]) tags.push(["hot","Bookmarked"]);
+  if(s.override) tags.push(["hot","Community edited"]);
+  var html="",i;
+  for(i=0;i<tags.length;i++) html+='<span class="tag '+tags[i][0]+'">'+tags[i][1]+'</span>';
+  document.getElementById("pTags").innerHTML=html;
+  var pnb=document.getElementById("pubNoteBox");
+  if(s.publicNotes){ pnb.style.display=""; document.getElementById("pubNote").textContent=s.publicNotes; }
+  else pnb.style.display="none";
+
+  var bl="";
+  for(i=0;i<s.bodies.length;i++){
+    var b=s.bodies[i];
+    bl+='<div class="brow" data-b="'+i+'"><span class="bdot" style="background:'+BIOMES[b.biome].base+'"></span>'+
+        '<span class="bn">'+(b.moon?"&#8627; ":"")+b.name+'</span>'+
+        '<span class="bb">'+b.biome+(b.water?" &middot; water":"")+'</span></div>';
+  }
+  document.getElementById("pBodies").innerHTML=bl;
+
+  renderSeq(document.getElementById("pSeq"),s.address);
+  document.getElementById("pAddr").textContent=s.address;
+  document.getElementById("pNote").value=store.notes[skey(s)]||"";
+  document.getElementById("bMark").classList.toggle("on",!!store.marks[skey(s)]);
+  var cb=document.getElementById("bCourse");
+  cb.classList.toggle("off",here);
+  cb.title = here ? "This is where you are. Select a different star to plot a course to it."
+    : "Plot a route from where you are to this system. Draws a line on the map and works out distance, bearing and how many hyperdrive jumps it takes.";
+  setKeypad(s.address);
+  updateRings();
+}
+function showBody(b,s){
+  document.getElementById("panel").style.display="block";
+  document.getElementById("pSys").style.display="none";
+  document.getElementById("pBody").style.display="";
+  document.getElementById("pStars").innerHTML=
+    '<span class="starsw" style="background:radial-gradient(circle at 36% 32%,#fff 0%,'+
+    BIOMES[b.biome].base+' 55%,rgba(0,0,0,0) 84%)"></span>';
+  document.getElementById("pName").textContent=b.name;
+  document.getElementById("pReg").textContent=
+    (b.moon?("MOON OF INDEX "+b.parent):"PLANET")+" · INDEX "+b.index;
+  document.getElementById("pCls").textContent=s.name+" // "+s.spectral;
+  document.getElementById("pCore").textContent=commas(s.coreLY)+" LY from galaxy centre";
+  document.getElementById("icBio").innerHTML=svg(IC_BIOME,BIOMES[b.biome].base);
+  document.getElementById("bBiome").textContent=b.biome;
+  document.getElementById("bTerr").textContent=b.terrain+(b.water?" · has water":" · no water");
+  var t=[["",b.moon?"Moon":"Planet"]];
+  if(!BIOMES[b.biome].atmo) t.push(["","No atmosphere"]);
+  if(b.biome==="Exotic"||b.biome==="Mega Exotic") t.push(["bh","Anomalous"]);
+  if(b.water) t.push(["hot","Water"]);
+  var html="",i;
+  for(i=0;i<t.length;i++) html+='<span class="tag '+t[i][0]+'">'+t[i][1]+'</span>';
+  document.getElementById("bTags").innerHTML=html;
+  document.getElementById("icRes").innerHTML=svg(IC_RES,BIOMES[b.biome].base);
+  var bd=BIOMES[b.biome], rlist=[];
+  if(bd.res) for(i=0;i<bd.res.length;i++) rlist.push(bd.res[i]);
+  var stel=STELLAR_EL[s.starTypes[0]];
+  if(stel) rlist.push(stel);
+  if(b.resUni) for(i=0;i<b.resUni.length;i++) rlist.push(b.resUni[i]);
+  var rhtml="";
+  for(i=0;i<rlist.length;i++) rhtml+='<span class="tag">'+rlist[i]+'</span>';
+  document.getElementById("bRes").innerHTML=rhtml||'<span class="tag">Varies &mdash; unconfirmed</span>';
+  var ba=formatAddress(b.index,s.idx,s.vx,s.vy,s.vz);
+  renderSeq(document.getElementById("pSeq"),ba);
+  document.getElementById("pAddr").textContent=ba;
+  setKeypad(ba);
+}
+
+/* ============ camera ============ */
+var cam={theta:0.7,phi:0.62,dist:330,target:new THREE.Vector3(0,0,0)};
+var DIST={galaxy:[30,1200],local:[5,260],system:[9,110]};
+var flyPos=new THREE.Vector3(0,6,40), flyYaw=0, flyPitch=0;
+var _d=new THREE.Vector3();
+/* point the fly camera at a world position — never guess the yaw */
+function aimFly(target){
+  _d.subVectors(target,flyPos);
+  if(_d.lengthSq()<1e-8){ flyYaw=0; flyPitch=0; return; }
+  _d.normalize();
+  flyYaw=Math.atan2(-_d.x,-_d.z);
+  flyPitch=Math.asin(Math.max(-1,Math.min(1,_d.y)));
+}
+function applyCam(){
+  if(ctrl==="fly"){
+    camera.position.copy(flyPos);
+    camera.rotation.set(0,0,0);
+    camera.rotateY(flyYaw); camera.rotateX(flyPitch);
+    return;
+  }
+  var lim=DIST[mode];
+  if(cam.dist<lim[0]) cam.dist=lim[0];
+  if(cam.dist>lim[1]) cam.dist=lim[1];
+  if(cam.phi<0.10) cam.phi=0.10;
+  if(cam.phi>Math.PI-0.10) cam.phi=Math.PI-0.10;
+  var sp=Math.sin(cam.phi), cp=Math.cos(cam.phi);
+  camera.position.set(cam.target.x+cam.dist*sp*Math.sin(cam.theta),
+    cam.target.y+cam.dist*cp, cam.target.z+cam.dist*sp*Math.cos(cam.theta));
+  camera.lookAt(cam.target);
+}
+var keys={};
+window.addEventListener("keydown",function(e){
+  if(e.target.tagName==="INPUT"||e.target.tagName==="TEXTAREA"||e.target.tagName==="SELECT") return;
+  keys[e.code]=true;
+  if(e.code==="KeyH") toggleLabels();
+  if(e.code==="KeyF") toggleFold("filt","fHead","Filters");
+  if(e.code==="KeyG") toggleGrid();
+});
+window.addEventListener("keyup",function(e){ keys[e.code]=false; });
+function flyStep(dt){
+  var sp=(keys.ShiftLeft||keys.ShiftRight)?46:18;
+  var fwd=new THREE.Vector3(), right=new THREE.Vector3();
+  camera.getWorldDirection(fwd);
+  right.crossVectors(fwd,new THREE.Vector3(0,1,0)).normalize();
+  var m=new THREE.Vector3();
+  if(keys.KeyW||keys.ArrowUp) m.add(fwd);
+  if(keys.KeyS||keys.ArrowDown) m.sub(fwd);
+  if(keys.KeyD||keys.ArrowRight) m.add(right);
+  if(keys.KeyA||keys.ArrowLeft) m.sub(right);
+  if(keys.Space||keys.KeyQ) m.y+=1;
+  if(keys.KeyE) m.y-=1;
+  if(stick.act){ m.add(fwd.clone().multiplyScalar(-stick.y)); m.add(right.clone().multiplyScalar(stick.x)); }
+  if(m.lengthSq()>0){ m.normalize().multiplyScalar(sp*dt); flyPos.add(m); }
+  applyCam();
+}
+
+var drag=false,lastX=0,lastY=0,pointers={},pinchD=0,moved=0;
+var stick={act:false,x:0,y:0,id:null,ox:0,oy:0};
+canvas.addEventListener("pointerdown",function(e){
+  pointers[e.pointerId]={x:e.clientX,y:e.clientY};
+  if(ctrl==="fly"&&e.pointerType==="touch"&&e.clientX<window.innerWidth*0.4&&!stick.act){
+    stick.act=true; stick.id=e.pointerId; stick.ox=e.clientX; stick.oy=e.clientY; stick.x=0; stick.y=0;
+    return;
+  }
+  drag=true; lastX=e.clientX; lastY=e.clientY; moved=0;
+  canvas.setPointerCapture(e.pointerId);
+});
+canvas.addEventListener("pointermove",function(e){
+  if(!pointers[e.pointerId]) return;
+  pointers[e.pointerId]={x:e.clientX,y:e.clientY};
+  if(stick.act&&e.pointerId===stick.id){
+    stick.x=Math.max(-1,Math.min(1,(e.clientX-stick.ox)/70));
+    stick.y=Math.max(-1,Math.min(1,(e.clientY-stick.oy)/70));
+    return;
+  }
+  var ids=Object.keys(pointers);
+  if(ids.length>=2&&ctrl==="orbit"){
+    var a=pointers[ids[0]],b=pointers[ids[1]];
+    var d=Math.hypot(a.x-b.x,a.y-b.y);
+    if(pinchD>0){ cam.dist*=pinchD/d; applyCam(); }
+    pinchD=d; return;
+  }
+  if(!drag) return;
+  var dx=e.clientX-lastX, dy=e.clientY-lastY;
+  moved+=Math.abs(dx)+Math.abs(dy);
+  if(ctrl==="fly"){
+    flyYaw-=dx*0.004; flyPitch-=dy*0.004;
+    if(flyPitch>1.5) flyPitch=1.5;
+    if(flyPitch<-1.5) flyPitch=-1.5;
+  } else { cam.theta-=dx*0.005; cam.phi-=dy*0.005; }
+  lastX=e.clientX; lastY=e.clientY;
+  applyCam();
+});
+function endPointer(e){
+  if(stick.act&&e.pointerId===stick.id){ stick.act=false; stick.x=0; stick.y=0; stick.id=null; }
+  if(pointers[e.pointerId]) delete pointers[e.pointerId];
+  if(Object.keys(pointers).length<2) pinchD=0;
+  if(Object.keys(pointers).length===0){
+    if(drag&&moved<6) tryPick(e.clientX,e.clientY);
+    drag=false;
+  }
+}
+canvas.addEventListener("pointerup",endPointer);
+canvas.addEventListener("pointercancel",endPointer);
+canvas.addEventListener("wheel",function(e){
+  e.preventDefault();
+  if(ctrl==="fly"){
+    var f=new THREE.Vector3(); camera.getWorldDirection(f);
+    flyPos.add(f.multiplyScalar(e.deltaY>0?-8:8));
+  } else cam.dist*=(e.deltaY>0?1.12:0.89);
+  applyCam();
+},{passive:false});
+
+/* ============ picking ============ */
+var ray=new THREE.Raycaster(), ndc=new THREE.Vector2();
+function tryPick(cx,cy){
+  var rect=canvas.getBoundingClientRect();
+  ndc.x=((cx-rect.left)/rect.width)*2-1;
+  ndc.y=-((cy-rect.top)/rect.height)*2+1;
+  ray.setFromCamera(ndc,camera);
+  if(mode==="local"&&locPts){
+    var d=(ctrl==="fly")?6:cam.dist;
+    ray.params.Points.threshold=Math.max(0.35,d*0.014);
+    var hits=ray.intersectObject(locPts);
+    if(hits.length&&shown[hits[0].index]) updatePanel(shown[hits[0].index]);
+  } else if(mode==="system"){
+    var bh=ray.intersectObjects(bodyMeshes.concat(starMeshes));
+    if(bh.length){
+      var ud=bh[0].object.userData;
+      if(ud.star) updatePanel(ud.sys);
+      else showBody(ud.body,ud.sys);
+    }
+  }
+}
+
+/* ============ labels ============ */
+var labelEls=[], LBL_MAX=28;
+function initLabels(){
+  var box=document.getElementById("labels"),i;
+  for(i=0;i<LBL_MAX;i++){
+    var d=document.createElement("div");
+    d.className="lbl"; d.style.display="none";
+    box.appendChild(d); labelEls.push(d);
+  }
+}
+function hideLabels(){ for(var i=0;i<labelEls.length;i++) labelEls[i].style.display="none"; }
+function toggleLabels(){
+  labelsOn=!labelsOn;
+  document.getElementById("bLbl").classList.toggle("on",labelsOn);
+  if(!labelsOn) hideLabels();
+}
+var _v=new THREE.Vector3(), _w=new THREE.Vector3();
+function updateLabels(){
+  if(!labelsOn||mode==="galaxy"){ hideLabels(); return; }
+  var cands=[],i;
+  if(mode==="local"){
+    for(i=0;i<shown.length;i++){
+      var s=shown[i];
+      var dx=s.px-camera.position.x, dy=s.py-camera.position.y, dz=s.pz-camera.position.z;
+      cands.push({x:s.px,y:s.py,z:s.pz,d:dx*dx+dy*dy+dz*dz,
+        t:(s.blackHole?"◉ ":(s.atlas?"◈ ":""))+s.name});
+    }
+  } else {
+    for(i=0;i<starMeshes.length;i++){
+      starMeshes[i].getWorldPosition(_w);
+      cands.push({x:_w.x,y:_w.y,z:_w.z,d:0,t:"★ "+starMeshes[i].userData.name});
+    }
+    for(i=0;i<bodyMeshes.length;i++){
+      bodyMeshes[i].getWorldPosition(_w);
+      var b=bodyMeshes[i].userData.body;
+      cands.push({x:_w.x,y:_w.y,z:_w.z,d:1,t:(b.moon?"↳ ":"")+b.name});
+    }
+  }
+  cands.sort(function(a,b){ return a.d-b.d; });
+  var w=window.innerWidth,h=window.innerHeight;
+  for(i=0;i<LBL_MAX;i++){
+    var el=labelEls[i];
+    if(i>=cands.length){ el.style.display="none"; continue; }
+    var cd=cands[i];
+    _v.set(cd.x,cd.y,cd.z).project(camera);
+    if(_v.z>1||_v.x<-1||_v.x>1||_v.y<-1||_v.y>1){ el.style.display="none"; continue; }
+    el.style.display="block";
+    el.style.left=((_v.x*0.5+0.5)*w)+"px";
+    el.style.top=((-_v.y*0.5+0.5)*h)+"px";
+    el.textContent=cd.t;
+  }
+}
+
+/* ============ keypad ============ */
+var keySeq="";
+function buildKeypad(){
+  var g=document.getElementById("kGrid"),html="",i;
+  for(i=0;i<16;i++){
+    var ch=HEXD[i];
+    html+='<button class="kbtn" data-h="'+ch+'" title="'+ch+'"><img alt="'+ch+'" src="'+glyphSrc(ch)+'"></button>';
+  }
+  g.innerHTML=html;
+  g.addEventListener("click",function(e){
+    var b=e.target.closest(".kbtn");
+    if(!b||keySeq.length>=12) return;
+    keySeq+=b.getAttribute("data-h"); drawKeypad();
+  });
+  /* seed from the address box, otherwise drawKeypad would blank it before the first jump */
+  keySeq=cleanHex(document.getElementById("inAddr").value).slice(0,12);
+  drawKeypad();
+}
+function setKeypad(addr){ keySeq=cleanHex(addr).slice(0,12); drawKeypad(); }
+function drawKeypad(){
+  var el=document.getElementById("kSeq"),html="",i;
+  for(i=0;i<12;i++){
+    if(i<keySeq.length) html+='<div class="kslot"><img alt="'+keySeq[i]+'" src="'+glyphSrc(keySeq[i])+'"></div>';
+    else html+='<div class="kslot"></div>';
+  }
+  el.innerHTML=html;
+  var pad=keySeq; while(pad.length<12) pad+="—";
+  document.getElementById("kHex").textContent=pad;
+  document.getElementById("inAddr").value=keySeq;
+}
+
+/* ============ modes ============ */
+function setMode(m){
+  mode=m;
+  galaxyGroup.visible=(m==="galaxy");
+  localGroup.visible=(m==="local");
+  systemGroup.visible=(m==="system");
+  document.getElementById("mGal").classList.toggle("on",m==="galaxy");
+  document.getElementById("mLoc").classList.toggle("on",m!=="galaxy");
+  document.getElementById("bEnter").textContent=(m==="system")?"Back to local":"Enter system";
+  document.getElementById("mstat").textContent=m.toUpperCase();
+  hideLabels();
+  document.getElementById("empty").style.display=(m==="local"&&shown.length===0)?"block":"none";
+  cam.target.set(0,0,0);
+  if(m==="galaxy"){ cam.dist=330; cam.phi=0.62; flyPos.set(0,150,240); }
+  if(m==="local"){ cam.dist=50; flyPos.set(0,10,44); }
+  if(m==="system"){ cam.dist=40; flyPos.set(0,12,38); }
+  aimFly(cam.target);
+  applyCam();
+}
+function setCtrl(c){
+  ctrl=c;
+  document.getElementById("cOrb").classList.toggle("on",c==="orbit");
+  document.getElementById("cFly").classList.toggle("on",c==="fly");
+  document.getElementById("flyhint").style.display=(c==="fly")?"block":"none";
+  if(c==="fly"){
+    flyPos.copy(camera.position);
+    aimFly(cam.target);
+  }
+  applyCam();
+}
+function jumpTo(str){
+  var a=parseAddress(str);
+  if(!a){ toast("Address needs 12 glyphs"); document.getElementById("inAddr").style.borderColor="#ff4a4a"; return; }
+  document.getElementById("inAddr").style.borderColor="";
+  focus.x=a.x; focus.y=a.y; focus.z=a.z;
+  marker.position.copy(voxelToGalaxy(a.x,a.y,a.z));
+  courseTarget=null;
+  document.getElementById("course").classList.remove("show");
+  generateSlice(a.idx);
+  focusSystem=null;
+  var i;
+  for(i=0;i<allSystems.length;i++){
+    if(allSystems[i].idx===a.idx&&allSystems[i].vx===a.x&&
+       allSystems[i].vy===a.y&&allSystems[i].vz===a.z){ focusSystem=allSystems[i]; break; }
+  }
+  if(!focusSystem){
+    focusSystem=generateSystem(a.x,a.y,a.z,a.idx);
+    focusSystem.px=0; focusSystem.py=0; focusSystem.pz=0;
+  }
+  setMode("local");
+  cam.target.set(focusSystem.px,focusSystem.py,focusSystem.pz);
+  flyPos.set(focusSystem.px,focusSystem.py+9,focusSystem.pz+40);
+  aimFly(cam.target);
+  applyCam();
+  updatePanel(focusSystem);
+  updateRings();
+  buildGalaxyMarks();
+}
+function toggleFold(boxId,headId,label){
+  var t=document.getElementById(boxId);
+  t.classList.toggle("min");
+  document.getElementById(headId).textContent=(t.classList.contains("min")?"▸ ":"▾ ")+label;
+}
+
+/* ============ wiring ============ */
+(function(){
+  var sel=document.getElementById("galSel"),i;
+  for(i=0;i<GALAXIES.length;i++){
+    var o=document.createElement("option");
+    o.value=String(i); o.textContent=(i+1)+". "+GALAXIES[i];
+    sel.appendChild(o);
+  }
+  sel.value="0";
+})();
+function updateGalaxyInfo(){
+  var gt=galaxyType(GALAXY);
+  var r=mulberry32(GALAXY*7919+13);
+  var el=document.getElementById("gType");
+  el.textContent=pickOne(r,gt.names)+" galaxy";
+  el.style.color=gt.c;
+}
+document.getElementById("galSel").addEventListener("change",function(){
+  GALAXY=parseInt(this.value,10);
+  updateGalaxyInfo();
+  buildGalaxy(); buildNebula();
+  focusSystem=null; courseTarget=null;
+  document.getElementById("course").classList.remove("show");
+  jumpTo(document.getElementById("inAddr").value);
+  toast("Galaxy: "+GALAXIES[GALAXY]);
+});
+
+function bindSlider(id,out,fn,fixed){
+  var el=document.getElementById(id);
+  el.addEventListener("input",function(){
+    document.getElementById(out).textContent=fixed?parseFloat(el.value).toFixed(1):el.value;
+    fn();
+  });
+}
+bindSlider("sNeb","vNeb",buildNebula,false);
+bindSlider("sCsz","vCsz",buildNebula,true);
+bindSlider("sGal","vGal",buildGalaxy,false);
+bindSlider("sArm","vArm",function(){ buildGalaxy(); buildNebula(); },false);
+bindSlider("sTw","vTw",function(){ buildGalaxy(); buildNebula(); },true);
+bindSlider("sTh","vTh",function(){ buildGalaxy(); buildNebula(); },true);
+bindSlider("sR","vR",generateSlice,false);
+bindSlider("sPer","vPer",generateSlice,false);
+bindSlider("sSz","vSz",function(){
+  if(locPts) locPts.material.size=parseFloat(document.getElementById("sSz").value);
+},true);
+
+(function(){
+  var sel=document.getElementById("fEco"),i;
+  for(i=0;i<ECON.length;i++){ var o=document.createElement("option"); o.textContent=ECON[i][0]; sel.appendChild(o); }
+})();
+["fCol","fRace","fEco","fBH","fAtl","fOut","fMark"].forEach(function(id){
+  document.getElementById(id).addEventListener("change",applyFilter);
+});
+document.getElementById("fHyper").addEventListener("change",function(){
+  if(courseTarget) setCourse(courseTarget);
+});
+document.getElementById("bReset").addEventListener("click",function(){
+  document.getElementById("fCol").value=""; document.getElementById("fRace").value="";
+  document.getElementById("fEco").value="";
+  document.getElementById("fBH").checked=false; document.getElementById("fAtl").checked=false;
+  document.getElementById("fOut").checked=false; document.getElementById("fMark").checked=false;
+  applyFilter();
+});
+document.getElementById("pBodies").addEventListener("click",function(e){
+  var row=e.target.closest(".brow");
+  if(!row||!selected) return;
+  var b=selected.bodies[parseInt(row.getAttribute("data-b"),10)];
+  if(b) showBody(b,selected);
+});
+document.getElementById("mGal").addEventListener("click",function(){ setMode("galaxy"); });
+document.getElementById("mLoc").addEventListener("click",function(){ setMode("local"); });
+document.getElementById("cOrb").addEventListener("click",function(){ setCtrl("orbit"); });
+document.getElementById("cFly").addEventListener("click",function(){ setCtrl("fly"); });
+document.getElementById("bJump").addEventListener("click",function(){ jumpTo(document.getElementById("inAddr").value); });
+document.getElementById("inAddr").addEventListener("input",function(){
+  var v=cleanHex(this.value).slice(0,12);
+  this.value=v; keySeq=v; drawKeypad();
+});
+document.getElementById("inAddr").addEventListener("keydown",function(e){
+  if(e.key==="Enter") jumpTo(this.value);
+});
+document.getElementById("bRand").addEventListener("click",function(){
+  var r=mulberry32((Math.random()*4294967296)>>>0);
+  var a=hex(1,1)+hex(Math.floor(r()*0x2FF),3)+hex(Math.floor(r()*0x100),2)+
+        hex(Math.floor(r()*0x1000),3)+hex(Math.floor(r()*0x1000),3);
+  setKeypad(a); jumpTo(a);
+});
+document.getElementById("bKeys").addEventListener("click",function(){
+  var k=document.getElementById("keys");
+  k.classList.toggle("show");
+  this.classList.toggle("on",k.classList.contains("show"));
+});
+document.getElementById("bLbl").addEventListener("click",toggleLabels);
+function toggleGrid(){
+  gridOn=!gridOn;
+  document.getElementById("bGrid").classList.toggle("on",gridOn);
+  buildVoxelGrid();
+}
+document.getElementById("bGrid").addEventListener("click",toggleGrid);
+document.getElementById("kBack").addEventListener("click",function(){ keySeq=keySeq.slice(0,-1); drawKeypad(); });
+document.getElementById("kClear").addEventListener("click",function(){ keySeq=""; drawKeypad(); });
+document.getElementById("kJump").addEventListener("click",function(){ jumpTo(keySeq); });
+document.getElementById("bEnter").addEventListener("click",function(){
+  if(mode==="system"){ setMode("local"); if(selected) updatePanel(selected); return; }
+  if(!selected) return;
+  buildSystemView(selected); setMode("system");
+});
+document.getElementById("bCourse").addEventListener("click",function(){
+  if(selected) setCourse(selected);
+});
+document.getElementById("bClrCourse").addEventListener("click",function(){
+  courseTarget=null; clearCourseLine(); buildGalaxyMarks();
+  document.getElementById("course").classList.remove("show");
+});
+document.getElementById("bGoCourse").addEventListener("click",function(){
+  if(courseTarget){ var a=courseTarget.address; setKeypad(a); jumpTo(a); }
+});
+document.getElementById("bSave").addEventListener("click",function(){
+  if(!selected) return;
+  var v=document.getElementById("pNote").value.trim();
+  if(v) store.notes[skey(selected)]=v; else delete store.notes[skey(selected)];
+  saveStore(); toast("Log saved");
+});
+document.getElementById("bMark").addEventListener("click",function(){
+  if(!selected) return;
+  var k=skey(selected);
+  if(store.marks[k]) delete store.marks[k]; else store.marks[k]=1;
+  saveStore(); applyFilter(); updatePanel(selected); buildGalaxyMarks();
+  toast(store.marks[k]?"Bookmarked":"Bookmark removed");
+});
+document.getElementById("bCopy").addEventListener("click",function(){
+  var txt=document.getElementById("pAddr").textContent;
+  if(navigator.clipboard&&navigator.clipboard.writeText)
+    navigator.clipboard.writeText(txt).then(function(){ toast("Address copied"); },function(){ toast(txt); });
+  else toast(txt);
+});
+document.getElementById("bExport").addEventListener("click",function(){
+  var blob=new Blob([JSON.stringify(store,null,2)],{type:"application/json"});
+  var a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="nms-galactic-map-logs.json"; a.click();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); },2000);
+  toast("Logs exported");
+});
+document.getElementById("bImport").addEventListener("click",function(){ document.getElementById("fFile").click(); });
+document.getElementById("fFile").addEventListener("change",function(e){
+  var f=e.target.files[0]; if(!f) return;
+  var rd=new FileReader();
+  rd.onload=function(){
+    try{
+      var o=JSON.parse(rd.result);
+      store.notes=Object.assign(store.notes,o.notes||{});
+      store.marks=Object.assign(store.marks,o.marks||{});
+      saveStore(); applyFilter(); buildGalaxyMarks(); toast("Logs imported");
+    }catch(err){ toast("Import failed — bad file"); }
+  };
+  rd.readAsText(f);
+});
+document.getElementById("tHead").addEventListener("click",function(){ toggleFold("tweak","tHead","Tweak"); });
+document.getElementById("fHead").addEventListener("click",function(){ toggleFold("filt","fHead","Filters"); });
+document.getElementById("telHead").addEventListener("click",function(){ toggleFold("tel","telHead","Sensor telemetry"); });
+
+/* ============ edit / report modal ============ */
+function escAttr(s){
+  return String(s==null?"":s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+var editBodies=[];
+function renderBodyEditList(){
+  var el=document.getElementById("bodyEditList"), html="",i,k;
+  for(i=0;i<editBodies.length;i++){
+    var b=editBodies[i], opts="";
+    for(k=0;k<BIOME_KEYS.length;k++) opts+='<option value="'+BIOME_KEYS[k]+'"'+(b.biome===BIOME_KEYS[k]?" selected":"")+'>'+BIOME_KEYS[k]+'</option>';
+    html+='<div class="bodyEdit" data-i="'+i+'">'+
+      '<div class="bhead"><span>'+(b.moon?"Moon":"Planet")+' #'+(i+1)+'</span><span class="bx" data-remove="'+i+'" title="Remove">&times;</span></div>'+
+      '<div class="brow2">'+
+        '<div class="mfld" style="margin-bottom:0"><div class="lb">Name</div><input type="text" class="bfName" data-i="'+i+'" maxlength="30" value="'+escAttr(b.name)+'"></div>'+
+        '<label class="chk2"><input type="checkbox" class="bfMoon" data-i="'+i+'"'+(b.moon?" checked":"")+'> Moon</label>'+
+      '</div>'+
+      '<div class="brow2">'+
+        '<div class="mfld" style="margin-bottom:0"><div class="lb">Biome</div><select class="bfBiome" data-i="'+i+'">'+opts+'</select></div>'+
+        '<label class="chk2"><input type="checkbox" class="bfWater" data-i="'+i+'"'+(b.water?" checked":"")+'> Water</label>'+
+      '</div>'+
+      '<div class="mfld" style="margin-bottom:0"><div class="lb">Resources (comma separated)</div><input type="text" class="bfRes" data-i="'+i+'" maxlength="120" value="'+escAttr(b.resources)+'"></div>'+
+    '</div>';
+  }
+  el.innerHTML=html;
+  document.getElementById("edAddBody").disabled=(editBodies.length>=6);
+}
+function openEditModal(){
+  if(!selected) return;
+  var s=selected;
+  document.getElementById("edName").value=s.name||"";
+  var raceOk=["Gek","Vy'keen","Korvax","Uninhabited"];
+  document.getElementById("edRace").value=(raceOk.indexOf(s.race)>=0)?s.race:"Uninhabited";
+  document.getElementById("edEcon").value=s.uncharted?"":(s.econName||"");
+  document.getElementById("edConflict").value=s.conflict||"";
+  document.getElementById("edNotes").value=s.publicNotes||"";
+  editBodies=s.bodies.map(function(b){
+    return {
+      name:b.name,
+      moon:!!b.moon,
+      biome:(BIOME_KEYS.indexOf(b.biome)>=0)?b.biome:BIOME_KEYS[0],
+      water:!!b.water,
+      resources:(b.resUni||[]).join(", ")
+    };
+  });
+  renderBodyEditList();
+  document.getElementById("editErr").style.display="none";
+  document.getElementById("editModal").style.display="";
+  document.getElementById("reportModal").style.display="none";
+  document.getElementById("modalWrap").classList.add("show");
+}
+function closeModal(){ document.getElementById("modalWrap").classList.remove("show"); }
+function clientPrecheck(){
+  /* Small client-side echo of the server's word list, purely for instant
+     feedback before the round trip. The Netlify Function's own copy
+     (netlify/functions/filter.mjs, BAD_WORDS) is the real, authoritative
+     filter -- if Tony wants to add more blocked words, add them there too. */
+  var CHECK_WORDS=["fuck","shit","bitch","cunt","nigger","nigga","retard","faggot","fag",
+    "rape","cock","pussy","whore","slut","kike","chink","spic","tranny","bastard","dick","piss","asshole"];
+  var LEET={"0":"o","1":"i","3":"e","4":"a","5":"s","@":"a","$":"s"};
+  function bad(str){
+    var n=String(str||"").toLowerCase().replace(/[01345@$]/g,function(c){return LEET[c];})
+      .replace(/[^a-z]/g,"").replace(/(.)\1{2,}/g,"$1");
+    for(var i=0;i<CHECK_WORDS.length;i++) if(n.indexOf(CHECK_WORDS[i])>=0) return true;
+    return false;
+  }
+  var fields=[document.getElementById("edName").value,document.getElementById("edEcon").value,
+    document.getElementById("edConflict").value,document.getElementById("edNotes").value];
+  for(var i=0;i<editBodies.length;i++) fields.push(editBodies[i].name);
+  for(i=0;i<fields.length;i++) if(bad(fields[i])) return "Please remove blocked language before saving.";
+  if(!document.getElementById("edName").value.trim()) return "System name can't be empty.";
+  return null;
+}
+document.getElementById("bodyEditList").addEventListener("input",function(e){
+  var iAttr=e.target.getAttribute("data-i"); if(iAttr===null) return; var i=+iAttr;
+  if(e.target.classList.contains("bfName")) editBodies[i].name=e.target.value;
+  else if(e.target.classList.contains("bfRes")) editBodies[i].resources=e.target.value;
+});
+document.getElementById("bodyEditList").addEventListener("change",function(e){
+  var iAttr=e.target.getAttribute("data-i"); if(iAttr===null) return; var i=+iAttr;
+  if(e.target.classList.contains("bfMoon")) editBodies[i].moon=e.target.checked;
+  else if(e.target.classList.contains("bfWater")) editBodies[i].water=e.target.checked;
+  else if(e.target.classList.contains("bfBiome")) editBodies[i].biome=e.target.value;
+});
+document.getElementById("bodyEditList").addEventListener("click",function(e){
+  var rm=e.target.getAttribute("data-remove");
+  if(rm!==null){ editBodies.splice(+rm,1); renderBodyEditList(); }
+});
+document.getElementById("edAddBody").addEventListener("click",function(){
+  if(editBodies.length>=6) return;
+  editBodies.push({name:"New body",moon:false,biome:BIOME_KEYS[0],water:false,resources:""});
+  renderBodyEditList();
+});
+document.getElementById("bEdit").addEventListener("click",function(){ if(selected) openEditModal(); });
+document.getElementById("bReport").addEventListener("click",function(){
+  if(!selected) return;
+  document.getElementById("reportErr").style.display="none";
+  document.getElementById("repReason").value="";
+  document.getElementById("editModal").style.display="none";
+  document.getElementById("reportModal").style.display="";
+  document.getElementById("modalWrap").classList.add("show");
+});
+document.getElementById("edCancel").addEventListener("click",closeModal);
+document.getElementById("repCancel").addEventListener("click",closeModal);
+document.getElementById("modalWrap").addEventListener("click",function(e){ if(e.target.id==="modalWrap") closeModal(); });
+document.getElementById("edSubmit").addEventListener("click",function(){
+  if(!selected) return;
+  var err=clientPrecheck();
+  var errEl=document.getElementById("editErr");
+  if(err){ errEl.textContent=err; errEl.style.display="block"; return; }
+  errEl.style.display="none";
+  var payload={
+    name:document.getElementById("edName").value.trim(),
+    race:document.getElementById("edRace").value,
+    econName:document.getElementById("edEcon").value.trim(),
+    conflict:document.getElementById("edConflict").value.trim(),
+    notes:document.getElementById("edNotes").value.trim(),
+    bodies:editBodies.map(function(b){
+      return {
+        name:b.name.trim(), moon:b.moon, parent:0, biome:b.biome, water:b.water,
+        resources:b.resources.split(",").map(function(x){ return x.trim(); }).filter(Boolean)
+      };
+    })
+  };
+  var spin=document.getElementById("editSpin"), btn=document.getElementById("edSubmit");
+  spin.style.display="block"; btn.disabled=true;
+  fetch(FUNC_URL,{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({action:"edit",address:selected.address,payload:payload})
+  }).then(function(r){ return r.json().then(function(j){ return {status:r.status,body:j}; }); })
+  .then(function(res){
+    spin.style.display="none"; btn.disabled=false;
+    if(!res.body.ok){
+      errEl.textContent=(res.body.error||"Could not save")+(res.body.details?"\n"+res.body.details.join("\n"):"");
+      errEl.style.display="block";
+      return;
+    }
+    closeModal(); toast("System saved -- visible to everyone"); loadOverrides();
+  }).catch(function(){
+    spin.style.display="none"; btn.disabled=false;
+    errEl.textContent="Could not reach the server. The shared-edit backend may not be set up yet (see Tony's setup notes).";
+    errEl.style.display="block";
+  });
+});
+document.getElementById("repSubmit").addEventListener("click",function(){
+  if(!selected) return;
+  var reason=document.getElementById("repReason").value.trim();
+  var errEl=document.getElementById("reportErr");
+  if(!reason){ errEl.textContent="Please describe what's wrong."; errEl.style.display="block"; return; }
+  errEl.style.display="none";
+  var spin=document.getElementById("reportSpin"), btn=document.getElementById("repSubmit");
+  spin.style.display="block"; btn.disabled=true;
+  fetch(FUNC_URL,{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({action:"report",address:selected.address,payload:{reason:reason}})
+  }).then(function(r){ return r.json().then(function(j){ return {status:r.status,body:j}; }); })
+  .then(function(res){
+    spin.style.display="none"; btn.disabled=false;
+    if(!res.body.ok){ errEl.textContent=res.body.error||"Could not send report"; errEl.style.display="block"; return; }
+    closeModal(); toast("Report sent -- thanks");
+  }).catch(function(){
+    spin.style.display="none"; btn.disabled=false;
+    errEl.textContent="Could not reach the server."; errEl.style.display="block";
+  });
+});
+
+/* ============ loop ============ */
+var _lastW=0, _lastH=0;
+function resize(){
+  var w=window.innerWidth,h=window.innerHeight;
+  _lastW=w; _lastH=h;
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+  /* true (not false) here is the actual fix: it makes three.js set canvas.style.width/height
+     to real CSS pixels (w,h). With false, the canvas is a replaced element with no explicit
+     CSS size, so the browser displays it at its raw drawing-buffer attribute size instead --
+     w*devicePixelRatio, h*devicePixelRatio -- which is only "correct" at devicePixelRatio 1.
+     At any OS display scaling above 100% (e.g. Windows 125%) the canvas renders that many
+     percent too large, silently misaligned against every label/camera calculation that
+     (correctly) uses plain window.innerWidth/innerHeight. */
+  renderer.setSize(w,h,true);
+  camera.aspect=w/h; camera.updateProjectionMatrix();
+}
+window.addEventListener("resize",resize);
+/* The browser's own "resize" event doesn't reliably fire for every case that changes
+   window.innerWidth/innerHeight (docking DevTools is a confirmed one). When it's missed,
+   the canvas keeps rendering at its old size/aspect while every other calculation (label
+   projection, camera aspect math) correctly uses the new window size -- so labels end up
+   nowhere near their planets even though their own math is completely correct. Checking
+   every frame instead of trusting the event means it can never go stale. */
+function syncSizeIfChanged(){
+  if(window.innerWidth!==_lastW||window.innerHeight!==_lastH) resize();
+}
+function updateTelemetry(){
+  var p=camera.position;
+  document.getElementById("tX").textContent=p.x.toFixed(2);
+  document.getElementById("tY").textContent=p.y.toFixed(2);
+  document.getElementById("tZ").textContent=p.z.toFixed(2);
+  var vx,vy,vz;
+  if(mode==="galaxy"){
+    vx=Math.round(p.x/GAL_R*2048); vy=Math.round(p.y/GAL_H*128); vz=Math.round(p.z/GAL_R*2048);
+  } else {
+    vx=focus.x+Math.round(p.x/VOX_U); vy=focus.y+Math.round(p.y/VOX_U); vz=focus.z+Math.round(p.z/VOX_U);
+  }
+  document.getElementById("tV").textContent=
+    hex(toRaw(vy,SIZE_Y)&0xFF,2)+":"+hex(toRaw(vz,SIZE_XZ)&0xFFF,3)+":"+hex(toRaw(vx,SIZE_XZ)&0xFFF,3);
+  document.getElementById("tCore").textContent="CAM "+commas(coreLY(vx,vy,vz))+" LY FROM CENTRE";
+}
+var frames=0, fpsT=performance.now(), lastT=fpsT, loopDead=false;
+function animate(){
+  requestAnimationFrame(animate);
+  if(loopDead) return;
+  try{
+    syncSizeIfChanged();
+    var now=performance.now();
+    var dt=Math.min(0.05,(now-lastT)/1000); lastT=now;
+    frames++;
+    if(now-fpsT>500){
+      document.getElementById("fps").textContent=Math.round(frames*1000/(now-fpsT));
+      frames=0; fpsT=now;
+    }
+    if(ctrl==="fly") flyStep(dt);
+    if(mode==="galaxy") galaxyGroup.rotation.y+=0.0003;
+    if(mode==="system"){
+      for(var i=0;i<pivots.length;i++){
+        pivots[i].p.rotation.y+=pivots[i].sp*0.01;
+        pivots[i].mesh.rotation.y+=pivots[i].spin*0.01;
+      }
+      for(i=0;i<coronas.length;i++) coronas[i].quaternion.copy(camera.quaternion);
+    }
+    marker.lookAt(camera.position);
+    if(mode==="local"){
+      if(selRing.visible) selRing.quaternion.copy(camera.quaternion);
+      if(focusRing.visible) focusRing.quaternion.copy(camera.quaternion);
+    }
+    /* camera.matrixWorldInverse is only refreshed as a side effect of renderer.render(),
+       which runs AFTER this point -- so without this, updateLabels() below always projects
+       against last frame's camera, one full frame stale. Invisible when the camera is still,
+       but during an orbit-drag (continuous mousemove -> applyCam(), not tied to this loop)
+       every label lags behind the live camera, landing nowhere near its body. Force the
+       refresh first so labels always use the camera position this frame actually renders with. */
+    camera.updateMatrixWorld();
+    updateLabels();
+    updateTelemetry();
+    renderer.render(scene,camera);
+  }catch(err){
+    loopDead=true;
+    showErr("render loop stopped: "+(err&&err.message?err.message:err));
+  }
+}
+
+/* ============ init ============ */
+loadStore();
+initLabels();
+buildKeypad();
+updateGalaxyInfo();
+resize();
+buildGalaxy();
+buildNebula();
+jumpTo(document.getElementById("inAddr").value);
+setMode("galaxy");
+setCtrl("orbit");
+applyCam();
+animate();
+loadOverrides();
+</script>
+</body>
+</html>
