@@ -34,6 +34,22 @@ has been seen on a real screen yet -- all reasoned from the actual CSS plus Tony
 screenshots, verified with the usual `node --check`/tag-balance/ID-existence checks, not
 a live render. Next real step is Tony reloading on the S26 again (both orientations) to
 confirm.
+
+**Second mobile pass, same session, from Tony's follow-up screenshot:** (1) address
+input had no label and no way to reset it -- added a small "Portal address" label and
+a Reset button (restores the box to `focusSystem.address`, your actual current
+location). (2) address input now forced onto its own line on mobile via a wrapping
+`#addrGrp` with `width:100%` (a 100%-wide flex child always starts a new row). (3)
+toolbar reflowed via mobile-only `order` values into: view-mode toggles, then address
+input, then Glyphs/Random/Filters/Jump, then Labels/Grid, then Install app/About --
+matches the grouping Tony asked for. (4) Tweak and Sensor Telemetry hidden on mobile
+entirely per Tony questioning whether they're needed there -- both power-user/debug
+tools, not needed by a first-time visitor; kept on desktop. A new toolbar "Filters"
+button gives direct access to the one left-column box mobile keeps. (5) added a
+collapse/expand toggle (▾/▸) to the system panel's own header, works on both mobile
+and desktop, hides everything but the name/region row when collapsed -- addresses "too
+much screen space taken up" without removing the detail entirely. Same caveat as
+everything else this session: reasoned from CSS + screenshots, not seen live yet.
 **Folder:** `C:\Users\elegr\Claude\Projects\NMS Galactic Map`
 
 ---
