@@ -907,6 +907,18 @@ function makeSprite(){
   var t=new THREE.Texture(cv); t.needsUpdate=true; return t;
 }
 var SPRITE=makeSprite();
+/* Hollow ring (not a filled blob like SPRITE/real stars) so course waypoint
+   markers read as UI markers at a glance instead of blending into the star
+   field -- confirmed live that a filled same-toned dot was invisible next to
+   real stars; a stroked ring is not. */
+function makeRingSprite(){
+  var cv=document.createElement("canvas"); cv.width=64; cv.height=64;
+  var g=cv.getContext("2d");
+  g.strokeStyle="rgba(255,255,255,1)"; g.lineWidth=8;
+  g.beginPath(); g.arc(32,32,21,0,Math.PI*2); g.stroke();
+  var t=new THREE.Texture(cv); t.needsUpdate=true; return t;
+}
+var RING_SPRITE=makeRingSprite();
 
 /* corona with rays, used as the billboard glow around a star */
 function makeCorona(){
@@ -1250,8 +1262,10 @@ function applyFilter(){
 }
 
 /* ============ course plotting ============ */
+var courseDots=null;
 function clearCourseLine(){
   if(courseLine){ localGroup.remove(courseLine); courseLine.geometry.dispose(); courseLine.material.dispose(); courseLine=null; }
+  if(courseDots){ localGroup.remove(courseDots); courseDots.geometry.dispose(); courseDots.material.dispose(); courseDots=null; }
 }
 var courseWaypoints=null, courseTruncated=false;
 var VOX_LY=LY_PER_VOXEL/VOX_U; /* light-years represented by one world unit, ~44.4 */
@@ -1350,6 +1364,27 @@ function drawCourse(){
     color:0xf0a500,dashSize:1.2,gapSize:0.8,transparent:true,opacity:0.85}));
   courseLine.computeLineDistances();
   localGroup.add(courseLine);
+  /* The route bends toward real systems along the way, but that bend can be
+     subtle to the eye when the detour is small relative to the total distance
+     -- confirmed live: a genuine 5-hop route looked almost like a straight line
+     at a normal zoom level and only clearly read as bent once zoomed in. A dot
+     at every intermediate real stop makes each hop unmistakable regardless of
+     zoom or how straight the route happens to look, without needing the full
+     selection-ring treatment the two endpoints already get. */
+  var mids=courseWaypoints.slice(1,-1).filter(function(w){ return w.real!==false; });
+  if(mids.length){
+    var dp=new Float32Array(mids.length*3);
+    for(i=0;i<mids.length;i++){ dp[i*3]=mids[i].px; dp[i*3+1]=mids[i].py; dp[i*3+2]=mids[i].pz; }
+    var dg=new THREE.BufferGeometry();
+    dg.setAttribute("position",new THREE.BufferAttribute(dp,3));
+    /* depthTest:false + a high renderOrder so a waypoint never gets visually
+       swallowed by a brighter/nearer real star sitting in front of it. */
+    courseDots=new THREE.Points(dg,new THREE.PointsMaterial({
+      color:0xf0a500,map:RING_SPRITE,size:1.3,transparent:true,
+      depthWrite:false,depthTest:false,sizeAttenuation:true}));
+    courseDots.renderOrder=999;
+    localGroup.add(courseDots);
+  }
 }
 function setCourse(s){
   if(!focusSystem){ toast("Jump somewhere first"); return; }
