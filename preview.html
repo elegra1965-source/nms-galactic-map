@@ -211,10 +211,10 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 @media(max-width:900px){
   #panel{width:auto;left:10px;right:10px;top:auto;bottom:10px;max-height:44vh}
   #course{top:50px;left:50%;transform:translateX(-50%);width:210px}
-  #leftcol{bottom:auto;top:150px;flex-direction:column;align-items:flex-start}
+  #leftcol{bottom:auto;top:calc(var(--top-h,150px) + 10px);flex-direction:column;align-items:flex-start}
   #tweak,#filt,#tel{width:158px}
-  #keys{bottom:auto;top:150px;width:calc(100vw - 20px)}
-  #stats{bottom:auto;top:50px;right:10px}
+  #keys{bottom:auto;top:calc(var(--top-h,150px) + 10px);width:calc(100vw - 20px)}
+  #stats{bottom:auto;top:calc(var(--top-h,150px) + 10px);right:10px}
   #flyhint{display:none!important}
   input[type=text]{width:110px}
 }
@@ -2083,6 +2083,21 @@ function resize(){
      (correctly) uses plain window.innerWidth/innerHeight. */
   renderer.setSize(w,h,true);
   camera.aspect=w/h; camera.updateProjectionMatrix();
+  syncTopOffset();
+}
+/* The mobile layout (leftcol/keys/stats) positions itself below the top
+   toolbar, but the toolbar's real height is NOT a fixed number -- it wraps
+   onto more rows the narrower the screen is (confirmed on Tony's S26: the
+   stats box was hardcoded to sit 50px from the top, but the wrapped toolbar
+   there is taller than that, so stats rendered on top of the Glyphs button).
+   Measuring the toolbar's actual rendered height and exposing it as a CSS
+   variable means everything below it stays correctly positioned on any
+   screen width, instead of guessing a pixel number that only happens to
+   work on whatever screen it was last tested on. */
+function syncTopOffset(){
+  var top=document.getElementById("top");
+  if(!top) return;
+  document.documentElement.style.setProperty("--top-h",top.offsetHeight+"px");
 }
 window.addEventListener("resize",resize);
 /* The browser's own "resize" event doesn't reliably fire for every case that changes
@@ -2166,6 +2181,10 @@ setCtrl("orbit");
 applyCam();
 animate();
 loadOverrides();
+/* Web fonts can finish loading a moment after this script runs, subtly
+   changing button widths and therefore how many rows the toolbar wraps
+   onto -- re-measure once fonts settle so --top-h doesn't end up stale. */
+if(document.fonts && document.fonts.ready) document.fonts.ready.then(syncTopOffset).catch(function(){});
 </script>
 </body>
 </html>
