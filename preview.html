@@ -288,7 +288,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     <div class="addr-lb">Portal address</div>
     <div class="addr-row">
       <input type="text" id="inAddr" value="" placeholder="TYPE OR TAP A 12-GLYPH ADDRESS" maxlength="12" spellcheck="false" title="Type or paste a 12-character portal address, or build one with the Glyphs keypad, then tap Jump.">
-      <button class="btn" id="bAddrReset" title="Reset the address box back to where you currently are.">Reset</button>
+      <button class="btn" id="bAddrReset" title="Clear the address box.">Clear</button>
     </div>
   </div>
   <button class="btn" id="bKeys" title="Open the 16-key portal glyph keypad. Tap glyphs to build an address; it stays in sync with the hex box.">Glyphs</button>
@@ -1253,13 +1253,99 @@ function applyFilter(){
 function clearCourseLine(){
   if(courseLine){ localGroup.remove(courseLine); courseLine.geometry.dispose(); courseLine.material.dispose(); courseLine=null; }
 }
+var courseWaypoints=null, courseTruncated=false;
+var VOX_LY=LY_PER_VOXEL/VOX_U; /* light-years represented by one world unit, ~44.4 */
+var ROUTE_MAX_HOPS=40; /* a real long-haul NMS trip can be hundreds of jumps -- past this
+  many the polyline stops being useful to look at anyway, so the route is truncated with
+  a final dashed run to the target and the jump COUNT still reported honestly via the
+  simple distance/range math rather than pretending every hop was individually plotted */
+/* Same deterministic per-region system-picking as generateSlice() (same 0xF00D seed,
+   same regionCount()) but scoped to a single region on demand -- lets the route
+   planner ask "what real named systems exist here" for any region along a course,
+   not just whatever happens to be in the currently-rendered local slice, without
+   needing to materialize/render systems the player never actually visits. Positions
+   are computed relative to the CURRENT `focus` origin, same formula generateSlice
+   uses, so they land in the same coordinate space as focusSystem/courseTarget. */
+function regionCandidates(vx,vy,vz){
+  var count=regionCount(vx,vy,vz);
+  var vr=mulberry32(gseed(vx,vy,vz,0xF00D));
+  var per=Math.min(parseInt(document.getElementById("sPer").value,10)||22,count);
+  var idxs=[0x079,0x07A],i;
+  for(i=0;i<per;i++){
+    var pick=Math.floor(vr()*count);
+    if(idxs.indexOf(pick)<0) idxs.push(pick);
+  }
+  var out=[], dx=vx-focus.x, dy=vy-focus.y, dz=vz-focus.z;
+  for(i=0;i<idxs.length;i++){
+    var idx=idxs[i];
+    var jr=mulberry32(gseed(vx,vy,vz,idx^0x9999));
+    var jx=jr(),jy=jr(),jz=jr();
+    out.push({
+      vx:vx,vy:vy,vz:vz,idx:idx,
+      px:(dx+jx-0.5)*VOX_U, py:(dy+jy-0.5)*VOX_U, pz:(dz+jz-0.5)*VOX_U,
+      name:nameFrom(gseed(vx,vy,vz,idx^0xABCD)),
+      address:formatAddress(1,idx,vx,vy,vz),
+      blackHole:idx===0x079, atlas:idx===0x07A
+    });
+  }
+  return out;
+}
+function wpDist(a,b){ var dx=a.px-b.px,dy=a.py-b.py,dz=a.pz-b.pz; return Math.sqrt(dx*dx+dy*dy+dz*dz); }
+/* Greedy multi-hop route: from each point, aim for the maximum hyperdrive range in
+   the ideal straight-line direction, then snap to whichever REAL charted system
+   lands nearest that ideal point (searching an expanding neighbourhood of regions
+   around it, not the whole sphere within range -- keeps this cheap even at the
+   6000 LY freighter range, which would otherwise mean scanning a huge volume every
+   hop). If a stretch of space genuinely has nothing charted nearby, the hop still
+   happens (exactly like jumping into open space in-game) but isn't tied to a name.
+   This is what actually produces the bent, system-to-system path the game itself
+   shows instead of one straight dashed line drawn through empty space. */
+function findRoute(from,to,rangeLY){
+  var rangeW=rangeLY/VOX_LY;
+  var path=[{px:from.px,py:from.py,pz:from.pz,name:from.name,address:from.address,real:true}];
+  var cur=path[0], truncated=false;
+  var total=wpDist(from,to);
+  if(total<=rangeW){
+    path.push({px:to.px,py:to.py,pz:to.pz,name:to.name,address:to.address,real:true});
+    return {path:path,truncated:false};
+  }
+  var guard=0;
+  while(wpDist(cur,to)>rangeW){
+    guard++;
+    if(guard>ROUTE_MAX_HOPS){ truncated=true; break; }
+    var remain=wpDist(cur,to);
+    var dir={x:(to.px-cur.px)/remain,y:(to.py-cur.py)/remain,z:(to.pz-cur.pz)/remain};
+    var step=Math.min(rangeW*0.95,remain);
+    var ideal={px:cur.px+dir.x*step,py:cur.py+dir.y*step,pz:cur.pz+dir.z*step};
+    var ivx=Math.round(focus.x+ideal.px/VOX_U), ivy=Math.round(focus.y+ideal.py/VOX_U), ivz=Math.round(focus.z+ideal.pz/VOX_U);
+    var best=null,bestD=Infinity;
+    for(var rad=1;rad<=2&&!best;rad++){
+      for(var ddx=-rad;ddx<=rad;ddx++) for(var ddy=-rad;ddy<=rad;ddy++) for(var ddz=-rad;ddz<=rad;ddz++){
+        if(rad>1 && Math.max(Math.abs(ddx),Math.abs(ddy),Math.abs(ddz))<rad) continue; /* shell only, inner already scanned at rad=1 */
+        var cands=regionCandidates(ivx+ddx,ivy+ddy,ivz+ddz),c;
+        for(var k=0;k<cands.length;k++){
+          c=cands[k];
+          var dHop=wpDist(cur,c);
+          if(dHop>rangeW||dHop<0.05) continue;
+          var dToIdeal=wpDist(ideal,c);
+          if(dToIdeal<bestD){ bestD=dToIdeal; best=c; }
+        }
+      }
+    }
+    var next=best||{px:ideal.px,py:ideal.py,pz:ideal.pz,name:null,address:null,real:false};
+    path.push(next);
+    cur=next;
+  }
+  path.push({px:to.px,py:to.py,pz:to.pz,name:to.name,address:to.address,real:true});
+  return {path:path,truncated:truncated};
+}
 function drawCourse(){
   clearCourseLine();
-  if(!courseTarget||!focusSystem) return;
+  if(!courseTarget||!focusSystem||!courseWaypoints||courseWaypoints.length<2) return;
+  var i,n=courseWaypoints.length,arr=new Float32Array(n*3);
+  for(i=0;i<n;i++){ arr[i*3]=courseWaypoints[i].px; arr[i*3+1]=courseWaypoints[i].py; arr[i*3+2]=courseWaypoints[i].pz; }
   var g=new THREE.BufferGeometry();
-  g.setAttribute("position",new THREE.BufferAttribute(new Float32Array([
-    focusSystem.px,focusSystem.py,focusSystem.pz,
-    courseTarget.px,courseTarget.py,courseTarget.pz]),3));
+  g.setAttribute("position",new THREE.BufferAttribute(arr,3));
   courseLine=new THREE.Line(g,new THREE.LineDashedMaterial({
     color:0xf0a500,dashSize:1.2,gapSize:0.8,transparent:true,opacity:0.85}));
   courseLine.computeLineDistances();
@@ -1276,9 +1362,12 @@ function setCourse(s){
     ly=Math.round(Math.sqrt(dx*dx+dy*dy+dz*dz)/VOX_U*LY_PER_VOXEL);
   }
   var range=parseInt(document.getElementById("fHyper").value,10);
+  var route=findRoute(focusSystem,s,range);
+  courseWaypoints=route.path; courseTruncated=route.truncated;
+  var hops=courseWaypoints.length-1;
   document.getElementById("cTarget").textContent=s.name;
   document.getElementById("cDist").textContent=commas(ly)+" LY";
-  document.getElementById("cJumps").textContent=Math.max(1,Math.ceil(ly/range))+" @ "+commas(range)+" LY";
+  document.getElementById("cJumps").textContent=(courseTruncated?(hops+"+"):hops)+" @ "+commas(range)+" LY"+(courseTruncated?" (simplified)":"");
   document.getElementById("cBear").textContent=(ly===0)?"—":bearingOf(dvx,dvz,dvy);
   document.getElementById("cCore").textContent=commas(s.coreLY)+" LY";
   document.getElementById("course").classList.add("show");
@@ -1796,7 +1885,7 @@ function jumpTo(str,silent){
   document.getElementById("inAddr").style.borderColor="";
   focus.x=a.x; focus.y=a.y; focus.z=a.z;
   marker.position.copy(voxelToGalaxy(a.x,a.y,a.z));
-  courseTarget=null;
+  courseTarget=null; courseWaypoints=null;
   document.getElementById("course").classList.remove("show");
   generateSlice(a.idx);
   focusSystem=null;
@@ -1813,7 +1902,7 @@ function jumpTo(str,silent){
   flyPos.set(focusSystem.px,focusSystem.py+9,focusSystem.pz+40);
   aimFly(cam.target);
   applyCam();
-  if(!silent){ setMode("local"); updatePanel(focusSystem); hasRealLocation=true; }
+  if(!silent){ setMode("local"); updatePanel(focusSystem); hasRealLocation=true; syncResetBtn(); }
   updateRings();
   buildGalaxyMarks();
 }
@@ -1844,7 +1933,7 @@ document.getElementById("galSel").addEventListener("change",function(){
   GALAXY=parseInt(this.value,10);
   updateGalaxyInfo();
   buildGalaxy(); buildNebula();
-  focusSystem=null; courseTarget=null;
+  focusSystem=null; courseTarget=null; courseWaypoints=null;
   document.getElementById("course").classList.remove("show");
   /* If the visitor hasn't actually jumped anywhere yet, the address box is
      still empty by design (see hasRealLocation) -- re-anchor silently on the
@@ -1939,7 +2028,7 @@ document.getElementById("bCourse").addEventListener("click",function(){
   if(selected) setCourse(selected);
 });
 document.getElementById("bClrCourse").addEventListener("click",function(){
-  courseTarget=null; clearCourseLine(); buildGalaxyMarks();
+  courseTarget=null; courseWaypoints=null; clearCourseLine(); buildGalaxyMarks();
   document.getElementById("course").classList.remove("show");
 });
 document.getElementById("bGoCourse").addEventListener("click",function(){
@@ -1990,11 +2079,19 @@ document.getElementById("tHead").addEventListener("click",function(){ toggleFold
 document.getElementById("fHead").addEventListener("click",function(){ toggleFold("filt","fHead","Filters"); });
 document.getElementById("telHead").addEventListener("click",function(){ toggleFold("tel","telHead","Telemetry"); });
 document.getElementById("bFiltToggle").addEventListener("click",function(){ toggleFold("filt","fHead","Filters"); });
+function syncResetBtn(){
+  var btn=document.getElementById("bAddrReset");
+  if(hasRealLocation&&focusSystem){ btn.textContent="Reset"; btn.title="Reset the address box back to where you currently are."; }
+  else { btn.textContent="Clear"; btn.title="Clear the address box."; }
+}
 document.getElementById("bAddrReset").addEventListener("click",function(){
-  var addr=(hasRealLocation&&focusSystem)?focusSystem.address:document.getElementById("inAddr").defaultValue;
+  var goingHome=hasRealLocation&&focusSystem;
+  var addr=goingHome?focusSystem.address:document.getElementById("inAddr").defaultValue;
   var el=document.getElementById("inAddr");
   el.value=addr; el.style.borderColor="";
   keySeq=addr; drawKeypad();
+  el.focus();
+  toast(goingHome?"Address reset to your current location":"Address cleared");
 });
 document.getElementById("bPanelMin").addEventListener("click",function(){
   var min=document.getElementById("panel").classList.toggle("panel-min");
@@ -2423,6 +2520,7 @@ buildNebula();
 var BOOT_ANCHOR_ADDR="1067FA5A9B2C"; /* arbitrary real coordinate purely to seed the initial slice/camera -- not shown to the visitor, see jumpTo's silent flag */
 jumpTo(BOOT_ANCHOR_ADDR,true);
 setMode("galaxy");
+syncResetBtn();
 setCtrl("orbit");
 applyCam();
 animate();
