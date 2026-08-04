@@ -287,7 +287,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   <div id="addrGrp">
     <div class="addr-lb">Portal address</div>
     <div class="addr-row">
-      <input type="text" id="inAddr" value="1067FA5A9B2C" maxlength="12" spellcheck="false" title="Type or paste a 12-character portal address, or build one with the Glyphs keypad, then tap Jump.">
+      <input type="text" id="inAddr" value="" placeholder="TYPE OR TAP A 12-GLYPH ADDRESS" maxlength="12" spellcheck="false" title="Type or paste a 12-character portal address, or build one with the Glyphs keypad, then tap Jump.">
       <button class="btn" id="bAddrReset" title="Reset the address box back to where you currently are.">Reset</button>
     </div>
   </div>
@@ -501,7 +501,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 
   <div class="box modal" id="disclaimerModal" style="max-width:380px;display:none">
     <h3>Before you explore</h3>
-    <div class="msub" style="margin-bottom:12px">Two quick things:</div>
+    <div class="msub" style="margin-bottom:12px">Three quick things:</div>
     <div class="mfld">
       <div class="lb">Fan-made project</div>
       <div style="font-size:12px;color:var(--text-dim);line-height:1.55">This is an unofficial, fan-made tool. It is not affiliated with, endorsed by, or sponsored by Hello Games.</div>
@@ -509,6 +509,10 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     <div class="mfld">
       <div class="lb">Procedural data</div>
       <div style="font-size:12px;color:var(--text-dim);line-height:1.55">Star systems are generated procedurally from their portal address, the same way the game does -- they are not scraped from anyone's real save. A system only reflects real in-game data once a traveller has entered it via <b>Edit system</b>, marked "Community edited".</div>
+    </div>
+    <div class="mfld">
+      <div class="lb">New to No Man's Sky?</div>
+      <div style="font-size:12px;color:var(--text-dim);line-height:1.55">A "portal address" is a 12-symbol code the game uses to pin down a star system's location. Don't have one? Hit <b>Random</b> in the toolbar to jump somewhere, or tap <b>Glyphs</b> to see the code as the game's own symbols instead of letters/numbers.</div>
     </div>
     <div class="modalBtns">
       <button class="btn primary" id="discOk">Got it</button>
@@ -1027,6 +1031,13 @@ var selRing=null, focusRing=null;
 galaxyGroup.add(nebulaGroup);
 var allSystems=[], shown=[];
 var focus={x:0,y:0,z:0}, focusSystem=null, courseTarget=null;
+/* True only once the visitor has actually jumped somewhere themselves (Jump/
+   Enter/keypad/course/galaxy-switch). The boot sequence silently anchors
+   focusSystem to a real coordinate purely for internal slice/camera math (see
+   jumpTo's silent flag) -- without this flag, "Reset" would fill the address
+   box back in with that boot coordinate instead of leaving it empty, quietly
+   defeating the whole point of not showing a specific system by default. */
+var hasRealLocation=false;
 var mode="galaxy", ctrl="orbit", selected=null, labelsOn=false;
 
 var marker=new THREE.Mesh(new THREE.RingGeometry(3.0,4.0,32),
@@ -1683,6 +1694,17 @@ function updateLabels(){
   }
   cands.sort(function(a,b){ return a.d-b.d; });
   var w=window.innerWidth,h=window.innerHeight;
+  /* A moon (or any two bodies close in-frame) projects to nearly the same
+     screen point as its parent planet, so two independently-placed labels can
+     land right on top of each other and read as one run-together mess (seen
+     live: a planet + its moon rendered as "Vylo-XI, Hucoreth" instead of two
+     legible tags). Each label already floats above its anchor point via CSS
+     (translate -150% on Y), so resolving a collision is just: whichever label
+     is lower-priority (farther from camera, since cands is sorted nearest
+     first) gets pushed further up in fixed steps until it clears every label
+     already placed this frame. Cheap -- LBL_MAX caps this at 28 labels, so at
+     most ~28*28 comparisons per frame. */
+  var placed=[];
   for(i=0;i<LBL_MAX;i++){
     var el=labelEls[i];
     if(i>=cands.length){ el.style.display="none"; continue; }
@@ -1690,8 +1712,19 @@ function updateLabels(){
     _v.set(cd.x,cd.y,cd.z).project(camera);
     if(_v.z>1||_v.x<-1||_v.x>1||_v.y<-1||_v.y>1){ el.style.display="none"; continue; }
     el.style.display="block";
-    el.style.left=((_v.x*0.5+0.5)*w)+"px";
-    el.style.top=((-_v.y*0.5+0.5)*h)+"px";
+    var lx=(_v.x*0.5+0.5)*w, ly=(-_v.y*0.5+0.5)*h;
+    var moved=true, guard=0;
+    while(moved && guard<20){
+      moved=false; guard++;
+      for(var k=0;k<placed.length;k++){
+        if(Math.abs(placed[k].x-lx)<64 && Math.abs(placed[k].y-ly)<16){
+          ly=placed[k].y-16; moved=true;
+        }
+      }
+    }
+    placed.push({x:lx,y:ly});
+    el.style.left=lx+"px";
+    el.style.top=ly+"px";
     el.textContent=cd.t;
   }
 }
@@ -1757,7 +1790,7 @@ function setCtrl(c){
   }
   applyCam();
 }
-function jumpTo(str){
+function jumpTo(str,silent){
   var a=parseAddress(str);
   if(!a){ toast("Address needs 12 glyphs"); document.getElementById("inAddr").style.borderColor="#ff4a4a"; return; }
   document.getElementById("inAddr").style.borderColor="";
@@ -1776,12 +1809,11 @@ function jumpTo(str){
     focusSystem=generateSystem(a.x,a.y,a.z,a.idx);
     focusSystem.px=0; focusSystem.py=0; focusSystem.pz=0;
   }
-  setMode("local");
   cam.target.set(focusSystem.px,focusSystem.py,focusSystem.pz);
   flyPos.set(focusSystem.px,focusSystem.py+9,focusSystem.pz+40);
   aimFly(cam.target);
   applyCam();
-  updatePanel(focusSystem);
+  if(!silent){ setMode("local"); updatePanel(focusSystem); hasRealLocation=true; }
   updateRings();
   buildGalaxyMarks();
 }
@@ -1814,7 +1846,12 @@ document.getElementById("galSel").addEventListener("change",function(){
   buildGalaxy(); buildNebula();
   focusSystem=null; courseTarget=null;
   document.getElementById("course").classList.remove("show");
-  jumpTo(document.getElementById("inAddr").value);
+  /* If the visitor hasn't actually jumped anywhere yet, the address box is
+     still empty by design (see hasRealLocation) -- re-anchor silently on the
+     boot coordinate instead of trying to jump to an empty string, which would
+     otherwise flash a red "Address needs 12 glyphs" error on a perfectly
+     normal galaxy switch before anyone's typed anything. */
+  jumpTo(hasRealLocation?document.getElementById("inAddr").value:BOOT_ANCHOR_ADDR,!hasRealLocation);
   toast("Galaxy: "+GALAXIES[GALAXY]);
 });
 
@@ -1954,7 +1991,7 @@ document.getElementById("fHead").addEventListener("click",function(){ toggleFold
 document.getElementById("telHead").addEventListener("click",function(){ toggleFold("tel","telHead","Telemetry"); });
 document.getElementById("bFiltToggle").addEventListener("click",function(){ toggleFold("filt","fHead","Filters"); });
 document.getElementById("bAddrReset").addEventListener("click",function(){
-  var addr=focusSystem?focusSystem.address:document.getElementById("inAddr").defaultValue;
+  var addr=(hasRealLocation&&focusSystem)?focusSystem.address:document.getElementById("inAddr").defaultValue;
   var el=document.getElementById("inAddr");
   el.value=addr; el.style.borderColor="";
   keySeq=addr; drawKeypad();
@@ -2262,6 +2299,7 @@ function resize(){
   renderer.setSize(w,h,true);
   camera.aspect=w/h; camera.updateProjectionMatrix();
   syncTopOffset();
+  _lastOccludeW=-1; /* force syncPanelOffset() to recompute against the new size next frame */
 }
 /* The mobile layout (leftcol/keys/stats) positions itself below the top
    toolbar, but the toolbar's real height is NOT a fixed number -- it wraps
@@ -2276,6 +2314,34 @@ function syncTopOffset(){
   var top=document.getElementById("top");
   if(!top) return;
   document.documentElement.style.setProperty("--top-h",top.offsetHeight+"px");
+}
+/* The camera frames the FULL window width, but the right-docked info panel
+   (desktop, and mobile landscape) visually sits on top of ~280-300px of that
+   canvas. Anything whose orbit happens to project into that strip -- a planet,
+   a moon, a star -- renders perfectly correctly and is just permanently hidden
+   behind the panel. Confirmed live: a 6th planet in a real system never showed
+   up no matter how far the camera zoomed out, because its screen position
+   landed exactly under the panel every time. Fix: shift the camera's frustum
+   left by the occluded width via setViewOffset, so the visible (non-panel)
+   area is what actually gets centred. Reading the panel's live bounding rect
+   instead of duplicating its CSS breakpoints means this keeps working if the
+   panel's own layout changes later. The mobile-portrait bottom dock spans the
+   full width instead of the right side, so it's correctly excluded (its rect
+   starts near the left edge, not past the window's midpoint). */
+var _lastOccludeW=-1;
+function syncPanelOffset(){
+  var panelEl=document.getElementById("panel");
+  var w=window.innerWidth,h=window.innerHeight;
+  var occludeW=0;
+  if(panelEl && panelEl.classList.contains("show")){
+    var r=panelEl.getBoundingClientRect();
+    if(r.width>0 && r.left>w*0.5) occludeW=Math.round(w-r.left+20);
+  }
+  if(occludeW===_lastOccludeW) return;
+  _lastOccludeW=occludeW;
+  if(occludeW>0) camera.setViewOffset(w+occludeW,h,0,0,w,h);
+  else camera.clearViewOffset();
+  camera.updateProjectionMatrix();
 }
 window.addEventListener("resize",resize);
 /* The browser's own "resize" event doesn't reliably fire for every case that changes
@@ -2308,6 +2374,7 @@ function animate(){
   if(loopDead) return;
   try{
     syncSizeIfChanged();
+    syncPanelOffset();
     var now=performance.now();
     var dt=Math.min(0.05,(now-lastT)/1000); lastT=now;
     frames++;
@@ -2353,7 +2420,8 @@ updateGalaxyInfo();
 resize();
 buildGalaxy();
 buildNebula();
-jumpTo(document.getElementById("inAddr").value);
+var BOOT_ANCHOR_ADDR="1067FA5A9B2C"; /* arbitrary real coordinate purely to seed the initial slice/camera -- not shown to the visitor, see jumpTo's silent flag */
+jumpTo(BOOT_ANCHOR_ADDR,true);
 setMode("galaxy");
 setCtrl("orbit");
 applyCam();

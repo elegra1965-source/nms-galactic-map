@@ -1,11 +1,93 @@
 # NMS Galactic Map — Handover
 
+**Last worked:** 2026-08-04 (Session 18)
+**Status:** Four fixes made to `preview.html`, verified via `node --check` + a full
+HTML tag-balance pass + manual logic tracing, but **NOT yet deployed** — this sandbox
+has no git/GitHub credentials for this project's GitHub-connected deploy, so Tony needs
+to push `preview.html` (and only that file changed this session) to the repo himself
+for these to go live. Sequence: Tony asked for an honest opinion on the live site vs.
+other NMS community tools (Galactic Atlas, Portal Repository, glyph decoders) — verdict
+was genuinely positive, nothing else out there combines a true 3D flyable galaxy +
+in-system view + working portal-glyph keypad + shared community edits. Four real issues
+surfaced from actually clicking through the live site (not just reading code), fixed in
+priority order:
+
+1. **P1 — planets rendering invisible behind the info panel (real bug).** Reported
+   initially as "a system says 6 planets but only 5 render." Root cause found by
+   force-recoloring the missing mesh bright magenta via `javascript_tool` on the live
+   site: the 6th planet WAS rendering, correctly positioned — directly behind the
+   right-docked `#panel` (278px desktop / 300px mobile-landscape), which visually
+   covers part of the canvas that the camera doesn't know about (it frames the FULL
+   `window.innerWidth`). Any body whose orbit projects into that strip is permanently
+   hidden, for any system, not just this one. Fixed with a new `syncPanelOffset()`
+   (called every frame from `animate()`) that reads `#panel`'s live `getBoundingClientRect()`
+   and, when it's in right-docked mode (`rect.left > w*0.5` — true on desktop and mobile
+   landscape, false on the mobile-portrait bottom dock, which is full-width and doesn't
+   occlude anything), shifts the camera's frustum left via `camera.setViewOffset()` by
+   the occluded width. This also keeps label projection and click-raycasting correctly
+   aligned for free, since both already go through `camera.projectionMatrix`.
+2. **P2 — site no longer opens on Tony's personal system by default.** The address box
+   had `value="1067FA5A9B2C"` hardcoded in the HTML (Tony's own real, community-edited
+   system — "Sranch Op10079", note "My skyscraper ARG system"), and boot called
+   `jumpTo()` on it unconditionally, which internally opens the info panel and shows it
+   as "CURRENT LOCATION" for **every visitor**, before `setMode("galaxy")` masked the
+   3D view (but not the panel) a line later. Tony: "it should have community edited but
+   it shouldn't be 1st port of call when running — should go to ready for input of hex
+   number or glyphs." Fixed: `jumpTo()` gained an optional `silent` param that skips
+   `setMode("local")` + `updatePanel()` (every real user action — Jump, Enter key,
+   keypad, course-plot, galaxy-switch — is unaffected since none of them pass it); boot
+   now calls `jumpTo(BOOT_ANCHOR_ADDR, true)` where `BOOT_ANCHOR_ADDR` is the same real
+   coordinate kept purely to seed internal slice/camera math, never shown. The address
+   input's HTML default is now `value=""` with a `placeholder`, so a fresh load lands on
+   the galaxy view, input empty and ready to type into. Caught and fixed two knock-on
+   regressions from this before calling it done: the **Reset** button used to fall back
+   to `focusSystem.address` (which is still the boot anchor internally) — would have
+   silently refilled the box with Tony's real address the moment anyone clicked it,
+   defeating the fix; added a `hasRealLocation` flag (true only after a *real*, non-silent
+   jump) so Reset now correctly falls back to empty instead. The galaxy-switcher dropdown
+   also used to re-jump on whatever's in the address box — with it now empty by default,
+   switching galaxy before typing anything would have flashed a red "Address needs 12
+   glyphs" error; patched to silently re-anchor on `BOOT_ANCHOR_ADDR` in that specific case.
+3. **P3 — overlapping body labels.** Confirmed live: a planet and its close moon
+   projected to nearly the same screen point and read as one illegible run-together
+   label. `updateLabels()` placed every label independently with zero collision
+   awareness. Added a cheap same-frame collision pass — labels are already priority-sorted
+   nearest-camera-first, so when a lower-priority label's position lands within 64px
+   horizontal / 16px vertical of one already placed this frame, it steps 16px further up
+   (labels already float above their anchor via CSS) until clear, max 20 iterations.
+4. **P4 — no explanation of what a portal address even is for a newcomer.** Added a
+   third item to the existing "Before you explore" disclaimer modal (already shown once
+   automatically per browser, reachable anytime via the About button — the natural home
+   for this, no toolbar clutter needed): "New to No Man's Sky?" explaining the 12-symbol
+   code in plain English and pointing at Random/Glyphs as ways in without one.
+
+**Verification this session:** `node --check` on the extracted script (clean), a proper
+HTML tag-balance pass with the `<script>` block stripped first (clean — an earlier naive
+attempt without stripping script content threw false positives from JS comparison
+operators being misread as tags, worth remembering if repeating this check), manual
+trace of every `jumpTo()` call site to confirm only the boot call passes `silent`, and
+hoisting-order check confirming `BOOT_ANCHOR_ADDR` (declared near the bottom, in the
+init sequence) is safe to reference from the earlier-defined `galSel` change handler
+since the handler only ever executes after the whole script — including that
+declaration — has already run once at load. No live-render check possible from this
+sandbox (same constraint as every prior session) — Tony's own look after deploying is
+the real check, particularly the panel-occlusion fix, camera framing.
+
+**Next step:** Tony pushes the updated `preview.html` to GitHub (`elegra1965-source/nms-galactic-map`)
+the same way as every other change this project's shared-edits feature required.
+Nothing else in the repo (functions, overrides.json, manifest, etc.) was touched this
+session. `preview.html.bak_1785837968` in the folder predates this session, unrelated.
+
+---
+
 **Last worked:** 2026-08-04 (Session 17)
 **Status:** LIVE at `nms-galaxy-map.netlify.app`, GitHub-connected deploy, cross-linked
 from NMS Hub, installable as a PWA. Labels/camera-matrix/moon-orbit bugs from Session 15
-confirmed fixed by Tony. Shared community system editing is built, self-tested, and
-deployed — but the Edit/Report flow itself has still never been clicked through in a
-real browser, so that's the next real check.
+confirmed fixed by Tony. **Shared community system editing is now confirmed fully
+working end-to-end by Tony, in a real browser, on both desktop and mobile** — Edit
+modal, dropdowns, save, GitHub write, "Community edited" badge, and the in-system
+label refresh all clicked through and verified. See "Session 17 continued" below for
+the chain of real bugs found and fixed to get there.
 
 **The last two "never seen render" unknowns are now closed, confirmed by Tony's own
 screenshots:** the in-system 3D view renders correctly (textured planets, real corona
@@ -59,6 +141,80 @@ and desktop, hides everything but the name/region row when collapsed -- addresse
 much screen space taken up" without removing the detail entirely. Same caveat as
 everything else this session: reasoned from CSS + screenshots, not seen live yet.
 **Folder:** `C:\Users\elegr\Claude\Projects\NMS Galactic Map`
+
+---
+
+## Session 17 continued — shared edits taken from "built" to "actually works live"
+
+Tony started clicking through the real Edit-system flow on the live site and found a
+chain of real bugs, each one only visible once the previous one was fixed — a good
+example of why "self-tested, never clicked" (Session 16's status) undersold how much
+was still broken:
+
+1. **Economy/Conflict dropdowns.** Were free-text inputs; Tony asked for dropdowns
+   like Race already had. Converted to `<select>` built from the same `ECON`/
+   `CONFLICT` tables the procedural generator itself uses (`buildEconConflictSelects()`
+   in `preview.html`), grouped by economy type / by Low-Medium-High tier.
+2. **"Nothing happens when I click Save"** — turned out to be two stacked bugs:
+   - The error box (`#editErr`) rendered at the *top* of a tall modal while Save sits
+     at the bottom; any error was genuinely invisible without scrolling up first. Fixed
+     by calling `.scrollIntoView()` on the error element every place it's shown, in
+     both the Edit and Report modals.
+   - Once errors became visible, the real one appeared: `GitHub write failed: 404`.
+     `netlify/functions/system-edit.mjs` had `GITHUB_OWNER = "TODO-tony-github-username"`
+     — a placeholder from Session 16 that was never swapped for Tony's real username.
+     Fixed to `"elegra1965-source"`. **This was a real shipped bug, not a Tony setup
+     step** — worth remembering if a similar TODO constant ever gets left in again.
+3. **False-positive content filter — a real Scunthorpe problem.** Tony's public note
+   "my skyscraper ARG system" got rejected as blocked language. Root cause:
+   `containsBadWord()` did a raw substring search across the whole normalized string,
+   so "sky**scrap**er" tripped on "rape" hiding inside it. Same bug would have blocked
+   "grape", "classic"/"assassin"/"brass" (contain "ass"), "cockpit"/"cockatoo" (contain
+   "cock"), etc. Fixed in both `netlify/functions/filter.mjs` (authoritative) and the
+   mirrored client-side echo in `preview.html` (`clientPrecheck()`'s `bad()`): split on
+   **whitespace only** into words first, normalize each word (leet-substitute, strip
+   inner punctuation so "f-u-c-k"/"f.u.c.k" still catch, collapse stretched letters),
+   then require an **exact whole-word match** against `BAD_WORDS` — not "does the bad
+   word appear anywhere in this word". Verified against a battery of known trap words
+   (skyscraper, grape, classic, assassin, cockpit, scunthorpe, grass, glass, pass,
+   therapist, well-known — all clean) and real bad words including leetspeak/hyphenated/
+   stretched-letter evasion (all still caught). One accepted trade-off: space-separated
+   evasion like "f u c k" no longer catches, since spaces are now real word boundaries —
+   worth it to stop blocking ordinary English words.
+4. **GitHub write 403 "Resource not accessible by personal access token".** Once the
+   404 was gone, this came up next. Root cause, confirmed by Tony's own token settings
+   screenshot: the fine-grained PAT had the right permission (Contents: Read and write)
+   but **zero repositories actually selected** — "This token does not have access to
+   any repositories." Purely a GitHub-side setting only Tony can fix (token
+   creation/editing is outside what Claude can do). Fix: Edit the token → Repository
+   access → select `nms-galactic-map`. Documented as its own troubleshooting entry in
+   `SHARED-EDITS-SETUP.md` (both the 404-wrong-owner and 403-no-repo-selected cases),
+   including the specific trap of a fine-grained token created *before* a repo
+   delete/recreate not automatically following the "new" repo of the same name.
+5. **In-system star/planet labels didn't update after a save**, while the info panel
+   did. Root cause: `buildSystemView(s)` bakes names onto the 3D meshes' `userData` at
+   build time, when "Enter system" is first clicked — those meshes don't live-follow
+   the `selected` variable. `refreshAfterOverrides()` was reassigning `selected` to the
+   fresh post-edit object but never rebuilding the 3D scene, so the old meshes (and
+   their labels) kept showing pre-edit data until you left the system view and
+   re-entered. Fixed: `refreshAfterOverrides()` now calls `buildSystemView(selected)`
+   again if `mode==="system"`, rebuilding the scene in place (camera untouched) right
+   after a save. **Tony confirmed this fix working on mobile too**, in-place, no need
+   to back out to local view and re-enter.
+6. **Collapsible planet/moon editor**, requested alongside the Save bug report: with
+   several planets each showing 3 full rows of fields at once, the modal got very tall
+   — Save and any error both required a lot of scrolling. Changed `editBodies` entries
+   to carry an `open` flag; `renderBodyEditList()` now shows each body as a one-line
+   collapsed summary by default and only renders its fields when open. Clicking a row
+   opens it and closes any other open row (accordion — only one open at a time,
+   directly answering Tony's "why not only have add planet/moon open when click add").
+   Clicking "+ Add" opens only the new row and scrolls it into view. Verified with a
+   7-assertion pure-logic test of the open/close state machine (collapse-by-default,
+   single-open swapping, toggle-to-close, add-always-opens-only-the-new-one).
+
+**End state, confirmed by Tony:** edit → save → GitHub commit → "Community edited"
+badge, panel fields, body list, and in-system 3D labels all update correctly, on both
+desktop and mobile, without needing to leave and re-enter the system.
 
 ---
 
@@ -136,7 +292,9 @@ pass once Tony has done the setup in `SHARED-EDITS-SETUP.md`.
 **Not done:** a friendlier admin view for the reports list (currently raw
 JSON at a URL with a token); no per-address "originally X, edited to Y" diff
 view; no way to clear/undo an edit from the site itself (has to be done via
-GitHub's file history, explained in the setup doc).
+GitHub's file history, explained in the setup doc). Update, Session 17
+continued: the edit/save flow itself (the main open item from Session 16) is
+now confirmed working — see "Session 17 continued" section above.
 
 ---
 
@@ -147,9 +305,8 @@ He clicks, Claude screenshots his screen and gives feedback. **This works and is
 worth continuing** — it has already found bugs that reading the code did not.
 
 **Still never seen render:**
-1. **Enter system** — the 3D orbital view. Do the textured planets actually read
-   as planets, or as coloured blobs? This is the biggest unknown.
-2. **Labels** inside the system view.
+1. ~~Enter system — the 3D orbital view~~ — **confirmed working, see top of doc.**
+2. ~~Labels inside the system view~~ — **confirmed working, see top of doc.**
 3. **Fly** movement (the camera aim is fixed and unit-tested, but WASD feel is unverified).
 4. The course readout panel in its new top-centre position.
 
