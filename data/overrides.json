@@ -20,19 +20,8 @@
             ]
           },
           {
-            "name": "Huwex-XV",
-            "moon": true,
-            "parent": 0,
-            "biome": "Volcanic",
-            "water": false,
-            "resources": [
-              "Silver",
-              "Cobalt"
-            ]
-          },
-          {
             "name": "Elsup-I",
-            "moon": true,
+            "moon": false,
             "parent": 0,
             "biome": "Frozen",
             "water": false,
@@ -70,17 +59,26 @@
             "biome": "Lush",
             "water": false,
             "resources": []
+          },
+          {
+            "name": "New body",
+            "moon": false,
+            "parent": 0,
+            "biome": "Lush",
+            "water": false,
+            "resources": []
           }
         ]
       },
-      "editedAt": "2026-08-04T16:43:10.374Z",
+      "editedAt": "2026-08-04T16:50:38.903Z",
       "editedByIp": "185.45.15.46"
     }
   },
   "reports": [],
   "ipLog": {
     "185.45.15.46": [
-      1785861790374
+      1785861790374,
+      1785862238903
     ]
   }
 }
