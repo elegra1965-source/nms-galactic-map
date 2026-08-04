@@ -198,9 +198,14 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   padding:8px 10px;font-size:11px;margin-bottom:10px;display:none;white-space:pre-wrap}
 .bodyEdit{border:1px solid var(--border-soft);border-radius:var(--r-sm);padding:8px;margin-bottom:8px;
   background:rgba(255,255,255,.02)}
-.bodyEdit .bhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.bodyEdit .bhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;cursor:pointer}
+.bodyEdit:not(.open) .bhead{margin-bottom:0}
+.bodyEdit .bhead:hover{background:rgba(255,255,255,.03)}
 .bodyEdit .bhead span{font-family:'Orbitron',sans-serif;font-size:9.5px;letter-spacing:.1em;color:var(--gold);
   text-transform:uppercase}
+.bodyEdit .bhLabel{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-right:8px}
+.bodyEdit .bhBtns{display:flex;align-items:center;gap:2px;flex-shrink:0}
+.bodyEdit .bchev{color:var(--text-faint);font-size:10px;padding:2px 4px}
 .bodyEdit .bx{cursor:pointer;color:var(--text-faint);font-size:14px;line-height:1;padding:2px 6px}
 .bodyEdit .bx:hover{color:#ff8080}
 .bodyEdit .brow2{display:flex;gap:6px;margin-bottom:6px}
@@ -1987,23 +1992,34 @@ function buildEconConflictSelects(){
 }
 buildEconConflictSelects();
 var editBodies=[];
+// Each row starts collapsed (just a name summary) so a system with several
+// planets doesn't turn the modal into a huge scroll -- only the row the
+// traveller is actively adding/editing expands, accordion-style, so Save
+// and any error message stay reachable without hunting through open fields.
 function renderBodyEditList(){
   var el=document.getElementById("bodyEditList"), html="",i,k;
   for(i=0;i<editBodies.length;i++){
     var b=editBodies[i], opts="";
-    for(k=0;k<BIOME_KEYS.length;k++) opts+='<option value="'+BIOME_KEYS[k]+'"'+(b.biome===BIOME_KEYS[k]?" selected":"")+'>'+BIOME_KEYS[k]+'</option>';
-    html+='<div class="bodyEdit" data-i="'+i+'">'+
-      '<div class="bhead"><span>'+(b.moon?"Moon":"Planet")+' #'+(i+1)+'</span><span class="bx" data-remove="'+i+'" title="Remove">&times;</span></div>'+
-      '<div class="brow2">'+
-        '<div class="mfld" style="margin-bottom:0"><div class="lb">Name</div><input type="text" class="bfName" data-i="'+i+'" maxlength="30" value="'+escAttr(b.name)+'"></div>'+
-        '<label class="chk2"><input type="checkbox" class="bfMoon" data-i="'+i+'"'+(b.moon?" checked":"")+'> Moon</label>'+
-      '</div>'+
-      '<div class="brow2">'+
-        '<div class="mfld" style="margin-bottom:0"><div class="lb">Biome</div><select class="bfBiome" data-i="'+i+'">'+opts+'</select></div>'+
-        '<label class="chk2"><input type="checkbox" class="bfWater" data-i="'+i+'"'+(b.water?" checked":"")+'> Water</label>'+
-      '</div>'+
-      '<div class="mfld" style="margin-bottom:0"><div class="lb">Resources (comma separated)</div><input type="text" class="bfRes" data-i="'+i+'" maxlength="120" value="'+escAttr(b.resources)+'"></div>'+
-    '</div>';
+    var summary=escAttr(b.name||"(unnamed)");
+    html+='<div class="bodyEdit'+(b.open?" open":"")+'" data-i="'+i+'">'+
+      '<div class="bhead">'+
+        '<span class="bhLabel">'+(b.moon?"Moon":"Planet")+' #'+(i+1)+' &mdash; '+summary+'</span>'+
+        '<span class="bhBtns"><span class="bchev">'+(b.open?"&#9662;":"&#9656;")+'</span>'+
+          '<span class="bx" data-remove="'+i+'" title="Remove">&times;</span></span>'+
+      '</div>';
+    if(b.open){
+      for(k=0;k<BIOME_KEYS.length;k++) opts+='<option value="'+BIOME_KEYS[k]+'"'+(b.biome===BIOME_KEYS[k]?" selected":"")+'>'+BIOME_KEYS[k]+'</option>';
+      html+='<div class="brow2">'+
+          '<div class="mfld" style="margin-bottom:0"><div class="lb">Name</div><input type="text" class="bfName" data-i="'+i+'" maxlength="30" value="'+escAttr(b.name)+'"></div>'+
+          '<label class="chk2"><input type="checkbox" class="bfMoon" data-i="'+i+'"'+(b.moon?" checked":"")+'> Moon</label>'+
+        '</div>'+
+        '<div class="brow2">'+
+          '<div class="mfld" style="margin-bottom:0"><div class="lb">Biome</div><select class="bfBiome" data-i="'+i+'">'+opts+'</select></div>'+
+          '<label class="chk2"><input type="checkbox" class="bfWater" data-i="'+i+'"'+(b.water?" checked":"")+'> Water</label>'+
+        '</div>'+
+        '<div class="mfld" style="margin-bottom:0"><div class="lb">Resources (comma separated)</div><input type="text" class="bfRes" data-i="'+i+'" maxlength="120" value="'+escAttr(b.resources)+'"></div>';
+    }
+    html+='</div>';
   }
   el.innerHTML=html;
   document.getElementById("edAddBody").disabled=(editBodies.length>=6);
@@ -2023,7 +2039,8 @@ function openEditModal(){
       moon:!!b.moon,
       biome:(BIOME_KEYS.indexOf(b.biome)>=0)?b.biome:BIOME_KEYS[0],
       water:!!b.water,
-      resources:(b.resUni||[]).join(", ")
+      resources:(b.resUni||[]).join(", "),
+      open:false
     };
   });
   renderBodyEditList();
@@ -2074,12 +2091,25 @@ document.getElementById("bodyEditList").addEventListener("change",function(e){
 });
 document.getElementById("bodyEditList").addEventListener("click",function(e){
   var rm=e.target.getAttribute("data-remove");
-  if(rm!==null){ editBodies.splice(+rm,1); renderBodyEditList(); }
+  if(rm!==null){ editBodies.splice(+rm,1); renderBodyEditList(); return; }
+  var row=e.target.closest?e.target.closest(".bodyEdit"):null;
+  var headHit=e.target.closest?e.target.closest(".bhead"):null;
+  if(row && headHit){
+    var idx=+row.getAttribute("data-i");
+    var wasOpen=editBodies[idx].open;
+    for(var j=0;j<editBodies.length;j++) editBodies[j].open=false; // accordion -- only one open at a time
+    editBodies[idx].open=!wasOpen;
+    renderBodyEditList();
+  }
 });
 document.getElementById("edAddBody").addEventListener("click",function(){
   if(editBodies.length>=6) return;
-  editBodies.push({name:"New body",moon:false,biome:BIOME_KEYS[0],water:false,resources:""});
+  for(var j=0;j<editBodies.length;j++) editBodies[j].open=false;
+  editBodies.push({name:"New body",moon:false,biome:BIOME_KEYS[0],water:false,resources:"",open:true});
   renderBodyEditList();
+  var rows=document.querySelectorAll("#bodyEditList .bodyEdit");
+  var last=rows[rows.length-1];
+  if(last) last.scrollIntoView({block:"nearest",behavior:"smooth"});
 });
 document.getElementById("bEdit").addEventListener("click",function(){ if(selected) openEditModal(); });
 document.getElementById("bReport").addEventListener("click",function(){

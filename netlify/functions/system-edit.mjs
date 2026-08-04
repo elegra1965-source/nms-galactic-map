@@ -29,7 +29,7 @@
 
 import { filterSystemEdit, filterReport } from "./filter.mjs";
 
-const GITHUB_OWNER  = "TODO-tony-github-username";
+const GITHUB_OWNER  = "elegra1965-source";
 const GITHUB_REPO   = "nms-galactic-map";
 const GITHUB_BRANCH = "main";
 const DATA_PATH     = "data/overrides.json";
