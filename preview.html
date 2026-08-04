@@ -51,6 +51,10 @@ canvas#c{display:block;position:fixed;inset:0;touch-action:none}
   padding:6px 10px;border-radius:var(--r-sm);cursor:pointer;white-space:nowrap}
 .btn:hover{background:var(--panel-2);border-color:var(--gold)}
 .btn.on{border-color:var(--gold);color:var(--gold);background:rgba(240,165,0,.08)}
+/* Same gold "this matters" language as .btn.on, but for a primary action
+   rather than an active toggle state -- used on the Jump button so it's
+   visually the obvious next step right after typing an address. */
+#top .btn.primary{border-color:var(--gold);color:var(--gold)}
 .btn.off{opacity:.4;border-color:var(--border-soft);color:var(--text-faint)}
 .sep{width:1px;height:18px;background:var(--border-soft)}
 input[type=text]{font-family:'Orbitron',monospace;font-size:11px;letter-spacing:.12em;
@@ -252,7 +256,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   #title{order:1} #galSel{order:2}
   #mGal{order:10} #mLoc{order:11} #cOrb{order:12} #cFly{order:13}
   #addrGrp{order:20;width:100%}
-  #bKeys{order:21} #bRand{order:22} #bFiltToggle{order:23} #bJump{order:24}
+  #bKeys{order:21} #bRand{order:22} #bFiltToggle{order:23}
   #bLbl{order:30} #bGrid{order:31}
   #bInstall{order:40} #bAbout{order:41}
 }
@@ -287,14 +291,14 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   <div id="addrGrp">
     <div class="addr-lb">Portal address</div>
     <div class="addr-row">
-      <input type="text" id="inAddr" value="" placeholder="TYPE OR TAP A 12-GLYPH ADDRESS" maxlength="12" spellcheck="false" title="Type or paste a 12-character portal address, or build one with the Glyphs keypad, then tap Jump.">
+      <input type="text" id="inAddr" value="" placeholder="TYPE OR TAP A 12-GLYPH ADDRESS" maxlength="12" spellcheck="false" enterkeyhint="go" title="Type or paste a 12-character portal address, or build one with the Glyphs keypad, then tap Jump.">
+      <button class="btn primary" id="bJump" title="Travel to the 12-glyph address in the box. Regenerates the local slice around it.">Jump</button>
       <button class="btn" id="bAddrReset" title="Clear the address box.">Clear</button>
     </div>
   </div>
   <button class="btn" id="bKeys" title="Open the 16-key portal glyph keypad. Tap glyphs to build an address; it stays in sync with the hex box.">Glyphs</button>
   <button class="btn" id="bRand" title="Roll a random valid portal address and jump there.">Random</button>
   <button class="btn" id="bFiltToggle" title="Show or hide the system filters.">Filters</button>
-  <button class="btn" id="bJump" title="Travel to the 12-glyph address in the box. Regenerates the local slice around it.">Jump</button>
   <div class="sep"></div>
   <button class="btn" id="bLbl" title="Show names on the nearest stars, or on planets and moons inside a system. Shortcut: H">Labels</button>
   <button class="btn on" id="bGrid" title="Show the region grid in Local view. Each cube is one region, roughly 400 light years across. Shortcut: G">Grid</button>
