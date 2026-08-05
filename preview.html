@@ -147,6 +147,18 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 #course .cline span:first-child{color:var(--text-faint)}
 #course .cline b{color:var(--cyan);font-family:'Orbitron',sans-serif;font-size:10.5px}
 #cTarget{font-family:'Orbitron',sans-serif;font-size:11px;color:var(--white);margin:5px 0 6px}
+#course .chead{display:flex;align-items:center;gap:8px}
+#course .chead>div{flex:1;min-width:0}
+#course .chead #bCourseMin{margin-left:auto;flex:none;padding:4px 9px;font-size:12px}
+/* Collapsed state: hide everything below the header row (distance/jumps/bearing/
+   target-from-centre/buttons) so the box shrinks to one line instead of a tall
+   block sitting over the star field -- Tony's "stays so can not see jumps" report.
+   Stays anchored in the same top-centre spot rather than relocating to the bottom,
+   since on mobile the bottom is already taken by the info panel's own sticky
+   Enter system/Set course row -- moving it there would just recreate the same
+   overlap problem this session's other fixes were about. */
+#course.min #cBody{display:none}
+#course.min{width:auto}
 
 #keys{position:fixed;left:50%;transform:translateX(-50%);bottom:10px;z-index:26;
   width:min(560px,calc(100vw - 20px));padding:10px 12px;display:none}
@@ -394,14 +406,21 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 </div>
 
 <div id="course" class="box">
-  <div class="kicker">Course plotted</div>
-  <div id="cTarget">—</div>
-  <div class="cline"><span>Distance</span><b id="cDist">—</b></div>
-  <div class="cline"><span>Jumps</span><b id="cJumps">—</b></div>
-  <div class="cline"><span>Bearing</span><b id="cBear">—</b></div>
-  <div class="cline"><span>Target from centre</span><b id="cCore">—</b></div>
-  <div class="prow"><button class="btn" id="bGoCourse" title="Travel to the plotted target.">Jump to</button>
-    <button class="btn" id="bClrCourse" title="Cancel the plotted course.">Clear</button></div>
+  <div class="chead">
+    <div>
+      <div class="kicker">Course plotted</div>
+      <div id="cTarget">—</div>
+    </div>
+    <button class="btn" id="bCourseMin" title="Collapse or expand the course readout.">&#9662;</button>
+  </div>
+  <div id="cBody">
+    <div class="cline"><span>Distance</span><b id="cDist">—</b></div>
+    <div class="cline"><span>Jumps</span><b id="cJumps">—</b></div>
+    <div class="cline"><span>Bearing</span><b id="cBear">—</b></div>
+    <div class="cline"><span>Target from centre</span><b id="cCore">—</b></div>
+    <div class="prow"><button class="btn" id="bGoCourse" title="Travel to the plotted target.">Jump to</button>
+      <button class="btn" id="bClrCourse" title="Cancel the plotted course.">Clear</button></div>
+  </div>
 </div>
 
 <div id="panel" class="box">
@@ -1547,6 +1566,8 @@ function setCourse(s){
   document.getElementById("cBear").textContent=(ly===0)?"—":bearingOf(dvx,dvz,dvy);
   document.getElementById("cCore").textContent=commas(s.coreLY)+" LY";
   document.getElementById("course").classList.add("show");
+  document.getElementById("course").classList.remove("min");
+  document.getElementById("bCourseMin").innerHTML="&#9662;";
   drawCourse();
   buildGalaxyMarks();
 }
@@ -2306,6 +2327,11 @@ document.getElementById("bAddrReset").addEventListener("click",function(){
 });
 document.getElementById("bPanelMin").addEventListener("click",function(){
   var min=document.getElementById("panel").classList.toggle("panel-min");
+  this.innerHTML=min?"&#9656;":"&#9662;";
+});
+document.getElementById("bCourseMin").addEventListener("click",function(e){
+  e.stopPropagation();
+  var min=document.getElementById("course").classList.toggle("min");
   this.innerHTML=min?"&#9656;":"&#9662;";
 });
 
