@@ -2677,6 +2677,33 @@ function syncPanelOffset(){
   else camera.clearViewOffset();
   camera.updateProjectionMatrix();
 }
+/* On mobile portrait, #filt (left-docked, grows downward) and #panel (also
+   bottom-docked there, full width) can end up sharing the same lower slice of
+   the screen once a system is selected -- #panel comes later in the DOM so it
+   paints on top, silently covering (and eating clicks on) Reset/Export/Import
+   underneath (confirmed by Tony: "buttons get hidden behind the planet index").
+   The static CSS max-height on #filt has no way to know #panel exists, so this
+   measures both boxes' live rects each frame (same technique syncPanelOffset
+   already uses for the camera) and clamps #filt's height to stop just above
+   wherever #panel actually starts -- on desktop/landscape #panel docks to the
+   right and never shares horizontal space with the left-docked #filt, so this
+   is a no-op there. */
+var _lastFiltCap=null;
+function syncFiltBoundary(){
+  var filt=document.getElementById("filt"), panel=document.getElementById("panel");
+  if(!filt||!panel) return;
+  var cap=null;
+  if(panel.classList.contains("show")){
+    var fr=filt.getBoundingClientRect(), pr=panel.getBoundingClientRect();
+    if(pr.width>0 && pr.left<fr.right && pr.top<window.innerHeight){
+      var avail=Math.round(pr.top-fr.top-10);
+      if(avail>80) cap=avail;
+    }
+  }
+  if(cap===_lastFiltCap) return;
+  _lastFiltCap=cap;
+  filt.style.maxHeight=cap?cap+"px":"";
+}
 window.addEventListener("resize",resize);
 /* The browser's own "resize" event doesn't reliably fire for every case that changes
    window.innerWidth/innerHeight (docking DevTools is a confirmed one). When it's missed,
@@ -2711,6 +2738,7 @@ function animate(){
   try{
     syncSizeIfChanged();
     syncPanelOffset();
+    syncFiltBoundary();
     var now=performance.now();
     var dt=Math.min(0.05,(now-lastT)/1000); lastT=now;
     frames++;
