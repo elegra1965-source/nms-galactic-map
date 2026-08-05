@@ -174,6 +174,10 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:.12em;color:var(--gold);
   background:rgba(11,17,25,.95);border:1px solid var(--gold);border-radius:var(--r-sm);
   padding:7px 13px;display:none}
+#galInfo{position:fixed;left:50%;top:84px;transform:translateX(-50%);z-index:39;
+  font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:.12em;color:var(--gold);
+  background:rgba(11,17,25,.95);border:1px solid var(--gold);border-radius:var(--r-sm);
+  padding:7px 13px;display:none;pointer-events:none}
 #err{position:fixed;left:10px;right:10px;bottom:10px;z-index:60;background:#2a0d0d;
   border:1px solid #ff4a4a;color:#ffb0b0;border-radius:var(--r-sm);padding:9px 12px;
   font-family:monospace;font-size:11px;display:none;white-space:pre-wrap;max-height:30vh;overflow:auto}
@@ -274,6 +278,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 <canvas id="c"></canvas>
 <div id="labels"></div>
 <div id="toast"></div>
+<div id="galInfo"></div>
 <div id="err"></div>
 <div id="empty">No systems match these filters</div>
 <div id="flyhint">WASD / ARROWS MOVE · SHIFT BOOST · SPACE-Q UP · E DOWN · DRAG TO LOOK</div>
@@ -1965,6 +1970,7 @@ function setMode(m){
   document.getElementById("mLoc").classList.toggle("on",m!=="galaxy");
   document.getElementById("bEnter").textContent=(m==="system")?"Back to local":"Enter system";
   document.getElementById("mstat").textContent=m.toUpperCase();
+  updateGalInfoBadge();
   hideLabels();
   document.getElementById("empty").style.display=(m==="local"&&shown.length===0)?"block":"none";
   cam.target.set(0,0,0);
@@ -2035,6 +2041,17 @@ function updateGalaxyInfo(){
   el.textContent=pickOne(r,gt.names)+" galaxy";
   el.style.color=gt.c;
 }
+function galInfoHTML(){
+  var gt=galaxyType(GALAXY);
+  var typeLabel=gt.k==="Unknown"?"TYPE UNKNOWN":gt.k.toUpperCase();
+  return GALAXIES[GALAXY].toUpperCase()+" \u2014 GALAXY #"+(GALAXY+1)+" OF "+GALAXIES.length+
+    " \u2014 <span style=\"color:"+gt.c+"\">"+typeLabel+"</span>";
+}
+function updateGalInfoBadge(){
+  var el=document.getElementById("galInfo");
+  if(mode==="galaxy"){ el.innerHTML=galInfoHTML(); el.style.display="block"; }
+  else{ el.style.display="none"; }
+}
 document.getElementById("galSel").addEventListener("change",function(){
   GALAXY=parseInt(this.value,10);
   updateGalaxyInfo();
@@ -2047,10 +2064,8 @@ document.getElementById("galSel").addEventListener("change",function(){
      otherwise flash a red "Address needs 12 glyphs" error on a perfectly
      normal galaxy switch before anyone's typed anything. */
   jumpTo(hasRealLocation?document.getElementById("inAddr").value:BOOT_ANCHOR_ADDR,!hasRealLocation);
-  var gt=galaxyType(GALAXY);
-  var typeLabel=gt.k==="Unknown"?"TYPE UNKNOWN":gt.k.toUpperCase();
-  toast(GALAXIES[GALAXY].toUpperCase()+" \u2014 GALAXY #"+(GALAXY+1)+" OF "+GALAXIES.length+
-    " \u2014 <span style=\"color:"+gt.c+"\">"+typeLabel+"</span>", 2600);
+  updateGalInfoBadge();
+  if(mode!=="galaxy") toast(galInfoHTML(), 2600);
 });
 
 function bindSlider(id,out,fn,fixed){
