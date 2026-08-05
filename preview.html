@@ -1267,7 +1267,8 @@ function drawGalIcon(){
   function hx(n){ return "#"+("000000"+n.toString(16)).slice(-6); }
   var cx=size/2, cy=size/2, R=size*0.47;
   var r=mulberry32(0x51EB7A+GALAXY*7919);
-  var arms=2+Math.floor(r()*2), tw=2.2+r()*1.6;
+  var arms=parseInt(document.getElementById("sArm").value,10)||4;
+  var tw=parseFloat(document.getElementById("sTw").value)||3.6;
   ctx.globalCompositeOperation="lighter";
   var N=Math.round(size*0.9);
   for(var i=0;i<N;i++){
@@ -2137,8 +2138,8 @@ function bindSlider(id,out,fn,fixed){
 bindSlider("sNeb","vNeb",buildNebula,false);
 bindSlider("sCsz","vCsz",buildNebula,true);
 bindSlider("sGal","vGal",buildGalaxy,false);
-bindSlider("sArm","vArm",function(){ buildGalaxy(); buildNebula(); },false);
-bindSlider("sTw","vTw",function(){ buildGalaxy(); buildNebula(); },true);
+bindSlider("sArm","vArm",function(){ buildGalaxy(); buildNebula(); drawGalIcon(); },false);
+bindSlider("sTw","vTw",function(){ buildGalaxy(); buildNebula(); drawGalIcon(); },true);
 bindSlider("sTh","vTh",function(){ buildGalaxy(); buildNebula(); },true);
 bindSlider("sR","vR",generateSlice,false);
 bindSlider("sPer","vPer",generateSlice,false);
