@@ -314,7 +314,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   <button class="btn" id="bRand" title="Roll a random valid portal address and jump there.">Random</button>
   <button class="btn" id="bFiltToggle" title="Show or hide the system filters.">Filters</button>
   <div class="sep"></div>
-  <button class="btn" id="bLbl" title="Show names on the nearest stars, or on planets and moons inside a system. Shortcut: H">Labels</button>
+  <button class="btn on" id="bLbl" title="Show names on the nearest stars, or on planets and moons inside a system. Shortcut: H">Labels</button>
   <button class="btn on" id="bGrid" title="Show the region grid in Local view. Each cube is one region, roughly 400 light years across. Shortcut: G">Grid</button>
   <div class="sep"></div>
   <button class="btn" id="bInstall" title="Install this map as an app on your device." style="display:none">&#9672; Install app</button>
@@ -1117,7 +1117,7 @@ var focus={x:0,y:0,z:0}, focusSystem=null, courseTarget=null;
    box back in with that boot coordinate instead of leaving it empty, quietly
    defeating the whole point of not showing a specific system by default. */
 var hasRealLocation=false;
-var mode="galaxy", ctrl="orbit", selected=null, labelsOn=false;
+var mode="galaxy", ctrl="orbit", selected=null, labelsOn=true;
 
 var marker=new THREE.Mesh(new THREE.RingGeometry(3.0,4.0,32),
   new THREE.MeshBasicMaterial({color:0xf0a500,side:THREE.DoubleSide,transparent:true,opacity:0.95}));
