@@ -518,6 +518,25 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
       <div class="lb">New to No Man's Sky?</div>
       <div style="font-size:12px;color:var(--text-dim);line-height:1.55">A "portal address" is a 12-symbol code the game uses to pin down a star system's location. Don't have one? Hit <b>Random</b> in the toolbar to jump somewhere, or tap <b>Glyphs</b> to see the code as the game's own symbols instead of letters/numbers.</div>
     </div>
+    <div class="mfld">
+      <div class="lb">More by elegra1965</div>
+      <div style="display:flex;flex-direction:column;gap:5px;font-size:12px">
+        <a href="https://nms-command-network.netlify.app" target="_blank" rel="noreferrer" style="color:var(--cyan);text-decoration:none">&#9670; NMS Command Network (hub)</a>
+        <a href="https://nms-atlas-interface-ai.netlify.app" target="_blank" rel="noreferrer" style="color:var(--cyan);text-decoration:none">&#9670; ATLAS -- AI assistant interface</a>
+        <a href="https://nms-theme-pack.netlify.app" target="_blank" rel="noreferrer" style="color:var(--cyan);text-decoration:none">&#9670; NMS Theme Pack</a>
+        <a href="https://nms-weather-app.netlify.app" target="_blank" rel="noreferrer" style="color:var(--cyan);text-decoration:none">&#9670; NMS Weather App</a>
+        <a href="https://nms-alphabet-translator.netlify.app" target="_blank" rel="noreferrer" style="color:var(--cyan);text-decoration:none">&#9670; Alphabet Translator</a>
+      </div>
+    </div>
+    <div class="mfld">
+      <div class="lb">Share this map</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn" onclick="return shareTo('x')" style="flex:1;text-align:center">Share on X</button>
+        <button class="btn" onclick="return shareTo('reddit')" style="flex:1;text-align:center">Reddit</button>
+        <button class="btn" onclick="return shareTo('copy')" style="flex:1;text-align:center">Copy link</button>
+      </div>
+    </div>
+    <div style="margin-top:2px;font-size:9px;letter-spacing:.1em;color:var(--text-faint);text-align:center">BUILT BY ELEGRA1965</div>
     <div class="modalBtns">
       <button class="btn primary" id="discOk">Got it</button>
     </div>
@@ -550,7 +569,7 @@ var GAL_R=200, GAL_H=13, CORE_R=14;
 var VOX_U=9, LY_PER_VOXEL=400;
 var HEXD="0123456789ABCDEF";
 
-var GALAXIES=["Euclid","Hilbert Dimension","Calypso","Hesperius Dimension","Hyades","Ickjamatew","Budullangr","Kikolgallr","Eltiensleen","Eissentam","Elkupalos","Aptarkaba","Ontiniangp","Odiwagiri","Ogtialabi","Muhacksonto","Hitonskyer","Rerasmutul","Isdoraijung","Doctinawyra","Loychazinq","Zukasizawa","Ekwathore","Yeberhahne","Twerbetek","Sivarates","Eajerandal","Aldukesci","Wotyarogii","Sudzerbal","Maupenzhay","Sugueziume","Brogoweldian","Ehbogdenbu","Ijsenufryos","Nipikulha","Autsurabin","Lusontrygiamh","Rewmanawa","Ethiophodhe","Urastrykle","Xobeurindj","Oniijialdu","Wucetosucc","Ebyeloof","Odyavanta","Milekistri","Waferganh","Agnusopwit","Teyaypilny","Zalienkosm","Ladgudiraf","Mushonponte","Amsentisz","Fladiselm","Laanawemb","Ilkerloor","Davanossi","Ploehrliou","Corpinyaya","Leckandmeram","Quulngais","Nokokipsechl","Rinblodesa","Loydporpen","Ibtrevskip","Elkowaldb","Heholhofsko","Yebrilowisod","Husalvangewi","Ovna'uesed","Bahibusey","Nuybeliaure","Doshawchuc","Ruckinarkh","Thorettac","Nuponoparau","Moglaschil","Uiweupose","Nasmilete","Ekdaluskin","Hakapanasy","Dimonimba","Cajaccari","Olonerovo","Umlanswick","Henayliszm","Utzenmate","Umirpaiya","Paholiang","Iaereznika","Yudukagath","Boealalosnj","Yaevarcko","Coellosipp","Wayndohalou","Smoduraykl","Apmaneessu","Hicanpaav","Akvasanta","Tuychelisaor","Rivskimbe","Daksanquix","Kissonlin","Aediabiel","Ulosaginyik","Roclaytonycar","Kichiaroa","Irceauffey","Nudquathsenfe","Getaizakaal","Hansolmien","Bloytisagra","Ladsenlay","Luyugoslasr","Ubredhatk","Cidoniana","Jasinessa","Torweierf","Saffneckm","Thnistner","Dotusingg","Luleukous","Jelmandan","Otimanaso","Enjaxusanto","Sezviktorew","Zikehpm","Bephembah","Broomerrai","Meximicka","Venessika","Gaiteseling","Zosakasiro","Drajayanes","Ooibekuar","Urckiansi","Dozivadido","Emiekereks","Meykinunukur","Kimycuristh","Roansfien","Isgarmeso","Daitibeli","Gucuttarik","Enlaythie","Drewweste","Akbulkabi","Homskiw","Zavainlani","Jewijkmas","Itlhotagra","Podalicess","Hiviusauer","Halsebenk","Puikitoac","Gaybakuaria","Grbodubhe","Rycempler","Indjalala","Fontenikk","Pasycihelwhee","Ikbaksmit","Telicianses","Oyleyzhan","Uagerosat","Impoxectin","Twoodmand","Hilfsesorbs","Ezdaranit","Wiensanshe","Ewheelonc","Litzmantufa","Emarmatosi","Mufimbomacvi","Wongquarum","Hapirajua","Igbinduina","Wepaitvas","Sthatigudi","Yekathsebehn","Ebedeagurst","Nolisonia","Ulexovitab","Iodhinxois","Irroswitzs","Bifredait","Beiraghedwe","Yeonatlak","Cugnatachh","Nozoryenki","Ebralduri","Evcickcandj","Ziybosswin","Heperclait","Sugiuniam","Aaseertush","Uglyestemaa","Horeroedsh","Drundemiso","Ityanianat","Purneyrine","Dokiessmat","Nupiacheh","Dihewsonj","Rudrailhik","Tweretnort","Snatreetze","Iwundaracos","Digarlewena","Erquagsta","Logovoloin","Boyaghosganh","Kuolungau","Pehneldept","Yevettiiqidcon","Sahliacabru","Noggalterpor","Chmageaki","Veticueca","Vittesbursul","Nootanore","Innebdjerah","Kisvarcini","Cuzcogipper","Pamanhermonsu","Brotoghek","Mibittara","Huruahili","Raldwicarn","Ezdartlic","Badesclema","Isenkeyan","Iadoitesu","Yagrovoisi","Ewcomechio","Inunnunnoda","Dischiutun","Yuwarugha","Ialmendra","Reponudrle","Rinjanagrbo","Zeziceloh","Oeileutasc","Zicniijinis","Dugnowarilda","Neuxoisan","Ilmenhorn","Rukwatsuku","Nepitzaspru","Chcehoemig","Haffneyrin","Uliciawai","Tuhgrespod","Iousongola"];
+var GALAXIES=["Euclid","Hilbert Dimension","Calypso","Hesperius Dimension","Hyades","Ickjamatew","Budullangr","Kikolgallr","Eltiensleen","Eissentam","Elkupalos","Aptarkaba","Ontiniangp","Odiwagiri","Ogtialabi","Muhacksonto","Hitonskyer","Rerasmutul","Isdoraijung","Doctinawyra","Loychazinq","Zukasizawa","Ekwathore","Yeberhahne","Twerbetek","Sivarates","Eajerandal","Aldukesci","Wotyarogii","Sudzerbal","Maupenzhay","Sugueziume","Brogoweldian","Ehbogdenbu","Ijsenufryos","Nipikulha","Autsurabin","Lusontrygiamh","Rewmanawa","Ethiophodhe","Urastrykle","Xobeurindj","Oniijialdu","Wucetosucc","Ebyeloof","Odyavanta","Milekistri","Waferganh","Agnusopwit","Teyaypilny","Zalienkosm","Ladgudiraf","Mushonponte","Amsentisz","Fladiselm","Laanawemb","Ilkerloor","Davanossi","Ploehrliou","Corpinyaya","Leckandmeram","Quulngais","Nokokipsechl","Rinblodesa","Loydporpen","Ibtrevskip","Elkowaldb","Heholhofsko","Yebrilowisod","Husalvangewi","Ovna'uesed","Bahibusey","Nuybeliaure","Doshawchuc","Ruckinarkh","Thorettac","Nuponoparau","Moglaschil","Uiweupose","Nasmilete","Ekdaluskin","Hakapanasy","Dimonimba","Cajaccari","Olonerovo","Umlanswick","Henayliszm","Utzenmate","Umirpaiya","Paholiang","Iaereznika","Yudukagath","Boealalosnj","Yaevarcko","Coellosipp","Wayndohalou","Smoduraykl","Apmaneessu","Hicanpaav","Akvasanta","Tuychelisaor","Rivskimbe","Daksanquix","Kissonlin","Aediabiel","Ulosaginyik","Roclaytonycar","Kichiaroa","Irceauffey","Nudquathsenfe","Getaizakaal","Hansolmien","Bloytisagra","Ladsenlay","Luyugoslasr","Ubredhatk","Cidoniana","Jasinessa","Torweierf","Saffneckm","Thnistner","Dotusingg","Luleukous","Jelmandan","Otimanaso","Enjaxusanto","Sezviktorew","Zikehpm","Bephembah","Broomerrai","Meximicka","Venessika","Gaiteseling","Zosakasiro","Drajayanes","Ooibekuar","Urckiansi","Dozivadido","Emiekereks","Meykinunukur","Kimycuristh","Roansfien","Isgarmeso","Daitibeli","Gucuttarik","Enlaythie","Drewweste","Akbulkabi","Homskiw","Zavainlani","Jewijkmas","Itlhotagra","Podalicess","Hiviusauer","Halsebenk","Puikitoac","Gaybakuaria","Grbodubhe","Rycempler","Indjalala","Fontenikk","Pasycihelwhee","Ikbaksmit","Telicianses","Oyleyzhan","Uagerosat","Impoxectin","Twoodmand","Hilfsesorbs","Ezdaranit","Wiensanshe","Ewheelonc","Litzmantufa","Emarmatosi","Mufimbomacvi","Wongquarum","Hapirajua","Igbinduina","Wepaitvas","Sthatigudi","Yekathsebehn","Ebedeagurst","Nolisonia","Ulexovitab","Iodhinxois","Irroswitzs","Bifredait","Beiraghedwe","Yeonatlak","Cugnatachh","Nozoryenki","Ebralduri","Evcickcandj","Ziybosswin","Heperclait","Sugiuniam","Aaseertush","Uglyestemaa","Horeroedsh","Drundemiso","Ityanianat","Purneyrine","Dokiessmat","Nupiacheh","Dihewsonj","Rudrailhik","Tweretnort","Snatreetze","Iwundaracos","Digarlewena","Erquagsta","Logovoloin","Boyaghosganh","Kuolungau","Pehneldept","Yevettiiqidcon","Sahliacabru","Noggalterpor","Chmageaki","Veticueca","Vittesbursul","Nootanore","Innebdjerah","Kisvarcini","Cuzcogipper","Pamanhermonsu","Brotoghek","Mibittara","Huruahili","Raldwicarn","Ezdartlic","Badesclema","Isenkeyan","Iadoitesu","Yagrovoisi","Ewcomechio","Inunnunnoda","Dischiutun","Yuwarugha","Ialmendra","Reponudrle","Rinjanagrbo","Zeziceloh","Oeileutasc","Zicniijinis","Dugnowarilda","Neuxoisan","Ilmenhorn","Rukwatsuku","Nepitzaspru","Chcehoemig","Haffneyrin","Uliciawai","Tuhgrespod","Iousongola","Odyalutai","Yilsrussimil"];
 
 var STAR_TYPES=[
   {k:"yellow",w:55,cls:["F","G"],col:0xffe08a},
@@ -679,9 +698,14 @@ var GALAXY_TYPE_INFO={
   Empty:{c:"#6ba8ff",names:["Ancestral","Frozen","Exhausted","Silent"]},
   Harsh:{c:"#ff7a4a",names:["Burning","Raging","Relentless","Ruthless"]},
   Lush:{c:"#6bffa8",names:["Halcyon","Inspiring","Serene","Tranquil"]},
-  Norm:{c:"#00e5ff",names:["Imperfect","Improved","Parallel","Rebuilt"]}
+  Norm:{c:"#00e5ff",names:["Imperfect","Improved","Parallel","Rebuilt"]},
+  Unknown:{c:"#b06bff",names:["Hidden","Forbidden","Concealed","Uncharted"]}
 };
 function galaxyType(n){
+  if(n===255||n===256){
+    var u=GALAXY_TYPE_INFO.Unknown;
+    return {k:"Unknown",c:u.c,names:u.names};
+  }
   var code=GALAXY_TYPES[((n%GALAXY_TYPES.length)+GALAXY_TYPES.length)%GALAXY_TYPES.length];
   var k=code==="E"?"Empty":code==="H"?"Harsh":code==="L"?"Lush":"Norm";
   var info=GALAXY_TYPE_INFO[k];
@@ -897,11 +921,19 @@ function saveStore(){
   try{ localStorage.setItem(STORE_K,JSON.stringify(store)); }
   catch(err){ toast("Could not save locally"); }
 }
-function toast(msg){
+function toast(msg,ms){
   var t=document.getElementById("toast");
-  t.textContent=msg; t.style.display="block";
+  t.innerHTML=msg; t.style.display="block";
   clearTimeout(toast._t);
-  toast._t=setTimeout(function(){ t.style.display="none"; },1800);
+  toast._t=setTimeout(function(){ t.style.display="none"; },ms||1800);
+}
+function shareTo(t){
+  var url="https://nms-galaxy-map.netlify.app",
+      txt="NMS Galactic Map \u2014 a fan-made 3D No Man's Sky galaxy map and portal address decoder, by elegra1965.";
+  if(t==="x") window.open("https://twitter.com/intent/tweet?text="+encodeURIComponent(txt)+"&url="+encodeURIComponent(url),"_blank");
+  else if(t==="reddit") window.open("https://www.reddit.com/submit?url="+encodeURIComponent(url)+"&title="+encodeURIComponent("NMS Galactic Map"),"_blank");
+  else if(t==="copy"){ navigator.clipboard.writeText(url).then(function(){ toast("Link copied"); },function(){ toast(url); }); }
+  return false;
 }
 
 /* ============ three setup ============ */
@@ -2015,7 +2047,10 @@ document.getElementById("galSel").addEventListener("change",function(){
      otherwise flash a red "Address needs 12 glyphs" error on a perfectly
      normal galaxy switch before anyone's typed anything. */
   jumpTo(hasRealLocation?document.getElementById("inAddr").value:BOOT_ANCHOR_ADDR,!hasRealLocation);
-  toast("Galaxy: "+GALAXIES[GALAXY]);
+  var gt=galaxyType(GALAXY);
+  var typeLabel=gt.k==="Unknown"?"TYPE UNKNOWN":gt.k.toUpperCase();
+  toast(GALAXIES[GALAXY].toUpperCase()+" \u2014 GALAXY #"+(GALAXY+1)+" OF "+GALAXIES.length+
+    " \u2014 <span style=\"color:"+gt.c+"\">"+typeLabel+"</span>", 2600);
 });
 
 function bindSlider(id,out,fn,fixed){
