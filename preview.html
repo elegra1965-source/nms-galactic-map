@@ -174,13 +174,14 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:.12em;color:var(--gold);
   background:rgba(11,17,25,.95);border:1px solid var(--gold);border-radius:var(--r-sm);
   padding:7px 13px;display:none}
-#galInfo{position:fixed;left:50%;top:calc(var(--top-h,60px) + 44px);transform:translateX(-50%);z-index:39;
+#galInfo{position:fixed;left:10px;top:calc(var(--top-h,60px) + 8px);z-index:39;
   font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:.12em;color:var(--gold);
   background:rgba(11,17,25,.95);border:1px solid var(--gold);border-radius:var(--r-sm);
   padding:7px 13px;display:none;pointer-events:none}
 #galHud{position:fixed;left:10px;top:calc(var(--top-h,60px) + 10px);z-index:24;
   font-family:'Orbitron',sans-serif;pointer-events:none;color:var(--white);display:flex;
-  align-items:center;gap:9px}
+  align-items:center;gap:9px;transition:top .15s}
+#galHud.withBadge{top:calc(var(--top-h,60px) + 46px)}
 #galIcon{width:84px;height:84px;flex:none;display:block}
 #galHud div{white-space:nowrap}
 #galHud .galHudTxt{text-shadow:0 1px 2px #000,0 -1px 2px #000,1px 0 2px #000,-1px 0 2px #000,0 0 6px #000}
@@ -246,9 +247,9 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   #prowEnter{order:-1;position:sticky;top:0;z-index:2;background:rgba(11,17,25,.97);
     margin:0 -14px;padding:10px 14px 8px;border-bottom:1px solid var(--border-soft)}
   #course{top:50px;left:50%;transform:translateX(-50%);width:210px}
-  #leftcol{bottom:auto;top:calc(var(--top-h,150px) + 104px);flex-direction:column;align-items:flex-start}
+  #leftcol{bottom:auto;top:calc(var(--top-h,150px) + 140px);flex-direction:column;align-items:flex-start}
   #filt{width:158px}
-  #keys{bottom:auto;top:calc(var(--top-h,150px) + 104px);width:calc(100vw - 20px)}
+  #keys{bottom:auto;top:calc(var(--top-h,150px) + 140px);width:calc(100vw - 20px)}
   #stats{display:none}
   #flyhint{display:none!important}
   input[type=text]{width:100%}
@@ -2109,8 +2110,9 @@ function galInfoHTML(){
 }
 function updateGalInfoBadge(){
   var el=document.getElementById("galInfo");
-  if(mode==="galaxy"){ el.innerHTML=galInfoHTML(); el.style.display="block"; }
-  else{ el.style.display="none"; }
+  var hud=document.getElementById("galHud");
+  if(mode==="galaxy"){ el.innerHTML=galInfoHTML(); el.style.display="block"; hud.classList.add("withBadge"); }
+  else{ el.style.display="none"; hud.classList.remove("withBadge"); }
 }
 document.getElementById("galSel").addEventListener("change",function(){
   GALAXY=parseInt(this.value,10);
