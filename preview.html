@@ -181,7 +181,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 #galHud{position:fixed;left:10px;top:calc(var(--top-h,60px) + 10px);z-index:24;
   font-family:'Orbitron',sans-serif;pointer-events:none;color:var(--white);display:flex;
   align-items:center;gap:9px}
-#galIcon{width:44px;height:44px;flex:none;display:block}
+#galIcon{width:84px;height:84px;flex:none;display:block}
 #galHud div{white-space:nowrap}
 #galHud .galHudTxt{text-shadow:0 1px 2px #000,0 -1px 2px #000,1px 0 2px #000,-1px 0 2px #000,0 0 6px #000}
 #galHudName{font-size:11px;letter-spacing:.06em;opacity:.92}
@@ -246,9 +246,9 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   #prowEnter{order:-1;position:sticky;top:0;z-index:2;background:rgba(11,17,25,.97);
     margin:0 -14px;padding:10px 14px 8px;border-bottom:1px solid var(--border-soft)}
   #course{top:50px;left:50%;transform:translateX(-50%);width:210px}
-  #leftcol{bottom:auto;top:calc(var(--top-h,150px) + 44px);flex-direction:column;align-items:flex-start}
+  #leftcol{bottom:auto;top:calc(var(--top-h,150px) + 104px);flex-direction:column;align-items:flex-start}
   #filt{width:158px}
-  #keys{bottom:auto;top:calc(var(--top-h,150px) + 44px);width:calc(100vw - 20px)}
+  #keys{bottom:auto;top:calc(var(--top-h,150px) + 104px);width:calc(100vw - 20px)}
   #stats{display:none}
   #flyhint{display:none!important}
   input[type=text]{width:100%}
@@ -287,7 +287,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 <div id="labels"></div>
 <div id="toast"></div>
 <div id="galInfo"></div>
-<div id="galHud"><canvas id="galIcon" width="88" height="88"></canvas><div class="galHudTxt"><div id="galHudName">Galactic Core</div><div id="galHudDist">&mdash;</div></div></div>
+<div id="galHud"><canvas id="galIcon" width="168" height="168"></canvas><div class="galHudTxt"><div id="galHudName">Galactic Core</div><div id="galHudDist">&mdash;</div></div></div>
 <div id="err"></div>
 <div id="empty">No systems match these filters</div>
 <div id="flyhint">WASD / ARROWS MOVE · SHIFT BOOST · SPACE-Q UP · E DOWN · DRAG TO LOOK</div>
@@ -1245,7 +1245,7 @@ function buildNebula(){
 function drawGalIcon(){
   var cv=document.getElementById("galIcon");
   var dpr=Math.min(window.devicePixelRatio||1,2);
-  var cssSize=44, size=cssSize*dpr;
+  var cssSize=84, size=cssSize*dpr;
   cv.width=size; cv.height=size;
   var ctx=cv.getContext("2d");
   ctx.clearRect(0,0,size,size);
@@ -1281,7 +1281,7 @@ function drawGalIcon(){
     var bs=(size*0.05)+r()*size*0.11;
     var g=ctx.createRadialGradient(px,py,0,px,py,bs);
     g.addColorStop(0,col); g.addColorStop(1,"rgba(0,0,0,0)");
-    ctx.globalAlpha=0.16+r()*0.22;
+    ctx.globalAlpha=0.32+r()*0.34;
     ctx.fillStyle=g;
     ctx.beginPath(); ctx.arc(px,py,bs,0,Math.PI*2); ctx.fill();
   }
