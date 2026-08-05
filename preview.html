@@ -179,9 +179,11 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   background:rgba(11,17,25,.95);border:1px solid var(--gold);border-radius:var(--r-sm);
   padding:7px 13px;display:none;pointer-events:none}
 #galHud{position:fixed;left:10px;top:calc(var(--top-h,60px) + 10px);z-index:24;
-  font-family:'Orbitron',sans-serif;pointer-events:none;color:var(--white);
-  text-shadow:0 1px 2px #000,0 -1px 2px #000,1px 0 2px #000,-1px 0 2px #000,0 0 6px #000}
+  font-family:'Orbitron',sans-serif;pointer-events:none;color:var(--white);display:flex;
+  align-items:center;gap:9px}
+#galIcon{width:44px;height:44px;flex:none;display:block}
 #galHud div{white-space:nowrap}
+#galHud .galHudTxt{text-shadow:0 1px 2px #000,0 -1px 2px #000,1px 0 2px #000,-1px 0 2px #000,0 0 6px #000}
 #galHudName{font-size:11px;letter-spacing:.06em;opacity:.92}
 #galHudDist{font-size:13px;letter-spacing:.04em;margin-top:1px}
 #err{position:fixed;left:10px;right:10px;bottom:10px;z-index:60;background:#2a0d0d;
@@ -285,7 +287,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 <div id="labels"></div>
 <div id="toast"></div>
 <div id="galInfo"></div>
-<div id="galHud"><div id="galHudName">Galactic Core</div><div id="galHudDist">&mdash;</div></div>
+<div id="galHud"><canvas id="galIcon" width="88" height="88"></canvas><div class="galHudTxt"><div id="galHudName">Galactic Core</div><div id="galHudDist">&mdash;</div></div></div>
 <div id="err"></div>
 <div id="empty">No systems match these filters</div>
 <div id="flyhint">WASD / ARROWS MOVE · SHIFT BOOST · SPACE-Q UP · E DOWN · DRAG TO LOOK</div>
@@ -1240,6 +1242,56 @@ function buildNebula(){
   coreMesh.rotation.x=-Math.PI/2;
   galaxyGroup.add(coreMesh);
 }
+function drawGalIcon(){
+  var cv=document.getElementById("galIcon");
+  var dpr=Math.min(window.devicePixelRatio||1,2);
+  var cssSize=44, size=cssSize*dpr;
+  cv.width=size; cv.height=size;
+  var ctx=cv.getContext("2d");
+  ctx.clearRect(0,0,size,size);
+  var gt=galaxyType(GALAXY);
+  var inner = gt.k==="Harsh" ? [0xff6a3d,0xff4a2a,0xffab5c] :
+              gt.k==="Lush"  ? [0xc8ff9a,0xa8ff7a,0xe8ffcb] :
+              gt.k==="Empty" ? [0xcfe0f5,0xaac0e0,0xe8f0ff] :
+                               [0xffb347,0xff8a3d,0xffd88a];
+  var mid = gt.k==="Harsh" ? [0xd94f2f,0xb03a2a,0xe07a3a,0xd9662a] :
+            gt.k==="Lush"  ? [0x3fd97a,0x2f9e5a,0x5ad98a,0x2a9e7a] :
+            gt.k==="Empty" ? [0x3a6fb0,0x2a4f80,0x4a8fd0,0x2f5f9a] :
+                             [0x2fd9c0,0x1f9e8f,0x3ad1a0,0x2a8fd9];
+  var outer = gt.k==="Harsh" ? [0x6a1f10,0x8a2f18,0x4a1a0c,0x7a2510] :
+              gt.k==="Lush"  ? [0x2a8f5a,0x1f6f45,0x3aab6a,0x256e50] :
+              gt.k==="Empty" ? [0x3a5a80,0x2a4560,0x4a6a90,0x35506f] :
+                               [0x4a6bd9,0x7a4ad9,0x9a5ad0,0x3a4a9a];
+  var coreCol = gt.k==="Harsh" ? 0xffd8b0 : gt.k==="Lush" ? 0xf0ffd8 :
+                gt.k==="Empty" ? 0xd8e8ff : 0xfff0c8;
+  function hx(n){ return "#"+("000000"+n.toString(16)).slice(-6); }
+  var cx=size/2, cy=size/2, R=size*0.47;
+  var r=mulberry32(0x51EB7A+GALAXY*7919);
+  var arms=2+Math.floor(r()*2), tw=2.2+r()*1.6;
+  ctx.globalCompositeOperation="lighter";
+  var N=Math.round(size*0.9);
+  for(var i=0;i<N;i++){
+    var t=Math.pow(r(),0.55);
+    var arm=Math.floor(r()*arms);
+    var ang=arm*(Math.PI*2/arms)+t*tw+(r()+r()+r()-1.5)*0.7;
+    var rad=t*R;
+    var px=cx+Math.cos(ang)*rad, py=cy+Math.sin(ang)*rad*0.62;
+    var pal=(t<0.16)?inner:((t<0.62)?mid:outer);
+    var col=hx(pal[Math.floor(r()*pal.length)]);
+    var bs=(size*0.05)+r()*size*0.11;
+    var g=ctx.createRadialGradient(px,py,0,px,py,bs);
+    g.addColorStop(0,col); g.addColorStop(1,"rgba(0,0,0,0)");
+    ctx.globalAlpha=0.16+r()*0.22;
+    ctx.fillStyle=g;
+    ctx.beginPath(); ctx.arc(px,py,bs,0,Math.PI*2); ctx.fill();
+  }
+  var cg=ctx.createRadialGradient(cx,cy,0,cx,cy,size*0.16);
+  cg.addColorStop(0,hx(coreCol)); cg.addColorStop(1,"rgba(0,0,0,0)");
+  ctx.globalAlpha=0.95;
+  ctx.fillStyle=cg;
+  ctx.beginPath(); ctx.arc(cx,cy,size*0.16,0,Math.PI*2); ctx.fill();
+  ctx.globalAlpha=1; ctx.globalCompositeOperation="source-over";
+}
 function buildGalaxy(){
   if(galPts){ galaxyGroup.remove(galPts); galPts.geometry.dispose(); galPts.material.dispose(); galPts=null; }
   var N=parseInt(document.getElementById("sGal").value,10);
@@ -2062,7 +2114,7 @@ function updateGalInfoBadge(){
 document.getElementById("galSel").addEventListener("change",function(){
   GALAXY=parseInt(this.value,10);
   updateGalaxyInfo();
-  buildGalaxy(); buildNebula();
+  buildGalaxy(); buildNebula(); drawGalIcon();
   focusSystem=null; courseTarget=null; courseWaypoints=null;
   document.getElementById("course").classList.remove("show");
   /* If the visitor hasn't actually jumped anywhere yet, the address box is
@@ -2650,6 +2702,7 @@ updateGalaxyInfo();
 resize();
 buildGalaxy();
 buildNebula();
+drawGalIcon();
 var BOOT_ANCHOR_ADDR="1067FA5A9B2C"; /* arbitrary real coordinate purely to seed the initial slice/camera -- not shown to the visitor, see jumpTo's silent flag */
 jumpTo(BOOT_ANCHOR_ADDR,true);
 setMode("galaxy");
