@@ -140,7 +140,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 .prow{display:flex;gap:5px;margin-top:6px}
 .prow .btn{flex:1;text-align:center}
 
-#course{position:fixed;left:50%;transform:translateX(-50%);top:50px;z-index:27;
+#course{position:fixed;left:50%;transform:translateX(-50%);top:calc(var(--top-h,60px) + 8px);z-index:27;
   width:246px;padding:10px 12px;display:none}
 #course.show{display:block}
 #course .cline{display:flex;justify-content:space-between;font-size:11.5px;padding:2px 0}
@@ -246,9 +246,9 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
      the instant you tap a system, and the rest of the detail scrolls underneath. */
   #prowEnter{order:-1;position:sticky;top:0;z-index:2;background:rgba(11,17,25,.97);
     margin:0 -14px;padding:10px 14px 8px;border-bottom:1px solid var(--border-soft)}
-  #course{top:50px;left:50%;transform:translateX(-50%);width:210px}
+  #course{top:calc(var(--top-h,150px) + 8px);left:50%;transform:translateX(-50%);width:210px}
   #leftcol{bottom:auto;top:calc(var(--top-h,150px) + 140px);flex-direction:column;align-items:flex-start}
-  #filt{width:158px}
+  #filt{width:158px;max-height:calc(100vh - var(--top-h,150px) - 150px);overflow-y:auto}
   #keys{bottom:auto;top:calc(var(--top-h,150px) + 140px);width:calc(100vw - 20px)}
   #stats{display:none}
   #flyhint{display:none!important}
@@ -1860,10 +1860,21 @@ canvas.addEventListener("pointermove",function(e){
     return;
   }
   var ids=Object.keys(pointers);
-  if(ids.length>=2&&ctrl==="orbit"){
+  if(ids.length>=2){
     var a=pointers[ids[0]],b=pointers[ids[1]];
     var d=Math.hypot(a.x-b.x,a.y-b.y);
-    if(pinchD>0){ cam.dist*=pinchD/d; applyCam(); }
+    if(pinchD>0){
+      if(ctrl==="fly"){
+        /* Fly has no orbit "dist" to scale -- dolly the camera itself along its
+           own view direction, same axis the wheel-zoom already uses for fly,
+           so a pinch does the same thing a wheel/scroll does. */
+        var pf=new THREE.Vector3(); camera.getWorldDirection(pf);
+        flyPos.add(pf.multiplyScalar((d-pinchD)*0.6));
+      } else {
+        cam.dist*=pinchD/d;
+      }
+      applyCam();
+    }
     pinchD=d; return;
   }
   if(!drag) return;
@@ -1978,6 +1989,7 @@ function updateLabels(){
     if(_v.z>1||_v.x<-1||_v.x>1||_v.y<-1||_v.y>1){ el.style.display="none"; continue; }
     el.style.display="block";
     var lx=(_v.x*0.5+0.5)*w, ly=(-_v.y*0.5+0.5)*h;
+    var ly0=ly, fits=true;
     var moved=true, guard=0;
     while(moved && guard<20){
       moved=false; guard++;
@@ -1986,7 +1998,16 @@ function updateLabels(){
           ly=placed[k].y-16; moved=true;
         }
       }
+      /* Zoomed far out, many stars project into the same small screen area at
+         once (not just an occasional moon+planet pair) -- the old loop kept
+         nudging every conflicting label up 16px regardless of how far that
+         pushed it from its real star, producing a stacked column of names
+         disconnected from the dots they're meant to label. Bail out and hide
+         the label instead of drifting it more than ~48px from its true spot;
+         a missing label at extreme zoom-out is less confusing than a wrong one. */
+      if(ly0-ly>48){ fits=false; break; }
     }
+    if(!fits){ el.style.display="none"; continue; }
     placed.push({x:lx,y:ly});
     el.style.left=lx+"px";
     el.style.top=ly+"px";
