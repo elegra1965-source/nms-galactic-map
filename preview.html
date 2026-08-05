@@ -38,6 +38,12 @@ canvas#c{display:block;position:fixed;inset:0;touch-action:none}
   color:var(--gold);text-transform:uppercase}
 .box{background:rgba(11,17,25,.93);border:1px solid var(--border);border-radius:12px;
   backdrop-filter:blur(6px);position:relative}
+/* Filters/Panel/Course-plotted headers double as drag handles (see makeDraggable) --
+   Tony's own suggestion after several sessions of chasing device-specific overlap
+   bugs one at a time: instead of guessing every viewport/orientation combination,
+   let him move the boxes himself. touch-action:none stops the browser's own
+   scroll/zoom gestures from stealing the pointer before the drag handler sees it. */
+#fHead,.phead,.chead{cursor:grab;touch-action:none}
 .box::before,.box::after{content:'';position:absolute;width:9px;height:9px;pointer-events:none}
 .box::before{top:-1px;right:-1px;border-top:1px solid var(--cyan);border-right:1px solid var(--cyan);border-radius:0 12px 0 0}
 .box::after{bottom:-1px;left:-1px;border-bottom:1px solid var(--cyan);border-left:1px solid var(--cyan);border-radius:0 0 0 12px}
@@ -551,6 +557,10 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     <div class="mfld">
       <div class="lb">New to No Man's Sky?</div>
       <div style="font-size:12px;color:var(--text-dim);line-height:1.55">A "portal address" is a 12-symbol code the game uses to pin down a star system's location. Don't have one? Hit <b>Random</b> in the toolbar to jump somewhere, or tap <b>Glyphs</b> to see the code as the game's own symbols instead of letters/numbers.</div>
+    </div>
+    <div class="mfld">
+      <div class="lb">Boxes in your way?</div>
+      <div style="font-size:12px;color:var(--text-dim);line-height:1.55">Filters, the system info panel, and Course plotted can all be dragged by their header to wherever suits your screen -- handy on smaller or rotated phones where they can otherwise overlap.</div>
     </div>
     <div class="mfld">
       <div class="lb">More by elegra1965</div>
@@ -2335,6 +2345,66 @@ document.getElementById("bCourseMin").addEventListener("click",function(e){
   this.innerHTML=min?"&#9656;":"&#9662;";
 });
 
+/* ============ draggable boxes ============ */
+/* Filters, the system info panel, and Course plotted can all end up in the
+   wrong place on some specific phone/orientation combo (this project's whole
+   session-22 punch list). Rather than keep chasing each device permutation
+   one screenshot at a time, let Tony drag any of them by their header to
+   wherever actually works on his screen. Tap-vs-drag is distinguished by the
+   same movement threshold the canvas star-picking already uses, so a plain
+   tap on the header still toggles collapse as before -- only a real drag
+   (>=6px of movement) repositions the box and swallows the click that would
+   otherwise also fire the collapse toggle. Session-only (resets on reload,
+   and on any resize/orientation change -- so a rotated phone can never end
+   up with a box stuck off-screen from a drag made in the other orientation). */
+var draggedBoxes=[];
+function makeDraggable(boxEl,handleEl){
+  if(!boxEl||!handleEl) return;
+  var sx=0,sy=0,ox=0,oy=0,dragging=false,moved=0,ptrId=null,wasDrag=false;
+  draggedBoxes.push(boxEl);
+  handleEl.addEventListener("pointerdown",function(e){
+    if(e.target.closest("button")) return;
+    var r=boxEl.getBoundingClientRect();
+    ox=r.left; oy=r.top; sx=e.clientX; sy=e.clientY;
+    dragging=true; moved=0; ptrId=e.pointerId;
+    handleEl.setPointerCapture(e.pointerId);
+  });
+  handleEl.addEventListener("pointermove",function(e){
+    if(!dragging||e.pointerId!==ptrId) return;
+    var ddx=e.clientX-sx, ddy=e.clientY-sy;
+    moved=Math.max(moved,Math.abs(ddx)+Math.abs(ddy));
+    if(moved<6) return;
+    boxEl.style.position="fixed";
+    boxEl.style.right="auto"; boxEl.style.bottom="auto"; boxEl.style.transform="none";
+    boxEl.style.left=Math.max(4,Math.min(window.innerWidth-40,ox+ddx))+"px";
+    boxEl.style.top=Math.max(4,Math.min(window.innerHeight-40,oy+ddy))+"px";
+  });
+  function end(e){
+    if(!dragging||e.pointerId!==ptrId) return;
+    dragging=false;
+    wasDrag=moved>=6;
+  }
+  handleEl.addEventListener("pointerup",end);
+  handleEl.addEventListener("pointercancel",end);
+  handleEl.addEventListener("click",function(e){
+    if(wasDrag){ e.stopPropagation(); e.preventDefault(); wasDrag=false; }
+  },true);
+}
+makeDraggable(document.getElementById("filt"),document.getElementById("fHead"));
+makeDraggable(document.getElementById("panel"),document.querySelector("#panel .phead"));
+makeDraggable(document.getElementById("course"),document.querySelector("#course .chead"));
+/* Any drag position is a manual override tied to the current window size/orientation --
+   reset it on resize (covers rotation too) rather than risk a box left stranded
+   off-screen or behind the toolbar after the layout changes underneath it. */
+function resetDraggedBoxes(){
+  for(var i=0;i<draggedBoxes.length;i++){
+    var el=draggedBoxes[i];
+    el.style.position=""; el.style.left=""; el.style.top="";
+    el.style.right=""; el.style.bottom=""; el.style.transform="";
+  }
+}
+window.addEventListener("resize",resetDraggedBoxes);
+
 /* ============ edit / report modal ============ */
 function escAttr(s){
   return String(s==null?"":s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
@@ -2671,6 +2741,16 @@ function syncPanelOffset(){
     var r=panelEl.getBoundingClientRect();
     if(r.width>0 && r.left>w*0.5) occludeW=Math.round(w-r.left+20);
   }
+  /* This compensation was tuned against desktop's panel, which covers roughly
+     15% of a typical window. On a narrow mobile-landscape screen the panel can
+     cover well over a third of the width -- checked the actual frustum maths
+     this produces (setViewOffset with a wider virtual sensor, cropped from its
+     left edge) and at that ratio it pushes the WHOLE system view, including the
+     star you're looking at, toward/behind the panel instead of just nudging an
+     occluded edge-case body into frame -- confirmed as the cause of Tony's
+     "planets are hidden" report in landscape. Past this ratio the correction
+     does more harm than good, so disable it rather than let it get worse. */
+  if(occludeW>w*0.22) occludeW=0;
   if(occludeW===_lastOccludeW) return;
   _lastOccludeW=occludeW;
   if(occludeW>0) camera.setViewOffset(w+occludeW,h,0,0,w,h);
