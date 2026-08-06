@@ -1,5 +1,77 @@
 {
-  "systems": {},
+  "systems": {
+    "107AFB5ABB2D": {
+      "data": {
+        "name": "Badun-III",
+        "race": "Korvax",
+        "econName": "Experimental",
+        "conflict": "Gentle",
+        "notes": "",
+        "bodies": [
+          {
+            "name": "Elsup-IV",
+            "moon": false,
+            "parent": 0,
+            "biome": "Frozen",
+            "water": true,
+            "resources": [
+              "Silver",
+              "Gold"
+            ]
+          },
+          {
+            "name": "Igwex-II",
+            "moon": false,
+            "parent": 0,
+            "biome": "Irradiated",
+            "water": true,
+            "resources": [
+              "Cobalt",
+              "Silver"
+            ]
+          },
+          {
+            "name": "Igtak-III",
+            "moon": true,
+            "parent": 0,
+            "biome": "Irradiated",
+            "water": false,
+            "resources": [
+              "Gold",
+              "Cobalt"
+            ]
+          },
+          {
+            "name": "Uxonuar",
+            "moon": false,
+            "parent": 0,
+            "biome": "Lush",
+            "water": false,
+            "resources": [
+              "Silver"
+            ]
+          },
+          {
+            "name": "Igves-IX",
+            "moon": false,
+            "parent": 0,
+            "biome": "Volcanic",
+            "water": true,
+            "resources": [
+              "Magnetised Ferrite",
+              "Sodium"
+            ]
+          }
+        ]
+      },
+      "editedAt": "2026-08-06T21:41:08.629Z",
+      "editedByIp": "5.133.46.24"
+    }
+  },
   "reports": [],
-  "ipLog": {}
+  "ipLog": {
+    "5.133.46.24": [
+      1786052468629
+    ]
+  }
 }
