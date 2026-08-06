@@ -499,7 +499,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 <div id="modalWrap">
   <div class="box modal" id="editModal">
     <h3>Edit system</h3>
-    <div class="msub">Enter your real in-game data. This replaces the generated placeholder for everyone who visits this address, including you if you reload -- there's no undo button on the site itself, but every save is a git commit Tony can revert on GitHub.</div>
+    <div class="msub">Enter your real in-game data. This replaces the generated placeholder for everyone who visits this address, including you if you reload -- there's no undo button on the site itself, but every save is a git commit elegra1965 can revert on GitHub.</div>
     <div class="merr" id="editErr"></div>
     <div class="mfld"><div class="lb">System name</div><input type="text" id="edName" maxlength="40"></div>
     <div class="mfld"><div class="lb">Race</div>
@@ -512,6 +512,10 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     </div>
     <div class="mfld"><div class="lb">Economy</div><select id="edEcon"></select></div>
     <div class="mfld"><div class="lb">Conflict level</div><select id="edConflict"></select></div>
+    <div class="mfld"><div class="lb">Special features</div>
+      <label class="chk"><input type="checkbox" id="edBH"> Black hole present</label>
+      <label class="chk"><input type="checkbox" id="edAtlas"> Atlas station present</label>
+    </div>
     <div class="mfld"><div class="lb">Public notes <span style="color:var(--text-faint)">(visible to everyone, not your private surveyor log)</span></div>
       <textarea id="edNotes" maxlength="800" placeholder="Anything else worth knowing about this system..."></textarea>
     </div>
@@ -887,6 +891,8 @@ function applyOverride(s){
   if(d.race) s.race=d.race;
   if(d.econName) s.econName=d.econName;
   if(d.conflict) s.conflict=d.conflict;
+  if(d.blackHole!==undefined) s.blackHole=!!d.blackHole;
+  if(d.atlas!==undefined) s.atlas=!!d.atlas;
   s.publicNotes=d.notes||"";
   if(d.bodies && d.bodies.length){
     var orig=s.bodies, out=[], planetIdx=0, lastPlanetIndex=0;
@@ -1059,6 +1065,9 @@ function makeCorona(){
   var t=new THREE.Texture(cv); t.needsUpdate=true; return t;
 }
 var CORONA=makeCorona();
+var TEX_LOADER=new THREE.TextureLoader();
+var BH_TEX=TEX_LOADER.load("icons-web/feature-blackhole.png");
+var ATLAS_TEX=TEX_LOADER.load("icons-web/feature-atlas.png");
 
 function makeCloud(seed){
   var cv=document.createElement("canvas"); cv.width=160; cv.height=160;
@@ -1583,22 +1592,20 @@ function setCourse(s){
 }
 
 /* ============ system view ============ */
-var bodyMeshes=[], pivots=[], starMeshes=[], coronas=[];
+var bodyMeshes=[], pivots=[], starMeshes=[], coronas=[], featureMeshes=[];
 function buildStar(s,i,pos){
-  var col=s.blackHole?0x1a0030:s.starColors[i%s.starColors.length];
-  var rad=s.blackHole?1.1:2.0;
+  var col=s.starColors[i%s.starColors.length];
+  var rad=2.0;
   var grp=new THREE.Group();
   grp.position.copy(pos);
   var core=new THREE.Mesh(new THREE.SphereGeometry(rad,30,22),
-    new THREE.MeshBasicMaterial({color:s.blackHole?0x050008:0xffffff}));
+    new THREE.MeshBasicMaterial({color:0xffffff}));
   core.userData={star:true,name:s.name+(s.stars>1?(" "+String.fromCharCode(65+i)):""),sys:s};
   grp.add(core); starMeshes.push(core);
-  if(!s.blackHole){
-    var tint=new THREE.Mesh(new THREE.SphereGeometry(rad*1.04,28,20),
-      new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:0.72,
-        blending:THREE.AdditiveBlending,depthWrite:false}));
-    grp.add(tint);
-  }
+  var tint=new THREE.Mesh(new THREE.SphereGeometry(rad*1.04,28,20),
+    new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:0.72,
+      blending:THREE.AdditiveBlending,depthWrite:false}));
+  grp.add(tint);
   var sh1=new THREE.Mesh(new THREE.SphereGeometry(rad*1.5,24,18),
     new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:0.22,
       blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.BackSide}));
@@ -1608,34 +1615,42 @@ function buildStar(s,i,pos){
   grp.add(sh1); grp.add(sh2);
   var cor=new THREE.Mesh(new THREE.PlaneGeometry(rad*11,rad*11),
     new THREE.MeshBasicMaterial({map:CORONA,color:col,transparent:true,
-      opacity:s.blackHole?0.55:0.95,blending:THREE.AdditiveBlending,depthWrite:false,
+      opacity:0.95,blending:THREE.AdditiveBlending,depthWrite:false,
       side:THREE.DoubleSide}));
   grp.add(cor); coronas.push(cor);
-  if(s.blackHole){
-    var disc=new THREE.Mesh(new THREE.RingGeometry(rad*1.6,rad*3.4,72),
-      new THREE.MeshBasicMaterial({color:0xc78aff,transparent:true,opacity:0.42,
-        side:THREE.DoubleSide,depthWrite:false,blending:THREE.AdditiveBlending}));
-    disc.rotation.x=Math.PI/2.35;
-    grp.add(disc);
-  }
   return grp;
+}
+function buildFeature(s,kind,pos){
+  var tex=kind==="bh"?BH_TEX:ATLAS_TEX;
+  var aspect=kind==="bh"?(512/346):(443/512);
+  var h=kind==="bh"?5.2:6.4, w=h*aspect;
+  var mat=new THREE.SpriteMaterial({map:tex,transparent:true,depthWrite:false});
+  var spr=new THREE.Sprite(mat);
+  spr.scale.set(w,h,1);
+  spr.position.copy(pos);
+  spr.userData={feature:true,name:kind==="bh"?"Black hole":"Atlas station",sys:s};
+  featureMeshes.push(spr);
+  return spr;
 }
 function buildSystemView(s){
   while(systemGroup.children.length){
     var ch=systemGroup.children.pop();
     ch.traverse(function(o){
       if(o.geometry) o.geometry.dispose();
-      if(o.material){ if(o.material.map&&o.material.map!==CORONA) o.material.map.dispose(); o.material.dispose(); }
+      if(o.material){ if(o.material.map&&o.material.map!==CORONA&&o.material.map!==BH_TEX&&o.material.map!==ATLAS_TEX) o.material.map.dispose(); o.material.dispose(); }
     });
   }
-  bodyMeshes=[]; pivots=[]; starMeshes=[]; coronas=[];
+  bodyMeshes=[]; pivots=[]; starMeshes=[]; coronas=[]; featureMeshes=[];
   var si;
   for(si=0; si<s.stars; si++){
     var off=new THREE.Vector3(si*3.6-(s.stars-1)*1.8,0,0);
     systemGroup.add(buildStar(s,si,off));
   }
-  starLight.color.setHex(s.blackHole?0x9a7aff:s.starColors[0]);
+  starLight.color.setHex(s.starColors[0]);
   starLight.position.set(0,0,0);
+  var featBase=10+s.planets*3.9;
+  if(s.blackHole) systemGroup.add(buildFeature(s,"bh",new THREE.Vector3(featBase*0.6,featBase*0.32,-featBase*0.55)));
+  if(s.atlas) systemGroup.add(buildFeature(s,"atlas",new THREE.Vector3(-featBase*0.7,-featBase*0.22,featBase*0.5)));
   var planetIdx=0, moonIdx=0, moonAnchor=null, moonAnchorSize=0;
   for(var bi=0; bi<s.bodies.length; bi++){
     var b=s.bodies[bi];
@@ -1708,7 +1723,7 @@ function renderSeq(el,addr){
 function starSwatches(s){
   var html="",i;
   for(i=0;i<s.stars;i++){
-    var c="#"+hex(s.blackHole?0x201030:s.starColors[i],6);
+    var c="#"+hex(s.starColors[i],6);
     html+='<span class="starsw" style="background:radial-gradient(circle at 38% 34%,#fff 0%,'+c+
           ' 46%,'+c+' 60%,rgba(0,0,0,0) 82%);box-shadow:0 0 10px '+c+'"></span>';
   }
@@ -1952,10 +1967,10 @@ function tryPick(cx,cy){
     var hits=ray.intersectObject(locPts);
     if(hits.length&&shown[hits[0].index]) updatePanel(shown[hits[0].index]);
   } else if(mode==="system"){
-    var bh=ray.intersectObjects(bodyMeshes.concat(starMeshes));
+    var bh=ray.intersectObjects(bodyMeshes.concat(starMeshes).concat(featureMeshes));
     if(bh.length){
       var ud=bh[0].object.userData;
-      if(ud.star) updatePanel(ud.sys);
+      if(ud.star||ud.feature) updatePanel(ud.sys);
       else showBody(ud.body,ud.sys);
     }
   }
@@ -1992,6 +2007,10 @@ function updateLabels(){
     for(i=0;i<starMeshes.length;i++){
       starMeshes[i].getWorldPosition(_w);
       cands.push({x:_w.x,y:_w.y,z:_w.z,d:0,t:"★ "+starMeshes[i].userData.name});
+    }
+    for(i=0;i<featureMeshes.length;i++){
+      featureMeshes[i].getWorldPosition(_w);
+      cands.push({x:_w.x,y:_w.y,z:_w.z,d:0,t:(featureMeshes[i].userData.name==="Black hole"?"◉ ":"◈ ")+featureMeshes[i].userData.name});
     }
     for(i=0;i<bodyMeshes.length;i++){
       bodyMeshes[i].getWorldPosition(_w);
@@ -2483,6 +2502,8 @@ function openEditModal(){
   document.getElementById("edRace").value=(raceOk.indexOf(s.race)>=0)?s.race:"Uninhabited";
   document.getElementById("edEcon").value=s.uncharted?"":(s.econName||"");
   document.getElementById("edConflict").value=s.conflict||"";
+  document.getElementById("edBH").checked=!!s.blackHole;
+  document.getElementById("edAtlas").checked=!!s.atlas;
   document.getElementById("edNotes").value=s.publicNotes||"";
   editBodies=s.bodies.map(function(b){
     return {
@@ -2605,6 +2626,8 @@ document.getElementById("edSubmit").addEventListener("click",function(){
     race:document.getElementById("edRace").value,
     econName:document.getElementById("edEcon").value.trim(),
     conflict:document.getElementById("edConflict").value.trim(),
+    blackHole:document.getElementById("edBH").checked,
+    atlas:document.getElementById("edAtlas").checked,
     notes:document.getElementById("edNotes").value.trim(),
     bodies:editBodies.map(function(b){
       return {
@@ -2628,7 +2651,7 @@ document.getElementById("edSubmit").addEventListener("click",function(){
     closeModal(); toast("System saved -- visible to everyone"); loadOverrides();
   }).catch(function(){
     spin.style.display="none"; btn.disabled=false;
-    errEl.textContent="Could not reach the server. The shared-edit backend may not be set up yet (see Tony's setup notes).";
+    errEl.textContent="Could not reach the server. The shared-edit backend may not be set up yet (see elegra1965's setup notes).";
     errEl.style.display="block"; errEl.scrollIntoView({block:"nearest"});
   });
 });
