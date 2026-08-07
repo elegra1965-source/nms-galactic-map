@@ -383,6 +383,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
       <label class="chk"><input type="checkbox" id="fBH">Black holes</label>
       <label class="chk"><input type="checkbox" id="fAtl">Atlas interfaces</label>
       <label class="chk"><input type="checkbox" id="fOut">Outlaw</label>
+      <label class="chk"><input type="checkbox" id="fGiant">Giant planet</label>
       <label class="chk"><input type="checkbox" id="fMark">Bookmarked</label>
       <div class="fld" style="margin-top:7px"><div class="lb">Hyperdrive range</div>
         <select id="fHyper">
@@ -1499,6 +1500,7 @@ function passFilter(s){
   if(document.getElementById("fBH").checked&&!s.blackHole) return false;
   if(document.getElementById("fAtl").checked&&!s.atlas) return false;
   if(document.getElementById("fOut").checked&&!s.outlaw) return false;
+  if(document.getElementById("fGiant").checked&&!s.giant) return false;
   if(document.getElementById("fMark").checked&&!store.marks[skey(s)]) return false;
   return true;
 }
@@ -2354,7 +2356,7 @@ bindSlider("sSz","vSz",function(){
   var sel=document.getElementById("fEco"),i;
   for(i=0;i<ECON.length;i++){ var o=document.createElement("option"); o.textContent=ECON[i][0]; sel.appendChild(o); }
 })();
-["fCol","fRace","fEco","fBH","fAtl","fOut","fMark"].forEach(function(id){
+["fCol","fRace","fEco","fBH","fAtl","fOut","fGiant","fMark"].forEach(function(id){
   document.getElementById(id).addEventListener("change",applyFilter);
 });
 document.getElementById("fHyper").addEventListener("change",function(){
@@ -2364,7 +2366,8 @@ document.getElementById("bReset").addEventListener("click",function(){
   document.getElementById("fCol").value=""; document.getElementById("fRace").value="";
   document.getElementById("fEco").value="";
   document.getElementById("fBH").checked=false; document.getElementById("fAtl").checked=false;
-  document.getElementById("fOut").checked=false; document.getElementById("fMark").checked=false;
+  document.getElementById("fOut").checked=false; document.getElementById("fGiant").checked=false;
+  document.getElementById("fMark").checked=false;
   applyFilter();
 });
 document.getElementById("pBodies").addEventListener("click",function(e){
