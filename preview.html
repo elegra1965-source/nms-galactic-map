@@ -511,6 +511,11 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
       </select>
     </div>
     <div class="mfld"><div class="lb">Economy</div><select id="edEcon"></select></div>
+    <div class="mfld" style="display:flex;gap:8px">
+      <div style="flex:1"><div class="lb">Sell %</div><input type="text" id="edSell" maxlength="10" inputmode="decimal" placeholder="e.g. 71.5"></div>
+      <div style="flex:1"><div class="lb">Buy %</div><input type="text" id="edBuy" maxlength="10" inputmode="decimal" placeholder="e.g. -15.7"></div>
+    </div>
+    <div class="mfld"><div class="lb">Economy strength</div><select id="edEconStr"></select></div>
     <div class="mfld"><div class="lb">Conflict level</div><select id="edConflict"></select></div>
     <div class="mfld"><div class="lb">Special features</div>
       <label class="chk"><input type="checkbox" id="edBH"> Black hole present</label>
@@ -890,6 +895,9 @@ function applyOverride(s){
   if(d.name) s.name=d.name;
   if(d.race) s.race=d.race;
   if(d.econName) s.econName=d.econName;
+  if(d.sell) s.sell=d.sell;
+  if(d.buy) s.buy=d.buy;
+  if(d.econDesc) s.econDesc=d.econDesc;
   if(d.conflict) s.conflict=d.conflict;
   if(d.blackHole!==undefined) s.blackHole=!!d.blackHole;
   if(d.atlas!==undefined) s.atlas=!!d.atlas;
@@ -1760,7 +1768,7 @@ function updatePanel(s){
   document.getElementById("pRace").textContent=s.race;
   document.getElementById("pEco").textContent=s.uncharted?"—":s.econName;
   document.getElementById("pEcoSub").textContent=s.uncharted?"Uncharted system":
-    ("Sell: "+s.sell+"% / Buy: "+s.buy+"% / "+s.econDesc);
+    (s.econName+" // Sell: "+s.sell+"% Buy: "+s.buy+"% // "+s.econDesc);
   document.getElementById("pCon").textContent=s.conflict;
 
   var tags=[["",["","Single","Binary","Ternary"][s.stars]+" star"]];
@@ -2440,6 +2448,7 @@ function escAttr(s){
    not free text -- so a dropdown is both easier to use and more accurate
    than a text box a traveller has to type an exact match into by hand. */
 var CONFLICT_TIER_LB=["Low","Medium","High"];
+var ECON_TIER_LB=["Poor","Average","Good"];
 function buildEconConflictSelects(){
   var econSel=document.getElementById("edEcon"), i,j;
   var blank=document.createElement("option");
@@ -2454,6 +2463,17 @@ function buildEconConflictSelects(){
       grp.appendChild(opt);
     }
     econSel.appendChild(grp);
+  }
+  var econStrSel=document.getElementById("edEconStr");
+  for(i=0;i<ECON_S.length;i++){
+    var sgrp=document.createElement("optgroup");
+    sgrp.label=ECON_TIER_LB[i]||("Tier "+i);
+    for(j=0;j<ECON_S[i].length;j++){
+      var sopt=document.createElement("option");
+      sopt.value=ECON_S[i][j]; sopt.textContent=ECON_S[i][j];
+      sgrp.appendChild(sopt);
+    }
+    econStrSel.appendChild(sgrp);
   }
   var conSel=document.getElementById("edConflict");
   for(i=0;i<CONFLICT.length;i++){
@@ -2508,6 +2528,9 @@ function openEditModal(){
   var raceOk=["Gek","Vy'keen","Korvax","Uninhabited"];
   document.getElementById("edRace").value=(raceOk.indexOf(s.race)>=0)?s.race:"Uninhabited";
   document.getElementById("edEcon").value=s.uncharted?"":(s.econName||"");
+  document.getElementById("edSell").value=(s.sell!=null?s.sell:"");
+  document.getElementById("edBuy").value=(s.buy!=null?s.buy:"");
+  document.getElementById("edEconStr").value=s.econDesc||"";
   document.getElementById("edConflict").value=s.conflict||"";
   document.getElementById("edBH").checked=!!s.blackHole;
   document.getElementById("edAtlas").checked=!!s.atlas;
@@ -2551,10 +2574,16 @@ function clientPrecheck(){
     return false;
   }
   var fields=[document.getElementById("edName").value,document.getElementById("edEcon").value,
-    document.getElementById("edConflict").value,document.getElementById("edNotes").value];
+    document.getElementById("edEconStr").value,document.getElementById("edConflict").value,
+    document.getElementById("edNotes").value];
   for(var i=0;i<editBodies.length;i++) fields.push(editBodies[i].name);
   for(i=0;i<fields.length;i++) if(bad(fields[i])) return "Please remove blocked language before saving.";
   if(!document.getElementById("edName").value.trim()) return "System name can't be empty.";
+  var PCT_RE=/^-?\d{1,4}(\.\d{1,2})?$/;
+  var sellV=document.getElementById("edSell").value.trim();
+  var buyV=document.getElementById("edBuy").value.trim();
+  if(sellV && !PCT_RE.test(sellV)) return "Sell % must be a plain number, e.g. 71.5 -- no % sign needed.";
+  if(buyV && !PCT_RE.test(buyV)) return "Buy % must be a plain number, e.g. -15.7 -- no % sign needed.";
   return null;
 }
 document.getElementById("bodyEditList").addEventListener("input",function(e){
@@ -2632,6 +2661,9 @@ document.getElementById("edSubmit").addEventListener("click",function(){
     name:document.getElementById("edName").value.trim(),
     race:document.getElementById("edRace").value,
     econName:document.getElementById("edEcon").value.trim(),
+    sell:document.getElementById("edSell").value.trim(),
+    buy:document.getElementById("edBuy").value.trim(),
+    econDesc:document.getElementById("edEconStr").value,
     conflict:document.getElementById("edConflict").value.trim(),
     blackHole:document.getElementById("edBH").checked,
     atlas:document.getElementById("edAtlas").checked,
