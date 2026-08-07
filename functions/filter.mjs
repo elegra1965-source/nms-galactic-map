@@ -15,6 +15,9 @@ export const BAD_WORDS = [
   "rape","rapist","kike","chink","spic","tranny"
 ];
 
+// Server-side mirror of preview.html's SENTINEL_LEVELS -- keep in sync.
+const SENTINEL_LEVELS = ["None","Low","High","Aggressive","Corrupted"];
+
 const LEET = {"0":"o","1":"i","3":"e","4":"a","5":"s","7":"t","@":"a","$":"s"};
 
 // Normalizes ONE token (no spaces left in it by the time this runs) --
@@ -125,35 +128,83 @@ export function filterSystemEdit(payload){
   var conR = filterText(payload.conflict, {maxLen:40, fieldName:"Conflict"});
   if(!conR.ok) errors.push(conR.reason); else out.conflict = conR.cleaned;
 
+  var regionR = filterText(payload.region, {maxLen:40, fieldName:"Region name"});
+  if(!regionR.ok) errors.push(regionR.reason); else out.region = regionR.cleaned;
+
+  var starClassR = filterText(payload.starClass, {maxLen:10, fieldName:"Star class"});
+  if(!starClassR.ok) errors.push(starClassR.reason); else out.starClass = starClassR.cleaned;
+
+  var suffixIn = String(payload.suffix||"");
+  out.suffix = (suffixIn==="Water"||suffixIn==="Dissonant"||suffixIn==="None") ? suffixIn : "";
+
   out.blackHole = !!payload.blackHole;
   out.atlas = !!payload.atlas;
+  out.giant = !!payload.giant;
 
   var notesR = filterText(payload.notes, {maxLen:800, allowNewlines:true, fieldName:"Notes"});
   if(!notesR.ok) errors.push(notesR.reason); else out.notes = notesR.cleaned;
 
+  // Small helper for the 4 grouped resource fields (Flora/Minerals/
+  // Salvageable tech/Fossils) -- same shape and limits as the existing
+  // Resources list, just run once per group.
+  function resArr(list,fieldName){
+    var out2 = [];
+    var arr = Array.isArray(list) ? list : [];
+    for(var k=0;k<Math.min(arr.length,6);k++){
+      var r = filterText(arr[k], {maxLen:24, fieldName:fieldName});
+      if(r.ok && r.cleaned) out2.push(r.cleaned);
+    }
+    return out2;
+  }
+
   out.bodies = [];
   var bodies = Array.isArray(payload.bodies) ? payload.bodies : [];
   if(bodies.length > 6) errors.push("A system can have at most 6 planets/moons total");
+  var planetCount = 0, moonCount = 0;
   for(var i=0;i<Math.min(bodies.length,6);i++){
     var b = bodies[i] || {};
     var bNameR = filterText(b.name, {maxLen:30, fieldName:"Planet/moon name"});
     if(!bNameR.ok){ errors.push(bNameR.reason); continue; }
     var biomeR = filterText(b.biome, {maxLen:20, fieldName:"Biome"});
     if(!biomeR.ok){ errors.push(biomeR.reason); continue; }
+    var descR = filterText(b.descriptor, {maxLen:20, fieldName:"Descriptor"});
+    if(!descR.ok){ errors.push(descR.reason); continue; }
     var resOut = [];
     var res = Array.isArray(b.resources) ? b.resources : [];
     for(var j=0;j<Math.min(res.length,6);j++){
       var resR = filterText(res[j], {maxLen:24, fieldName:"Resource"});
       if(resR.ok && resR.cleaned) resOut.push(resR.cleaned);
     }
+    var isMoon = !!b.moon;
+    if(isMoon) moonCount++; else planetCount++;
+    var sentinelIn = String(b.sentinel||"None");
     out.bodies.push({
       name: bNameR.cleaned,
-      moon: !!b.moon,
-      parent: Math.max(0, parseInt(b.parent,10)||0),
+      moon: isMoon,
+      // 1-based position (within THIS bodies array) of the planet this moon
+      // orbits, chosen via the Orbits dropdown -- 0 means "not set", which
+      // applyOverride() on the client falls back to inferring from list
+      // order, same as every save made before this field existed.
+      orbits: Math.max(0, Math.min(6, parseInt(b.orbits,10)||0)),
       biome: biomeR.cleaned,
+      descriptor: descR.cleaned,
       water: !!b.water,
-      resources: resOut
+      resources: resOut,
+      flora: resArr(b.flora,"Flora"),
+      minerals: resArr(b.minerals,"Mineral"),
+      salvage: resArr(b.salvage,"Salvageable tech"),
+      fossils: resArr(b.fossils,"Fossil/curiosity"),
+      sentinel: SENTINEL_LEVELS.indexOf(sentinelIn)>=0 ? sentinelIn : "None",
+      autophage: !!b.autophage
     });
+  }
+
+  // Real game constraint (Giant planets): at most 1 non-moon body, since a
+  // system with a Giant can't generate any other planets, only up to 5
+  // moons orbiting the Giant itself.
+  if(out.giant){
+    if(planetCount>1) errors.push("A Giant planet system can only have 1 planet (the Giant itself)");
+    if(moonCount>5) errors.push("A Giant planet can have at most 5 moons");
   }
 
   return {ok: errors.length===0, cleaned: out, errors: errors};

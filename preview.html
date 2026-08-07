@@ -128,6 +128,9 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border:none;border-ra
   border-radius:var(--r-sm);border:1px solid var(--border);color:var(--text-dim);text-transform:uppercase}
 .tag.hot{border-color:var(--gold);color:var(--gold)}
 .tag.bh{border-color:#c78aff;color:#c78aff}
+.starRating{display:flex;gap:2px;margin-left:auto;align-self:center}
+.conBadge{display:flex;align-items:center;gap:4px;margin-left:auto;align-self:center}
+.conBadge b{font-family:'Orbitron',sans-serif;background:#2a0d0d;color:#ff8a80;font-size:10px;border-radius:8px;padding:1px 6px}
 .bodylist{margin-top:9px;border-top:1px solid var(--border-soft);padding-top:8px}
 .brow{display:flex;align-items:center;gap:7px;font-size:12px;padding:3px 0;cursor:pointer}
 .brow:hover{color:var(--white)}
@@ -444,9 +447,11 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     <div class="row"><span id="icRace"></span>
       <div><div class="lb">Race</div><div class="vl" id="pRace">—</div></div></div>
     <div class="row"><span id="icEco"></span>
-      <div><div class="lb">Economy</div><div class="vl" id="pEco">—</div><div class="sub" id="pEcoSub">—</div></div></div>
+      <div><div class="lb">Economy</div><div class="vl" id="pEco">—</div><div class="sub" id="pEcoSub">—</div></div>
+      <span class="starRating" id="pEcoStars"></span></div>
     <div class="row"><span id="icCon"></span>
-      <div><div class="lb">Conflict</div><div class="vl" id="pCon">—</div></div></div>
+      <div><div class="lb">Conflict</div><div class="vl" id="pCon">—</div></div>
+      <span class="conBadge" id="pConBadge"></span></div>
     <div class="tags" id="pTags"></div>
     <div class="bodylist" id="pBodies"></div>
   </div>
@@ -454,8 +459,18 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     <div class="row"><span id="icBio"></span>
       <div><div class="lb">Biome</div><div class="vl" id="bBiome">—</div><div class="sub" id="bTerr">—</div></div></div>
     <div class="tags" id="bTags"></div>
+    <div class="row" style="margin-top:10px"><span id="icSent"></span>
+      <div><div class="lb">Sentinel activity</div><div class="vl" id="bSent">Not reported</div></div></div>
     <div class="row" style="margin-top:10px"><span id="icRes"></span>
       <div><div class="lb">Resources</div><div class="tags" id="bRes"></div></div></div>
+    <div class="row" id="bFloraRow" style="margin-top:10px;display:none"><span id="icFlora"></span>
+      <div><div class="lb">Flora</div><div class="tags" id="bFlora"></div></div></div>
+    <div class="row" id="bMineralRow" style="margin-top:10px;display:none"><span id="icMineral"></span>
+      <div><div class="lb">Minerals</div><div class="tags" id="bMineral"></div></div></div>
+    <div class="row" id="bSalvageRow" style="margin-top:10px;display:none"><span id="icSalvage"></span>
+      <div><div class="lb">Salvageable tech</div><div class="tags" id="bSalvage"></div></div></div>
+    <div class="row" id="bFossilRow" style="margin-top:10px;display:none"><span id="icFossil"></span>
+      <div><div class="lb">Fossils &amp; curiosities</div><div class="tags" id="bFossil"></div></div></div>
   </div>
   <div class="prow" id="prowEnter">
     <button class="btn" id="bEnter" title="Fly into this system and see its star, planets and moons in 3D.">Enter system</button>
@@ -502,6 +517,13 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     <div class="msub">Enter your real in-game data. This replaces the generated placeholder for everyone who visits this address, including you if you reload -- there's no undo button on the site itself, but every save is a git commit elegra1965 can revert on GitHub.</div>
     <div class="merr" id="editErr"></div>
     <div class="mfld"><div class="lb">System name</div><input type="text" id="edName" maxlength="40"></div>
+    <div class="mfld"><div class="lb">Region name</div><input type="text" id="edRegion" maxlength="40"></div>
+    <div class="mfld" style="display:flex;gap:8px">
+      <div style="flex:1"><div class="lb">Star class</div><input type="text" id="edStarClass" maxlength="10" placeholder="e.g. G7p"></div>
+      <div style="flex:1"><div class="lb">Suffix</div>
+        <select id="edSuffix"><option value="None">None</option><option value="Water">Water</option><option value="Dissonant">Dissonant</option></select>
+      </div>
+    </div>
     <div class="mfld"><div class="lb">Race</div>
       <select id="edRace">
         <option value="Gek">Gek</option>
@@ -520,6 +542,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     <div class="mfld"><div class="lb">Special features</div>
       <label class="chk"><input type="checkbox" id="edBH"> Black hole present</label>
       <label class="chk"><input type="checkbox" id="edAtlas"> Atlas station present</label>
+      <label class="chk"><input type="checkbox" id="edGiant"> Giant planet (purple systems only -- limits to 1 planet + up to 5 moons)</label>
     </div>
     <div class="mfld"><div class="lb">Public notes <span style="color:var(--text-faint)">(visible to everyone, not your private surveyor log)</span></div>
       <textarea id="edNotes" maxlength="800" placeholder="Anything else worth knowing about this system..."></textarea>
@@ -695,6 +718,52 @@ var IC_CONFLICT='<path d="M4 4.2 14.4 14.6M20 4.2 9.6 14.6M4.6 19.4l4-4M19.4 19.
 var IC_BIOME='<circle cx="12" cy="12" r="8.4"/><path d="M3.6 12h16.8M12 3.6c2.7 2.7 2.7 14.1 0 16.8M12 3.6c-2.7 2.7-2.7 14.1 0 16.8"/>';
 var IC_RES='<path d="M12 3.4 20.2 9l-2.6 11.4H6.4L3.8 9Z"/><path d="M3.8 9h16.4M8.6 9 12 3.4l3.4 5.6M6.4 20.4 8.6 9M17.6 20.4 15.4 9"/>';
 var CONFLICT_COL=["#6bffa8","#f0a500","#ff5a4a"];
+
+var SENTINEL_LEVELS=["None","Low","High","Aggressive","Corrupted"];
+var SENTINEL_COL={None:"#5a6a76",Low:"#6bffa8",High:"#f4a623",Aggressive:"#e2564f",Corrupted:"#b06bff"};
+/* Placeholder icon marks for the newer additions -- original line-art in the
+   same style as IC_CONFLICT/IC_UNINHAB above, NOT lifted from the game.
+   Tony couldn't grab real in-game screenshots for these right now, so these
+   stand in until he can -- swap them out the same way Race/Economy went
+   from placeholder to real cropped screenshots. */
+var IC_SENTINEL='<ellipse cx="12" cy="12" rx="9" ry="5.4"/><circle cx="12" cy="12" r="2.6" fill="currentColor" stroke="none"/>';
+var IC_AUTOPHAGE='<rect x="12" y="2.5" width="13.4" height="13.4" transform="rotate(45 12 12)"/><path d="M12 8v8M8 12h8"/>';
+var IC_GIANT='<circle cx="12" cy="12" r="6.4"/><ellipse cx="12" cy="12" rx="10.4" ry="3" transform="rotate(-20 12 12)"/>';
+var IC_FLORA='<path d="M12 20c0-9 4-13.6 8-14.6-1 7.8-4 11.8-8 14.6Z"/><path d="M12 20c0-9-4-13.6-8-14.6 1 7.8 4 11.8 8 14.6Z"/>';
+var IC_MINERAL='<path d="M12 3.4 19.4 8.8l-2.6 11.2H7.2L4.6 8.8Z"/>';
+var IC_SALVAGE='<circle cx="12" cy="12" r="3"/><path d="M12 3.6V6.4M12 17.6v2.8M3.6 12H6.4M17.6 12h2.8M6.5 6.5l2 2M15.5 15.5l2 2M6.5 17.5l2-2M15.5 8.5l2-2"/>';
+var IC_FOSSIL='<path d="M6 9.6C6 6.1 8.4 4.2 10.9 5.6c1 .6 1 1.7 0 2.3-1.3.8-1.3 2.1 0 2.9 1.3.8 1.3 2.1 0 2.9-1 .6-1 1.7 0 2.3 2.5 1.4 5.1-.5 5.1-4"/><circle cx="8.4" cy="8.4" r="0.9" fill="currentColor" stroke="none"/><circle cx="16.2" cy="17.2" r="0.9" fill="currentColor" stroke="none"/>';
+var IC_SKULL='M12 3.6c-3.6 0-6 2.6-6 6.2 0 2 .9 3.4 2 4.4v2.6c0 .6.5 1 1 1h1.4v-1.6h1.2V19h1V17.8h1.2V19h1.4c.5 0 1-.4 1-1v-2.6c1.1-1 2-2.4 2-4.4 0-3.6-2.4-6.2-6-6.2Z';
+var STAR_PATH='M12 3.6l2.2 4.6 5 .7-3.6 3.6.9 5-4.5-2.4-4.5 2.4.9-5-3.6-3.6 5-.7Z';
+function ecoStars(tier){
+  var n=Math.max(0,Math.min(3,(tier|0)+1)),html="",i,on;
+  for(i=0;i<3;i++){
+    on=i<n;
+    html+='<svg viewBox="0 0 24 24" width="11" height="11"><path d="'+STAR_PATH+'" '+
+      (on?'fill="var(--gold)" stroke="none"':'fill="none" stroke="#324352" stroke-width="1.6"')+'/></svg>';
+  }
+  return html;
+}
+function conBadge(s){
+  var n=Math.max(1,Math.min(3,(s.conTier|0)+1)),html="";
+  if(s.outlaw) html+='<svg viewBox="0 0 24 24" width="13" height="13" style="color:#e2564f"><path d="'+IC_SKULL+
+    '" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  html+='<b>'+n+'</b>';
+  return html;
+}
+/* Overriding the Economy Strength / Conflict word (via the dropdowns) must
+   also move the star-rating / number badge to match -- otherwise a saved
+   word from a higher tier would still show the old procedural tier's count.
+   Finds which tier array a saved word actually belongs to; returns null
+   (leave the procedural tier alone) if it's not a recognised word. */
+function tierFromWord(word,table){
+  for(var t=0;t<table.length;t++) if(table[t].indexOf(word)>=0) return t;
+  return null;
+}
+function bodyByIndex(s,idx){
+  for(var i=0;i<s.bodies.length;i++) if(s.bodies[i].index===idx) return s.bodies[i];
+  return null;
+}
 
 var BIOMES={
   "Lush":       {base:"#1d5f31",land:["#2f8f45","#3fa855","#256b30","#6f9438"],sea:"#12406e",cap:"#dce9f4",water:true, atmo:0x6fd8ff, res:["Paraffinium","Star Bulb","Nitrogen"]},
@@ -897,10 +966,16 @@ function applyOverride(s){
   if(d.econName) s.econName=d.econName;
   if(d.sell) s.sell=d.sell;
   if(d.buy) s.buy=d.buy;
-  if(d.econDesc) s.econDesc=d.econDesc;
-  if(d.conflict) s.conflict=d.conflict;
+  if(d.econDesc){ s.econDesc=d.econDesc; var et=tierFromWord(d.econDesc,ECON_S); if(et!==null) s.econTier=et; }
+  if(d.conflict){ s.conflict=d.conflict; var ct=tierFromWord(d.conflict,CONFLICT); if(ct!==null) s.conTier=ct; }
   if(d.blackHole!==undefined) s.blackHole=!!d.blackHole;
   if(d.atlas!==undefined) s.atlas=!!d.atlas;
+  if(d.region) s.region=d.region;
+  if(d.starClass) s.spectral=d.starClass;
+  if(d.suffix==="Water"){ s.water=true; s.dissonant=false; }
+  else if(d.suffix==="Dissonant"){ s.water=false; s.dissonant=true; }
+  else if(d.suffix==="None"){ s.water=false; s.dissonant=false; }
+  if(d.giant!==undefined) s.giant=!!d.giant;
   s.publicNotes=d.notes||"";
   if(d.bodies && d.bodies.length){
     var orig=s.bodies, out=[], planetIdx=0, lastPlanetIndex=0;
@@ -910,18 +985,32 @@ function applyOverride(s){
       var biome=BIOMES[b.biome]?b.biome:(o?o.biome:"Lush");
       var isMoon=!!b.moon && i>0;
       var idx1=i+1;
+      /* If the traveller explicitly picked which planet a moon orbits
+         (the Orbits dropdown), b.orbits is the 1-based position of that
+         planet within this SAME saved bodies array -- use it when it still
+         points at a real, non-moon body. Otherwise fall back to the old
+         behaviour (assume it orbits the nearest preceding planet), which
+         also covers every save made before this field existed. */
+      var validOrbit=isMoon && b.orbits>=1 && b.orbits<=d.bodies.length && d.bodies[b.orbits-1] && !d.bodies[b.orbits-1].moon;
       out.push({
         index:idx1,
         moon:isMoon,
-        parent:isMoon?lastPlanetIndex:0,
+        parent:isMoon?(validOrbit?b.orbits:lastPlanetIndex):0,
         name:(b.name&&b.name.trim())||(o?o.name:"Unnamed"),
         biome:biome,
+        descriptor:b.descriptor||"",
         terrain:o?o.terrain:"Pangean",
         water:!!b.water,
         size:o?o.size:(isMoon?0.42:0.85),
         tilt:o?o.tilt:((i%2?1:-1)*(0.1+0.05*i)),
         spin:o?o.spin:0.3,
         resUni:(b.resources&&b.resources.length)?b.resources.slice(0,6):(o?o.resUni:[]),
+        flora:(b.flora&&b.flora.length)?b.flora.slice(0,6):[],
+        minerals:(b.minerals&&b.minerals.length)?b.minerals.slice(0,6):[],
+        salvage:(b.salvage&&b.salvage.length)?b.salvage.slice(0,6):[],
+        fossils:(b.fossils&&b.fossils.length)?b.fossils.slice(0,6):[],
+        sentinel:(SENTINEL_LEVELS.indexOf(b.sentinel)>=0)?b.sentinel:"None",
+        autophage:!!b.autophage,
         seed:o?o.seed:gseed(s.vx,s.vy,s.vz,(s.idx*57)+i)
       });
       if(!isMoon) lastPlanetIndex=idx1;
@@ -1769,11 +1858,14 @@ function updatePanel(s){
   document.getElementById("pEco").textContent=s.uncharted?"—":s.econName;
   document.getElementById("pEcoSub").textContent=s.uncharted?"Uncharted system":
     (s.econName+" // Sell: "+s.sell+"% Buy: "+s.buy+"% // "+s.econDesc);
+  document.getElementById("pEcoStars").innerHTML=s.uncharted?"":ecoStars(s.econTier);
   document.getElementById("pCon").textContent=s.conflict;
+  document.getElementById("pConBadge").innerHTML=conBadge(s);
 
   var tags=[["",["","Single","Binary","Ternary"][s.stars]+" star"]];
   tags.push(["",s.planets+(s.planets===1?" planet":" planets")]);
   if(s.moons>0) tags.push(["",s.moons+(s.moons===1?" moon":" moons")]);
+  if(s.giant) tags.push(["hot","Giant planet"]);
   if(s.blackHole) tags.push(["bh","Black hole"]);
   if(s.atlas) tags.push(["hot","Atlas interface"]);
   if(s.outlaw) tags.push(["hot","Outlaw"]);
@@ -1816,20 +1908,24 @@ function showBody(b,s){
     '<span class="starsw" style="background:radial-gradient(circle at 36% 32%,#fff 0%,'+
     BIOMES[b.biome].base+' 55%,rgba(0,0,0,0) 84%)"></span>';
   document.getElementById("pName").textContent=b.name;
+  var pbod=b.moon?bodyByIndex(s,b.parent):null;
   document.getElementById("pReg").textContent=
-    (b.moon?("MOON OF INDEX "+b.parent):"PLANET")+" · INDEX "+b.index;
+    (b.moon?("MOON OF "+(pbod?pbod.name:("INDEX "+b.parent))):(s.giant?"GIANT":"PLANET"))+" · INDEX "+b.index;
   document.getElementById("pCls").textContent=s.name+" // "+s.spectral;
   document.getElementById("pCore").textContent=commas(s.coreLY)+" LY from galaxy centre";
   document.getElementById("icBio").innerHTML=svg(IC_BIOME,BIOMES[b.biome].base);
-  document.getElementById("bBiome").textContent=b.biome;
+  document.getElementById("bBiome").textContent=b.biome+(b.descriptor?" ("+b.descriptor+")":"");
   document.getElementById("bTerr").textContent=b.terrain+(b.water?" · has water":" · no water");
-  var t=[["",b.moon?"Moon":"Planet"]];
+  var t=[["",b.moon?"Moon":(s.giant?"Giant":"Planet")]];
   if(!BIOMES[b.biome].atmo) t.push(["","No atmosphere"]);
   if(b.biome==="Exotic"||b.biome==="Mega Exotic") t.push(["bh","Anomalous"]);
   if(b.water) t.push(["hot","Water"]);
+  if(b.autophage) t.push(["hot","Autophage camp"]);
   var html="",i;
   for(i=0;i<t.length;i++) html+='<span class="tag '+t[i][0]+'">'+t[i][1]+'</span>';
   document.getElementById("bTags").innerHTML=html;
+  document.getElementById("icSent").innerHTML=svg(IC_SENTINEL,SENTINEL_COL[b.sentinel]||SENTINEL_COL.None);
+  document.getElementById("bSent").textContent=(b.sentinel&&b.sentinel!=="None")?(b.sentinel+" Sentinel Activity"):"Not reported";
   document.getElementById("icRes").innerHTML=svg(IC_RES,BIOMES[b.biome].base);
   var bd=BIOMES[b.biome], rlist=[];
   if(bd.res) for(i=0;i<bd.res.length;i++) rlist.push(bd.res[i]);
@@ -1839,6 +1935,21 @@ function showBody(b,s){
   var rhtml="";
   for(i=0;i<rlist.length;i++) rhtml+='<span class="tag">'+rlist[i]+'</span>';
   document.getElementById("bRes").innerHTML=rhtml||'<span class="tag">Varies &mdash; unconfirmed</span>';
+  /* the 4 player-submitted resource groups only take up space once someone
+     has actually reported something in them -- most bodies won't have any
+     of this yet, so each row hides itself rather than showing empty */
+  function resGroup(key,rowId,tagId,iconId,icon){
+    var arr=b[key]||[], row=document.getElementById(rowId);
+    if(!arr.length){ row.style.display="none"; return; }
+    row.style.display="";
+    document.getElementById(iconId).innerHTML=svg(icon,BIOMES[b.biome].base);
+    var h="",j; for(j=0;j<arr.length;j++) h+='<span class="tag">'+arr[j]+'</span>';
+    document.getElementById(tagId).innerHTML=h;
+  }
+  resGroup("flora","bFloraRow","bFlora","icFlora",IC_FLORA);
+  resGroup("minerals","bMineralRow","bMineral","icMineral",IC_MINERAL);
+  resGroup("salvage","bSalvageRow","bSalvage","icSalvage",IC_SALVAGE);
+  resGroup("fossils","bFossilRow","bFossil","icFossil",IC_FOSSIL);
   var ba=formatAddress(b.index,s.idx,s.vx,s.vy,s.vz);
   renderSeq(document.getElementById("pSeq"),ba);
   document.getElementById("pAddr").textContent=ba;
@@ -2489,18 +2600,24 @@ function buildEconConflictSelects(){
 }
 buildEconConflictSelects();
 var editBodies=[];
+var bodyUidSeq=1; // stable per-row id, survives add/remove reordering during a single edit session
 // Each row starts collapsed (just a name summary) so a system with several
 // planets doesn't turn the modal into a huge scroll -- only the row the
 // traveller is actively adding/editing expands, accordion-style, so Save
 // and any error message stay reachable without hunting through open fields.
 function renderBodyEditList(){
   var el=document.getElementById("bodyEditList"), html="",i,k;
+  // A Giant system only ever has 1 non-moon body -- the Giant itself -- so
+  // this relabels both the row header and the Orbits dropdown to say
+  // "Giant" instead of "Planet #1" wherever that single body shows up,
+  // matching how the info panel already renders it once saved.
+  var isGiantSys=document.getElementById("edGiant").checked;
   for(i=0;i<editBodies.length;i++){
     var b=editBodies[i], opts="";
     var summary=escAttr(b.name||"(unnamed)");
     html+='<div class="bodyEdit'+(b.open?" open":"")+'" data-i="'+i+'">'+
       '<div class="bhead">'+
-        '<span class="bhLabel">'+(b.moon?"Moon":"Planet")+' #'+(i+1)+' &mdash; '+summary+'</span>'+
+        '<span class="bhLabel">'+(b.moon?"Moon":(isGiantSys?"Giant":"Planet"))+' #'+(i+1)+' &mdash; '+summary+'</span>'+
         '<span class="bhBtns"><span class="bchev">'+(b.open?"&#9662;":"&#9656;")+'</span>'+
           '<span class="bx" data-remove="'+i+'" title="Remove">&times;</span></span>'+
       '</div>';
@@ -2512,9 +2629,33 @@ function renderBodyEditList(){
         '</div>'+
         '<div class="brow2">'+
           '<div class="mfld" style="margin-bottom:0"><div class="lb">Biome</div><select class="bfBiome" data-i="'+i+'">'+opts+'</select></div>'+
-          '<label class="chk2"><input type="checkbox" class="bfWater" data-i="'+i+'"'+(b.water?" checked":"")+'> Water</label>'+
+          '<div class="mfld" style="margin-bottom:0"><div class="lb">Descriptor</div><input type="text" class="bfDesc" data-i="'+i+'" maxlength="20" placeholder="e.g. Bountiful" value="'+escAttr(b.descriptor)+'"></div>'+
         '</div>'+
-        '<div class="mfld" style="margin-bottom:0"><div class="lb">Resources (comma separated)</div><input type="text" class="bfRes" data-i="'+i+'" maxlength="120" value="'+escAttr(b.resources)+'"></div>';
+        '<div class="brow2">'+
+          '<label class="chk2"><input type="checkbox" class="bfWater" data-i="'+i+'"'+(b.water?" checked":"")+'> Water</label>'+
+          '<label class="chk2"><input type="checkbox" class="bfAutophage" data-i="'+i+'"'+(b.autophage?" checked":"")+'> Autophage camp</label>'+
+        '</div>';
+      if(b.moon){
+        var orbOpts='<option value="">'+(isGiantSys?"The Giant (default)":"Nearest preceding planet (default)")+'</option>';
+        for(var p=0;p<editBodies.length;p++){
+          if(p===i || editBodies[p].moon) continue;
+          orbOpts+='<option value="'+editBodies[p].uid+'"'+(String(b.orbits)===String(editBodies[p].uid)?" selected":"")+
+            '>'+(isGiantSys?"Giant":("Planet #"+(p+1)))+' — '+escAttr(editBodies[p].name||"(unnamed)")+'</option>';
+        }
+        html+='<div class="mfld" style="margin-bottom:0"><div class="lb">Orbits</div><select class="bfOrbits" data-i="'+i+'">'+orbOpts+'</select></div>';
+      }
+      var sentOpts="";
+      for(k=0;k<SENTINEL_LEVELS.length;k++) sentOpts+='<option value="'+SENTINEL_LEVELS[k]+'"'+(b.sentinel===SENTINEL_LEVELS[k]?" selected":"")+'>'+SENTINEL_LEVELS[k]+'</option>';
+      html+='<div class="mfld" style="margin-bottom:0"><div class="lb">Sentinel activity</div><select class="bfSentinel" data-i="'+i+'">'+sentOpts+'</select></div>'+
+        '<div class="mfld" style="margin-bottom:0"><div class="lb">Resources (comma separated)</div><input type="text" class="bfRes" data-i="'+i+'" maxlength="120" value="'+escAttr(b.resources)+'"></div>'+
+        '<div class="brow2">'+
+          '<div class="mfld" style="margin-bottom:0"><div class="lb">Flora</div><input type="text" class="bfFlora" data-i="'+i+'" maxlength="80" value="'+escAttr(b.flora)+'"></div>'+
+          '<div class="mfld" style="margin-bottom:0"><div class="lb">Minerals</div><input type="text" class="bfMinerals" data-i="'+i+'" maxlength="80" value="'+escAttr(b.minerals)+'"></div>'+
+        '</div>'+
+        '<div class="brow2">'+
+          '<div class="mfld" style="margin-bottom:0"><div class="lb">Salvageable tech</div><input type="text" class="bfSalvage" data-i="'+i+'" maxlength="80" value="'+escAttr(b.salvage)+'"></div>'+
+          '<div class="mfld" style="margin-bottom:0"><div class="lb">Fossils &amp; curiosities</div><input type="text" class="bfFossils" data-i="'+i+'" maxlength="80" value="'+escAttr(b.fossils)+'"></div>'+
+        '</div>';
     }
     html+='</div>';
   }
@@ -2534,17 +2675,38 @@ function openEditModal(){
   document.getElementById("edConflict").value=s.conflict||"";
   document.getElementById("edBH").checked=!!s.blackHole;
   document.getElementById("edAtlas").checked=!!s.atlas;
+  document.getElementById("edRegion").value=s.region||"";
+  document.getElementById("edStarClass").value=s.spectral||"";
+  document.getElementById("edSuffix").value=s.water?"Water":(s.dissonant?"Dissonant":"None");
+  document.getElementById("edGiant").checked=!!s.giant;
   document.getElementById("edNotes").value=s.publicNotes||"";
   editBodies=s.bodies.map(function(b){
     return {
+      uid:bodyUidSeq++,
       name:b.name,
       moon:!!b.moon,
       biome:(BIOME_KEYS.indexOf(b.biome)>=0)?b.biome:BIOME_KEYS[0],
+      descriptor:b.descriptor||"",
       water:!!b.water,
       resources:(b.resUni||[]).join(", "),
+      flora:(b.flora||[]).join(", "),
+      minerals:(b.minerals||[]).join(", "),
+      salvage:(b.salvage||[]).join(", "),
+      fossils:(b.fossils||[]).join(", "),
+      sentinel:(SENTINEL_LEVELS.indexOf(b.sentinel)>=0)?b.sentinel:"None",
+      autophage:!!b.autophage,
+      parentPos:b.moon?b.parent:0,
       open:false
     };
   });
+  // resolve each moon's saved 1-based parent POSITION into the matching
+  // row's stable uid, since the Orbits dropdown is keyed by uid (positions
+  // shift as rows are added/removed, uids never do)
+  for(var pj=0;pj<editBodies.length;pj++){
+    var pp=editBodies[pj].parentPos;
+    editBodies[pj].orbits=(pp>=1 && editBodies[pp-1])?editBodies[pp-1].uid:"";
+    delete editBodies[pj].parentPos;
+  }
   renderBodyEditList();
   document.getElementById("editErr").style.display="none";
   closeAllModalBoxes();
@@ -2589,8 +2751,12 @@ function clientPrecheck(){
   }
   var fields=[document.getElementById("edName").value,document.getElementById("edEcon").value,
     document.getElementById("edEconStr").value,document.getElementById("edConflict").value,
+    document.getElementById("edRegion").value,document.getElementById("edStarClass").value,
     document.getElementById("edNotes").value];
-  for(var i=0;i<editBodies.length;i++) fields.push(editBodies[i].name);
+  for(var i=0;i<editBodies.length;i++){
+    fields.push(editBodies[i].name,editBodies[i].descriptor,editBodies[i].flora,
+      editBodies[i].minerals,editBodies[i].salvage,editBodies[i].fossils);
+  }
   for(i=0;i<fields.length;i++) if(bad(fields[i])) return "Please remove blocked language before saving.";
   if(!document.getElementById("edName").value.trim()) return "System name can't be empty.";
   var PCT_RE=/^-?\d{1,4}(\.\d{1,2})?$/;
@@ -2598,18 +2764,35 @@ function clientPrecheck(){
   var buyV=document.getElementById("edBuy").value.trim();
   if(sellV && !PCT_RE.test(sellV)) return "Sell % must be a plain number, e.g. 71.5 -- no % sign needed.";
   if(buyV && !PCT_RE.test(buyV)) return "Buy % must be a plain number, e.g. -15.7 -- no % sign needed.";
+  if(document.getElementById("edGiant").checked){
+    var planetCount=0, moonCount=0;
+    for(i=0;i<editBodies.length;i++){ if(editBodies[i].moon) moonCount++; else planetCount++; }
+    if(planetCount>1) return "A Giant planet system can only have 1 planet (the Giant itself) -- remove the extra planet(s) or untick Giant planet.";
+    if(moonCount>5) return "A Giant planet can have at most 5 moons.";
+  }
   return null;
 }
 document.getElementById("bodyEditList").addEventListener("input",function(e){
   var iAttr=e.target.getAttribute("data-i"); if(iAttr===null) return; var i=+iAttr;
   if(e.target.classList.contains("bfName")) editBodies[i].name=e.target.value;
   else if(e.target.classList.contains("bfRes")) editBodies[i].resources=e.target.value;
+  else if(e.target.classList.contains("bfDesc")) editBodies[i].descriptor=e.target.value;
+  else if(e.target.classList.contains("bfFlora")) editBodies[i].flora=e.target.value;
+  else if(e.target.classList.contains("bfMinerals")) editBodies[i].minerals=e.target.value;
+  else if(e.target.classList.contains("bfSalvage")) editBodies[i].salvage=e.target.value;
+  else if(e.target.classList.contains("bfFossils")) editBodies[i].fossils=e.target.value;
 });
 document.getElementById("bodyEditList").addEventListener("change",function(e){
   var iAttr=e.target.getAttribute("data-i"); if(iAttr===null) return; var i=+iAttr;
-  if(e.target.classList.contains("bfMoon")) editBodies[i].moon=e.target.checked;
+  if(e.target.classList.contains("bfMoon")){
+    editBodies[i].moon=e.target.checked;
+    renderBodyEditList(); // Orbits dropdown only applies to moon rows -- must appear/disappear immediately
+  }
   else if(e.target.classList.contains("bfWater")) editBodies[i].water=e.target.checked;
   else if(e.target.classList.contains("bfBiome")) editBodies[i].biome=e.target.value;
+  else if(e.target.classList.contains("bfAutophage")) editBodies[i].autophage=e.target.checked;
+  else if(e.target.classList.contains("bfSentinel")) editBodies[i].sentinel=e.target.value;
+  else if(e.target.classList.contains("bfOrbits")) editBodies[i].orbits=e.target.value;
 });
 document.getElementById("bodyEditList").addEventListener("click",function(e){
   var rm=e.target.getAttribute("data-remove");
@@ -2627,12 +2810,14 @@ document.getElementById("bodyEditList").addEventListener("click",function(e){
 document.getElementById("edAddBody").addEventListener("click",function(){
   if(editBodies.length>=6) return;
   for(var j=0;j<editBodies.length;j++) editBodies[j].open=false;
-  editBodies.push({name:"New body",moon:false,biome:BIOME_KEYS[0],water:false,resources:"",open:true});
+  editBodies.push({uid:bodyUidSeq++,name:"New body",moon:false,biome:BIOME_KEYS[0],descriptor:"",water:false,
+    resources:"",flora:"",minerals:"",salvage:"",fossils:"",sentinel:"None",autophage:false,orbits:"",open:true});
   renderBodyEditList();
   var rows=document.querySelectorAll("#bodyEditList .bodyEdit");
   var last=rows[rows.length-1];
   if(last) last.scrollIntoView({block:"nearest",behavior:"smooth"});
 });
+document.getElementById("edGiant").addEventListener("change",renderBodyEditList);
 document.getElementById("bEdit").addEventListener("click",function(){ if(selected) openEditModal(); });
 document.getElementById("bReport").addEventListener("click",function(){
   if(!selected) return;
@@ -2670,9 +2855,19 @@ document.getElementById("edSubmit").addEventListener("click",function(){
   var errEl=document.getElementById("editErr");
   if(err){ errEl.textContent=err; errEl.style.display="block"; errEl.scrollIntoView({block:"nearest"}); return; }
   errEl.style.display="none";
+  // Orbits is stored per-row as a stable uid while editing (survives
+  // add/remove reordering); resolve every uid to its final SAVED array
+  // position right before building the payload, since that's the only
+  // reference applyOverride() can use once this comes back from the server.
+  var uidToPos={};
+  editBodies.forEach(function(b,idx){ uidToPos[b.uid]=idx+1; });
   var payload={
     name:document.getElementById("edName").value.trim(),
     race:document.getElementById("edRace").value,
+    region:document.getElementById("edRegion").value.trim(),
+    starClass:document.getElementById("edStarClass").value.trim(),
+    suffix:document.getElementById("edSuffix").value,
+    giant:document.getElementById("edGiant").checked,
     econName:document.getElementById("edEcon").value.trim(),
     sell:document.getElementById("edSell").value.trim(),
     buy:document.getElementById("edBuy").value.trim(),
@@ -2683,8 +2878,16 @@ document.getElementById("edSubmit").addEventListener("click",function(){
     notes:document.getElementById("edNotes").value.trim(),
     bodies:editBodies.map(function(b){
       return {
-        name:b.name.trim(), moon:b.moon, parent:0, biome:b.biome, water:b.water,
-        resources:b.resources.split(",").map(function(x){ return x.trim(); }).filter(Boolean)
+        name:b.name.trim(), moon:b.moon,
+        orbits:(b.moon && b.orbits && uidToPos[b.orbits])?uidToPos[b.orbits]:0,
+        biome:b.biome, descriptor:(b.descriptor||"").trim(), water:b.water,
+        resources:b.resources.split(",").map(function(x){ return x.trim(); }).filter(Boolean),
+        flora:(b.flora||"").split(",").map(function(x){ return x.trim(); }).filter(Boolean),
+        minerals:(b.minerals||"").split(",").map(function(x){ return x.trim(); }).filter(Boolean),
+        salvage:(b.salvage||"").split(",").map(function(x){ return x.trim(); }).filter(Boolean),
+        fossils:(b.fossils||"").split(",").map(function(x){ return x.trim(); }).filter(Boolean),
+        sentinel:b.sentinel||"None",
+        autophage:!!b.autophage
       };
     })
   };
