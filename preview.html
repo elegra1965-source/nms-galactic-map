@@ -661,6 +661,9 @@ var STAR_TYPES=[
 ];
 var ODDS={yellow:{out:.25,unc:0,aba:0},red:{out:.50,unc:.95,aba:0},
   green:{out:.15,unc:.40,aba:.10},blue:{out:.15,unc:.40,aba:.10},purple:{out:.15,unc:.40,aba:.10}};
+/* chance a purple system is also a Giant-planet system -- placeholder,
+   see the comment in generateSystem() where it's used */
+var GIANT_CHANCE=0.12;
 var RACES=["Gek","Vy'keen","Korvax"];
 var ECON=[
   ["Trading",["Mercantile","Trading","Shipping","Commercial"]],
@@ -890,6 +893,14 @@ function generateSystem(vx,vy,vz,idx){
   s.vx=vx; s.vy=vy; s.vz=vz; s.idx=idx; s.galaxy=GALAXY;
   s.blackHole=(idx===0x079); s.atlas=(idx===0x07A);
   s.type=st.k; s.color=st.col;
+  /* Giants are exclusive to purple systems in the real game, and were only
+     ever settable by hand until now -- meaning the Giant-planet filter
+     always came back empty against the procedurally generated universe,
+     since nothing ever set it. GIANT_CHANCE is a placeholder (the wiki
+     only says "quite uncommon", no hard number) -- Tony, adjust this once
+     you've explored a few purple systems and have a feel for how often
+     you'd like to actually run into one. */
+  s.giant = s.type==="purple" && mulberry32(gseed(vx,vy,vz,idx^0x61A47))()<GIANT_CHANCE;
   s.spectral=pickOne(r,st.cls)+Math.floor(r()*10)+pickOne(r,["","","","f","p","pf"]);
   s.water=r()<0.18; s.dissonant=r()<0.10;
   var sc=r(); s.stars = sc<0.80?1:(sc<0.95?2:3);
@@ -923,7 +934,7 @@ function generateSystem(vx,vy,vz,idx){
   s.bodies=[]; s.planets=0; s.moons=0;
   for(var pi=0; pi<total; pi++){
     var br=mulberry32(gseed(vx,vy,vz,(idx<<4)^(pi+7)));
-    var isMoon = pi>0 && br()<0.28 && s.bodies.length>0;
+    var isMoon = s.giant ? (pi>0) : (pi>0 && br()<0.28 && s.bodies.length>0);
     var biome=pickOne(br,BIOME_KEYS);
     var bd=BIOMES[biome];
     var canWater = bd.water && !isMoon;
@@ -933,7 +944,10 @@ function generateSystem(vx,vy,vz,idx){
     if(resU2!==resUni[0]) resUni.push(resU2);
     s.bodies.push({
       index:pi+1, moon:isMoon,
-      parent:isMoon?s.bodies[s.bodies.length-1].index:0,
+      // every moon of a Giant orbits the Giant itself (always body #1) --
+      // NOT the previous body pushed, which is what the non-giant fallback
+      // means (each planet's own trailing moon chain)
+      parent:isMoon?(s.giant?1:s.bodies[s.bodies.length-1].index):0,
       name:nameFrom(gseed(vx,vy,vz,(idx*31)+pi)),
       biome:biome, terrain:hasWater?pickOne(br,TERRAIN.slice(1)):"Pangean", water:hasWater,
       size:isMoon?(0.34+br()*0.22):(0.68+br()*0.62),
