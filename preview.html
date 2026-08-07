@@ -386,12 +386,12 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
       <label class="chk"><input type="checkbox" id="fGiant">Giant planet</label>
       <label class="chk"><input type="checkbox" id="fMark">Bookmarked</label>
       <div class="fld" style="margin-top:7px"><div class="lb">Hyperdrive range</div>
-        <select id="fHyper">
-          <option value="100">100 LY — base</option>
+        <select id="fHyper" title="Used for course plotting -- set this to match your ship's real hyperdrive class or jump counts on Set course will be wrong.">
+          <option value="100" selected>100 LY — Basic (default)</option>
           <option value="500">500 LY</option>
           <option value="1000">1000 LY</option>
           <option value="1500">1500 LY</option>
-          <option value="2200" selected>2200 LY — S upgrades</option>
+          <option value="2200">2200 LY — S upgrades</option>
           <option value="3000">3000 LY — S explorer</option>
           <option value="6000">6000 LY — freighter</option>
         </select></div>
@@ -620,6 +620,18 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     <div style="margin-top:2px;font-size:9px;letter-spacing:.1em;color:var(--text-faint);text-align:center">BUILT BY ELEGRA1965</div>
     <div class="modalBtns">
       <button class="btn primary" id="discOk">Got it</button>
+    </div>
+  </div>
+
+  <div class="box modal" id="hyperdriveModal" style="max-width:360px;display:none">
+    <h3>Set your hyperdrive class</h3>
+    <div class="msub" style="margin-bottom:10px">Course plotting defaults to a <b>Basic hyperdrive (100 LY)</b> -- the range every save starts with. If you've upgraded your ship (Sigma/Tau/Theta drives, an S-class engine, a freighter, etc.) your real range is longer, so jump counts on Set course will look off until you match it here.</div>
+    <div class="mfld"><div class="lb">Change it any time</div>
+      <div style="font-size:12px;color:var(--text-dim);line-height:1.55">Filters &rarr; Hyperdrive range.</div>
+    </div>
+    <div class="modalBtns">
+      <button class="btn primary" id="hyperOpenFilters">Open Filters</button>
+      <button class="btn" id="hyperOk">Got it</button>
     </div>
   </div>
 </div>
@@ -1699,6 +1711,7 @@ function drawCourse(){
 function setCourse(s){
   if(!focusSystem){ toast("Jump somewhere first"); return; }
   if(s.address===focusSystem.address){ toast("That is where you are — pick another star"); return; }
+  maybeShowHyperNotice();
   courseTarget=s;
   var dvx=s.vx-focusSystem.vx, dvy=s.vy-focusSystem.vy, dvz=s.vz-focusSystem.vz;
   var ly=Math.round(Math.sqrt(dvx*dvx+dvy*dvy+dvz*dvz)*LY_PER_VOXEL);
@@ -2271,7 +2284,7 @@ function setMode(m){
   document.getElementById("empty").style.display=(m==="local"&&shown.length===0)?"block":"none";
   cam.target.set(0,0,0);
   if(m==="galaxy"){ cam.dist=330; cam.phi=0.62; flyPos.set(0,150,240); }
-  if(m==="local"){ cam.dist=50; flyPos.set(0,10,44); }
+  if(m==="local"){ cam.dist=50; flyPos.set(0,10,44); maybeShowHyperNotice(); }
   if(m==="system"){ cam.dist=40; flyPos.set(0,12,38); }
   aimFly(cam.target);
   applyCam();
@@ -2775,6 +2788,7 @@ function closeAllModalBoxes(){
   document.getElementById("editModal").style.display="none";
   document.getElementById("reportModal").style.display="none";
   document.getElementById("disclaimerModal").style.display="none";
+  document.getElementById("hyperdriveModal").style.display="none";
 }
 function closeModal(){ document.getElementById("modalWrap").classList.remove("show"); }
 function clientPrecheck(){
@@ -2898,6 +2912,41 @@ try{
   /* localStorage blocked (private browsing etc) -- show it once per page load instead of never */
   openDisclaimer();
 }
+
+/* ============ hyperdrive-range first-time notice ============
+   fHyper defaults to Basic (100 LY, see the select above) rather than an
+   upgraded class -- most players have upgraded, so jump counts on Set course
+   will be wrong for them until they change it. That control lives inside the
+   Filters box, easy to miss, so flag it once the first time it'd actually
+   matter: entering Local view, or plotting a course, whichever happens
+   first. Shown once ever (localStorage-gated), same pattern as the
+   disclaimer above -- if storage is blocked, falls back to once per page
+   load via the in-memory flag instead of never showing at all. */
+var HYPER_KEY="nms-galmap-hyperdrive-seen";
+var hyperNoticeShown=false;
+function openHyperNotice(){
+  closeAllModalBoxes();
+  document.getElementById("hyperdriveModal").style.display="";
+  document.getElementById("modalWrap").classList.add("show");
+}
+function maybeShowHyperNotice(){
+  if(hyperNoticeShown) return;
+  try{
+    if(localStorage.getItem(HYPER_KEY)){ hyperNoticeShown=true; return; }
+    localStorage.setItem(HYPER_KEY,"1");
+  }catch(e){ /* localStorage blocked -- fall through, in-memory flag still stops repeats this load */ }
+  hyperNoticeShown=true;
+  openHyperNotice();
+}
+document.getElementById("hyperOk").addEventListener("click",closeModal);
+document.getElementById("hyperOpenFilters").addEventListener("click",function(){
+  closeModal();
+  var f=document.getElementById("filt");
+  if(f.classList.contains("min")) toggleFold("filt","fHead","Filters");
+  var sel=document.getElementById("fHyper");
+  sel.scrollIntoView({block:"center",behavior:"smooth"});
+  sel.focus();
+});
 document.getElementById("edSubmit").addEventListener("click",function(){
   if(!selected) return;
   var err=clientPrecheck();
