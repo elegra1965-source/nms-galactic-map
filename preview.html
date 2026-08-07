@@ -2547,9 +2547,23 @@ function openEditModal(){
   });
   renderBodyEditList();
   document.getElementById("editErr").style.display="none";
+  closeAllModalBoxes();
   document.getElementById("editModal").style.display="";
-  document.getElementById("reportModal").style.display="none";
   document.getElementById("modalWrap").classList.add("show");
+}
+// Every modal-open path must hide the OTHER modal boxes first -- editModal/
+// reportModal/disclaimerModal are siblings inside the same #modalWrap, and
+// each one only ever set its own display plus one sibling's, never all
+// three -- so a modal left open from an earlier trigger (e.g. the
+// first-visit disclaimer, or the About button) could still be showing
+// underneath/alongside a newly-opened one. Real bug Tony hit: opening
+// Edit system while the disclaimer was still up rendered both side by side,
+// and "Got it" on the disclaimer closed #modalWrap entirely, taking Edit
+// system with it before he could type anything.
+function closeAllModalBoxes(){
+  document.getElementById("editModal").style.display="none";
+  document.getElementById("reportModal").style.display="none";
+  document.getElementById("disclaimerModal").style.display="none";
 }
 function closeModal(){ document.getElementById("modalWrap").classList.remove("show"); }
 function clientPrecheck(){
@@ -2624,7 +2638,7 @@ document.getElementById("bReport").addEventListener("click",function(){
   if(!selected) return;
   document.getElementById("reportErr").style.display="none";
   document.getElementById("repReason").value="";
-  document.getElementById("editModal").style.display="none";
+  closeAllModalBoxes();
   document.getElementById("reportModal").style.display="";
   document.getElementById("modalWrap").classList.add("show");
 });
@@ -2635,8 +2649,7 @@ document.getElementById("modalWrap").addEventListener("click",function(e){ if(e.
 /* ============ fan-made / procedural-data disclaimer ============ */
 var DISCLAIMER_KEY="nms-galmap-disclaimer-seen";
 function openDisclaimer(){
-  document.getElementById("editModal").style.display="none";
-  document.getElementById("reportModal").style.display="none";
+  closeAllModalBoxes();
   document.getElementById("disclaimerModal").style.display="";
   document.getElementById("modalWrap").classList.add("show");
 }
