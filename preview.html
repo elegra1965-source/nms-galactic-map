@@ -1056,6 +1056,24 @@ function loadOverrides(){
 function refreshAfterOverrides(){
   if(focusSystem) focusSystem=generateSystem(focusSystem.vx,focusSystem.vy,focusSystem.vz,focusSystem.idx);
   generateSlice(focusSystem?focusSystem.idx:null);
+  if(focusSystem){
+    // generateSystem() above only refreshes override-affected fields -- it
+    // never assigns a spatial position (only generateSlice's own loop does
+    // that, same as jumpTo() already relies on) -- so focusSystem loses its
+    // px/py/pz the instant this runs, and every "distance from here"
+    // calculation for the rest of the session silently reads NaN. Confirmed
+    // live on the deployed site 2026-08-07 (Tony's Oktakar screenshot) and
+    // reproduced/fixed against real app state before this edit was made.
+    // Re-find this exact address in the slice we just rebuilt and adopt its
+    // correctly positioned copy -- same lookup jumpTo() uses.
+    var posMatch=null;
+    for(var fi=0; fi<allSystems.length; fi++){
+      if(allSystems[fi].idx===focusSystem.idx && allSystems[fi].vx===focusSystem.vx &&
+         allSystems[fi].vy===focusSystem.vy && allSystems[fi].vz===focusSystem.vz){ posMatch=allSystems[fi]; break; }
+    }
+    if(posMatch) focusSystem=posMatch;
+    else { focusSystem.px=0; focusSystem.py=0; focusSystem.pz=0; }
+  }
   if(selected){
     var fresh=null;
     for(var i=0;i<allSystems.length;i++) if(allSystems[i].address===selected.address){ fresh=allSystems[i]; break; }
@@ -2495,6 +2513,20 @@ document.getElementById("bAddrReset").addEventListener("click",function(){
   el.value=addr; el.style.borderColor="";
   keySeq=addr; drawKeypad();
   el.focus();
+  // The address box's text isn't the only place a system shows -- clicking a
+  // star in Local/System view calls updatePanel() independently of the box,
+  // so `selected`/the info panel can still be showing whatever was last
+  // clicked even after this button rewrites the box back to something else
+  // entirely. Confirmed live: Random -> click a different star -> Reset left
+  // the address box correctly back home while the panel kept showing the
+  // OTHER star -- exactly the "picture 1 vs picture 2" mismatch Tony flagged.
+  // Re-sync selection/panel here so the box and panel always agree.
+  if(goingHome){
+    updatePanel(focusSystem);
+  } else {
+    selected=null;
+    document.getElementById("panel").classList.remove("show");
+  }
   toast(goingHome?"Address reset to your current location":"Address cleared");
 });
 document.getElementById("bPanelMin").addEventListener("click",function(){
