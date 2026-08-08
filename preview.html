@@ -223,7 +223,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   font-size:9.5px;letter-spacing:.1em;color:var(--text-faint);text-align:right;line-height:1.7}
 #stats b{color:var(--cyan);font-weight:600}
 #labels{position:fixed;inset:0;z-index:15;pointer-events:none;overflow:hidden}
-.lbl{position:absolute;font-family:'Orbitron',sans-serif;font-size:9.5px;letter-spacing:.1em;
+.lbl{position:absolute;font-family:'Orbitron',sans-serif;font-size:calc(9.5px * var(--ui-zoom,1));letter-spacing:.1em;
   color:var(--white);text-shadow:0 1px 2px #000,0 -1px 2px #000,1px 0 2px #000,-1px 0 2px #000,0 0 6px #000;
   white-space:nowrap;transform:translate(-50%,-150%);opacity:.92;
   background:rgba(4,6,10,0.55);padding:2px 6px;border-radius:4px}
@@ -601,7 +601,8 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     <div class="mfld" style="display:flex;gap:8px">
       <div style="flex:1"><div class="lb">Star class</div><input type="text" id="edStarClass" maxlength="10" placeholder="e.g. G7p"></div>
       <div style="flex:1"><div class="lb">Suffix</div>
-        <select id="edSuffix"><option value="None">None</option><option value="Water">Water</option><option value="Dissonant">Dissonant</option></select>
+        <label class="chk" style="margin-bottom:2px" title="Shown when at least one planet in the system has an ocean."><input type="checkbox" id="edWaterSuf"> Water</label>
+        <label class="chk" title="Shown when at least one planet in the system is dissonant."><input type="checkbox" id="edDissonantSuf"> Dissonant</label>
       </div>
     </div>
     <div class="mfld"><div class="lb">Race</div>
@@ -1105,9 +1106,14 @@ function applyOverride(s){
   if(d.atlas!==undefined) s.atlas=!!d.atlas;
   if(d.region) s.region=d.region;
   if(d.starClass) s.spectral=d.starClass;
-  if(d.suffix==="Water"){ s.water=true; s.dissonant=false; }
-  else if(d.suffix==="Dissonant"){ s.water=false; s.dissonant=true; }
-  else if(d.suffix==="None"){ s.water=false; s.dissonant=false; }
+  // Independent flags, not a 3-way choice -- confirmed against the wiki:
+  // Water (Abyss update) and Dissonant (Interceptor update) were added in
+  // separate updates as separate per-system conditions ("has an ocean
+  // world" / "has a dissonant world"), so a system can legitimately show
+  // both suffixes at once. The old single edSuffix dropdown couldn't
+  // represent that -- picking one always silently cleared the other.
+  if(d.water!==undefined) s.water=!!d.water;
+  if(d.dissonant!==undefined) s.dissonant=!!d.dissonant;
   if(d.giant!==undefined) s.giant=!!d.giant;
   s.publicNotes=d.notes||"";
   if(d.bodies && d.bodies.length){
@@ -2094,7 +2100,8 @@ function updatePanel(s){
   document.getElementById("pName").textContent=s.name;
   document.getElementById("pReg").textContent="REGION: "+s.region;
   var here=(focusSystem&&s.address===focusSystem.address&&s.galaxy===focusSystem.galaxy);
-  var suffix=s.water?" // Water":(s.dissonant?" // Dissonant":"");
+  var suffixParts=[]; if(s.water) suffixParts.push("Water"); if(s.dissonant) suffixParts.push("Dissonant");
+  var suffix=suffixParts.length?" // "+suffixParts.join(" "):"";
   document.getElementById("pCls").textContent=
     (here?"CURRENT LOCATION":(commas(distanceLY(s))+" LY"))+" // "+s.spectral+suffix;
   document.getElementById("pCore").textContent=commas(s.coreLY)+" LY from galaxy centre";
@@ -2404,6 +2411,14 @@ function updateLabels(){
      first) gets pushed further up in fixed steps until it clears every label
      already placed this frame. Cheap -- LBL_MAX caps this at 28 labels, so at
      most ~28*28 comparisons per frame. */
+  /* Collision thresholds below were tuned against the default 9.5px label
+     size -- the accessibility font-size setting now scales .lbl's actual
+     CSS size (see the --ui-zoom rule), so the same pixel gaps have to scale
+     with it too, or XL text would still be allowed to overlap by the old
+     default-size thresholds. a11y.fs is the same multiplier driving
+     --ui-zoom, read directly rather than round-tripping through a style
+     read every frame. */
+  var lz=(typeof a11y!=="undefined"&&a11y.fs)?a11y.fs:1;
   var placed=[];
   for(i=0;i<LBL_MAX;i++){
     var el=labelEls[i];
@@ -2418,8 +2433,8 @@ function updateLabels(){
     while(moved && guard<20){
       moved=false; guard++;
       for(var k=0;k<placed.length;k++){
-        if(Math.abs(placed[k].x-lx)<64 && Math.abs(placed[k].y-ly)<16){
-          ly=placed[k].y-16; moved=true;
+        if(Math.abs(placed[k].x-lx)<64*lz && Math.abs(placed[k].y-ly)<16*lz){
+          ly=placed[k].y-16*lz; moved=true;
         }
       }
       /* Zoomed far out, many stars project into the same small screen area at
@@ -2429,7 +2444,7 @@ function updateLabels(){
          disconnected from the dots they're meant to label. Bail out and hide
          the label instead of drifting it more than ~48px from its true spot;
          a missing label at extreme zoom-out is less confusing than a wrong one. */
-      if(ly0-ly>48){ fits=false; break; }
+      if(ly0-ly>48*lz){ fits=false; break; }
     }
     if(!fits){ el.style.display="none"; continue; }
     placed.push({x:lx,y:ly});
@@ -2947,7 +2962,8 @@ function openEditModal(){
   document.getElementById("edAtlas").checked=!!s.atlas;
   document.getElementById("edRegion").value=s.region||"";
   document.getElementById("edStarClass").value=s.spectral||"";
-  document.getElementById("edSuffix").value=s.water?"Water":(s.dissonant?"Dissonant":"None");
+  document.getElementById("edWaterSuf").checked=!!s.water;
+  document.getElementById("edDissonantSuf").checked=!!s.dissonant;
   document.getElementById("edGiant").checked=!!s.giant;
   document.getElementById("edNotes").value=s.publicNotes||"";
   editBodies=s.bodies.map(function(b){
@@ -3238,9 +3254,32 @@ applyA11y();
      on the page, closes it after that. On touch devices (no hover at all)
      every open is a click, so every open is pinned by definition. */
   var pinned=false;
+  /* The static top:.../right:10px in the CSS was a guess at where the gear
+     button would end up -- wrong on a wide desktop window (the toolbar packs
+     from the left, so the last button often isn't anywhere near the right
+     edge) and wrong again once the toolbar wraps to its own rows on mobile
+     (Tony's own screenshot showed the button, and where he wanted the panel,
+     over on the left). Same lesson as --top-h elsewhere in this file: measure
+     the button's real rendered position instead of guessing a fixed corner.
+     Only runs once per session/resize -- makeDraggable() already gives this
+     box a real inline left/top the moment it's auto-positioned OR dragged,
+     and resetDraggedBoxes() (on window resize) clears that inline style back
+     to "", which is exactly the signal used here to know a fresh anchor is
+     needed rather than clobbering a position Tony deliberately dragged it to. */
+  function positionUnderButton(){
+    var r=btn.getBoundingClientRect();
+    var pw=pop.offsetWidth||198;
+    var left=Math.min(window.innerWidth-pw-8,Math.max(8,r.left));
+    pop.style.position="fixed";
+    pop.style.left=left+"px";
+    pop.style.right="auto";
+    pop.style.top=(r.bottom+8)+"px";
+    pop.style.bottom="auto";
+  }
   function open(){
     clearTimeout(hideT);
     pop.classList.add("show");
+    if(!pop.style.left) positionUnderButton();
     btn.setAttribute("aria-expanded","true");
   }
   function scheduleClose(){
@@ -3287,7 +3326,8 @@ document.getElementById("edSubmit").addEventListener("click",function(){
     race:document.getElementById("edRace").value,
     region:document.getElementById("edRegion").value.trim(),
     starClass:document.getElementById("edStarClass").value.trim(),
-    suffix:document.getElementById("edSuffix").value,
+    water:document.getElementById("edWaterSuf").checked,
+    dissonant:document.getElementById("edDissonantSuf").checked,
     giant:document.getElementById("edGiant").checked,
     econName:document.getElementById("edEcon").value.trim(),
     sell:document.getElementById("edSell").value.trim(),

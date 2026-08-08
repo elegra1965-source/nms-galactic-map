@@ -147,8 +147,11 @@ export function filterSystemEdit(payload){
   var starClassR = filterText(payload.starClass, {maxLen:10, fieldName:"Star class"});
   if(!starClassR.ok) errors.push(starClassR.reason); else out.starClass = starClassR.cleaned;
 
-  var suffixIn = String(payload.suffix||"");
-  out.suffix = (suffixIn==="Water"||suffixIn==="Dissonant"||suffixIn==="None") ? suffixIn : "";
+  // Independent, not a 3-way "suffix" choice -- Water (added in the Abyss
+  // update) and Dissonant (added in Interceptor) are separate per-system
+  // conditions in the real game and can both apply to the same system.
+  out.water = !!payload.water;
+  out.dissonant = !!payload.dissonant;
 
   out.blackHole = !!payload.blackHole;
   out.atlas = !!payload.atlas;
