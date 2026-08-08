@@ -114,9 +114,12 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border:none;border-ra
    that corner instead of reflowing. Deliberately scoped to UI chrome only --
    the 3D canvas and in-scene star/planet labels are a separate system with
    their own pixel-math collision-avoidance and aren't touched here.
-   Colour-blind filters + Invert apply to the whole page (html), including
-   the canvas, via SVG feColorMatrix / CSS invert -- a colourblind player
-   needs the actual star colours corrected too, not just the UI text.
+   Colour-blind filters apply to the whole page (html), including the
+   canvas, via SVG feColorMatrix -- a colourblind player needs the actual
+   star colours corrected too, not just the UI text. (Invert was in the
+   original spec too but Tony dropped it after trying it live -- it made
+   the whole map, including the cyan/gold accent colours that carry real
+   meaning, unreadable rather than more readable.)
    High Contrast reuses the existing --text-*/--border-* variable system
    instead of a filter, so it boosts real contrast without touching the
    cyan/gold accent colours that already carry meaning (selection, warnings). */
@@ -374,7 +377,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   <div class="sep"></div>
   <button class="btn" id="bInstall" title="Install this map as an app on your device." style="display:none">&#9672; Install app</button>
   <button class="btn" id="bAbout" title="Fan-made disclaimer and a note on procedural vs. real system data.">&#9432; About</button>
-  <button class="btn" id="bAccess" title="Accessibility settings: font size, colour-blind filters, invert colours, high contrast." aria-label="Accessibility settings" aria-haspopup="true" aria-expanded="false">&#9881;</button>
+  <button class="btn" id="bAccess" title="Accessibility settings: font size, colour-blind filters, high contrast." aria-label="Accessibility settings" aria-haspopup="true" aria-expanded="false">&#9881;</button>
 </div>
 
 <div id="leftcol">
@@ -555,21 +558,37 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
       <button class="pill" type="button" data-fs="1.15">Large</button>
       <button class="pill" type="button" data-fs="1.3">XL</button>
     </div></div>
-  <label class="chk"><input type="checkbox" id="a11yCC">Colour correction</label>
+  <label class="chk" title="Shifts the map's colours to make them easier to tell apart if you have colour blindness. Pick which type below."><input type="checkbox" id="a11yCC">Colour correction</label>
   <div class="pillrow" id="a11yFiltRow" style="opacity:.35;margin-top:7px">
-    <button class="pill on" type="button" data-filt="none" disabled>None</button>
-    <button class="pill" type="button" data-filt="protanopia" disabled>Protanopia</button>
-    <button class="pill" type="button" data-filt="deuteranopia" disabled>Deuteranopia</button>
-    <button class="pill" type="button" data-filt="tritanopia" disabled>Tritanopia</button>
-    <button class="pill" type="button" data-filt="invert" disabled>Invert</button>
+    <button class="pill on" type="button" data-filt="none" disabled title="No colour correction applied.">None</button>
+    <button class="pill" type="button" data-filt="protanopia" disabled title="For red-green colour blindness with reduced red sensitivity.">Protanopia</button>
+    <button class="pill" type="button" data-filt="deuteranopia" disabled title="For red-green colour blindness with reduced green sensitivity -- the most common type.">Deuteranopia</button>
+    <button class="pill" type="button" data-filt="tritanopia" disabled title="For blue-yellow colour blindness -- rare, and the correction shift is stronger for this type.">Tritanopia</button>
   </div>
-  <label class="chk" style="margin-top:2px"><input type="checkbox" id="a11yHC">High contrast</label>
+  <label class="chk" style="margin-top:2px" title="Sharpens faint text and thickens panel borders across the map's UI. Can be used together with a colour correction option above."><input type="checkbox" id="a11yHC">High contrast</label>
 </div>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
-<filter id="protanopia-f" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="0.567 0.433 0 0 0 0.558 0.442 0 0 0 0 0.242 0.758 0 0 0 0 0 1 0"/></filter>
-<filter id="deuteranopia-f" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="0.625 0.375 0 0 0 0.7 0.3 0 0 0 0 0.3 0.7 0 0 0 0 0 1 0"/></filter>
-<filter id="tritanopia-f" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="0.95 0.05 0 0 0 0 0.433 0.567 0 0 0 0.475 0.525 0 0 0 0 0 1 0"/></filter>
+<!-- Real Daltonization (correction), not simulation -- Tony's call after I
+     flagged the distinction: these need to help a colorblind player actually
+     tell the map's colours apart, not show a sighted player what they're
+     missing. Coefficients computed offline (Python/numpy, not hand-derived)
+     from the verified daltonize.org LMS algorithm: RGB->LMS (Viénot/Brettel
+     coefficients), simulate the deficiency in LMS space, LMS->RGB, take the
+     "error" (what the original had that the simulation lost), then shift
+     that error into channels the deficiency doesn't affect and add it back
+     on top of the original -- confirmed against a real, cited reference
+     implementation (a ReShade port of the daltonize.org shader) rather than
+     built from memory. Composing all of those linear steps collapses into
+     one fixed 3x3 per type, which is what's baked into the matrix below.
+     Tritanopia's correction looks the most aggressive of the three (larger
+     coefficients) -- that's inherent to this algorithm, not a mistake: the
+     reference implementation itself uses the same error-shift weights for
+     all three deficiency types, and shifting error away from an already-
+     weak blue channel needs a bigger push than the red-green cases. -->
+<filter id="protanopia-f" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="1 0 0 0 0 0.5089 0.4911 0 0 0 0.6173 -0.6173 1 0 0 0 0 0 1 0"/></filter>
+<filter id="deuteranopia-f" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="1 0 0 0 0 0.2023 0.7977 0 0 0 0.5174 -0.5174 1 0 0 0 0 0 1 0"/></filter>
+<filter id="tritanopia-f" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="1 0 0 0 0 -0.1385 1.1385 0 0 0 3.3656 -3.3656 1 0 0 0 0 0 1 0"/></filter>
 </defs></svg>
 
 <div id="modalWrap">
@@ -740,6 +759,26 @@ var GIANT_CHANCE=0.12;
    with rings, placeholder same as GIANT_CHANCE above -- Tony, adjust once
    you've got a feel for how common ringed worlds should look on the map. */
 var RING_CHANCE=0.22;
+/* Which of the 5 ring looks each biome gets -- Tony's own pairing ("ice for
+   frozen planets, ash for volcanic etc"), not random per-planet. b.ring is
+   now one of these style keys (or false for no ring), not a plain boolean --
+   still works everywhere that just checks `if(b.ring)` truthy/falsy, but
+   also tells makeRingTexture() and buildSystemView() which look to use. */
+var RING_STYLE_BY_BIOME={
+  Frozen:"icy",
+  Barren:"tan", Lush:"tan", Marsh:"tan",
+  Volcanic:"ash", Dead:"ash", Toxic:"ash",
+  Scorched:"gold", Irradiated:"gold", "Mega Exotic":"gold",
+  Exotic:"split"
+};
+var RING_STYLE_LABEL={icy:"Icy",tan:"Dusty",ash:"Ash",gold:"Golden",split:"Split"};
+var RING_PALETTES={
+  icy:  [0xeaf6ff,0xb9dcf0,0xdceefc,0x8fc4e0],
+  tan:  [0xd8c9a8,0xcbb694,0xbfa87e,0xe4dcc2],
+  ash:  [0x6b6b6b,0x232323,0x5a5a5a,0x1c1c1c],
+  gold: [0xffcf5c,0xc97f16,0xf0a500,0xa85e00],
+  split:[0xe8edf0,0x9aa7ab,0xcfd8dc,0x7f8a8e]
+};
 var RACES=["Gek","Vy'keen","Korvax"];
 var ECON=[
   ["Trading",["Mercantile","Trading","Shipping","Commercial"]],
@@ -1016,6 +1055,7 @@ function generateSystem(vx,vy,vz,idx){
     var canWater = bd.water && !isMoon;
     var hasWater = canWater && br()<0.62;
     var hasRing = !isMoon && br()<RING_CHANCE;
+    var ringStyle = hasRing ? (RING_STYLE_BY_BIOME[biome]||"tan") : false;
     var resUni=[UNIVERSAL_EL[Math.floor(br()*UNIVERSAL_EL.length)]];
     var resU2=UNIVERSAL_EL[Math.floor(br()*UNIVERSAL_EL.length)];
     if(resU2!==resUni[0]) resUni.push(resU2);
@@ -1027,7 +1067,7 @@ function generateSystem(vx,vy,vz,idx){
       parent:isMoon?(s.giant?1:s.bodies[s.bodies.length-1].index):0,
       name:nameFrom(gseed(vx,vy,vz,(idx*31)+pi)),
       biome:biome, terrain:hasWater?pickOne(br,TERRAIN.slice(1)):"Pangean", water:hasWater,
-      ring:hasRing,
+      ring:ringStyle,
       size:isMoon?(0.34+br()*0.22):(0.68+br()*0.62),
       tilt:(br()-0.5)*0.7, spin:0.15+br()*0.5,
       resUni:resUni,
@@ -1094,7 +1134,7 @@ function applyOverride(s){
         descriptor:b.descriptor||"",
         terrain:o?o.terrain:"Pangean",
         water:!!b.water,
-        ring:!isMoon&&!!b.ring,
+        ring:(!isMoon&&!!b.ring)?(RING_STYLE_BY_BIOME[biome]||"tan"):false,
         size:o?o.size:(isMoon?0.42:0.85),
         tilt:o?o.tilt:((i%2?1:-1)*(0.1+0.05*i)),
         spin:o?o.spin:0.3,
@@ -1366,7 +1406,7 @@ function makeRingTexture(b){
   var W=8,H=64;
   var cv=document.createElement("canvas"); cv.width=W; cv.height=H;
   var g=cv.getContext("2d"), r=mulberry32(b.seed^0x21196E), i;
-  var base=[0xd8c9a8,0xcbb694,0xbfa87e,0xe4dcc2];
+  var base=RING_PALETTES[b.ring]||RING_PALETTES.tan;
   for(i=0;i<H;i++){
     var v=i/H;
     var edge=Math.min(v,1-v)*2; // fades near inner/outer edge instead of a hard cutoff
@@ -1968,10 +2008,25 @@ function buildSystemView(s){
         // (was 0.95x, read as a chunky solid disc rather than a ring on
         // Tony's actual screen) -- a tighter band plus a small gap off the
         // planet's surface reads as a proper ring at real render size.
-        var pRing=new THREE.Mesh(new THREE.RingGeometry(b.size*1.4,b.size*1.7,64),
-          new THREE.MeshBasicMaterial({map:makeRingTexture(b),transparent:true,
-            side:THREE.DoubleSide,depthWrite:false}));
-        pRing.rotation.x=Math.PI/2; mesh.add(pRing);
+        // "split" is the one style that's a genuinely different SHAPE, not
+        // just a different texture -- two separate thin bands with a real
+        // gap between them (Cassini-division look), matching the mockup
+        // Tony picked rather than faking a gap in the texture alone.
+        if(b.ring==="split"){
+          var pRingIn=new THREE.Mesh(new THREE.RingGeometry(b.size*1.4,b.size*1.5,64),
+            new THREE.MeshBasicMaterial({map:makeRingTexture(b),transparent:true,
+              side:THREE.DoubleSide,depthWrite:false}));
+          pRingIn.rotation.x=Math.PI/2; mesh.add(pRingIn);
+          var pRingOut=new THREE.Mesh(new THREE.RingGeometry(b.size*1.58,b.size*1.7,64),
+            new THREE.MeshBasicMaterial({map:makeRingTexture(b),transparent:true,
+              side:THREE.DoubleSide,depthWrite:false}));
+          pRingOut.rotation.x=Math.PI/2; mesh.add(pRingOut);
+        } else {
+          var pRing=new THREE.Mesh(new THREE.RingGeometry(b.size*1.4,b.size*1.7,64),
+            new THREE.MeshBasicMaterial({map:makeRingTexture(b),transparent:true,
+              side:THREE.DoubleSide,depthWrite:false}));
+          pRing.rotation.x=Math.PI/2; mesh.add(pRing);
+        }
       }
       pivots.push({p:pivot,sp:0.10/(1+planetIdx*0.55),mesh:mesh,spin:b.spin});
       bodyMeshes.push(mesh);
@@ -2077,7 +2132,7 @@ function updatePanel(s){
     var b=s.bodies[i];
     bl+='<div class="brow" data-b="'+i+'"><span class="bdot" style="background:'+BIOMES[b.biome].base+'"></span>'+
         '<span class="bn">'+(b.moon?"&#8627; ":"")+b.name+'</span>'+
-        '<span class="bb">'+b.biome+(b.water?" &middot; water":"")+(b.ring?" &middot; rings":"")+'</span></div>';
+        '<span class="bb">'+b.biome+(b.water?" &middot; water":"")+(b.ring?" &middot; "+(RING_STYLE_LABEL[b.ring]||"").toLowerCase()+" rings":"")+'</span></div>';
   }
   document.getElementById("pBodies").innerHTML=bl;
 
@@ -2112,7 +2167,7 @@ function showBody(b,s){
   if(!BIOMES[b.biome].atmo) t.push(["","No atmosphere"]);
   if(b.biome==="Exotic"||b.biome==="Mega Exotic") t.push(["bh","Anomalous"]);
   if(b.water) t.push(["hot","Water"]);
-  if(b.ring) t.push(["hot","Rings"]);
+  if(b.ring) t.push(["hot",(RING_STYLE_LABEL[b.ring]||"")+" rings"]);
   if(b.autophage) t.push(["hot","Autophage camp"]);
   var html="",i;
   for(i=0;i<t.length;i++) html+='<span class="tag '+t[i][0]+'">'+t[i][1]+'</span>';
@@ -3104,7 +3159,7 @@ document.getElementById("hyperOpenFilters").addEventListener("click",function(){
 });
 
 /* ============ accessibility panel ============
-   Font size / colour-blind filters / invert / high contrast, gated behind a
+   Font size / colour-blind filters / high contrast, gated behind a
    small gear icon rather than a full toolbar button -- Tony's own call: this
    is a setting a player sets once and forgets, not a feature they reach for
    every session, so it shouldn't compete for space with Jump/Filters/Labels.
@@ -3122,6 +3177,10 @@ var a11y={fs:1,cc:false,filt:"none",hc:false};
 try{
   var savedA11y=JSON.parse(localStorage.getItem(A11Y_KEY)||"null");
   if(savedA11y) a11y=Object.assign(a11y,savedA11y);
+  // Invert was removed after Tony tried it live and didn't like it -- a
+  // returning visitor with an old saved "invert" choice falls back to no
+  // filter rather than applying a setting that no longer has a UI control.
+  if(a11y.filt==="invert") a11y.filt="none";
 }catch(e){ /* localStorage blocked or bad JSON -- fall back to defaults */ }
 function saveA11y(){
   try{ localStorage.setItem(A11Y_KEY,JSON.stringify(a11y)); }catch(e){}
@@ -3142,7 +3201,6 @@ function applyA11y(){
     if(a11y.filt==="protanopia") cssFilter="url(#protanopia-f)";
     else if(a11y.filt==="deuteranopia") cssFilter="url(#deuteranopia-f)";
     else if(a11y.filt==="tritanopia") cssFilter="url(#tritanopia-f)";
-    else if(a11y.filt==="invert") cssFilter="invert(1) hue-rotate(180deg)";
   }
   document.documentElement.style.filter=cssFilter;
   document.documentElement.classList.toggle("hc-on",a11y.hc);

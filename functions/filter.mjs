@@ -18,6 +18,19 @@ export const BAD_WORDS = [
 // Server-side mirror of preview.html's SENTINEL_LEVELS -- keep in sync.
 const SENTINEL_LEVELS = ["None","Low","High","Aggressive","Corrupted"];
 
+// Server-side mirror of preview.html's RING_STYLE_BY_BIOME -- keep in sync.
+// The client only ever sends a boolean "does this body have a ring", never
+// the style itself -- the style is always derived here (and again on every
+// client re-render) from the body's own biome, so a manual edit and a
+// procedurally generated planet of the same biome always get the same look.
+const RING_STYLE_BY_BIOME = {
+  Frozen: "icy",
+  Barren: "tan", Lush: "tan", Marsh: "tan",
+  Volcanic: "ash", Dead: "ash", Toxic: "ash",
+  Scorched: "gold", Irradiated: "gold", "Mega Exotic": "gold",
+  Exotic: "split"
+};
+
 const LEET = {"0":"o","1":"i","3":"e","4":"a","5":"s","7":"t","@":"a","$":"s"};
 
 // Normalizes ONE token (no spaces left in it by the time this runs) --
@@ -191,7 +204,10 @@ export function filterSystemEdit(payload){
       water: !!b.water,
       // Rings aren't a thing on moons in-game -- enforced server-side too,
       // not just hidden client-side, since this is the authoritative copy.
-      ring: !isMoon && !!b.ring,
+      // Style is derived from the (already-filtered) biome, same lookup the
+      // client uses in applyOverride() and generateSystem() -- never trust
+      // a style string from the client itself, since one was never sent.
+      ring: (!isMoon && !!b.ring) ? (RING_STYLE_BY_BIOME[biomeR.cleaned] || "tan") : false,
       resources: resOut,
       flora: resArr(b.flora,"Flora"),
       minerals: resArr(b.minerals,"Mineral"),
