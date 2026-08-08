@@ -43,7 +43,7 @@ canvas#c{display:block;position:fixed;inset:0;touch-action:none}
    bugs one at a time: instead of guessing every viewport/orientation combination,
    let him move the boxes himself. touch-action:none stops the browser's own
    scroll/zoom gestures from stealing the pointer before the drag handler sees it. */
-#fHead,.phead,.chead{cursor:grab;touch-action:none}
+#fHead,.phead,.chead,#a11yHead{cursor:grab;touch-action:none}
 .box::before,.box::after{content:'';position:absolute;width:9px;height:9px;pointer-events:none}
 .box::before{top:-1px;right:-1px;border-top:1px solid var(--cyan);border-right:1px solid var(--cyan);border-radius:0 12px 0 0}
 .box::after{bottom:-1px;left:-1px;border-bottom:1px solid var(--cyan);border-left:1px solid var(--cyan);border-radius:0 0 0 12px}
@@ -547,7 +547,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 </div>
 
 <div class="box" id="accessPop" role="dialog" aria-label="Accessibility settings">
-  <div class="kicker" style="margin-bottom:8px">&#9881; Accessibility</div>
+  <div class="kicker" id="a11yHead" style="margin-bottom:8px">&#9881; Accessibility</div>
   <div class="fld"><div class="lb">Font size</div>
     <div class="pillrow" id="a11yFsRow">
       <button class="pill" type="button" data-fs="0.85">Small</button>
@@ -1964,8 +1964,11 @@ function buildSystemView(s){
         // orbit-path ring above -- lives as a CHILD of the planet mesh so it
         // automatically inherits mesh.rotation.z (the planet's own axial
         // tilt) and sits correctly in its equatorial plane with zero extra
-        // tilt math needed here.
-        var pRing=new THREE.Mesh(new THREE.RingGeometry(b.size*1.35,b.size*2.3,64),
+        // tilt math needed here. Width kept to ~0.3x the planet's own radius
+        // (was 0.95x, read as a chunky solid disc rather than a ring on
+        // Tony's actual screen) -- a tighter band plus a small gap off the
+        // planet's surface reads as a proper ring at real render size.
+        var pRing=new THREE.Mesh(new THREE.RingGeometry(b.size*1.4,b.size*1.7,64),
           new THREE.MeshBasicMaterial({map:makeRingTexture(b),transparent:true,
             side:THREE.DoubleSide,depthWrite:false}));
         pRing.rotation.x=Math.PI/2; mesh.add(pRing);
@@ -2743,6 +2746,7 @@ function makeDraggable(boxEl,handleEl){
 makeDraggable(document.getElementById("filt"),document.getElementById("fHead"));
 makeDraggable(document.getElementById("panel"),document.querySelector("#panel .phead"));
 makeDraggable(document.getElementById("course"),document.querySelector("#course .chead"));
+makeDraggable(document.getElementById("accessPop"),document.getElementById("a11yHead"));
 /* Any drag position is a manual override tied to the current window size/orientation --
    reset it on resize (covers rotation too) rather than risk a box left stranded
    off-screen or behind the toolbar after the layout changes underneath it. */
@@ -3165,18 +3169,31 @@ applyA11y();
   var btn=document.getElementById("bAccess"), pop=document.getElementById("accessPop");
   var hoverCapable=window.matchMedia && window.matchMedia("(hover:hover)").matches;
   var hideT=null;
+  /* Tony's real feedback: a pure hover tooltip is unusable for something with
+     actual controls in it -- moving the mouse from the gear toward a checkbox
+     or slider can leave the hover zone before you reach it, closing the whole
+     panel mid-click. "pinned" fixes that: hovering still opens it for a quick
+     peek and auto-closes on mouseleave like before, but the moment the panel
+     is actually interacted with (a click, or grabbing the header to drag it,
+     which is a pointerdown on the header) it pins open and ignores mouseleave
+     entirely -- only a click on the gear while pinned, or a click elsewhere
+     on the page, closes it after that. On touch devices (no hover at all)
+     every open is a click, so every open is pinned by definition. */
+  var pinned=false;
   function open(){
     clearTimeout(hideT);
     pop.classList.add("show");
     btn.setAttribute("aria-expanded","true");
   }
   function scheduleClose(){
+    if(pinned) return;
     clearTimeout(hideT);
     hideT=setTimeout(close,220);
   }
   function close(){
     pop.classList.remove("show");
     btn.setAttribute("aria-expanded","false");
+    pinned=false;
   }
   if(hoverCapable){
     btn.addEventListener("mouseenter",open);
@@ -3186,8 +3203,10 @@ applyA11y();
   }
   btn.addEventListener("click",function(e){
     e.stopPropagation();
-    if(pop.classList.contains("show")) close(); else open();
+    if(pop.classList.contains("show") && pinned){ close(); }
+    else { pinned=true; open(); }
   });
+  pop.addEventListener("pointerdown",function(){ pinned=true; });
   document.addEventListener("click",function(e){
     if(pop.classList.contains("show") && !pop.contains(e.target) && e.target!==btn) close();
   });
