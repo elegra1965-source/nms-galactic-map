@@ -1663,6 +1663,13 @@ function findRoute(from,to,rangeLY){
           c=cands[k];
           var dHop=wpDist(cur,c);
           if(dHop>rangeW||dHop<0.05) continue;
+          /* Being the closest real star to the ideal point isn't enough on its own --
+             without this, a hop could snap to a real system that's within range but
+             actually sideways or slightly BEHIND cur relative to the target, which
+             reads on screen as the route doubling back on itself. Requiring real
+             progress here means a rejected detour just falls through to the ideal
+             open-space point below instead (still forward motion, just unnamed). */
+          if(wpDist(c,to)>=remain) continue;
           var dToIdeal=wpDist(ideal,c);
           if(dToIdeal<bestD){ bestD=dToIdeal; best=c; }
         }
