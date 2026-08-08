@@ -387,7 +387,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
       <label class="chk"><input type="checkbox" id="fMark">Bookmarked</label>
       <div class="fld" style="margin-top:7px"><div class="lb">Hyperdrive range</div>
         <select id="fHyper" title="Used for course plotting -- set this to match your ship's real hyperdrive class or jump counts on Set course will be wrong.">
-          <option value="100" selected>100 LY — Basic (default)</option>
+          <option value="101" selected>101 LY — Basic (default)</option>
           <option value="500">500 LY</option>
           <option value="1000">1000 LY</option>
           <option value="1500">1500 LY</option>
@@ -625,7 +625,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 
   <div class="box modal" id="hyperdriveModal" style="max-width:360px;display:none">
     <h3>Set your hyperdrive class</h3>
-    <div class="msub" style="margin-bottom:10px">Course plotting defaults to a <b>Basic hyperdrive (100 LY)</b> -- the range every save starts with. If you've upgraded your ship (Sigma/Tau/Theta drives, an S-class engine, a freighter, etc.) your real range is longer, so jump counts on Set course will look off until you match it here.</div>
+    <div class="msub" style="margin-bottom:10px">Course plotting defaults to a <b>Basic hyperdrive (101 LY)</b> -- the range every save starts with (confirmed against the NMS wiki: the unupgraded base range is exactly 101 LY, not a round 100). If you've upgraded your ship (Sigma/Tau/Theta drives, an S-class engine, a freighter, etc.) your real range is longer, so jump counts on Set course will look off until you match it here.</div>
     <div class="mfld"><div class="lb">Change it any time</div>
       <div style="font-size:12px;color:var(--text-dim);line-height:1.55">Filters &rarr; Hyperdrive range.</div>
     </div>
@@ -1605,7 +1605,12 @@ var ROUTE_MAX_HOPS=40; /* a real long-haul NMS trip can be hundreds of jumps -- 
 function regionCandidates(vx,vy,vz){
   var count=regionCount(vx,vy,vz);
   var vr=mulberry32(gseed(vx,vy,vz,0xF00D));
-  var per=Math.min(parseInt(document.getElementById("sPer").value,10)||22,count);
+  /* Route-finding only, not the visible local-slice density (#sPer) -- verified
+     against the NMS wiki that a hyperdrive can only ever warp to a real charted
+     star system, never empty space, so route candidates need to be dense enough
+     that a real system is essentially always found in range, especially at the
+     Basic (101 LY) default where a hop only covers a sliver of one region. */
+  var per=Math.min(200,count);
   var idxs=[0x079,0x07A],i;
   for(i=0;i<per;i++){
     var pick=Math.floor(vr()*count);
@@ -1632,13 +1637,27 @@ function wpDist(a,b){ var dx=a.px-b.px,dy=a.py-b.py,dz=a.pz-b.pz; return Math.sq
    lands nearest that ideal point (searching an expanding neighbourhood of regions
    around it, not the whole sphere within range -- keeps this cheap even at the
    6000 LY freighter range, which would otherwise mean scanning a huge volume every
-   hop). If a stretch of space genuinely has nothing charted nearby, the hop still
-   happens (exactly like jumping into open space in-game) but isn't tied to a name.
-   This is what actually produces the bent, system-to-system path the game itself
-   shows instead of one straight dashed line drawn through empty space. */
+   hop). This is what actually produces the bent, system-to-system path the game
+   itself shows instead of one straight dashed line drawn through empty space.
+   Confirmed against the NMS wiki (Hyperdrive page) that a hyperdrive can only ever
+   warp to a real charted star system, accessed via the Galactic Map -- never to a
+   point in empty space -- so every hop below must land on a real system with a
+   real name. If nothing forward-progressing is in range even after the widened
+   search, the last resort is still a real in-range star (just not one that's
+   strictly closer yet); only if literally no charted system is in range at all
+   does the route give up and report itself truncated, same as running out of
+   hyperdrive range for real. */
 function findRoute(from,to,rangeLY){
   var rangeW=rangeLY/VOX_LY;
   var path=[{px:from.px,py:from.py,pz:from.pz,name:from.name,address:from.address,real:true}];
+  /* Every address ever pushed onto the path is excluded from future candidacy --
+     verified via a headless test that without this, the route can genuinely
+     ping-pong forever between two real stars right at the edge of jump range
+     (a real star that's the "closest in range" from A can turn out to be
+     WORSE than A once you're standing at it, sending you right back to A).
+     Tony's own rule -- "never goes back to a previous star" -- turns out to be
+     exactly what prevents that, not just a nicety. */
+  var visited={}; if(from.address) visited[from.address]=true;
   var cur=path[0], truncated=false;
   var total=wpDist(from,to);
   if(total<=rangeW){
@@ -1655,28 +1674,38 @@ function findRoute(from,to,rangeLY){
     var ideal={px:cur.px+dir.x*step,py:cur.py+dir.y*step,pz:cur.pz+dir.z*step};
     var ivx=Math.round(focus.x+ideal.px/VOX_U), ivy=Math.round(focus.y+ideal.py/VOX_U), ivz=Math.round(focus.z+ideal.pz/VOX_U);
     var best=null,bestD=Infinity;
-    for(var rad=1;rad<=2&&!best;rad++){
+    var fallback=null,fallbackD=Infinity; /* nearest-to-ideal among ALL in-range,
+      not-yet-visited real stars, regardless of whether they beat `remain` --
+      last resort only. Tried "nearest to the TARGET" here first, but a headless
+      test caught it wandering the route further and further away over many
+      hops in a sparse patch (each compromise still had to avoid every star
+      visited so far, so it kept drifting) -- nearest-to-ideal keeps the
+      fallback on roughly the same bearing instead of jumping off in whatever
+      direction happens to be closest overall, which behaves far more sanely. */
+    for(var rad=1;rad<=3&&!best;rad++){
       for(var ddx=-rad;ddx<=rad;ddx++) for(var ddy=-rad;ddy<=rad;ddy++) for(var ddz=-rad;ddz<=rad;ddz++){
-        if(rad>1 && Math.max(Math.abs(ddx),Math.abs(ddy),Math.abs(ddz))<rad) continue; /* shell only, inner already scanned at rad=1 */
+        if(rad>1 && Math.max(Math.abs(ddx),Math.abs(ddy),Math.abs(ddz))<rad) continue; /* shell only, inner already scanned */
         var cands=regionCandidates(ivx+ddx,ivy+ddy,ivz+ddz),c;
         for(var k=0;k<cands.length;k++){
           c=cands[k];
+          if(visited[c.address]) continue;
           var dHop=wpDist(cur,c);
           if(dHop>rangeW||dHop<0.05) continue;
+          var dToIdeal=wpDist(ideal,c);
+          if(dToIdeal<fallbackD){ fallbackD=dToIdeal; fallback=c; }
           /* Being the closest real star to the ideal point isn't enough on its own --
              without this, a hop could snap to a real system that's within range but
              actually sideways or slightly BEHIND cur relative to the target, which
-             reads on screen as the route doubling back on itself. Requiring real
-             progress here means a rejected detour just falls through to the ideal
-             open-space point below instead (still forward motion, just unnamed). */
+             reads on screen as the route doubling back on itself. */
           if(wpDist(c,to)>=remain) continue;
-          var dToIdeal=wpDist(ideal,c);
           if(dToIdeal<bestD){ bestD=dToIdeal; best=c; }
         }
       }
     }
-    var next=best||{px:ideal.px,py:ideal.py,pz:ideal.pz,name:null,address:null,real:false};
+    var next=best||fallback;
+    if(!next){ truncated=true; break; } /* no charted, unvisited system in range at all -- report honestly rather than invent one */
     path.push(next);
+    if(next.address) visited[next.address]=true;
     cur=next;
   }
   path.push({px:to.px,py:to.py,pz:to.pz,name:to.name,address:to.address,real:true});
@@ -1697,10 +1726,14 @@ function drawCourse(){
      subtle to the eye when the detour is small relative to the total distance
      -- confirmed live: a genuine 5-hop route looked almost like a straight line
      at a normal zoom level and only clearly read as bent once zoomed in. A dot
-     at every intermediate real stop makes each hop unmistakable regardless of
-     zoom or how straight the route happens to look, without needing the full
-     selection-ring treatment the two endpoints already get. */
-  var mids=courseWaypoints.slice(1,-1).filter(function(w){ return w.real!==false; });
+     at every intermediate stop makes each hop unmistakable regardless of zoom
+     or how straight the route happens to look, without needing the full
+     selection-ring treatment the two endpoints already get. Every intermediate
+     stop is always a real charted system now (findRoute no longer invents an
+     open-space point -- confirmed via the NMS wiki that a hyperdrive can only
+     ever warp to a real system), so the dot count now always equals the
+     reported jump count. */
+  var mids=courseWaypoints.slice(1,-1);
   if(mids.length){
     var dp=new Float32Array(mids.length*3);
     for(i=0;i<mids.length;i++){ dp[i*3]=mids[i].px; dp[i*3+1]=mids[i].py; dp[i*3+2]=mids[i].pz; }
@@ -2921,7 +2954,7 @@ try{
 }
 
 /* ============ hyperdrive-range first-time notice ============
-   fHyper defaults to Basic (100 LY, see the select above) rather than an
+   fHyper defaults to Basic (101 LY, see the select above) rather than an
    upgraded class -- most players have upgraded, so jump counts on Set course
    will be wrong for them until they change it. That control lives inside the
    Filters box, easy to miss, so flag it once the first time it'd actually
