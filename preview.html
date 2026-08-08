@@ -105,6 +105,39 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border:none;border-ra
 .fld{margin-bottom:7px}
 .fld .lb{font-size:9px;letter-spacing:.12em;color:var(--text-faint);text-transform:uppercase;margin-bottom:3px}
 
+/* ============ accessibility ============
+   Font size uses zoom (not transform or a rem refactor) on each floating
+   UI box -- same technique the Phone Preview Tool already relies on for its
+   own "Fit to screen" toggle, chosen there specifically because it avoids a
+   touch-routing bug transform has on real touchscreens, and it keeps each
+   box's fixed top/right anchor point stable while the box grows/shrinks from
+   that corner instead of reflowing. Deliberately scoped to UI chrome only --
+   the 3D canvas and in-scene star/planet labels are a separate system with
+   their own pixel-math collision-avoidance and aren't touched here.
+   Colour-blind filters + Invert apply to the whole page (html), including
+   the canvas, via SVG feColorMatrix / CSS invert -- a colourblind player
+   needs the actual star colours corrected too, not just the UI text.
+   High Contrast reuses the existing --text-*/--border-* variable system
+   instead of a filter, so it boosts real contrast without touching the
+   cyan/gold accent colours that already carry meaning (selection, warnings). */
+#bAccess{width:30px;height:30px;padding:0;border-radius:50%;display:flex;
+  align-items:center;justify-content:center;font-size:14px;flex:none}
+#top,#leftcol,#tel,#panel,#course,#modalWrap .modal,#galHud,#accessPop,#keys{
+  zoom:var(--ui-zoom,1)}
+#accessPop{position:fixed;z-index:36;width:198px;padding:11px 13px;
+  top:calc(var(--top-h,60px) + 8px);right:10px;display:none}
+#accessPop.show{display:block}
+.pillrow{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:9px}
+.pill{font-family:'Orbitron',sans-serif;font-size:8.5px;letter-spacing:.06em;
+  padding:5px 7px;border-radius:var(--r-sm);border:1px solid var(--border);
+  color:var(--text-dim);background:transparent;cursor:pointer;text-transform:uppercase}
+.pill.on{border-color:var(--gold);color:var(--gold);background:rgba(240,165,0,.08)}
+.pill[disabled]{opacity:.35;cursor:default}
+html.hc-on{--text-dim:#ffffff;--text-faint:#e6e6e6;--border:#ffffff;--border-soft:#ffffff}
+html.hc-on .box{background:#000;border-width:2px}
+html.hc-on .box::before,html.hc-on .box::after{border-color:#fff}
+html.hc-on .btn{border-width:2px}
+
 #panel{position:fixed;top:50px;right:10px;width:278px;z-index:25;padding:13px 14px;
   display:none;max-height:calc(100vh - 70px);overflow-y:auto;overflow-x:hidden}
 #panel.show{display:block}
@@ -341,6 +374,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   <div class="sep"></div>
   <button class="btn" id="bInstall" title="Install this map as an app on your device." style="display:none">&#9672; Install app</button>
   <button class="btn" id="bAbout" title="Fan-made disclaimer and a note on procedural vs. real system data.">&#9432; About</button>
+  <button class="btn" id="bAccess" title="Accessibility settings: font size, colour-blind filters, invert colours, high contrast." aria-label="Accessibility settings" aria-haspopup="true" aria-expanded="false">&#9881;</button>
 </div>
 
 <div id="leftcol">
@@ -512,6 +546,32 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   </div>
 </div>
 
+<div class="box" id="accessPop" role="dialog" aria-label="Accessibility settings">
+  <div class="kicker" style="margin-bottom:8px">&#9881; Accessibility</div>
+  <div class="fld"><div class="lb">Font size</div>
+    <div class="pillrow" id="a11yFsRow">
+      <button class="pill" type="button" data-fs="0.85">Small</button>
+      <button class="pill on" type="button" data-fs="1">Default</button>
+      <button class="pill" type="button" data-fs="1.15">Large</button>
+      <button class="pill" type="button" data-fs="1.3">XL</button>
+    </div></div>
+  <label class="chk"><input type="checkbox" id="a11yCC">Colour correction</label>
+  <div class="pillrow" id="a11yFiltRow" style="opacity:.35;margin-top:7px">
+    <button class="pill on" type="button" data-filt="none" disabled>None</button>
+    <button class="pill" type="button" data-filt="protanopia" disabled>Protanopia</button>
+    <button class="pill" type="button" data-filt="deuteranopia" disabled>Deuteranopia</button>
+    <button class="pill" type="button" data-filt="tritanopia" disabled>Tritanopia</button>
+    <button class="pill" type="button" data-filt="invert" disabled>Invert</button>
+  </div>
+  <label class="chk" style="margin-top:2px"><input type="checkbox" id="a11yHC">High contrast</label>
+</div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<filter id="protanopia-f" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="0.567 0.433 0 0 0 0.558 0.442 0 0 0 0 0.242 0.758 0 0 0 0 0 1 0"/></filter>
+<filter id="deuteranopia-f" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="0.625 0.375 0 0 0 0.7 0.3 0 0 0 0 0.3 0.7 0 0 0 0 0 1 0"/></filter>
+<filter id="tritanopia-f" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="0.95 0.05 0 0 0 0 0.433 0.567 0 0 0 0.475 0.525 0 0 0 0 0 1 0"/></filter>
+</defs></svg>
+
 <div id="modalWrap">
   <div class="box modal" id="editModal">
     <h3>Edit system</h3>
@@ -662,7 +722,7 @@ var GAL_R=200, GAL_H=13, CORE_R=14;
 var VOX_U=9, LY_PER_VOXEL=400;
 var HEXD="0123456789ABCDEF";
 
-var GALAXIES=["Euclid","Hilbert Dimension","Calypso","Hesperius Dimension","Hyades","Ickjamatew","Budullangr","Kikolgallr","Eltiensleen","Eissentam","Elkupalos","Aptarkaba","Ontiniangp","Odiwagiri","Ogtialabi","Muhacksonto","Hitonskyer","Rerasmutul","Isdoraijung","Doctinawyra","Loychazinq","Zukasizawa","Ekwathore","Yeberhahne","Twerbetek","Sivarates","Eajerandal","Aldukesci","Wotyarogii","Sudzerbal","Maupenzhay","Sugueziume","Brogoweldian","Ehbogdenbu","Ijsenufryos","Nipikulha","Autsurabin","Lusontrygiamh","Rewmanawa","Ethiophodhe","Urastrykle","Xobeurindj","Oniijialdu","Wucetosucc","Ebyeloof","Odyavanta","Milekistri","Waferganh","Agnusopwit","Teyaypilny","Zalienkosm","Ladgudiraf","Mushonponte","Amsentisz","Fladiselm","Laanawemb","Ilkerloor","Davanossi","Ploehrliou","Corpinyaya","Leckandmeram","Quulngais","Nokokipsechl","Rinblodesa","Loydporpen","Ibtrevskip","Elkowaldb","Heholhofsko","Yebrilowisod","Husalvangewi","Ovna'uesed","Bahibusey","Nuybeliaure","Doshawchuc","Ruckinarkh","Thorettac","Nuponoparau","Moglaschil","Uiweupose","Nasmilete","Ekdaluskin","Hakapanasy","Dimonimba","Cajaccari","Olonerovo","Umlanswick","Henayliszm","Utzenmate","Umirpaiya","Paholiang","Iaereznika","Yudukagath","Boealalosnj","Yaevarcko","Coellosipp","Wayndohalou","Smoduraykl","Apmaneessu","Hicanpaav","Akvasanta","Tuychelisaor","Rivskimbe","Daksanquix","Kissonlin","Aediabiel","Ulosaginyik","Roclaytonycar","Kichiaroa","Irceauffey","Nudquathsenfe","Getaizakaal","Hansolmien","Bloytisagra","Ladsenlay","Luyugoslasr","Ubredhatk","Cidoniana","Jasinessa","Torweierf","Saffneckm","Thnistner","Dotusingg","Luleukous","Jelmandan","Otimanaso","Enjaxusanto","Sezviktorew","Zikehpm","Bephembah","Broomerrai","Meximicka","Venessika","Gaiteseling","Zosakasiro","Drajayanes","Ooibekuar","Urckiansi","Dozivadido","Emiekereks","Meykinunukur","Kimycuristh","Roansfien","Isgarmeso","Daitibeli","Gucuttarik","Enlaythie","Drewweste","Akbulkabi","Homskiw","Zavainlani","Jewijkmas","Itlhotagra","Podalicess","Hiviusauer","Halsebenk","Puikitoac","Gaybakuaria","Grbodubhe","Rycempler","Indjalala","Fontenikk","Pasycihelwhee","Ikbaksmit","Telicianses","Oyleyzhan","Uagerosat","Impoxectin","Twoodmand","Hilfsesorbs","Ezdaranit","Wiensanshe","Ewheelonc","Litzmantufa","Emarmatosi","Mufimbomacvi","Wongquarum","Hapirajua","Igbinduina","Wepaitvas","Sthatigudi","Yekathsebehn","Ebedeagurst","Nolisonia","Ulexovitab","Iodhinxois","Irroswitzs","Bifredait","Beiraghedwe","Yeonatlak","Cugnatachh","Nozoryenki","Ebralduri","Evcickcandj","Ziybosswin","Heperclait","Sugiuniam","Aaseertush","Uglyestemaa","Horeroedsh","Drundemiso","Ityanianat","Purneyrine","Dokiessmat","Nupiacheh","Dihewsonj","Rudrailhik","Tweretnort","Snatreetze","Iwundaracos","Digarlewena","Erquagsta","Logovoloin","Boyaghosganh","Kuolungau","Pehneldept","Yevettiiqidcon","Sahliacabru","Noggalterpor","Chmageaki","Veticueca","Vittesbursul","Nootanore","Innebdjerah","Kisvarcini","Cuzcogipper","Pamanhermonsu","Brotoghek","Mibittara","Huruahili","Raldwicarn","Ezdartlic","Badesclema","Isenkeyan","Iadoitesu","Yagrovoisi","Ewcomechio","Inunnunnoda","Dischiutun","Yuwarugha","Ialmendra","Reponudrle","Rinjanagrbo","Zeziceloh","Oeileutasc","Zicniijinis","Dugnowarilda","Neuxoisan","Ilmenhorn","Rukwatsuku","Nepitzaspru","Chcehoemig","Haffneyrin","Uliciawai","Tuhgrespod","Iousongola","Odyalutai","Yilsrussimil"];
+var GALAXIES=["Euclid","Hilbert Dimension","Calypso","Hesperius Dimension","Hyades","Ickjamatew","Budullangr","Kikolgallr","Eltiensleen","Eissentam","Elkupalos","Aptarkaba","Ontiniangp","Odiwagiri","Ogtialabi","Muhacksonto","Hitonskyer","Rerasmutul","Isdoraijung","Doctinawyra","Loychazinq","Zukasizawa","Ekwathore","Yeberhahne","Twerbetek","Sivarates","Eajerandal","Aldukesci","Wotyarogii","Sudzerbal","Maupenzhay","Sugueziume","Brogoweldian","Ehbogdenbu","Ijsenufryos","Nipikulha","Autsurabin","Lusontrygiamh","Rewmanawa","Ethiophodhe","Urastrykle","Xobeurindj","Oniijialdu","Wucetosucc","Ebyeloof","Odyavanta","Milekistri","Waferganh","Agnusopwit","Teyaypilny","Zalienkosm","Ladgudiraf","Mushonponte","Amsentisz","Fladiselm","Laanawemb","Ilkerloor","Davanossi","Ploehrliou","Corpinyaya","Leckandmeram","Quulngais","Nokokipsechl","Rinblodesa","Loydporpen","Ibtrevskip","Elkowaldb","Heholhofsko","Yebrilowisod","Husalvangewi","Ovna'uesed","Bahibusey","Nuybeliaure","Doshawchuc","Ruckinarkh","Thorettac","Nuponoparau","Moglaschil","Uiweupose","Nasmilete","Ekdaluskin","Hakapanasy","Dimonimba","Cajaccari","Olonerovo","Umlanswick","Henayliszm","Utzenmate","Umirpaiya","Paholiang","Iaereznika","Yudukagath","Boealalosnj","Yaevarcko","Coellosipp","Wayndohalou","Smoduraykl","Apmaneessu","Hicanpaav","Akvasanta","Tuychelisaor","Rivskimbe","Daksanquix","Kissonlin","Aediabiel","Ulosaginyik","Roclaytonycar","Kichiaroa","Irceauffey","Nudquathsenfe","Getaizakaal","Hansolmien","Bloytisagra","Ladsenlay","Luyugoslasr","Ubredhatk","Cidoniana","Jasinessa","Torweierf","Saffneckm","Thnistner","Dotusingg","Luleukous","Jelmandan","Otimanaso","Enjaxusanto","Sezviktorew","Zikehpm","Bephembah","Broomerrai","Meximicka","Venessika","Gaiteseling","Zosakasiro","Drajayanes","Ooibekuar","Urckiansi","Dozivadido","Emiekereks","Meykinunukur","Kimycuristh","Roansfien","Isgarmeso","Daitibeli","Gucuttarik","Enlaythie","Drewweste","Akbulkabi","Homskiw","Zavainlani","Jewijkmas","Itlhotagra","Podalicess","Hiviusauer","Halsebenk","Puikitoac","Gaybakuaria","Grbodubhe","Rycempler","Indjalala","Fontenikk","Pasycihelwhee","Ikbaksmit","Telicianses","Oyleyzhan","Uagerosat","Impoxectin","Twoodmand","Hilfsesorbs","Ezdaranit","Wiensanshe","Ewheelonc","Litzmantufa","Emarmatosi","Mufimbomacvi","Wongquarum","Hapirajua","Igbinduina","Wepaitvas","Sthatigudi","Yekathsebehn","Ebedeagurst","Nolisonia","Ulexovitab","Iodhinxois","Irroswitzs","Bifredait","Beiraghedwe","Yeonatlak","Cugnatachh","Nozoryenki","Ebralduri","Evcickcandj","Ziybosswin","Heperclait","Sugiuniam","Aaseertush","Uglyestemaa","Horeroedsh","Drundemiso","Ityanianat","Purneyrine","Dokiessmat","Nupiacheh","Dihewsonj","Rudrailhik","Tweretnort","Snatreetze","Iwundaracos","Digarlewena","Erquagsta","Logovoloin","Boyaghosganh","Kuolungau","Pehneldept","Yevettiiqidcon","Sahliacabru","Noggalterpor","Chmageaki","Veticueca","Vittesbursul","Nootanore","Innebdjerah","Kisvarcini","Cuzcogipper","Pamanhermonsu","Brotoghek","Mibittara","Huruahili","Raldwicarn","Ezdartlic","Badesclema","Isenkeyan","Iadoitesu","Yagrovoisi","Ewcomechio","Inunnunnoda","Dischiutun","Yuwarugha","Ialmendra","Reponudrle","Rinjanagrbo","Zeziceloh","Oeileutasc","Zicniijinis","Dugnowarilda","Neuxoisan","Ilmenhorn","Rukwatsuku","Nepitzaspru","Chcehoemig","Haffneyrin","Uliciawai","Tuhgrespod","Iousongola","Odyalutai"];
 
 var STAR_TYPES=[
   {k:"yellow",w:55,cls:["F","G"],col:0xffe08a},
@@ -676,6 +736,10 @@ var ODDS={yellow:{out:.25,unc:0,aba:0},red:{out:.50,unc:.95,aba:0},
 /* chance a purple system is also a Giant-planet system -- placeholder,
    see the comment in generateSystem() where it's used */
 var GIANT_CHANCE=0.12;
+/* chance any given PLANET (never a moon -- not a thing in-game) generates
+   with rings, placeholder same as GIANT_CHANCE above -- Tony, adjust once
+   you've got a feel for how common ringed worlds should look on the map. */
+var RING_CHANCE=0.22;
 var RACES=["Gek","Vy'keen","Korvax"];
 var ECON=[
   ["Trading",["Mercantile","Trading","Shipping","Commercial"]],
@@ -844,7 +908,7 @@ var GALAXY_TYPE_INFO={
   Unknown:{c:"#b06bff",names:["Hidden","Forbidden","Concealed","Uncharted"]}
 };
 function galaxyType(n){
-  if(n===255||n===256){
+  if(n===255){
     var u=GALAXY_TYPE_INFO.Unknown;
     return {k:"Unknown",c:u.c,names:u.names};
   }
@@ -951,6 +1015,7 @@ function generateSystem(vx,vy,vz,idx){
     var bd=BIOMES[biome];
     var canWater = bd.water && !isMoon;
     var hasWater = canWater && br()<0.62;
+    var hasRing = !isMoon && br()<RING_CHANCE;
     var resUni=[UNIVERSAL_EL[Math.floor(br()*UNIVERSAL_EL.length)]];
     var resU2=UNIVERSAL_EL[Math.floor(br()*UNIVERSAL_EL.length)];
     if(resU2!==resUni[0]) resUni.push(resU2);
@@ -962,6 +1027,7 @@ function generateSystem(vx,vy,vz,idx){
       parent:isMoon?(s.giant?1:s.bodies[s.bodies.length-1].index):0,
       name:nameFrom(gseed(vx,vy,vz,(idx*31)+pi)),
       biome:biome, terrain:hasWater?pickOne(br,TERRAIN.slice(1)):"Pangean", water:hasWater,
+      ring:hasRing,
       size:isMoon?(0.34+br()*0.22):(0.68+br()*0.62),
       tilt:(br()-0.5)*0.7, spin:0.15+br()*0.5,
       resUni:resUni,
@@ -1028,6 +1094,7 @@ function applyOverride(s){
         descriptor:b.descriptor||"",
         terrain:o?o.terrain:"Pangean",
         water:!!b.water,
+        ring:!isMoon&&!!b.ring,
         size:o?o.size:(isMoon?0.42:0.85),
         tilt:o?o.tilt:((i%2?1:-1)*(0.1+0.05*i)),
         spin:o?o.spin:0.3,
@@ -1287,6 +1354,30 @@ function makePlanetTexture(b){
     g.fillStyle=cg2; g.fillRect(0,H*0.81,W,H*0.19);
   }
   var t=new THREE.CanvasTexture(cv); t.needsUpdate=true; return t;
+}
+/* Saturn-style ring band texture for planets flagged b.ring. RingGeometry's
+   built-in UVs map u around the circumference and v from inner to outer
+   radius, so a texture that only varies vertically (bands) and repeats
+   cleanly across u is exactly what's needed -- no special UV remapping.
+   Seeded off the body's own seed (offset, so it never rolls the same
+   pattern as the planet surface texture) purely for band-pattern variety
+   between different ringed worlds. */
+function makeRingTexture(b){
+  var W=8,H=64;
+  var cv=document.createElement("canvas"); cv.width=W; cv.height=H;
+  var g=cv.getContext("2d"), r=mulberry32(b.seed^0x21196E), i;
+  var base=[0xd8c9a8,0xcbb694,0xbfa87e,0xe4dcc2];
+  for(i=0;i<H;i++){
+    var v=i/H;
+    var edge=Math.min(v,1-v)*2; // fades near inner/outer edge instead of a hard cutoff
+    var band=base[Math.floor(r()*base.length)];
+    var a=(0.28+r()*0.5)*Math.min(1,edge*3);
+    g.fillStyle="rgba("+((band>>16)&255)+","+((band>>8)&255)+","+(band&255)+","+a.toFixed(3)+")";
+    g.fillRect(0,i,W,1);
+  }
+  var t=new THREE.CanvasTexture(cv); t.needsUpdate=true;
+  t.wrapS=THREE.RepeatWrapping; t.wrapT=THREE.ClampToEdgeWrapping;
+  return t;
 }
 
 var galPts=null, locPts=null, nebulaGroup=new THREE.Group(), coreMesh=null, courseLine=null;
@@ -1868,6 +1959,17 @@ function buildSystemView(s){
         new THREE.MeshBasicMaterial({color:0x00e5ff,transparent:true,opacity:0.12,
           side:THREE.DoubleSide,depthWrite:false}));
       ring.rotation.x=Math.PI/2; pivot.add(ring);
+      if(b.ring){
+        // A real Saturn-style planetary ring, distinct from the thin cyan
+        // orbit-path ring above -- lives as a CHILD of the planet mesh so it
+        // automatically inherits mesh.rotation.z (the planet's own axial
+        // tilt) and sits correctly in its equatorial plane with zero extra
+        // tilt math needed here.
+        var pRing=new THREE.Mesh(new THREE.RingGeometry(b.size*1.35,b.size*2.3,64),
+          new THREE.MeshBasicMaterial({map:makeRingTexture(b),transparent:true,
+            side:THREE.DoubleSide,depthWrite:false}));
+        pRing.rotation.x=Math.PI/2; mesh.add(pRing);
+      }
       pivots.push({p:pivot,sp:0.10/(1+planetIdx*0.55),mesh:mesh,spin:b.spin});
       bodyMeshes.push(mesh);
       moonAnchor=new THREE.Object3D();
@@ -1972,7 +2074,7 @@ function updatePanel(s){
     var b=s.bodies[i];
     bl+='<div class="brow" data-b="'+i+'"><span class="bdot" style="background:'+BIOMES[b.biome].base+'"></span>'+
         '<span class="bn">'+(b.moon?"&#8627; ":"")+b.name+'</span>'+
-        '<span class="bb">'+b.biome+(b.water?" &middot; water":"")+'</span></div>';
+        '<span class="bb">'+b.biome+(b.water?" &middot; water":"")+(b.ring?" &middot; rings":"")+'</span></div>';
   }
   document.getElementById("pBodies").innerHTML=bl;
 
@@ -2007,6 +2109,7 @@ function showBody(b,s){
   if(!BIOMES[b.biome].atmo) t.push(["","No atmosphere"]);
   if(b.biome==="Exotic"||b.biome==="Mega Exotic") t.push(["bh","Anomalous"]);
   if(b.water) t.push(["hot","Water"]);
+  if(b.ring) t.push(["hot","Rings"]);
   if(b.autophage) t.push(["hot","Autophage camp"]);
   var html="",i;
   for(i=0;i<t.length;i++) html+='<span class="tag '+t[i][0]+'">'+t[i][1]+'</span>';
@@ -2737,6 +2840,12 @@ function renderBodyEditList(){
           '<label class="chk2"><input type="checkbox" class="bfWater" data-i="'+i+'"'+(b.water?" checked":"")+'> Water</label>'+
           '<label class="chk2"><input type="checkbox" class="bfAutophage" data-i="'+i+'"'+(b.autophage?" checked":"")+'> Autophage camp</label>'+
         '</div>';
+      if(!b.moon){
+        // Rings aren't a thing on moons in-game, so this only ever shows
+        // for a planet/Giant row -- matches the same moon-only-field pattern
+        // the Orbits dropdown below uses in reverse.
+        html+='<label class="chk2"><input type="checkbox" class="bfRing" data-i="'+i+'"'+(b.ring?" checked":"")+'> Has rings</label>';
+      }
       if(b.moon){
         var orbOpts='<option value="">'+(isGiantSys?"The Giant (default)":"Nearest preceding planet (default)")+'</option>';
         for(var p=0;p<editBodies.length;p++){
@@ -2790,6 +2899,7 @@ function openEditModal(){
       biome:(BIOME_KEYS.indexOf(b.biome)>=0)?b.biome:BIOME_KEYS[0],
       descriptor:b.descriptor||"",
       water:!!b.water,
+      ring:!!b.ring,
       resources:(b.resUni||[]).join(", "),
       flora:(b.flora||[]).join(", "),
       minerals:(b.minerals||[]).join(", "),
@@ -2892,6 +3002,7 @@ document.getElementById("bodyEditList").addEventListener("change",function(e){
     renderBodyEditList(); // Orbits dropdown only applies to moon rows -- must appear/disappear immediately
   }
   else if(e.target.classList.contains("bfWater")) editBodies[i].water=e.target.checked;
+  else if(e.target.classList.contains("bfRing")) editBodies[i].ring=e.target.checked;
   else if(e.target.classList.contains("bfBiome")) editBodies[i].biome=e.target.value;
   else if(e.target.classList.contains("bfAutophage")) editBodies[i].autophage=e.target.checked;
   else if(e.target.classList.contains("bfSentinel")) editBodies[i].sentinel=e.target.value;
@@ -2987,6 +3098,101 @@ document.getElementById("hyperOpenFilters").addEventListener("click",function(){
   sel.scrollIntoView({block:"center",behavior:"smooth"});
   sel.focus();
 });
+
+/* ============ accessibility panel ============
+   Font size / colour-blind filters / invert / high contrast, gated behind a
+   small gear icon rather than a full toolbar button -- Tony's own call: this
+   is a setting a player sets once and forgets, not a feature they reach for
+   every session, so it shouldn't compete for space with Jump/Filters/Labels.
+   Opens on hover on devices that have real hover (desktop mouse), and on
+   tap everywhere else -- matchMedia(hover:hover) is the standard feature
+   test for "does this device have a mouse", since touch-only devices report
+   no hover capability at all. Click-to-toggle is always wired too, so a
+   mouse user can still pin it open by clicking, and it's the only way in on
+   touch. All three settings persist to localStorage (same per-feature key
+   pattern as the disclaimer/hyperdrive notices above) and are re-applied on
+   boot before the first frame renders, so a returning visitor's choice
+   doesn't flash back to default first. */
+var A11Y_KEY="nms-galmap-a11y";
+var a11y={fs:1,cc:false,filt:"none",hc:false};
+try{
+  var savedA11y=JSON.parse(localStorage.getItem(A11Y_KEY)||"null");
+  if(savedA11y) a11y=Object.assign(a11y,savedA11y);
+}catch(e){ /* localStorage blocked or bad JSON -- fall back to defaults */ }
+function saveA11y(){
+  try{ localStorage.setItem(A11Y_KEY,JSON.stringify(a11y)); }catch(e){}
+}
+function applyA11y(){
+  document.documentElement.style.setProperty("--ui-zoom",a11y.fs);
+  document.querySelectorAll("#a11yFsRow .pill").forEach(function(b){
+    b.classList.toggle("on",parseFloat(b.dataset.fs)===a11y.fs);
+  });
+  var filtRow=document.getElementById("a11yFiltRow");
+  filtRow.style.opacity=a11y.cc?"1":".35";
+  filtRow.querySelectorAll(".pill").forEach(function(b){
+    b.disabled=!a11y.cc;
+    b.classList.toggle("on",b.dataset.filt===a11y.filt);
+  });
+  var cssFilter="none";
+  if(a11y.cc){
+    if(a11y.filt==="protanopia") cssFilter="url(#protanopia-f)";
+    else if(a11y.filt==="deuteranopia") cssFilter="url(#deuteranopia-f)";
+    else if(a11y.filt==="tritanopia") cssFilter="url(#tritanopia-f)";
+    else if(a11y.filt==="invert") cssFilter="invert(1) hue-rotate(180deg)";
+  }
+  document.documentElement.style.filter=cssFilter;
+  document.documentElement.classList.toggle("hc-on",a11y.hc);
+  document.getElementById("a11yCC").checked=a11y.cc;
+  document.getElementById("a11yHC").checked=a11y.hc;
+}
+document.querySelectorAll("#a11yFsRow .pill").forEach(function(b){
+  b.addEventListener("click",function(){ a11y.fs=parseFloat(b.dataset.fs); applyA11y(); saveA11y(); });
+});
+document.getElementById("a11yCC").addEventListener("change",function(e){
+  a11y.cc=e.target.checked; applyA11y(); saveA11y();
+});
+document.getElementById("a11yHC").addEventListener("change",function(e){
+  a11y.hc=e.target.checked; applyA11y(); saveA11y();
+});
+document.querySelectorAll("#a11yFiltRow .pill").forEach(function(b){
+  b.addEventListener("click",function(){
+    if(b.disabled) return;
+    a11y.filt=b.dataset.filt; applyA11y(); saveA11y();
+  });
+});
+applyA11y();
+(function(){
+  var btn=document.getElementById("bAccess"), pop=document.getElementById("accessPop");
+  var hoverCapable=window.matchMedia && window.matchMedia("(hover:hover)").matches;
+  var hideT=null;
+  function open(){
+    clearTimeout(hideT);
+    pop.classList.add("show");
+    btn.setAttribute("aria-expanded","true");
+  }
+  function scheduleClose(){
+    clearTimeout(hideT);
+    hideT=setTimeout(close,220);
+  }
+  function close(){
+    pop.classList.remove("show");
+    btn.setAttribute("aria-expanded","false");
+  }
+  if(hoverCapable){
+    btn.addEventListener("mouseenter",open);
+    btn.addEventListener("mouseleave",scheduleClose);
+    pop.addEventListener("mouseenter",function(){ clearTimeout(hideT); });
+    pop.addEventListener("mouseleave",scheduleClose);
+  }
+  btn.addEventListener("click",function(e){
+    e.stopPropagation();
+    if(pop.classList.contains("show")) close(); else open();
+  });
+  document.addEventListener("click",function(e){
+    if(pop.classList.contains("show") && !pop.contains(e.target) && e.target!==btn) close();
+  });
+})();
+
 document.getElementById("edSubmit").addEventListener("click",function(){
   if(!selected) return;
   var err=clientPrecheck();
@@ -3018,7 +3224,7 @@ document.getElementById("edSubmit").addEventListener("click",function(){
       return {
         name:b.name.trim(), moon:b.moon,
         orbits:(b.moon && b.orbits && uidToPos[b.orbits])?uidToPos[b.orbits]:0,
-        biome:b.biome, descriptor:(b.descriptor||"").trim(), water:b.water,
+        biome:b.biome, descriptor:(b.descriptor||"").trim(), water:b.water, ring:!b.moon&&!!b.ring,
         resources:b.resources.split(",").map(function(x){ return x.trim(); }).filter(Boolean),
         flora:(b.flora||"").split(",").map(function(x){ return x.trim(); }).filter(Boolean),
         minerals:(b.minerals||"").split(",").map(function(x){ return x.trim(); }).filter(Boolean),

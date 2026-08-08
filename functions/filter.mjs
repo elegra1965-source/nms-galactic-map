@@ -189,6 +189,9 @@ export function filterSystemEdit(payload){
       biome: biomeR.cleaned,
       descriptor: descR.cleaned,
       water: !!b.water,
+      // Rings aren't a thing on moons in-game -- enforced server-side too,
+      // not just hidden client-side, since this is the authoritative copy.
+      ring: !isMoon && !!b.ring,
       resources: resOut,
       flora: resArr(b.flora,"Flora"),
       minerals: resArr(b.minerals,"Mineral"),

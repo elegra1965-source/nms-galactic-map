@@ -6,7 +6,7 @@
      address = the 12-char portal hex address the edit applies to
      "edit"   payload = {name, race, region, starClass, suffix, giant, econName, sell, buy,
                          econDesc, conflict, blackHole, atlas, notes,
-                         bodies:[{name, moon, orbits, biome, descriptor, water, resources,
+                         bodies:[{name, moon, orbits, biome, descriptor, water, ring, resources,
                                   flora, minerals, salvage, fossils, sentinel, autophage}, ...]}
      "report" payload = {reason}
 
