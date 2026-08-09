@@ -313,33 +313,24 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 /* Status icon shown above the Saving/error text -- which of the 6 PNGs and which
    animation class is picked in JS (see statusIcon() / STATUS_ICONS). "Waiting" states
    (still might succeed -- normal save, heavy traffic) get a calm pulse; "resolved
-   failure" states (conflict, offline, blocked, rate limit) get an erratic multi-axis
-   tumble instead, so the motion itself signals success-still-possible vs something's-
-   actually-wrong, not just the icon artwork. */
-.iconWrap{display:none;justify-content:center;margin-bottom:6px;perspective:500px}
+   failure" states (conflict, offline, blocked, rate limit) get a left-right drift
+   instead, so the motion itself signals success-still-possible vs something's-
+   actually-wrong, not just the icon artwork. Drift is the same drone-patrol pattern
+   already used for the Theme Pack's "click me to scan" flyer (flyAcross/droneBob in
+   NMS_FINAL_SITE-9.6.26/index.html) -- reused rather than guessed at a new motion,
+   since Tony already knows that one fits the site's style and this one didn't
+   (an earlier 3D-tumble version read as "an icon flipping card, too fast"). */
+.iconWrap{display:none;justify-content:center;margin-bottom:6px}
 .iconWrap img{width:56px;height:56px;object-fit:contain}
 .iconWrap.pulse img{animation:iconPulse 1.6s ease-in-out infinite}
-.iconWrap.tumble img{animation:iconTumble 2.8s ease-in-out infinite}
+.iconWrap.drift img{animation:iconDrift 3s ease-in-out infinite}
 @keyframes iconPulse{
   0%,100%{transform:scale(1);filter:drop-shadow(0 0 2px rgba(0,229,255,.3))}
   50%{transform:scale(1.08);filter:drop-shadow(0 0 8px rgba(0,229,255,.6))}
 }
-/* Slow, wobbly multi-axis spin rather than a flat card-flip -- the earlier
-   version combined only two rotate3d() calls with round 90/180-style angles,
-   which on a flat 2D icon just reads as a fast flip. This mixes independent
-   rotateX/rotateY/rotateZ at uneven angles plus a slight scale wobble, and
-   nets a full 720deg on Y so it loops with no visible seam. Tony flagged the
-   original as "an icon flipping card, too fast" -- fixed on both counts. */
-@keyframes iconTumble{
-  0%{transform:rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1)}
-  12%{transform:rotateX(25deg) rotateY(95deg) rotateZ(-18deg) scale(.96)}
-  25%{transform:rotateX(-40deg) rotateY(190deg) rotateZ(30deg) scale(1.04)}
-  38%{transform:rotateX(55deg) rotateY(300deg) rotateZ(-45deg) scale(.94)}
-  50%{transform:rotateX(-20deg) rotateY(410deg) rotateZ(15deg) scale(1.02)}
-  62%{transform:rotateX(38deg) rotateY(520deg) rotateZ(-30deg) scale(.97)}
-  75%{transform:rotateX(-55deg) rotateY(630deg) rotateZ(50deg) scale(1.05)}
-  88%{transform:rotateX(15deg) rotateY(700deg) rotateZ(-10deg) scale(.99)}
-  100%{transform:rotateX(0deg) rotateY(720deg) rotateZ(0deg) scale(1)}
+@keyframes iconDrift{
+  0%,100%{transform:translateX(-16px)}
+  50%{transform:translateX(16px)}
 }
 
 @media(max-width:900px){
@@ -3502,16 +3493,17 @@ applyA11y();
        "edit the flagged text and try again" once the visitor fixes it. */
 /* The 6 status icons (real game imagery, sourced same as every other icon
    already in icons-web/) and which animation each uses -- "waiting" states
-   (still might succeed) get a calm pulse; "resolved failure" states get an
-   erratic multi-axis tumble, so the MOTION itself signals "still working, be
+   (still might succeed) get a calm pulse; "resolved failure" states get a
+   left-right drift (the same drone-patrol motion as the Theme Pack's "click
+   me to scan" flyer), so the MOTION itself signals "still working, be
    patient" vs "something's actually wrong" independent of the artwork. */
 var STATUS_ICONS={
   atlas:   {src:"icons-web/status-atlas.png",     cls:"pulse"},  // normal save, in flight
   sentinel:{src:"icons-web/status-sentinel.png",  cls:"pulse"},  // still in flight, heavy traffic
-  grave:   {src:"icons-web/status-grave.png",     cls:"tumble"}, // no connection / server unreachable
-  pass3:   {src:"icons-web/status-atlaspass.png", cls:"tumble"}, // someone else saved first (conflict)
-  corrupt: {src:"icons-web/status-corrupt.png",   cls:"tumble"}, // blocked text
-  ship:    {src:"icons-web/status-ship.png",      cls:"tumble"}  // rate limit hit
+  grave:   {src:"icons-web/status-grave.png",     cls:"pulse"},  // no connection / server unreachable -- a badge, doesn't fly
+  pass3:   {src:"icons-web/status-atlaspass.png", cls:"pulse"},  // someone else saved first (conflict) -- a badge, doesn't fly
+  corrupt: {src:"icons-web/status-corrupt.png",   cls:"drift"},  // blocked text -- a drone, flies
+  ship:    {src:"icons-web/status-ship.png",      cls:"drift"}   // rate limit hit -- a ship, flies
 };
 function showStatusIcon(wrap,img,key){
   var d=STATUS_ICONS[key];
