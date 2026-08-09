@@ -280,32 +280,25 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 .merr{background:#2a0d0d;border:1px solid #ff4a4a;color:#ffb0b0;border-radius:var(--r-sm);
   padding:8px 10px;font-size:11px;margin-bottom:10px;display:none;white-space:pre-wrap;
   position:relative;overflow:hidden}
-/* Continuous horizontal scan line over the error text -- only switched on
-   (.merr.scanning, toggled in showStatusIcon/hideStatusIcon) for the two
-   "drift" failures (blocked text, rate limit), pairing the flying-drone icon
-   above the box with a beam that reads as it actively scanning the text below
-   it. Modeled on the Theme Pack's beam glow (hub-eyebeam/hub-pbeam -- same
-   gradient+box-shadow look) but that pair are one-shot-on-click; this instead
-   loops continuously like the Theme Pack's OWN always-on hub-mscan does, since
-   Tony asked for "constant beam scan not just on click."
-   IMPORTANT: this must share the EXACT same duration, easing function, and
-   keyframe % breakpoints (0/46/50/96/100) as .iconWrap.drift img's iconDrift
-   animation below -- that's what keeps the beam locked to the icon's
-   left-right-flip-left cycle instead of drifting out of phase with it (an
-   earlier version used a different duration/easing/one-directional sweep and
-   Tony correctly flagged them as "not in sync"). Both were also slowed down
-   together per his "too fast" note. */
-.merr .errScan{position:absolute;top:0;bottom:0;left:0;width:2px;pointer-events:none;opacity:0}
-.merr.scanning .errScan{opacity:1;animation:errScanSweep 7s ease-in-out infinite;
-  background:linear-gradient(180deg,transparent,rgba(180,245,255,.95),#ff8080,rgba(180,245,255,.95),transparent);
-  box-shadow:0 0 8px #ff4a4a,0 0 16px rgba(255,74,74,.5)}
-@keyframes errScanSweep{
-  0%{left:0}
-  46%{left:calc(100% - 2px)}
-  50%{left:calc(100% - 2px)}
-  96%{left:0}
-  100%{left:0}
-}
+/* Text sits in its own stacking layer above the .errScan glow patch below --
+   without this, the glow (an absolutely-positioned sibling) paints on top of
+   the plain-flow text and makes it harder to read. */
+.errTxt{position:relative;z-index:1}
+/* Glow patch on the error text where the drone's beam "lands" -- only
+   switched on (.merr.scanning, toggled in showStatusIcon/hideStatusIcon) for
+   the "drift" failures (blocked text, rate limit). Tony's reference screenshot
+   showed an actual ship with a physical light beam connecting it to the
+   ground, not just two independent effects moving in the same rhythm -- so
+   this, the new .driftBeam cone under the icon, and the icon itself all now
+   share ONE animation (iconDrift, same keyframe used for the icon's own
+   left/flip motion below) and are all exactly 56px wide, the same as the
+   icon -- guaranteeing this glow always sits in the same column as the
+   drone and its beam, frame for frame, rather than three separately-timed
+   effects that could still drift apart. */
+.merr .errScan{position:absolute;top:0;left:0;width:56px;height:100%;pointer-events:none;opacity:0;
+  background:radial-gradient(ellipse at 50% 0%,rgba(255,138,138,.55),rgba(255,74,74,.18) 55%,transparent 75%)}
+.merr.scanning .errScan{opacity:1;animation:iconDrift 7s ease-in-out infinite;
+  filter:drop-shadow(0 0 10px rgba(255,74,74,.5))}
 .mnotice{background:rgba(240,165,0,.06);border:1px solid rgba(240,165,0,.35);color:#f0c060;
   border-radius:var(--r-sm);padding:8px 10px;font-size:11px;margin-bottom:10px;display:none}
 .bodyEdit{border:1px solid var(--border-soft);border-radius:var(--r-sm);padding:8px;margin-bottom:8px;
@@ -353,12 +346,17 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
    right below it, both being plain children of the same modal column) so the
    drone's translateX(0) -> translateX(100%-its own width) keyframe naturally
    spans "start of the error text" to "end of the error text" without needing
-   to measure the text in JS -- it just always matches whatever's below it. */
-.iconWrap.drift{display:block;position:relative;height:56px;overflow:hidden}
+   to measure the text in JS -- it just always matches whatever's below it.
+   margin-bottom is widened to 14px (from the pulse default's 6px) to leave
+   physical room for .driftBeam to actually connect the drone to the text
+   below rather than the two floating with a visible dead gap between them;
+   overflow is left visible (not hidden) so that beam isn't clipped where it
+   extends past this wrap's own 56px height into that gap. */
+.iconWrap.drift{display:block;position:relative;height:56px;margin-bottom:14px}
 .iconWrap img{width:56px;height:56px;object-fit:contain}
 .iconWrap.pulse img{animation:iconPulse 1.6s ease-in-out infinite}
 .iconWrap.drift img{position:absolute;top:0;left:0;animation:iconDrift 7s ease-in-out infinite;
-  filter:drop-shadow(0 0 6px rgba(0,229,255,.6)) drop-shadow(0 0 2px rgba(0,229,255,.85))}
+  filter:drop-shadow(0 0 6px rgba(0,229,255,.6)) drop-shadow(0 0 2px rgba(0,229,255,.85));z-index:2}
 @keyframes iconPulse{
   0%,100%{transform:scale(1);filter:drop-shadow(0 0 2px rgba(0,229,255,.3))}
   50%{transform:scale(1.08);filter:drop-shadow(0 0 8px rgba(0,229,255,.6))}
@@ -366,7 +364,10 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 /* Flies left->right across the full width, flips to face the other way
    (scaleX mirror, same static mirroring the Theme Pack's own flyer-drone
    image uses) at each end, then flies back -- "start of text, end of text,
-   flip like theme pack, back to the beginning" as a continuous loop. */
+   flip like theme pack, back to the beginning" as a continuous loop. Reused
+   as-is (not duplicated) for .driftBeam and the error box's .errScan glow
+   below, since all three are 56px wide -- one shared keyframe means the
+   drone, its beam, and the glow it lands on can never drift out of sync. */
 @keyframes iconDrift{
   0%{left:0;transform:scaleX(1)}
   46%{left:calc(100% - 56px);transform:scaleX(1)}
@@ -374,6 +375,18 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   96%{left:0;transform:scaleX(-1)}
   100%{left:0;transform:scaleX(1)}
 }
+/* The physical connecting beam Tony's reference screenshot showed -- a
+   tapered cone (narrow at the drone's belly, wider at the text) shining
+   down from it into the gap below, sized to exactly fill that 14px margin
+   so it visually touches both the drone above and the error box below
+   rather than stopping short of either. Hidden entirely for "pulse" icons
+   (Grave/Atlas Pass v3), which don't fly and so have nothing to beam from. */
+.driftBeam{display:none}
+.iconWrap.drift .driftBeam{display:block;position:absolute;top:40px;left:0;width:56px;height:30px;
+  animation:iconDrift 7s ease-in-out infinite;pointer-events:none;z-index:1;
+  background:linear-gradient(180deg,rgba(0,229,255,.5),rgba(0,229,255,.15) 65%,transparent);
+  clip-path:polygon(40% 0%,60% 0%,92% 100%,8% 100%);
+  filter:drop-shadow(0 0 5px rgba(0,229,255,.45))}
 
 @media(max-width:900px){
   #panel{width:auto;left:10px;right:10px;top:auto;bottom:10px;max-height:44vh}
@@ -678,7 +691,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     <div class="mnotice" id="editPrevNotice"></div>
     <div class="merr" id="editErr"><span class="errTxt"></span><span class="errScan"></span></div>
     <button class="btn" id="edRetry" type="button" style="display:none;margin:-4px 0 10px">Retry save</button>
-    <div class="iconWrap" id="editIconWrap"><img id="editIconImg" src="" alt=""></div>
+    <div class="iconWrap" id="editIconWrap"><img id="editIconImg" src="" alt=""><span class="driftBeam"></span></div>
     <div id="editSpin"><span id="editSpinTxt">Atlas is working on it...</span></div>
     <div class="mfld"><div class="lb">System name</div><input type="text" id="edName" maxlength="40"></div>
     <div class="mfld"><div class="lb">Region name</div><input type="text" id="edRegion" maxlength="40"></div>
@@ -737,7 +750,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     <div class="msub">Flags this system's current data for review.</div>
     <div class="merr" id="reportErr"><span class="errTxt"></span><span class="errScan"></span></div>
     <button class="btn" id="repRetry" type="button" style="display:none;margin:-4px 0 10px">Retry send</button>
-    <div class="iconWrap" id="reportIconWrap"><img id="reportIconImg" src="" alt=""></div>
+    <div class="iconWrap" id="reportIconWrap"><img id="reportIconImg" src="" alt=""><span class="driftBeam"></span></div>
     <div id="reportSpin"><span id="reportSpinTxt">Atlas is working on it...</span></div>
     <div class="mfld"><div class="lb">What's wrong?</div>
       <textarea id="repReason" maxlength="200" placeholder="e.g. Name field has an offensive word"></textarea>
