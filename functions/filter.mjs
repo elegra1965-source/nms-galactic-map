@@ -147,6 +147,25 @@ export function filterSystemEdit(payload){
   var starClassR = filterText(payload.starClass, {maxLen:10, fieldName:"Star class"});
   if(!starClassR.ok) errors.push(starClassR.reason); else out.starClass = starClassR.cleaned;
 
+  // Real game constraint: 1-3 stars per system (single/binary/ternary), and
+  // in a binary/ternary system every star is a different colour -- this is
+  // the AUTHORITATIVE check, the client's own copy in preview.html's
+  // clientPrecheck() is only there for instant feedback and can't be relied
+  // on alone (same reasoning as every other allowlisted field here).
+  var STAR_COLOR_KEYS = ["yellow","red","green","blue","purple"];
+  var starsIn = Array.isArray(payload.stars) ? payload.stars : [];
+  if (starsIn.length > 3) {
+    errors.push("A system can have at most 3 stars (ternary is the real in-game limit)");
+  } else if (new Set(starsIn).size !== starsIn.length) {
+    errors.push("Each star must be a different colour -- that's how binary/ternary systems work in-game");
+  }
+  var starsOut = [];
+  for (var si = 0; si < starsIn.length && si < 3; si++) {
+    var sc = String(starsIn[si] || "");
+    if (STAR_COLOR_KEYS.indexOf(sc) >= 0 && starsOut.indexOf(sc) < 0) starsOut.push(sc);
+  }
+  out.stars = starsOut.length ? starsOut : ["yellow"];
+
   // Independent, not a 3-way "suffix" choice -- Water (added in the Abyss
   // update) and Dissonant (added in Interceptor) are separate per-system
   // conditions in the real game and can both apply to the same system.

@@ -297,6 +297,12 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   white-space:nowrap;padding-top:16px}
 .chk2 input{accent-color:#00e5ff;width:13px;height:13px}
 #bodyEditList{margin-bottom:8px}
+.starRow{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.starRow .mfld{flex:1}
+.starRow .bx{cursor:pointer;color:var(--text-faint);font-size:14px;line-height:1;padding:2px 6px;flex-shrink:0}
+.starRow .bx:hover{color:#ff8080}
+.starSwatch{width:14px;height:14px;border-radius:50%;flex:0 0 auto;border:1px solid rgba(255,255,255,.3)}
+#starEditList{margin-bottom:8px}
 .modalBtns{display:flex;gap:6px;margin-top:12px}
 .modalBtns .btn{flex:1;text-align:center}
 .modalBtns .btn.primary{border-color:var(--gold);color:var(--gold)}
@@ -605,8 +611,15 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     <div class="merr" id="editErr"></div>
     <div class="mfld"><div class="lb">System name</div><input type="text" id="edName" maxlength="40"></div>
     <div class="mfld"><div class="lb">Region name</div><input type="text" id="edRegion" maxlength="40"></div>
+    <div class="mfld">
+      <div class="lb" style="display:flex;justify-content:space-between;align-items:center">
+        <span>Stars (max 3 -- single / binary / ternary)</span>
+        <button class="btn" id="edAddStar" type="button" style="padding:3px 8px">+ Add star</button>
+      </div>
+      <div id="starEditList"></div>
+    </div>
     <div class="mfld" style="display:flex;gap:8px">
-      <div style="flex:1"><div class="lb">Star class</div><input type="text" id="edStarClass" maxlength="10" placeholder="e.g. G7p"></div>
+      <div style="flex:1"><div class="lb">Star class (primary star)</div><input type="text" id="edStarClass" maxlength="10" placeholder="e.g. G7p"></div>
       <div style="flex:1"><div class="lb">Suffix</div>
         <label class="chk" style="margin-bottom:2px" title="Shown when at least one planet in the system has an ocean."><input type="checkbox" id="edWaterSuf"> Water</label>
         <label class="chk" title="Shown when at least one planet in the system is dissonant."><input type="checkbox" id="edDissonantSuf"> Dissonant</label>
@@ -758,6 +771,10 @@ var STAR_TYPES=[
   {k:"blue",  w:9, cls:["B","O"],col:0x6ba8ff},
   {k:"purple",w:5, cls:["X","Y"],col:0xc78aff}
 ];
+/* Human-readable labels for the star-colour dropdown in Edit system --
+   matches the wiki's own class groupings for each of the 5 real colours. */
+var STAR_COLOR_LABEL={yellow:"Yellow (F/G)",red:"Red/Orange (K/M)",green:"Green (E)",blue:"Blue (B/O)",purple:"Purple (X/Y)"};
+function starTypeByKey(k){ for(var i=0;i<STAR_TYPES.length;i++) if(STAR_TYPES[i].k===k) return STAR_TYPES[i]; return STAR_TYPES[0]; }
 var ODDS={yellow:{out:.25,unc:0,aba:0},red:{out:.50,unc:.95,aba:0},
   green:{out:.15,unc:.40,aba:.10},blue:{out:.15,unc:.40,aba:.10},purple:{out:.15,unc:.40,aba:.10}};
 /* chance a purple system is also a Giant-planet system -- placeholder,
@@ -1118,6 +1135,27 @@ function applyOverride(s){
   if(d.atlas!==undefined) s.atlas=!!d.atlas;
   if(d.region) s.region=d.region;
   if(d.starClass) s.spectral=d.starClass;
+  // Number of stars + each star's own colour -- wiki-confirmed real game
+  // mechanics: 1-3 stars per system (single/binary/ternary), and in a
+  // binary/ternary system every star is a different colour. d.stars is an
+  // array of colour keys (index 0 = the "original"/primary star, which is
+  // what actually drives this system's spectral class, biome odds and
+  // economy-element odds elsewhere in the generator). Falls back to the
+  // procedural stars if no override was ever saved.
+  if(d.stars && d.stars.length){
+    var validKeys=STAR_TYPES.map(function(t){return t.k;});
+    var stk=[];
+    for(var si=0; si<d.stars.length && si<3; si++){
+      if(validKeys.indexOf(d.stars[si])>=0 && stk.indexOf(d.stars[si])<0) stk.push(d.stars[si]);
+    }
+    if(stk.length){
+      s.starTypes=stk;
+      s.starColors=stk.map(function(k){ return starTypeByKey(k).col; });
+      s.stars=stk.length;
+      s.type=stk[0];
+      s.color=starTypeByKey(stk[0]).col;
+    }
+  }
   // Independent flags, not a 3-way choice -- confirmed against the wiki:
   // Water (Abyss update) and Dissonant (Interceptor update) were added in
   // separate updates as separate per-system conditions ("has an ocean
@@ -2890,6 +2928,28 @@ function buildEconConflictSelects(){
   }
 }
 buildEconConflictSelects();
+var editStars=[];
+var starUidSeq=1; // stable per-row id, same pattern as bodyUidSeq below
+// Star colour rows for Edit system -- one row per star (max 3, matching the
+// real game's single/binary/ternary limit). Index 0 is always labelled as
+// the original/primary star, since that's the one that actually drives the
+// system's spectral class + economy-element odds in generateSystem().
+function renderStarEditList(){
+  var el=document.getElementById("starEditList"), html="";
+  for(var i=0;i<editStars.length;i++){
+    var st=editStars[i], t=starTypeByKey(st.color), opts="";
+    for(var k=0;k<STAR_TYPES.length;k++){
+      opts+='<option value="'+STAR_TYPES[k].k+'"'+(st.color===STAR_TYPES[k].k?" selected":"")+'>'+STAR_COLOR_LABEL[STAR_TYPES[k].k]+'</option>';
+    }
+    html+='<div class="starRow" data-si="'+i+'">'+
+      '<span class="starSwatch" style="background:#'+hex(t.col,6)+'" title="'+(i===0?"Original star -- drives this system\u2019s star class":"Companion star")+'"></span>'+
+      '<div class="mfld" style="margin-bottom:0"><div class="lb">'+(i===0?"Star A (original)":"Star "+String.fromCharCode(65+i))+'</div>'+
+      '<select class="sfColor" data-si="'+i+'">'+opts+'</select></div>'+
+      (editStars.length>1?'<span class="bx" data-star-remove="'+i+'" title="Remove">&times;</span>':'')+
+    '</div>';
+  }
+  el.innerHTML=html;
+}
 var editBodies=[];
 var bodyUidSeq=1; // stable per-row id, survives add/remove reordering during a single edit session
 // Each row starts collapsed (just a name summary) so a system with several
@@ -2957,7 +3017,6 @@ function renderBodyEditList(){
     html+='</div>';
   }
   el.innerHTML=html;
-  document.getElementById("edAddBody").disabled=(editBodies.length>=6);
 }
 function openEditModal(){
   if(!selected) return;
@@ -2974,6 +3033,10 @@ function openEditModal(){
   document.getElementById("edAtlas").checked=!!s.atlas;
   document.getElementById("edRegion").value=s.region||"";
   document.getElementById("edStarClass").value=s.spectral||"";
+  editStars=(s.starTypes&&s.starTypes.length?s.starTypes:[s.type]).slice(0,3).map(function(k){
+    return {uid:starUidSeq++, color:(STAR_TYPES.map(function(t){return t.k;}).indexOf(k)>=0)?k:"yellow"};
+  });
+  renderStarEditList();
   document.getElementById("edWaterSuf").checked=!!s.water;
   document.getElementById("edDissonantSuf").checked=!!s.dissonant;
   document.getElementById("edGiant").checked=!!s.giant;
@@ -3070,8 +3133,33 @@ function clientPrecheck(){
     if(planetCount>1) return "A Giant planet system can only have 1 planet (the Giant itself) -- remove the extra planet(s) or untick Giant planet.";
     if(moonCount>5) return "A Giant planet can have at most 5 moons.";
   }
+  if(editStars.length<1 || editStars.length>3) return "A system must have 1 to 3 stars.";
+  var seenColors=[];
+  for(i=0;i<editStars.length;i++){
+    if(seenColors.indexOf(editStars[i].color)>=0) return "Each star in a binary/ternary system must be a different colour -- that's how it works in-game.";
+    seenColors.push(editStars[i].color);
+  }
   return null;
 }
+document.getElementById("starEditList").addEventListener("change",function(e){
+  var siAttr=e.target.getAttribute("data-si"); if(siAttr===null) return;
+  if(e.target.classList.contains("sfColor")) editStars[+siAttr].color=e.target.value;
+  renderStarEditList();
+});
+document.getElementById("starEditList").addEventListener("click",function(e){
+  var rm=e.target.getAttribute("data-star-remove");
+  if(rm===null) return;
+  if(editStars.length<=1) return; // real game minimum -- every system has at least 1 star
+  editStars.splice(+rm,1);
+  renderStarEditList();
+});
+document.getElementById("edAddStar").addEventListener("click",function(){
+  if(editStars.length>=3){ toast("Ternary is the limit -- No Man's Sky systems can have at most 3 stars."); return; }
+  var used=editStars.map(function(s){return s.color;});
+  var nextColor=STAR_TYPES.map(function(t){return t.k;}).filter(function(k){return used.indexOf(k)<0;})[0]||"yellow";
+  editStars.push({uid:starUidSeq++,color:nextColor});
+  renderStarEditList();
+});
 document.getElementById("bodyEditList").addEventListener("input",function(e){
   var iAttr=e.target.getAttribute("data-i"); if(iAttr===null) return; var i=+iAttr;
   if(e.target.classList.contains("bfName")) editBodies[i].name=e.target.value;
@@ -3109,7 +3197,7 @@ document.getElementById("bodyEditList").addEventListener("click",function(e){
   }
 });
 document.getElementById("edAddBody").addEventListener("click",function(){
-  if(editBodies.length>=6) return;
+  if(editBodies.length>=6){ toast("6 is the limit -- No Man's Sky systems can have at most 6 planets and moons combined."); return; }
   for(var j=0;j<editBodies.length;j++) editBodies[j].open=false;
   editBodies.push({uid:bodyUidSeq++,name:"New body",moon:false,biome:BIOME_KEYS[0],descriptor:"",water:false,
     resources:"",flora:"",minerals:"",salvage:"",fossils:"",sentinel:"None",autophage:false,orbits:"",open:true});
@@ -3337,6 +3425,7 @@ document.getElementById("edSubmit").addEventListener("click",function(){
     name:document.getElementById("edName").value.trim(),
     race:document.getElementById("edRace").value,
     region:document.getElementById("edRegion").value.trim(),
+    stars:editStars.map(function(s){ return s.color; }),
     starClass:document.getElementById("edStarClass").value.trim(),
     water:document.getElementById("edWaterSuf").checked,
     dissonant:document.getElementById("edDissonantSuf").checked,
