@@ -412,15 +412,46 @@
       },
       "editedAt": "2026-08-09T07:09:33.833Z",
       "editedByIp": "185.45.15.46"
+    },
+    "10ADB2FB4C13": {
+      "data": {
+        "name": "Test",
+        "race": "Korvax",
+        "econName": "Commercial",
+        "conflict": "Fractious",
+        "notes": "This is a test system to show edit badge present",
+        "bodies": [
+          {
+            "name": "Planet elegra",
+            "moon": false,
+            "parent": 0,
+            "biome": "Frozen",
+            "water": false,
+            "resources": [
+              "Magnetised Ferrite"
+            ]
+          },
+          {
+            "name": "Tadel-I",
+            "moon": false,
+            "parent": 0,
+            "biome": "Dead",
+            "water": false,
+            "resources": [
+              "Cobalt",
+              "Silver"
+            ]
+          }
+        ]
+      },
+      "editedAt": "2026-08-09T23:21:11.742Z",
+      "editedByIp": "82.132.185.221"
     }
   },
   "reports": [],
   "ipLog": {
-    "185.45.15.46": [
-      1786256290527,
-      1786257337226,
-      1786258854228,
-      1786259373833
+    "82.132.185.221": [
+      1786317671742
     ]
   }
 }
