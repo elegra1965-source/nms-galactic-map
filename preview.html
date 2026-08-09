@@ -287,19 +287,24 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
    it. Modeled on the Theme Pack's beam glow (hub-eyebeam/hub-pbeam -- same
    gradient+box-shadow look) but that pair are one-shot-on-click; this instead
    loops continuously like the Theme Pack's OWN always-on hub-mscan does, since
-   Tony asked for "constant beam scan not just on click." Left as a single
-   one-directional sweep (not back-and-forth like the drone) on purpose --
-   reads as a radar/scanner sweeping the text, a deliberate contrast to the
-   drone's patrol motion above it rather than the two just mirroring each other. */
+   Tony asked for "constant beam scan not just on click."
+   IMPORTANT: this must share the EXACT same duration, easing function, and
+   keyframe % breakpoints (0/46/50/96/100) as .iconWrap.drift img's iconDrift
+   animation below -- that's what keeps the beam locked to the icon's
+   left-right-flip-left cycle instead of drifting out of phase with it (an
+   earlier version used a different duration/easing/one-directional sweep and
+   Tony correctly flagged them as "not in sync"). Both were also slowed down
+   together per his "too fast" note. */
 .merr .errScan{position:absolute;top:0;bottom:0;left:0;width:2px;pointer-events:none;opacity:0}
-.merr.scanning .errScan{opacity:1;animation:errScanSweep 2.2s linear infinite;
+.merr.scanning .errScan{opacity:1;animation:errScanSweep 7s ease-in-out infinite;
   background:linear-gradient(180deg,transparent,rgba(180,245,255,.95),#ff8080,rgba(180,245,255,.95),transparent);
   box-shadow:0 0 8px #ff4a4a,0 0 16px rgba(255,74,74,.5)}
 @keyframes errScanSweep{
-  0%{left:0;opacity:0}
-  8%{opacity:1}
-  92%{opacity:1}
-  100%{left:100%;opacity:0}
+  0%{left:0}
+  46%{left:calc(100% - 2px)}
+  50%{left:calc(100% - 2px)}
+  96%{left:0}
+  100%{left:0}
 }
 .mnotice{background:rgba(240,165,0,.06);border:1px solid rgba(240,165,0,.35);color:#f0c060;
   border-radius:var(--r-sm);padding:8px 10px;font-size:11px;margin-bottom:10px;display:none}
@@ -352,7 +357,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 .iconWrap.drift{display:block;position:relative;height:56px;overflow:hidden}
 .iconWrap img{width:56px;height:56px;object-fit:contain}
 .iconWrap.pulse img{animation:iconPulse 1.6s ease-in-out infinite}
-.iconWrap.drift img{position:absolute;top:0;left:0;animation:iconDrift 4.4s ease-in-out infinite;
+.iconWrap.drift img{position:absolute;top:0;left:0;animation:iconDrift 7s ease-in-out infinite;
   filter:drop-shadow(0 0 6px rgba(0,229,255,.6)) drop-shadow(0 0 2px rgba(0,229,255,.85))}
 @keyframes iconPulse{
   0%,100%{transform:scale(1);filter:drop-shadow(0 0 2px rgba(0,229,255,.3))}
@@ -3539,14 +3544,17 @@ var STATUS_ICONS={
   sentinel:{src:"icons-web/status-sentinel.png",  cls:"pulse"},  // still in flight, heavy traffic
   grave:   {src:"icons-web/status-grave.png",     cls:"pulse"},  // no connection / server unreachable -- a badge, doesn't fly
   pass3:   {src:"icons-web/status-atlaspass.png", cls:"pulse"},  // someone else saved first (conflict) -- a badge, doesn't fly
-  corrupt: {src:"icons-web/status-corrupt.png",   cls:"drift"},  // blocked text -- a drone, flies
-  ship:    {src:"icons-web/status-ship.png",      cls:"drift"}   // rate limit hit -- a ship, flies
+  corrupt: {src:"icons-web/status-corrupt.png",   cls:"drift"}   // blocked text AND rate limit -- a drone, flies
+  // "ship" (status-ship.png) removed -- Tony felt it didn't look right paired
+  // with the drift motion, so both drift-style errors now share Corrupt
+  // Sentinel for a consistent look, same as how Grave already covers every
+  // pulse-style connection failure rather than having its own icon each.
 };
 /* The scanning beam lives on the .merr box paired with each icon wrap
    (editIconWrap -> editErr, reportIconWrap -> reportErr, same naming
-   convention both ids already share), toggled on only for "drift" icons
-   (Corrupt Sentinel / Sentinel ship) so the beam and the flying-drone icon
-   always appear and disappear together. */
+   convention both ids already share), toggled on only for the "drift" icon
+   (Corrupt Sentinel, now shared by both blocked-text and rate-limit errors)
+   so the beam and the flying-drone icon always appear and disappear together. */
 function pairedErrEl(wrap){ return document.getElementById(wrap.id.replace("IconWrap","Err")); }
 function showStatusIcon(wrap,img,key){
   var d=STATUS_ICONS[key];
@@ -3585,7 +3593,7 @@ function describeSaveError(status, body, isReport){
   var err=(body && body.error) || "Could not save";
   var verb=isReport?"report":"edit", saveWord=isReport?"Send report":"Save";
   if(status===429){
-    return { message: err, retryable:false, icon:"ship" };
+    return { message: err, retryable:false, icon:"corrupt" };
   }
   if(status===422){
     var extra=(body && body.details && body.details.length)?"\n"+body.details.join("\n"):"";
