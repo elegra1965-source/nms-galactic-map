@@ -278,7 +278,29 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   letter-spacing:.02em;color:var(--text);font-size:12px}
 .mfld textarea{margin-top:0}
 .merr{background:#2a0d0d;border:1px solid #ff4a4a;color:#ffb0b0;border-radius:var(--r-sm);
-  padding:8px 10px;font-size:11px;margin-bottom:10px;display:none;white-space:pre-wrap}
+  padding:8px 10px;font-size:11px;margin-bottom:10px;display:none;white-space:pre-wrap;
+  position:relative;overflow:hidden}
+/* Continuous horizontal scan line over the error text -- only switched on
+   (.merr.scanning, toggled in showStatusIcon/hideStatusIcon) for the two
+   "drift" failures (blocked text, rate limit), pairing the flying-drone icon
+   above the box with a beam that reads as it actively scanning the text below
+   it. Modeled on the Theme Pack's beam glow (hub-eyebeam/hub-pbeam -- same
+   gradient+box-shadow look) but that pair are one-shot-on-click; this instead
+   loops continuously like the Theme Pack's OWN always-on hub-mscan does, since
+   Tony asked for "constant beam scan not just on click." Left as a single
+   one-directional sweep (not back-and-forth like the drone) on purpose --
+   reads as a radar/scanner sweeping the text, a deliberate contrast to the
+   drone's patrol motion above it rather than the two just mirroring each other. */
+.merr .errScan{position:absolute;top:0;bottom:0;left:0;width:2px;pointer-events:none;opacity:0}
+.merr.scanning .errScan{opacity:1;animation:errScanSweep 2.2s linear infinite;
+  background:linear-gradient(180deg,transparent,rgba(180,245,255,.95),#ff8080,rgba(180,245,255,.95),transparent);
+  box-shadow:0 0 8px #ff4a4a,0 0 16px rgba(255,74,74,.5)}
+@keyframes errScanSweep{
+  0%{left:0;opacity:0}
+  8%{opacity:1}
+  92%{opacity:1}
+  100%{left:100%;opacity:0}
+}
 .mnotice{background:rgba(240,165,0,.06);border:1px solid rgba(240,165,0,.35);color:#f0c060;
   border-radius:var(--r-sm);padding:8px 10px;font-size:11px;margin-bottom:10px;display:none}
 .bodyEdit{border:1px solid var(--border-soft);border-radius:var(--r-sm);padding:8px;margin-bottom:8px;
@@ -320,17 +342,32 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
    NMS_FINAL_SITE-9.6.26/index.html) -- reused rather than guessed at a new motion,
    since Tony already knows that one fits the site's style and this one didn't
    (an earlier 3D-tumble version read as "an icon flipping card, too fast"). */
-.iconWrap{display:none;justify-content:center;margin-bottom:6px}
+.iconWrap{display:none;margin-bottom:6px}
+.iconWrap.pulse{display:flex;justify-content:center}
+/* Drift wrap is block-level and full-width (same width as the .merr text box
+   right below it, both being plain children of the same modal column) so the
+   drone's translateX(0) -> translateX(100%-its own width) keyframe naturally
+   spans "start of the error text" to "end of the error text" without needing
+   to measure the text in JS -- it just always matches whatever's below it. */
+.iconWrap.drift{display:block;position:relative;height:56px;overflow:hidden}
 .iconWrap img{width:56px;height:56px;object-fit:contain}
 .iconWrap.pulse img{animation:iconPulse 1.6s ease-in-out infinite}
-.iconWrap.drift img{animation:iconDrift 3s ease-in-out infinite}
+.iconWrap.drift img{position:absolute;top:0;left:0;animation:iconDrift 4.4s ease-in-out infinite;
+  filter:drop-shadow(0 0 6px rgba(0,229,255,.6)) drop-shadow(0 0 2px rgba(0,229,255,.85))}
 @keyframes iconPulse{
   0%,100%{transform:scale(1);filter:drop-shadow(0 0 2px rgba(0,229,255,.3))}
   50%{transform:scale(1.08);filter:drop-shadow(0 0 8px rgba(0,229,255,.6))}
 }
+/* Flies left->right across the full width, flips to face the other way
+   (scaleX mirror, same static mirroring the Theme Pack's own flyer-drone
+   image uses) at each end, then flies back -- "start of text, end of text,
+   flip like theme pack, back to the beginning" as a continuous loop. */
 @keyframes iconDrift{
-  0%,100%{transform:translateX(-16px)}
-  50%{transform:translateX(16px)}
+  0%{left:0;transform:scaleX(1)}
+  46%{left:calc(100% - 56px);transform:scaleX(1)}
+  50%{left:calc(100% - 56px);transform:scaleX(-1)}
+  96%{left:0;transform:scaleX(-1)}
+  100%{left:0;transform:scaleX(1)}
 }
 
 @media(max-width:900px){
@@ -634,7 +671,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     <h3>Edit system</h3>
     <div class="msub">Enter your real in-game data. This replaces the generated placeholder for everyone who visits this address, including you if you reload -- there's no undo button on the site itself, but every save is a git commit elegra1965 can revert on GitHub.</div>
     <div class="mnotice" id="editPrevNotice"></div>
-    <div class="merr" id="editErr"></div>
+    <div class="merr" id="editErr"><span class="errTxt"></span><span class="errScan"></span></div>
     <button class="btn" id="edRetry" type="button" style="display:none;margin:-4px 0 10px">Retry save</button>
     <div class="iconWrap" id="editIconWrap"><img id="editIconImg" src="" alt=""></div>
     <div id="editSpin"><span id="editSpinTxt">Atlas is working on it...</span></div>
@@ -693,7 +730,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   <div class="box modal" id="reportModal" style="max-width:340px;display:none">
     <h3>Report this system</h3>
     <div class="msub">Flags this system's current data for review.</div>
-    <div class="merr" id="reportErr"></div>
+    <div class="merr" id="reportErr"><span class="errTxt"></span><span class="errScan"></span></div>
     <button class="btn" id="repRetry" type="button" style="display:none;margin:-4px 0 10px">Retry send</button>
     <div class="iconWrap" id="reportIconWrap"><img id="reportIconImg" src="" alt=""></div>
     <div id="reportSpin"><span id="reportSpinTxt">Atlas is working on it...</span></div>
@@ -3505,14 +3542,32 @@ var STATUS_ICONS={
   corrupt: {src:"icons-web/status-corrupt.png",   cls:"drift"},  // blocked text -- a drone, flies
   ship:    {src:"icons-web/status-ship.png",      cls:"drift"}   // rate limit hit -- a ship, flies
 };
+/* The scanning beam lives on the .merr box paired with each icon wrap
+   (editIconWrap -> editErr, reportIconWrap -> reportErr, same naming
+   convention both ids already share), toggled on only for "drift" icons
+   (Corrupt Sentinel / Sentinel ship) so the beam and the flying-drone icon
+   always appear and disappear together. */
+function pairedErrEl(wrap){ return document.getElementById(wrap.id.replace("IconWrap","Err")); }
 function showStatusIcon(wrap,img,key){
   var d=STATUS_ICONS[key];
-  if(!d){ wrap.style.display="none"; return; }
+  var errEl=pairedErrEl(wrap);
+  if(!d){ hideStatusIcon(wrap); return; }
   img.src=d.src;
+  wrap.style.display=""; // clear any inline "none" so the class below controls display/layout
   wrap.className="iconWrap "+d.cls;
-  wrap.style.display="flex";
+  if(errEl) errEl.classList.toggle("scanning", d.cls==="drift");
 }
-function hideStatusIcon(wrap){ wrap.style.display="none"; wrap.className="iconWrap"; }
+function hideStatusIcon(wrap){
+  wrap.style.display="none"; wrap.className="iconWrap";
+  var errEl=pairedErrEl(wrap);
+  if(errEl) errEl.classList.remove("scanning");
+}
+/* Sets the error box's message without wiping out the .errScan beam element
+   that lives alongside the text -- errEl.textContent=... would delete it. */
+function setErrText(errEl, msg){
+  var t=errEl.querySelector(".errTxt");
+  if(t) t.textContent=msg; else errEl.textContent=msg;
+}
 /* Turns a failed save's raw status/body into a plain-English reason, which
    status icon to show, and whether a Retry button makes sense. Three real
    failure shapes exist here:
@@ -3588,7 +3643,7 @@ function submitEditPayload(address, payload){
     if(!res.body.ok){
       var d=describeSaveError(res.status,res.body,false);
       showStatusIcon(iconWrap,iconImg,d.icon);
-      errEl.textContent=d.message; errEl.style.display="block"; errEl.scrollIntoView({block:"nearest"});
+      setErrText(errEl,d.message); errEl.style.display="block"; errEl.scrollIntoView({block:"nearest"});
       retryBtn.style.display=d.retryable?"inline-block":"none";
       return;
     }
@@ -3597,7 +3652,7 @@ function submitEditPayload(address, payload){
   }).catch(function(){
     stopWait(); spin.style.display="none"; btn.disabled=false;
     showStatusIcon(iconWrap,iconImg,"grave");
-    errEl.textContent="Couldn't reach the server -- check your connection. Your edit was NOT saved.";
+    setErrText(errEl,"Couldn't reach the server -- check your connection. Your edit was NOT saved.");
     errEl.style.display="block"; errEl.scrollIntoView({block:"nearest"});
     retryBtn.style.display="inline-block";
   });
@@ -3618,7 +3673,7 @@ document.getElementById("edSubmit").addEventListener("click",function(){
   // error text appeared with no icon above it. Real bug, caught from Tony's
   // own screenshot testing "rope" as a system name.
   if(err){
-    errEl.textContent=err; errEl.style.display="block"; retryBtn.style.display="none";
+    setErrText(errEl,err); errEl.style.display="block"; retryBtn.style.display="none";
     showStatusIcon(iconWrap,iconImg,"corrupt");
     errEl.scrollIntoView({block:"nearest"}); return;
   }
@@ -3681,7 +3736,7 @@ function submitReportPayload(address, reason){
     if(!res.body.ok){
       var d=describeSaveError(res.status,res.body,true);
       showStatusIcon(iconWrap,iconImg,d.icon);
-      errEl.textContent=d.message; errEl.style.display="block"; errEl.scrollIntoView({block:"nearest"});
+      setErrText(errEl,d.message); errEl.style.display="block"; errEl.scrollIntoView({block:"nearest"});
       retryBtn.style.display=d.retryable?"inline-block":"none";
       return;
     }
@@ -3690,7 +3745,7 @@ function submitReportPayload(address, reason){
   }).catch(function(){
     stopWait(); spin.style.display="none"; btn.disabled=false;
     showStatusIcon(iconWrap,iconImg,"grave");
-    errEl.textContent="Couldn't reach the server -- check your connection. Your report was NOT sent.";
+    setErrText(errEl,"Couldn't reach the server -- check your connection. Your report was NOT sent.");
     errEl.style.display="block"; errEl.scrollIntoView({block:"nearest"});
     retryBtn.style.display="inline-block";
   });
@@ -3703,7 +3758,7 @@ document.getElementById("repSubmit").addEventListener("click",function(){
   if(!selected) return;
   var reason=document.getElementById("repReason").value.trim();
   var errEl=document.getElementById("reportErr"), retryBtn=document.getElementById("repRetry");
-  if(!reason){ errEl.textContent="Please describe what's wrong."; errEl.style.display="block"; retryBtn.style.display="none"; errEl.scrollIntoView({block:"nearest"}); return; }
+  if(!reason){ setErrText(errEl,"Please describe what's wrong."); errEl.style.display="block"; retryBtn.style.display="none"; errEl.classList.remove("scanning"); errEl.scrollIntoView({block:"nearest"}); return; }
   errEl.style.display="none"; retryBtn.style.display="none";
   submitReportPayload(selected.address, reason);
 });
