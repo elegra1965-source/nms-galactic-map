@@ -279,6 +279,8 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 .mfld textarea{margin-top:0}
 .merr{background:#2a0d0d;border:1px solid #ff4a4a;color:#ffb0b0;border-radius:var(--r-sm);
   padding:8px 10px;font-size:11px;margin-bottom:10px;display:none;white-space:pre-wrap}
+.mnotice{background:rgba(240,165,0,.06);border:1px solid rgba(240,165,0,.35);color:#f0c060;
+  border-radius:var(--r-sm);padding:8px 10px;font-size:11px;margin-bottom:10px;display:none}
 .bodyEdit{border:1px solid var(--border-soft);border-radius:var(--r-sm);padding:8px;margin-bottom:8px;
   background:rgba(255,255,255,.02)}
 .bodyEdit .bhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;cursor:pointer}
@@ -613,6 +615,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   <div class="box modal" id="editModal">
     <h3>Edit system</h3>
     <div class="msub">Enter your real in-game data. This replaces the generated placeholder for everyone who visits this address, including you if you reload -- there's no undo button on the site itself, but every save is a git commit elegra1965 can revert on GitHub.</div>
+    <div class="mnotice" id="editPrevNotice"></div>
     <div class="merr" id="editErr"></div>
     <button class="btn" id="edRetry" type="button" style="display:none;margin:-4px 0 10px">Retry save</button>
     <div class="mfld"><div class="lb">System name</div><input type="text" id="edName" maxlength="40"></div>
@@ -693,6 +696,10 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     <div class="mfld">
       <div class="lb">Procedural data</div>
       <div style="font-size:12px;color:var(--text-dim);line-height:1.55">Star systems are generated procedurally from their portal address, the same way the game does -- they are not scraped from anyone's real save. A system only reflects real in-game data once a traveller has entered it via <b>Edit system</b>, marked "Community edited".</div>
+    </div>
+    <div class="mfld">
+      <div class="lb">Community-submitted data</div>
+      <div style="font-size:12px;color:var(--text-dim);line-height:1.55">Anything entered via <b>Edit system</b> is trusted as typed -- it isn't checked against Hello Games' own in-game discovery records, which are known to desync between players. Two travellers can occasionally submit different names for the same system in good faith. If something looks wrong, use <b>Report</b> and elegra1965 will sort it out from the save history.</div>
     </div>
     <div class="mfld">
       <div class="lb">New to No Man's Sky?</div>
@@ -3025,9 +3032,39 @@ function renderBodyEditList(){
   }
   el.innerHTML=html;
 }
+/* Plain-English "N days/hours ago" for the Edit-system "currently saved as"
+   notice -- overrideAt is an ISO timestamp from the server (system-edit.mjs's
+   editedAt), so this only ever formats a real value, never a guess. */
+function relTime(iso){
+  var then=new Date(iso).getTime();
+  if(isNaN(then)) return "recently";
+  var mins=Math.floor((Date.now()-then)/60000);
+  if(mins<1) return "just now";
+  if(mins<60) return mins+" minute"+(mins===1?"":"s")+" ago";
+  var hrs=Math.floor(mins/60);
+  if(hrs<24) return hrs+" hour"+(hrs===1?"":"s")+" ago";
+  var days=Math.floor(hrs/24);
+  if(days<30) return days+" day"+(days===1?"":"s")+" ago";
+  var months=Math.floor(days/30);
+  if(months<12) return months+" month"+(months===1?"":"s")+" ago";
+  var years=Math.floor(months/12);
+  return years+" year"+(years===1?"":"s")+" ago";
+}
 function openEditModal(){
   if(!selected) return;
   var s=selected;
+  // Shows what's already saved for this address BEFORE the form below
+  // pre-fills over it with the same values, so a visitor about to overwrite
+  // real community data (not just a procedural placeholder) sees that
+  // plainly instead of silently clobbering someone else's honest submission.
+  var prevNotice=document.getElementById("editPrevNotice");
+  if(s.override){
+    prevNotice.textContent='Currently saved as "'+(s.name||"Unnamed")+'" -- submitted '+relTime(s.overrideAt)+' by another traveller. Saving will replace it for everyone.';
+    prevNotice.style.display="block";
+  } else {
+    prevNotice.style.display="none";
+    prevNotice.textContent="";
+  }
   document.getElementById("edName").value=s.name||"";
   var raceOk=["Gek","Vy'keen","Korvax","Uninhabited"];
   document.getElementById("edRace").value=(raceOk.indexOf(s.race)>=0)?s.race:"Uninhabited";
