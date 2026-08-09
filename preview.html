@@ -316,20 +316,30 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
    failure" states (conflict, offline, blocked, rate limit) get an erratic multi-axis
    tumble instead, so the motion itself signals success-still-possible vs something's-
    actually-wrong, not just the icon artwork. */
-.iconWrap{display:none;justify-content:center;margin-bottom:6px;perspective:300px}
+.iconWrap{display:none;justify-content:center;margin-bottom:6px;perspective:500px}
 .iconWrap img{width:56px;height:56px;object-fit:contain}
 .iconWrap.pulse img{animation:iconPulse 1.6s ease-in-out infinite}
-.iconWrap.tumble img{animation:iconTumble 1.1s cubic-bezier(.36,.07,.19,.97) infinite}
+.iconWrap.tumble img{animation:iconTumble 2.8s ease-in-out infinite}
 @keyframes iconPulse{
   0%,100%{transform:scale(1);filter:drop-shadow(0 0 2px rgba(0,229,255,.3))}
   50%{transform:scale(1.08);filter:drop-shadow(0 0 8px rgba(0,229,255,.6))}
 }
+/* Slow, wobbly multi-axis spin rather than a flat card-flip -- the earlier
+   version combined only two rotate3d() calls with round 90/180-style angles,
+   which on a flat 2D icon just reads as a fast flip. This mixes independent
+   rotateX/rotateY/rotateZ at uneven angles plus a slight scale wobble, and
+   nets a full 720deg on Y so it loops with no visible seam. Tony flagged the
+   original as "an icon flipping card, too fast" -- fixed on both counts. */
 @keyframes iconTumble{
-  0%{transform:rotate3d(1,0,0,0deg) rotate3d(0,1,0,0deg) rotate3d(0,0,1,0deg)}
-  25%{transform:rotate3d(1,.4,.2,160deg) rotate3d(0,0,1,40deg)}
-  50%{transform:rotate3d(.3,1,.5,300deg) rotate3d(0,0,1,-30deg)}
-  75%{transform:rotate3d(.6,.2,1,220deg) rotate3d(0,0,1,60deg)}
-  100%{transform:rotate3d(1,0,0,360deg) rotate3d(0,1,0,360deg) rotate3d(0,0,1,360deg)}
+  0%{transform:rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1)}
+  12%{transform:rotateX(25deg) rotateY(95deg) rotateZ(-18deg) scale(.96)}
+  25%{transform:rotateX(-40deg) rotateY(190deg) rotateZ(30deg) scale(1.04)}
+  38%{transform:rotateX(55deg) rotateY(300deg) rotateZ(-45deg) scale(.94)}
+  50%{transform:rotateX(-20deg) rotateY(410deg) rotateZ(15deg) scale(1.02)}
+  62%{transform:rotateX(38deg) rotateY(520deg) rotateZ(-30deg) scale(.97)}
+  75%{transform:rotateX(-55deg) rotateY(630deg) rotateZ(50deg) scale(1.05)}
+  88%{transform:rotateX(15deg) rotateY(700deg) rotateZ(-10deg) scale(.99)}
+  100%{transform:rotateX(0deg) rotateY(720deg) rotateZ(0deg) scale(1)}
 }
 
 @media(max-width:900px){
@@ -3553,10 +3563,17 @@ var lastEditAttempt=null; // {address,payload} of the most recent failed save, s
    otherwise; this at least tells people it's congestion, not broken. Returns
    a stop() to call once the request settles (success, failure, or network
    error), which cancels the timer either way so a fast request never shows
-   the slow-message/icon at all. */
+   the slow-message/icon at all.
+   The modal itself scrolls (long form, Save sits at the very bottom), so the
+   icon living near the top -- fixed after Tony flagged it was buried below
+   the fold -- goes invisible again the moment someone actually scrolls down
+   to click Save. scrollIntoView() here brings it into view the instant a
+   save starts, regardless of where in the form the click happened, same
+   pattern this file already uses to surface error messages. */
 function startAtlasWait(txtEl, iconWrap, iconImg){
   txtEl.textContent="Atlas is working on it...";
   showStatusIcon(iconWrap, iconImg, "atlas");
+  iconWrap.scrollIntoView({block:"nearest",behavior:"smooth"});
   var slowTimer=setTimeout(function(){
     txtEl.textContent="Atlas is busy helping a lot of travellers right now -- please be patient, this can take a little longer than usual.";
     showStatusIcon(iconWrap, iconImg, "sentinel");
