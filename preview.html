@@ -310,10 +310,27 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 .modalBtns .btn.primary{border-color:var(--gold);color:var(--gold)}
 #editSpin,#reportSpin{display:none;align-items:center;justify-content:center;gap:8px;
   font-size:10px;color:var(--text-faint);text-align:center;margin-top:6px;letter-spacing:.02em}
-.spinIcon{width:12px;height:12px;flex:0 0 auto;border-radius:50%;
-  border:2px solid rgba(0,229,255,.25);border-top-color:var(--cyan);
-  animation:atlasSpin .8s linear infinite}
-@keyframes atlasSpin{to{transform:rotate(360deg)}}
+/* Status icon shown above the Saving/error text -- which of the 6 PNGs and which
+   animation class is picked in JS (see statusIcon() / STATUS_ICONS). "Waiting" states
+   (still might succeed -- normal save, heavy traffic) get a calm pulse; "resolved
+   failure" states (conflict, offline, blocked, rate limit) get an erratic multi-axis
+   tumble instead, so the motion itself signals success-still-possible vs something's-
+   actually-wrong, not just the icon artwork. */
+.iconWrap{display:none;justify-content:center;margin-bottom:6px;perspective:300px}
+.iconWrap img{width:56px;height:56px;object-fit:contain}
+.iconWrap.pulse img{animation:iconPulse 1.6s ease-in-out infinite}
+.iconWrap.tumble img{animation:iconTumble 1.1s cubic-bezier(.36,.07,.19,.97) infinite}
+@keyframes iconPulse{
+  0%,100%{transform:scale(1);filter:drop-shadow(0 0 2px rgba(0,229,255,.3))}
+  50%{transform:scale(1.08);filter:drop-shadow(0 0 8px rgba(0,229,255,.6))}
+}
+@keyframes iconTumble{
+  0%{transform:rotate3d(1,0,0,0deg) rotate3d(0,1,0,0deg) rotate3d(0,0,1,0deg)}
+  25%{transform:rotate3d(1,.4,.2,160deg) rotate3d(0,0,1,40deg)}
+  50%{transform:rotate3d(.3,1,.5,300deg) rotate3d(0,0,1,-30deg)}
+  75%{transform:rotate3d(.6,.2,1,220deg) rotate3d(0,0,1,60deg)}
+  100%{transform:rotate3d(1,0,0,360deg) rotate3d(0,1,0,360deg) rotate3d(0,0,1,360deg)}
+}
 
 @media(max-width:900px){
   #panel{width:auto;left:10px;right:10px;top:auto;bottom:10px;max-height:44vh}
@@ -664,7 +681,8 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
       </div>
       <div id="bodyEditList"></div>
     </div>
-    <div id="editSpin"><span class="spinIcon"></span><span id="editSpinTxt">Atlas is working on it...</span></div>
+    <div class="iconWrap" id="editIconWrap"><img id="editIconImg" src="" alt=""></div>
+    <div id="editSpin"><span id="editSpinTxt">Atlas is working on it...</span></div>
     <div class="modalBtns">
       <button class="btn primary" id="edSubmit">Save</button>
       <button class="btn" id="edCancel">Cancel</button>
@@ -679,7 +697,8 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     <div class="mfld"><div class="lb">What's wrong?</div>
       <textarea id="repReason" maxlength="200" placeholder="e.g. Name field has an offensive word"></textarea>
     </div>
-    <div id="reportSpin"><span class="spinIcon"></span><span id="reportSpinTxt">Atlas is working on it...</span></div>
+    <div class="iconWrap" id="reportIconWrap"><img id="reportIconImg" src="" alt=""></div>
+    <div id="reportSpin"><span id="reportSpinTxt">Atlas is working on it...</span></div>
     <div class="modalBtns">
       <button class="btn primary" id="repSubmit">Send report</button>
       <button class="btn" id="repCancel">Cancel</button>
@@ -3116,6 +3135,7 @@ function openEditModal(){
   renderBodyEditList();
   document.getElementById("editErr").style.display="none";
   document.getElementById("edRetry").style.display="none";
+  hideStatusIcon(document.getElementById("editIconWrap"));
   lastEditAttempt=null;
   closeAllModalBoxes();
   document.getElementById("editModal").style.display="";
@@ -3258,6 +3278,7 @@ document.getElementById("bReport").addEventListener("click",function(){
   if(!selected) return;
   document.getElementById("reportErr").style.display="none";
   document.getElementById("repRetry").style.display="none";
+  hideStatusIcon(document.getElementById("reportIconWrap"));
   lastReportAttempt=null;
   document.getElementById("repReason").value="";
   closeAllModalBoxes();
@@ -3469,49 +3490,87 @@ applyA11y();
        the exact same payload would only fail again identically, so no
        Retry button for these; the existing Save/Send button already covers
        "edit the flagged text and try again" once the visitor fixes it. */
+/* The 6 status icons (real game imagery, sourced same as every other icon
+   already in icons-web/) and which animation each uses -- "waiting" states
+   (still might succeed) get a calm pulse; "resolved failure" states get an
+   erratic multi-axis tumble, so the MOTION itself signals "still working, be
+   patient" vs "something's actually wrong" independent of the artwork. */
+var STATUS_ICONS={
+  atlas:   {src:"icons-web/status-atlas.png",     cls:"pulse"},  // normal save, in flight
+  sentinel:{src:"icons-web/status-sentinel.png",  cls:"pulse"},  // still in flight, heavy traffic
+  grave:   {src:"icons-web/status-grave.png",     cls:"tumble"}, // no connection / server unreachable
+  pass3:   {src:"icons-web/status-atlaspass.png", cls:"tumble"}, // someone else saved first (conflict)
+  corrupt: {src:"icons-web/status-corrupt.png",   cls:"tumble"}, // blocked text
+  ship:    {src:"icons-web/status-ship.png",      cls:"tumble"}  // rate limit hit
+};
+function showStatusIcon(wrap,img,key){
+  var d=STATUS_ICONS[key];
+  if(!d){ wrap.style.display="none"; return; }
+  img.src=d.src;
+  wrap.className="iconWrap "+d.cls;
+  wrap.style.display="flex";
+}
+function hideStatusIcon(wrap){ wrap.style.display="none"; wrap.className="iconWrap"; }
+/* Turns a failed save's raw status/body into a plain-English reason, which
+   status icon to show, and whether a Retry button makes sense. Three real
+   failure shapes exist here:
+     - a genuine conflict (someone else saved this same system a moment
+       earlier -- GitHub's Contents API rejects the write with a 409 because
+       the file changed under us) -- nothing was lost on either side, just
+       retry and it re-reads the latest file first;
+     - a transient problem reaching GitHub or no network at all -- also
+       just a Retry;
+     - content-filter rejection or the per-hour submission limit -- retrying
+       the exact same payload would only fail again identically, so no
+       Retry button for these; the existing Save/Send button already covers
+       "edit the flagged text and try again" once the visitor fixes it. */
 function describeSaveError(status, body, isReport){
   var err=(body && body.error) || "Could not save";
   var verb=isReport?"report":"edit", saveWord=isReport?"Send report":"Save";
   if(status===429){
-    return { message: err, retryable:false };
+    return { message: err, retryable:false, icon:"ship" };
   }
   if(status===422){
     var extra=(body && body.details && body.details.length)?"\n"+body.details.join("\n"):"";
-    return { message:"This "+verb+" was blocked: "+err+extra+"\n\nFix the flagged text above and click "+saveWord+" again.", retryable:false };
+    return { message:"This "+verb+" was blocked: "+err+extra+"\n\nFix the flagged text above and click "+saveWord+" again.", retryable:false, icon:"corrupt" };
   }
   if(status===502 && /write failed:\s*409/i.test(err)){
-    return { message:"Someone else saved a change to this system at almost the same moment, so this "+verb+" didn't go through. Nothing was lost on their end -- click Retry to save yours now.", retryable:true };
+    return { message:"Someone else saved a change to this system at almost the same moment, so this "+verb+" didn't go through. Nothing was lost on their end -- click Retry to save yours now.", retryable:true, icon:"pass3" };
   }
   if(status===502){
-    return { message:"Couldn't reach the shared data store just now (GitHub may be briefly unavailable or busy). Your "+verb+" was NOT saved -- click Retry.", retryable:true };
+    return { message:"Couldn't reach the shared data store just now (GitHub may be briefly unavailable or busy). Your "+verb+" was NOT saved -- click Retry.", retryable:true, icon:"grave" };
   }
   if(status===500){
-    return { message:"The shared-edit system isn't fully set up on the server yet. Retrying won't fix this -- flag it to elegra1965.", retryable:false };
+    return { message:"The shared-edit system isn't fully set up on the server yet. Retrying won't fix this -- flag it to elegra1965.", retryable:false, icon:"grave" };
   }
-  return { message: err, retryable:false };
+  return { message: err, retryable:false, icon:"grave" };
 }
 var lastEditAttempt=null; // {address,payload} of the most recent failed save, so Retry resubmits exactly what failed without re-reading the form
-/* Shows the themed "Atlas is working on it" line while a save/report is in
-   flight, and -- if it's still going after 5s -- swaps to a "heavy traffic,
-   please be patient" message. A slow GitHub/Netlify response under real
-   load looks identical to a stuck request otherwise; this at least tells
-   people it's congestion, not broken. Returns a stop() to call once the
-   request settles (success, failure, or network error), which cancels the
-   timer either way so a fast request never shows the slow-message at all. */
-function startAtlasWait(txtEl){
+/* Shows the Atlas icon (pulsing) and "Atlas is working on it" line while a
+   save/report is in flight, and -- if it's still going after 5s -- swaps to
+   the Sentinel icon and a "heavy traffic, please be patient" message. A slow
+   GitHub/Netlify response under real load looks identical to a stuck request
+   otherwise; this at least tells people it's congestion, not broken. Returns
+   a stop() to call once the request settles (success, failure, or network
+   error), which cancels the timer either way so a fast request never shows
+   the slow-message/icon at all. */
+function startAtlasWait(txtEl, iconWrap, iconImg){
   txtEl.textContent="Atlas is working on it...";
+  showStatusIcon(iconWrap, iconImg, "atlas");
   var slowTimer=setTimeout(function(){
     txtEl.textContent="Atlas is busy helping a lot of travellers right now -- please be patient, this can take a little longer than usual.";
+    showStatusIcon(iconWrap, iconImg, "sentinel");
   }, 5000);
   return function stop(){ clearTimeout(slowTimer); };
 }
 function submitEditPayload(address, payload){
   var errEl=document.getElementById("editErr"), retryBtn=document.getElementById("edRetry");
   var spin=document.getElementById("editSpin"), spinTxt=document.getElementById("editSpinTxt"), btn=document.getElementById("edSubmit");
+  var iconWrap=document.getElementById("editIconWrap"), iconImg=document.getElementById("editIconImg");
   lastEditAttempt={address:address,payload:payload};
   retryBtn.style.display="none";
   spin.style.display="flex"; btn.disabled=true;
-  var stopWait=startAtlasWait(spinTxt);
+  var stopWait=startAtlasWait(spinTxt, iconWrap, iconImg);
   fetch(FUNC_URL,{method:"POST",headers:{"Content-Type":"application/json"},
     body:JSON.stringify({action:"edit",address:address,payload:payload})
   }).then(function(r){ return r.json().then(function(j){ return {status:r.status,body:j}; }); })
@@ -3519,13 +3578,16 @@ function submitEditPayload(address, payload){
     stopWait(); spin.style.display="none"; btn.disabled=false;
     if(!res.body.ok){
       var d=describeSaveError(res.status,res.body,false);
+      showStatusIcon(iconWrap,iconImg,d.icon);
       errEl.textContent=d.message; errEl.style.display="block"; errEl.scrollIntoView({block:"nearest"});
       retryBtn.style.display=d.retryable?"inline-block":"none";
       return;
     }
+    hideStatusIcon(iconWrap);
     closeModal(); toast("System saved -- visible to everyone"); loadOverrides();
   }).catch(function(){
     stopWait(); spin.style.display="none"; btn.disabled=false;
+    showStatusIcon(iconWrap,iconImg,"grave");
     errEl.textContent="Couldn't reach the server -- check your connection. Your edit was NOT saved.";
     errEl.style.display="block"; errEl.scrollIntoView({block:"nearest"});
     retryBtn.style.display="inline-block";
@@ -3585,10 +3647,11 @@ var lastReportAttempt=null; // {address,reason} of the most recent failed report
 function submitReportPayload(address, reason){
   var errEl=document.getElementById("reportErr"), retryBtn=document.getElementById("repRetry");
   var spin=document.getElementById("reportSpin"), spinTxt=document.getElementById("reportSpinTxt"), btn=document.getElementById("repSubmit");
+  var iconWrap=document.getElementById("reportIconWrap"), iconImg=document.getElementById("reportIconImg");
   lastReportAttempt={address:address,reason:reason};
   retryBtn.style.display="none";
   spin.style.display="flex"; btn.disabled=true;
-  var stopWait=startAtlasWait(spinTxt);
+  var stopWait=startAtlasWait(spinTxt, iconWrap, iconImg);
   fetch(FUNC_URL,{method:"POST",headers:{"Content-Type":"application/json"},
     body:JSON.stringify({action:"report",address:address,payload:{reason:reason}})
   }).then(function(r){ return r.json().then(function(j){ return {status:r.status,body:j}; }); })
@@ -3596,13 +3659,16 @@ function submitReportPayload(address, reason){
     stopWait(); spin.style.display="none"; btn.disabled=false;
     if(!res.body.ok){
       var d=describeSaveError(res.status,res.body,true);
+      showStatusIcon(iconWrap,iconImg,d.icon);
       errEl.textContent=d.message; errEl.style.display="block"; errEl.scrollIntoView({block:"nearest"});
       retryBtn.style.display=d.retryable?"inline-block":"none";
       return;
     }
+    hideStatusIcon(iconWrap);
     closeModal(); toast("Report sent -- thanks");
   }).catch(function(){
     stopWait(); spin.style.display="none"; btn.disabled=false;
+    showStatusIcon(iconWrap,iconImg,"grave");
     errEl.textContent="Couldn't reach the server -- check your connection. Your report was NOT sent.";
     errEl.style.display="block"; errEl.scrollIntoView({block:"nearest"});
     retryBtn.style.display="inline-block";
