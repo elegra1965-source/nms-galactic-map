@@ -23,6 +23,30 @@
         every past version is a git commit he can look at or roll
         back on github.com without any extra tooling.
 
+   Public GET caching (added for traffic-wave resilience):
+     Every visitor's page load calls GET once to merge live community
+     edits over the procedural map (loadOverrides() in preview.html).
+     Uncached, that's one live GitHub Contents-API read per visitor
+     against the token's shared 5,000-req/hour limit. GET now keeps a
+     30s in-memory copy (_getCache) and sets Cache-Control so a burst
+     of visitors in the same window shares one GitHub read, and serves
+     that last-known-good copy instead of failing outright if GitHub
+     is briefly rate-limited/unreachable. The cache is cleared the
+     moment a save succeeds, so the saving visitor's own immediate
+     reload sees their edit, not a stale pre-save copy. The admin
+     view (?token=<ADMIN_TOKEN>, reports list) always bypasses the
+     cache and reads live -- Tony should never see a stale reports queue.
+
+   Save-failure handling (client side, preview.html):
+     A 409 buried in a GitHub write-failure message means someone
+     else's save landed on the same system a moment earlier (their
+     edit succeeded, this one didn't -- nothing lost, just retry).
+     Any other 502/network failure is also retryable. A 422 (content
+     filter) or 429 (rate limit) is not -- retrying the same payload
+     would just fail again identically, so the client shows the
+     specific reason instead of a Retry button for those. See
+     describeSaveError() in preview.html.
+
    Requires one Netlify environment variable:
      GITHUB_TOKEN   -- a fine-grained PAT scoped to Contents:read/write
                        on ONLY the nms-galactic-map repo. Set in
@@ -40,16 +64,33 @@ const DATA_PATH     = "data/overrides.json";
 const MAX_EDITS_PER_IP_PER_HOUR = 8;
 const MAX_REPORTS_PER_IP_PER_HOUR = 15;
 
-function json(status, body){
-  return new Response(JSON.stringify(body), {
-    status: status,
-    headers: {
-      "Content-Type": "application/json",
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type"
-    }
-  });
+// How long a successful public GET response is reused before reading GitHub
+// again. Every visitor's page load hits GET once (see loadOverrides() in
+// preview.html) with no caching in front of it previously -- under a real
+// traffic wave that's one live GitHub Contents-API call per visitor against
+// the token's shared 5,000-requests/hour limit. This cache means a burst of
+// visitors landing in the same 30s window shares one GitHub read instead of
+// one each. It lives in plain module-scope memory, so it only helps within
+// a single warm function instance (Netlify reuses a warm instance across
+// back-to-back requests, but a big simultaneous spike still spins up more
+// than one instance in parallel) -- it's a real, meaningful reduction, not
+// a guaranteed shared cache across every instance. The Cache-Control header
+// below is the other half: it lets browsers (and Netlify's CDN, on plans
+// that honour it for Function responses) skip the network call entirely
+// for repeat loads inside the window, on top of whatever this in-memory
+// cache saves at the origin.
+const GET_CACHE_TTL_MS = 30 * 1000;
+let _getCache = { data: null, fetchedAt: 0 };
+
+function json(status, body, extraHeaders){
+  var headers = {
+    "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type"
+  };
+  if(extraHeaders){ for(var k in extraHeaders) headers[k] = extraHeaders[k]; }
+  return new Response(JSON.stringify(body), { status: status, headers: headers });
 }
 
 function isValidAddress(addr){
@@ -119,10 +160,33 @@ function pruneIpLog(ipLog, now){
 }
 
 async function handleGet(req, token){
+  // Tony-only view: append ?token=<ADMIN_TOKEN> (set as a Netlify env var,
+  // separate from GITHUB_TOKEN) to also see the flagged/reports list, so he
+  // can periodically skim it without digging through raw JSON on GitHub.
+  // This path always reads live and is never cached or served from cache --
+  // Tony reviewing reports should never see a stale or public-only copy.
+  var url = new URL(req.url);
+  var suppliedAdminToken = url.searchParams.get("token");
+  var adminToken = process.env.ADMIN_TOKEN;
+  var isAdmin = !!(adminToken && suppliedAdminToken && suppliedAdminToken === adminToken);
+
+  var now = Date.now();
+  var cacheHeaders = { "Cache-Control": "public, max-age=30, s-maxage=30" };
+
+  if(!isAdmin && _getCache.data && (now - _getCache.fetchedAt) < GET_CACHE_TTL_MS){
+    return json(200, _getCache.data, cacheHeaders);
+  }
+
   var current;
   try {
     current = await githubGetFile(token);
   } catch(e){
+    // GitHub briefly unreachable or rate-limited: if we have a last-known-good
+    // copy, serve that instead of nothing -- keeps the community-edit layer
+    // alive through a transient GitHub problem instead of every visitor's map
+    // silently losing shared edits for the duration (loadOverrides() in
+    // preview.html treats a failed GET as "no shared edits", not an error).
+    if(!isAdmin && _getCache.data) return json(200, _getCache.data, cacheHeaders);
     return json(502, {ok:false, error:"Could not read shared data store: "+e.message});
   }
 
@@ -136,17 +200,13 @@ async function handleGet(req, token){
 
   var out = { ok:true, systems: publicSystems };
 
-  // Tony-only view: append ?token=<ADMIN_TOKEN> (set as a Netlify env var,
-  // separate from GITHUB_TOKEN) to also see the flagged/reports list, so he
-  // can periodically skim it without digging through raw JSON on GitHub.
-  var url = new URL(req.url);
-  var suppliedAdminToken = url.searchParams.get("token");
-  var adminToken = process.env.ADMIN_TOKEN;
-  if(adminToken && suppliedAdminToken && suppliedAdminToken === adminToken){
+  if(isAdmin){
     out.reports = current.data.reports;
+    return json(200, out); // admin view: always live, never cached/served-from-cache
   }
 
-  return json(200, out);
+  _getCache = { data: out, fetchedAt: now };
+  return json(200, out, cacheHeaders);
 }
 
 export default async (req, context) => {
@@ -219,8 +279,18 @@ export default async (req, context) => {
   try {
     await githubPutFile(token, current.data, current.sha, commitMessage);
   } catch(e){
+    // Surfaces to the client as a 502; if GitHub's message contains "409" this
+    // is a genuine conflict (someone else's save landed first and changed the
+    // file's sha) -- preview.html's describeSaveError() detects that string
+    // and tells the visitor their edit was NOT lost, just needs a retry.
     return json(502, {ok:false, error:"Could not save to shared data store: "+e.message});
   }
+
+  // Invalidate the GET cache immediately so the visitor who just saved (their
+  // own client calls loadOverrides() right after this resolves) sees their
+  // own edit reflected straight away, instead of possibly getting served a
+  // pre-save cached copy for up to GET_CACHE_TTL_MS on this same warm instance.
+  _getCache = { data: null, fetchedAt: 0 };
 
   return json(200, {ok:true, address: address, action: action});
 };

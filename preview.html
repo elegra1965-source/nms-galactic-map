@@ -306,7 +306,12 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 .modalBtns{display:flex;gap:6px;margin-top:12px}
 .modalBtns .btn{flex:1;text-align:center}
 .modalBtns .btn.primary{border-color:var(--gold);color:var(--gold)}
-#editSpin{display:none;font-size:10px;color:var(--text-faint);text-align:center;margin-top:6px}
+#editSpin,#reportSpin{display:none;align-items:center;justify-content:center;gap:8px;
+  font-size:10px;color:var(--text-faint);text-align:center;margin-top:6px;letter-spacing:.02em}
+.spinIcon{width:12px;height:12px;flex:0 0 auto;border-radius:50%;
+  border:2px solid rgba(0,229,255,.25);border-top-color:var(--cyan);
+  animation:atlasSpin .8s linear infinite}
+@keyframes atlasSpin{to{transform:rotate(360deg)}}
 
 @media(max-width:900px){
   #panel{width:auto;left:10px;right:10px;top:auto;bottom:10px;max-height:44vh}
@@ -609,6 +614,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     <h3>Edit system</h3>
     <div class="msub">Enter your real in-game data. This replaces the generated placeholder for everyone who visits this address, including you if you reload -- there's no undo button on the site itself, but every save is a git commit elegra1965 can revert on GitHub.</div>
     <div class="merr" id="editErr"></div>
+    <button class="btn" id="edRetry" type="button" style="display:none;margin:-4px 0 10px">Retry save</button>
     <div class="mfld"><div class="lb">System name</div><input type="text" id="edName" maxlength="40"></div>
     <div class="mfld"><div class="lb">Region name</div><input type="text" id="edRegion" maxlength="40"></div>
     <div class="mfld">
@@ -655,7 +661,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
       </div>
       <div id="bodyEditList"></div>
     </div>
-    <div id="editSpin">Saving...</div>
+    <div id="editSpin"><span class="spinIcon"></span><span id="editSpinTxt">Atlas is working on it...</span></div>
     <div class="modalBtns">
       <button class="btn primary" id="edSubmit">Save</button>
       <button class="btn" id="edCancel">Cancel</button>
@@ -666,10 +672,11 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     <h3>Report this system</h3>
     <div class="msub">Flags this system's current data for review.</div>
     <div class="merr" id="reportErr"></div>
+    <button class="btn" id="repRetry" type="button" style="display:none;margin:-4px 0 10px">Retry send</button>
     <div class="mfld"><div class="lb">What's wrong?</div>
       <textarea id="repReason" maxlength="200" placeholder="e.g. Name field has an offensive word"></textarea>
     </div>
-    <div id="reportSpin" style="display:none;font-size:10px;color:var(--text-faint);text-align:center;margin-top:6px">Sending...</div>
+    <div id="reportSpin"><span class="spinIcon"></span><span id="reportSpinTxt">Atlas is working on it...</span></div>
     <div class="modalBtns">
       <button class="btn primary" id="repSubmit">Send report</button>
       <button class="btn" id="repCancel">Cancel</button>
@@ -3071,6 +3078,8 @@ function openEditModal(){
   }
   renderBodyEditList();
   document.getElementById("editErr").style.display="none";
+  document.getElementById("edRetry").style.display="none";
+  lastEditAttempt=null;
   closeAllModalBoxes();
   document.getElementById("editModal").style.display="";
   document.getElementById("modalWrap").classList.add("show");
@@ -3211,6 +3220,8 @@ document.getElementById("bEdit").addEventListener("click",function(){ if(selecte
 document.getElementById("bReport").addEventListener("click",function(){
   if(!selected) return;
   document.getElementById("reportErr").style.display="none";
+  document.getElementById("repRetry").style.display="none";
+  lastReportAttempt=null;
   document.getElementById("repReason").value="";
   closeAllModalBoxes();
   document.getElementById("reportModal").style.display="";
@@ -3409,12 +3420,90 @@ applyA11y();
   });
 })();
 
+/* Turns a failed save's raw status/body into a plain-English reason PLUS
+   whether a Retry button makes sense. Three real failure shapes exist here:
+     - a genuine conflict (someone else saved this same system a moment
+       earlier -- GitHub's Contents API rejects the write with a 409 because
+       the file changed under us) -- nothing was lost on either side, just
+       retry and it re-reads the latest file first;
+     - a transient problem reaching GitHub or no network at all -- also
+       just a Retry;
+     - content-filter rejection or the per-hour submission limit -- retrying
+       the exact same payload would only fail again identically, so no
+       Retry button for these; the existing Save/Send button already covers
+       "edit the flagged text and try again" once the visitor fixes it. */
+function describeSaveError(status, body, isReport){
+  var err=(body && body.error) || "Could not save";
+  var verb=isReport?"report":"edit", saveWord=isReport?"Send report":"Save";
+  if(status===429){
+    return { message: err, retryable:false };
+  }
+  if(status===422){
+    var extra=(body && body.details && body.details.length)?"\n"+body.details.join("\n"):"";
+    return { message:"This "+verb+" was blocked: "+err+extra+"\n\nFix the flagged text above and click "+saveWord+" again.", retryable:false };
+  }
+  if(status===502 && /write failed:\s*409/i.test(err)){
+    return { message:"Someone else saved a change to this system at almost the same moment, so this "+verb+" didn't go through. Nothing was lost on their end -- click Retry to save yours now.", retryable:true };
+  }
+  if(status===502){
+    return { message:"Couldn't reach the shared data store just now (GitHub may be briefly unavailable or busy). Your "+verb+" was NOT saved -- click Retry.", retryable:true };
+  }
+  if(status===500){
+    return { message:"The shared-edit system isn't fully set up on the server yet. Retrying won't fix this -- flag it to elegra1965.", retryable:false };
+  }
+  return { message: err, retryable:false };
+}
+var lastEditAttempt=null; // {address,payload} of the most recent failed save, so Retry resubmits exactly what failed without re-reading the form
+/* Shows the themed "Atlas is working on it" line while a save/report is in
+   flight, and -- if it's still going after 5s -- swaps to a "heavy traffic,
+   please be patient" message. A slow GitHub/Netlify response under real
+   load looks identical to a stuck request otherwise; this at least tells
+   people it's congestion, not broken. Returns a stop() to call once the
+   request settles (success, failure, or network error), which cancels the
+   timer either way so a fast request never shows the slow-message at all. */
+function startAtlasWait(txtEl){
+  txtEl.textContent="Atlas is working on it...";
+  var slowTimer=setTimeout(function(){
+    txtEl.textContent="Atlas is busy helping a lot of travellers right now -- please be patient, this can take a little longer than usual.";
+  }, 5000);
+  return function stop(){ clearTimeout(slowTimer); };
+}
+function submitEditPayload(address, payload){
+  var errEl=document.getElementById("editErr"), retryBtn=document.getElementById("edRetry");
+  var spin=document.getElementById("editSpin"), spinTxt=document.getElementById("editSpinTxt"), btn=document.getElementById("edSubmit");
+  lastEditAttempt={address:address,payload:payload};
+  retryBtn.style.display="none";
+  spin.style.display="flex"; btn.disabled=true;
+  var stopWait=startAtlasWait(spinTxt);
+  fetch(FUNC_URL,{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({action:"edit",address:address,payload:payload})
+  }).then(function(r){ return r.json().then(function(j){ return {status:r.status,body:j}; }); })
+  .then(function(res){
+    stopWait(); spin.style.display="none"; btn.disabled=false;
+    if(!res.body.ok){
+      var d=describeSaveError(res.status,res.body,false);
+      errEl.textContent=d.message; errEl.style.display="block"; errEl.scrollIntoView({block:"nearest"});
+      retryBtn.style.display=d.retryable?"inline-block":"none";
+      return;
+    }
+    closeModal(); toast("System saved -- visible to everyone"); loadOverrides();
+  }).catch(function(){
+    stopWait(); spin.style.display="none"; btn.disabled=false;
+    errEl.textContent="Couldn't reach the server -- check your connection. Your edit was NOT saved.";
+    errEl.style.display="block"; errEl.scrollIntoView({block:"nearest"});
+    retryBtn.style.display="inline-block";
+  });
+}
+document.getElementById("edRetry").addEventListener("click",function(){
+  if(!lastEditAttempt) return;
+  submitEditPayload(lastEditAttempt.address, lastEditAttempt.payload);
+});
 document.getElementById("edSubmit").addEventListener("click",function(){
   if(!selected) return;
   var err=clientPrecheck();
-  var errEl=document.getElementById("editErr");
-  if(err){ errEl.textContent=err; errEl.style.display="block"; errEl.scrollIntoView({block:"nearest"}); return; }
-  errEl.style.display="none";
+  var errEl=document.getElementById("editErr"), retryBtn=document.getElementById("edRetry");
+  if(err){ errEl.textContent=err; errEl.style.display="block"; retryBtn.style.display="none"; errEl.scrollIntoView({block:"nearest"}); return; }
+  errEl.style.display="none"; retryBtn.style.display="none";
   // Orbits is stored per-row as a stable uid while editing (survives
   // add/remove reordering); resolve every uid to its final SAVED array
   // position right before building the payload, since that's the only
@@ -3453,44 +3542,46 @@ document.getElementById("edSubmit").addEventListener("click",function(){
       };
     })
   };
-  var spin=document.getElementById("editSpin"), btn=document.getElementById("edSubmit");
-  spin.style.display="block"; btn.disabled=true;
+  submitEditPayload(selected.address, payload);
+});
+var lastReportAttempt=null; // {address,reason} of the most recent failed report, so Retry resubmits without retyping
+function submitReportPayload(address, reason){
+  var errEl=document.getElementById("reportErr"), retryBtn=document.getElementById("repRetry");
+  var spin=document.getElementById("reportSpin"), spinTxt=document.getElementById("reportSpinTxt"), btn=document.getElementById("repSubmit");
+  lastReportAttempt={address:address,reason:reason};
+  retryBtn.style.display="none";
+  spin.style.display="flex"; btn.disabled=true;
+  var stopWait=startAtlasWait(spinTxt);
   fetch(FUNC_URL,{method:"POST",headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({action:"edit",address:selected.address,payload:payload})
+    body:JSON.stringify({action:"report",address:address,payload:{reason:reason}})
   }).then(function(r){ return r.json().then(function(j){ return {status:r.status,body:j}; }); })
   .then(function(res){
-    spin.style.display="none"; btn.disabled=false;
+    stopWait(); spin.style.display="none"; btn.disabled=false;
     if(!res.body.ok){
-      errEl.textContent=(res.body.error||"Could not save")+(res.body.details?"\n"+res.body.details.join("\n"):"");
-      errEl.style.display="block"; errEl.scrollIntoView({block:"nearest"});
+      var d=describeSaveError(res.status,res.body,true);
+      errEl.textContent=d.message; errEl.style.display="block"; errEl.scrollIntoView({block:"nearest"});
+      retryBtn.style.display=d.retryable?"inline-block":"none";
       return;
     }
-    closeModal(); toast("System saved -- visible to everyone"); loadOverrides();
+    closeModal(); toast("Report sent -- thanks");
   }).catch(function(){
-    spin.style.display="none"; btn.disabled=false;
-    errEl.textContent="Could not reach the server. The shared-edit backend may not be set up yet (see elegra1965's setup notes).";
+    stopWait(); spin.style.display="none"; btn.disabled=false;
+    errEl.textContent="Couldn't reach the server -- check your connection. Your report was NOT sent.";
     errEl.style.display="block"; errEl.scrollIntoView({block:"nearest"});
+    retryBtn.style.display="inline-block";
   });
+}
+document.getElementById("repRetry").addEventListener("click",function(){
+  if(!lastReportAttempt) return;
+  submitReportPayload(lastReportAttempt.address, lastReportAttempt.reason);
 });
 document.getElementById("repSubmit").addEventListener("click",function(){
   if(!selected) return;
   var reason=document.getElementById("repReason").value.trim();
-  var errEl=document.getElementById("reportErr");
-  if(!reason){ errEl.textContent="Please describe what's wrong."; errEl.style.display="block"; errEl.scrollIntoView({block:"nearest"}); return; }
-  errEl.style.display="none";
-  var spin=document.getElementById("reportSpin"), btn=document.getElementById("repSubmit");
-  spin.style.display="block"; btn.disabled=true;
-  fetch(FUNC_URL,{method:"POST",headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({action:"report",address:selected.address,payload:{reason:reason}})
-  }).then(function(r){ return r.json().then(function(j){ return {status:r.status,body:j}; }); })
-  .then(function(res){
-    spin.style.display="none"; btn.disabled=false;
-    if(!res.body.ok){ errEl.textContent=res.body.error||"Could not send report"; errEl.style.display="block"; errEl.scrollIntoView({block:"nearest"}); return; }
-    closeModal(); toast("Report sent -- thanks");
-  }).catch(function(){
-    spin.style.display="none"; btn.disabled=false;
-    errEl.textContent="Could not reach the server."; errEl.style.display="block"; errEl.scrollIntoView({block:"nearest"});
-  });
+  var errEl=document.getElementById("reportErr"), retryBtn=document.getElementById("repRetry");
+  if(!reason){ errEl.textContent="Please describe what's wrong."; errEl.style.display="block"; retryBtn.style.display="none"; errEl.scrollIntoView({block:"nearest"}); return; }
+  errEl.style.display="none"; retryBtn.style.display="none";
+  submitReportPayload(selected.address, reason);
 });
 
 /* ============ install as app ============ */
