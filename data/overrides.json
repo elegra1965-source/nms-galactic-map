@@ -110,6 +110,41 @@
       },
       "editedAt": "2026-08-09T05:52:59.338Z",
       "editedByIp": "185.45.15.46"
+    },
+    "1251AF814039": {
+      "data": {
+        "name": "Oklo-I",
+        "race": "Uninhabited",
+        "econName": "",
+        "conflict": "Tranquil",
+        "notes": "",
+        "bodies": [
+          {
+            "name": "Vysup-II",
+            "moon": false,
+            "parent": 0,
+            "biome": "Barren",
+            "water": true,
+            "resources": [
+              "Silver",
+              "Salt"
+            ]
+          },
+          {
+            "name": "Hura-XV",
+            "moon": false,
+            "parent": 0,
+            "biome": "Scorched",
+            "water": false,
+            "resources": [
+              "Salt",
+              "Cobalt"
+            ]
+          }
+        ]
+      },
+      "editedAt": "2026-08-09T06:03:43.880Z",
+      "editedByIp": "185.45.15.46"
     }
   },
   "reports": [],
@@ -118,7 +153,8 @@
       1786254495645,
       1786254503905,
       1786254759204,
-      1786254779338
+      1786254779338,
+      1786255423880
     ]
   }
 }
