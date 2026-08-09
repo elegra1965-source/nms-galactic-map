@@ -66,12 +66,56 @@
       },
       "editedAt": "2026-08-06T21:41:08.629Z",
       "editedByIp": "5.133.46.24"
+    },
+    "11E4E9732CC9": {
+      "data": {
+        "name": "Ritaketh",
+        "race": "Vy'keen",
+        "econName": "Trading",
+        "conflict": "Perilous",
+        "notes": "",
+        "bodies": [
+          {
+            "name": "Suyak-XI",
+            "moon": false,
+            "parent": 0,
+            "biome": "Lush",
+            "water": true,
+            "resources": [
+              "Silver"
+            ]
+          },
+          {
+            "name": "Neyakar",
+            "moon": false,
+            "parent": 0,
+            "biome": "Lush",
+            "water": true,
+            "resources": [
+              "Sodium"
+            ]
+          },
+          {
+            "name": "Newexeth",
+            "moon": false,
+            "parent": 0,
+            "biome": "Irradiated",
+            "water": false,
+            "resources": [
+              "Salt",
+              "Silver"
+            ]
+          }
+        ]
+      },
+      "editedAt": "2026-08-09T05:48:15.645Z",
+      "editedByIp": "185.45.15.46"
     }
   },
   "reports": [],
   "ipLog": {
-    "5.133.46.24": [
-      1786052468629
+    "185.45.15.46": [
+      1786254495645
     ]
   }
 }
