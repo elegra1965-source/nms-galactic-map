@@ -635,6 +635,8 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     <div class="mnotice" id="editPrevNotice"></div>
     <div class="merr" id="editErr"></div>
     <button class="btn" id="edRetry" type="button" style="display:none;margin:-4px 0 10px">Retry save</button>
+    <div class="iconWrap" id="editIconWrap"><img id="editIconImg" src="" alt=""></div>
+    <div id="editSpin"><span id="editSpinTxt">Atlas is working on it...</span></div>
     <div class="mfld"><div class="lb">System name</div><input type="text" id="edName" maxlength="40"></div>
     <div class="mfld"><div class="lb">Region name</div><input type="text" id="edRegion" maxlength="40"></div>
     <div class="mfld">
@@ -681,8 +683,6 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
       </div>
       <div id="bodyEditList"></div>
     </div>
-    <div class="iconWrap" id="editIconWrap"><img id="editIconImg" src="" alt=""></div>
-    <div id="editSpin"><span id="editSpinTxt">Atlas is working on it...</span></div>
     <div class="modalBtns">
       <button class="btn primary" id="edSubmit">Save</button>
       <button class="btn" id="edCancel">Cancel</button>
@@ -694,11 +694,11 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     <div class="msub">Flags this system's current data for review.</div>
     <div class="merr" id="reportErr"></div>
     <button class="btn" id="repRetry" type="button" style="display:none;margin:-4px 0 10px">Retry send</button>
+    <div class="iconWrap" id="reportIconWrap"><img id="reportIconImg" src="" alt=""></div>
+    <div id="reportSpin"><span id="reportSpinTxt">Atlas is working on it...</span></div>
     <div class="mfld"><div class="lb">What's wrong?</div>
       <textarea id="repReason" maxlength="200" placeholder="e.g. Name field has an offensive word"></textarea>
     </div>
-    <div class="iconWrap" id="reportIconWrap"><img id="reportIconImg" src="" alt=""></div>
-    <div id="reportSpin"><span id="reportSpinTxt">Atlas is working on it...</span></div>
     <div class="modalBtns">
       <button class="btn primary" id="repSubmit">Send report</button>
       <button class="btn" id="repCancel">Cancel</button>
@@ -3601,8 +3601,20 @@ document.getElementById("edSubmit").addEventListener("click",function(){
   if(!selected) return;
   var err=clientPrecheck();
   var errEl=document.getElementById("editErr"), retryBtn=document.getElementById("edRetry");
-  if(err){ errEl.textContent=err; errEl.style.display="block"; retryBtn.style.display="none"; errEl.scrollIntoView({block:"nearest"}); return; }
+  var iconWrap=document.getElementById("editIconWrap"), iconImg=document.getElementById("editIconImg");
+  // clientPrecheck() catching this locally means the request never reaches
+  // submitEditPayload()/describeSaveError() at all -- without this, the
+  // blocked-content icon (Corrupt Sentinel) only ever showed for a SERVER-side
+  // rejection, never this much more common instant client-side one, so the
+  // error text appeared with no icon above it. Real bug, caught from Tony's
+  // own screenshot testing "rope" as a system name.
+  if(err){
+    errEl.textContent=err; errEl.style.display="block"; retryBtn.style.display="none";
+    showStatusIcon(iconWrap,iconImg,"corrupt");
+    errEl.scrollIntoView({block:"nearest"}); return;
+  }
   errEl.style.display="none"; retryBtn.style.display="none";
+  hideStatusIcon(iconWrap);
   // Orbits is stored per-row as a stable uid while editing (survives
   // add/remove reordering); resolve every uid to its final SAVED array
   // position right before building the payload, since that's the only
