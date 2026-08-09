@@ -294,9 +294,15 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
    left/flip motion below) and are all exactly 56px wide, the same as the
    icon -- guaranteeing this glow always sits in the same column as the
    drone and its beam, frame for frame, rather than three separately-timed
-   effects that could still drift apart. */
+   effects that could still drift apart.
+   The icon actually sits BELOW the error text in the modal (error box, then
+   Retry, then the icon), so the glow is brightest at the BOTTOM of this box
+   -- that's the edge nearest the drone -- fading toward the top, matching
+   where .driftBeam actually connects into it from underneath. (An earlier
+   version had this reversed, glowing at the top -- caught from Tony's
+   screenshot showing the beam pointing the wrong way entirely.) */
 .merr .errScan{position:absolute;top:0;left:0;width:56px;height:100%;pointer-events:none;opacity:0;
-  background:radial-gradient(ellipse at 50% 0%,rgba(255,138,138,.55),rgba(255,74,74,.18) 55%,transparent 75%)}
+  background:radial-gradient(ellipse at 50% 100%,rgba(255,138,138,.55),rgba(255,74,74,.18) 55%,transparent 75%)}
 .merr.scanning .errScan{opacity:1;animation:iconDrift 7s ease-in-out infinite;
   filter:drop-shadow(0 0 10px rgba(255,74,74,.5))}
 .mnotice{background:rgba(240,165,0,.06);border:1px solid rgba(240,165,0,.35);color:#f0c060;
@@ -343,16 +349,19 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 .iconWrap{display:none;margin-bottom:6px}
 .iconWrap.pulse{display:flex;justify-content:center}
 /* Drift wrap is block-level and full-width (same width as the .merr text box
-   right below it, both being plain children of the same modal column) so the
+   ABOVE it in the modal -- error box, then Retry, then this icon -- so the
    drone's translateX(0) -> translateX(100%-its own width) keyframe naturally
    spans "start of the error text" to "end of the error text" without needing
-   to measure the text in JS -- it just always matches whatever's below it.
-   margin-bottom is widened to 14px (from the pulse default's 6px) to leave
-   physical room for .driftBeam to actually connect the drone to the text
-   below rather than the two floating with a visible dead gap between them;
-   overflow is left visible (not hidden) so that beam isn't clipped where it
-   extends past this wrap's own 56px height into that gap. */
-.iconWrap.drift{display:block;position:relative;height:56px;margin-bottom:14px}
+   to measure the text in JS -- it just always matches whatever's above it.
+   margin-TOP (not bottom) is widened to 14px so there's physical room ABOVE
+   the icon for .driftBeam to actually reach up into the error text rather
+   than the two floating with a visible dead gap between them -- an earlier
+   version put this gap below the icon instead, which is why the beam was
+   shooting down into empty space next to "System name" rather than up
+   toward the text, per Tony's screenshot. overflow is left visible (not
+   hidden) so the beam isn't clipped where it extends past this wrap's own
+   56px box into that gap above it. */
+.iconWrap.drift{display:block;position:relative;height:56px;margin-top:14px}
 .iconWrap img{width:56px;height:56px;object-fit:contain}
 .iconWrap.pulse img{animation:iconPulse 1.6s ease-in-out infinite}
 .iconWrap.drift img{position:absolute;top:0;left:0;animation:iconDrift 7s ease-in-out infinite;
@@ -376,16 +385,21 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   100%{left:0;transform:scaleX(1)}
 }
 /* The physical connecting beam Tony's reference screenshot showed -- a
-   tapered cone (narrow at the drone's belly, wider at the text) shining
-   down from it into the gap below, sized to exactly fill that 14px margin
-   so it visually touches both the drone above and the error box below
-   rather than stopping short of either. Hidden entirely for "pulse" icons
-   (Grave/Atlas Pass v3), which don't fly and so have nothing to beam from. */
+   tapered cone shining UP from the drone into the error text above it,
+   narrow at the drone's body (bottom of this element) and widening out as
+   it reaches the text (top of this element), sized to reach past the 14px
+   gap and a few px into both the icon and the error box so it visibly
+   touches each end rather than stopping short. (Direction fixed from an
+   earlier version that shot the beam downward into empty space below the
+   icon instead -- this modal's real order is error text, then Retry, then
+   the icon, so "up" is the only direction that actually reaches the text.)
+   Hidden entirely for "pulse" icons (Grave/Atlas Pass v3), which don't fly
+   and so have nothing to beam from. */
 .driftBeam{display:none}
-.iconWrap.drift .driftBeam{display:block;position:absolute;top:40px;left:0;width:56px;height:30px;
+.iconWrap.drift .driftBeam{display:block;position:absolute;top:-16px;left:0;width:56px;height:24px;
   animation:iconDrift 7s ease-in-out infinite;pointer-events:none;z-index:1;
-  background:linear-gradient(180deg,rgba(0,229,255,.5),rgba(0,229,255,.15) 65%,transparent);
-  clip-path:polygon(40% 0%,60% 0%,92% 100%,8% 100%);
+  background:linear-gradient(0deg,rgba(0,229,255,.55),rgba(0,229,255,.15) 65%,transparent);
+  clip-path:polygon(8% 0%,92% 0%,60% 100%,40% 100%);
   filter:drop-shadow(0 0 5px rgba(0,229,255,.45))}
 
 @media(max-width:900px){
