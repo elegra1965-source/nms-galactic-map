@@ -268,19 +268,94 @@
       },
       "editedAt": "2026-08-09T06:35:37.226Z",
       "editedByIp": "185.45.15.46"
+    },
+    "1081D78F0C5E": {
+      "data": {
+        "name": "Yawex-I",
+        "race": "Gek",
+        "econName": "Mass Production",
+        "conflict": "Relaxed",
+        "notes": "",
+        "bodies": [
+          {
+            "name": "Kadun-IV",
+            "moon": false,
+            "parent": 0,
+            "biome": "Barren",
+            "water": false,
+            "resources": [
+              "Gold",
+              "Salt"
+            ]
+          },
+          {
+            "name": "Yacor-IX",
+            "moon": true,
+            "parent": 0,
+            "biome": "Lush",
+            "water": false,
+            "resources": [
+              "Magnetised Ferrite",
+              "Salt"
+            ]
+          },
+          {
+            "name": "Netakus",
+            "moon": false,
+            "parent": 0,
+            "biome": "Volcanic",
+            "water": true,
+            "resources": [
+              "Cobalt",
+              "Salt"
+            ]
+          },
+          {
+            "name": "Uxtak-XI",
+            "moon": false,
+            "parent": 0,
+            "biome": "Irradiated",
+            "water": false,
+            "resources": [
+              "Cobalt",
+              "Sodium"
+            ]
+          },
+          {
+            "name": "Mudel-XV",
+            "moon": false,
+            "parent": 0,
+            "biome": "Lush",
+            "water": false,
+            "resources": [
+              "Cobalt",
+              "Magnetised Ferrite"
+            ]
+          },
+          {
+            "name": "Okmor-IX",
+            "moon": false,
+            "parent": 0,
+            "biome": "Marsh",
+            "water": false,
+            "resources": [
+              "Cobalt"
+            ]
+          }
+        ]
+      },
+      "editedAt": "2026-08-09T07:00:54.228Z",
+      "editedByIp": "185.45.15.46"
     }
   },
   "reports": [],
   "ipLog": {
     "185.45.15.46": [
-      1786254495645,
-      1786254503905,
-      1786254759204,
-      1786254779338,
       1786255423880,
       1786255614314,
       1786256290527,
-      1786257337226
+      1786257337226,
+      1786258854228
     ]
   }
 }
