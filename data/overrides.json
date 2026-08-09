@@ -346,16 +346,81 @@
       },
       "editedAt": "2026-08-09T07:00:54.228Z",
       "editedByIp": "185.45.15.46"
+    },
+    "12111056F066": {
+      "data": {
+        "name": "Rigalum",
+        "race": "Uninhabited",
+        "econName": "",
+        "conflict": "Stable",
+        "notes": "",
+        "bodies": [
+          {
+            "name": "Igyakix",
+            "moon": false,
+            "parent": 0,
+            "biome": "Frozen",
+            "water": true,
+            "resources": [
+              "Salt"
+            ]
+          },
+          {
+            "name": "Tara-III",
+            "moon": true,
+            "parent": 0,
+            "biome": "Scorched",
+            "water": false,
+            "resources": [
+              "Silver",
+              "Salt"
+            ]
+          },
+          {
+            "name": "Qolo-IX",
+            "moon": false,
+            "parent": 0,
+            "biome": "Lush",
+            "water": true,
+            "resources": [
+              "Magnetised Ferrite",
+              "Cobalt"
+            ]
+          },
+          {
+            "name": "Muloeth",
+            "moon": false,
+            "parent": 0,
+            "biome": "Mega Exotic",
+            "water": true,
+            "resources": [
+              "Silver",
+              "Gold"
+            ]
+          },
+          {
+            "name": "Kayakon",
+            "moon": false,
+            "parent": 0,
+            "biome": "Dead",
+            "water": false,
+            "resources": [
+              "Silver"
+            ]
+          }
+        ]
+      },
+      "editedAt": "2026-08-09T07:09:33.833Z",
+      "editedByIp": "185.45.15.46"
     }
   },
   "reports": [],
   "ipLog": {
     "185.45.15.46": [
-      1786255423880,
-      1786255614314,
       1786256290527,
       1786257337226,
-      1786258854228
+      1786258854228,
+      1786259373833
     ]
   }
 }
