@@ -82,7 +82,12 @@ input[type=text]{font-family:'Orbitron',monospace;font-size:11px;letter-spacing:
   padding:6px 8px;border-radius:var(--r-sm);width:140px;text-transform:uppercase;outline:none}
 input[type=text]:focus{border-color:var(--gold)}
 #addrGrp{display:flex;flex-direction:column;gap:2px}
-.addr-lb{font-size:8px;letter-spacing:.14em;color:var(--text-faint);text-transform:uppercase;text-align:center}
+/* Width pinned to #inAddr's own rendered box (140px content + 8px*2
+   padding + 1px*2 border = 158px) so the centered text sits over just
+   the HEX ADDRESS input, not the whole addr-row (which also includes
+   Jump/Clear and would otherwise stretch this label wider, per Tony's
+   screenshot -- centered on the row, not the box). */
+.addr-lb{font-size:8px;letter-spacing:.14em;color:var(--text-faint);text-transform:uppercase;text-align:center;width:158px}
 .addr-row{display:flex;gap:4px;align-items:center}
 #panel.panel-min>*:not(.phead){display:none}
 .phead #bPanelMin{margin-left:auto;flex:none;padding:4px 9px;font-size:12px}
