@@ -176,6 +176,20 @@ export function filterSystemEdit(payload){
   out.atlas = !!payload.atlas;
   out.giant = !!payload.giant;
 
+  // Phantom Star / Shadow Star -- an obscure, wiki-documented NMS oddity
+  // (nomanssky.fandom.com/wiki/Phantom_Star, researched in
+  // Galactic-Map-Session-Notes.md): most regions contain thousands of
+  // unreachable "phantom" system indices that never appear on the real
+  // in-game map, plus a distinct "Shadow Star" anomaly (the first invalid
+  // index past the portal network's valid range, reachable by hyperjump
+  // unlike ordinary phantoms). Neither is something the procedural
+  // generator can know on its own -- purely a manual flag a visitor sets
+  // after confirming one in-game -- so this is a plain enum allowlist, same
+  // pattern as every other field here, not derived from anything else in
+  // the payload.
+  var PHANTOM_KEYS = ["", "phantom", "shadow"];
+  out.phantom = PHANTOM_KEYS.indexOf(payload.phantom) >= 0 ? payload.phantom : "";
+
   var notesR = filterText(payload.notes, {maxLen:800, allowNewlines:true, fieldName:"Notes"});
   if(!notesR.ok) errors.push(notesR.reason); else out.notes = notesR.cleaned;
 

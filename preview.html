@@ -90,7 +90,7 @@ select{font-family:'Rajdhani',sans-serif;font-size:12px;background:#04070c;color
 #tCore{font-size:9px;color:var(--text-faint);margin-top:2px}
 
 #leftcol{position:fixed;left:10px;bottom:10px;z-index:25;display:flex;gap:8px;align-items:flex-end}
-#tweak{width:198px;padding:10px 12px}
+#tweak{width:100%;padding:8px 10px;box-sizing:border-box}
 #filt{width:176px;padding:10px 12px}
 .fold.min .fbody{display:none}
 .fold.min{width:auto}
@@ -175,6 +175,7 @@ html.hc-on .btn{border-width:2px}
   border-radius:var(--r-sm);border:1px solid var(--border);color:var(--text-dim);text-transform:uppercase}
 .tag.hot{border-color:var(--gold);color:var(--gold)}
 .tag.bh{border-color:#c78aff;color:#c78aff}
+.tag.ghost{border-color:#8892a6;color:#8892a6;border-style:dashed}
 /* Icon + its rating/badge stacked vertically underneath, matching the real
    game's own economy panel (Tony's reference screenshot) rather than the
    badge floating off at the far right of the row like it was before. */
@@ -246,7 +247,9 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 #kHex{font-family:'Orbitron',monospace;font-size:11px;color:var(--gold);letter-spacing:.16em;flex:1;min-width:110px}
 
 #stats{position:fixed;right:10px;bottom:10px;z-index:25;font-family:'Orbitron',sans-serif;
-  font-size:9.5px;letter-spacing:.1em;color:var(--text-faint);text-align:right;line-height:1.7}
+  font-size:9.5px;letter-spacing:.1em;color:var(--text-faint);text-align:right;line-height:1.7;
+  display:none}
+#stats.show{display:block}
 #stats b{color:var(--cyan);font-weight:600}
 #labels{position:fixed;inset:0;z-index:15;pointer-events:none;overflow:hidden}
 .lbl{position:absolute;font-family:'Orbitron',sans-serif;font-size:calc(9.5px * var(--ui-zoom,1));letter-spacing:.1em;
@@ -438,7 +441,6 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   #leftcol{bottom:auto;top:calc(var(--top-h,150px) + 140px);flex-direction:column;align-items:flex-start}
   #filt{width:158px;max-height:calc(100vh - var(--top-h,150px) - 150px);overflow-y:auto}
   #keys{bottom:auto;top:calc(var(--top-h,150px) + 140px);width:calc(100vw - 20px)}
-  #stats{display:none}
   #flyhint{display:none!important}
   input[type=text]{width:100%}
 
@@ -512,30 +514,6 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 </div>
 
 <div id="leftcol">
-  <div id="tweak" class="box fold min">
-    <div class="kicker fhead" id="tHead">▸ Tweak</div>
-    <div class="fbody">
-      <div class="sl"><label>Nebula clouds <b id="vNeb">300</b></label>
-        <input type="range" id="sNeb" min="0" max="600" step="20" value="300"></div>
-      <div class="sl"><label>Cloud size <b id="vCsz">1.0</b></label>
-        <input type="range" id="sCsz" min="0.4" max="2.5" step="0.1" value="1.0"></div>
-      <div class="sl"><label>Galaxy stars <b id="vGal">24000</b></label>
-        <input type="range" id="sGal" min="2000" max="40000" step="1000" value="24000"></div>
-      <div class="sl"><label>Arms <b id="vArm">4</b></label>
-        <input type="range" id="sArm" min="2" max="6" step="1" value="4"></div>
-      <div class="sl"><label>Twist <b id="vTw">3.6</b></label>
-        <input type="range" id="sTw" min="0.5" max="6" step="0.1" value="3.6"></div>
-      <div class="sl"><label>Thickness <b id="vTh">0.8</b></label>
-        <input type="range" id="sTh" min="0.2" max="3" step="0.1" value="0.8"></div>
-      <div class="sl"><label>Slice radius <b id="vR">2</b></label>
-        <input type="range" id="sR" min="0" max="5" step="1" value="2"></div>
-      <div class="sl"><label>Systems / voxel <b id="vPer">22</b></label>
-        <input type="range" id="sPer" min="4" max="80" step="2" value="22"></div>
-      <div class="sl"><label>Star size <b id="vSz">1.5</b></label>
-        <input type="range" id="sSz" min="0.4" max="4" step="0.1" value="1.5"></div>
-    </div>
-  </div>
-
   <div id="filt" class="box fold min">
     <div class="kicker fhead" id="fHead">▸ Filters</div>
     <div class="fbody">
@@ -695,6 +673,43 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     <button class="pill" type="button" data-filt="tritanopia" disabled title="For blue-yellow colour blindness -- rare, and the correction shift is stronger for this type.">Tritanopia</button>
   </div>
   <label class="chk" style="margin-top:2px" title="Sharpens faint text and thickens panel borders across the map's UI. Can be used together with a colour correction option above."><input type="checkbox" id="a11yHC">High contrast</label>
+  <!-- Rendering tuning (formerly a standalone "Tweak" box docked in the
+       bottom-left corner) relocated in here per Tony's own session note --
+       these are power-user generation/performance sliders, not narrowly
+       "accessibility", but the gear icon has already become his general
+       "extra settings that shouldn't clutter the main toolbar" catch-all
+       (see Session 26's own reasoning for why Filters/Panel/Course stayed
+       out front but this didn't), so nesting it here matches how he's
+       actually using the popup rather than the label on the tin. Kept as
+       its own nested fold box (unchanged toggleFold logic, ID-based, so no
+       JS needed) so it reads as a distinct sub-section, not mixed in with
+       the actual accessibility options above it. Deliberately still hidden
+       on mobile via the existing #tweak{display:none} media-query rule --
+       these were always power-user/desktop tools, moving them didn't change
+       that intent. -->
+  <div id="tweak" class="box fold min" style="margin-top:10px">
+    <div class="kicker fhead" id="tHead">▸ Rendering tuning</div>
+    <div class="fbody">
+      <div class="sl"><label>Nebula clouds <b id="vNeb">300</b></label>
+        <input type="range" id="sNeb" min="0" max="600" step="20" value="300"></div>
+      <div class="sl"><label>Cloud size <b id="vCsz">1.0</b></label>
+        <input type="range" id="sCsz" min="0.4" max="2.5" step="0.1" value="1.0"></div>
+      <div class="sl"><label>Galaxy stars <b id="vGal">24000</b></label>
+        <input type="range" id="sGal" min="2000" max="40000" step="1000" value="24000"></div>
+      <div class="sl"><label>Arms <b id="vArm">4</b></label>
+        <input type="range" id="sArm" min="2" max="6" step="1" value="4"></div>
+      <div class="sl"><label>Twist <b id="vTw">3.6</b></label>
+        <input type="range" id="sTw" min="0.5" max="6" step="0.1" value="3.6"></div>
+      <div class="sl"><label>Thickness <b id="vTh">0.8</b></label>
+        <input type="range" id="sTh" min="0.2" max="3" step="0.1" value="0.8"></div>
+      <div class="sl"><label>Slice radius <b id="vR">2</b></label>
+        <input type="range" id="sR" min="0" max="5" step="1" value="2"></div>
+      <div class="sl"><label>Systems / voxel <b id="vPer">22</b></label>
+        <input type="range" id="sPer" min="4" max="80" step="2" value="22"></div>
+      <div class="sl"><label>Star size <b id="vSz">1.5</b></label>
+        <input type="range" id="sSz" min="0.4" max="4" step="0.1" value="1.5"></div>
+    </div>
+  </div>
 </div>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
@@ -764,6 +779,13 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
       <label class="chk"><input type="checkbox" id="edBH"> Black hole present</label>
       <label class="chk"><input type="checkbox" id="edAtlas"> Atlas station present</label>
       <label class="chk"><input type="checkbox" id="edGiant"> Giant planet (purple systems only -- limits to 1 planet + up to 5 moons)</label>
+    </div>
+    <div class="mfld"><div class="lb">Phantom / Shadow Star status</div>
+      <select id="edPhantom" title="An obscure NMS oddity, researched from the wiki (nomanssky.fandom.com/wiki/Phantom_Star): most regions contain thousands of unreachable 'phantom' system indices that never show on the real in-game map, normally only reached via a save/portal-index edit. A Shadow Star is a distinct, related anomaly -- the first invalid index right after the portal network's valid range -- that CAN be reached by hyperjump, unlike ordinary phantoms. Leave as None unless you've actually confirmed one of these in-game.">
+        <option value="">None</option>
+        <option value="phantom">Phantom Star (unreachable)</option>
+        <option value="shadow">Shadow Star (reachable by hyperjump)</option>
+      </select>
     </div>
     <div class="mfld"><div class="lb">Public notes <span style="color:var(--text-faint)">(visible to everyone, not your private surveyor log)</span></div>
       <textarea id="edNotes" maxlength="800" placeholder="Anything else worth knowing about this system..."></textarea>
@@ -1284,6 +1306,7 @@ function generateSystem(vx,vy,vz,idx,noOverride){
 
   var anomaly=regionAnomalyIdx(vx,vy,vz);
   s.blackHole=(idx===anomaly.bh); s.atlas=(idx===anomaly.atlas);
+  s.phantom=""; // "phantom" | "shadow" | "" -- manual-only, see applyOverride()
 
   /* Giants are exclusive to purple systems in the real game. Now driven
      directly by nms-core's own gas_giant draw (real gate, not a guess) when
@@ -1413,7 +1436,7 @@ var OVERRIDES={systems:{}};
    there's no way to share a JS module between the client bundle and the
    Netlify Functions here). "bodies.N" (N=0..5) is the 13th category,
    generated dynamically per system rather than listed here. */
-var FLAG_CATEGORIES=["name","race","region","starClass","stars","suffix","giant","economy","conflict","blackHole","atlas","notes"];
+var FLAG_CATEGORIES=["name","race","region","starClass","stars","suffix","giant","economy","conflict","blackHole","atlas","phantom","notes"];
 function applyOverride(s){
   var ov=OVERRIDES.systems && OVERRIDES.systems[s.address];
   // Flag/dispute status can exist on a system that's never been edited at
@@ -1435,6 +1458,7 @@ function applyOverride(s){
   if(d.conflict){ s.conflict=d.conflict; var ct=tierFromWord(d.conflict,CONFLICT); if(ct!==null) s.conTier=ct; }
   if(d.blackHole!==undefined) s.blackHole=!!d.blackHole;
   if(d.atlas!==undefined) s.atlas=!!d.atlas;
+  if(d.phantom!==undefined) s.phantom=(d.phantom==="phantom"||d.phantom==="shadow")?d.phantom:"";
   if(d.region) s.region=d.region;
   if(d.starClass) s.spectral=d.starClass;
   // Number of stars + each star's own colour -- wiki-confirmed real game
@@ -2061,7 +2085,7 @@ function applyFilter(){
   for(i=0;i<n;i++){
     var s=shown[i];
     pos[i*3]=s.px; pos[i*3+1]=s.py; pos[i*3+2]=s.pz;
-    var hx=s.blackHole?0xffffff:(s.atlas?0xf0a500:s.color);
+    var hx=s.blackHole?0xffffff:(s.atlas?0xf0a500:(s.phantom==="shadow"?0x6a4fa0:(s.phantom==="phantom"?0x777788:s.color)));
     if(store.marks[skey(s)]) hx=0x00e5ff;
     c.setHex(hx);
     col[i*3]=c.r; col[i*3+1]=c.g; col[i*3+2]=c.b;
@@ -2497,6 +2521,7 @@ function fsCategoryValue(s,category){
     case "conflict": return s.conflict;
     case "blackHole": return !!s.blackHole;
     case "atlas": return !!s.atlas;
+    case "phantom": return s.phantom||"";
     case "notes": return s.publicNotes||"";
     default: return undefined;
   }
@@ -2590,6 +2615,10 @@ function updatePanel(s){
   if(s.giant) tags.push(["hot","Giant planet","giant"]);
   if(s.blackHole) tags.push(["bh","Black hole","blackHole"]);
   if(s.atlas) tags.push(["hot","Atlas interface","atlas"]);
+  if(s.phantom==="phantom") tags.push(["ghost","Phantom Star","phantom",
+    "An unreachable NMS oddity: most regions contain thousands of \"phantom\" system indices that never appear on the real in-game map or Galactic Map. Normally only reached via a save/portal-index edit -- opening the map while inside one snaps your position to the nearest normal star instead."]);
+  if(s.phantom==="shadow") tags.push(["ghost","Shadow Star","phantom",
+    "A distinct, related anomaly: the first invalid system index right after the portal network's valid range. Unlike an ordinary phantom, a Shadow Star CAN be reached by hyperjump."]);
   if(s.outlaw) tags.push(["hot","Outlaw"]);
   if(s.uncharted) tags.push(["","Uncharted"]);
   if(s.abandoned) tags.push(["","Abandoned"]);
@@ -2597,9 +2626,9 @@ function updatePanel(s){
   if(s.override) tags.push(["hot","Community edited"]);
   var html="",i;
   for(i=0;i<tags.length;i++){
-    var extraCls=tags[i][0], cat=tags[i][2];
+    var extraCls=tags[i][0], cat=tags[i][2], tip=tags[i][3];
     if(cat){ var st=getFieldStatus(s,cat); if(st!=="original") extraCls+=" fs-"+st; }
-    html+='<span class="tag '+extraCls+'">'+tags[i][1]+'</span>';
+    html+='<span class="tag '+extraCls+'"'+(tip?' title="'+tip.replace(/"/g,"&quot;")+'"':'')+'>'+tags[i][1]+'</span>';
   }
   document.getElementById("pTags").innerHTML=html;
   var pnb=document.getElementById("pubNoteBox");
@@ -2719,10 +2748,17 @@ var keys={};
 window.addEventListener("keydown",function(e){
   if(e.target.tagName==="INPUT"||e.target.tagName==="TEXTAREA"||e.target.tagName==="SELECT") return;
   keys[e.code]=true;
+  /* Ctrl+Shift+F is the hidden FPS/debug-stats hotkey (Session Notes,
+     2026-08-09 -- "gate behind a keyboard combo... rather than a visible
+     toggle", so regular visitors never see it). Checked and returned first
+     so it can't ALSO fire the plain "F" Filters-panel shortcut below on the
+     very same keypress. */
+  if(e.ctrlKey&&e.shiftKey&&e.code==="KeyF"){ e.preventDefault(); toggleStats(); return; }
   if(e.code==="KeyH") toggleLabels();
   if(e.code==="KeyF") toggleFold("filt","fHead","Filters");
   if(e.code==="KeyG") toggleGrid();
 });
+function toggleStats(){ document.getElementById("stats").classList.toggle("show"); }
 window.addEventListener("keyup",function(e){ keys[e.code]=false; });
 function flyStep(dt){
   var sp=(keys.ShiftLeft||keys.ShiftRight)?46:18;
@@ -2856,7 +2892,7 @@ function updateLabels(){
       var s=shown[i];
       var dx=s.px-camera.position.x, dy=s.py-camera.position.y, dz=s.pz-camera.position.z;
       cands.push({x:s.px,y:s.py,z:s.pz,d:dx*dx+dy*dy+dz*dz,
-        t:(s.blackHole?"◉ ":(s.atlas?"◈ ":""))+s.name});
+        t:(s.blackHole?"◉ ":(s.atlas?"◈ ":(s.phantom==="shadow"?"◇ ":(s.phantom==="phantom"?"◌ ":""))))+s.name});
     }
   } else {
     for(i=0;i<starMeshes.length;i++){
@@ -3485,6 +3521,7 @@ function openEditModal(){
   document.getElementById("edConflict").value=s.conflict||"";
   document.getElementById("edBH").checked=!!s.blackHole;
   document.getElementById("edAtlas").checked=!!s.atlas;
+  document.getElementById("edPhantom").value=(s.phantom==="phantom"||s.phantom==="shadow")?s.phantom:"";
   document.getElementById("edRegion").value=s.region||"";
   document.getElementById("edStarClass").value=s.spectral||"";
   editStars=(s.starTypes&&s.starTypes.length?s.starTypes:[s.type]).slice(0,3).map(function(k){
@@ -3672,7 +3709,7 @@ var FLAG_LABELS={
   name:"System name", race:"Race", region:"Region name", starClass:"Star class",
   stars:"Star colour(s)", suffix:"Water / Dissonant suffix", giant:"Giant planet",
   economy:"Economy (name, sell/buy %, strength)", conflict:"Conflict level",
-  blackHole:"Black hole", atlas:"Atlas Interface", notes:"Notes"
+  blackHole:"Black hole", atlas:"Atlas Interface", phantom:"Phantom / Shadow Star", notes:"Notes"
 };
 function renderFlagFieldList(s){
   var html="",i;
@@ -4094,6 +4131,7 @@ document.getElementById("edSubmit").addEventListener("click",function(){
     conflict:document.getElementById("edConflict").value.trim(),
     blackHole:document.getElementById("edBH").checked,
     atlas:document.getElementById("edAtlas").checked,
+    phantom:document.getElementById("edPhantom").value,
     notes:document.getElementById("edNotes").value.trim(),
     bodies:editBodies.map(function(b){
       return {
@@ -4355,7 +4393,23 @@ function updateTelemetry(){
     hex(toRaw(vy,SIZE_Y)&0xFF,2)+":"+hex(toRaw(vz,SIZE_XZ)&0xFFF,3)+":"+hex(toRaw(vx,SIZE_XZ)&0xFFF,3);
   document.getElementById("tCore").textContent="CAM "+commas(coreLY(vx,vy,vz))+" LY FROM CENTRE";
   document.getElementById("galHudName").textContent="Galactic Core ("+GALAXIES[GALAXY]+")";
-  document.getElementById("galHudDist").textContent=commas(coreLY(vx,vy,vz))+" LY";
+  /* This HUD reads as "how far is [whatever I'm looking at] from the galaxy
+     centre" -- it must NOT drift as you orbit-rotate the camera around a
+     selected star, since rotating is a pure view transform and doesn't move
+     the star at all. Bug reported 2026-08-09 (Galactic-Map-Session-Notes.md):
+     this always read off the live camera position (vx,vy,vz above), which
+     visibly shifts as the camera orbits around any target that isn't exactly
+     the true origin -- not floating-point drift, the camera genuinely moves.
+     Fixed by preferring a real anchor's own fixed voxel-derived coreLY
+     (selected star, else the system you're focused/jumped to) -- both
+     already computed once at generation time straight from integer voxel
+     coordinates, so they can't be affected by camera movement at all. Falls
+     back to the live camera-derived reading only when nothing is selected/
+     focused, preserving the original "where am I roaming" behaviour for that
+     case. tCore above is left alone -- it's explicitly labelled "CAM", so
+     it's honestly describing camera position, not misrepresenting a star. */
+  var _hudAnchor=selected||focusSystem;
+  document.getElementById("galHudDist").textContent=commas(_hudAnchor?_hudAnchor.coreLY:coreLY(vx,vy,vz))+" LY";
 }
 var frames=0, fpsT=performance.now(), lastT=fpsT, loopDead=false;
 function animate(){
