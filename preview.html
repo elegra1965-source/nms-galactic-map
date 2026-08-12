@@ -4002,10 +4002,26 @@ applyA11y();
     var r=btn.getBoundingClientRect();
     var pw=pop.offsetWidth||198;
     var left=Math.min(window.innerWidth-pw-8,Math.max(8,r.left));
+    var top=r.bottom+8;
+    // Never open on top of the "GALAXY #N OF N" badge (#galInfo, Galaxy
+    // view only) -- both it and this popup anchor to roughly the same
+    // "just under the toolbar" spot, and the badge's higher z-index then
+    // rendered in front of the popup's own first row, making it look like
+    // the badge was PART of the popup instead of floating over it (Tony's
+    // screenshot). Measure its real rendered bottom edge rather than
+    // guessing a fixed offset -- its height varies with the galaxy name's
+    // length/wrapping, and getBoundingClientRect() naturally returns 0
+    // height when it's hidden (Local/System view), so this only ever
+    // pushes the popup down when the badge is actually showing.
+    var badge=document.getElementById("galInfo");
+    if(badge){
+      var br=badge.getBoundingClientRect();
+      if(br.height>0) top=Math.max(top,br.bottom+8);
+    }
     pop.style.position="fixed";
     pop.style.left=left+"px";
     pop.style.right="auto";
-    pop.style.top=(r.bottom+8)+"px";
+    pop.style.top=top+"px";
     pop.style.bottom="auto";
   }
   function open(){
