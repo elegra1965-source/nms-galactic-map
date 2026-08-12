@@ -22,6 +22,12 @@
 <style>
 :root{
   --gold:#f0a500; --gold-dim:#a06800; --cyan:#00e5ff; --cyan-dim:#0096a8;
+  /* Field-level edit status (EDIT-TRACKING-AND-DISPUTES.md) -- reuses this
+     site's own existing green/amber/red convention (CONFLICT_COL in the
+     script below) rather than introducing a second palette; "flagged"
+     happening to equal --gold is intentional, not a collision -- CONFLICT_COL
+     already overloads this exact hex for its own "medium" tier. */
+  --fs-edited:#6bffa8; --fs-flagged:#f0a500; --fs-disputed:#ff5a4a;
   --bg:#070b11; --bg2:#0b1119; --bg3:#0f1620;
   --panel:rgba(255,255,255,0.035); --panel-2:rgba(0,229,255,0.05);
   --border:rgba(0,229,255,0.16); --border-soft:rgba(255,255,255,0.07);
@@ -182,6 +188,17 @@ html.hc-on .btn{border-width:2px}
 .bdot{width:12px;height:12px;border-radius:50%;flex:none;border:1px solid rgba(255,255,255,.22)}
 .brow .bn{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .brow .bb{font-size:10px;color:var(--text-faint);letter-spacing:.05em}
+/* ============ field-level edit status (EDIT-TRACKING-AND-DISPUTES.md) ============
+   inset box-shadow rather than a real border -- keeps every row's box model
+   and existing flex gaps exactly as they were, this is purely a colour cue
+   down the left edge of whichever row/tag a category's status applies to. */
+.fs-edited,.fs-flagged,.fs-disputed{padding-left:8px}
+.fs-edited{box-shadow:inset 3px 0 0 var(--fs-edited)}
+.fs-flagged{box-shadow:inset 3px 0 0 var(--fs-flagged)}
+.fs-disputed{box-shadow:inset 3px 0 0 var(--fs-disputed)}
+.tag.fs-edited{border-color:var(--fs-edited);color:var(--fs-edited);box-shadow:none;padding-left:7px}
+.tag.fs-flagged{border-color:var(--fs-flagged);color:var(--fs-flagged);box-shadow:none;padding-left:7px}
+.tag.fs-disputed{border-color:var(--fs-disputed);color:var(--fs-disputed);box-shadow:none;padding-left:7px}
 .seqbox{border:1px solid var(--border-soft);border-radius:var(--r-sm);padding:7px;margin-top:10px;background:#04070c}
 .seqbox .lb{font-size:9px;letter-spacing:.16em;color:var(--gold);text-align:center;margin-bottom:5px}
 .seq{display:grid;grid-template-columns:repeat(12,1fr);gap:2px}
@@ -277,6 +294,11 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 .mfld input[type=text],.mfld input[type=number]{width:100%;text-transform:none;font-family:'Rajdhani',sans-serif;
   letter-spacing:.02em;color:var(--text);font-size:12px}
 .mfld textarea{margin-top:0}
+.flagFieldList{max-height:150px;overflow-y:auto;border:1px solid var(--border-soft);border-radius:var(--r-sm);
+  padding:6px 8px;background:#04070c}
+.flagFieldRow{display:flex;align-items:center;gap:7px;padding:3px 0;font-size:12px;color:var(--text)}
+.flagFieldRow input[type=checkbox]{flex:none}
+.flagFieldRow .fq{margin-left:auto;font-size:9px;color:var(--fs-flagged);letter-spacing:.06em;white-space:nowrap}
 .merr{background:#2a0d0d;border:1px solid #ff4a4a;color:#ffb0b0;border-radius:var(--r-sm);
   padding:8px 10px;font-size:11px;margin-bottom:10px;display:none;white-space:pre-wrap;
   position:relative;overflow:hidden}
@@ -591,11 +613,11 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   <div class="cls" id="pCls">—</div>
   <div id="pCore">—</div>
   <div id="pSys">
-    <div class="row"><span id="icRace"></span>
+    <div class="row" id="pRaceRow"><span id="icRace"></span>
       <div><div class="lb">Race</div><div class="vl" id="pRace">—</div></div></div>
-    <div class="row row-eco"><div class="iconstack"><span id="icEco"></span><span class="starRating" id="pEcoStars"></span></div>
+    <div class="row row-eco" id="pEcoRow"><div class="iconstack"><span id="icEco"></span><span class="starRating" id="pEcoStars"></span></div>
       <div><div class="lb">Economy</div><div class="vl" id="pEco">—</div><div class="sub" id="pEcoSub">—</div></div></div>
-    <div class="row"><div class="iconstack"><span id="icCon"></span><span class="conBadge" id="pConBadge"></span></div>
+    <div class="row" id="pConRow"><div class="iconstack"><span id="icCon"></span><span class="conBadge" id="pConBadge"></span></div>
       <div><div class="lb">Conflict</div><div class="vl" id="pCon">—</div></div></div>
     <div class="tags" id="pTags"></div>
     <div class="bodylist" id="pBodies"></div>
@@ -761,14 +783,31 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 
   <div class="box modal" id="reportModal" style="max-width:340px;display:none">
     <h3>Report this system</h3>
-    <div class="msub">Flags this system's current data for review.</div>
+    <div class="msub">Pick what kind of problem this is.</div>
+    <div style="display:flex;gap:6px;margin-bottom:12px">
+      <button class="btn on" id="repModeContent" type="button" style="flex:1;font-size:11px">Inappropriate content</button>
+      <button class="btn" id="repModeFlag" type="button" style="flex:1;font-size:11px">Data looks wrong</button>
+    </div>
+    <div id="repContentSection">
+      <div class="mfld"><div class="lb">What's wrong?</div>
+        <textarea id="repReason" maxlength="200" placeholder="e.g. Name field has an offensive word"></textarea>
+      </div>
+    </div>
+    <div id="repFlagSection" style="display:none">
+      <div class="mfld"><div class="lb">Which field(s) look wrong? (pick at least one)</div>
+        <div id="flagFieldList" class="flagFieldList"></div>
+      </div>
+      <div class="mfld"><div class="lb">Note (optional)</div>
+        <textarea id="flagNote" maxlength="200" placeholder="e.g. this should be a Vy'keen system, I've been there"></textarea>
+      </div>
+      <div style="font-size:10.5px;color:var(--text-faint);line-height:1.5;margin:-2px 0 10px">
+        Flagged fields turn amber for every visitor until 2+ travellers agree on a correction, or elegra1965 reviews it directly.
+      </div>
+    </div>
     <div class="merr" id="reportErr"><span class="errTxt"></span><span class="errScan"></span></div>
     <button class="btn" id="repRetry" type="button" style="display:none;margin:-4px 0 10px">Retry send</button>
     <div class="iconWrap" id="reportIconWrap"><img id="reportIconImg" src="" alt=""><span class="driftBeam"></span></div>
     <div id="reportSpin"><span id="reportSpinTxt">Atlas is working on it...</span></div>
-    <div class="mfld"><div class="lb">What's wrong?</div>
-      <textarea id="repReason" maxlength="200" placeholder="e.g. Name field has an offensive word"></textarea>
-    </div>
     <div class="modalBtns">
       <button class="btn primary" id="repSubmit">Send report</button>
       <button class="btn" id="repCancel">Cancel</button>
@@ -837,6 +876,22 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
       <button class="btn" id="hyperOk">Got it</button>
     </div>
   </div>
+</div>
+
+<!-- Admin-only flag review queue -- reached via ?admin=<ADMIN_TOKEN> on the
+     URL, never linked from anywhere in the normal UI. See openAdminPanel()
+     below. Deliberately lean: confirm-dispute / dismiss / view-system for
+     every flagged field, plus a plain-text "fix it now" for the simple
+     scalar categories only (composite ones like Economy or a whole planet
+     still route through the normal Edit system flow, which already goes
+     through the same consensus-safe voting path as any other edit). -->
+<div id="adminPanel" class="box" style="display:none;position:fixed;top:50px;left:50%;transform:translateX(-50%);max-width:640px;width:92vw;max-height:calc(100vh - 90px);overflow-y:auto;z-index:500;padding:16px">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+    <h3 style="margin:0">Flag review queue</h3>
+    <button class="btn" id="adminClose" type="button">Close</button>
+  </div>
+  <div class="msub" id="adminSub">Loading…</div>
+  <div id="adminQueue"></div>
 </div>
 
 <div id="stats">
@@ -1206,7 +1261,7 @@ function regionAnomalyIdx(vx,vy,vz){
   }
   return {bh:0x079, atlas:0x07A};
 }
-function generateSystem(vx,vy,vz,idx){
+function generateSystem(vx,vy,vz,idx,noOverride){
   var r=mulberry32(gseed(vx,vy,vz,idx)), s={}, i;
   s.vx=vx; s.vy=vy; s.vz=vz; s.idx=idx; s.galaxy=GALAXY;
 
@@ -1336,7 +1391,12 @@ function generateSystem(vx,vy,vz,idx){
   }
   s.address=address;
   s.coreLY=coreLY(vx,vy,vz);
-  applyOverride(s);
+  // noOverride: used only by getFieldStatus()'s procedural-baseline diff
+  // (see below) -- gives a clean "what would this system look like with NO
+  // community data at all" snapshot to compare a real, override-applied
+  // system against, field by field, without a second copy of every
+  // generation rule living in two places.
+  if(!noOverride) applyOverride(s);
   return s;
 }
 
@@ -1346,9 +1406,22 @@ function generateSystem(vx,vy,vz,idx){
    over the procedural output so a system a player has entered real
    in-game data for shows that data to every visitor, not just locally. */
 var FUNC_URL="/.netlify/functions/system-edit";
+var FLAG_URL="/.netlify/functions/flag-dispute";
 var OVERRIDES={systems:{}};
+/* The 12 whole-row flag categories a visitor can flag/dispute (see
+   FLAG_FIELDS in netlify/functions/_shared.mjs -- kept in sync by hand,
+   there's no way to share a JS module between the client bundle and the
+   Netlify Functions here). "bodies.N" (N=0..5) is the 13th category,
+   generated dynamically per system rather than listed here. */
+var FLAG_CATEGORIES=["name","race","region","starClass","stars","suffix","giant","economy","conflict","blackHole","atlas","notes"];
 function applyOverride(s){
   var ov=OVERRIDES.systems && OVERRIDES.systems[s.address];
+  // Flag/dispute status can exist on a system that's never been edited at
+  // all (a visitor can flag a purely procedural value as "this looks
+  // wrong" without providing a correction) -- so this has to be read BEFORE
+  // the "no override data" early-return below, not folded into it.
+  s.flaggedFields=(ov&&ov.flaggedFields)||[];
+  s.disputedFields=(ov&&ov.disputedFields)||[];
   if(!ov || !ov.data) return s;
   var d=ov.data;
   s.override=true;
@@ -2379,6 +2452,76 @@ function distanceLY(s){
   var dx=s.px-focusSystem.px, dy=s.py-focusSystem.py, dz=s.pz-focusSystem.pz;
   return Math.round(Math.sqrt(dx*dx+dy*dy+dz*dz)/VOX_U*LY_PER_VOXEL);
 }
+/* ============ field-level edit status (EDIT-TRACKING-AND-DISPUTES.md) ============
+   Gold/green ("original" vs "edited") is computed HERE, client-side, by
+   diffing the live system against a freshly-generated, override-free
+   version of the exact same address -- rather than the server tracking an
+   editedFields list the way the spec originally sketched it. This is a
+   deliberate simplification made while building this: the server already
+   has to store the CURRENT value of every field somewhere (sysRec.data),
+   and generateSystem() already knows exactly how to reproduce the pure
+   procedural version of any address on demand -- so "did a real person
+   change this" is just "does it differ from what the algorithm alone would
+   have produced", no separate bookkeeping required, and it's automatically
+   correct for every system ever saved (including ones edited before this
+   feature existed), not just ones with a server-tracked history. Amber
+   (flagged) and red (disputed) genuinely can't be derived this way -- they
+   describe REVIEW STATE, not value divergence -- so those two still come
+   from the server (s.flaggedFields/s.disputedFields, set in applyOverride()). */
+function fieldStatusBaseline(s){
+  if(!s._fsBaseline){
+    s._fsBaseline=generateSystem(s.vx,s.vy,s.vz,s.idx,true);
+    upgradeBodyNames(s._fsBaseline); // compare like for like -- see upgradeBodyNames() below
+  }
+  return s._fsBaseline;
+}
+function fsBodyKey(b){
+  if(!b) return null;
+  return JSON.stringify({n:b.name,bi:b.biome,d:b.descriptor,w:!!b.water,r:b.ring||false,
+    se:b.sentinel||"None",au:!!b.autophage,ru:(b.resUni||[]).slice().sort(),
+    fl:(b.flora||[]).slice().sort(),mi:(b.minerals||[]).slice().sort(),
+    sa:(b.salvage||[]).slice().sort(),fo:(b.fossils||[]).slice().sort()});
+}
+function fsCategoryValue(s,category){
+  var m=/^bodies\.(\d)$/.exec(category);
+  if(m) return fsBodyKey(s.bodies[+m[1]]);
+  switch(category){
+    case "name": return s.name;
+    case "race": return s.race;
+    case "region": return s.region;
+    case "starClass": return s.spectral;
+    case "stars": return JSON.stringify(s.starTypes);
+    case "suffix": return JSON.stringify({water:!!s.water,dissonant:!!s.dissonant});
+    case "giant": return !!s.giant;
+    case "economy": return JSON.stringify({e:s.econName,se:s.sell,b:s.buy,d:s.econDesc});
+    case "conflict": return s.conflict;
+    case "blackHole": return !!s.blackHole;
+    case "atlas": return !!s.atlas;
+    case "notes": return s.publicNotes||"";
+    default: return undefined;
+  }
+}
+/* Returns 'original'|'edited'|'flagged'|'disputed' for one field category on
+   one system. Order matters -- a field a traveller is actively disputing
+   should read as disputed/flagged even if it also happens to differ from
+   the procedural baseline (it almost always will, that's WHY it's flagged). */
+function getFieldStatus(s,category){
+  if((s.disputedFields||[]).indexOf(category)>=0) return "disputed";
+  if((s.flaggedFields||[]).indexOf(category)>=0) return "flagged";
+  if(!s.override) return "original";
+  var base=fieldStatusBaseline(s);
+  return fsCategoryValue(s,category)===fsCategoryValue(base,category) ? "original" : "edited";
+}
+function fsClass(s,category){ return "fs-"+getFieldStatus(s,category); }
+/* Swaps in the right fs-* class on one panel element without disturbing any
+   other class it already carries (e.g. #pStars also has "stars", .row
+   elements also have "row row-eco", etc). */
+function setFsClass(id,category,s){
+  var el=document.getElementById(id);
+  if(!el) return;
+  el.classList.remove("fs-original","fs-edited","fs-flagged","fs-disputed");
+  el.classList.add(fsClass(s,category));
+}
 /* Lazily upgrades a single system's body names to nms-core's accurate
    planetName() output, in place, the first time that system is actually
    viewed (called from updatePanel(), the one choke point every selection
@@ -2411,11 +2554,21 @@ function updatePanel(s){
   document.getElementById("pStars").innerHTML=starSwatches(s);
   document.getElementById("pName").textContent=s.name;
   document.getElementById("pReg").textContent="REGION: "+s.region;
+  setFsClass("pStars","stars",s);
+  setFsClass("pName","name",s);
+  setFsClass("pReg","region",s);
   var here=(focusSystem&&s.address===focusSystem.address&&s.galaxy===focusSystem.galaxy);
   var suffixParts=[]; if(s.water) suffixParts.push("Water"); if(s.dissonant) suffixParts.push("Dissonant");
   var suffix=suffixParts.length?" // "+suffixParts.join(" "):"";
   document.getElementById("pCls").textContent=
     (here?"CURRENT LOCATION":(commas(distanceLY(s))+" LY"))+" // "+s.spectral+suffix;
+  // pCls shows starClass and the water/dissonant suffix on one combined
+  // line -- worse-of the two statuses (disputed beats flagged beats edited
+  // beats original) so the line lights up if EITHER underlying field needs
+  // attention, since there's no way to colour half a text node.
+  var FS_RANK={original:0,edited:1,flagged:2,disputed:3};
+  var clsStat=getFieldStatus(s,"starClass"), sufStat=getFieldStatus(s,"suffix");
+  setFsClass("pCls", FS_RANK[sufStat]>FS_RANK[clsStat]?"suffix":"starClass", s);
   document.getElementById("pCore").textContent=commas(s.coreLY)+" LY from galaxy centre";
   document.getElementById("icRace").innerHTML=raceIcon(s.race);
   document.getElementById("icEco").innerHTML=econIcon(s.econType);
@@ -2427,29 +2580,38 @@ function updatePanel(s){
   document.getElementById("pEcoStars").innerHTML=s.uncharted?"":ecoStars(s.econTier);
   document.getElementById("pCon").textContent=s.conflict;
   document.getElementById("pConBadge").innerHTML=conBadge(s);
+  setFsClass("pRaceRow","race",s);
+  setFsClass("pEcoRow","economy",s);
+  setFsClass("pConRow","conflict",s);
 
   var tags=[["",["","Single","Binary","Ternary"][s.stars]+" star"]];
   tags.push(["",s.planets+(s.planets===1?" planet":" planets")]);
   if(s.moons>0) tags.push(["",s.moons+(s.moons===1?" moon":" moons")]);
-  if(s.giant) tags.push(["hot","Giant planet"]);
-  if(s.blackHole) tags.push(["bh","Black hole"]);
-  if(s.atlas) tags.push(["hot","Atlas interface"]);
+  if(s.giant) tags.push(["hot","Giant planet","giant"]);
+  if(s.blackHole) tags.push(["bh","Black hole","blackHole"]);
+  if(s.atlas) tags.push(["hot","Atlas interface","atlas"]);
   if(s.outlaw) tags.push(["hot","Outlaw"]);
   if(s.uncharted) tags.push(["","Uncharted"]);
   if(s.abandoned) tags.push(["","Abandoned"]);
   if(store.marks[skey(s)]) tags.push(["hot","Bookmarked"]);
   if(s.override) tags.push(["hot","Community edited"]);
   var html="",i;
-  for(i=0;i<tags.length;i++) html+='<span class="tag '+tags[i][0]+'">'+tags[i][1]+'</span>';
+  for(i=0;i<tags.length;i++){
+    var extraCls=tags[i][0], cat=tags[i][2];
+    if(cat){ var st=getFieldStatus(s,cat); if(st!=="original") extraCls+=" fs-"+st; }
+    html+='<span class="tag '+extraCls+'">'+tags[i][1]+'</span>';
+  }
   document.getElementById("pTags").innerHTML=html;
   var pnb=document.getElementById("pubNoteBox");
   if(s.publicNotes){ pnb.style.display=""; document.getElementById("pubNote").textContent=s.publicNotes; }
   else pnb.style.display="none";
+  setFsClass("pubNoteBox","notes",s);
 
   var bl="";
   for(i=0;i<s.bodies.length;i++){
     var b=s.bodies[i];
-    bl+='<div class="brow" data-b="'+i+'"><span class="bdot" style="background:'+BIOMES[b.biome].base+'"></span>'+
+    var bStat=getFieldStatus(s,"bodies."+i);
+    bl+='<div class="brow'+(bStat!=="original"?" fs-"+bStat:"")+'" data-b="'+i+'"><span class="bdot" style="background:'+BIOMES[b.biome].base+'"></span>'+
         '<span class="bn">'+(b.moon?"&#8627; ":"")+b.name+'</span>'+
         '<span class="bb">'+b.biome+(b.water?" &middot; water":"")+(b.ring?" &middot; "+(RING_STYLE_LABEL[b.ring]||"").toLowerCase()+" rings":"")+'</span></div>';
   }
@@ -3503,13 +3665,50 @@ document.getElementById("edAddBody").addEventListener("click",function(){
 });
 document.getElementById("edGiant").addEventListener("change",renderBodyEditList);
 document.getElementById("bEdit").addEventListener("click",function(){ if(selected) openEditModal(); });
-document.getElementById("bReport").addEventListener("click",function(){
-  if(!selected) return;
+/* Human-readable labels for the "Flag this field" picker -- must list the
+   exact same 12 categories as FLAG_CATEGORIES above (kept in sync by hand
+   with FLAG_FIELDS in netlify/functions/_shared.mjs, same caveat). */
+var FLAG_LABELS={
+  name:"System name", race:"Race", region:"Region name", starClass:"Star class",
+  stars:"Star colour(s)", suffix:"Water / Dissonant suffix", giant:"Giant planet",
+  economy:"Economy (name, sell/buy %, strength)", conflict:"Conflict level",
+  blackHole:"Black hole", atlas:"Atlas Interface", notes:"Notes"
+};
+function renderFlagFieldList(s){
+  var html="",i;
+  for(i=0;i<FLAG_CATEGORIES.length;i++){
+    var cat=FLAG_CATEGORIES[i];
+    var st=getFieldStatus(s,cat);
+    html+='<label class="flagFieldRow"><input type="checkbox" value="'+cat+'">'+FLAG_LABELS[cat]+
+      (st==="flagged"?'<span class="fq">already flagged</span>':st==="disputed"?'<span class="fq">disputed</span>':'')+'</label>';
+  }
+  for(i=0;i<s.bodies.length;i++){
+    var cat2="bodies."+i, st2=getFieldStatus(s,cat2), b=s.bodies[i];
+    html+='<label class="flagFieldRow"><input type="checkbox" value="'+cat2+'">'+(b.moon?"Moon: ":"Planet: ")+b.name+
+      (st2==="flagged"?'<span class="fq">already flagged</span>':st2==="disputed"?'<span class="fq">disputed</span>':'')+'</label>';
+  }
+  document.getElementById("flagFieldList").innerHTML=html;
+}
+function setReportMode(mode){
+  var flagMode=mode==="flag";
+  document.getElementById("repModeFlag").classList.toggle("on",flagMode);
+  document.getElementById("repModeContent").classList.toggle("on",!flagMode);
+  document.getElementById("repFlagSection").style.display=flagMode?"":"none";
+  document.getElementById("repContentSection").style.display=flagMode?"none":"";
   document.getElementById("reportErr").style.display="none";
   document.getElementById("repRetry").style.display="none";
   hideStatusIcon(document.getElementById("reportIconWrap"));
+}
+document.getElementById("repModeContent").addEventListener("click",function(){ setReportMode("content"); });
+document.getElementById("repModeFlag").addEventListener("click",function(){ setReportMode("flag"); });
+document.getElementById("bReport").addEventListener("click",function(){
+  if(!selected) return;
+  setReportMode("content");
   lastReportAttempt=null;
+  lastFlagAttempt=null;
   document.getElementById("repReason").value="";
+  document.getElementById("flagNote").value="";
+  renderFlagFieldList(selected);
   closeAllModalBoxes();
   document.getElementById("reportModal").style.display="";
   document.getElementById("modalWrap").classList.add("show");
@@ -3944,14 +4143,57 @@ function submitReportPayload(address, reason){
     retryBtn.style.display="inline-block";
   });
 }
+var lastFlagAttempt=null; // {address,fields,note} of the most recent failed flag submission, so Retry resubmits without re-checking boxes
+function submitFlagPayload(address, fields, note){
+  var errEl=document.getElementById("reportErr"), retryBtn=document.getElementById("repRetry");
+  var spin=document.getElementById("reportSpin"), spinTxt=document.getElementById("reportSpinTxt"), btn=document.getElementById("repSubmit");
+  var iconWrap=document.getElementById("reportIconWrap"), iconImg=document.getElementById("reportIconImg");
+  lastFlagAttempt={address:address,fields:fields,note:note};
+  retryBtn.style.display="none";
+  spin.style.display="flex"; btn.disabled=true;
+  var stopWait=startAtlasWait(spinTxt, iconWrap, iconImg);
+  fetch(FLAG_URL,{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({address:address,fields:fields,note:note})
+  }).then(function(r){ return r.json().then(function(j){ return {status:r.status,body:j}; }); })
+  .then(function(res){
+    stopWait(); spin.style.display="none"; btn.disabled=false;
+    if(!res.body.ok){
+      var d=describeSaveError(res.status,res.body,true);
+      showStatusIcon(iconWrap,iconImg,d.icon);
+      setErrText(errEl,d.message); errEl.style.display="block"; errEl.scrollIntoView({block:"nearest"});
+      retryBtn.style.display=d.retryable?"inline-block":"none";
+      return;
+    }
+    hideStatusIcon(iconWrap);
+    closeModal();
+    toast(res.body.issueCreated?"Flagged -- elegra1965 has been notified":"Flagged -- visible as amber to everyone now");
+    loadOverrides(); // so the amber colour shows up immediately without a manual refresh
+  }).catch(function(){
+    stopWait(); spin.style.display="none"; btn.disabled=false;
+    showStatusIcon(iconWrap,iconImg,"grave");
+    setErrText(errEl,"Couldn't reach the server -- check your connection. Nothing was flagged.");
+    errEl.style.display="block"; errEl.scrollIntoView({block:"nearest"});
+    retryBtn.style.display="inline-block";
+  });
+}
 document.getElementById("repRetry").addEventListener("click",function(){
-  if(!lastReportAttempt) return;
-  submitReportPayload(lastReportAttempt.address, lastReportAttempt.reason);
+  if(document.getElementById("repModeFlag").classList.contains("on")){
+    if(lastFlagAttempt) submitFlagPayload(lastFlagAttempt.address, lastFlagAttempt.fields, lastFlagAttempt.note);
+  } else if(lastReportAttempt){
+    submitReportPayload(lastReportAttempt.address, lastReportAttempt.reason);
+  }
 });
 document.getElementById("repSubmit").addEventListener("click",function(){
   if(!selected) return;
-  var reason=document.getElementById("repReason").value.trim();
   var errEl=document.getElementById("reportErr"), retryBtn=document.getElementById("repRetry");
+  if(document.getElementById("repModeFlag").classList.contains("on")){
+    var checked=Array.prototype.slice.call(document.querySelectorAll("#flagFieldList input:checked")).map(function(c){ return c.value; });
+    if(!checked.length){ setErrText(errEl,"Pick at least one field to flag."); errEl.style.display="block"; retryBtn.style.display="none"; errEl.classList.remove("scanning"); errEl.scrollIntoView({block:"nearest"}); return; }
+    errEl.style.display="none"; retryBtn.style.display="none";
+    submitFlagPayload(selected.address, checked, document.getElementById("flagNote").value.trim());
+    return;
+  }
+  var reason=document.getElementById("repReason").value.trim();
   if(!reason){ setErrText(errEl,"Please describe what's wrong."); errEl.style.display="block"; retryBtn.style.display="none"; errEl.classList.remove("scanning"); errEl.scrollIntoView({block:"nearest"}); return; }
   errEl.style.display="none"; retryBtn.style.display="none";
   submitReportPayload(selected.address, reason);
@@ -4160,6 +4402,89 @@ function animate(){
   }
 }
 
+/* ============ admin flag review queue ============
+   Reached via ?admin=<ADMIN_TOKEN> on the URL -- never linked anywhere in
+   the normal UI, purely something Tony types in himself. Pulls the same
+   admin GET view system-edit.mjs already serves at ?token=<ADMIN_TOKEN>
+   (flagQueue: every currently flagged field across every system, with the
+   note/timestamp/vote-count detail the public payload deliberately omits).
+   See the header comment on adminPanel's HTML above for what's in and out
+   of scope here. */
+var ADMIN_TOKEN=null;
+function adminAction(address, field, resolution, value){
+  return fetch(FUNC_URL+"?token="+encodeURIComponent(ADMIN_TOKEN),{
+    method:"POST", headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({action:"resolve-flag", address:address, payload:{field:field, resolution:resolution, value:value}})
+  }).then(function(r){ return r.json(); });
+}
+// Composite categories can't be fixed with a single plain-text prompt() --
+// their real correction always goes through the normal Edit system flow
+// anyway (which is itself consensus-safe, see voteAndMaybeResolve() in
+// system-edit.mjs), so "fix it now" is only offered for simple ones.
+var ADMIN_SIMPLE_FIELDS={name:1,race:1,region:1,starClass:1,conflict:1,notes:1};
+function renderAdminQueue(data){
+  var sub=document.getElementById("adminSub"), box=document.getElementById("adminQueue");
+  var q=data.flagQueue||[];
+  sub.textContent=q.length?(q.length+" flagged field"+(q.length===1?"":"s")+" waiting on review:"):"Nothing flagged right now.";
+  if(!q.length){ box.innerHTML=""; return; }
+  var html="";
+  for(var i=0;i<q.length;i++){
+    var it=q[i];
+    var label=FLAG_LABELS[it.field]||("Body "+(it.field.split(".")[1]!==undefined?(+it.field.split(".")[1]+1):"?"));
+    html+='<div class="mfld" style="border:1px solid var(--border-soft);border-radius:var(--r-sm);padding:8px 10px" data-addr="'+it.address+'" data-field="'+it.field+'">'+
+      '<div style="display:flex;justify-content:space-between;gap:8px"><b style="color:var(--text)">'+label+'</b>'+
+      '<span style="font-size:10px;color:var(--text-faint)">'+(it.flaggedAt?relTime(new Date(it.flaggedAt).toISOString()):"")+' &middot; '+it.votes+' vote(s)'+(it.issueUrl?' &middot; <a href="'+it.issueUrl+'" target="_blank" style="color:var(--cyan)">Issue</a>':'')+'</span></div>'+
+      '<div style="font-size:11px;color:var(--text-dim);margin:3px 0 6px">'+it.address+(it.note?' -- "'+it.note+'"':'')+'</div>'+
+      '<div style="display:flex;gap:6px;flex-wrap:wrap">'+
+        '<button class="btn" data-act="view" style="font-size:10px">View system</button>'+
+        '<button class="btn" data-act="dispute" style="font-size:10px">Confirm dispute</button>'+
+        '<button class="btn" data-act="dismiss" style="font-size:10px">Dismiss (data was fine)</button>'+
+        (ADMIN_SIMPLE_FIELDS[it.field]?'<button class="btn" data-act="fix" style="font-size:10px">Fix it now</button>':'')+
+      '</div></div>';
+  }
+  box.innerHTML=html;
+}
+function loadAdminQueue(){
+  document.getElementById("adminSub").textContent="Loading…";
+  fetch(FUNC_URL+"?token="+encodeURIComponent(ADMIN_TOKEN)).then(function(r){ return r.json(); }).then(function(data){
+    if(!data.ok || data.flagQueue===undefined){
+      document.getElementById("adminSub").textContent="Invalid admin token, or the server isn't set up yet.";
+      document.getElementById("adminQueue").innerHTML="";
+      return;
+    }
+    renderAdminQueue(data);
+  }).catch(function(){
+    document.getElementById("adminSub").textContent="Couldn't reach the server.";
+  });
+}
+document.getElementById("adminQueue").addEventListener("click",function(e){
+  var btn=e.target.closest?e.target.closest("button[data-act]"):null;
+  if(!btn) return;
+  var row=btn.closest(".mfld");
+  var address=row.getAttribute("data-addr"), field=row.getAttribute("data-field"), act=btn.getAttribute("data-act");
+  if(act==="view"){
+    document.getElementById("adminPanel").style.display="none";
+    jumpTo(address);
+    return;
+  }
+  if(act==="fix"){
+    var val=prompt("New value for "+(FLAG_LABELS[field]||field)+":");
+    if(val===null || !val.trim()) return;
+    adminAction(address,field,"set-value",val.trim()).then(function(){ loadAdminQueue(); loadOverrides(); });
+    return;
+  }
+  var resolution = act==="dispute" ? "dispute" : "dismiss";
+  adminAction(address,field,resolution).then(function(){ loadAdminQueue(); loadOverrides(); });
+});
+document.getElementById("adminClose").addEventListener("click",function(){
+  document.getElementById("adminPanel").style.display="none";
+});
+function openAdminPanel(token){
+  ADMIN_TOKEN=token;
+  document.getElementById("adminPanel").style.display="";
+  loadAdminQueue();
+}
+
 /* ============ init ============ */
 loadStore();
 initLabels();
@@ -4183,6 +4508,10 @@ window.nmsCoreReady.then(function(){
   applyCam();
   animate();
   loadOverrides();
+  try{
+    var adminQ=new URLSearchParams(location.search).get("admin");
+    if(adminQ) openAdminPanel(adminQ);
+  }catch(e){}
 });
 /* Web fonts can finish loading a moment after this script runs, subtly
    changing button widths and therefore how many rows the toolbar wraps
