@@ -65,7 +65,8 @@ canvas#c{display:block;position:fixed;inset:0;touch-action:none}
 #top{position:fixed;top:0;left:0;right:0;z-index:30;display:flex;align-items:flex-end;
   gap:6px;padding:8px 10px;background:linear-gradient(#070b11f2,#070b1100);flex-wrap:wrap}
 #title{font-family:'Orbitron',sans-serif;font-weight:700;font-size:12px;letter-spacing:.14em;
-  color:var(--white);text-shadow:0 0 18px rgba(0,229,255,.45);white-space:nowrap;margin-right:2px}
+  color:var(--white);text-shadow:0 0 18px rgba(0,229,255,.45);white-space:nowrap;margin-right:2px;
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .btn{font-family:'Orbitron',sans-serif;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;
   background:var(--panel);border:1px solid var(--border);color:var(--text);
   padding:6px 10px;border-radius:var(--r-sm);cursor:pointer;white-space:nowrap}
@@ -2882,6 +2883,33 @@ function toggleStats(){
   document.getElementById("stats").classList.toggle("show");
   document.documentElement.classList.toggle("debug-on");
 }
+/* Long-press the title = the touch equivalent of Ctrl+Shift+F -- phones have
+   no keyboard to reach the debug hotkey at all. Uses Pointer Events (unifies
+   touch/mouse/pen, so this also works by long-pressing with a mouse on
+   desktop) with a movement-cancel tolerance so a drag/scroll starting on the
+   title doesn't accidentally trigger it. Deliberately no visual hint this is
+   interactive -- same "regular visitors never see it" intent as the hotkey. */
+(function(){
+  var el=document.getElementById("title"), timer=null, sx=0, sy=0, TOL=10, HOLD_MS=1200;
+  function start(e){
+    if(timer) return;
+    sx=e.clientX; sy=e.clientY;
+    timer=setTimeout(function(){
+      timer=null;
+      toggleStats();
+      toast(document.documentElement.classList.contains("debug-on")?"Debug mode on":"Debug mode off");
+    },HOLD_MS);
+  }
+  function cancel(){ if(timer){ clearTimeout(timer); timer=null; } }
+  function move(e){
+    if(timer&&(Math.abs(e.clientX-sx)>TOL||Math.abs(e.clientY-sy)>TOL)) cancel();
+  }
+  el.addEventListener("pointerdown",start);
+  el.addEventListener("pointerup",cancel);
+  el.addEventListener("pointercancel",cancel);
+  el.addEventListener("pointerleave",cancel);
+  el.addEventListener("pointermove",move);
+})();
 window.addEventListener("keyup",function(e){ keys[e.code]=false; });
 function flyStep(dt){
   var sp=(keys.ShiftLeft||keys.ShiftRight)?46:18;
