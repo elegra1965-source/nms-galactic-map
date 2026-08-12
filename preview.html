@@ -845,6 +845,43 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   <div>MODE <b id="mstat">GALAXY</b></div>
 </div>
 
+<script>
+/* Synchronous placeholder promise, created before the nms-core module script
+   below even begins loading. This MUST be a plain classic script (not part of
+   the module below) because <script type="module"> is deferred until after
+   the whole document has parsed, while the big classic <script> further down
+   this page runs synchronously as the parser reaches it -- meaning by the time
+   that script's own init code runs, the module below would not have executed
+   yet, and a naive `window.nmsCoreReady.then(...)` there would throw on
+   undefined. Defining the real Promise object here first (its RESOLUTION can
+   be deferred; calling .then() on it can't) makes the gate below correct
+   regardless of module-vs-classic execution ordering. See DEPLOYMENT_BRIEF.md. */
+window.nmsCoreReady=new Promise(function(res){ window.__nmsCoreResolve=res; });
+</script>
+<script type="module">
+/* Game-accurate NMS proc-gen core (star type / planet count / black hole &
+   Atlas placement / system, region, planet naming) -- ported from
+   hadsh/nms_namegen (MIT). Loaded as a real ES module (needs import/export)
+   and bridged onto window so the existing plain-script app code (which relies
+   on everything being global for its onclick="" handlers) can call it
+   synchronously once ready. If this fails to load -- e.g. opened via file://
+   where ES module imports are blocked by CORS, rather than served over
+   http(s) -- window.NMSCore/window.nmsLetterMap simply stay unset and every
+   call site below falls back to the original (less accurate but
+   always-available) generation it used before this swap. See
+   DEPLOYMENT_BRIEF.md for the full integration story. */
+import * as NMSCore from './nms-core/index.js';
+import { loadLetterMap } from './nms-core/loadLetterMap.js';
+window.NMSCore = NMSCore;
+loadLetterMap('./nms-core/letter-map').then(function(lm){
+  window.nmsLetterMap = lm;
+  window.__nmsCoreResolve();
+}).catch(function(err){
+  console.error('nms-core letter map failed to load -- falling back to legacy generation', err);
+  window.NMSCore = null;
+  window.__nmsCoreResolve();
+});
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 "use strict";
@@ -1136,19 +1173,70 @@ function weightedStar(r){
   for(i=0;i<STAR_TYPES.length;i++){ v-=STAR_TYPES[i].w; if(v<=0) return STAR_TYPES[i]; }
   return STAR_TYPES[0];
 }
+/* 0->yellow/white(F/G), 1->green(E), 2->blue(B/O), 3->red(K/M), 4->purple/exotic(X/Y) --
+   nms-core's systemAttributes().star_type convention, mapped onto this site's own
+   STAR_TYPES key names so everything downstream (colour, icon, ODDS table, spectral
+   class letters) keeps working unchanged once the source of `st` changes. */
+var NMS_STAR_TYPE_KEY=["yellow","green","blue","red","purple"];
+/* portalCode as a BigInt, reusing formatAddress's own hex layout (P SSS YY ZZZ XXX)
+   so this can never drift out of sync with the address the rest of the app already
+   shows/copies for a system -- see DEPLOYMENT_BRIEF.md "File placement" section. */
+function portalCodeBig(p,idx,vx,vy,vz){ return BigInt("0x"+formatAddress(p,idx,vx,vy,vz)); }
+/* Real black-hole/Atlas-station placement for a region, replacing the old blanket
+   "every region has exactly one of each, always at index 0x079/0x07A" assumption --
+   see DEPLOYMENT_BRIEF.md "The fixed-index problem is bigger than one function".
+   Derived from nms-core's voxelAttributes(): a region's guide-star/black-hole/Atlas
+   counts are constant (120/1/1) everywhere except the ~8-voxel dead core around
+   galaxy centre, where there are none of either -- this reduces to exactly the old
+   0x079/0x07A indices everywhere outside that core (verified: guide_star_count+1 =
+   0x79, +black_hole_count = 0x7A with the module's default counts), so this is a
+   pure correctness fix for the dead core, not a behaviour change anywhere else.
+   Falls back to the old fixed indices if nms-core isn't loaded (see module script
+   above) so the map still renders something sensible either way. Returns
+   {bh:index|-1, atlas:index|-1}; -1 means "this region genuinely has none". */
+function regionAnomalyIdx(vx,vy,vz){
+  if(window.NMSCore){
+    try{
+      var va=window.NMSCore.voxelAttributes(portalCodeBig(1,0,vx,vy,vz));
+      return {
+        bh: va.black_hole_count>0 ? (va.guide_star_count+1) : -1,
+        atlas: va.atlas_station_count>0 ? (va.guide_star_count+va.black_hole_count+1) : -1
+      };
+    }catch(e){ /* fall through to legacy fallback below */ }
+  }
+  return {bh:0x079, atlas:0x07A};
+}
 function generateSystem(vx,vy,vz,idx){
-  var r=mulberry32(gseed(vx,vy,vz,idx)), st=weightedStar(r), s={}, i;
+  var r=mulberry32(gseed(vx,vy,vz,idx)), s={}, i;
   s.vx=vx; s.vy=vy; s.vz=vz; s.idx=idx; s.galaxy=GALAXY;
-  s.blackHole=(idx===0x079); s.atlas=(idx===0x07A);
+
+  /* Accurate star type / planet count / black hole & Atlas placement / system,
+     region & planet naming via the ported nms-core module (see
+     DEPLOYMENT_BRIEF.md) when it's loaded; every field below falls back to
+     this site's original procedural approximation otherwise (module not yet
+     ready, or unavailable e.g. under file://). address is built once up
+     front since both the accurate path and s.address (unchanged, still
+     shown/copied everywhere else) need the exact same portal code. */
+  var address=formatAddress(1,idx,vx,vy,vz);
+  var pc = window.NMSCore ? BigInt("0x"+address) : null;
+  var attrs=null;
+  if(pc!==null){
+    try{ attrs=window.NMSCore.systemAttributes(pc,GALAXY); }catch(e){ attrs=null; }
+  }
+
+  var st = attrs ? starTypeByKey(NMS_STAR_TYPE_KEY[attrs.star_type]||"yellow") : weightedStar(r);
   s.type=st.k; s.color=st.col;
-  /* Giants are exclusive to purple systems in the real game, and were only
-     ever settable by hand until now -- meaning the Giant-planet filter
-     always came back empty against the procedurally generated universe,
-     since nothing ever set it. GIANT_CHANCE is a placeholder (the wiki
-     only says "quite uncommon", no hard number) -- Tony, adjust this once
-     you've explored a few purple systems and have a feel for how often
-     you'd like to actually run into one. */
-  s.giant = s.type==="purple" && mulberry32(gseed(vx,vy,vz,idx^0x61A47))()<GIANT_CHANCE;
+
+  var anomaly=regionAnomalyIdx(vx,vy,vz);
+  s.blackHole=(idx===anomaly.bh); s.atlas=(idx===anomaly.atlas);
+
+  /* Giants are exclusive to purple systems in the real game. Now driven
+     directly by nms-core's own gas_giant draw (real gate, not a guess) when
+     available; falls back to the placeholder GIANT_CHANCE roll otherwise --
+     Tony, that placeholder now only matters for the file:// fallback path,
+     see the comment on GIANT_CHANCE above. */
+  s.giant = attrs ? !!attrs.gas_giant
+                  : (s.type==="purple" && mulberry32(gseed(vx,vy,vz,idx^0x61A47))()<GIANT_CHANCE);
   s.spectral=pickOne(r,st.cls)+Math.floor(r()*10)+pickOne(r,["","","","f","p","pf"]);
   s.water=r()<0.18; s.dissonant=r()<0.10;
   var sc=r(); s.stars = sc<0.80?1:(sc<0.95?2:3);
@@ -1162,8 +1250,17 @@ function generateSystem(vx,vy,vz,idx){
     var pick=pool.splice(pi2,1)[0];
     s.starColors.push(pick.col); s.starTypes.push(pick.k);
   }
-  s.name=nameFrom(gseed(vx,vy,vz,idx^0xABCD));
-  s.region=regionName(vx,vy,vz);
+
+  if(attrs && window.nmsLetterMap){
+    try{ s.name=window.NMSCore.systemName(pc,GALAXY,window.nmsLetterMap); }
+    catch(e){ s.name=nameFrom(gseed(vx,vy,vz,idx^0xABCD)); }
+    try{ s.region=window.NMSCore.regionName(pc,GALAXY,window.nmsLetterMap); }
+    catch(e){ s.region=regionName(vx,vy,vz); }
+  } else {
+    s.name=nameFrom(gseed(vx,vy,vz,idx^0xABCD));
+    s.region=regionName(vx,vy,vz);
+  }
+
   var o=ODDS[st.k];
   s.uncharted=r()<o.unc;
   s.abandoned=!s.uncharted&&(r()<o.aba);
@@ -1178,7 +1275,25 @@ function generateSystem(vx,vy,vz,idx){
   var cr=r(); s.conTier=cr<0.45?0:(cr<0.82?1:2);
   s.conflict=pickOne(r,CONFLICT[s.conTier]);
 
-  var total=2+Math.floor(r()*5); if(total>6) total=6;
+  /* Total body count (planets+moons combined, real 6-body hard cap): accurate
+     via nms-core's planetSeeds() when available -- its final planet_count+
+     moon_count already folds in the gas-giant collapse (1 planet+5 moons)
+     and the real prime-planet/moon-absorption draws, replacing the old flat
+     2-6 guess. Falls back to that same guess otherwise. This only swaps the
+     COUNT; which slots end up flagged as moons, and every biome/terrain/
+     water/ring/resource roll below, is still this site's own long-standing
+     invented flavour generation, untouched -- nms-core doesn't expose a
+     per-slot moon breakdown to port that part accurately (see
+     DEPLOYMENT_BRIEF.md; this is a known scoped-out gap, not an oversight). */
+  var total;
+  if(attrs){
+    try{
+      var ps=window.NMSCore.planetSeeds(pc,GALAXY);
+      total=Math.min(6,Math.max(1,ps.planet_count+ps.moon_count));
+    }catch(e){ total=2+Math.floor(r()*5); if(total>6) total=6; }
+  } else {
+    total=2+Math.floor(r()*5); if(total>6) total=6;
+  }
   s.bodies=[]; s.planets=0; s.moons=0;
   for(var pi=0; pi<total; pi++){
     var br=mulberry32(gseed(vx,vy,vz,(idx<<4)^(pi+7)));
@@ -1192,13 +1307,24 @@ function generateSystem(vx,vy,vz,idx){
     var resUni=[UNIVERSAL_EL[Math.floor(br()*UNIVERSAL_EL.length)]];
     var resU2=UNIVERSAL_EL[Math.floor(br()*UNIVERSAL_EL.length)];
     if(resU2!==resUni[0]) resUni.push(resU2);
+    /* Body names stay on the cheap legacy generator here, even when nms-core
+       is available -- benchmarked at ~0.15ms/system for the accurate
+       per-body planetName() calls (75% of a system's total generation cost),
+       which would freeze the page for several seconds on a "Heavy" slice
+       regen (see the Node harness in this session's verification, referenced
+       from DEPLOYMENT_BRIEF.md's own "needs benchmarking" flag). Real names
+       are still used, just lazily -- see upgradeBodyNames(), called once
+       from updatePanel() so a viewed/entered system always shows accurate
+       names without paying that cost for the thousands of systems rendered
+       as unlabeled points that a player never opens. */
+    var bodyName=nameFrom(gseed(vx,vy,vz,(idx*31)+pi));
     s.bodies.push({
       index:pi+1, moon:isMoon,
       // every moon of a Giant orbits the Giant itself (always body #1) --
       // NOT the previous body pushed, which is what the non-giant fallback
       // means (each planet's own trailing moon chain)
       parent:isMoon?(s.giant?1:s.bodies[s.bodies.length-1].index):0,
-      name:nameFrom(gseed(vx,vy,vz,(idx*31)+pi)),
+      name:bodyName,
       biome:biome, terrain:hasWater?pickOne(br,TERRAIN.slice(1)):"Pangean", water:hasWater,
       ring:ringStyle,
       size:isMoon?(0.34+br()*0.22):(0.68+br()*0.62),
@@ -1208,7 +1334,7 @@ function generateSystem(vx,vy,vz,idx){
     });
     if(isMoon) s.moons++; else s.planets++;
   }
-  s.address=formatAddress(1,idx,vx,vy,vz);
+  s.address=address;
   s.coreLY=coreLY(vx,vy,vz);
   applyOverride(s);
   return s;
@@ -1805,7 +1931,12 @@ function generateSlice(focusIdx){
     var vx=focus.x+dx, vy=focus.y+dy, vz=focus.z+dz;
     var count=regionCount(vx,vy,vz);
     var vr=mulberry32(gseed(vx,vy,vz,0xF00D));
-    var idxs=[0x079,0x07A];
+    /* real per-region black-hole/Atlas indices (0, 1, or 2 entries -- see
+       regionAnomalyIdx()), replacing the old blanket [0x079,0x07A] which
+       force-manufactured one of each in every region shown, including the
+       dead core where the real game has none. */
+    var _an=regionAnomalyIdx(vx,vy,vz);
+    var idxs=[]; if(_an.bh>=0) idxs.push(_an.bh); if(_an.atlas>=0) idxs.push(_an.atlas);
     /* the system you jumped to must always be in the slice, or nothing gets selected */
     if(focusIdx!=null && dx===0 && dy===0 && dz===0 && idxs.indexOf(focusIdx)<0) idxs.push(focusIdx);
     for(i=0;i<per;i++){
@@ -1901,7 +2032,11 @@ function regionCandidates(vx,vy,vz){
      that a real system is essentially always found in range, especially at the
      Basic (101 LY) default where a hop only covers a sliver of one region. */
   var per=Math.min(200,count);
-  var idxs=[0x079,0x07A],i;
+  /* real per-region black-hole/Atlas indices, same fix as generateSlice() --
+     see regionAnomalyIdx(). */
+  var _an=regionAnomalyIdx(vx,vy,vz);
+  var idxs=[]; if(_an.bh>=0) idxs.push(_an.bh); if(_an.atlas>=0) idxs.push(_an.atlas);
+  var i;
   for(i=0;i<per;i++){
     var pick=Math.floor(vr()*count);
     if(idxs.indexOf(pick)<0) idxs.push(pick);
@@ -1916,7 +2051,7 @@ function regionCandidates(vx,vy,vz){
       px:(dx+jx-0.5)*VOX_U, py:(dy+jy-0.5)*VOX_U, pz:(dz+jz-0.5)*VOX_U,
       name:nameFrom(gseed(vx,vy,vz,idx^0xABCD)),
       address:formatAddress(1,idx,vx,vy,vz),
-      blackHole:idx===0x079, atlas:idx===0x07A
+      blackHole:idx===_an.bh, atlas:idx===_an.atlas
     });
   }
   return out;
@@ -2244,8 +2379,32 @@ function distanceLY(s){
   var dx=s.px-focusSystem.px, dy=s.py-focusSystem.py, dz=s.pz-focusSystem.pz;
   return Math.round(Math.sqrt(dx*dx+dy*dy+dz*dz)/VOX_U*LY_PER_VOXEL);
 }
+/* Lazily upgrades a single system's body names to nms-core's accurate
+   planetName() output, in place, the first time that system is actually
+   viewed (called from updatePanel(), the one choke point every selection
+   path -- star click, jump, Enter system, edit-save refresh -- already goes
+   through before a player can see either the info panel or the 3D system
+   view; buildSystemView() only ever runs on `selected`, which this has
+   already mutated by then). Memoised on the system object itself
+   (s._bodyNamesUpgraded) so re-opening the same system doesn't repeat the
+   work. See the comment on the body loop in generateSystem() for why this
+   isn't done eagerly for every generated system. */
+function upgradeBodyNames(s){
+  if(!s || s._bodyNamesUpgraded || !window.NMSCore || !window.nmsLetterMap) return;
+  s._bodyNamesUpgraded=true;
+  var ps2;
+  try{ ps2=window.NMSCore.planetSeeds(BigInt("0x"+s.address),s.galaxy); }
+  catch(e){ return; }
+  for(var i=0;i<s.bodies.length;i++){
+    var b=s.bodies[i];
+    if(b.index>ps2.planet_seeds.length) continue;
+    try{ b.name=window.NMSCore.planetName(portalCodeBig(b.index,s.idx,s.vx,s.vy,s.vz),s.galaxy,window.nmsLetterMap); }
+    catch(e){ /* keep the existing (legacy) name for this one body */ }
+  }
+}
 function updatePanel(s){
   selected=s;
+  upgradeBodyNames(s);
   document.getElementById("panel").classList.add("show");
   document.getElementById("pSys").style.display="";
   document.getElementById("pBody").style.display="none";
@@ -4011,13 +4170,20 @@ buildGalaxy();
 buildNebula();
 drawGalIcon();
 var BOOT_ANCHOR_ADDR="1067FA5A9B2C"; /* arbitrary real coordinate purely to seed the initial slice/camera -- not shown to the visitor, see jumpTo's silent flag */
-jumpTo(BOOT_ANCHOR_ADDR,true);
-setMode("galaxy");
-syncResetBtn();
-setCtrl("orbit");
-applyCam();
-animate();
-loadOverrides();
+/* Gated behind the nms-core module script above (see DEPLOYMENT_BRIEF.md) so
+   the very first generateSlice() call -- inside jumpTo() below -- doesn't run
+   before window.nmsLetterMap is populated. window.nmsCoreReady always
+   resolves (even if the module failed to load, see its .catch() above), so
+   this never hangs the page waiting on it. */
+window.nmsCoreReady.then(function(){
+  jumpTo(BOOT_ANCHOR_ADDR,true);
+  setMode("galaxy");
+  syncResetBtn();
+  setCtrl("orbit");
+  applyCam();
+  animate();
+  loadOverrides();
+});
 /* Web fonts can finish loading a moment after this script runs, subtly
    changing button widths and therefore how many rows the toolbar wraps
    onto -- re-measure once fonts settle so --top-h doesn't end up stale. */
