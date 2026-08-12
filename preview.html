@@ -1352,8 +1352,21 @@ function generateSystem(vx,vy,vz,idx,noOverride){
   }
 
   var o=ODDS[st.k];
-  s.uncharted=r()<o.unc;
-  s.abandoned=!s.uncharted&&(r()<o.aba);
+  /* Verified 2026-08-12 via a statistical sweep cross-checking this against
+     nms-core's own corpus-verified real draw sequence (system.js's
+     ABANDONED_SYSTEM_PCT comment: "when a system is abandoned, the
+     empty-system check draw is SKIPPED"). The real game rolls Abandoned
+     FIRST, unconditionally, then only rolls the empty/uncharted check if
+     the system wasn't already abandoned. This project previously rolled
+     uncharted first and gated abandoned behind THAT instead -- the
+     opposite order, which skewed which flag "won" when both would apply
+     (e.g. purple's real 35% abandoned rate was only landing at ~28% of
+     purple systems because 20% of them got claimed as uncharted first).
+     Order now matches the real sequence. Outlaw's own gate (behind
+     !uncharted) is left as it was -- nms-core doesn't model pirate/outlaw
+     at all, so there's no real evidence for where it belongs. */
+  s.abandoned=r()<o.aba;
+  s.uncharted=!s.abandoned&&(r()<o.unc);
   s.outlaw=!s.uncharted&&(r()<o.out);
   s.race=(s.uncharted||s.abandoned)?"Uninhabited":pickOne(r,RACES);
   var e=pickOne(r,ECON);
@@ -1415,6 +1428,7 @@ function generateSystem(vx,vy,vz,idx,noOverride){
       // means (each planet's own trailing moon chain)
       parent:isMoon?(s.giant?1:s.bodies[s.bodies.length-1].index):0,
       name:bodyName,
+      nameOverridden:false, // this is the placeholder legacy name, not a real traveller submission -- upgradeBodyNames() is free to replace it with the accurate nms-core name
       biome:biome, terrain:hasWater?pickOne(br,TERRAIN.slice(1)):"Pangean", water:hasWater,
       ring:ringStyle,
       size:isMoon?(0.34+br()*0.22):(0.68+br()*0.62),
@@ -1524,6 +1538,12 @@ function applyOverride(s){
         moon:isMoon,
         parent:isMoon?(validOrbit?b.orbits:lastPlanetIndex):0,
         name:(b.name&&b.name.trim())||(o?o.name:"Unnamed"),
+        // true only when THIS traveller actually typed a name for this slot --
+        // tells upgradeBodyNames() (below) to never clobber a real submitted
+        // name with its own procedural guess. A blank submission (falling
+        // through to the old procedural o.name/"Unnamed") is NOT a real name,
+        // so it stays eligible to be upgraded to the accurate one.
+        nameOverridden:!!(b.name&&b.name.trim()),
         biome:biome,
         descriptor:b.descriptor||"",
         terrain:o?o.terrain:"Pangean",
@@ -2513,7 +2533,17 @@ function fieldStatusBaseline(s){
 }
 function fsBodyKey(b){
   if(!b) return null;
-  return JSON.stringify({n:b.name,bi:b.biome,d:b.descriptor,w:!!b.water,r:b.ring||false,
+  // Real bug fixed 2026-08-12: every other field here already defaults a
+  // missing value the same way on both the pure-procedural path
+  // (generateSystem's own body loop, which never sets descriptor/flora/
+  // minerals/salvage/fossils at all) and the override path (applyOverride,
+  // which always sets them, even to "" / [] / "None") -- descriptor was the
+  // one field still comparing raw b.descriptor, i.e. undefined vs "". Since
+  // JSON.stringify OMITS keys whose value is undefined but KEEPS an empty
+  // string, an untouched body on a system that had ANY other body edited
+  // would permanently compare as "edited" even though nothing about that
+  // specific body ever changed -- a false-positive green/edited status.
+  return JSON.stringify({n:b.name,bi:b.biome,d:b.descriptor||"",w:!!b.water,r:b.ring||false,
     se:b.sentinel||"None",au:!!b.autophage,ru:(b.resUni||[]).slice().sort(),
     fl:(b.flora||[]).slice().sort(),mi:(b.minerals||[]).slice().sort(),
     sa:(b.salvage||[]).slice().sort(),fo:(b.fossils||[]).slice().sort()});
@@ -2577,6 +2607,15 @@ function upgradeBodyNames(s){
   catch(e){ return; }
   for(var i=0;i<s.bodies.length;i++){
     var b=s.bodies[i];
+    // Real bug fixed 2026-08-12: this used to overwrite EVERY body's name
+    // unconditionally, including ones a traveller had actually typed in via
+    // Edit system and saved as shared community data -- so a system with
+    // real submitted planet names would silently show this site's own
+    // procedural guess instead the moment it was opened. A submitted name
+    // is a fact (from someone's real save), the procedural name is only a
+    // best-effort guess when no one has told us the real one yet -- never
+    // let the guess win.
+    if(b.nameOverridden) continue;
     if(b.index>ps2.planet_seeds.length) continue;
     try{ b.name=window.NMSCore.planetName(portalCodeBig(b.index,s.idx,s.vx,s.vy,s.vz),s.galaxy,window.nmsLetterMap); }
     catch(e){ /* keep the existing (legacy) name for this one body */ }
