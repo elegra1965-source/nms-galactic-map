@@ -992,15 +992,27 @@ var STAR_TYPES=[
    matches the wiki's own class groupings for each of the 5 real colours. */
 var STAR_COLOR_LABEL={yellow:"Yellow (F/G)",red:"Red/Orange (K/M)",green:"Green (E)",blue:"Blue (B/O)",purple:"Purple (X/Y)"};
 function starTypeByKey(k){ for(var i=0;i<STAR_TYPES.length;i++) if(STAR_TYPES[i].k===k) return STAR_TYPES[i]; return STAR_TYPES[0]; }
+/* Verified 2026-08-12 against Tony's own legitimately-owned game install:
+   decompiled GCSOLARGENERATIONGLOBALS.GLOBAL.MBIN via NMS Mod Tool
+   (nexusmods.com/nomanssky/mods/4312), which wraps libMBIN -- real Hello
+   Games data, not a guess or another fan tool's reverse-engineering. That
+   file's AbandonedSystemProbability / EmptySystemProbability /
+   PirateSystemProbability tables (keyed Yellow/Green/Blue/Red/Purple)
+   match every value below exactly EXCEPT purple, which this project had
+   been approximating -- out .15->.05, unc .40->.20, aba .10->.35, now the
+   real numbers. (unc here = the real "EmptySystemProbability" name; aba =
+   AbandonedSystemProbability; out = PirateSystemProbability.) */
 var ODDS={yellow:{out:.25,unc:0,aba:0},red:{out:.50,unc:.95,aba:0},
-  green:{out:.15,unc:.40,aba:.10},blue:{out:.15,unc:.40,aba:.10},purple:{out:.15,unc:.40,aba:.10}};
+  green:{out:.15,unc:.40,aba:.10},blue:{out:.15,unc:.40,aba:.10},purple:{out:.05,unc:.20,aba:.35}};
 /* chance a purple system is also a Giant-planet system -- placeholder,
    see the comment in generateSystem() where it's used */
 var GIANT_CHANCE=0.12;
-/* chance any given PLANET (never a moon -- not a thing in-game) generates
-   with rings, placeholder same as GIANT_CHANCE above -- Tony, adjust once
-   you've got a feel for how common ringed worlds should look on the map. */
-var RING_CHANCE=0.22;
+/* Chance any given PLANET (never a moon -- not a thing in-game) generates
+   with rings. Was a 0.22 placeholder; verified 2026-08-12 as the real
+   PlanetRingProbability value (0.30) from the same decompiled
+   GCSOLARGENERATIONGLOBALS.GLOBAL.MBIN referenced in the ODDS comment
+   above. */
+var RING_CHANCE=0.30;
 /* Which of the 5 ring looks each biome gets -- Tony's own pairing ("ice for
    frozen planets, ash for volcanic etc"), not random per-planet. b.ring is
    now one of these style keys (or false for no ring), not a plain boolean --
