@@ -96,14 +96,21 @@ select{font-family:'Rajdhani',sans-serif;font-size:12px;background:#04070c;color
 #galSel{width:auto;max-width:168px;font-family:'Orbitron',sans-serif;font-size:10px;
   letter-spacing:.06em;color:var(--gold)}
 
-#tel{width:190px;padding:10px 12px;font-family:'Orbitron',sans-serif;
+/* Telemetry and Rendering tuning (below) are debug/power-user tools, not
+   meant for regular visitors -- per Tony's own call, both are hidden
+   entirely by default and only appear once the existing hidden Ctrl+Shift+F
+   debug hotkey (toggleStats(), see keydown handler) has been used, the same
+   gate the FPS counter already lives behind. html.debug-on is added there. */
+#tel{display:none;width:190px;padding:10px 12px;font-family:'Orbitron',sans-serif;
   font-size:10px;letter-spacing:.08em;line-height:1.75}
+html.debug-on #tel{display:block}
 #tel b{color:var(--cyan);font-weight:600}
 #gType{font-size:9px;margin-top:4px}
 #tCore{font-size:9px;color:var(--text-faint);margin-top:2px}
 
 #leftcol{position:fixed;left:10px;bottom:10px;z-index:25;display:flex;gap:8px;align-items:flex-end}
-#tweak{width:100%;padding:8px 10px;box-sizing:border-box}
+#tweak{display:none;width:100%;padding:8px 10px;box-sizing:border-box}
+html.debug-on #tweak{display:block}
 /* Rendering tuning expands SIDEWAYS out of #accessPop instead of downward in
    its own flow -- with 9+ sliders, expanding in place pushed the whole
    accessibility popup taller than the viewport with no way to scroll down to
@@ -471,10 +478,12 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   input[type=text]{width:100%}
 
   /* Tweak (generation tuning) and Sensor telemetry (a debug X/Y/Z readout) are
-     power-user tools, not something a first-time visitor needs -- per Tony's
-     own call, hidden on mobile so the left column is just Filters. Both stay
-     available on desktop. */
-  #tweak,#tel{display:none}
+     power-user tools, not something a first-time visitor needs. Both are now
+     gated behind the Ctrl+Shift+F debug hotkey at every width (see html.debug-on
+     rules above) -- this mobile-only rule predates that and would otherwise
+     ALSO suppress them for Tony himself on his own phone with debug mode on,
+     so it's scoped to only matter while debug mode is off. */
+  html:not(.debug-on) #tweak,html:not(.debug-on) #tel{display:none}
 
   /* Toolbar reflow: view-mode toggles first, then the address input on its own
      line (with a Reset button, since there wasn't one before) plus a label so
@@ -2869,7 +2878,10 @@ window.addEventListener("keydown",function(e){
   if(e.code==="KeyF") toggleFold("filt","fHead","Filters");
   if(e.code==="KeyG") toggleGrid();
 });
-function toggleStats(){ document.getElementById("stats").classList.toggle("show"); }
+function toggleStats(){
+  document.getElementById("stats").classList.toggle("show");
+  document.documentElement.classList.toggle("debug-on");
+}
 window.addEventListener("keyup",function(e){ keys[e.code]=false; });
 function flyStep(dt){
   var sp=(keys.ShiftLeft||keys.ShiftRight)?46:18;
