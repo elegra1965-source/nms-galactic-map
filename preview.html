@@ -104,6 +104,19 @@ select{font-family:'Rajdhani',sans-serif;font-size:12px;background:#04070c;color
 
 #leftcol{position:fixed;left:10px;bottom:10px;z-index:25;display:flex;gap:8px;align-items:flex-end}
 #tweak{width:100%;padding:8px 10px;box-sizing:border-box}
+/* Rendering tuning expands SIDEWAYS out of #accessPop instead of downward in
+   its own flow -- with 9+ sliders, expanding in place pushed the whole
+   accessibility popup taller than the viewport with no way to scroll down to
+   it or reach anything below (Tony's screenshot). position:absolute anchored
+   to #accessPop itself (its nearest positioned ancestor, being position:fixed)
+   rather than position:fixed with a one-off computed offset, so it
+   automatically travels with the popup if Tony drags it afterward -- no extra
+   tracking needed. Side (.sideL/.sideR) is chosen once per open by
+   positionTweakPanel(), based on real available viewport space. */
+#tweak.sideR,#tweak.sideL{position:absolute;top:0;width:190px;
+  max-height:calc(100vh - 40px);overflow-y:auto;z-index:1}
+#tweak.sideR{left:100%;margin-left:8px}
+#tweak.sideL{right:100%;margin-right:8px}
 #filt{width:176px;padding:10px 12px}
 .fold.min .fbody{display:none}
 .fold.min{width:auto}
@@ -3334,7 +3347,23 @@ document.getElementById("fFile").addEventListener("change",function(e){
   };
   rd.readAsText(f);
 });
-document.getElementById("tHead").addEventListener("click",function(){ toggleFold("tweak","tHead","Tweak"); });
+document.getElementById("tHead").addEventListener("click",function(){
+  toggleFold("tweak","tHead","Tweak");
+  positionTweakPanel();
+});
+function positionTweakPanel(){
+  var tw=document.getElementById("tweak"), pop=document.getElementById("accessPop");
+  if(tw.classList.contains("min")){
+    tw.classList.remove("sideL","sideR");
+    tw.style.marginTop="10px";
+    return;
+  }
+  var pr=pop.getBoundingClientRect();
+  var roomRight=window.innerWidth-pr.right-8, roomLeft=pr.left-8;
+  tw.classList.remove("sideL","sideR");
+  tw.classList.add(roomRight>=190||roomRight>=roomLeft?"sideR":"sideL");
+  tw.style.marginTop="0";
+}
 document.getElementById("fHead").addEventListener("click",function(){ toggleFold("filt","fHead","Filters"); });
 document.getElementById("telHead").addEventListener("click",function(){ toggleFold("tel","telHead","Telemetry"); });
 document.getElementById("bFiltToggle").addEventListener("click",function(){ toggleFold("filt","fHead","Filters"); });
