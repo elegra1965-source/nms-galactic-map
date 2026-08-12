@@ -599,6 +599,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
       <div><div class="lb">Conflict</div><div class="vl" id="pCon">—</div></div></div>
     <div class="tags" id="pTags"></div>
     <div class="bodylist" id="pBodies"></div>
+    <div style="font-size:10px;color:var(--text-faint);line-height:1.4;margin-top:5px">Planet names are a procedural guess, not your save data (<span style="text-decoration:underline;cursor:pointer" onclick="openDisclaimer()">see About</span>) -- Edit system to add the real ones.</div>
   </div>
   <div id="pBody" style="display:none">
     <div class="row"><span id="icBio"></span>
@@ -845,7 +846,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     </div>
     <div class="mfld">
       <div class="lb">Procedural data</div>
-      <div style="font-size:12px;color:var(--text-dim);line-height:1.55">Star systems are generated procedurally from their portal address, the same way the game does -- they are not scraped from anyone's real save. A system only reflects real in-game data once a traveller has entered it via <b>Edit system</b>, marked "Community edited".</div>
+      <div style="font-size:12px;color:var(--text-dim);line-height:1.55">Star systems are generated procedurally from their portal address, the same way the game does -- they are not scraped from anyone's real save. Star type, system/region names, and planet count are consistently accurate. <b>Individual planet names are not</b> -- the real game's planet-naming logic has never been fully reverse-engineered, so what you see is a plausible guess, not your actual save data. A system only reflects real in-game data once a traveller has entered it via <b>Edit system</b>, marked "Community edited".</div>
     </div>
     <div class="mfld">
       <div class="lb">Community-submitted data</div>
@@ -949,7 +950,18 @@ window.nmsCoreReady=new Promise(function(res){ window.__nmsCoreResolve=res; });
    DEPLOYMENT_BRIEF.md for the full integration story. */
 import * as NMSCore from './nms-core/index.js';
 import { loadLetterMap } from './nms-core/loadLetterMap.js';
+import * as NMSEconomy from './nms-core/economy.js';
 window.NMSCore = NMSCore;
+/* Standalone, shareable economy/conflict/race/outlaw/ring module -- see
+   nms-core/economy.js's own header for the full sourcing story. Unlike
+   NMSCore, this one has no async letter-map fetch step, so it's just
+   assigned directly; if the static import itself fails (e.g. under file://
+   where ES module imports are blocked by CORS -- same failure mode already
+   possible for NMSCore above), this whole <script type="module"> block
+   never runs at all and window.NMSEconomy simply stays undefined, which the
+   generateSystem() call sites below already treat the same as "fall back
+   to the plain-script copy of this same logic that's always been here". */
+window.NMSEconomy = NMSEconomy;
 loadLetterMap('./nms-core/letter-map').then(function(lm){
   window.nmsLetterMap = lm;
   window.__nmsCoreResolve();
@@ -1351,32 +1363,47 @@ function generateSystem(vx,vy,vz,idx,noOverride){
     s.region=regionName(vx,vy,vz);
   }
 
-  var o=ODDS[st.k];
-  /* Verified 2026-08-12 via a statistical sweep cross-checking this against
-     nms-core's own corpus-verified real draw sequence (system.js's
-     ABANDONED_SYSTEM_PCT comment: "when a system is abandoned, the
-     empty-system check draw is SKIPPED"). The real game rolls Abandoned
-     FIRST, unconditionally, then only rolls the empty/uncharted check if
-     the system wasn't already abandoned. This project previously rolled
-     uncharted first and gated abandoned behind THAT instead -- the
-     opposite order, which skewed which flag "won" when both would apply
-     (e.g. purple's real 35% abandoned rate was only landing at ~28% of
-     purple systems because 20% of them got claimed as uncharted first).
-     Order now matches the real sequence. Outlaw's own gate (behind
-     !uncharted) is left as it was -- nms-core doesn't model pirate/outlaw
-     at all, so there's no real evidence for where it belongs. */
-  s.abandoned=r()<o.aba;
-  s.uncharted=!s.abandoned&&(r()<o.unc);
-  s.outlaw=!s.uncharted&&(r()<o.out);
-  s.race=(s.uncharted||s.abandoned)?"Uninhabited":pickOne(r,RACES);
-  var e=pickOne(r,ECON);
-  s.econType=e[0]; s.econName=pickOne(r,e[1]);
-  var tr=r(); s.econTier=tr<0.45?0:(tr<0.85?1:2);
-  s.econDesc=pickOne(r,ECON_S[s.econTier]);
-  s.sell=Math.min(80,[5+r()*30,30+r()*30,55+r()*25][s.econTier]).toFixed(1);
-  s.buy=(-(5+r()*25)).toFixed(1);
-  var cr=r(); s.conTier=cr<0.45?0:(cr<0.82?1:2);
-  s.conflict=pickOne(r,CONFLICT[s.conTier]);
+  /* Economy/conflict/race/outlaw/abandoned/uncharted: rolled via the
+     standalone nms-core/economy.js module when it loaded successfully (see
+     that file's own header for the real decompiled-GLOBALS sourcing of
+     ODDS/RING_CHANCE), falling back to this identical inline copy of the
+     exact same logic otherwise (file:// / module load failure -- same
+     fallback pattern as window.NMSCore elsewhere in this function). The two
+     paths are verified byte-identical, including RNG-call parity so
+     everything drawn from `r` afterwards (e.g. the fallback body-count
+     total below) stays in sync either way -- see a 200,000-trial parity
+     test run against this exact code before it shipped. Order (abandoned
+     first & unconditional, uncharted only if not abandoned, outlaw only if
+     not uncharted) verified 2026-08-12 against nms-core's own
+     corpus-verified real draw sequence (system.js's ABANDONED_SYSTEM_PCT
+     comment: "when a system is abandoned, the empty-system check draw is
+     SKIPPED") -- this project previously rolled uncharted first instead,
+     which skewed purple's real 35% abandoned rate down to ~28% before the
+     fix. */
+  var flavor;
+  if(window.NMSEconomy){
+    flavor=window.NMSEconomy.rollSystemFlavor(r,st.k);
+  } else {
+    var o=ODDS[st.k];
+    flavor={};
+    flavor.abandoned=r()<o.aba;
+    flavor.uncharted=!flavor.abandoned&&(r()<o.unc);
+    flavor.outlaw=!flavor.uncharted&&(r()<o.out);
+    flavor.race=(flavor.uncharted||flavor.abandoned)?"Uninhabited":pickOne(r,RACES);
+    var e=pickOne(r,ECON);
+    flavor.econType=e[0]; flavor.econName=pickOne(r,e[1]);
+    var tr=r(); flavor.econTier=tr<0.45?0:(tr<0.85?1:2);
+    flavor.econDesc=pickOne(r,ECON_S[flavor.econTier]);
+    flavor.sell=Math.min(80,[5+r()*30,30+r()*30,55+r()*25][flavor.econTier]).toFixed(1);
+    flavor.buy=(-(5+r()*25)).toFixed(1);
+    var cr=r(); flavor.conTier=cr<0.45?0:(cr<0.82?1:2);
+    flavor.conflict=pickOne(r,CONFLICT[flavor.conTier]);
+  }
+  s.abandoned=flavor.abandoned; s.uncharted=flavor.uncharted; s.outlaw=flavor.outlaw;
+  s.race=flavor.race;
+  s.econType=flavor.econType; s.econName=flavor.econName; s.econTier=flavor.econTier;
+  s.econDesc=flavor.econDesc; s.sell=flavor.sell; s.buy=flavor.buy;
+  s.conTier=flavor.conTier; s.conflict=flavor.conflict;
 
   /* Total body count (planets+moons combined, real 6-body hard cap): accurate
      via nms-core's planetSeeds() when available -- its final planet_count+
@@ -1405,8 +1432,15 @@ function generateSystem(vx,vy,vz,idx,noOverride){
     var bd=BIOMES[biome];
     var canWater = bd.water && !isMoon;
     var hasWater = canWater && br()<0.62;
-    var hasRing = !isMoon && br()<RING_CHANCE;
-    var ringStyle = hasRing ? (RING_STYLE_BY_BIOME[biome]||"tan") : false;
+    // Same fallback pattern as the flavor roll above -- window.NMSEconomy's
+    // rollRing() when available, else this identical inline copy. Verified
+    // byte-identical (including the isMoon short-circuit that skips
+    // consuming br() entirely for moons, preserving downstream br() draws
+    // for resUni/size/tilt/spin below) via the same parity test.
+    var ringStyle = window.NMSEconomy
+      ? window.NMSEconomy.rollRing(br,biome,isMoon)
+      : (!isMoon && br()<RING_CHANCE ? (RING_STYLE_BY_BIOME[biome]||"tan") : false);
+    var hasRing = !!ringStyle;
     var resUni=[UNIVERSAL_EL[Math.floor(br()*UNIVERSAL_EL.length)]];
     var resU2=UNIVERSAL_EL[Math.floor(br()*UNIVERSAL_EL.length)];
     if(resU2!==resUni[0]) resUni.push(resU2);
