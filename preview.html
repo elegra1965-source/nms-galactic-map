@@ -54,7 +54,15 @@ canvas#c{display:block;position:fixed;inset:0;touch-action:none}
 .box::before{top:-1px;right:-1px;border-top:1px solid var(--cyan);border-right:1px solid var(--cyan);border-radius:0 12px 0 0}
 .box::after{bottom:-1px;left:-1px;border-bottom:1px solid var(--cyan);border-left:1px solid var(--cyan);border-radius:0 0 0 12px}
 
-#top{position:fixed;top:0;left:0;right:0;z-index:30;display:flex;align-items:center;
+/* align-items:flex-end (not center) so every same-height toolbar button
+   bottom-lines-up with the address group's input row -- #addrGrp is a
+   two-line stack (label + input row) so under center alignment its taller
+   box got vertically centered as a whole, leaving the actual Jump/Clear/
+   input row sitting visibly lower than every single-line button next to
+   it (Tony's "buttons are not level" screenshot). .sep below restores its
+   own centering since a short 18px divider bottom-anchored to a ~30px row
+   would look stuck to the floor instead of centred between the buttons. */
+#top{position:fixed;top:0;left:0;right:0;z-index:30;display:flex;align-items:flex-end;
   gap:6px;padding:8px 10px;background:linear-gradient(#070b11f2,#070b1100);flex-wrap:wrap}
 #title{font-family:'Orbitron',sans-serif;font-weight:700;font-size:12px;letter-spacing:.14em;
   color:var(--white);text-shadow:0 0 18px rgba(0,229,255,.45);white-space:nowrap;margin-right:2px}
@@ -68,13 +76,13 @@ canvas#c{display:block;position:fixed;inset:0;touch-action:none}
    visually the obvious next step right after typing an address. */
 #top .btn.primary{border-color:var(--gold);color:var(--gold)}
 .btn.off{opacity:.4;border-color:var(--border-soft);color:var(--text-faint)}
-.sep{width:1px;height:18px;background:var(--border-soft)}
+.sep{width:1px;height:18px;background:var(--border-soft);align-self:center}
 input[type=text]{font-family:'Orbitron',monospace;font-size:11px;letter-spacing:.12em;
   background:#04070c;border:1px solid var(--border);color:var(--cyan);
   padding:6px 8px;border-radius:var(--r-sm);width:140px;text-transform:uppercase;outline:none}
 input[type=text]:focus{border-color:var(--gold)}
 #addrGrp{display:flex;flex-direction:column;gap:2px}
-.addr-lb{font-size:8px;letter-spacing:.14em;color:var(--text-faint);text-transform:uppercase}
+.addr-lb{font-size:8px;letter-spacing:.14em;color:var(--text-faint);text-transform:uppercase;text-align:center}
 .addr-row{display:flex;gap:4px;align-items:center}
 #panel.panel-min>*:not(.phead){display:none}
 .phead #bPanelMin{margin-left:auto;flex:none;padding:4px 9px;font-size:12px}
