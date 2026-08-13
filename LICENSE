@@ -36,3 +36,18 @@ Note on shared data: this license covers the code only, not any community-
 submitted system data collected via the live site's Edit system feature
 (stored in data/overrides.json on the deployed backend) -- that data belongs
 to the players who submitted it.
+
+----------------------------------------------------------------------------
+
+Note on third-party code: nms-core/ (star type, planet count, black hole/
+Atlas placement, and system/region/planet name generation) is a port of
+hadsh/nms_namegen (https://github.com/hadsh/nms_namegen), itself a fork of
+Stuart Coyle's original nms_namegen, co-authored by GoodGuysFree. hadsh's
+repository states this work is MIT-licensed. The MIT license above applies
+to elegra1965's own original code in this project; it does not make
+elegra1965 the author of the ported generation logic. Each file under
+nms-core/ additionally carries its own "Ported from hadsh/nms_namegen (MIT
+licensed)" attribution comment at the top, per MIT's own requirement that
+the original notice travel with the code. Credit for the underlying
+generation algorithms belongs to Stuart Coyle (original author), GoodGuysFree
+(co-author of the hadsh fork), and hadsh (fork maintainer).
