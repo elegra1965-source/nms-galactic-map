@@ -65,8 +65,7 @@ canvas#c{display:block;position:fixed;inset:0;touch-action:none}
 #top{position:fixed;top:0;left:0;right:0;z-index:30;display:flex;align-items:flex-end;
   gap:6px;padding:8px 10px;background:linear-gradient(#070b11f2,#070b1100);flex-wrap:wrap}
 #title{font-family:'Orbitron',sans-serif;font-weight:700;font-size:12px;letter-spacing:.14em;
-  color:var(--white);text-shadow:0 0 18px rgba(0,229,255,.45);white-space:nowrap;margin-right:2px;
-  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+  color:var(--white);text-shadow:0 0 18px rgba(0,229,255,.45);white-space:nowrap;margin-right:2px}
 .btn{font-family:'Orbitron',sans-serif;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;
   background:var(--panel);border:1px solid var(--border);color:var(--text);
   padding:6px 10px;border-radius:var(--r-sm);cursor:pointer;white-space:nowrap}
@@ -302,7 +301,8 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   font-family:'Orbitron',sans-serif;pointer-events:none;color:var(--white);display:flex;
   align-items:center;gap:9px;transition:top .15s}
 #galHud.withBadge{top:calc(var(--top-h,60px) + 46px)}
-#galIcon{width:84px;height:84px;flex:none;display:block}
+#galIcon{width:84px;height:84px;flex:none;display:block;pointer-events:auto;
+  -webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 #galHud div{white-space:nowrap}
 #galHud .galHudTxt{text-shadow:0 1px 2px #000,0 -1px 2px #000,1px 0 2px #000,-1px 0 2px #000,0 0 6px #000}
 #galHudName{font-size:11px;letter-spacing:.06em;opacity:.92}
@@ -2883,16 +2883,29 @@ function toggleStats(){
   document.getElementById("stats").classList.toggle("show");
   document.documentElement.classList.toggle("debug-on");
 }
-/* Long-press the title = the touch equivalent of Ctrl+Shift+F -- phones have
-   no keyboard to reach the debug hotkey at all. Uses Pointer Events (unifies
-   touch/mouse/pen, so this also works by long-pressing with a mouse on
-   desktop) with a movement-cancel tolerance so a drag/scroll starting on the
-   title doesn't accidentally trigger it. Deliberately no visual hint this is
-   interactive -- same "regular visitors never see it" intent as the hotkey. */
+/* Long-press the small galaxy icon (top-left HUD, next to "Galactic Core...
+   LY") = the touch equivalent of Ctrl+Shift+F -- phones have no keyboard to
+   reach the debug hotkey at all. Originally bound to the title text instead,
+   but that triggered Android Chrome's own native long-press context menu
+   (Copy/Share/Select all/Web search) regardless of user-select/touch-callout
+   CSS -- moved here, to a small icon rather than a text run, and this
+   version calls preventDefault() on pointerdown to actually suppress that
+   native behaviour rather than just styling around it. Also a better spot
+   than the title on its own merits: this icon is visible in every view mode
+   (Galaxy/Local/System), not just Galaxy view like the text badge above it.
+   Uses Pointer Events (unifies touch/mouse/pen, so this also works by
+   long-pressing with a mouse on desktop) with a movement-cancel tolerance so
+   a drag/scroll starting on the icon doesn't accidentally trigger it.
+   Deliberately no visual hint this is interactive -- same "regular visitors
+   never see it" intent as the hotkey. #galIcon itself has pointer-events:auto
+   set in CSS to poke a hole through its parent #galHud's own
+   pointer-events:none (deliberate there, so the HUD doesn't block dragging
+   the 3D camera underneath it everywhere else). */
 (function(){
-  var el=document.getElementById("title"), timer=null, sx=0, sy=0, TOL=10, HOLD_MS=1200;
+  var el=document.getElementById("galIcon"), timer=null, sx=0, sy=0, TOL=10, HOLD_MS=1200;
   function start(e){
     if(timer) return;
+    e.preventDefault();
     sx=e.clientX; sy=e.clientY;
     timer=setTimeout(function(){
       timer=null;
@@ -2909,6 +2922,7 @@ function toggleStats(){
   el.addEventListener("pointercancel",cancel);
   el.addEventListener("pointerleave",cancel);
   el.addEventListener("pointermove",move);
+  el.addEventListener("contextmenu",function(e){ e.preventDefault(); });
 })();
 window.addEventListener("keyup",function(e){ keys[e.code]=false; });
 function flyStep(dt){
