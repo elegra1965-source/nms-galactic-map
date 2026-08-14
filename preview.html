@@ -35,6 +35,22 @@
   --white:#eaf6ff; --r-sm:8px;
 }
 *{box-sizing:border-box;margin:0;padding:0}
+/* Themed thin scrollbar for every scrollable box in the app (modals, Filters,
+   Hyperdrive panel, admin panel, etc). Without this, every overflow-y:auto
+   element falls back to the OS/browser's own default scrollbar -- on Windows
+   Chrome/Edge that's the old bulky non-overlay style with visible track +
+   arrow buttons at each end (Tony's screenshots: "why slide bars" on a
+   one-time notice modal whose text clearly fit without needing to scroll at
+   all). A real scrollbar only ever shows when content genuinely overflows --
+   this doesn't change WHETHER one appears, only makes it look like a
+   deliberate part of the UI instead of a jarring stock OS widget when it
+   does. Firefox gets the equivalent via scrollbar-width/scrollbar-color. */
+*{scrollbar-width:thin;scrollbar-color:var(--cyan-dim) rgba(0,0,0,.25)}
+*::-webkit-scrollbar{width:7px;height:7px}
+*::-webkit-scrollbar-track{background:rgba(0,0,0,.25)}
+*::-webkit-scrollbar-thumb{background:var(--cyan-dim);border-radius:4px}
+*::-webkit-scrollbar-thumb:hover{background:var(--cyan)}
+*::-webkit-scrollbar-corner{background:transparent}
 html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);
   font-family:'Rajdhani',system-ui,sans-serif;-webkit-font-smoothing:antialiased;
   -webkit-tap-highlight-color:transparent}
@@ -121,15 +137,23 @@ html.debug-on #tweak{display:block}
    tracking needed. Side (.sideL/.sideR) is chosen once per open by
    positionTweakPanel(), based on real available viewport space. */
 #tweak.sideR,#tweak.sideL{position:absolute;top:0;width:190px;
-  max-height:calc(100vh - 40px);overflow-y:auto;z-index:1}
+  max-height:calc(100vh - 40px);overflow-y:auto;overflow-x:hidden;z-index:1}
 #tweak.sideR{left:100%;margin-left:8px}
 #tweak.sideL{right:100%;margin-right:8px}
 #filt{width:176px;padding:10px 12px;position:relative}
-#hyperPanel{display:none;position:absolute;top:0;width:190px;
-  max-height:calc(100vh - 40px);overflow-y:auto;z-index:5}
+/* position:fixed + JS-computed left/top (positionHyperPanel, below), same
+   "measure the real button rect, clamp inside the viewport" pattern as the
+   accessibility popup's positionUnderButton() -- the old sideL/sideR
+   absolute-anchored-to-#filt approach (like #tweak) had no vertical
+   clamping at all, so on a short/scrolled viewport the panel could render
+   with its bottom past the screen edge (Tony's screenshot: pills cut off,
+   a horizontal scrollbar appearing at the very bottom). Fixed positioning
+   with real clamping means this shouldn't need to scroll in practice --
+   max-height/overflow stay only as a safety net for a genuinely tiny
+   viewport, not the primary mechanism. */
+#hyperPanel{display:none;position:fixed;width:198px;
+  max-height:calc(100vh - 16px);overflow-y:auto;overflow-x:hidden;z-index:40}
 #hyperPanel.show{display:block}
-#hyperPanel.sideR{left:100%;margin-left:8px}
-#hyperPanel.sideL{right:100%;margin-right:8px}
 #hyperSummary{color:var(--gold);font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:.04em}
 .tag.wp{border-color:#ffb454;color:#ffb454}
 .tag.ruin{border-color:#c9a06a;color:#c9a06a}
@@ -330,9 +354,9 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 
 /* ============ edit / report modal ============ */
 #modalWrap{position:fixed;inset:0;z-index:80;display:none;background:rgba(2,4,7,.72);
-  align-items:flex-start;justify-content:center;overflow-y:auto;padding:50px 12px}
+  align-items:flex-start;justify-content:center;overflow-y:auto;overflow-x:hidden;padding:50px 12px}
 #modalWrap.show{display:flex}
-.modal{width:100%;max-width:420px;padding:16px 16px 14px;margin-bottom:40px;max-height:calc(100vh - 100px);overflow-y:auto}
+.modal{width:100%;max-width:420px;padding:16px 16px 14px;margin-bottom:40px;max-height:calc(100vh - 100px);overflow-y:auto;overflow-x:hidden}
 .modal h3{font-family:'Orbitron',sans-serif;font-size:13px;letter-spacing:.1em;
   color:var(--white);margin-bottom:2px;text-transform:uppercase}
 .modal .msub{font-size:11px;color:var(--text-faint);margin-bottom:12px}
@@ -341,7 +365,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 .mfld input[type=text],.mfld input[type=number]{width:100%;text-transform:none;font-family:'Rajdhani',sans-serif;
   letter-spacing:.02em;color:var(--text);font-size:12px}
 .mfld textarea{margin-top:0}
-.flagFieldList{max-height:150px;overflow-y:auto;border:1px solid var(--border-soft);border-radius:var(--r-sm);
+.flagFieldList{max-height:150px;overflow-y:auto;overflow-x:hidden;border:1px solid var(--border-soft);border-radius:var(--r-sm);
   padding:6px 8px;background:#04070c}
 .flagFieldRow{display:flex;align-items:center;gap:7px;padding:3px 0;font-size:12px;color:var(--text)}
 .flagFieldRow input[type=checkbox]{flex:none}
@@ -483,7 +507,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     margin:0 -14px;padding:10px 14px 8px;border-bottom:1px solid var(--border-soft)}
   #course{top:calc(var(--top-h,150px) + 8px);left:50%;transform:translateX(-50%);width:210px}
   #leftcol{bottom:auto;top:calc(var(--top-h,150px) + 140px);flex-direction:column;align-items:flex-start}
-  #filt{width:158px;max-height:calc(100vh - var(--top-h,150px) - 150px);overflow-y:auto}
+  #filt{width:158px;max-height:calc(100vh - var(--top-h,150px) - 150px);overflow-y:auto;overflow-x:hidden}
   #keys{bottom:auto;top:calc(var(--top-h,150px) + 140px);width:calc(100vw - 20px)}
   #flyhint{display:none!important}
   input[type=text]{width:100%}
@@ -1005,7 +1029,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
      scalar categories only (composite ones like Economy or a whole planet
      still route through the normal Edit system flow, which already goes
      through the same consensus-safe voting path as any other edit). -->
-<div id="adminPanel" class="box" style="display:none;position:fixed;top:50px;left:50%;transform:translateX(-50%);max-width:640px;width:92vw;max-height:calc(100vh - 90px);overflow-y:auto;z-index:500;padding:16px">
+<div id="adminPanel" class="box" style="display:none;position:fixed;top:50px;left:50%;transform:translateX(-50%);max-width:640px;width:92vw;max-height:calc(100vh - 90px);overflow-y:auto;overflow-x:hidden;z-index:500;padding:16px">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
     <h3 style="margin:0">Flag review queue</h3>
     <button class="btn" id="adminClose" type="button">Close</button>
@@ -3526,12 +3550,14 @@ function updateHyperSummary(){
   document.getElementById("hyperSummary").textContent=d.short+" // "+commas(parseInt(r,10))+" LY";
 }
 function positionHyperPanel(){
-  var hp=document.getElementById("hyperPanel"), filt=document.getElementById("filt");
+  var hp=document.getElementById("hyperPanel"), btn=document.getElementById("bHyperOpen");
   if(!hp.classList.contains("show")) return;
-  var pr=filt.getBoundingClientRect();
-  var roomRight=window.innerWidth-pr.right-8, roomLeft=pr.left-8;
-  hp.classList.remove("sideL","sideR");
-  hp.classList.add(roomRight>=198||roomRight>=roomLeft?"sideR":"sideL");
+  var r=btn.getBoundingClientRect();
+  var pw=hp.offsetWidth||198, ph=hp.offsetHeight||300;
+  var left=Math.min(window.innerWidth-pw-8,Math.max(8,r.left));
+  var top=Math.min(window.innerHeight-ph-8,Math.max(8,r.bottom+8));
+  hp.style.left=left+"px";
+  hp.style.top=Math.max(8,top)+"px";
 }
 document.getElementById("bHyperOpen").addEventListener("click",function(e){
   e.stopPropagation();
