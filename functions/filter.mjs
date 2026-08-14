@@ -175,6 +175,13 @@ export function filterSystemEdit(payload){
   out.blackHole = !!payload.blackHole;
   out.atlas = !!payload.atlas;
   out.giant = !!payload.giant;
+  // Ancient Ruins: a real surface point of interest (Knowledge Stones + a
+  // memoir device, sometimes a buried Artifact Ruin) -- researched for
+  // Tony's hyperdrive-types.docx task list (2026-08-14) and found no
+  // confirmed procedural rule for which systems/planets have one, so this
+  // is manual-only, same pattern as blackHole/atlas above -- not derived
+  // from anything else in the payload.
+  out.ruins = !!payload.ruins;
 
   // Phantom Star / Shadow Star -- an obscure, wiki-documented NMS oddity
   // (nomanssky.fandom.com/wiki/Phantom_Star, researched in
@@ -254,12 +261,13 @@ export function filterSystemEdit(payload){
     });
   }
 
-  // Real game constraint (Giant planets): at most 1 non-moon body, since a
-  // system with a Giant can't generate any other planets, only up to 5
-  // moons orbiting the Giant itself.
+  // Real game constraint (Gas giants -- renamed from "Giant planet" to match
+  // the wiki's own term, 2026-08-14): at most 1 non-moon body, since a
+  // system with a gas giant can't generate any other planets, only up to 5
+  // moons orbiting the giant itself.
   if(out.giant){
-    if(planetCount>1) errors.push("A Giant planet system can only have 1 planet (the Giant itself)");
-    if(moonCount>5) errors.push("A Giant planet can have at most 5 moons");
+    if(planetCount>1) errors.push("A Gas giant system can only have 1 planet (the giant itself)");
+    if(moonCount>5) errors.push("A Gas giant can have at most 5 moons");
   }
 
   return {ok: errors.length===0, cleaned: out, errors: errors};

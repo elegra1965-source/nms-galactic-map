@@ -124,7 +124,17 @@ html.debug-on #tweak{display:block}
   max-height:calc(100vh - 40px);overflow-y:auto;z-index:1}
 #tweak.sideR{left:100%;margin-left:8px}
 #tweak.sideL{right:100%;margin-right:8px}
-#filt{width:176px;padding:10px 12px}
+#filt{width:176px;padding:10px 12px;position:relative}
+#hyperPanel{display:none;position:absolute;top:0;width:190px;
+  max-height:calc(100vh - 40px);overflow-y:auto;z-index:5}
+#hyperPanel.show{display:block}
+#hyperPanel.sideR{left:100%;margin-left:8px}
+#hyperPanel.sideL{right:100%;margin-right:8px}
+#hyperSummary{color:var(--gold);font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:.04em}
+.tag.wp{border-color:#ffb454;color:#ffb454}
+.tag.ruin{border-color:#c9a06a;color:#c9a06a}
+.tag.noreach{border-color:#ff5a4a;color:#ff5a4a}
+
 .fold.min .fbody{display:none}
 .fold.min{width:auto}
 .fhead{cursor:pointer;user-select:none;white-space:nowrap}
@@ -522,6 +532,13 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 <div id="top">
   <div id="title">NMS GALACTIC MAP</div>
   <select id="galSel"></select>
+  <select id="galTypeFilter" title="Narrow the galaxy list above to just one type -- Normal, Harsh, Empty or Lush -- picked from Tony's own reference list of all 255 real galaxy types." style="max-width:104px;font-family:'Orbitron',sans-serif;font-size:9px">
+    <option value="">Any type</option>
+    <option value="Norm">Normal</option>
+    <option value="Harsh">Harsh</option>
+    <option value="Empty">Empty</option>
+    <option value="Lush">Lush</option>
+  </select>
   <div class="sep"></div>
   <button class="btn on" id="mGal" title="Whole-galaxy view. Decorative starfield plus your focus marker, bookmarks and course target.">Galaxy</button>
   <button class="btn" id="mLoc" title="The real star systems around your current voxel. This is where clicking, filters and labels work.">Local</button>
@@ -565,10 +582,17 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
       <label class="chk"><input type="checkbox" id="fBH">Black holes</label>
       <label class="chk"><input type="checkbox" id="fAtl">Atlas interfaces</label>
       <label class="chk"><input type="checkbox" id="fOut">Outlaw</label>
-      <label class="chk"><input type="checkbox" id="fGiant">Giant planet</label>
+      <label class="chk" title="Real in-game term (Purple systems only) -- was labelled &quot;Giant planet&quot;, renamed to match the wiki. Always 1 huge planet with 5 moons, no other planets."><input type="checkbox" id="fGiant">Gas giant</label>
       <label class="chk"><input type="checkbox" id="fMark">Bookmarked</label>
-      <div class="fld" style="margin-top:7px"><div class="lb">Hyperdrive range</div>
-        <select id="fHyper" title="Used for course plotting -- set this to match your ship's real hyperdrive class or jump counts on Set course will be wrong.">
+      <label class="chk" title="Systems you've saved as a travel goal, whether or not your current drive can reach them yet -- see the Waypoint button on a system's panel."><input type="checkbox" id="fWaypoint">Waypoints</label>
+      <label class="chk" title="Systems you've actually jumped to before, tracked automatically on this device."><input type="checkbox" id="fVisited">Visited</label>
+      <label class="chk" title="Hide any system your Hyperdrive setting below can't reach yet."><input type="checkbox" id="fReachOnly">Only reachable systems</label>
+      <div class="fld" style="margin-top:7px">
+        <div class="lb">Hyperdrive</div>
+        <button class="btn" type="button" id="bHyperOpen" style="width:100%;text-align:left"
+          title="Set your hyperdrive class and jump range. Drives are backwards-compatible -- an Indium Drive also reaches yellow/red/green, not just blue. Used for reachability warnings and course plotting.">
+          <span id="hyperSummary">Standard // 101 LY</span></button>
+        <select id="fHyper" style="display:none">
           <option value="101" selected>101 LY — Basic (default)</option>
           <option value="500">500 LY</option>
           <option value="1000">1000 LY</option>
@@ -576,7 +600,36 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
           <option value="2200">2200 LY — S upgrades</option>
           <option value="3000">3000 LY — S explorer</option>
           <option value="6000">6000 LY — freighter</option>
-        </select></div>
+        </select>
+        <select id="fHyperDrive" style="display:none">
+          <option value="standard" selected>Standard Hyperdrive</option>
+          <option value="cadmium">Cadmium Drive</option>
+          <option value="emeril">Emeril Drive</option>
+          <option value="indium">Indium Drive</option>
+          <option value="atlantid">Atlantid Drive</option>
+        </select>
+        <div class="box" id="hyperPanel" role="dialog" aria-label="Hyperdrive settings">
+          <div class="kicker" style="margin-bottom:8px">Hyperdrive</div>
+          <div class="lb">Drive type <span style="text-transform:none;color:var(--text-faint)">(each also reaches every lower tier)</span></div>
+          <div class="pillrow" id="hyperDriveRow">
+            <button class="pill on" type="button" data-drive="standard" title="Yellow only. Every save starts with this.">Standard</button>
+            <button class="pill" type="button" data-drive="cadmium" title="+ Red/Orange">Cadmium</button>
+            <button class="pill" type="button" data-drive="emeril" title="+ Green">Emeril</button>
+            <button class="pill" type="button" data-drive="indium" title="+ Blue">Indium</button>
+            <button class="pill" type="button" data-drive="atlantid" title="+ Purple -- requires the In Stellar Multitudes questline">Atlantid</button>
+          </div>
+          <div class="lb" style="margin-top:6px">Jump range</div>
+          <div class="pillrow" id="hyperRangeRow">
+            <button class="pill on" type="button" data-range="101">101 LY</button>
+            <button class="pill" type="button" data-range="500">500</button>
+            <button class="pill" type="button" data-range="1000">1000</button>
+            <button class="pill" type="button" data-range="1500">1500</button>
+            <button class="pill" type="button" data-range="2200">2200</button>
+            <button class="pill" type="button" data-range="3000">3000</button>
+            <button class="pill" type="button" data-range="6000">6000</button>
+          </div>
+        </div>
+      </div>
       <div class="prow"><button class="btn" id="bReset" title="Clear all filters.">Reset</button>
         <button class="btn" id="bExport" title="Download your notes and bookmarks as a JSON file.">Export</button></div>
       <div class="prow"><button class="btn" id="bImport" title="Load notes and bookmarks from a previously exported JSON file.">Import logs</button></div>
@@ -661,6 +714,9 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   <div class="prow">
     <button class="btn" id="bMark" title="Save this system to your device. Bookmarked systems turn cyan and show in Galaxy view.">Bookmark</button>
     <button class="btn" id="bCopy" title="Copy the 12-glyph address to the clipboard.">Copy address</button>
+  </div>
+  <div class="prow">
+    <button class="btn" id="bWaypoint" title="Save this as somewhere you want to go, even if your current hyperdrive can't reach it yet -- shows as an amber marker in Galaxy view. Personal to this device only.">Waypoint</button>
   </div>
   <div class="prow">
     <button class="btn" id="bEdit" title="Enter your real in-game data for this system -- name, race, economy, conflict, planets/moons and resources. Saved for every visitor to see.">Edit system</button>
@@ -815,7 +871,8 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     <div class="mfld"><div class="lb">Special features</div>
       <label class="chk"><input type="checkbox" id="edBH"> Black hole present</label>
       <label class="chk"><input type="checkbox" id="edAtlas"> Atlas station present</label>
-      <label class="chk"><input type="checkbox" id="edGiant"> Giant planet (purple systems only -- limits to 1 planet + up to 5 moons)</label>
+      <label class="chk"><input type="checkbox" id="edGiant"> Gas giant (purple systems only -- limits to 1 planet + up to 5 moons; renamed from "Giant planet" to match the real in-game term)</label>
+      <label class="chk" title="Ancient Ruins are a real surface point of interest (Knowledge Stones + a memoir device, sometimes a buried Artifact Ruin) -- not tied to any procedural rule this project could find, so this is manual-only, same as black hole/Atlas."><input type="checkbox" id="edRuins"> Ruins present</label>
     </div>
     <div class="mfld"><div class="lb">Phantom / Shadow Star status</div>
       <select id="edPhantom" title="An obscure NMS oddity, researched from the wiki (nomanssky.fandom.com/wiki/Phantom_Star): most regions contain thousands of unreachable 'phantom' system indices that never show on the real in-game map, normally only reached via a save/portal-index edit. A Shadow Star is a distinct, related anomaly -- the first invalid index right after the portal network's valid range -- that CAN be reached by hyperjump, unlike ordinary phantoms. Leave as None unless you've actually confirmed one of these in-game.">
@@ -885,6 +942,10 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
       <div style="font-size:12px;color:var(--text-dim);line-height:1.55">Star systems are generated procedurally from their portal address, the same way the game does -- they are not scraped from anyone's real save. Star type, system/region names, and planet count are consistently accurate. <b>Individual planet names are not</b> -- the real game's planet-naming logic has never been fully reverse-engineered, so what you see is a plausible guess, not your actual save data. A system only reflects real in-game data once a traveller has entered it via <b>Edit system</b>, marked "Community edited".</div>
     </div>
     <div class="mfld">
+      <div class="lb">Star class letters (e.g. "G7p")</div>
+      <div style="font-size:12px;color:var(--text-dim);line-height:1.55">The letter is the spectral class (matches star colour) and the digit is a sub-class. The lower-case suffix -- <b>f</b>, <b>p</b>, or <b>pf</b> -- borrows real astronomy terms (p = "peculiar", an unusual spectrum); researched this against the wiki and community discussion, and found no confirmed in-game effect either way -- what, if anything, the suffix changes is genuinely debated among players, so this map doesn't tie anything (like Ruins odds) to it.</div>
+    </div>
+    <div class="mfld">
       <div class="lb">Community-submitted data</div>
       <div style="font-size:12px;color:var(--text-dim);line-height:1.55">Anything entered via <b>Edit system</b> is trusted as typed -- it isn't checked against Hello Games' own in-game discovery records, which are known to desync between players. Two travellers can occasionally submit different names for the same system in good faith. If something looks wrong, use <b>Report</b> and elegra1965 will sort it out from the save history.</div>
     </div>
@@ -926,9 +987,9 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 
   <div class="box modal" id="hyperdriveModal" style="max-width:360px;display:none">
     <h3>Set your hyperdrive class</h3>
-    <div class="msub" style="margin-bottom:10px">Course plotting defaults to a <b>Basic hyperdrive (101 LY)</b> -- the range every save starts with (confirmed against the NMS wiki: the unupgraded base range is exactly 101 LY, not a round 100). If you've upgraded your ship (Sigma/Tau/Theta drives, an S-class engine, a freighter, etc.) your real range is longer, so jump counts on Set course will look off until you match it here.</div>
+    <div class="msub" style="margin-bottom:10px">Course plotting defaults to a <b>Standard hyperdrive, Basic range (101 LY)</b> -- what every save starts with (confirmed against the NMS wiki: the unupgraded base range is exactly 101 LY, not a round 100). If you've upgraded your ship (Cadmium/Emeril/Indium/Atlantid drives, an S-class engine, a freighter, etc.) set your real drive type and range here, or Enter system / Jump to will warn you that a star's colour is out of reach.</div>
     <div class="mfld"><div class="lb">Change it any time</div>
-      <div style="font-size:12px;color:var(--text-dim);line-height:1.55">Filters &rarr; Hyperdrive range.</div>
+      <div style="font-size:12px;color:var(--text-dim);line-height:1.55">Filters &rarr; Hyperdrive button (also sets your drive TYPE now -- see below).</div>
     </div>
     <div class="modalBtns">
       <button class="btn primary" id="hyperOpenFilters">Open Filters</button>
@@ -1040,6 +1101,68 @@ var STAR_TYPES=[
    matches the wiki's own class groupings for each of the 5 real colours. */
 var STAR_COLOR_LABEL={yellow:"Yellow (F/G)",red:"Red/Orange (K/M)",green:"Green (E)",blue:"Blue (B/O)",purple:"Purple (X/Y)"};
 function starTypeByKey(k){ for(var i=0;i<STAR_TYPES.length;i++) if(STAR_TYPES[i].k===k) return STAR_TYPES[i]; return STAR_TYPES[0]; }
+/* ============ hyperdrive types (task from Tony's "hyperdrive types.docx",
+   2026-08-14) ============
+   Access tiers transcribed directly from Tony's own doc, which itself
+   matches the NMS wiki's Hyperdrive page: each drive is backwards-
+   compatible with every lower tier's star colour, not just its own --
+   an Indium Drive reaches yellow/red/green/blue, not blue alone. This
+   `reach` array is the authoritative "what colours can this drive jump
+   to" set used everywhere below (click warnings, Enter system / Jump to
+   gating, and route-finding candidate filtering). Standard is the
+   default, matching the same "every save starts here" reasoning already
+   used for the 101 LY Basic hyperdrive-range default above. */
+var HYPER_DRIVES=[
+  {k:"standard", label:"Standard Hyperdrive", short:"Standard", reach:["yellow"]},
+  {k:"cadmium",  label:"Cadmium Drive",       short:"Cadmium",  reach:["yellow","red"]},
+  {k:"emeril",   label:"Emeril Drive",        short:"Emeril",   reach:["yellow","red","green"]},
+  {k:"indium",   label:"Indium Drive",        short:"Indium",   reach:["yellow","red","green","blue"]},
+  {k:"atlantid", label:"Atlantid Drive",      short:"Atlantid", reach:["yellow","red","green","blue","purple"]}
+];
+var COLOR_LABEL_PLAIN={yellow:"Yellow",red:"Red/Orange",green:"Green",blue:"Blue",purple:"Purple"};
+function driveByKey(k){ for(var i=0;i<HYPER_DRIVES.length;i++) if(HYPER_DRIVES[i].k===k) return HYPER_DRIVES[i]; return HYPER_DRIVES[0]; }
+function currentDrive(){
+  var el=document.getElementById("fHyperDrive");
+  return driveByKey(el?el.value:"standard");
+}
+function canReachColor(colKey,drive){ return (drive||currentDrive()).reach.indexOf(colKey)>=0; }
+/* The lowest-tier drive that first unlocks a given colour -- used for the
+   "you need X to reach Y systems" message, so purple always says Atlantid
+   even if the player currently has Indium selected. */
+function minDriveForColor(colKey){
+  for(var i=0;i<HYPER_DRIVES.length;i++) if(HYPER_DRIVES[i].reach.indexOf(colKey)>=0) return HYPER_DRIVES[i];
+  return HYPER_DRIVES[HYPER_DRIVES.length-1];
+}
+function driveNeededMsg(colKey){
+  return "Need "+minDriveForColor(colKey).label+" to reach "+COLOR_LABEL_PLAIN[colKey]+" star systems";
+}
+/* Deterministically reproduces the exact star type generateSystem() would
+   assign at (vx,vy,vz,idx) WITHOUT running the rest of generateSystem --
+   used only for read-only colour lookups (route-candidate filtering) where
+   materializing a full system would be wasteful. Deliberately a fresh,
+   standalone function rather than a refactor of generateSystem() itself --
+   generateSystem's own `r` is a single shared mulberry32 instance consumed
+   in a fixed order by everything after the star-type roll (spectral class,
+   water/dissonant, star count, ...), so extracting this block out of that
+   function and having it draw from a DIFFERENT rng instance would shift
+   every later r() call by one and silently change every downstream field
+   for any system that falls back to weightedStar() (i.e. whenever nms-core
+   isn't loaded or errors) -- exactly the kind of subtle determinism bug
+   this project has been burned by before. This function instead builds its
+   OWN fresh mulberry32(gseed(vx,vy,vz,idx)) and feeds it straight into
+   weightedStar(), which only ever consumes one r() call -- the identical
+   first draw generateSystem's own `r` would produce at that same point,
+   verified by inspection (weightedStar is the very next statement after
+   `r` is created in generateSystem, with nothing drawing from it first)
+   and by a Node parity test run before shipping this. */
+function starTypeForIdx(vx,vy,vz,idx){
+  var address=formatAddress(1,idx,vx,vy,vz);
+  var pc = window.NMSCore ? BigInt("0x"+address) : null;
+  var attrs=null;
+  if(pc!==null){ try{ attrs=window.NMSCore.systemAttributes(pc,GALAXY); }catch(e){ attrs=null; } }
+  if(attrs) return starTypeByKey(NMS_STAR_TYPE_KEY[attrs.star_type]||"yellow");
+  return weightedStar(mulberry32(gseed(vx,vy,vz,idx)));
+}
 /* Verified 2026-08-12 against Tony's own legitimately-owned game install:
    decompiled GCSOLARGENERATIONGLOBALS.GLOBAL.MBIN via NMS Mod Tool
    (nexusmods.com/nomanssky/mods/4312), which wraps libMBIN -- real Hello
@@ -1587,6 +1710,7 @@ function applyOverride(s){
   if(d.water!==undefined) s.water=!!d.water;
   if(d.dissonant!==undefined) s.dissonant=!!d.dissonant;
   if(d.giant!==undefined) s.giant=!!d.giant;
+  if(d.ruins!==undefined) s.ruins=!!d.ruins;
   s.publicNotes=d.notes||"";
   if(d.bodies && d.bodies.length){
     var orig=s.bodies, out=[], planetIdx=0, lastPlanetIndex=0;
@@ -1696,13 +1820,25 @@ function refreshAfterOverrides(){
 
 /* ============ storage ============ */
 var STORE_K="nms-galmap-logs";
-var store={notes:{},marks:{}};
+/* waypoints/visited/bases are all personal, local-only lists -- same
+   localStorage-only mechanism as marks/notes, never sent anywhere and
+   never part of the shared community-edit data. Task 11 (waypoints for
+   systems you can't reach yet) and task 12 (visited/base tagging, "not a
+   priority, just thoughts... obviously only in their saved app... not on
+   the general public map") both explicitly asked for personal-device-only
+   tracking, so this reuses the exact same pattern rather than inventing a
+   new storage mechanism. */
+var store={notes:{},marks:{},waypoints:{},visited:{}};
 function skey(s){ return s.galaxy+":"+s.address; }
 function loadStore(){
   try{
     var raw=localStorage.getItem(STORE_K);
-    if(raw){ var o=JSON.parse(raw); store.notes=o.notes||{}; store.marks=o.marks||{}; }
-  }catch(err){ store={notes:{},marks:{}}; }
+    if(raw){
+      var o=JSON.parse(raw);
+      store.notes=o.notes||{}; store.marks=o.marks||{};
+      store.waypoints=o.waypoints||{}; store.visited=o.visited||{};
+    }
+  }catch(err){ store={notes:{},marks:{},waypoints:{},visited:{}}; }
 }
 function saveStore(){
   try{ localStorage.setItem(STORE_K,JSON.stringify(store)); }
@@ -1964,6 +2100,19 @@ function buildGalaxyMarks(){
     v=voxelToGalaxy(a.x,a.y,a.z);
     pts.push(v.x,v.y,v.z); cols.push(0,0.9,1);
   }
+  /* Waypoints (task 11: places you want to go but can't reach yet) get their
+     own amber marker, distinct from bookmark cyan and the course-target
+     orange, so a saved goal is still visible on the whole-galaxy view even
+     before you've upgraded a drive to actually plot a course to it. */
+  var wpKeys=Object.keys(store.waypoints);
+  for(i=0;i<wpKeys.length;i++){
+    var wparts=wpKeys[i].split(":");
+    if(parseInt(wparts[0],10)!==GALAXY) continue;
+    var wa=parseAddress(wparts[1]);
+    if(!wa) continue;
+    v=voxelToGalaxy(wa.x,wa.y,wa.z);
+    pts.push(v.x,v.y,v.z); cols.push(1,0.71,0.33);
+  }
   if(courseTarget){
     v=voxelToGalaxy(courseTarget.vx,courseTarget.vy,courseTarget.vz);
     pts.push(v.x,v.y,v.z); cols.push(1,0.65,0);
@@ -2166,6 +2315,9 @@ function passFilter(s){
   if(document.getElementById("fOut").checked&&!s.outlaw) return false;
   if(document.getElementById("fGiant").checked&&!s.giant) return false;
   if(document.getElementById("fMark").checked&&!store.marks[skey(s)]) return false;
+  if(document.getElementById("fWaypoint").checked&&!store.waypoints[skey(s)]) return false;
+  if(document.getElementById("fVisited").checked&&!store.visited[skey(s)]) return false;
+  if(document.getElementById("fReachOnly").checked&&!canReachColor(s.type)) return false;
   return true;
 }
 function updateRings(){
@@ -2188,6 +2340,7 @@ function applyFilter(){
     var s=shown[i];
     pos[i*3]=s.px; pos[i*3+1]=s.py; pos[i*3+2]=s.pz;
     var hx=s.blackHole?0xffffff:(s.atlas?0xf0a500:(s.phantom==="shadow"?0x6a4fa0:(s.phantom==="phantom"?0x777788:s.color)));
+    if(store.waypoints[skey(s)]) hx=0xffb454;
     if(store.marks[skey(s)]) hx=0x00e5ff;
     c.setHex(hx);
     col[i*3]=c.r; col[i*3+1]=c.g; col[i*3+2]=c.b;
@@ -2250,7 +2403,16 @@ function regionCandidates(vx,vy,vz){
       px:(dx+jx-0.5)*VOX_U, py:(dy+jy-0.5)*VOX_U, pz:(dz+jz-0.5)*VOX_U,
       name:nameFrom(gseed(vx,vy,vz,idx^0xABCD)),
       address:formatAddress(1,idx,vx,vy,vz),
-      blackHole:idx===_an.bh, atlas:idx===_an.atlas
+      blackHole:idx===_an.bh, atlas:idx===_an.atlas,
+      /* Star colour of this candidate, via the read-only starTypeForIdx()
+         helper (see its own comment) -- lets findRoute() below only route
+         hyperdrive hops through colours the CURRENT drive can actually
+         reach, task 4's ask. Black hole/Atlas indices have no real star
+         type of their own in-game, but they're extremely rare picks
+         (guide-star reserved indices) and canReachColor() only ever
+         narrows candidates, never adds bad ones, so leaving them typed
+         normally like any other index is harmless. */
+      type:starTypeForIdx(vx,vy,vz,idx).k
     });
   }
   return out;
@@ -2271,7 +2433,7 @@ function wpDist(a,b){ var dx=a.px-b.px,dy=a.py-b.py,dz=a.pz-b.pz; return Math.sq
    strictly closer yet); only if literally no charted system is in range at all
    does the route give up and report itself truncated, same as running out of
    hyperdrive range for real. */
-function findRoute(from,to,rangeLY){
+function findRoute(from,to,rangeLY,driveGateRoute){
   var rangeW=rangeLY/VOX_LY;
   var path=[{px:from.px,py:from.py,pz:from.pz,name:from.name,address:from.address,real:true}];
   /* Every address ever pushed onto the path is excluded from future candidacy --
@@ -2313,6 +2475,19 @@ function findRoute(from,to,rangeLY){
         for(var k=0;k<cands.length;k++){
           c=cands[k];
           if(visited[c.address]) continue;
+          /* Task 4 ("don't just jump between [the drive's max] colour --
+             sometimes add lower star colours too, since a higher drive is
+             backwards-compatible"): a hop is a valid candidate if its colour
+             is ANYWHERE in the current drive's reach set, not just its top
+             tier -- an Indium Drive route should freely mix blue AND
+             yellow/red/green hops, exactly like the real backwards-
+             compatible mechanic in Tony's own doc. Only the FINAL waypoint
+             (pushed unconditionally after this loop, same as before) is
+             allowed to be a colour outside the current reach -- that's the
+             "I want to plan a trip to a system I can't reach yet" case,
+             handled instead by disabling Jump-to and offering a Waypoint
+             save (see bGoCourse's handler). */
+          if(driveGateRoute && !canReachColor(c.type)) continue;
           var dHop=wpDist(cur,c);
           if(dHop>rangeW||dHop<0.05) continue;
           var dToIdeal=wpDist(ideal,c);
@@ -2384,7 +2559,7 @@ function setCourse(s){
     ly=Math.round(Math.sqrt(dx*dx+dy*dy+dz*dz)/VOX_U*LY_PER_VOXEL);
   }
   var range=parseInt(document.getElementById("fHyper").value,10);
-  var route=findRoute(focusSystem,s,range);
+  var route=findRoute(focusSystem,s,range,true);
   courseWaypoints=route.path; courseTruncated=route.truncated;
   var hops=courseWaypoints.length-1;
   document.getElementById("cTarget").textContent=s.name;
@@ -2733,9 +2908,11 @@ function updatePanel(s){
   var tags=[["",["","Single","Binary","Ternary"][s.stars]+" star"]];
   tags.push(["",s.planets+(s.planets===1?" planet":" planets")]);
   if(s.moons>0) tags.push(["",s.moons+(s.moons===1?" moon":" moons")]);
-  if(s.giant) tags.push(["hot","Giant planet","giant"]);
+  if(s.giant) tags.push(["hot","Gas giant","giant"]);
+  if(s.ruins) tags.push(["ruin","Ruins"]);
   if(s.blackHole) tags.push(["bh","Black hole","blackHole"]);
   if(s.atlas) tags.push(["hot","Atlas interface","atlas"]);
+  if(!canReachColor(s.type)) tags.push(["noreach",driveNeededMsg(s.type)]);
   if(s.phantom==="phantom") tags.push(["ghost","Phantom Star","phantom",
     "An unreachable NMS oddity: most regions contain thousands of \"phantom\" system indices that never appear on the real in-game map or Galactic Map. Normally only reached via a save/portal-index edit -- opening the map while inside one snaps your position to the nearest normal star instead."]);
   if(s.phantom==="shadow") tags.push(["ghost","Shadow Star","phantom",
@@ -2744,6 +2921,8 @@ function updatePanel(s){
   if(s.uncharted) tags.push(["","Uncharted"]);
   if(s.abandoned) tags.push(["","Abandoned"]);
   if(store.marks[skey(s)]) tags.push(["hot","Bookmarked"]);
+  if(store.waypoints[skey(s)]) tags.push(["wp","Waypoint"]);
+  if(store.visited[skey(s)]) tags.push(["","Visited"]);
   if(s.override) tags.push(["hot","Community edited"]);
   var html="",i;
   for(i=0;i<tags.length;i++){
@@ -3021,7 +3200,17 @@ function tryPick(cx,cy){
     var d=(ctrl==="fly")?6:cam.dist;
     ray.params.Points.threshold=Math.max(0.35,d*0.014);
     var hits=ray.intersectObject(locPts);
-    if(hits.length&&shown[hits[0].index]) updatePanel(shown[hits[0].index]);
+    if(hits.length&&shown[hits[0].index]){
+      var pickedSys=shown[hits[0].index];
+      updatePanel(pickedSys);
+      /* Task 2: "if click on a star and they don't have correct drive,
+         popup saying need X to reach Y". Informational only -- still opens
+         the panel above so the map stays usable as a reference/planning
+         tool, doesn't block browsing. The actual travel actions (Enter
+         system, Jump to a plotted course) are the ones that hard-block --
+         see their own handlers below. */
+      if(!canReachColor(pickedSys.type)) toast(driveNeededMsg(pickedSys.type));
+    }
   } else if(mode==="system"){
     var bh=ray.intersectObjects(bodyMeshes.concat(starMeshes).concat(featureMeshes));
     if(bh.length){
@@ -3214,7 +3403,16 @@ function jumpTo(str,silent){
   flyPos.set(focusSystem.px,focusSystem.py+9,focusSystem.pz+40);
   aimFly(cam.target);
   applyCam();
-  if(!silent){ setMode("local"); updatePanel(focusSystem); hasRealLocation=true; syncResetBtn(); }
+  if(!silent){
+    setMode("local"); updatePanel(focusSystem); hasRealLocation=true; syncResetBtn();
+    /* Task 12 ("possible marking stars already visited... obviously only in
+       their saved app on their map on their computer/mobile, not on the
+       general public map"): auto-tracked, personal/local-only (store.visited,
+       localStorage, never sent anywhere -- same as notes/marks). Only a real
+       jump counts, not the silent boot/galaxy-switch re-anchor. */
+    var vk=skey(focusSystem);
+    if(!store.visited[vk]){ store.visited[vk]=1; saveStore(); }
+  }
   updateRings();
   buildGalaxyMarks();
 }
@@ -3292,11 +3490,16 @@ bindSlider("sSz","vSz",function(){
   var sel=document.getElementById("fEco"),i;
   for(i=0;i<ECON.length;i++){ var o=document.createElement("option"); o.textContent=ECON[i][0]; sel.appendChild(o); }
 })();
-["fCol","fRace","fEco","fBH","fAtl","fOut","fGiant","fMark"].forEach(function(id){
+["fCol","fRace","fEco","fBH","fAtl","fOut","fGiant","fMark","fWaypoint","fVisited","fReachOnly"].forEach(function(id){
   document.getElementById(id).addEventListener("change",applyFilter);
 });
 document.getElementById("fHyper").addEventListener("change",function(){
   if(courseTarget) setCourse(courseTarget);
+});
+document.getElementById("fHyperDrive").addEventListener("change",function(){
+  if(courseTarget) setCourse(courseTarget);
+  if(selected) updatePanel(selected);
+  applyFilter();
 });
 document.getElementById("bReset").addEventListener("click",function(){
   document.getElementById("fCol").value=""; document.getElementById("fRace").value="";
@@ -3304,7 +3507,82 @@ document.getElementById("bReset").addEventListener("click",function(){
   document.getElementById("fBH").checked=false; document.getElementById("fAtl").checked=false;
   document.getElementById("fOut").checked=false; document.getElementById("fGiant").checked=false;
   document.getElementById("fMark").checked=false;
+  document.getElementById("fWaypoint").checked=false; document.getElementById("fVisited").checked=false;
+  document.getElementById("fReachOnly").checked=false;
   applyFilter();
+});
+/* ============ hyperdrive slide-out panel (task 6: "filter may look
+   cluttered so maybe a new window slides right for hyperdrive type then
+   right again after to choosing jump range") -- simplified from two
+   chained slide-outs to one slide-out panel covering both drive type and
+   range together, reusing the exact sideL/sideR "expand into whichever
+   side has room" mechanism already built for the accessibility popup's
+   Rendering tuning panel (positionTweakPanel), anchored to #filt itself
+   rather than #accessPop. Flagged as a scope simplification in HANDOVER.md
+   for Tony to review -- easy to split into two panels later if he'd rather
+   have the literal two-hop version. */
+function updateHyperSummary(){
+  var d=currentDrive(), r=document.getElementById("fHyper").value;
+  document.getElementById("hyperSummary").textContent=d.short+" // "+commas(parseInt(r,10))+" LY";
+}
+function positionHyperPanel(){
+  var hp=document.getElementById("hyperPanel"), filt=document.getElementById("filt");
+  if(!hp.classList.contains("show")) return;
+  var pr=filt.getBoundingClientRect();
+  var roomRight=window.innerWidth-pr.right-8, roomLeft=pr.left-8;
+  hp.classList.remove("sideL","sideR");
+  hp.classList.add(roomRight>=198||roomRight>=roomLeft?"sideR":"sideL");
+}
+document.getElementById("bHyperOpen").addEventListener("click",function(e){
+  e.stopPropagation();
+  document.getElementById("hyperPanel").classList.toggle("show");
+  positionHyperPanel();
+});
+document.addEventListener("click",function(e){
+  var hp=document.getElementById("hyperPanel");
+  if(hp.classList.contains("show") && !hp.contains(e.target) && e.target.id!=="bHyperOpen"){
+    hp.classList.remove("show");
+  }
+});
+document.getElementById("hyperDriveRow").addEventListener("click",function(e){
+  var b=e.target.closest(".pill"); if(!b) return;
+  document.querySelectorAll("#hyperDriveRow .pill").forEach(function(p){ p.classList.remove("on"); });
+  b.classList.add("on");
+  document.getElementById("fHyperDrive").value=b.getAttribute("data-drive");
+  document.getElementById("fHyperDrive").dispatchEvent(new Event("change"));
+  updateHyperSummary();
+});
+document.getElementById("hyperRangeRow").addEventListener("click",function(e){
+  var b=e.target.closest(".pill"); if(!b) return;
+  document.querySelectorAll("#hyperRangeRow .pill").forEach(function(p){ p.classList.remove("on"); });
+  b.classList.add("on");
+  document.getElementById("fHyper").value=b.getAttribute("data-range");
+  document.getElementById("fHyper").dispatchEvent(new Event("change"));
+  updateHyperSummary();
+});
+document.getElementById("bWaypoint").addEventListener("click",function(){
+  if(!selected) return;
+  var k=skey(selected);
+  if(store.waypoints[k]) delete store.waypoints[k]; else store.waypoints[k]={name:selected.name,at:Date.now()};
+  saveStore(); applyFilter(); updatePanel(selected); buildGalaxyMarks();
+  toast(store.waypoints[k]?"Saved as waypoint":"Waypoint removed");
+});
+document.getElementById("galTypeFilter").addEventListener("change",function(){
+  var want=this.value;
+  var sel=document.getElementById("galSel");
+  var cur=sel.value;
+  for(var i=0;i<sel.options.length;i++){
+    var gi=parseInt(sel.options[i].value,10);
+    var show=!want || galaxyType(gi).k===want;
+    sel.options[i].style.display=show?"":"none";
+  }
+  // if the current selection just got hidden, jump to the first still-visible option
+  var curOpt=sel.querySelector('option[value="'+cur+'"]');
+  if(curOpt && curOpt.style.display==="none"){
+    for(var j=0;j<sel.options.length;j++){
+      if(sel.options[j].style.display!=="none"){ sel.value=sel.options[j].value; sel.dispatchEvent(new Event("change")); break; }
+    }
+  }
 });
 document.getElementById("pBodies").addEventListener("click",function(e){
   var row=e.target.closest(".brow");
@@ -3348,6 +3626,7 @@ document.getElementById("kJump").addEventListener("click",function(){ jumpTo(key
 document.getElementById("bEnter").addEventListener("click",function(){
   if(mode==="system"){ setMode("local"); if(selected) updatePanel(selected); return; }
   if(!selected) return;
+  if(!canReachColor(selected.type)){ toast(driveNeededMsg(selected.type)); return; }
   buildSystemView(selected); setMode("system");
 });
 document.getElementById("bCourse").addEventListener("click",function(){
@@ -3358,7 +3637,12 @@ document.getElementById("bClrCourse").addEventListener("click",function(){
   document.getElementById("course").classList.remove("show");
 });
 document.getElementById("bGoCourse").addEventListener("click",function(){
-  if(courseTarget){ var a=courseTarget.address; setKeypad(a); jumpTo(a); }
+  if(!courseTarget) return;
+  if(!canReachColor(courseTarget.type)){
+    toast(driveNeededMsg(courseTarget.type)+" -- tap Waypoint on its panel to save it for later");
+    return;
+  }
+  var a=courseTarget.address; setKeypad(a); jumpTo(a);
 });
 document.getElementById("bSave").addEventListener("click",function(){
   if(!selected) return;
@@ -3396,6 +3680,8 @@ document.getElementById("fFile").addEventListener("change",function(e){
       var o=JSON.parse(rd.result);
       store.notes=Object.assign(store.notes,o.notes||{});
       store.marks=Object.assign(store.marks,o.marks||{});
+      store.waypoints=Object.assign(store.waypoints,o.waypoints||{});
+      store.visited=Object.assign(store.visited,o.visited||{});
       saveStore(); applyFilter(); buildGalaxyMarks(); toast("Logs imported");
     }catch(err){ toast("Import failed — bad file"); }
   };
@@ -3712,6 +3998,7 @@ function openEditModal(){
   document.getElementById("edWaterSuf").checked=!!s.water;
   document.getElementById("edDissonantSuf").checked=!!s.dissonant;
   document.getElementById("edGiant").checked=!!s.giant;
+  document.getElementById("edRuins").checked=!!s.ruins;
   document.getElementById("edNotes").value=s.publicNotes||"";
   editBodies=s.bodies.map(function(b){
     return {
@@ -3805,8 +4092,8 @@ function clientPrecheck(){
   if(document.getElementById("edGiant").checked){
     var planetCount=0, moonCount=0;
     for(i=0;i<editBodies.length;i++){ if(editBodies[i].moon) moonCount++; else planetCount++; }
-    if(planetCount>1) return "A Giant planet system can only have 1 planet (the Giant itself) -- remove the extra planet(s) or untick Giant planet.";
-    if(moonCount>5) return "A Giant planet can have at most 5 moons.";
+    if(planetCount>1) return "A Gas giant system can only have 1 planet (the giant itself) -- remove the extra planet(s) or untick Gas giant.";
+    if(moonCount>5) return "A Gas giant can have at most 5 moons.";
   }
   if(editStars.length<1 || editStars.length>3) return "A system must have 1 to 3 stars.";
   var seenColors=[];
@@ -3888,7 +4175,7 @@ document.getElementById("bEdit").addEventListener("click",function(){ if(selecte
    with FLAG_FIELDS in netlify/functions/_shared.mjs, same caveat). */
 var FLAG_LABELS={
   name:"System name", race:"Race", region:"Region name", starClass:"Star class",
-  stars:"Star colour(s)", suffix:"Water / Dissonant suffix", giant:"Giant planet",
+  stars:"Star colour(s)", suffix:"Water / Dissonant suffix", giant:"Gas giant",
   economy:"Economy (name, sell/buy %, strength)", conflict:"Conflict level",
   blackHole:"Black hole", atlas:"Atlas Interface", phantom:"Phantom / Shadow Star", notes:"Notes"
 };
@@ -3984,9 +4271,13 @@ document.getElementById("hyperOpenFilters").addEventListener("click",function(){
   closeModal();
   var f=document.getElementById("filt");
   if(f.classList.contains("min")) toggleFold("filt","fHead","Filters");
-  var sel=document.getElementById("fHyper");
-  sel.scrollIntoView({block:"center",behavior:"smooth"});
-  sel.focus();
+  // fHyper/fHyperDrive are hidden inputs now (see task 6's slide-out redesign)
+  // driven by the Hyperdrive button + pill panel -- open that instead of
+  // trying to focus a display:none select.
+  var btn=document.getElementById("bHyperOpen");
+  btn.scrollIntoView({block:"center",behavior:"smooth"});
+  document.getElementById("hyperPanel").classList.add("show");
+  positionHyperPanel();
 });
 
 /* ============ accessibility panel ============
@@ -4321,6 +4612,7 @@ document.getElementById("edSubmit").addEventListener("click",function(){
     water:document.getElementById("edWaterSuf").checked,
     dissonant:document.getElementById("edDissonantSuf").checked,
     giant:document.getElementById("edGiant").checked,
+    ruins:document.getElementById("edRuins").checked,
     econName:document.getElementById("edEcon").value.trim(),
     sell:document.getElementById("edSell").value.trim(),
     buy:document.getElementById("edBuy").value.trim(),
@@ -4741,6 +5033,7 @@ loadStore();
 initLabels();
 buildKeypad();
 updateGalaxyInfo();
+updateHyperSummary();
 resize();
 buildGalaxy();
 buildNebula();

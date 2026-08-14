@@ -5,9 +5,11 @@
    POST body: { action: "edit"|"report"|"resolve-flag", address, payload }
      address = the 12-char portal hex address the edit applies to
      "edit"   payload = {name, race, region, stars:[colourKey,...] (max 3), starClass, water, dissonant,
-                         giant, econName, sell, buy, econDesc, conflict, blackHole, atlas, notes,
+                         giant, ruins, phantom, econName, sell, buy, econDesc, conflict, blackHole, atlas, notes,
                          bodies:[{name, moon, orbits, biome, descriptor, water, ring, resources,
                                   flora, minerals, salvage, fossils, sentinel, autophage}, ...]}
+                         (ruins added 2026-08-14; phantom was already validated/shown but is only
+                         actually persisted as of the same date -- see getCategoryValue's comment)
      "report" payload = {reason}
      "resolve-flag" (admin only, requires ?token=<ADMIN_TOKEN> on the URL) payload =
                     {field, resolution:"dispute"|"dismiss"|"set-value", value?}
@@ -118,6 +120,17 @@ function getCategoryValue(out, category){
     case "conflict": return out.conflict;
     case "blackHole": return !!out.blackHole;
     case "atlas": return !!out.atlas;
+    // Ruins (2026-08-14, hyperdrive-types.docx task 9): plain boolean, same
+    // pattern as giant/blackHole/atlas above.
+    case "ruins": return !!out.ruins;
+    // Phantom / Shadow Star -- was validated by filterSystemEdit() and shown
+    // in the Edit system modal since it was added, but never actually wired
+    // into TOP_CATS/getCategoryValue/applyCategoryValue below, so a
+    // traveller's phantom/shadow submission was silently dropped before it
+    // ever reached the shared data store. Found while wiring ruins through
+    // this same code path -- genuinely pre-existing, unrelated to ruins
+    // itself, fixed alongside since it's the identical one-line pattern.
+    case "phantom": return out.phantom || "";
     case "notes": return out.notes;
     default: return undefined;
   }
@@ -151,6 +164,8 @@ function applyCategoryValue(data, category, value){
     case "conflict": data.conflict=value; return;
     case "blackHole": data.blackHole=!!value; return;
     case "atlas": data.atlas=!!value; return;
+    case "ruins": data.ruins=!!value; return;
+    case "phantom": data.phantom=value; return;
     case "notes": data.notes=value; return;
   }
 }
@@ -404,7 +419,7 @@ export default async (req, context) => {
     // or more categories from flaggedFields/disputedFields.
     var stillUnderReview = sysRec.flaggedFields.concat(sysRec.disputedFields);
 
-    var TOP_CATS = ["name","race","region","starClass","stars","suffix","giant","economy","conflict","blackHole","atlas","notes"];
+    var TOP_CATS = ["name","race","region","starClass","stars","suffix","giant","economy","conflict","blackHole","atlas","ruins","phantom","notes"];
     for(var ti=0; ti<TOP_CATS.length; ti++){
       if(stillUnderReview.indexOf(TOP_CATS[ti])>=0) continue;
       applyCategoryValue(sysRec.data, TOP_CATS[ti], getCategoryValue(filtered.cleaned, TOP_CATS[ti]));
