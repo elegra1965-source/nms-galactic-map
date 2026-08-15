@@ -3551,6 +3551,7 @@ function updateHyperSummary(){
 }
 function positionHyperPanel(){
   var hp=document.getElementById("hyperPanel"), btn=document.getElementById("bHyperOpen");
+  if(hp.parentElement!==document.body) document.body.appendChild(hp);
   if(!hp.classList.contains("show")) return;
   var r=btn.getBoundingClientRect();
   var pw=hp.offsetWidth||198, ph=hp.offsetHeight||300;
