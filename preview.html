@@ -153,9 +153,18 @@ html.debug-on #tweak{display:block}
    layout, just without the cut-off). This version keeps the correct sideways
    layout AND copies #tweak's own max-height:calc(100vh - 40px) safety net,
    which is the one piece v1 was actually missing. */
-#hyperPanel{display:none;width:198px;
-  max-height:calc(100vh - 40px);overflow-y:auto;overflow-x:hidden;z-index:40}
+#hyperPanel{display:none;width:198px;padding:10px 12px;
+  max-height:calc(100vh - 40px);overflow-y:hidden;overflow-x:hidden;z-index:40}
 #hyperPanel.show{display:block}
+/* #hyperPanel.scroll: only added by positionHyperPanel() once it's actually
+   measured real overflow against max-height. overflow-y:auto by default here
+   (like #tweak has) shows a 1px phantom scrollbar on some viewports even when
+   content visibly fits -- a sub-pixel scrollHeight-vs-clientHeight rounding
+   quirk, confirmed live (scrollHeight 181 vs clientHeight 180 with nowhere
+   near max-height reached). Measuring in JS and only opting into scroll when
+   truly needed sidesteps that rounding entirely instead of guessing at a
+   CSS fudge factor. */
+#hyperPanel.scroll{overflow-y:auto}
 #hyperPanel.sideR{position:absolute;top:0;left:100%;margin-left:8px}
 #hyperPanel.sideL{position:absolute;top:0;right:100%;margin-right:8px}
 #hyperSummary{color:var(--gold);font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:.04em}
@@ -3561,6 +3570,9 @@ function positionHyperPanel(){
   var roomRight=window.innerWidth-fr.right-8, roomLeft=fr.left-8;
   hp.classList.remove("sideL","sideR");
   hp.classList.add(roomRight>=pw||roomRight>=roomLeft?"sideR":"sideL");
+  hp.classList.remove("scroll");
+  var maxH=window.innerHeight-40;
+  if(hp.scrollHeight>maxH+1) hp.classList.add("scroll");
 }
 document.getElementById("bHyperOpen").addEventListener("click",function(e){
   e.stopPropagation();
