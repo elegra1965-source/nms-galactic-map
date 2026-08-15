@@ -141,19 +141,23 @@ html.debug-on #tweak{display:block}
 #tweak.sideR{left:100%;margin-left:8px}
 #tweak.sideL{right:100%;margin-right:8px}
 #filt{width:176px;padding:10px 12px;position:relative}
-/* position:fixed + JS-computed left/top (positionHyperPanel, below), same
-   "measure the real button rect, clamp inside the viewport" pattern as the
-   accessibility popup's positionUnderButton() -- the old sideL/sideR
-   absolute-anchored-to-#filt approach (like #tweak) had no vertical
-   clamping at all, so on a short/scrolled viewport the panel could render
-   with its bottom past the screen edge (Tony's screenshot: pills cut off,
-   a horizontal scrollbar appearing at the very bottom). Fixed positioning
-   with real clamping means this shouldn't need to scroll in practice --
-   max-height/overflow stay only as a safety net for a genuinely tiny
-   viewport, not the primary mechanism. */
-#hyperPanel{display:none;position:fixed;width:198px;
-  max-height:calc(100vh - 16px);overflow-y:auto;overflow-x:hidden;z-index:40}
+/* Expands SIDEWAYS out of #filt, same proven mechanism #tweak already uses
+   out of #accessPop (position:absolute anchored to the nearest positioned
+   ancestor, #filt itself, which is position:relative) -- NOT position:fixed.
+   Two earlier attempts got this wrong in opposite directions: v1 (.sideL/
+   .sideR with no max-height) let the panel run past the bottom of a short
+   viewport with no way to scroll to it; v2 (position:fixed anchored to the
+   button, escaping to document.body) fixed that but opened the panel BELOW
+   the button instead of beside the Filters box, overlapping the checkbox
+   list -- not what Tony asked for (he wanted the original side-by-side
+   layout, just without the cut-off). This version keeps the correct sideways
+   layout AND copies #tweak's own max-height:calc(100vh - 40px) safety net,
+   which is the one piece v1 was actually missing. */
+#hyperPanel{display:none;width:198px;
+  max-height:calc(100vh - 40px);overflow-y:auto;overflow-x:hidden;z-index:40}
 #hyperPanel.show{display:block}
+#hyperPanel.sideR{position:absolute;top:0;left:100%;margin-left:8px}
+#hyperPanel.sideL{position:absolute;top:0;right:100%;margin-right:8px}
 #hyperSummary{color:var(--gold);font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:.04em}
 .tag.wp{border-color:#ffb454;color:#ffb454}
 .tag.ruin{border-color:#c9a06a;color:#c9a06a}
@@ -3550,15 +3554,13 @@ function updateHyperSummary(){
   document.getElementById("hyperSummary").textContent=d.short+" // "+commas(parseInt(r,10))+" LY";
 }
 function positionHyperPanel(){
-  var hp=document.getElementById("hyperPanel"), btn=document.getElementById("bHyperOpen");
-  if(hp.parentElement!==document.body) document.body.appendChild(hp);
+  var hp=document.getElementById("hyperPanel"), filt=document.getElementById("filt");
   if(!hp.classList.contains("show")) return;
-  var r=btn.getBoundingClientRect();
-  var pw=hp.offsetWidth||198, ph=hp.offsetHeight||300;
-  var left=Math.min(window.innerWidth-pw-8,Math.max(8,r.left));
-  var top=Math.min(window.innerHeight-ph-8,Math.max(8,r.bottom+8));
-  hp.style.left=left+"px";
-  hp.style.top=Math.max(8,top)+"px";
+  var fr=filt.getBoundingClientRect();
+  var pw=198;
+  var roomRight=window.innerWidth-fr.right-8, roomLeft=fr.left-8;
+  hp.classList.remove("sideL","sideR");
+  hp.classList.add(roomRight>=pw||roomRight>=roomLeft?"sideR":"sideL");
 }
 document.getElementById("bHyperOpen").addEventListener("click",function(e){
   e.stopPropagation();
