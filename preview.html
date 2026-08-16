@@ -310,7 +310,11 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 #course.show{display:block}
 #course .cline{display:flex;justify-content:space-between;font-size:11.5px;padding:2px 0}
 #course .cline span:first-child{color:var(--text-faint)}
-#course .cline b{color:var(--cyan);font-family:'Orbitron',sans-serif;font-size:10.5px}
+/* letter-spacing added 2026-08-16: every other Orbitron stat readout in the
+   app (#hyperSummary, #pCore, etc.) sets some, this one didn't -- at this
+   size/font, tight digit pairs like "17" can visually fuse into what Tony
+   correctly read as looking like a single merged glyph. */
+#course .cline b{color:var(--cyan);font-family:'Orbitron',sans-serif;font-size:10.5px;letter-spacing:.04em}
 #cTarget{font-family:'Orbitron',sans-serif;font-size:11px;color:var(--white);margin:5px 0 6px}
 #course .chead{display:flex;align-items:center;gap:8px}
 #course .chead>div{flex:1;min-width:0}
@@ -2881,6 +2885,29 @@ function drawCourse(){
     localGroup.add(courseDots);
   }
 }
+/* Investigated 2026-08-16 (Tony: "why not go 1 jump back... research how
+   it's done in game"): tried feeding the existing A* worker above a denser
+   graph -- sampled from regionCandidates() along the direct corridor
+   between start and target, instead of the sparse currently-rendered
+   slice it was getting before (which is why A* was silently failing and
+   falling back to findRoute() on nearly every real course; a graph that
+   sparse is almost never even connected over a few hundred LY). The idea
+   was sound -- A* can look ahead/backtrack in a way a greedy hop-by-hop
+   search structurally can't -- but tested head-to-head via a Node harness
+   against the real nms-core module: a one-shot corridor sample wide enough
+   to matter took 1.5-2.5s to build BEFORE A* even ran, and still landed
+   WORSE on average (~1.3x the naive distance/range minimum, worst 1.5x)
+   than the findRoute() fix already shipped below (~1.1x average, worst
+   1.3x, verified via the same harness). Root cause: findRoute()'s own
+   search re-centres and can expand its candidate search up to 3 regions
+   around EACH hop's own ideal point individually, which turns out to
+   concentrate search effort far more effectively than spreading a single
+   upfront budget across the whole corridor -- so the already-shipped fix
+   is genuinely the better one here, not just the simpler one. Not
+   pursuing this further. Separately: there's no real in-game precedent to
+   match -- No Man's Sky itself has no multi-hop route planner; players
+   jump one star at a time and just see which stars are in range each
+   time, so there's no canonical "how the real game shows this" to copy. */
 function setCourse(s){
   if(!focusSystem){ toast("Jump somewhere first"); return; }
   if(s.address===focusSystem.address){ toast("That is where you are — pick another star"); return; }
@@ -2899,8 +2926,17 @@ function setCourse(s){
   var _s=s,_ly=ly,_range=range,_dvx=dvx,_dvy=dvy,_dvz=dvz;
   /* world-unit jump range for A* */
   var _rangeW=_range/VOX_LY;
-  /* star database for A*: map current slice to {address,x,y,z} */
-  var _db=allSystems.map(function(sys){
+  /* star database for A*: map current slice to {address,x,y,z}. Real bug
+     fixed 2026-08-16: this never filtered by the selected hyperdrive's
+     reachable colours at all, so on the rare occasion A* did find a
+     connected path in the rendered slice, it could have routed straight
+     through a colour the current drive can't actually reach -- findRoute()
+     below always applied that gate, this never did. Cheap, safe fix
+     (allSystems is already computed, this is just a filter over it) --
+     left the denser corridor-sampling idea out after testing showed it
+     performed worse than the already-shipped findRoute() fix, see the
+     comment above setCourse(). */
+  var _db=allSystems.filter(function(sys){ return canReachColor(sys.type); }).map(function(sys){
     return {address:sys.address,x:sys.px,y:sys.py,z:sys.pz};
   });
   /* ensure target is in the database (may be outside current slice) */
