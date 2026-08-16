@@ -5819,11 +5819,18 @@ function animate(){
     }
     if(ctrl==="fly") flyStep(dt);
     if(mode==="galaxy") galaxyGroup.rotation.y+=0.0003;
+    /* Tony confirmed live: the icon spun the opposite way to the real 3D
+       galaxy, and at a different speed. Fixed by matching both exactly --
+       same per-frame magnitude as galaxyGroup.rotation.y above (0.0003,
+       advanced every frame regardless of mode so the icon keeps turning in
+       Local/System too, not just Galaxy view) and the opposite sign, since
+       the previous "+=" was the direction Tony saw as backwards. Redraw
+       itself stays throttled to every 3rd frame for performance -- only the
+       redraw is skipped, the angle still accumulates every frame so the
+       average speed is correct rather than 3x too fast. */
+    galIconRot-=0.0003; if(galIconRot<-Math.PI*2) galIconRot+=Math.PI*2;
     galIconFrame++;
-    if(galIconFrame%3===0){
-      galIconRot+=0.0157; if(galIconRot>Math.PI*2) galIconRot-=Math.PI*2;
-      drawGalIcon();
-    }
+    if(galIconFrame%3===0) drawGalIcon();
     if(mode==="system"){
       for(var i=0;i<pivots.length;i++){
         pivots[i].p.rotation.y+=pivots[i].sp*0.01;
