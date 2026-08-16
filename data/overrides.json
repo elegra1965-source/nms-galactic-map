@@ -446,12 +446,161 @@
       },
       "editedAt": "2026-08-09T23:21:11.742Z",
       "editedByIp": "82.132.185.221"
+    },
+    "1058E1434753": {
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Sranch Op10079",
+        "race": "Gek",
+        "region": "Yaptisb Conflux",
+        "starClass": "G7f",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Alchemical",
+        "sell": "56.9",
+        "buy": "-25.2",
+        "econDesc": "Medium Supply",
+        "conflict": "Peaceful",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "phantom": "",
+        "notes": "My Skyscraper ARG System",
+        "bodies": [
+          {
+            "name": "Naupac Minor",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Barren",
+            "descriptor": "",
+            "water": true,
+            "ring": "tan",
+            "resources": [
+              "Salt",
+              "Cobalt"
+            ],
+            "flora": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "None",
+            "autophage": false
+          },
+          {
+            "name": "Ayne",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Volcanic",
+            "descriptor": "",
+            "water": true,
+            "ring": false,
+            "resources": [
+              "Silver",
+              "Salt"
+            ],
+            "flora": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "None",
+            "autophage": false
+          },
+          {
+            "name": "Anmar XIII",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Irradiated",
+            "descriptor": "",
+            "water": false,
+            "ring": false,
+            "resources": [
+              "Magnetised Ferrite",
+              "Silver"
+            ],
+            "flora": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "None",
+            "autophage": false
+          },
+          {
+            "name": "Tanh",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Lush",
+            "descriptor": "",
+            "water": true,
+            "ring": false,
+            "resources": [
+              "Gold"
+            ],
+            "flora": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "None",
+            "autophage": false
+          },
+          {
+            "name": "Sayab 94/B2",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Irradiated",
+            "descriptor": "",
+            "water": true,
+            "ring": false,
+            "resources": [
+              "Silver",
+              "Gold"
+            ],
+            "flora": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "None",
+            "autophage": false
+          },
+          {
+            "name": "Fave",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Barren",
+            "descriptor": "",
+            "water": true,
+            "ring": false,
+            "resources": [
+              "Salt"
+            ],
+            "flora": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "None",
+            "autophage": false
+          }
+        ]
+      },
+      "editedAt": "2026-08-16T20:22:15.870Z",
+      "editedByIp": "2a00:23c7:13a4:b901:cc07:7a7c:292f:bc03",
+      "history": [
+        {
+          "at": "2026-08-16T20:22:15.870Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
-    "82.132.185.221": [
-      1786317671742
+    "2a00:23c7:13a4:b901:cc07:7a7c:292f:bc03": [
+      1786911735870
     ]
-  }
+  },
+  "flagLog": {}
 }
