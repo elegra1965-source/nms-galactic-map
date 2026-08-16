@@ -28,7 +28,10 @@ portal address  ->  12 hex glyphs  ->  signed 3D voxel coordinate
 
 ## What it can do
 
-Screenshots from the live site, in the order you'd actually hit them.
+Screenshots from the live site, in the order you'd actually hit them. The
+site itself also has a live version of this same walkthrough -- hit **Tour**
+in the toolbar (or "Take a quick tour" on the first-visit disclaimer) for a
+7-step guided spotlight over the real UI instead of static images.
 
 **Galaxy view.** Every one of the 256 real galaxies rendered as a proper 3D
 spiral, colour-matched to its actual type (Normal / Harsh / Empty / Lush) --
