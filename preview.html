@@ -628,6 +628,24 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 #route-itinerary-card.show{display:block}
 #route-itinerary-card .rihead{display:flex;justify-content:space-between;align-items:center;
   margin-bottom:10px;cursor:grab;user-select:none}
+/* ---- first-visit feature tour (2026-08-16, Tony's ask: a walkthrough of
+   what the site can do, adapted from the README's screenshot walkthrough
+   into a real in-site spotlight sequence). Not auto-shown -- reachable via
+   "Take a quick tour" on the disclaimer modal and a standing Tour button in
+   the toolbar, so it never stacks on top of the disclaimer itself and can be
+   replayed any time, including live in front of someone. #tourHole is a
+   small fixed box positioned exactly over the real target element each step
+   (measure-don't-guess, same as positionUnderButton/positionCourseCard) --
+   its own oversized box-shadow does the actual dimming of everything else,
+   a plain CSS spotlight with no canvas/SVG masking needed. */
+#tourOverlay{position:fixed;inset:0;z-index:9000;display:none;pointer-events:none}
+#tourOverlay.show{display:block}
+#tourHole{position:fixed;border-radius:8px;border:2px solid var(--cyan);
+  box-shadow:0 0 0 9999px rgba(2,4,7,.8),0 0 16px rgba(0,229,255,.5);pointer-events:none;
+  transition:top .25s ease,left .25s ease,width .25s ease,height .25s ease}
+#tourBox{position:fixed;max-width:280px;padding:14px;pointer-events:auto;z-index:9001}
+#tourBox .modalBtns{margin-top:12px}
+#tourBox #tourBack{visibility:hidden}
 </style>
 </head>
 <body>
@@ -675,6 +693,21 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 <div id="empty">No systems match these filters</div>
 <div id="flyhint">WASD / ARROWS MOVE · SHIFT BOOST · SPACE-Q UP · E DOWN · DRAG TO LOOK</div>
 
+<!-- First-visit feature tour (see CSS comment for why it's opt-in, not auto-shown) -->
+<div id="tourOverlay">
+  <div id="tourHole"></div>
+  <div class="box" id="tourBox">
+    <div class="kicker" id="tourStepLabel">STEP 1 OF 6</div>
+    <h3 id="tourTitle" style="margin-top:4px">—</h3>
+    <div id="tourBody" style="font-size:12px;color:var(--text-dim);line-height:1.55;margin-top:6px">—</div>
+    <div class="modalBtns">
+      <button class="btn" id="tourSkip" title="Close the tour. You can restart it any time from the Tour button.">Skip</button>
+      <button class="btn" id="tourBack" title="Previous step.">Back</button>
+      <button class="btn primary" id="tourNext" title="Next step.">Next</button>
+    </div>
+  </div>
+</div>
+
 <div id="top">
   <div id="title">NMS GALACTIC MAP</div>
   <select id="galSel"></select>
@@ -708,6 +741,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   <button class="btn on" id="bGrid" title="Show the region grid in Local view. Each cube is one region, roughly 400 light years across. Shortcut: G">Grid</button>
   <div class="sep"></div>
   <button class="btn" id="bInstall" title="Install this map as an app on your device." style="display:none">&#9672; Install app</button>
+  <button class="btn" id="bTour" title="A quick guided tour of what this map can do.">&#9673; Tour</button>
   <button class="btn" id="bAbout" title="Fan-made disclaimer and a note on procedural vs. real system data.">&#9432; About</button>
   <button class="btn" id="bAccess" title="Accessibility settings: font size, colour-blind filters, high contrast." aria-label="Accessibility settings" aria-haspopup="true" aria-expanded="false">&#9881;</button>
 </div>
@@ -1136,6 +1170,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     </div>
     <div style="margin-top:2px;font-size:9px;letter-spacing:.1em;color:var(--text-faint);text-align:center">BUILT BY ELEGRA1965</div>
     <div class="modalBtns">
+      <button class="btn" id="discTour" title="A quick guided tour of what this map can do.">Take a quick tour</button>
       <button class="btn primary" id="discOk">Got it</button>
     </div>
   </div>
@@ -4890,6 +4925,83 @@ document.getElementById("hyperOpenFilters").addEventListener("click",function(){
   document.getElementById("hyperPanel").classList.add("show");
   positionHyperPanel();
 });
+
+/* ============ first-visit feature tour ============
+   Opt-in, not auto-shown (see the CSS comment above #tourOverlay for why) --
+   reached via "Take a quick tour" on the disclaimer modal or the standing
+   Tour button in the toolbar, so it can be replayed any time rather than
+   only ever firing once. Steps are adapted from the same walkthrough written
+   for README.md, just pointed at the real live elements instead of static
+   screenshots. Positioning follows the same measure-don't-guess pattern as
+   positionUnderButton/positionCourseCard elsewhere in this file: read the
+   real target element's on-screen rect each step rather than hardcoding
+   coordinates, so it stays correct across window sizes and toolbar wrapping. */
+var TOUR_STEPS=[
+  {sel:"#mGal",title:"A real 3D galaxy",
+    body:"You're looking at one of 256 real No Man's Sky galaxies, generated from a portal address -- not a static image, a galaxy you can actually fly through and zoom into."},
+  {sel:"#mLoc",title:"Local view",
+    body:"Local shows the real star field around you. Click any star for its race, economy, conflict and planets, then Enter system for a full 3D orbital view -- or add your own in-game data via Edit system."},
+  {sel:"#inAddr",title:"Type an address",
+    body:"Paste or type a 12-character portal address here and hit Jump to fly straight to that exact system."},
+  {sel:"#bKeys",title:"No address handy?",
+    body:"Tap Glyphs to enter the address using the game's own 16 symbols instead of hex -- handy for decoding one off a screenshot."},
+  {sel:"#bFiltToggle",title:"Narrow what you see",
+    body:"Filters can limit the star field by colour, race, economy, or special types like black holes and Atlas interfaces -- plus your hyperdrive type and range, which gates what Set course and Enter system will actually let you reach."},
+  {sel:"#bAbout",title:"Worth a read",
+    body:"About explains exactly what's generated accurately versus a plausible guess, and the gear icon next to it has font size, high contrast and colour-blind correction."}
+];
+var tourIdx=0, tourActive=false;
+var TOUR_KEY="nms-galmap-tour-done";
+function markTourDone(){ try{ localStorage.setItem(TOUR_KEY,"1"); }catch(e){} }
+function tourPosition(){
+  var step=TOUR_STEPS[tourIdx];
+  var el=document.querySelector(step.sel);
+  var hole=document.getElementById("tourHole");
+  var box=document.getElementById("tourBox");
+  if(!el){ tourNextStep(); return; } /* target not on screen this session -- skip rather than spotlight nothing */
+  var r=el.getBoundingClientRect();
+  var pad=6;
+  hole.style.top=(r.top-pad)+"px";
+  hole.style.left=(r.left-pad)+"px";
+  hole.style.width=(r.width+pad*2)+"px";
+  hole.style.height=(r.height+pad*2)+"px";
+  document.getElementById("tourStepLabel").textContent="STEP "+(tourIdx+1)+" OF "+TOUR_STEPS.length;
+  document.getElementById("tourTitle").textContent=step.title;
+  document.getElementById("tourBody").textContent=step.body;
+  document.getElementById("tourBack").style.visibility=tourIdx===0?"hidden":"visible";
+  document.getElementById("tourNext").textContent=(tourIdx===TOUR_STEPS.length-1)?"Done":"Next";
+  var bw=box.offsetWidth||280, bh=box.offsetHeight||140;
+  var top=r.bottom+pad+10;
+  if(top+bh>window.innerHeight-8) top=Math.max(8,r.top-pad-10-bh);
+  var left=Math.min(window.innerWidth-bw-8,Math.max(8,r.left));
+  box.style.top=top+"px";
+  box.style.left=left+"px";
+}
+function openTour(){
+  closeAllModalBoxes();
+  closeModal();
+  tourIdx=0; tourActive=true;
+  document.getElementById("tourOverlay").classList.add("show");
+  tourPosition();
+}
+function closeTour(){
+  tourActive=false;
+  document.getElementById("tourOverlay").classList.remove("show");
+}
+function tourNextStep(){
+  if(tourIdx>=TOUR_STEPS.length-1){ closeTour(); markTourDone(); return; }
+  tourIdx++; tourPosition();
+}
+function tourPrevStep(){ if(tourIdx>0){ tourIdx--; tourPosition(); } }
+document.getElementById("tourNext").addEventListener("click",tourNextStep);
+document.getElementById("tourBack").addEventListener("click",tourPrevStep);
+document.getElementById("tourSkip").addEventListener("click",function(){ closeTour(); markTourDone(); });
+document.getElementById("bTour").addEventListener("click",openTour);
+document.getElementById("discTour").addEventListener("click",function(){
+  try{ localStorage.setItem(DISCLAIMER_KEY,"1"); }catch(e){}
+  openTour();
+});
+window.addEventListener("resize",function(){ if(tourActive) tourPosition(); });
 
 /* ============ accessibility panel ============
    Font size / colour-blind filters / high contrast, gated behind a

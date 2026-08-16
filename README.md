@@ -26,6 +26,65 @@ portal address  ->  12 hex glyphs  ->  signed 3D voxel coordinate
                                           data/overrides.json (lives only on GitHub, see below)
 ```
 
+## What it can do
+
+Screenshots from the live site, in the order you'd actually hit them.
+
+**Galaxy view.** Every one of the 256 real galaxies rendered as a proper 3D
+spiral, colour-matched to its actual type (Normal / Harsh / Empty / Lush) --
+not a static image, a real navigable scene you fly through.
+
+![Galaxy view](screenshots/01-galaxy-view.jpg)
+
+**Local view.** Zoom into a galaxy and the real star field appears --
+thousands of systems, coloured by spectral class, named and clickable.
+Selecting one opens the info panel on the right: race, economy (with real
+sell/buy percentages), conflict level, star count, and every planet/moon in
+the system.
+
+![Local view with a system selected](screenshots/02-local-view-select.jpg)
+
+**Enter system.** Fly into any system for a true 3D orbital view -- binary
+and ternary stars, planets and moons on real orbits with rings where the
+generator rolled them, and (where the region has one) a black hole or Atlas
+Interface rendered as its own object rather than swapped in for the star.
+
+![3D system view](screenshots/03-system-3d-view.jpg)
+
+**Filters.** Narrow the local star field by colour, race, economy, or special
+system types (outlaw, black holes, Atlas interfaces, phantom/shadow stars),
+plus a hyperdrive type + range setting that actually gates what you can
+reach -- Set course and Enter system both check it.
+
+![Filters panel](screenshots/04-filters-panel.jpg)
+
+**Edit system.** Every system starts as a plausible procedural guess. Edit
+system lets you overwrite that with what you actually see in-game -- stars,
+race, economy, conflict, per-planet biomes and rings -- and the result is
+visible to every visitor, not just saved locally. Every edit is a real git
+commit, so nothing is ever silently lost.
+
+![Edit system modal](screenshots/05-edit-system-modal.jpg)
+
+**Portal glyph keypad.** Type a hex address or tap the real 16 in-game glyphs
+directly -- both stay in sync, so you can decode a screenshot from your own
+game without knowing the hex first.
+
+![Portal glyph keypad](screenshots/06-glyph-keypad.jpg)
+
+**Honest about its limits.** The About modal spells out exactly what's
+generated accurately (star type, system/region names, planet count) versus
+an unverified guess (individual planet names, and why) -- rather than
+presenting a guess as fact.
+
+![About modal](screenshots/07-about-modal.jpg)
+
+**Accessibility.** Four font-size presets, a high-contrast mode, and real
+Daltonization colour-correction (not simulation) for protanopia, deuteranopia,
+and tritanopia -- built into the map itself, not bolted on as an afterthought.
+
+![Accessibility panel](screenshots/08-accessibility-panel.jpg)
+
 ## The address, decoded
 
 ```
