@@ -5800,6 +5800,13 @@ function updateTelemetry(){
   document.getElementById("galHudDist").textContent=commas(_hudAnchor?_hudAnchor.coreLY:coreLY(vx,vy,vz))+" LY";
 }
 var frames=0, fpsT=performance.now(), lastT=fpsT, loopDead=false, _totalT=0;
+/* Galaxy rotation speed, shared by the real 3D galaxy (galaxyGroup.rotation.y)
+   and the mini HUD icon (galIconRot) so they can never drift out of sync again --
+   a real galaxy's rotation period is ~200-250 MILLION years (Milky Way), so
+   there's no "accurate" speed to use for a live UI; this is a stylised choice
+   tuned for ~20s per full turn, fast enough to actually read as spinning
+   rather than the near-static 0.0003 rad/frame (~350s/turn) it shipped with. */
+var GAL_ROT_SPD=0.0052;
 /* mini galaxy icon's own rotation angle -- advanced a little each frame in
    animate() below, independent of the 3D scene's galaxyGroup.rotation.y */
 var galIconRot=0, galIconFrame=0;
@@ -5818,7 +5825,7 @@ function animate(){
       frames=0; fpsT=now;
     }
     if(ctrl==="fly") flyStep(dt);
-    if(mode==="galaxy") galaxyGroup.rotation.y+=0.0003;
+    if(mode==="galaxy") galaxyGroup.rotation.y+=GAL_ROT_SPD;
     /* Tony confirmed live: the icon spun the opposite way to the real 3D
        galaxy, and at a different speed. Fixed by matching both exactly --
        same per-frame magnitude as galaxyGroup.rotation.y above (0.0003,
@@ -5828,7 +5835,7 @@ function animate(){
        itself stays throttled to every 3rd frame for performance -- only the
        redraw is skipped, the angle still accumulates every frame so the
        average speed is correct rather than 3x too fast. */
-    galIconRot-=0.0003; if(galIconRot<-Math.PI*2) galIconRot+=Math.PI*2;
+    galIconRot-=GAL_ROT_SPD; if(galIconRot<-Math.PI*2) galIconRot+=Math.PI*2;
     galIconFrame++;
     if(galIconFrame%3===0) drawGalIcon();
     if(mode==="system"){
