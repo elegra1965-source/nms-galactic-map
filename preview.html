@@ -462,7 +462,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 .modalBtns{display:flex;gap:6px;margin-top:12px}
 .modalBtns .btn{flex:1;text-align:center}
 .modalBtns .btn.primary{border-color:var(--gold);color:var(--gold)}
-#editSpin,#reportSpin{display:none;align-items:center;justify-content:center;gap:8px;
+#editSpin,#reportSpin,#feedbackSpin{display:none;align-items:center;justify-content:center;gap:8px;
   font-size:10px;color:var(--text-faint);text-align:center;margin-top:6px;letter-spacing:.02em}
 /* Status icon shown above the Saving/error text -- which of the 6 PNGs and which
    animation class is picked in JS (see statusIcon() / STATUS_ICONS). "Waiting" states
@@ -1115,6 +1115,43 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     </div>
   </div>
 
+  <!-- General site feedback (2026-08-16, Tony's ask) -- distinct from the
+       Report modal above, which is always about a SPECIFIC system. This one
+       isn't tied to any address at all, so it lives separately even though
+       it reuses the exact same error/spinner/retry machinery. -->
+  <div class="box modal" id="feedbackModal" style="max-width:340px;display:none">
+    <h3>Feedback / found a bug?</h3>
+    <div class="msub">Opens a GitHub Issue elegra1965 can see -- no account needed to send one.</div>
+    <div class="mfld"><div class="lb">What's this about?</div>
+      <select id="fbCategory">
+        <option>Bug/glitch</option>
+        <option>Feature idea</option>
+        <option>Something looks wrong</option>
+        <option>Other</option>
+      </select>
+    </div>
+    <div class="mfld"><div class="lb">What happened, or what you'd like</div>
+      <textarea id="fbMessage" maxlength="800" placeholder="Be as specific as you can"></textarea>
+    </div>
+    <div class="mfld"><div class="lb">Steps to reproduce (if it's a bug, optional)</div>
+      <textarea id="fbRepro" maxlength="500" placeholder="e.g. Click Local, click any star, click Enter system"></textarea>
+    </div>
+    <div class="mfld"><div class="lb">Device/browser</div>
+      <input type="text" id="fbDevice" maxlength="100">
+    </div>
+    <div class="mfld"><div class="lb">Want a reply? Leave a contact (optional)</div>
+      <input type="text" id="fbContact" maxlength="100" placeholder="Discord/email/etc -- entirely optional">
+    </div>
+    <div class="merr" id="feedbackErr"><span class="errTxt"></span><span class="errScan"></span></div>
+    <button class="btn" id="fbRetry" type="button" style="display:none;margin:-4px 0 10px">Retry send</button>
+    <div class="iconWrap" id="feedbackIconWrap"><img id="feedbackIconImg" src="" alt=""><span class="driftBeam"></span></div>
+    <div id="feedbackSpin"><span id="feedbackSpinTxt">Atlas is working on it...</span></div>
+    <div class="modalBtns">
+      <button class="btn primary" id="fbSubmit">Send feedback</button>
+      <button class="btn" id="fbCancel">Cancel</button>
+    </div>
+  </div>
+
   <div class="box modal" id="disclaimerModal" style="max-width:380px;display:none">
     <h3>Before you explore</h3>
     <div class="msub" style="margin-bottom:12px">Three quick things:</div>
@@ -1159,6 +1196,11 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     <div class="mfld">
       <div class="lb">Say hi in-game</div>
       <div style="font-size:12px;color:var(--text-dim);line-height:1.55">Traveller T672B774 &middot; Friend code MGD8-C6PP-XKFGT</div>
+    </div>
+    <div class="mfld">
+      <div class="lb">Feedback / found a bug?</div>
+      <div style="font-size:12px;color:var(--text-dim);line-height:1.55;margin-bottom:6px">Opens a GitHub Issue elegra1965 can see -- no account or email needed.</div>
+      <button class="btn" id="discFeedback" style="width:100%;text-align:center">Send feedback</button>
     </div>
     <div class="mfld">
       <div class="lb">Share this map</div>
@@ -1854,6 +1896,7 @@ function generateSystem(vx,vy,vz,idx,noOverride){
    in-game data for shows that data to every visitor, not just locally. */
 var FUNC_URL="/.netlify/functions/system-edit";
 var FLAG_URL="/.netlify/functions/flag-dispute";
+var FEEDBACK_URL="/.netlify/functions/feedback";
 var OVERRIDES={systems:{}};
 /* The 12 whole-row flag categories a visitor can flag/dispute (see
    FLAG_FIELDS in netlify/functions/_shared.mjs -- kept in sync by hand,
@@ -4692,6 +4735,7 @@ function closeAllModalBoxes(){
   document.getElementById("reportModal").style.display="none";
   document.getElementById("disclaimerModal").style.display="none";
   document.getElementById("hyperdriveModal").style.display="none";
+  document.getElementById("feedbackModal").style.display="none";
 }
 function closeModal(){ document.getElementById("modalWrap").classList.remove("show"); }
 function clientPrecheck(){
@@ -5481,6 +5525,81 @@ document.getElementById("repSubmit").addEventListener("click",function(){
   if(!reason){ setErrText(errEl,"Please describe what's wrong."); errEl.style.display="block"; retryBtn.style.display="none"; errEl.classList.remove("scanning"); errEl.scrollIntoView({block:"nearest"}); return; }
   errEl.style.display="none"; retryBtn.style.display="none";
   submitReportPayload(selected.address, reason);
+});
+
+/* ============ general site feedback (2026-08-16) ============
+   Not tied to any address, unlike Report above -- so it doesn't need
+   `selected` at all. Reuses the exact same describeSaveError/startAtlasWait/
+   showStatusIcon/setErrText machinery as edit/report/flag; "feedbackIconWrap"
+   -> "feedbackErr" already matches pairedErrEl()'s naming convention with no
+   extra wiring needed. */
+function openFeedbackModal(){
+  closeAllModalBoxes();
+  document.getElementById("fbCategory").value="Bug/glitch";
+  document.getElementById("fbMessage").value="";
+  document.getElementById("fbRepro").value="";
+  // Best-effort device/browser prefill -- still a plain editable text input,
+  // not read-only, since a visitor might want to add/replace this themselves.
+  try{ document.getElementById("fbDevice").value=navigator.userAgent.slice(0,100); }
+  catch(e){ /* navigator unavailable for some reason -- leave it blank, not required */ }
+  document.getElementById("fbContact").value="";
+  document.getElementById("feedbackErr").style.display="none";
+  document.getElementById("feedbackErr").classList.remove("scanning");
+  document.getElementById("fbRetry").style.display="none";
+  hideStatusIcon(document.getElementById("feedbackIconWrap"));
+  lastFeedbackAttempt=null;
+  document.getElementById("feedbackModal").style.display="";
+  document.getElementById("modalWrap").classList.add("show");
+}
+document.getElementById("discFeedback").addEventListener("click",openFeedbackModal);
+document.getElementById("fbCancel").addEventListener("click",closeModal);
+var lastFeedbackAttempt=null; // {category,message,repro,device,contact} of the most recent failed send, so Retry resubmits without retyping
+function submitFeedbackPayload(payload){
+  var errEl=document.getElementById("feedbackErr"), retryBtn=document.getElementById("fbRetry");
+  var spin=document.getElementById("feedbackSpin"), spinTxt=document.getElementById("feedbackSpinTxt"), btn=document.getElementById("fbSubmit");
+  var iconWrap=document.getElementById("feedbackIconWrap"), iconImg=document.getElementById("feedbackIconImg");
+  lastFeedbackAttempt=payload;
+  retryBtn.style.display="none";
+  spin.style.display="flex"; btn.disabled=true;
+  var stopWait=startAtlasWait(spinTxt, iconWrap, iconImg);
+  fetch(FEEDBACK_URL,{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify(payload)
+  }).then(function(r){ return r.json().then(function(j){ return {status:r.status,body:j}; }); })
+  .then(function(res){
+    stopWait(); spin.style.display="none"; btn.disabled=false;
+    if(!res.body.ok){
+      var d=describeSaveError(res.status,res.body,true);
+      showStatusIcon(iconWrap,iconImg,d.icon);
+      setErrText(errEl,d.message); errEl.style.display="block"; errEl.scrollIntoView({block:"nearest"});
+      retryBtn.style.display=d.retryable?"inline-block":"none";
+      return;
+    }
+    hideStatusIcon(iconWrap);
+    closeModal();
+    toast(res.body.issueUrl?"Feedback sent -- thank you":"Feedback sent -- thanks");
+  }).catch(function(){
+    stopWait(); spin.style.display="none"; btn.disabled=false;
+    showStatusIcon(iconWrap,iconImg,"grave");
+    setErrText(errEl,"Couldn't reach the server -- check your connection. Your feedback was NOT sent.");
+    errEl.style.display="block"; errEl.scrollIntoView({block:"nearest"});
+    retryBtn.style.display="inline-block";
+  });
+}
+document.getElementById("fbRetry").addEventListener("click",function(){
+  if(lastFeedbackAttempt) submitFeedbackPayload(lastFeedbackAttempt);
+});
+document.getElementById("fbSubmit").addEventListener("click",function(){
+  var errEl=document.getElementById("feedbackErr"), retryBtn=document.getElementById("fbRetry");
+  var message=document.getElementById("fbMessage").value.trim();
+  if(!message){ setErrText(errEl,"Please describe what happened or what you'd like."); errEl.style.display="block"; retryBtn.style.display="none"; errEl.classList.remove("scanning"); errEl.scrollIntoView({block:"nearest"}); return; }
+  errEl.style.display="none"; retryBtn.style.display="none";
+  submitFeedbackPayload({
+    category: document.getElementById("fbCategory").value,
+    message: message,
+    repro: document.getElementById("fbRepro").value.trim(),
+    device: document.getElementById("fbDevice").value.trim(),
+    contact: document.getElementById("fbContact").value.trim()
+  });
 });
 
 /* ============ install as app ============ */

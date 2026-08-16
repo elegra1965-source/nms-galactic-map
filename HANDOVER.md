@@ -1690,3 +1690,78 @@ touched, no new verification needed beyond confirming the markdown renders
 (checked the raw file). **Not deployed** -- same `preview.html` + `screenshots/`
 + `README.md` push as the rest of this session.
 
+---
+
+## Session 2026-08-16, continued yet again — self-hosted feedback form (no Google Form needed)
+
+Tony asked for a way to hear general site feedback/bug reports without
+exposing his personal email, and picked "GitHub Issues + a no-account form."
+Asked to actually create a Google Form for the no-account half, and couldn't
+-- the connected Drive tool only creates Docs/Sheets/Slides/folders, no
+Forms API access, and there's no Google Forms connector in the registry
+either. Tony chose to skip Google entirely instead: build the no-account
+form as part of the site itself, submitting straight to a GitHub Issue via
+a new Netlify Function.
+
+**New `netlify/functions/feedback.mjs`** -- POST `{category, message, repro,
+device, contact}`, filtered through the existing `filterText()` from
+`filter.mjs` (same content filter every other submission on this site goes
+through), then opens a real GitHub Issue (title `[Feedback] <category>:
+<message excerpt>`, labelled `feedback`). Two deliberate departures from the
+existing flag-dispute.mjs pattern, both explained in the function's own
+header comment: (1) Issue creation is NOT best-effort here -- flag-dispute
+has `overrides.json`'s `flagMeta` as a fallback record if the GITHUB_TOKEN
+lacks Issues:write permission, but general feedback has no such fallback, so
+a failed Issue creation fails the whole request with a real error rather
+than silently vanishing; (2) rate limiting (5/IP/hour) is in-memory only,
+deliberately NOT persisted to `data/overrides.json` the way editLog/
+reportLog/flagLog are, since feedback has nothing to do with per-system data
+and doesn't need a durable store -- keeps this feature fully decoupled from
+the precious shared data file every real system edit also writes to.
+**Important for deploy:** this means the existing `GITHUB_TOKEN` needs
+"Issues: Read and write" permission on its fine-grained PAT for this to work
+AT ALL, not just for optional notifications like flag-dispute -- worth
+checking/adding that scope before or right after this goes live, since
+there's no way to tell from the UI alone whether it's missing until someone
+actually submits feedback and gets a 502.
+
+**Frontend (`preview.html`)** -- a new `feedbackModal`, structurally a sibling
+of `editModal`/`reportModal`/`disclaimerModal`/`hyperdriveModal` inside
+`#modalWrap` (added to `closeAllModalBoxes()`), reusing 100% of the existing
+save/report machinery rather than building anything new: `describeSaveError`,
+`startAtlasWait`, `showStatusIcon`/`hideStatusIcon`, `setErrText`, the same
+`.merr`/`.iconWrap`/`.driftBeam` CSS and `STATUS_ICONS` set -- no new icon
+assets needed, and `feedbackIconWrap` -> `feedbackErr` already matches
+`pairedErrEl()`'s existing naming convention with zero extra wiring. Fields:
+category dropdown (Bug/glitch, Feature idea, Something looks wrong, Other),
+required message, optional repro steps, a device/browser field auto-filled
+from `navigator.userAgent` (still a plain editable text input, not
+read-only), and an optional contact field for anyone who wants a reply.
+Reachable only from the About/disclaimer modal (a new "Feedback / found a
+bug?" section with a "Send feedback" button) -- deliberately NOT added as
+its own toolbar button, given this project's own history of toolbar-
+wrapping bugs from added buttons (Session 19, Session 22) and Tony just
+having confirmed the brand-new Tour button already adds real pressure to
+that row on his S26; Report has never had a toolbar button either, so this
+matches existing precedent rather than introducing a new one.
+
+Verified: a from-scratch Node harness mocking `fetch` and importing the real
+shipped `feedback.mjs` unmodified -- 8 checks covering empty message (400),
+blocked content (422), a valid submission (200 with a real issueUrl), an
+invalid category silently falling back to "Other" rather than erroring,
+6 submissions from one IP tripping the 5/hour cap on the 6th (429), a GitHub
+API failure surfacing as a real 502 with the error text `describeSaveError`
+expects, a missing `GITHUB_TOKEN` (500), and a wrong HTTP method (405) -- all
+8 pass. Plus the project's standard `node --check` on `feedback.mjs` and all
+3 non-empty `preview.html` script blocks (pass), a tag-balance pass (pass,
+same one pre-existing quirk), an ID-existence check (271 unique ids, up from
+256 -- exactly the 15 new feedback-related ids, 0 duplicates, 0 missing
+`getElementById` targets), and a diff confirming only the intended blocks
+changed. **Not deployed** -- needs `preview.html` AND the new
+`netlify/functions/feedback.mjs` pushed together this time (the function
+won't exist server-side otherwise); `data/overrides.json` excluded as
+always. The real on-screen modal layout and whether GITHUB_TOKEN actually
+has Issues:write still need a real end-to-end test once live -- try
+submitting one real piece of feedback after deploying and confirm it shows
+up as an Issue on GitHub.
+
