@@ -293,12 +293,9 @@ html.hc-on .btn{border-width:2px}
 .seq img{width:100%;filter:drop-shadow(0 0 4px rgba(0,229,255,.5))}
 #pAddr{font-family:'Orbitron',monospace;font-size:10px;color:var(--cyan);letter-spacing:.14em;
   text-align:center;margin-top:6px}
-/* Small inline glyph row next to the hex address in the sliding system-info
-   drawer (Tony's ask, 2026-08-16) -- reuses the same glyph PNGs/renderSeq()
-   the Portal glyph keypad and #pSeq already use, just scaled down to sit
-   on one line beside the hex text instead of a full 12-column grid. */
-.hexGlyphs{display:inline-flex;gap:2px;flex-wrap:wrap;vertical-align:middle}
-.hexGlyphs img{width:13px;height:13px;filter:drop-shadow(0 0 3px rgba(0,229,255,.55))}
+.seqbox .lb.pCoordsLb{margin-top:8px;margin-bottom:3px}
+#pCoords{font-family:'Orbitron',monospace;font-size:10px;color:var(--text-dim);letter-spacing:.1em;
+  text-align:center}
 textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(--text);
   border-radius:var(--r-sm);padding:6px 7px;font-family:'Rajdhani',sans-serif;font-size:12px;
   resize:vertical;min-height:50px;outline:none;margin-top:8px}
@@ -631,13 +628,6 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 #route-itinerary-card.show{display:block}
 #route-itinerary-card .rihead{display:flex;justify-content:space-between;align-items:center;
   margin-bottom:10px;cursor:grab;user-select:none}
-/* ---- spec item 5: sliding system-info drawer (left side) ---- */
-#system-info-drawer{position:fixed;top:calc(var(--top-h,60px) + 8px);left:-380px;width:320px;
-  height:calc(100vh - var(--top-h,60px) - 30px);padding:20px;z-index:9998;overflow-y:auto;
-  transition:left 0.4s cubic-bezier(0.25,0.8,0.25,1);scrollbar-width:thin;
-  scrollbar-color:rgba(0,229,255,0.3) transparent}
-#system-info-drawer.open{left:20px}
-@media(max-width:900px){#system-info-drawer{display:none!important}}
 </style>
 </head>
 <body>
@@ -676,39 +666,6 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     Est. Distance: <span id="stat-dist" style="color:var(--white)">0 LY</span>
   </div>
   <div id="route-steps-list" style="max-height:150px;overflow-y:auto;font-size:11px;color:var(--text);line-height:16px"></div>
-</div>
-<!-- Sliding system-info drawer (spec item 5) -->
-<div id="system-info-drawer" class="nms-hud-card">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;border-bottom:1px solid var(--nms-border-neon);padding-bottom:10px">
-    <span id="drawer-system-name" style="color:var(--cyan);font-weight:bold;letter-spacing:2px;font-size:14px;text-shadow:0 0 10px rgba(0,229,255,0.4)">UNCHARTED REGION</span>
-    <button onclick="closeInfoDrawer()" style="background:transparent;border:none;color:var(--color-magenta);cursor:pointer;font-family:inherit;font-size:13px;letter-spacing:1px">[CLOSE]</button>
-  </div>
-  <div style="background:rgba(0,0,0,0.3);border:1px solid rgba(112,161,255,0.1);border-radius:4px;padding:12px;font-size:11px;margin-bottom:20px;line-height:16px">
-    <span style="color:var(--color-slate)">GALACTIC HEX ADDRESS:</span><br>
-    <span style="display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap">
-      <span id="drawer-hex" style="color:#fff;font-weight:bold">0000:0000:0000:0000</span>
-      <span id="drawer-hex-glyphs" class="hexGlyphs"></span>
-    </span><br><br>
-    <span style="color:var(--color-slate)">MATRIX VECTOR POINTS:</span><br>
-    <span id="drawer-coords" style="color:#fff">X: 0 | Y: 0 | Z: 0</span>
-  </div>
-  <div style="font-size:11px;margin-bottom:25px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
-    <div>
-      <span style="color:var(--color-slate);font-size:9px;display:block;margin-bottom:2px">PLANET COUNT</span>
-      <span id="drawer-planet-count" style="color:#fff;font-size:13px;font-weight:bold">0 Total</span>
-    </div>
-    <div>
-      <span style="color:var(--color-slate);font-size:9px;display:block;margin-bottom:2px">SPECTRAL CODE</span>
-      <span id="drawer-spectral" style="color:var(--color-matrix);font-size:13px;font-weight:bold">F5 // Normal</span>
-    </div>
-  </div>
-  <div style="color:var(--cyan);font-size:10px;font-weight:bold;letter-spacing:1px;margin-bottom:10px;text-transform:uppercase">// REGISTERED PLANETARY BIOMES</div>
-  <div id="drawer-planets-list" style="display:flex;flex-direction:column;gap:8px"></div>
-  <div style="margin-top:30px;border-top:1px solid rgba(0,229,255,0.15);padding-top:20px;display:flex;flex-direction:column;gap:10px">
-    <button id="drawer-route-btn" class="nms-btn nms-btn-action" style="width:100%;font-weight:bold;padding:8px 0"
-      title="Plot a hyperdrive route from where you are to this system -- draws the course on the map and works out distance, bearing and how many jumps it takes (see About for why that count can run a bit over the straight-line minimum).">LOCK NAVIGATION TARGET</button>
-    <button id="drawer-edit-btn" class="nms-btn" style="width:100%;font-size:10px;color:var(--color-slate);border:1px solid rgba(112,161,255,0.3)">MODIFY REGISTRY MANIFEST</button>
-  </div>
 </div>
 <div id="labels"></div>
 <div id="toast"></div>
@@ -922,6 +879,8 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     <div class="lb">Portal sequence</div>
     <div class="seq" id="pSeq"></div>
     <div id="pAddr">—</div>
+    <div class="lb pCoordsLb">Matrix vector points</div>
+    <div id="pCoords">X: — | Y: — | Z: —</div>
   </div>
   <textarea id="pNote" placeholder="Surveyor notes..."></textarea>
   <div class="prow">
@@ -3028,28 +2987,27 @@ function setCourse(s){
 }
 /* Real bug fixed 2026-08-16 (Tony's own two screenshots): #course's default
    CSS position -- centred under the toolbar -- collides with whatever else
-   is open. When the sliding system-info-drawer is open (drawer occupies
-   the left ~320px), a centred box can sit half-hidden behind/over it; with
-   nothing else open, the same centred spot can still cover a chunk of the
-   local star field. Same measure-don't-guess fix used everywhere else in
+   is open, e.g. it can cover a chunk of the local star field or sit under
+   the info panel. Same measure-don't-guess fix used everywhere else in
    this file (positionUnderButton, --top-h): check what's actually on
    screen and anchor beside it instead of guessing a fixed spot. Only runs
    once per session/resize -- a real drag (or this auto-anchor itself)
    leaves a real inline left/top that resetDraggedBoxes() clears on the
    next window resize, same signal makeDraggable's other boxes already use
    to know a fresh anchor is actually needed rather than clobbering
-   somewhere Tony deliberately dragged it to. */
+   somewhere Tony deliberately dragged it to.
+   (2026-08-16, continued: the sliding system-info-drawer this originally
+   also accounted for was scrapped same-session -- its fields moved into
+   this panel itself, see the Matrix vector points block in the Portal
+   sequence box -- so the drawer branch here was removed too.) */
 function positionCourseCard(){
   var course=document.getElementById("course");
   if(course.style.left) return; /* already dragged, or already auto-anchored this session */
-  var drawer=document.getElementById("system-info-drawer");
   var panel=document.getElementById("panel");
   var cw=course.offsetWidth||246;
   var topY=parseFloat(getComputedStyle(course).top)||70;
   var left;
-  if(drawer&&drawer.classList.contains("open")){
-    left=drawer.getBoundingClientRect().right+16;
-  } else if(panel&&panel.classList.contains("show")){
+  if(panel&&panel.classList.contains("show")){
     left=panel.getBoundingClientRect().left-cw-16;
   } else {
     return; /* nothing else open to avoid -- the default centred CSS position is fine */
@@ -3456,13 +3414,13 @@ function updatePanel(s){
 
   renderSeq(document.getElementById("pSeq"),s.address);
   document.getElementById("pAddr").textContent=s.address;
+  document.getElementById("pCoords").textContent="X: "+s.vx+" | Y: "+s.vy+" | Z: "+s.vz;
   document.getElementById("pNote").value=store.notes[skey(s)]||"";
   document.getElementById("bMark").classList.toggle("on",!!store.marks[skey(s)]);
   var cb=document.getElementById("bCourse");
   cb.classList.toggle("off",here);
   cb.title = here ? "This is where you are. Select a different star to plot a course to it."
     : "Plot a route from where you are to this system. Draws a line on the map and works out distance, bearing and how many hyperdrive jumps it takes.";
-  openInfoDrawer(s);
   setKeypad(s.address);
   updateRings();
 }
@@ -4252,7 +4210,6 @@ document.getElementById("bAddrReset").addEventListener("click",function(){
   } else {
     selected=null;
     document.getElementById("panel").classList.remove("show");
-    closeInfoDrawer();
   }
   toast(goingHome?"Address reset to your current location":"Address cleared");
 });
@@ -4407,43 +4364,6 @@ function displayCalculatedItinerary(waypoints,totalLY){
     card.style.left=(r.left+r.width/2-150)+"px";
     card.style.transform="none";
   }
-}
-/* ---- sliding info drawer helpers (spec item 5) ---- */
-function openInfoDrawer(s){
-  var drawer=document.getElementById("system-info-drawer");
-  if(!drawer) return;
-  document.getElementById("drawer-system-name").textContent=s.name||"UNCHARTED SYSTEM";
-  document.getElementById("drawer-hex").textContent=s.address||"";
-  renderSeq(document.getElementById("drawer-hex-glyphs"),s.address||"");
-  document.getElementById("drawer-coords").textContent=
-    "X: "+s.vx+" | Y: "+s.vy+" | Z: "+s.vz;
-  var count=(s.planets||0)+(s.moons||0);
-  document.getElementById("drawer-planet-count").textContent=
-    count+" Object"+(count!==1?"s":"");
-  document.getElementById("drawer-spectral").textContent=s.spectral||"UNKNOWN CLASS";
-  var pl=document.getElementById("drawer-planets-list");
-  pl.innerHTML="";
-  if(s.bodies&&s.bodies.length>0){
-    s.bodies.forEach(function(b,i){
-      pl.innerHTML+='<div style="background:rgba(0,0,0,0.2);border-left:2px solid var(--cyan);'+
-        'padding:6px 10px;font-size:11px;display:flex;justify-content:space-between;align-items:center">'+
-        '<span style="color:#fff;font-weight:bold">'+(b.moon?"Moon":"Planet")+" #"+(i+1)+"</span>"+
-        '<span style="color:var(--color-slate);font-size:10px">['+b.biome+"]</span></div>";
-    });
-  } else {
-    pl.innerHTML='<div style="font-size:11px;opacity:0.5;font-style:italic">No planetary surface scans archived for this node.</div>';
-  }
-  document.getElementById("drawer-route-btn").onclick=function(){
-    if(selected) setCourse(selected);
-  };
-  document.getElementById("drawer-edit-btn").onclick=function(){
-    openEditModal();
-  };
-  drawer.classList.add("open");
-}
-function closeInfoDrawer(){
-  var drawer=document.getElementById("system-info-drawer");
-  if(drawer) drawer.classList.remove("open");
 }
 /* hide manifest when course is cleared */
 document.getElementById("bClrCourse").addEventListener("click",function(){
