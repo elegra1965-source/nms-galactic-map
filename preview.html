@@ -384,14 +384,16 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   align-items:flex-start;justify-content:center;overflow-y:auto;overflow-x:hidden;padding:50px 12px}
 #modalWrap.show{display:flex}
 .modal{width:100%;max-width:420px;padding:16px 16px 14px;margin-bottom:40px;max-height:calc(100vh - 100px);overflow-y:auto;overflow-x:hidden}
-/* hyperdriveModal: .modal's blanket overflow-y:auto showed an always-on
-   scrollbar here even on viewports where the short notice text comfortably
-   fits -- same 1px scrollHeight-vs-clientHeight rounding quirk already
-   documented above for #hyperPanel. Default to hidden and let
-   openHyperNotice() opt into real scrolling only when it measures genuine
-   overflow, same fix, same reason. */
-#hyperdriveModal{overflow-y:hidden}
-#hyperdriveModal.scroll{overflow-y:auto}
+/* hyperdriveModal, feedbackModal: .modal's blanket overflow-y:auto showed
+   an always-on scrollbar here even on viewports where the content
+   comfortably fits -- same 1px scrollHeight-vs-clientHeight rounding quirk
+   already documented above for #hyperPanel. Default both to hidden and let
+   openHyperNotice()/openFeedbackModal() opt into real scrolling only when
+   they measure genuine overflow, same fix, same reason (Tony hit this on
+   feedbackModal on his S26 the same way he'd hit it on hyperdriveModal
+   before). */
+#hyperdriveModal,#feedbackModal{overflow-y:hidden}
+#hyperdriveModal.scroll,#feedbackModal.scroll{overflow-y:auto}
 .modal h3{font-family:'Orbitron',sans-serif;font-size:13px;letter-spacing:.1em;
   color:var(--white);margin-bottom:2px;text-transform:uppercase}
 .modal .msub{font-size:11px;color:var(--text-faint);margin-bottom:12px}
@@ -5548,8 +5550,13 @@ function openFeedbackModal(){
   document.getElementById("fbRetry").style.display="none";
   hideStatusIcon(document.getElementById("feedbackIconWrap"));
   lastFeedbackAttempt=null;
-  document.getElementById("feedbackModal").style.display="";
+  var fm=document.getElementById("feedbackModal");
   document.getElementById("modalWrap").classList.add("show");
+  fm.style.display="";
+  fm.classList.remove("scroll");
+  /* Same measure-don't-guess fix as openHyperNotice() -- only opt into a
+     real scrollbar once actual overflow is confirmed after layout. */
+  if(fm.scrollHeight>fm.clientHeight+1) fm.classList.add("scroll");
 }
 document.getElementById("discFeedback").addEventListener("click",openFeedbackModal);
 document.getElementById("fbCancel").addEventListener("click",closeModal);
