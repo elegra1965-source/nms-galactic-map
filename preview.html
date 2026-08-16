@@ -776,7 +776,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
       <label class="chk" title="Systems you've saved as a travel goal, whether or not your current drive can reach them yet -- see the Waypoint button on a system's panel."><input type="checkbox" id="fWaypoint">Waypoints</label>
       <label class="chk" title="Systems you've actually jumped to before, tracked automatically on this device."><input type="checkbox" id="fVisited">Visited</label>
       <label class="chk" title="Hides stars your current Hyperdrive drive type can't reach by star colour (yellow/red/green/blue/purple). Nothing to do with phantom or shadow stars -- those are a different kind of &quot;unreachable&quot;, with their own filters below."><input type="checkbox" id="fReachOnly">Drive: reachable only</label>
-      <label class="chk"><input type="checkbox" id="fMark">Bookmarked</label>
+      <label class="chk" title="Systems where a traveller has submitted real in-game data via Edit system -- same systems that show the &quot;Community edited&quot; tag on their info panel."><input type="checkbox" id="fEdited">Systems edited by traveller</label>
       <div class="fld" style="margin-top:7px">
         <div class="lb">Hyperdrive</div>
         <button class="btn" type="button" id="bHyperOpen" style="width:100%;text-align:left"
@@ -916,6 +916,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   <div id="pubNoteBox" style="display:none">
     <div class="lb" style="font-size:9px;letter-spacing:.12em;color:var(--text-faint);text-transform:uppercase;margin:8px 0 3px">Community notes</div>
     <div id="pubNote" style="font-size:12px;color:var(--text-dim);white-space:pre-wrap"></div>
+    <div id="pEditorLine" style="font-size:10.5px;color:var(--text-faint);margin-top:5px;display:none"></div>
   </div>
   <div class="seqbox">
     <div class="lb">Portal sequence</div>
@@ -1076,6 +1077,10 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     </div>
     <div class="mfld"><div class="lb">Public notes <span style="color:var(--text-faint)">(visible to everyone, not your private surveyor log)</span></div>
       <textarea id="edNotes" maxlength="800" placeholder="Anything else worth knowing about this system..."></textarea>
+    </div>
+    <div class="mfld" style="display:flex;gap:8px">
+      <div style="flex:1"><div class="lb">Your name <span style="color:var(--text-faint)">(optional)</span></div><input type="text" id="edEditorName" maxlength="30" placeholder="Shown as who documented this system"></div>
+      <div style="flex:1"><div class="lb">Friend code <span style="color:var(--text-faint)">(optional)</span></div><input type="text" id="edEditorCode" maxlength="24" placeholder="e.g. MGD8-C6PP-XKFGT"></div>
     </div>
     <div class="mfld">
       <div class="lb" style="display:flex;justify-content:space-between;align-items:center">
@@ -1968,6 +1973,8 @@ function applyOverride(s){
   if(d.giant!==undefined) s.giant=!!d.giant;
   if(d.ruins!==undefined) s.ruins=!!d.ruins;
   s.publicNotes=d.notes||"";
+  s.editorName=d.editorName||"";
+  s.editorFriendCode=d.editorFriendCode||"";
   if(d.bodies && d.bodies.length){
     var orig=s.bodies, out=[], planetIdx=0, lastPlanetIndex=0;
     for(var i=0;i<d.bodies.length && i<6;i++){
@@ -2076,6 +2083,7 @@ function refreshAfterOverrides(){
 
 /* ============ storage ============ */
 var STORE_K="nms-galmap-logs";
+var TRAVELLER_K="nms-galmap-traveller"; // remembers "your name"/"friend code" locally so Edit system doesn't need retyping every time -- see loadTravellerId()/saveTravellerId()
 /* waypoints/visited/bases are all personal, local-only lists -- same
    localStorage-only mechanism as marks/notes, never sent anywhere and
    never part of the shared community-edit data. Task 11 (waypoints for
@@ -2099,6 +2107,17 @@ function loadStore(){
 function saveStore(){
   try{ localStorage.setItem(STORE_K,JSON.stringify(store)); }
   catch(err){ toast("Could not save locally"); }
+}
+function loadTravellerId(){
+  try{
+    var raw=localStorage.getItem(TRAVELLER_K);
+    if(raw){ var o=JSON.parse(raw); return {name:o.name||"",code:o.code||""}; }
+  }catch(err){}
+  return {name:"",code:""};
+}
+function saveTravellerId(name,code){
+  try{ localStorage.setItem(TRAVELLER_K,JSON.stringify({name:name||"",code:code||""})); }
+  catch(err){}
 }
 function toast(msg,ms){
   var t=document.getElementById("toast");
@@ -2634,7 +2653,7 @@ function passFilter(s){
   if(document.getElementById("fShadow").checked&&s.phantom!=="shadow") return false;
   if(document.getElementById("fOut").checked&&!s.outlaw) return false;
   if(document.getElementById("fGiant").checked&&!s.giant) return false;
-  if(document.getElementById("fMark").checked&&!store.marks[skey(s)]) return false;
+  if(document.getElementById("fEdited").checked&&!s.override) return false;
   if(document.getElementById("fWaypoint").checked&&!store.waypoints[skey(s)]) return false;
   if(document.getElementById("fVisited").checked&&!store.visited[skey(s)]) return false;
   if(document.getElementById("fReachOnly").checked&&!canReachColor(s.type)) return false;
@@ -3484,8 +3503,13 @@ function updatePanel(s){
   }
   document.getElementById("pTags").innerHTML=html;
   var pnb=document.getElementById("pubNoteBox");
-  if(s.publicNotes){ pnb.style.display=""; document.getElementById("pubNote").textContent=s.publicNotes; }
-  else pnb.style.display="none";
+  var pEditorLine=document.getElementById("pEditorLine");
+  var editorTxt=s.editorName?("Documented by "+s.editorName+(s.editorFriendCode?" \u00b7 Friend code: "+s.editorFriendCode:"")):(s.editorFriendCode?("Friend code: "+s.editorFriendCode):"");
+  if(editorTxt){ pEditorLine.textContent=editorTxt; pEditorLine.style.display="block"; }
+  else pEditorLine.style.display="none";
+  if(s.publicNotes){ document.getElementById("pubNote").style.display=""; document.getElementById("pubNote").textContent=s.publicNotes; }
+  else document.getElementById("pubNote").style.display="none";
+  pnb.style.display=(s.publicNotes||editorTxt)?"":"none";
   setFsClass("pubNoteBox","notes",s);
 
   var bl="";
@@ -4052,7 +4076,7 @@ bindSlider("sSz","vSz",function(){
   var sel=document.getElementById("fEco"),i;
   for(i=0;i<ECON.length;i++){ var o=document.createElement("option"); o.textContent=ECON[i][0]; sel.appendChild(o); }
 })();
-["fCol","fRace","fEco","fBH","fAtl","fOut","fGiant","fMark","fWaypoint","fVisited","fReachOnly","fPhantom","fShadow"].forEach(function(id){
+["fCol","fRace","fEco","fBH","fAtl","fOut","fGiant","fEdited","fWaypoint","fVisited","fReachOnly","fPhantom","fShadow"].forEach(function(id){
   document.getElementById(id).addEventListener("change",applyFilter);
 });
 /* spec item 9 -- warp animation toggle */
@@ -4074,7 +4098,7 @@ document.getElementById("bReset").addEventListener("click",function(){
   document.getElementById("fEco").value="";
   document.getElementById("fBH").checked=false; document.getElementById("fAtl").checked=false;
   document.getElementById("fOut").checked=false; document.getElementById("fGiant").checked=false;
-  document.getElementById("fMark").checked=false;
+  document.getElementById("fEdited").checked=false;
   document.getElementById("fWaypoint").checked=false; document.getElementById("fVisited").checked=false;
   document.getElementById("fReachOnly").checked=false;
   document.getElementById("fPhantom").checked=false;
@@ -4202,6 +4226,10 @@ document.getElementById("bEnter").addEventListener("click",function(){
   if(!selected) return;
   if(!canReachColor(selected.type)){ toast(driveNeededMsg(selected.type)); return; }
   buildSystemView(selected); setMode("system"); playWarpTransition();
+  if(selected.editorName||selected.editorFriendCode){
+    var who=selected.editorName?("Documented by "+selected.editorName):"Documented by a traveller";
+    toast(who+(selected.editorFriendCode?(" \u00b7 Friend code: "+selected.editorFriendCode):""), 3200);
+  }
 });
 document.getElementById("bCourse").addEventListener("click",function(){
   if(selected) setCourse(selected);
@@ -4674,7 +4702,8 @@ function openEditModal(){
   // plainly instead of silently clobbering someone else's honest submission.
   var prevNotice=document.getElementById("editPrevNotice");
   if(s.override){
-    prevNotice.textContent='Currently saved as "'+(s.name||"Unnamed")+'" -- submitted '+relTime(s.overrideAt)+' by another traveller. Saving will replace it for everyone.';
+    var prevBy=s.editorName?(" by "+s.editorName):" by another traveller";
+    prevNotice.textContent='Currently saved as "'+(s.name||"Unnamed")+'" -- submitted '+relTime(s.overrideAt)+prevBy+'. Saving will replace it for everyone.';
     prevNotice.style.display="block";
   } else {
     prevNotice.style.display="none";
@@ -4702,6 +4731,9 @@ function openEditModal(){
   document.getElementById("edGiant").checked=!!s.giant;
   document.getElementById("edRuins").checked=!!s.ruins;
   document.getElementById("edNotes").value=s.publicNotes||"";
+  var myId=loadTravellerId();
+  document.getElementById("edEditorName").value=myId.name;
+  document.getElementById("edEditorCode").value=myId.code;
   editBodies=s.bodies.map(function(b){
     return {
       uid:bodyUidSeq++,
@@ -4780,7 +4812,8 @@ function clientPrecheck(){
   var fields=[document.getElementById("edName").value,document.getElementById("edEcon").value,
     document.getElementById("edEconStr").value,document.getElementById("edConflict").value,
     document.getElementById("edRegion").value,document.getElementById("edStarClass").value,
-    document.getElementById("edNotes").value];
+    document.getElementById("edNotes").value,document.getElementById("edEditorName").value,
+    document.getElementById("edEditorCode").value];
   for(var i=0;i<editBodies.length;i++){
     fields.push(editBodies[i].name,editBodies[i].descriptor,editBodies[i].flora,
       editBodies[i].minerals,editBodies[i].salvage,editBodies[i].fossils);
@@ -4923,7 +4956,17 @@ document.getElementById("bReport").addEventListener("click",function(){
 });
 document.getElementById("edCancel").addEventListener("click",closeModal);
 document.getElementById("repCancel").addEventListener("click",closeModal);
-document.getElementById("modalWrap").addEventListener("click",function(e){ if(e.target.id==="modalWrap") closeModal(); });
+document.getElementById("modalWrap").addEventListener("click",function(e){
+  if(e.target.id!=="modalWrap") return;
+  // Edit system involves a lot of typing (planets, resources, notes) -- an
+  // accidental click on the dark backdrop used to silently discard all of
+  // it with zero confirmation, which Tony flagged as genuinely frustrating.
+  // Every other modal (Report, disclaimer, hyperdrive notice, feedback,
+  // tour) still closes on a backdrop click same as before; only Edit
+  // system now requires an explicit Save or Cancel.
+  if(document.getElementById("editModal").style.display!=="none") return;
+  closeModal();
+});
 
 /* ============ fan-made / procedural-data disclaimer ============ */
 var DISCLAIMER_KEY="nms-galmap-disclaimer-seen";
@@ -5422,6 +5465,9 @@ document.getElementById("edSubmit").addEventListener("click",function(){
   // reference applyOverride() can use once this comes back from the server.
   var uidToPos={};
   editBodies.forEach(function(b,idx){ uidToPos[b.uid]=idx+1; });
+  var edEditorName=document.getElementById("edEditorName").value.trim();
+  var edEditorCode=document.getElementById("edEditorCode").value.trim();
+  saveTravellerId(edEditorName,edEditorCode); // remember locally so this doesn't need retyping next time
   var payload={
     name:document.getElementById("edName").value.trim(),
     race:document.getElementById("edRace").value,
@@ -5441,6 +5487,8 @@ document.getElementById("edSubmit").addEventListener("click",function(){
     atlas:document.getElementById("edAtlas").checked,
     phantom:document.getElementById("edPhantom").value,
     notes:document.getElementById("edNotes").value.trim(),
+    editorName:edEditorName,
+    editorFriendCode:edEditorCode,
     bodies:editBodies.map(function(b){
       return {
         name:b.name.trim(), moon:b.moon,
