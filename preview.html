@@ -3914,7 +3914,17 @@ function setMode(m){
   hideLabels();
   document.getElementById("empty").style.display=(m==="local"&&shown.length===0)?"block":"none";
   cam.target.set(0,0,0);
-  if(m==="galaxy"){ cam.dist=330; cam.phi=0.62; flyPos.set(0,150,240); }
+  if(m==="galaxy"){
+    cam.dist=330; cam.phi=0.62; flyPos.set(0,150,240);
+    /* Tony: clicking a star in Local correctly opens the info panel, but
+       going back to Galaxy left it hanging open showing a now-irrelevant
+       system. Galaxy view has no concept of a "selected" star (that only
+       exists in Local/System), so close the panel and clear selection the
+       same way the address Reset/Clear button already does. */
+    selected=null;
+    document.getElementById("panel").classList.remove("show");
+    updateRings();
+  }
   if(m==="local"){ cam.dist=50; flyPos.set(0,10,44); maybeShowHyperNotice(); }
   if(m==="system"){ cam.dist=40; flyPos.set(0,12,38); }
   aimFly(cam.target);
