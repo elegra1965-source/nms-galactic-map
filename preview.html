@@ -33,6 +33,13 @@
   --border:rgba(0,229,255,0.16); --border-soft:rgba(255,255,255,0.07);
   --text:#cfe0f0; --text-dim:rgba(207,224,240,0.6); --text-faint:rgba(207,224,240,0.4);
   --white:#eaf6ff; --r-sm:8px;
+  /* ---- spec item 10: nms-hud-card/nms-btn theme variables ---- */
+  --nms-bg-glass:rgba(4,10,20,0.85);
+  --nms-border-neon:rgba(0,229,255,0.3);
+  --nms-border-neon-hover:rgba(0,229,255,0.7);
+  --color-magenta:#ff0055;
+  --color-matrix:#00ff66;
+  --color-slate:#70a1ff;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 /* Themed thin scrollbar for every scrollable box in the app (modals, Filters,
@@ -348,7 +355,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   font-family:'Orbitron',sans-serif;pointer-events:none;color:var(--white);display:flex;
   align-items:center;gap:9px;transition:top .15s}
 #galHud.withBadge{top:calc(var(--top-h,60px) + 46px)}
-#galIcon{width:84px;height:84px;flex:none;display:block;pointer-events:auto;
+#galIcon{width:84px;height:84px;flex:none;display:block;pointer-events:auto;animation:spinGalIcon 20s linear infinite;will-change:transform;
   -webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 #galHud div{white-space:nowrap}
 #galHud .galHudTxt{text-shadow:0 1px 2px #000,0 -1px 2px #000,1px 0 2px #000,-1px 0 2px #000,0 0 6px #000}
@@ -554,10 +561,133 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
      left-docked boxes entirely rather than fighting over the same vertical space. */
   #panel{left:auto;right:10px;width:300px;top:calc(var(--top-h,60px) + 10px);bottom:10px;max-height:none}
 }
+/* ---- nms-hud-card / nms-btn theme wrappers (spec item 10) ---- */
+.nms-hud-card{background:var(--nms-bg-glass);border:1px solid var(--nms-border-neon);
+  border-radius:6px;font-family:monospace;box-shadow:0 0 15px rgba(0,229,255,0.15)}
+.nms-btn{background:transparent;border:1px solid var(--nms-border-neon);color:var(--text);
+  padding:5px 10px;font-size:10px;cursor:pointer;border-radius:4px;letter-spacing:1px;
+  font-family:'Orbitron',sans-serif;transition:all 0.2s}
+.nms-btn:hover{border-color:var(--nms-border-neon-hover);background:rgba(0,229,255,0.07)}
+.nms-btn-action{color:var(--color-matrix);border-color:var(--color-matrix)}
+.nms-btn-action:hover{background:rgba(0,255,102,0.1)}
+.nms-btn-danger{color:#ff5a4a;border-color:#ff5a4a}
+.nms-btn-danger:hover{background:rgba(255,74,74,0.1)}
+/* ---- route loader overlay (spec item 7) ---- */
+#route-loader{display:none;position:fixed;top:0;left:0;width:100%;height:100%;
+  background:rgba(4,10,20,0.9);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  z-index:99999;justify-content:center;align-items:center;flex-direction:column;
+  font-family:'Orbitron',Courier,monospace}
+.ring{position:absolute;border-radius:50%;border:3px solid transparent}
+.outer-ring{width:80px;height:80px;border-top-color:var(--cyan);border-bottom-color:var(--cyan);
+  box-shadow:0 0 15px rgba(0,229,255,0.4);animation:loaderRotCW 1.5s cubic-bezier(0.5,0,0.5,1) infinite}
+.inner-ring{top:15px;left:15px;width:50px;height:50px;
+  border-left-color:var(--color-magenta);border-right-color:var(--color-magenta);
+  box-shadow:0 0 10px rgba(255,0,85,0.3);animation:loaderRotCCW 1s linear infinite}
+.core-dot{position:absolute;top:35px;left:35px;width:10px;height:10px;background:#fff;
+  border-radius:50%;box-shadow:0 0 20px #fff,0 0 10px var(--cyan);
+  animation:loaderPulse 0.8s ease-in-out infinite alternate}
+.blinking-cursor{color:var(--cyan);animation:loaderBlink 0.8s infinite}
+#loader-text{color:var(--cyan);font-size:14px;font-weight:bold;letter-spacing:4px;
+  text-shadow:0 0 10px rgba(0,229,255,0.6)}
+.loader-sub{color:var(--color-slate);font-size:10px;letter-spacing:2px;margin-top:8px;opacity:0.7}
+#terminal-console{margin-top:25px;width:320px;height:60px;
+  border-top:1px solid rgba(0,229,255,0.2);padding-top:10px;font-size:9px;
+  color:var(--color-matrix);text-align:left;overflow:hidden;line-height:14px;
+  opacity:0.8;letter-spacing:1px;font-family:Courier,monospace}
+@keyframes loaderRotCW{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+@keyframes loaderRotCCW{0%{transform:rotate(360deg)}100%{transform:rotate(0deg)}}
+@keyframes loaderPulse{0%{transform:scale(0.8);opacity:0.5}100%{transform:scale(1.3);opacity:1}}
+@keyframes loaderBlink{0%,49%{opacity:1}50%,100%{opacity:0}}
+/* ---- warp transition overlay (spec item 9) ---- */
+#warp-overlay{display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;
+  z-index:10000;background:#000;cursor:pointer;user-select:none}
+#warp-overlay video{width:100%;height:100%;object-fit:cover;display:block}
+.warp-skip{position:absolute;bottom:22px;width:100%;text-align:center;
+  font-family:'Orbitron',monospace;font-size:10px;letter-spacing:3px;
+  color:rgba(0,229,255,0.35);pointer-events:none}
+    /* ---- animated mini galaxy icon (spec item 11) ---- */
+    @keyframes spinGalIcon{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+/* ---- warp manifest itinerary card (spec item 7) ---- */
+#route-itinerary-card{position:fixed;left:50%;transform:translateX(-50%);
+  top:calc(var(--top-h,60px) + 8px);z-index:26;width:300px;display:none}
+#route-itinerary-card.show{display:block}
+#route-itinerary-card .rihead{display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:10px;cursor:grab;user-select:none}
+/* ---- spec item 5: sliding system-info drawer (left side) ---- */
+#system-info-drawer{position:fixed;top:calc(var(--top-h,60px) + 8px);left:-380px;width:320px;
+  height:calc(100vh - var(--top-h,60px) - 30px);padding:20px;z-index:9998;overflow-y:auto;
+  transition:left 0.4s cubic-bezier(0.25,0.8,0.25,1);scrollbar-width:thin;
+  scrollbar-color:rgba(0,229,255,0.3) transparent}
+#system-info-drawer.open{left:20px}
+@media(max-width:900px){#system-info-drawer{display:none!important}}
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
+<!-- Route loader overlay (spec item 7) -->
+<div id="route-loader">
+  <div style="position:relative;width:80px;height:80px;margin-bottom:25px">
+    <div class="ring outer-ring"></div>
+    <div class="ring inner-ring"></div>
+    <div class="core-dot"></div>
+  </div>
+  <div style="text-align:center">
+    <span id="loader-text">PLOTTING HYPERDRIVE TRAJECTORY</span>
+    <span class="blinking-cursor">_</span>
+  </div>
+  <div class="loader-sub">HYPERSPACE MAP ENGINE V2.0 // COMPUTING SEEDS</div>
+  <div id="terminal-console"></div>
+  <button id="bAbortRoute" onclick="abortRoute()" style="margin-top:14px;padding:5px 22px;background:transparent;border:1px solid #f04;color:#f04;font-family:inherit;font-size:10px;letter-spacing:2px;cursor:pointer;text-shadow:0 0 6px rgba(255,0,68,.5)">ABORT</button>
+</div>
+<!-- WARP TRANSITION video overlay (spec item 9) -->
+<div id="warp-overlay" onclick="skipWarp()">
+  <video id="warp-vid" autoplay muted playsinline preload="auto">
+    <source src="warp_transition.webm" type="video/webm">
+    <source src="warp_transition.mp4" type="video/mp4">
+  </video>
+  <div class="warp-skip">TAP TO SKIP</div>
+</div>
+<!-- WARP MANIFEST itinerary card (spec item 7) -->
+<div id="route-itinerary-card" class="box nms-hud-card">
+  <div class="rihead" id="riHead">
+    <span class="kicker" style="color:var(--cyan);font-weight:bold;letter-spacing:1px">WARP MANIFEST</span>
+    <button id="copy-route-btn" class="btn nms-btn nms-btn-action" title="Copy the full route as text to clipboard.">COPY STEPS</button>
+  </div>
+  <div id="route-stats" style="color:var(--color-slate);font-size:11px;margin-bottom:10px;border-bottom:1px solid rgba(112,161,255,0.2);padding-bottom:8px">
+    Total Jumps: <span id="stat-jumps" style="color:var(--white)">0</span><br>
+    Est. Distance: <span id="stat-dist" style="color:var(--white)">0 LY</span>
+  </div>
+  <div id="route-steps-list" style="max-height:150px;overflow-y:auto;font-size:11px;color:var(--text);line-height:16px"></div>
+</div>
+<!-- Sliding system-info drawer (spec item 5) -->
+<div id="system-info-drawer" class="nms-hud-card">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;border-bottom:1px solid var(--nms-border-neon);padding-bottom:10px">
+    <span id="drawer-system-name" style="color:var(--cyan);font-weight:bold;letter-spacing:2px;font-size:14px;text-shadow:0 0 10px rgba(0,229,255,0.4)">UNCHARTED REGION</span>
+    <button onclick="closeInfoDrawer()" style="background:transparent;border:none;color:var(--color-magenta);cursor:pointer;font-family:inherit;font-size:13px;letter-spacing:1px">[CLOSE]</button>
+  </div>
+  <div style="background:rgba(0,0,0,0.3);border:1px solid rgba(112,161,255,0.1);border-radius:4px;padding:12px;font-size:11px;margin-bottom:20px;line-height:16px">
+    <span style="color:var(--color-slate)">GALACTIC HEX ADDRESS:</span><br>
+    <span id="drawer-hex" style="color:#fff;font-weight:bold">0000:0000:0000:0000</span><br><br>
+    <span style="color:var(--color-slate)">MATRIX VECTOR POINTS:</span><br>
+    <span id="drawer-coords" style="color:#fff">X: 0 | Y: 0 | Z: 0</span>
+  </div>
+  <div style="font-size:11px;margin-bottom:25px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
+    <div>
+      <span style="color:var(--color-slate);font-size:9px;display:block;margin-bottom:2px">PLANET COUNT</span>
+      <span id="drawer-planet-count" style="color:#fff;font-size:13px;font-weight:bold">0 Total</span>
+    </div>
+    <div>
+      <span style="color:var(--color-slate);font-size:9px;display:block;margin-bottom:2px">SPECTRAL CODE</span>
+      <span id="drawer-spectral" style="color:var(--color-matrix);font-size:13px;font-weight:bold">F5 // Normal</span>
+    </div>
+  </div>
+  <div style="color:var(--cyan);font-size:10px;font-weight:bold;letter-spacing:1px;margin-bottom:10px;text-transform:uppercase">// REGISTERED PLANETARY BIOMES</div>
+  <div id="drawer-planets-list" style="display:flex;flex-direction:column;gap:8px"></div>
+  <div style="margin-top:30px;border-top:1px solid rgba(0,229,255,0.15);padding-top:20px;display:flex;flex-direction:column;gap:10px">
+    <button id="drawer-route-btn" class="nms-btn nms-btn-action" style="width:100%;font-weight:bold;padding:8px 0">LOCK NAVIGATION TARGET</button>
+    <button id="drawer-edit-btn" class="nms-btn" style="width:100%;font-size:10px;color:var(--color-slate);border:1px solid rgba(112,161,255,0.3)">MODIFY REGISTRY MANIFEST</button>
+  </div>
+</div>
 <div id="labels"></div>
 <div id="toast"></div>
 <div id="galInfo"></div>
@@ -616,14 +746,16 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
         <option>Korvax</option><option>Uninhabited</option></select></div>
       <div class="fld"><div class="lb">Economy</div>
         <select id="fEco"><option value="">Any</option></select></div>
-      <label class="chk"><input type="checkbox" id="fBH">Black holes</label>
-      <label class="chk"><input type="checkbox" id="fAtl">Atlas interfaces</label>
       <label class="chk"><input type="checkbox" id="fOut">Outlaw</label>
       <label class="chk" title="Real in-game term (Purple systems only) -- was labelled &quot;Giant planet&quot;, renamed to match the wiki. Always 1 huge planet with 5 moons, no other planets."><input type="checkbox" id="fGiant">Gas giant</label>
-      <label class="chk"><input type="checkbox" id="fMark">Bookmarked</label>
+      <label class="chk"><input type="checkbox" id="fBH">Black holes</label>
+      <label class="chk"><input type="checkbox" id="fAtl">Atlas interfaces</label>
+      <label class="chk" title="Phantom stars are a rare NMS oddity: system indices that exist in the portal address space but don't appear on the real in-game Galactic Map. Normally only reachable via a save/portal-index edit -- entering the map from inside one snaps your position to the nearest real star instead. Tick to show ONLY phantom star systems."><input type="checkbox" id="fPhantom">Phantom stars</label>
+      <label class="chk" title="Shadow stars are a distinct, related anomaly: the first invalid system index just past the portal network's valid range. Unlike ordinary phantoms, a shadow star CAN be reached by a normal hyperjump. Tick to show ONLY shadow star systems."><input type="checkbox" id="fShadow">Shadow stars</label>
       <label class="chk" title="Systems you've saved as a travel goal, whether or not your current drive can reach them yet -- see the Waypoint button on a system's panel."><input type="checkbox" id="fWaypoint">Waypoints</label>
       <label class="chk" title="Systems you've actually jumped to before, tracked automatically on this device."><input type="checkbox" id="fVisited">Visited</label>
-      <label class="chk" title="Hide any system your Hyperdrive setting below can't reach yet."><input type="checkbox" id="fReachOnly">Only reachable systems</label>
+      <label class="chk" title="Hides stars your current Hyperdrive drive type can't reach by star colour (yellow/red/green/blue/purple). Nothing to do with phantom or shadow stars -- those are a different kind of &quot;unreachable&quot;, with their own filters below."><input type="checkbox" id="fReachOnly">Drive: reachable only</label>
+      <label class="chk"><input type="checkbox" id="fMark">Bookmarked</label>
       <div class="fld" style="margin-top:7px">
         <div class="lb">Hyperdrive</div>
         <button class="btn" type="button" id="bHyperOpen" style="width:100%;text-align:left"
@@ -667,6 +799,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
           </div>
         </div>
       </div>
+      <label class="chk" title="Play a warp-jump animation when entering system view. Click or tap to skip."><input type="checkbox" id="fWarpAnim" checked>Warp animation</label>
       <div class="prow"><button class="btn" id="bReset" title="Clear all filters.">Reset</button>
         <button class="btn" id="bExport" title="Download your notes and bookmarks as a JSON file.">Export</button></div>
       <div class="prow"><button class="btn" id="bImport" title="Load notes and bookmarks from a previously exported JSON file.">Import logs</button></div>
@@ -1920,6 +2053,33 @@ function makeSprite(){
   var t=new THREE.Texture(cv); t.needsUpdate=true; return t;
 }
 var SPRITE=makeSprite();
+/* ---- spec item 10: GLSL star shaders (cinematic twinkling galaxy map) ---- */
+var STAR_VERT_SH=[
+  'uniform float uTime;',
+  'attribute vec3 aColor;',
+  'attribute float aSize;',
+  'varying vec3 vColor;',
+  'varying float vTwinkle;',
+  'void main(){',
+  '  vColor=aColor;',
+  '  vTwinkle=sin(uTime*3.0+position.x*10.0+position.y*5.0)*0.4+0.6;',
+  '  vec4 mvp=modelViewMatrix*vec4(position,1.0);',
+  '  gl_Position=projectionMatrix*mvp;',
+  '  gl_PointSize=aSize*(300.0/-mvp.z);',
+  '}'
+].join('\n');
+var STAR_FRAG_SH=[
+  'varying vec3 vColor;',
+  'varying float vTwinkle;',
+  'void main(){',
+  '  float d=length(gl_PointCoord-vec2(0.5));',
+  '  if(d>0.5) discard;',
+  '  float g=smoothstep(0.5,0.0,d);',
+  '  vec3 c=vColor*(0.6+vTwinkle*0.4);',
+  '  gl_FragColor=vec4(c,g);',
+  '}'
+].join('\n');
+var _starTime={value:0}; /* shared uniform for both galPts and locPts shaders */
 /* Hollow ring (not a filled blob like SPRITE/real stars) so course waypoint
    markers read as UI markers at a glance instead of blending into the star
    field -- confirmed live that a filled same-toned dot was invisible next to
@@ -2077,7 +2237,8 @@ function makeRingTexture(b){
   return t;
 }
 
-var galPts=null, locPts=null, nebulaGroup=new THREE.Group(), coreMesh=null, courseLine=null;
+var galPts=null, locPts=null, locInstMesh=null, nebulaGroup=new THREE.Group(), coreMesh=null, courseLine=null;
+var backdropPts=null; /* Item 8 — parallax starfield backdrop layer */
 var voxGrid=null, galMarks=null, gridOn=true;
 var selRing=null, focusRing=null;
 galaxyGroup.add(nebulaGroup);
@@ -2279,6 +2440,34 @@ function drawGalIcon(){
   ctx.beginPath(); ctx.arc(cx,cy,size*0.16,0,Math.PI*2); ctx.fill();
   ctx.globalAlpha=1; ctx.globalCompositeOperation="source-over";
 }
+/* ============ Item 8: starfield parallax backdrop ============
+   2200 cool-white points on a large sphere (radius 1100-1500 wu) —
+   renders before galaxy/nebula so it sits behind everything.
+   Fixed in world space; natural perspective parallax as camera moves. */
+function buildBackdrop(){
+  if(backdropPts){scene.remove(backdropPts);backdropPts.geometry.dispose();backdropPts.material.dispose();backdropPts=null;}
+  var N=2200,pos=new Float32Array(N*3),col=new Float32Array(N*3);
+  var rb=mulberry32(0x5EED5001);
+  for(var i=0;i<N;i++){
+    var theta=rb()*Math.PI*2,phi=Math.acos(2*rb()-1);
+    var rad=1100+rb()*400; /* 1100–1500 wu — behind galaxy, within camera far=5000 */
+    pos[i*3]=rad*Math.sin(phi)*Math.cos(theta);
+    pos[i*3+1]=rad*Math.sin(phi)*Math.sin(theta);
+    pos[i*3+2]=rad*Math.cos(phi);
+    var b=0.25+rb()*0.65; /* brightness 0.25–0.9 */
+    col[i*3]=b*0.74;col[i*3+1]=b*0.82;col[i*3+2]=b; /* cool blue-white tint */
+  }
+  var g=new THREE.BufferGeometry();
+  g.setAttribute('position',new THREE.BufferAttribute(pos,3));
+  g.setAttribute('color',new THREE.BufferAttribute(col,3));
+  backdropPts=new THREE.Points(g,new THREE.PointsMaterial({
+    size:2.2,sizeAttenuation:true,vertexColors:true,
+    transparent:true,opacity:0.5,depthWrite:false,
+    blending:THREE.AdditiveBlending
+  }));
+  backdropPts.renderOrder=-1; /* draw first, sits behind galaxy/nebula */
+  scene.add(backdropPts);
+}
 function buildGalaxy(){
   if(galPts){ galaxyGroup.remove(galPts); galPts.geometry.dispose(); galPts.material.dispose(); galPts=null; }
   var N=parseInt(document.getElementById("sGal").value,10);
@@ -2298,11 +2487,17 @@ function buildGalaxy(){
     var b=0.4+(1-t)*0.6;
     col[i*3]=c.r*b; col[i*3+1]=c.g*b; col[i*3+2]=c.b*b;
   }
+  /* item 10: add per-star size variation for GLSL shader */
+  var sz=new Float32Array(N);
+  for(var _si=0;_si<N;_si++) sz[_si]=0.9+r()*0.7;
   var g=new THREE.BufferGeometry();
   g.setAttribute("position",new THREE.BufferAttribute(pos,3));
-  g.setAttribute("color",new THREE.BufferAttribute(col,3));
-  galPts=new THREE.Points(g,new THREE.PointsMaterial({size:1.25,map:SPRITE,vertexColors:true,
-    transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,sizeAttenuation:true,opacity:0.95}));
+  g.setAttribute("aColor",new THREE.BufferAttribute(col,3));
+  g.setAttribute("aSize",new THREE.BufferAttribute(sz,1));
+  galPts=new THREE.Points(g,new THREE.ShaderMaterial({
+    vertexShader:STAR_VERT_SH,fragmentShader:STAR_FRAG_SH,
+    uniforms:{uTime:_starTime},
+    transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}));
   galaxyGroup.add(galPts);
 }
 
@@ -2349,6 +2544,8 @@ function passFilter(s){
   if(eco&&s.econType!==eco) return false;
   if(document.getElementById("fBH").checked&&!s.blackHole) return false;
   if(document.getElementById("fAtl").checked&&!s.atlas) return false;
+  if(document.getElementById("fPhantom").checked&&s.phantom!=="phantom") return false;
+  if(document.getElementById("fShadow").checked&&s.phantom!=="shadow") return false;
   if(document.getElementById("fOut").checked&&!s.outlaw) return false;
   if(document.getElementById("fGiant").checked&&!s.giant) return false;
   if(document.getElementById("fMark").checked&&!store.marks[skey(s)]) return false;
@@ -2365,6 +2562,7 @@ function updateRings(){
 }
 function applyFilter(){
   if(locPts){ localGroup.remove(locPts); locPts.geometry.dispose(); locPts.material.dispose(); locPts=null; }
+  if(locInstMesh){ localGroup.remove(locInstMesh); locInstMesh.geometry.dispose(); locInstMesh.material.dispose(); locInstMesh=null; }
   shown=[];
   var i;
   for(i=0;i<allSystems.length;i++) if(passFilter(allSystems[i])) shown.push(allSystems[i]);
@@ -2382,13 +2580,35 @@ function applyFilter(){
     c.setHex(hx);
     col[i*3]=c.r; col[i*3+1]=c.g; col[i*3+2]=c.b;
   }
+  /* item 10: per-star size for GLSL shader, based on user size setting */
+  var szBase=parseFloat(document.getElementById("sSz").value);
+  var sz=new Float32Array(n);
+  var _szr=mulberry32(0xA5712E33);
+  for(i=0;i<n;i++) sz[i]=szBase*(0.8+_szr()*0.5);
   var g=new THREE.BufferGeometry();
   g.setAttribute("position",new THREE.BufferAttribute(pos,3));
-  g.setAttribute("color",new THREE.BufferAttribute(col,3));
-  locPts=new THREE.Points(g,new THREE.PointsMaterial({
-    size:parseFloat(document.getElementById("sSz").value),map:SPRITE,vertexColors:true,
-    transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,sizeAttenuation:true}));
+  g.setAttribute("aColor",new THREE.BufferAttribute(col,3));
+  g.setAttribute("aSize",new THREE.BufferAttribute(sz,1));
+  locPts=new THREE.Points(g,new THREE.ShaderMaterial({
+    vertexShader:STAR_VERT_SH,fragmentShader:STAR_FRAG_SH,
+    uniforms:{uTime:_starTime},
+    transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}));
   localGroup.add(locPts);
+  /* ---- InstancedMesh picking layer: invisible spheres give reliable instanceId raycasting ---- */
+  var _iGeo=new THREE.SphereGeometry(0.55,4,3);
+  var _iMat=new THREE.MeshBasicMaterial({vertexColors:true,transparent:true,opacity:0,depthWrite:false});
+  locInstMesh=new THREE.InstancedMesh(_iGeo,_iMat,n);
+  locInstMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+  var _im4=new THREE.Matrix4(),_icv=new THREE.Color();
+  for(var _ii=0;_ii<n;_ii++){
+    _im4.setPosition(shown[_ii].px,shown[_ii].py,shown[_ii].pz);
+    locInstMesh.setMatrixAt(_ii,_im4);
+    _icv.setRGB(col[_ii*3],col[_ii*3+1],col[_ii*3+2]);
+    locInstMesh.setColorAt(_ii,_icv);
+  }
+  locInstMesh.instanceMatrix.needsUpdate=true;
+  if(locInstMesh.instanceColor) locInstMesh.instanceColor.needsUpdate=true;
+  localGroup.add(locInstMesh);
   drawCourse();
   updateRings();
 }
@@ -2400,6 +2620,39 @@ function clearCourseLine(){
   if(courseDots){ localGroup.remove(courseDots); courseDots.geometry.dispose(); courseDots.material.dispose(); courseDots=null; }
 }
 var courseWaypoints=null, courseTruncated=false;
+var _routeWorker=null; /* active A* web worker, null when idle */
+var WARP_ENABLED=localStorage.getItem('nms-galmap-warp')!=='0'; /* spec item 9 */
+/* inline A* worker — blob URL created once at startup, reused for every setCourse() call */
+var _ASTAR_WORKER_URL=(function(){
+  var src='function gd(a,b){var dx=a.x-b.x,dy=a.y-b.y,dz=a.z-b.z;return Math.sqrt(dx*dx+dy*dy+dz*dz);}\n'+
+    'function planRoute(s,e,db,mr){\n'+
+    '  var open=[s],cf=new Map(),gs=new Map(),fs=new Map();\n'+
+    '  gs.set(s.address,0); fs.set(s.address,gd(s,e));\n'+
+    '  while(open.length>0){\n'+
+    '    open.sort(function(a,b){return(fs.get(a.address)||Infinity)-(fs.get(b.address)||Infinity);});\n'+
+    '    var cur=open.shift();\n'+
+    '    if(cur.address===e.address||gd(cur,e)<=mr){\n'+
+    '      var path=[],tmp=cur;\n'+
+    '      while(cf.has(tmp.address)){path.unshift(tmp);tmp=cf.get(tmp.address);}\n'+
+    '      path.unshift(s);\n'+
+    '      if(cur.address!==e.address) path.push(e);\n'+
+    '      return path;\n'+
+    '    }\n'+
+    '    var nbrs=db.filter(function(x){var d=gd(cur,x);return d>0&&d<=mr;});\n'+
+    '    for(var i=0;i<nbrs.length;i++){\n'+
+    '      var nb=nbrs[i],tg=(gs.get(cur.address)||0)+gd(cur,nb);\n'+
+    '      if(tg<(gs.get(nb.address)||Infinity)){\n'+
+    '        cf.set(nb.address,cur); gs.set(nb.address,tg);\n'+
+    '        fs.set(nb.address,tg+gd(nb,e));\n'+
+    '        if(!open.some(function(x){return x.address===nb.address;})) open.push(nb);\n'+
+    '      }\n'+
+    '    }\n'+
+    '  }\n'+
+    '  return null;\n'+
+    '}\n'+
+    'self.onmessage=function(e){self.postMessage(planRoute(e.data.s,e.data.e,e.data.db,e.data.mr));};';
+  return URL.createObjectURL(new Blob([src],{type:'application/javascript'}));
+})();
 var VOX_LY=LY_PER_VOXEL/VOX_U; /* light-years represented by one world unit, ~44.4 */
 var ROUTE_MAX_HOPS=40; /* a real long-haul NMS trip can be hundreds of jumps -- past this
   many the polyline stops being useful to look at anyway, so the route is truncated with
@@ -2596,19 +2849,66 @@ function setCourse(s){
     ly=Math.round(Math.sqrt(dx*dx+dy*dy+dz*dz)/VOX_U*LY_PER_VOXEL);
   }
   var range=parseInt(document.getElementById("fHyper").value,10);
-  var route=findRoute(focusSystem,s,range,true);
-  courseWaypoints=route.path; courseTruncated=route.truncated;
+  /* terminate any previous worker before starting a fresh one */
+  if(_routeWorker){ _routeWorker.terminate(); _routeWorker=null; }
+  showRouteLoader();
+  var _s=s,_ly=ly,_range=range,_dvx=dvx,_dvy=dvy,_dvz=dvz;
+  /* world-unit jump range for A* */
+  var _rangeW=_range/VOX_LY;
+  /* star database for A*: map current slice to {address,x,y,z} */
+  var _db=allSystems.map(function(sys){
+    return {address:sys.address,x:sys.px,y:sys.py,z:sys.pz};
+  });
+  /* ensure target is in the database (may be outside current slice) */
+  if(!_db.some(function(o){return o.address===_s.address;}))
+    _db.push({address:_s.address,x:_s.px,y:_s.py,z:_s.pz});
+  var _startObj={address:focusSystem.address,x:focusSystem.px,y:focusSystem.py,z:focusSystem.pz};
+  var _endObj={address:_s.address,x:_s.px,y:_s.py,z:_s.pz};
+  /* address→system lookup for mapping A* results back to full objects */
+  var _amap={};
+  for(var _ai=0;_ai<allSystems.length;_ai++) _amap[allSystems[_ai].address]=allSystems[_ai];
+  function _applyRoute(apath){
+    if(apath&&apath.length>=2){
+      /* map lightweight A* result back to full system objects */
+      courseWaypoints=apath.map(function(wp){
+        return _amap[wp.address]||{address:wp.address,px:wp.x,py:wp.y,pz:wp.z,
+          name:'—',type:'',coreLY:0,vx:0,vy:0,vz:0};
+      });
+      /* pin start/end to authoritative system objects */
+      courseWaypoints[0]=focusSystem;
+      courseWaypoints[courseWaypoints.length-1]=_s;
+      courseTruncated=false;
+    } else {
+      /* A* returned null (target beyond local slice) — fall back to findRoute() */
+      var rt=findRoute(focusSystem,_s,_range,true);
+      courseWaypoints=rt.path; courseTruncated=rt.truncated;
+    }
+    _finishSetCourse(_s,_ly,_range,_dvx,_dvy,_dvz);
+  }
+  _routeWorker=new Worker(_ASTAR_WORKER_URL);
+  _routeWorker.onmessage=function(e){ _routeWorker=null; _applyRoute(e.data); };
+  _routeWorker.onerror=function(){
+    _routeWorker=null;
+    var rt=findRoute(focusSystem,_s,_range,true);
+    courseWaypoints=rt.path; courseTruncated=rt.truncated;
+    _finishSetCourse(_s,_ly,_range,_dvx,_dvy,_dvz);
+  };
+  _routeWorker.postMessage({s:_startObj,e:_endObj,db:_db,mr:_rangeW});
+}
+function _finishSetCourse(_s,_ly,_range,_dvx,_dvy,_dvz){
   var hops=courseWaypoints.length-1;
-  document.getElementById("cTarget").textContent=s.name;
-  document.getElementById("cDist").textContent=commas(ly)+" LY";
-  document.getElementById("cJumps").textContent=(courseTruncated?(hops+"+"):hops)+" @ "+commas(range)+" LY"+(courseTruncated?" (simplified)":"");
-  document.getElementById("cBear").textContent=(ly===0)?"—":bearingOf(dvx,dvz,dvy);
-  document.getElementById("cCore").textContent=commas(s.coreLY)+" LY";
+  document.getElementById("cTarget").textContent=_s.name;
+  document.getElementById("cDist").textContent=commas(_ly)+" LY";
+  document.getElementById("cJumps").textContent=(courseTruncated?(hops+"+"):hops)+" @ "+commas(_range)+" LY"+(courseTruncated?" (simplified)":"");
+  document.getElementById("cBear").textContent=(_ly===0)?"—":bearingOf(_dvx,_dvz,_dvy);
+  document.getElementById("cCore").textContent=commas(_s.coreLY)+" LY";
   document.getElementById("course").classList.add("show");
   document.getElementById("course").classList.remove("min");
   document.getElementById("bCourseMin").innerHTML="&#9662;";
   drawCourse();
   buildGalaxyMarks();
+  hideRouteLoader();
+  displayCalculatedItinerary(courseWaypoints,_ly);
 }
 
 /* ============ system view ============ */
@@ -2991,6 +3291,7 @@ function updatePanel(s){
   cb.classList.toggle("off",here);
   cb.title = here ? "This is where you are. Select a different star to plot a course to it."
     : "Plot a route from where you are to this system. Draws a line on the map and works out distance, bearing and how many hyperdrive jumps it takes.";
+  openInfoDrawer(s);
   setKeypad(s.address);
   updateRings();
 }
@@ -3233,12 +3534,10 @@ function tryPick(cx,cy){
   ndc.x=((cx-rect.left)/rect.width)*2-1;
   ndc.y=-((cy-rect.top)/rect.height)*2+1;
   ray.setFromCamera(ndc,camera);
-  if(mode==="local"&&locPts){
-    var d=(ctrl==="fly")?6:cam.dist;
-    ray.params.Points.threshold=Math.max(0.35,d*0.014);
-    var hits=ray.intersectObject(locPts);
-    if(hits.length&&shown[hits[0].index]){
-      var pickedSys=shown[hits[0].index];
+  if(mode==="local"&&locInstMesh){
+    var hits=ray.intersectObject(locInstMesh);
+    if(hits.length&&hits[0].instanceId!==undefined&&shown[hits[0].instanceId]){
+      var pickedSys=shown[hits[0].instanceId];
       updatePanel(pickedSys);
       /* Task 2: "if click on a star and they don't have correct drive,
          popup saying need X to reach Y". Informational only -- still opens
@@ -3520,15 +3819,22 @@ bindSlider("sTh","vTh",function(){ buildGalaxy(); buildNebula(); },true);
 bindSlider("sR","vR",generateSlice,false);
 bindSlider("sPer","vPer",generateSlice,false);
 bindSlider("sSz","vSz",function(){
-  if(locPts) locPts.material.size=parseFloat(document.getElementById("sSz").value);
+  /* item 10: shader uses aSize attribute baked per-star, so rebuild locPts on size change */
+  if(mode==="local") applyFilter();
 },true);
 
 (function(){
   var sel=document.getElementById("fEco"),i;
   for(i=0;i<ECON.length;i++){ var o=document.createElement("option"); o.textContent=ECON[i][0]; sel.appendChild(o); }
 })();
-["fCol","fRace","fEco","fBH","fAtl","fOut","fGiant","fMark","fWaypoint","fVisited","fReachOnly"].forEach(function(id){
+["fCol","fRace","fEco","fBH","fAtl","fOut","fGiant","fMark","fWaypoint","fVisited","fReachOnly","fPhantom","fShadow"].forEach(function(id){
   document.getElementById(id).addEventListener("change",applyFilter);
+});
+/* spec item 9 -- warp animation toggle */
+document.getElementById("fWarpAnim").checked=WARP_ENABLED;
+document.getElementById("fWarpAnim").addEventListener("change",function(){
+  WARP_ENABLED=this.checked;
+  localStorage.setItem('nms-galmap-warp',WARP_ENABLED?'1':'0');
 });
 document.getElementById("fHyper").addEventListener("change",function(){
   if(courseTarget) setCourse(courseTarget);
@@ -3546,6 +3852,8 @@ document.getElementById("bReset").addEventListener("click",function(){
   document.getElementById("fMark").checked=false;
   document.getElementById("fWaypoint").checked=false; document.getElementById("fVisited").checked=false;
   document.getElementById("fReachOnly").checked=false;
+  document.getElementById("fPhantom").checked=false;
+  document.getElementById("fShadow").checked=false;
   applyFilter();
 });
 /* ============ hyperdrive slide-out panel (task 6: "filter may look
@@ -3668,7 +3976,7 @@ document.getElementById("bEnter").addEventListener("click",function(){
   if(mode==="system"){ setMode("local"); if(selected) updatePanel(selected); return; }
   if(!selected) return;
   if(!canReachColor(selected.type)){ toast(driveNeededMsg(selected.type)); return; }
-  buildSystemView(selected); setMode("system");
+  buildSystemView(selected); setMode("system"); playWarpTransition();
 });
 document.getElementById("bCourse").addEventListener("click",function(){
   if(selected) setCourse(selected);
@@ -3773,6 +4081,7 @@ document.getElementById("bAddrReset").addEventListener("click",function(){
   } else {
     selected=null;
     document.getElementById("panel").classList.remove("show");
+    closeInfoDrawer();
   }
   toast(goingHome?"Address reset to your current location":"Address cleared");
 });
@@ -3835,6 +4144,163 @@ makeDraggable(document.getElementById("filt"),document.getElementById("fHead"));
 makeDraggable(document.getElementById("panel"),document.querySelector("#panel .phead"));
 makeDraggable(document.getElementById("course"),document.querySelector("#course .chead"));
 makeDraggable(document.getElementById("accessPop"),document.getElementById("a11yHead"));
+makeDraggable(document.getElementById("route-itinerary-card"),document.getElementById("riHead"));
+
+/* ---- route loader + warp manifest helpers (spec item 7) ---- */
+var _logStreamInterval=null;
+var _activeRouteData=[];
+var _SCIFI_LOGS=[
+  "FETCHING GALACTIC VOXEL INDEXES...",
+  "SCANNING REGIONAL SPECTRAL CLASS HIERARCHIES...",
+  "ISOLATING BLACK HOLE EVENT HORIZONS...",
+  "CONVERTING VOXEL HEX TO LOCAL SYSTEM INDEX...",
+  "CALCULATING FUEL-OPTIMISED WARP HOP PATHS...",
+  "FILTERING ATLAS INTERFACE CHRONOLOGY SEEDS...",
+  "QUERYING EUCLID CORE APPROXIMATIONS...",
+  "CORRELATING PORTAL GLYPH ADJACENCY MATRIX...",
+  "GENERATING HYPERDRIVE MANIFEST SEGMENTS...",
+  "EVALUATING BIOME MATRICES FOR LUSH SPONS...",
+  "SYNCHRONISING INTERSTELLAR COORDINATE BUFFERS...",
+  "RESOLVING LOCAL ANOMALY VECTORS..."
+];
+function showRouteLoader(){
+  var el=document.getElementById("route-loader");
+  var tc=document.getElementById("terminal-console");
+  if(!el) return;
+  if(tc) tc.innerHTML="&gt; SYSTEM ONLINE<br>&gt; INITIALISING LOGS...";
+  el.style.display="flex";
+  clearInterval(_logStreamInterval);
+  _logStreamInterval=setInterval(function(){
+    if(!tc) return;
+    var phrase=_SCIFI_LOGS[Math.floor(Math.random()*_SCIFI_LOGS.length)];
+    var hex=Math.floor(Math.random()*0xFFFF).toString(16).toUpperCase().padStart(4,"0");
+    tc.innerHTML+="<br>&gt; ["+hex+"] "+phrase;
+    tc.scrollTop=tc.scrollHeight;
+  },180);
+}
+function hideRouteLoader(){
+  clearInterval(_logStreamInterval);
+  var el=document.getElementById("route-loader");
+  if(el) el.style.display="none";
+}
+function abortRoute(){
+  if(_routeWorker){ _routeWorker.terminate(); _routeWorker=null; }
+  hideRouteLoader();
+}
+function playWarpTransition(){
+  if(!WARP_ENABLED) return;
+  var ov=document.getElementById('warp-overlay');
+  var vid=document.getElementById('warp-vid');
+  if(!ov||!vid) return;
+  ov.style.display='block';
+  vid.currentTime=0;
+  vid.play().catch(function(){ ov.style.display='none'; });
+  vid.onended=function(){ ov.style.display='none'; vid.onended=null; };
+}
+function skipWarp(){
+  var ov=document.getElementById('warp-overlay');
+  var vid=document.getElementById('warp-vid');
+  if(ov) ov.style.display='none';
+  if(vid){ vid.pause(); vid.onended=null; }
+}
+function displayCalculatedItinerary(waypoints,totalLY){
+  var card=document.getElementById("route-itinerary-card");
+  var stepsList=document.getElementById("route-steps-list");
+  var statJumps=document.getElementById("stat-jumps");
+  var statDist=document.getElementById("stat-dist");
+  if(!card||!waypoints||waypoints.length<2) return;
+  _activeRouteData=waypoints;
+  stepsList.innerHTML="";
+  statJumps.textContent=waypoints.length-1;
+  statDist.textContent=commas(totalLY)+" LY";
+  waypoints.forEach(function(wp,i){
+    var label=i===0?"START":i===waypoints.length-1?"DESTINATION":"HOP "+i;
+    var name=wp.name||(wp.real?"(system)":"(open space)");
+    var addr=wp.address||"";
+    stepsList.innerHTML+='<div style="margin-bottom:6px"><b style="color:var(--cyan)">['+label+']</b> '+
+      name+'<br><span style="opacity:0.55;font-size:10px">'+addr+'</span></div>';
+  });
+  card.classList.add("show");
+  /* position below #course if not yet dragged */
+  var courseEl=document.getElementById("course");
+  if(courseEl&&!card.dataset.dragged){
+    var r=courseEl.getBoundingClientRect();
+    card.style.top=(r.bottom+8)+"px";
+    card.style.left=(r.left+r.width/2-150)+"px";
+    card.style.transform="none";
+  }
+}
+/* ---- sliding info drawer helpers (spec item 5) ---- */
+function openInfoDrawer(s){
+  var drawer=document.getElementById("system-info-drawer");
+  if(!drawer) return;
+  document.getElementById("drawer-system-name").textContent=s.name||"UNCHARTED SYSTEM";
+  document.getElementById("drawer-hex").textContent=s.address||"";
+  document.getElementById("drawer-coords").textContent=
+    "X: "+s.vx+" | Y: "+s.vy+" | Z: "+s.vz;
+  var count=(s.planets||0)+(s.moons||0);
+  document.getElementById("drawer-planet-count").textContent=
+    count+" Object"+(count!==1?"s":"");
+  document.getElementById("drawer-spectral").textContent=s.spectral||"UNKNOWN CLASS";
+  var pl=document.getElementById("drawer-planets-list");
+  pl.innerHTML="";
+  if(s.bodies&&s.bodies.length>0){
+    s.bodies.forEach(function(b,i){
+      pl.innerHTML+='<div style="background:rgba(0,0,0,0.2);border-left:2px solid var(--cyan);'+
+        'padding:6px 10px;font-size:11px;display:flex;justify-content:space-between;align-items:center">'+
+        '<span style="color:#fff;font-weight:bold">'+(b.moon?"Moon":"Planet")+" #"+(i+1)+"</span>"+
+        '<span style="color:var(--color-slate);font-size:10px">['+b.biome+"]</span></div>";
+    });
+  } else {
+    pl.innerHTML='<div style="font-size:11px;opacity:0.5;font-style:italic">No planetary surface scans archived for this node.</div>';
+  }
+  document.getElementById("drawer-route-btn").onclick=function(){
+    if(selected) setCourse(selected);
+  };
+  document.getElementById("drawer-edit-btn").onclick=function(){
+    openEditModal();
+  };
+  drawer.classList.add("open");
+}
+function closeInfoDrawer(){
+  var drawer=document.getElementById("system-info-drawer");
+  if(drawer) drawer.classList.remove("open");
+}
+/* hide manifest when course is cleared */
+document.getElementById("bClrCourse").addEventListener("click",function(){
+  var card=document.getElementById("route-itinerary-card");
+  if(card) card.classList.remove("show");
+},true);
+/* copy button */
+(function(){
+  var btn=document.getElementById("copy-route-btn");
+  if(!btn) return;
+  btn.addEventListener("click",function(){
+    if(!_activeRouteData.length) return;
+    var txt="--- NO MAN'S SKY FLIGHT ROUTE MANIFEST ---\n";
+    txt+="Total Warp Jumps: "+(_activeRouteData.length-1)+"\n\n";
+    _activeRouteData.forEach(function(wp,i){
+      var label=i===0?"STARTING POINT":i===_activeRouteData.length-1?"FINAL DESTINATION":"WARP JUMP STEP "+i;
+      txt+="["+label+"]\n";
+      txt+="System: "+(wp.name||(wp.real?"(system)":"(open space)"))+"\n";
+      if(wp.address) txt+="Portal Hex: "+wp.address+"\n";
+      txt+="-----------------------------------------\n";
+    });
+    navigator.clipboard.writeText(txt).then(function(){
+      var orig=btn.textContent;
+      btn.textContent="COPIED! ✓";
+      btn.style.color="#fff";
+      btn.style.background="var(--color-matrix)";
+      setTimeout(function(){
+        btn.textContent=orig;
+        btn.style.color="";
+        btn.style.background="";
+      },1500);
+    }).catch(function(err){
+      console.error("Clipboard copy failed:",err);
+    });
+  });
+})();
 /* Any drag position is a manual override tied to the current window size/orientation --
    reset it on resize (covers rotation too) rather than risk a box left stranded
    off-screen or behind the toolbar after the layout changes underneath it. */
@@ -4941,7 +5407,7 @@ function updateTelemetry(){
   var _hudAnchor=selected||focusSystem;
   document.getElementById("galHudDist").textContent=commas(_hudAnchor?_hudAnchor.coreLY:coreLY(vx,vy,vz))+" LY";
 }
-var frames=0, fpsT=performance.now(), lastT=fpsT, loopDead=false;
+var frames=0, fpsT=performance.now(), lastT=fpsT, loopDead=false, _totalT=0;
 function animate(){
   requestAnimationFrame(animate);
   if(loopDead) return;
@@ -4976,6 +5442,7 @@ function animate(){
        but during an orbit-drag (continuous mousemove -> applyCam(), not tied to this loop)
        every label lags behind the live camera, landing nowhere near its body. Force the
        refresh first so labels always use the camera position this frame actually renders with. */
+    _totalT+=dt; _starTime.value=_totalT;
     camera.updateMatrixWorld();
     updateLabels();
     updateTelemetry();
@@ -5076,6 +5543,7 @@ buildKeypad();
 updateGalaxyInfo();
 updateHyperSummary();
 resize();
+buildBackdrop();
 buildGalaxy();
 buildNebula();
 drawGalIcon();
