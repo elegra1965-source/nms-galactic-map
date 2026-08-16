@@ -362,7 +362,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   font-family:'Orbitron',sans-serif;pointer-events:none;color:var(--white);display:flex;
   align-items:center;gap:9px;transition:top .15s}
 #galHud.withBadge{top:calc(var(--top-h,60px) + 46px)}
-#galIcon{width:84px;height:84px;flex:none;display:block;pointer-events:auto;animation:spinGalIcon 20s linear infinite;will-change:transform;
+#galIcon{width:84px;height:84px;flex:none;display:block;pointer-events:auto;
   -webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 #galHud div{white-space:nowrap}
 #galHud .galHudTxt{text-shadow:0 1px 2px #000,0 -1px 2px #000,1px 0 2px #000,-1px 0 2px #000,0 0 6px #000}
@@ -622,8 +622,14 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 .warp-skip{position:absolute;bottom:22px;width:100%;text-align:center;
   font-family:'Orbitron',monospace;font-size:10px;letter-spacing:3px;
   color:rgba(0,229,255,0.35);pointer-events:none}
-    /* ---- animated mini galaxy icon (spec item 11) ---- */
-    @keyframes spinGalIcon{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+    /* ---- animated mini galaxy icon (spec item 11): rotation is now done by
+       redrawing the canvas with an advancing polar-angle offset in drawGalIcon()
+       (see JS, near galIconRot) instead of a CSS transform. A flat CSS rotate()
+       spun the whole tilted ellipse like a clock hand -- reads as a coin
+       spinning face-on, not a disc rotating on its own axis. Redrawing the
+       spiral pattern inside a fixed-tilt ellipse keeps the ellipse's shape and
+       orientation constant on screen while the arms sweep around inside it,
+       the way a real tilted galactic disc actually looks when it spins. ---- */
 /* ---- warp manifest itinerary card (spec item 7) ---- */
 #route-itinerary-card{position:fixed;left:50%;transform:translateX(-50%);
   top:calc(var(--top-h,60px) + 8px);z-index:26;width:300px;display:none}
@@ -2501,7 +2507,7 @@ function drawGalIcon(){
   for(var i=0;i<N;i++){
     var t=Math.pow(r(),0.55);
     var arm=Math.floor(r()*arms);
-    var ang=arm*(Math.PI*2/arms)+t*tw+(r()+r()+r()-1.5)*0.7;
+    var ang=arm*(Math.PI*2/arms)+t*tw+(r()+r()+r()-1.5)*0.7+galIconRot;
     var rad=t*R;
     var px=cx+Math.cos(ang)*rad, py=cy+Math.sin(ang)*rad*0.62;
     var pal=(t<0.16)?inner:((t<0.62)?mid:outer);
@@ -5784,6 +5790,9 @@ function updateTelemetry(){
   document.getElementById("galHudDist").textContent=commas(_hudAnchor?_hudAnchor.coreLY:coreLY(vx,vy,vz))+" LY";
 }
 var frames=0, fpsT=performance.now(), lastT=fpsT, loopDead=false, _totalT=0;
+/* mini galaxy icon's own rotation angle -- advanced a little each frame in
+   animate() below, independent of the 3D scene's galaxyGroup.rotation.y */
+var galIconRot=0, galIconFrame=0;
 function animate(){
   requestAnimationFrame(animate);
   if(loopDead) return;
@@ -5800,6 +5809,11 @@ function animate(){
     }
     if(ctrl==="fly") flyStep(dt);
     if(mode==="galaxy") galaxyGroup.rotation.y+=0.0003;
+    galIconFrame++;
+    if(galIconFrame%3===0){
+      galIconRot+=0.0157; if(galIconRot>Math.PI*2) galIconRot-=Math.PI*2;
+      drawGalIcon();
+    }
     if(mode==="system"){
       for(var i=0;i<pivots.length;i++){
         pivots[i].p.rotation.y+=pivots[i].sp*0.01;
