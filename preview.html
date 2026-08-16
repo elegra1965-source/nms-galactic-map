@@ -705,7 +705,8 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   <div style="color:var(--cyan);font-size:10px;font-weight:bold;letter-spacing:1px;margin-bottom:10px;text-transform:uppercase">// REGISTERED PLANETARY BIOMES</div>
   <div id="drawer-planets-list" style="display:flex;flex-direction:column;gap:8px"></div>
   <div style="margin-top:30px;border-top:1px solid rgba(0,229,255,0.15);padding-top:20px;display:flex;flex-direction:column;gap:10px">
-    <button id="drawer-route-btn" class="nms-btn nms-btn-action" style="width:100%;font-weight:bold;padding:8px 0">LOCK NAVIGATION TARGET</button>
+    <button id="drawer-route-btn" class="nms-btn nms-btn-action" style="width:100%;font-weight:bold;padding:8px 0"
+      title="Plot a hyperdrive route from where you are to this system -- draws the course on the map and works out distance, bearing and how many jumps it takes (see About for why that count can run a bit over the straight-line minimum).">LOCK NAVIGATION TARGET</button>
     <button id="drawer-edit-btn" class="nms-btn" style="width:100%;font-size:10px;color:var(--color-slate);border:1px solid rgba(112,161,255,0.3)">MODIFY REGISTRY MANIFEST</button>
   </div>
 </div>
@@ -1143,6 +1144,10 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     <div class="mfld">
       <div class="lb">New to No Man's Sky?</div>
       <div style="font-size:12px;color:var(--text-dim);line-height:1.55">A "portal address" is a 12-symbol code the game uses to pin down a star system's location. Don't have one? Hit <b>Random</b> in the toolbar to jump somewhere, or tap <b>Glyphs</b> to see the code as the game's own symbols instead of letters/numbers.</div>
+    </div>
+    <div class="mfld">
+      <div class="lb">Plotting a hyperdrive course</div>
+      <div style="font-size:12px;color:var(--text-dim);line-height:1.55"><b>Set course</b> / <b>Lock navigation target</b> plots a real multi-jump route to that system for your current hyperdrive type and range (set in Filters). Every jump always lands on a real charted star, never empty space -- same as the real game -- so the reported jump count is usually a bit above the straight-line distance-divided-by-range number, sometimes noticeably so in sparser patches of space. That's not a bug: a real star is rarely sitting exactly on your bearing at exactly your max range, so routes drift slightly to reach one, and that adds up over a long trip. No Man's Sky itself has no multi-hop route planner at all -- you'd normally do this same star-by-star checking manually, this just does it for you and shows the whole path at once.</div>
     </div>
     <div class="mfld">
       <div class="lb">Boxes in your way?</div>
@@ -2660,11 +2665,29 @@ var _routeWorker=null; /* active A* web worker, null when idle */
 var WARP_ENABLED=localStorage.getItem('nms-galmap-warp')!=='0'; /* spec item 9 */
 /* inline A* worker — blob URL created once at startup, reused for every setCourse() call */
 var _ASTAR_WORKER_URL=(function(){
+  /* Real bug fixed 2026-08-16 (Tony: "LOCK NAVIGATION TARGET" spinning
+     forever, only stoppable via Abort): this A* search had no upper bound
+     at all on how long it could run -- for a big/dense enough candidate
+     graph (allSystems can now be several thousand real systems, especially
+     after a course has been plotted a few times and mergeWaypointsIntoSlice()
+     keeps adding to it) the plain O(n) neighbour filter + O(n log n) sort
+     every single iteration could genuinely take a very long time before
+     either finding the target or exhausting every node, which is exactly
+     what "doesn't stop till you click abort" looks like from the outside --
+     not a true infinite loop, just unbounded work. Added a wall-clock bail:
+     if the search is still running after ~4 seconds it gives up and returns
+     null, which the existing onmessage handler already treats as "A* found
+     nothing" and falls back to the fast, already-solid findRoute() below --
+     same safety-net path that already runs whenever A* can't find a
+     connected route, just now guaranteed to actually trigger instead of
+     hanging indefinitely first. */
   var src='function gd(a,b){var dx=a.x-b.x,dy=a.y-b.y,dz=a.z-b.z;return Math.sqrt(dx*dx+dy*dy+dz*dz);}\n'+
     'function planRoute(s,e,db,mr){\n'+
     '  var open=[s],cf=new Map(),gs=new Map(),fs=new Map();\n'+
     '  gs.set(s.address,0); fs.set(s.address,gd(s,e));\n'+
+    '  var _t0=Date.now(),_n=0;\n'+
     '  while(open.length>0){\n'+
+    '    _n++; if(_n%200===0 && Date.now()-_t0>4000) return null;\n'+
     '    open.sort(function(a,b){return(fs.get(a.address)||Infinity)-(fs.get(b.address)||Infinity);});\n'+
     '    var cur=open.shift();\n'+
     '    if(cur.address===e.address||gd(cur,e)<=mr){\n'+
