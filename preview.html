@@ -3026,6 +3026,41 @@ function setCourse(s){
   };
   _routeWorker.postMessage({s:_startObj,e:_endObj,db:_db,mr:_rangeW});
 }
+/* Real bug fixed 2026-08-16 (Tony's own two screenshots): #course's default
+   CSS position -- centred under the toolbar -- collides with whatever else
+   is open. When the sliding system-info-drawer is open (drawer occupies
+   the left ~320px), a centred box can sit half-hidden behind/over it; with
+   nothing else open, the same centred spot can still cover a chunk of the
+   local star field. Same measure-don't-guess fix used everywhere else in
+   this file (positionUnderButton, --top-h): check what's actually on
+   screen and anchor beside it instead of guessing a fixed spot. Only runs
+   once per session/resize -- a real drag (or this auto-anchor itself)
+   leaves a real inline left/top that resetDraggedBoxes() clears on the
+   next window resize, same signal makeDraggable's other boxes already use
+   to know a fresh anchor is actually needed rather than clobbering
+   somewhere Tony deliberately dragged it to. */
+function positionCourseCard(){
+  var course=document.getElementById("course");
+  if(course.style.left) return; /* already dragged, or already auto-anchored this session */
+  var drawer=document.getElementById("system-info-drawer");
+  var panel=document.getElementById("panel");
+  var cw=course.offsetWidth||246;
+  var topY=parseFloat(getComputedStyle(course).top)||70;
+  var left;
+  if(drawer&&drawer.classList.contains("open")){
+    left=drawer.getBoundingClientRect().right+16;
+  } else if(panel&&panel.classList.contains("show")){
+    left=panel.getBoundingClientRect().left-cw-16;
+  } else {
+    return; /* nothing else open to avoid -- the default centred CSS position is fine */
+  }
+  left=Math.max(8,Math.min(window.innerWidth-cw-8,left));
+  course.style.position="fixed";
+  course.style.left=left+"px";
+  course.style.top=topY+"px";
+  course.style.right="auto";
+  course.style.transform="none";
+}
 function _finishSetCourse(_s,_ly,_range,_dvx,_dvy,_dvz){
   var hops=courseWaypoints.length-1;
   document.getElementById("cTarget").textContent=_s.name;
@@ -3036,6 +3071,7 @@ function _finishSetCourse(_s,_ly,_range,_dvx,_dvy,_dvz){
   document.getElementById("course").classList.add("show");
   document.getElementById("course").classList.remove("min");
   document.getElementById("bCourseMin").innerHTML="&#9662;";
+  positionCourseCard();
   /* merge each hop into the real star field first, then applyFilter() --
      not just drawCourse() -- so shown/locPts/locInstMesh actually rebuild
      to include them (applyFilter() calls drawCourse() itself at the end). */
@@ -4356,9 +4392,16 @@ function displayCalculatedItinerary(waypoints,totalLY){
       name+'<br><span style="opacity:0.55;font-size:10px">'+addr+'</span></div>';
   });
   card.classList.add("show");
-  /* position below #course if not yet dragged */
+  /* position below #course if not yet dragged. Real bug fixed 2026-08-16:
+     this checked card.dataset.dragged, which nothing in the file ever
+     actually sets (makeDraggable() only ever writes a real inline
+     style.left/top on drag, never a dataset flag) -- so this condition was
+     always true and the manifest silently re-snapped under #course on
+     every single course re-plot, discarding any drag Tony had done.
+     Checking the real inline style (same signal every other draggable box
+     in this file already uses) fixes that. */
   var courseEl=document.getElementById("course");
-  if(courseEl&&!card.dataset.dragged){
+  if(courseEl&&!card.style.left){
     var r=courseEl.getBoundingClientRect();
     card.style.top=(r.bottom+8)+"px";
     card.style.left=(r.left+r.width/2-150)+"px";
@@ -5078,6 +5121,38 @@ applyA11y();
     if(pop.classList.contains("show") && !pop.contains(e.target) && e.target!==btn) close();
   });
 })();
+
+/* Real bug fixed 2026-08-16 (Tony: "on other windows clicking outside
+   closes it, but with these it just clicks a different star"). Every other
+   closeable box in this app either sits inside #modalWrap's own opaque
+   backdrop (clicking the backdrop closes the modal, see modalWrap's own
+   click listener) or has its own outside-click-closes handler (see
+   #accessPop just above). #course and #route-itinerary-card had neither --
+   they just float directly over the interactive 3D canvas with no backdrop,
+   so a click meant to dismiss them fell straight through to the canvas's
+   own pointerdown/pointerup handlers and picked whatever star was under the
+   cursor instead. Listens on pointerdown in the CAPTURE phase specifically
+   so this runs before canvas's own (bubble-phase) pointerdown listener --
+   stopping propagation there is what actually prevents that fall-through
+   star pick, not just closing the boxes after the fact. Only stops
+   propagation when the click landed on the canvas itself; clicking any
+   other real button/UI element still closes these boxes too (harmless) but
+   is left free to do its own job as normal -- this only ever swallows the
+   one interaction it was built for. Closing here only hides the cards --
+   it does not clear the plotted course/waypoints/line, so the route stays
+   on the map and CLEAR still works exactly as it did for actually
+   cancelling a course. */
+document.addEventListener("pointerdown",function(e){
+  var course=document.getElementById("course");
+  var manifest=document.getElementById("route-itinerary-card");
+  var courseOpen=course.classList.contains("show");
+  var manifestOpen=manifest.classList.contains("show");
+  if(!courseOpen&&!manifestOpen) return;
+  if(course.contains(e.target)||manifest.contains(e.target)) return;
+  course.classList.remove("show");
+  manifest.classList.remove("show");
+  if(e.target===canvas) e.stopPropagation();
+},true);
 
 /* Turns a failed save's raw status/body into a plain-English reason PLUS
    whether a Retry button makes sense. Three real failure shapes exist here:
