@@ -24,13 +24,23 @@ SOFTWARE.
 
 Note on game assets: NMS Galactic Map is a fan-made portal decoder and 3D
 galaxy map for No Man's Sky. This license covers the original code
-(preview.html, the Netlify Functions, and the address/generation logic) in
-this project only. The portal glyphs, race/economy icons, and other imagery
-sourced or adapted from No Man's Sky itself are the property of Hello Games
-and are not covered by this license -- they're included here under fair-use
-fan-project conventions. Anyone reusing this code should credit elegra1965
-for the original work and source their own copies of any game assets rather
-than relying on this license to cover them.
+(preview.html, the Netlify Functions, nms-tools/, and the address/generation
+logic in nms-core/ -- see the third-party note below for what in nms-core/
+is and isn't elegra1965's own work) in this project only. The portal glyphs,
+race/economy icons, and other imagery sourced or adapted from No Man's Sky
+itself are the property of Hello Games and are not covered by this license
+-- they're included here under fair-use fan-project conventions. Anyone
+reusing this code should credit elegra1965 for the original work and source
+their own copies of any game assets rather than relying on this license to
+cover them.
+
+Note on decompiled game data: nms-core/economy.js's probability tables
+(abandoned/empty/outlaw system odds, ring chance) were decompiled from a
+legitimately-owned No Man's Sky install for research and interoperability
+purposes, per the note above -- Hello Games owns the underlying game data,
+elegra1965's own code is the transcription/lookup logic and the two roll
+functions (rollSystemFlavor, rollRing) built around it, not a claim of
+authorship over the numbers themselves.
 
 Note on shared data: this license covers the code only, not any community-
 submitted system data collected via the live site's Edit system feature
@@ -39,15 +49,25 @@ to the players who submitted it.
 
 ----------------------------------------------------------------------------
 
-Note on third-party code: nms-core/ (star type, planet count, black hole/
-Atlas placement, and system/region/planet name generation) is a port of
-hadsh/nms_namegen (https://github.com/hadsh/nms_namegen), itself a fork of
-Stuart Coyle's original nms_namegen, co-authored by GoodGuysFree. hadsh's
-repository states this work is MIT-licensed. The MIT license above applies
-to elegra1965's own original code in this project; it does not make
-elegra1965 the author of the ported generation logic. Each file under
-nms-core/ additionally carries its own "Ported from hadsh/nms_namegen (MIT
-licensed)" attribution comment at the top, per MIT's own requirement that
-the original notice travel with the code. Credit for the underlying
-generation algorithms belongs to Stuart Coyle (original author), GoodGuysFree
+Note on third-party code: all files in nms-core/ except economy.js and
+letter-map/ (star type, planet count, black hole/Atlas placement, and
+system/region/planet name generation) are a port of hadsh/nms_namegen
+(https://github.com/hadsh/nms_namegen), itself a fork of Stuart Coyle's
+original nms_namegen, co-authored by GoodGuysFree. hadsh's repository
+states this work is MIT-licensed. The MIT license above applies to
+elegra1965's own original code in this project; it does not make elegra1965
+the author of the ported generation logic. Each ported file under nms-core/
+additionally carries its own "Ported from hadsh/nms_namegen (MIT licensed)"
+attribution comment at the top, per MIT's own requirement that the original
+notice travel with the code. Credit for the underlying generation
+algorithms belongs to Stuart Coyle (original author), GoodGuysFree
 (co-author of the hadsh fork), and hadsh (fork maintainer).
+
+nms-core/economy.js (real system economy/conflict/race odds and ring
+generation, added 2026-08-12) and everything in nms-tools/ (the
+nms-lookup.js single-call wrapper, added 2026-08-15) are elegra1965's own
+original code, not ported from hadsh's work -- the upstream nms_namegen
+project never modeled economy/conflict/race/rings at all, so there was
+nothing to port for that part. Both are covered by the MIT license above
+like the rest of this project's own code, subject to the decompiled-data
+note further up.
