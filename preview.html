@@ -293,6 +293,12 @@ html.hc-on .btn{border-width:2px}
 .seq img{width:100%;filter:drop-shadow(0 0 4px rgba(0,229,255,.5))}
 #pAddr{font-family:'Orbitron',monospace;font-size:10px;color:var(--cyan);letter-spacing:.14em;
   text-align:center;margin-top:6px}
+/* Small inline glyph row next to the hex address in the sliding system-info
+   drawer (Tony's ask, 2026-08-16) -- reuses the same glyph PNGs/renderSeq()
+   the Portal glyph keypad and #pSeq already use, just scaled down to sit
+   on one line beside the hex text instead of a full 12-column grid. */
+.hexGlyphs{display:inline-flex;gap:2px;flex-wrap:wrap;vertical-align:middle}
+.hexGlyphs img{width:13px;height:13px;filter:drop-shadow(0 0 3px rgba(0,229,255,.55))}
 textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(--text);
   border-radius:var(--r-sm);padding:6px 7px;font-family:'Rajdhani',sans-serif;font-size:12px;
   resize:vertical;min-height:50px;outline:none;margin-top:8px}
@@ -377,6 +383,14 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   align-items:flex-start;justify-content:center;overflow-y:auto;overflow-x:hidden;padding:50px 12px}
 #modalWrap.show{display:flex}
 .modal{width:100%;max-width:420px;padding:16px 16px 14px;margin-bottom:40px;max-height:calc(100vh - 100px);overflow-y:auto;overflow-x:hidden}
+/* hyperdriveModal: .modal's blanket overflow-y:auto showed an always-on
+   scrollbar here even on viewports where the short notice text comfortably
+   fits -- same 1px scrollHeight-vs-clientHeight rounding quirk already
+   documented above for #hyperPanel. Default to hidden and let
+   openHyperNotice() opt into real scrolling only when it measures genuine
+   overflow, same fix, same reason. */
+#hyperdriveModal{overflow-y:hidden}
+#hyperdriveModal.scroll{overflow-y:auto}
 .modal h3{font-family:'Orbitron',sans-serif;font-size:13px;letter-spacing:.1em;
   color:var(--white);margin-bottom:2px;text-transform:uppercase}
 .modal .msub{font-size:11px;color:var(--text-faint);margin-bottom:12px}
@@ -667,7 +681,10 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   </div>
   <div style="background:rgba(0,0,0,0.3);border:1px solid rgba(112,161,255,0.1);border-radius:4px;padding:12px;font-size:11px;margin-bottom:20px;line-height:16px">
     <span style="color:var(--color-slate)">GALACTIC HEX ADDRESS:</span><br>
-    <span id="drawer-hex" style="color:#fff;font-weight:bold">0000:0000:0000:0000</span><br><br>
+    <span style="display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <span id="drawer-hex" style="color:#fff;font-weight:bold">0000:0000:0000:0000</span>
+      <span id="drawer-hex-glyphs" class="hexGlyphs"></span>
+    </span><br><br>
     <span style="color:var(--color-slate)">MATRIX VECTOR POINTS:</span><br>
     <span id="drawer-coords" style="color:#fff">X: 0 | Y: 0 | Z: 0</span>
   </div>
@@ -1595,7 +1612,22 @@ function regionName(vx,vy,vz){
   var tail=["Anomaly","Fringe","Mass","Conflux","Expanse","Void","Sector","Cluster","Nebula","Reach"];
   return (pickOne(r,SYL_A)+pickOne(r,SYL_B)+" "+pickOne(r,tail)).toUpperCase();
 }
-function regionCount(vx,vy,vz){ var r=mulberry32(gseed(vx,vy,vz,0xC017)); return 122+Math.floor(r()*458); }
+/* Real bug found 2026-08-16: this used to return a placeholder 122-580,
+   invented before nms-core was wired in. formatAddress()'s own encoding
+   (idx&0xFFF) already proves the true per-region system-index field is 3
+   hex digits -- 0-4095, 4096 possible systems -- and nms-core's real
+   systemAttributes() only ever assigns purple/gas-giant to raw index
+   1001-1065, which sat completely outside the old 580 ceiling. Net effect:
+   purple stars (and therefore gas giants, which only ever roll on purple)
+   could NEVER be generated anywhere, by anything that calls regionCount --
+   ticking either filter was guaranteed to show "no systems match" forever,
+   no matter how far you searched. This also starved regionCandidates()
+   below, which is why Set course routes were taking far more hops than
+   distance/range implied (see its own comment). Verified via a 300-region
+   Node sweep with this fix: ~29% of regions now contain >=1 purple system
+   and ~4% a gas giant at the default 22-per-region density -- both
+   filters are reliably findable now instead of structurally impossible. */
+function regionCount(vx,vy,vz){ return 4096; }
 function weightedStar(r){
   var tot=0,i;
   for(i=0;i<STAR_TYPES.length;i++) tot+=STAR_TYPES[i].w;
@@ -2672,8 +2704,20 @@ function regionCandidates(vx,vy,vz){
      against the NMS wiki that a hyperdrive can only ever warp to a real charted
      star system, never empty space, so route candidates need to be dense enough
      that a real system is essentially always found in range, especially at the
-     Basic (101 LY) default where a hop only covers a sliver of one region. */
-  var per=Math.min(200,count);
+     Basic (101 LY) default where a hop only covers a sliver of one region.
+     Bumped 200->1000 alongside the regionCount() fix above (2026-08-16): a
+     101 LY hop only spans ~7% of one region's volume by geometry, so once
+     regionCount() started reporting the true 4096-wide pool instead of the
+     old ~350-average placeholder, 200 draws against the bigger pool was
+     actually SPARSER than before and made hop counts worse, not better --
+     confirmed by a Node harness reproducing Tony's own "980 LY should be
+     ~10 jumps, not 26" report. A 40-trial regression sweep at per=1000
+     landed routes at ~1.1x the naive distance/range minimum on average
+     (worst case 1.3x) with zero truncated/backtracking routes, versus up
+     to ~2.6x before -- the one-time cost is a couple of extra seconds of
+     findRoute() compute on a long trip, which the existing showRouteLoader()
+     screen already covers. */
+  var per=Math.min(1000,count);
   /* real per-region black-hole/Atlas indices, same fix as generateSlice() --
      see regionAnomalyIdx(). */
   var _an=regionAnomalyIdx(vx,vy,vz);
@@ -4236,6 +4280,7 @@ function openInfoDrawer(s){
   if(!drawer) return;
   document.getElementById("drawer-system-name").textContent=s.name||"UNCHARTED SYSTEM";
   document.getElementById("drawer-hex").textContent=s.address||"";
+  renderSeq(document.getElementById("drawer-hex-glyphs"),s.address||"");
   document.getElementById("drawer-coords").textContent=
     "X: "+s.vx+" | Y: "+s.vy+" | Z: "+s.vz;
   var count=(s.planets||0)+(s.moons||0);
@@ -4761,8 +4806,13 @@ var HYPER_KEY="nms-galmap-hyperdrive-seen";
 var hyperNoticeShown=false;
 function openHyperNotice(){
   closeAllModalBoxes();
-  document.getElementById("hyperdriveModal").style.display="";
+  var hm=document.getElementById("hyperdriveModal");
   document.getElementById("modalWrap").classList.add("show");
+  hm.style.display="";
+  hm.classList.remove("scroll");
+  /* Same measure-don't-guess fix as positionHyperPanel() -- only opt into a
+     real scrollbar once actual overflow is confirmed after layout. */
+  if(hm.scrollHeight>hm.clientHeight+1) hm.classList.add("scroll");
 }
 function maybeShowHyperNotice(){
   if(hyperNoticeShown) return;
