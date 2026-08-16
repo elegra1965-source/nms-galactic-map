@@ -73,7 +73,15 @@ async function openGithubIssue(token, category, message, repro, device, contact)
       "Content-Type": "application/json",
       "User-Agent": "nms-galactic-map-function"
     },
-    body: JSON.stringify({ title: title, body: bodyLines.join("\n"), labels: ["feedback"] })
+    // Self-assigning at creation is what actually gets Tony notified: GitHub
+    // never notifies an account about issues its own token/actions create
+    // (confirmed via GitHub's own docs/community discussions, 2026-08-16 --
+    // "you can't receive notifications for your own actions"), but being
+    // ASSIGNED to an issue is a distinct notification event that fires even
+    // when the assignment happens in the same request as the creation.
+    // Without this, every feedback submission would silently land as an
+    // Issue Tony would only ever see by manually checking the repo.
+    body: JSON.stringify({ title: title, body: bodyLines.join("\n"), labels: ["feedback"], assignees: [GITHUB_OWNER] })
   });
   if (!res.ok) {
     var errText = await res.text();
