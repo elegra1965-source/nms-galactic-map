@@ -2885,6 +2885,34 @@ function drawCourse(){
     localGroup.add(courseDots);
   }
 }
+/* Real bug fixed 2026-08-16 (Tony, zoomed into a hop marker and found empty
+   space: "the stars are listed in the manifest so should hit them"). Every
+   intermediate hop IS a real, fully-generated system -- findRoute() never
+   invents an open-space stop, and the Warp Manifest already proves it by
+   showing a real name/address for each one. The bug was that only the bare
+   coordinates ever reached the map, via the decorative courseDots sprite
+   above -- the actual star itself was never added to the real, clickable
+   star field (allSystems / locPts / locInstMesh), so a hop marker sat over
+   nothing you could actually click. This regenerates each intermediate hop
+   as a full system -- same generateSystem() call and position formula
+   every other star on the map already uses -- and merges it into
+   allSystems so it becomes a real star: visible, filterable, and clickable
+   exactly like any other. Start and destination don't need this -- they're
+   always already real, already-rendered systems, which is how you picked
+   them in the first place. */
+function mergeWaypointsIntoSlice(){
+  if(!courseWaypoints) return;
+  for(var i=0;i<courseWaypoints.length;i++){
+    var wp=courseWaypoints[i];
+    if(wp.vx===undefined||wp.idx===undefined) continue; /* start/end -- already real & rendered */
+    var dup=false;
+    for(var j=0;j<allSystems.length;j++) if(allSystems[j].address===wp.address){ dup=true; break; }
+    if(dup) continue;
+    var full=generateSystem(wp.vx,wp.vy,wp.vz,wp.idx);
+    full.px=wp.px; full.py=wp.py; full.pz=wp.pz;
+    allSystems.push(full);
+  }
+}
 /* Investigated 2026-08-16 (Tony: "why not go 1 jump back... research how
    it's done in game"): tried feeding the existing A* worker above a denser
    graph -- sampled from regionCandidates() along the direct corridor
@@ -2985,7 +3013,11 @@ function _finishSetCourse(_s,_ly,_range,_dvx,_dvy,_dvz){
   document.getElementById("course").classList.add("show");
   document.getElementById("course").classList.remove("min");
   document.getElementById("bCourseMin").innerHTML="&#9662;";
-  drawCourse();
+  /* merge each hop into the real star field first, then applyFilter() --
+     not just drawCourse() -- so shown/locPts/locInstMesh actually rebuild
+     to include them (applyFilter() calls drawCourse() itself at the end). */
+  mergeWaypointsIntoSlice();
+  applyFilter();
   buildGalaxyMarks();
   hideRouteLoader();
   displayCalculatedItinerary(courseWaypoints,_ly);
