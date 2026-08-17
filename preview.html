@@ -424,6 +424,12 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 .hoverpop .hpRow .icimg.tint{width:15px;height:15px}
 .hoverpop .hpLbl{color:var(--text);font-size:11px;letter-spacing:.03em}
 .hoverpop .hpSub{color:var(--text-dim);font-size:9px;letter-spacing:.02em;margin:1px 0 0 23px}
+/* Tony (2026-08-17): the conBadge() pill reused for the hover popup's
+   Conflict row is sized for the full info panel/dropdown (10px text, 8px
+   radius) -- too bulky next to this popup's smaller 16px icons, so scoped
+   down just here rather than shrinking it everywhere it's reused. */
+.hoverpop .conBadge b{font-size:8px;padding:0 4px;border-radius:6px}
+.hoverpop .conBadge{gap:3px}
 #toast{position:fixed;left:50%;top:calc(var(--top-h,60px) + 8px);transform:translateX(-50%);z-index:40;
   font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:.12em;color:var(--gold);
   background:rgba(11,17,25,.95);border:1px solid var(--gold);border-radius:var(--r-sm);
