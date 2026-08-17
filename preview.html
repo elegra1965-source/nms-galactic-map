@@ -4005,7 +4005,7 @@ function updatePreviewAnim(dt){
   if(!previewLine||!previewFromPos||!previewToPos) return;
   var pos=previewLine.geometry.attributes.position;
   if(previewGrowing){
-    previewAnimT+=dt/0.35;
+    previewAnimT+=dt/0.7; /* half speed per Tony's ask -- was 0.35 */
     if(previewAnimT>=1){ previewAnimT=1; previewGrowing=false; previewHoldT=0; }
     var t=1-Math.pow(1-previewAnimT,3);
     pos.setXYZ(1,
