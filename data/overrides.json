@@ -461,11 +461,11 @@
         "water": false,
         "dissonant": false,
         "giant": false,
-        "econName": "Alchemical",
-        "sell": "56.9",
-        "buy": "-25.2",
+        "econName": "Scientific",
+        "sell": "71.5",
+        "buy": "-15.7",
         "econDesc": "Medium Supply",
-        "conflict": "Lawless",
+        "conflict": "Alarming",
         "blackHole": false,
         "atlas": false,
         "ruins": false,
@@ -586,8 +586,8 @@
           }
         ]
       },
-      "editedAt": "2026-08-16T20:23:29.467Z",
-      "editedByIp": "2a00:23c7:13a4:b901:cc07:7a7c:292f:bc03",
+      "editedAt": "2026-08-17T09:44:34.284Z",
+      "editedByIp": "5.133.46.24",
       "history": [
         {
           "at": "2026-08-16T20:22:15.870Z",
@@ -600,16 +600,18 @@
         {
           "at": "2026-08-16T20:23:29.467Z",
           "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-08-17T09:44:34.284Z",
+          "text": "edited by a traveller"
         }
       ]
     }
   },
   "reports": [],
   "ipLog": {
-    "2a00:23c7:13a4:b901:cc07:7a7c:292f:bc03": [
-      1786911735870,
-      1786911778467,
-      1786911809467
+    "5.133.46.24": [
+      1786959874284
     ]
   },
   "flagLog": {}
