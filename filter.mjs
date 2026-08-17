@@ -312,6 +312,25 @@ export function filterSystemEdit(payload){
     if(moonCount>5) errors.push("A Gas giant can have at most 5 moons");
   }
 
+  // "Colliding planets present" (2026-08-17, Tony -- built client-side in a
+  // separate session, but never actually wired into this server-side
+  // allowlist, so the checkbox/pair picker looked like it worked in the
+  // Edit form but a submitted choice was silently dropped before it ever
+  // reached the shared data store -- same "allowlist is authoritative"
+  // pattern every other field on this page already follows, just missed
+  // for this one. Display-only, like ring style: which two planets visually
+  // collide can ONLY be a traveller's own in-game observation, so this is a
+  // manual pick, not derived from anything else in the payload. collidingA/
+  // collidingB are 1-based positions into THIS SAME submitted bodies array
+  // (same shape as a moon's "orbits" field above) -- clamped to a real
+  // position or 0 ("not set"), never trusted blindly, but not hard-rejected
+  // either if the pair looks incomplete/equal, since that just means the
+  // display-only pairing quietly does nothing rather than blocking an
+  // otherwise-valid save over one optional cosmetic field. */
+  out.colliding = !!payload.colliding;
+  out.collidingA = Math.max(0, Math.min(out.bodies.length, parseInt(payload.collidingA,10)||0));
+  out.collidingB = Math.max(0, Math.min(out.bodies.length, parseInt(payload.collidingB,10)||0));
+
   return {ok: errors.length===0, cleaned: out, errors: errors};
 }
 

@@ -6,7 +6,7 @@
      address = the 12-char portal hex address the edit applies to
      "edit"   payload = {name, race, region, stars:[colourKey,...] (max 3), starClass, water, dissonant,
                          giant, ruins, outlaw, phantom, econName, sell, buy, econDesc, conflict, blackHole, atlas, notes,
-                         editorName, editorFriendCode,
+                         editorName, editorFriendCode, colliding, collidingA, collidingB,
                          bodies:[{name, moon, orbits, biome, descriptor, water, ring, resources,
                                   flora, fauna, minerals, salvage, fossils, sentinel, autophage, base}, ...]}
                          (base added 2026-08-17 -- "Has base" per-body marker, same manual-only
@@ -19,7 +19,11 @@
                          flag-consensus system below, see filter.mjs's comment on why. outlaw added
                          2026-08-17 -- Tony caught that picking the "Pirate Controlled" conflict word
                          didn't set this separate skull/tag flag, same manual-only pattern as
-                         giant/ruins/blackHole/atlas.)
+                         giant/ruins/blackHole/atlas. colliding/collidingA/collidingB added
+                         2026-08-17 -- display-only "these two planets visually overlap" flag, built
+                         client-side in a separate session but never actually added to this
+                         allowlist until now -- see filter.mjs's own comment on that same field for
+                         why it's a manual pick, not derived data.)
      "report" payload = {reason}
      "resolve-flag" (admin only, requires ?token=<ADMIN_TOKEN> on the URL) payload =
                     {field, resolution:"dispute"|"dismiss"|"set-value", value?}
@@ -145,6 +149,11 @@ function getCategoryValue(out, category){
     // itself, fixed alongside since it's the identical one-line pattern.
     case "phantom": return out.phantom || "";
     case "notes": return out.notes;
+    // Colliding planets (2026-08-17): bundled the same way "suffix" bundles
+    // water+dissonant above -- colliding/collidingA/collidingB are one
+    // traveller pick (display-only pairing), so they go through consensus
+    // together, not as 3 independently-flaggable fields.
+    case "colliding": return { colliding: !!out.colliding, collidingA: out.collidingA||0, collidingB: out.collidingB||0 };
     default: return undefined;
   }
 }
@@ -181,6 +190,9 @@ function applyCategoryValue(data, category, value){
     case "outlaw": data.outlaw=!!value; return;
     case "phantom": data.phantom=value; return;
     case "notes": data.notes=value; return;
+    case "colliding":
+      data.colliding=!!value.colliding; data.collidingA=value.collidingA||0; data.collidingB=value.collidingB||0;
+      return;
   }
 }
 
@@ -433,7 +445,7 @@ export default async (req, context) => {
     // or more categories from flaggedFields/disputedFields.
     var stillUnderReview = sysRec.flaggedFields.concat(sysRec.disputedFields);
 
-    var TOP_CATS = ["name","race","region","starClass","stars","suffix","giant","economy","conflict","blackHole","atlas","ruins","outlaw","phantom","notes"];
+    var TOP_CATS = ["name","race","region","starClass","stars","suffix","giant","economy","conflict","blackHole","atlas","ruins","outlaw","phantom","notes","colliding"];
     for(var ti=0; ti<TOP_CATS.length; ti++){
       if(stillUnderReview.indexOf(TOP_CATS[ti])>=0) continue;
       applyCategoryValue(sysRec.data, TOP_CATS[ti], getCategoryValue(filtered.cleaned, TOP_CATS[ti]));
