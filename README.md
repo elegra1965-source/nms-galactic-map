@@ -52,9 +52,9 @@ plotted before.
 
 **Course lines, styled like the real game.** Solid means one jump gets you
 there, dashed means it's a multi-hop route, red-dashed means your current
-hyperdrive can't reach that star's colour at all. Hovering a candidate
-while a system's panel is open draws a quick preview line before you commit
-to it.
+hyperdrive can't reach that star's colour at all. Just hovering any star
+(no need to select one first) draws a quick preview line before you commit
+to a course.
 
 **Enter system.** Fly into any system for a true 3D orbital view -- binary
 and ternary stars, planets and moons on real orbits with rings where the

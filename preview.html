@@ -336,6 +336,8 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
    overlap problem this session's other fixes were about. */
 #course.min #cBody{display:none}
 #course.min{width:auto}
+#route-itinerary-card.min #riBody{display:none}
+#route-itinerary-card.min{width:auto}
 
 #keys{position:fixed;left:50%;transform:translateX(-50%);bottom:10px;z-index:26;
   width:min(560px,calc(100vw - 20px));padding:10px 12px;display:none}
@@ -366,11 +368,11 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   padding:6px 10px;transform:translate(-50%,calc(-100% - 14px));white-space:nowrap}
 .hoverpop .hpName{color:var(--gold);font-size:12px;letter-spacing:.06em;margin:0 0 2px}
 .hoverpop .hpCls{color:var(--cyan);font-size:10px;letter-spacing:.05em;margin:0 0 4px}
-.hoverpop .hpIcons{display:flex;gap:9px;align-items:center}
-.hoverpop .hpIcons svg{width:15px;height:15px;stroke:currentColor;fill:none;
+.hoverpop .hpIcons{display:flex;gap:10px;align-items:center;margin-top:2px}
+.hoverpop .hpIcons svg{width:22px;height:22px;stroke:currentColor;fill:none;
   stroke-linecap:round;stroke-linejoin:round}
-.hoverpop .hpIcons .icimg{width:17px;height:17px;object-fit:contain}
-.hoverpop .hpIcons .icimg.tint{width:15px;height:15px}
+.hoverpop .hpIcons .icimg{width:24px;height:24px;object-fit:contain}
+.hoverpop .hpIcons .icimg.tint{width:21px;height:21px}
 #toast{position:fixed;left:50%;top:calc(var(--top-h,60px) + 8px);transform:translateX(-50%);z-index:40;
   font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:.12em;color:var(--gold);
   background:rgba(11,17,25,.95);border:1px solid var(--gold);border-radius:var(--r-sm);
@@ -707,12 +709,15 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   <div class="rihead" id="riHead">
     <span class="kicker" style="color:var(--cyan);font-weight:bold;letter-spacing:1px">WARP MANIFEST</span>
     <button id="copy-route-btn" class="btn nms-btn nms-btn-action" title="Copy the full route as text to clipboard.">COPY STEPS</button>
+    <button class="btn" id="bManifestMin" title="Collapse or expand the warp manifest." style="margin-left:8px;padding:4px 9px;font-size:12px">&#9662;</button>
   </div>
-  <div id="route-stats" style="color:var(--color-slate);font-size:11px;margin-bottom:10px;border-bottom:1px solid rgba(112,161,255,0.2);padding-bottom:8px">
-    Total Jumps: <span id="stat-jumps" style="color:var(--white)">0</span><br>
-    Est. Distance: <span id="stat-dist" style="color:var(--white)">0 LY</span>
+  <div id="riBody">
+    <div id="route-stats" style="color:var(--color-slate);font-size:11px;margin-bottom:10px;border-bottom:1px solid rgba(112,161,255,0.2);padding-bottom:8px">
+      Total Jumps: <span id="stat-jumps" style="color:var(--white)">0</span><br>
+      Est. Distance: <span id="stat-dist" style="color:var(--white)">0 LY</span>
+    </div>
+    <div id="route-steps-list" style="max-height:150px;overflow-y:auto;font-size:11px;color:var(--text);line-height:16px"></div>
   </div>
-  <div id="route-steps-list" style="max-height:150px;overflow-y:auto;font-size:11px;color:var(--text);line-height:16px"></div>
 </div>
 <div id="labels"></div>
 <div id="hoverPop" class="hoverpop" style="display:none"></div>
@@ -3014,7 +3019,7 @@ function drawCourse(){
   courseLine=lstyle.solid?
     new THREE.Line(g,new THREE.LineBasicMaterial({color:lstyle.color,transparent:true,opacity:0.9})):
     new THREE.Line(g,new THREE.LineDashedMaterial({
-      color:lstyle.color,dashSize:1.2,gapSize:0.8,transparent:true,opacity:0.85}));
+      color:lstyle.color,dashSize:2.4,gapSize:1.6,transparent:true,opacity:0.9}));
   if(!lstyle.solid) courseLine.computeLineDistances();
   localGroup.add(courseLine);
   /* The route bends toward real systems along the way, but that bend can be
@@ -3935,17 +3940,18 @@ function hideHoverPop(){
   document.getElementById("hoverPop").style.display="none";
   hoverPopVisible=false; hoverSys=null;
 }
-/* "Only during Set course" (Tony's choice): the preview line only appears
-   while a system's info panel is open, i.e. while actively looking at one
-   system and considering another -- not on every idle hover across the
-   whole map. Deliberately a straight two-point line (real distance vs
-   current hyperdrive range), NOT a full findRoute() multi-hop search --
-   running the real pathfinder on every hover frame would be far too
-   expensive. The full, real multi-hop route is still only ever computed
-   when Set course is actually clicked, same as before. */
+/* Corrected 2026-08-17 after Tony's live feedback: his original "only
+   during Set course" answer was interpreted as "only once a panel is
+   already open", but what he actually wants matches the real game --
+   hovering ANY star shows the preview line immediately, before you've
+   clicked/selected anything, as long as you're actually somewhere
+   (focusSystem exists). No panel-open gate anymore. Still deliberately a
+   straight two-point line (real distance vs current hyperdrive range), NOT
+   a full findRoute() multi-hop search -- running the real pathfinder on
+   every hover frame would be far too expensive. The full, real multi-hop
+   route is still only ever computed when Set course is actually clicked. */
 function updateCoursePreviewHover(s){
-  var panelOpen=document.getElementById("panel").classList.contains("show");
-  if(!panelOpen||!focusSystem||!s||s.address===focusSystem.address||
+  if(!focusSystem||!s||s.address===focusSystem.address||
      (courseTarget&&s.address===courseTarget.address)){
     clearCoursePreview(); return;
   }
@@ -3969,7 +3975,7 @@ function startPreviewLine(fromSys,toSys,style){
   previewLine=style.solid?
     new THREE.Line(g,new THREE.LineBasicMaterial({color:style.color,transparent:true,opacity:0.75})):
     new THREE.Line(g,new THREE.LineDashedMaterial({
-      color:style.color,dashSize:1.0,gapSize:0.7,transparent:true,opacity:0.7}));
+      color:style.color,dashSize:2.0,gapSize:1.4,transparent:true,opacity:0.8}));
   localGroup.add(previewLine);
   hoverRing.position.set(previewToPos.x,previewToPos.y,previewToPos.z);
   hoverRing.material.color.setHex(style.color);
@@ -4550,6 +4556,11 @@ document.getElementById("bPanelMin").addEventListener("click",function(){
 document.getElementById("bCourseMin").addEventListener("click",function(e){
   e.stopPropagation();
   var min=document.getElementById("course").classList.toggle("min");
+  this.innerHTML=min?"&#9656;":"&#9662;";
+});
+document.getElementById("bManifestMin").addEventListener("click",function(e){
+  e.stopPropagation();
+  var min=document.getElementById("route-itinerary-card").classList.toggle("min");
   this.innerHTML=min?"&#9656;":"&#9662;";
 });
 

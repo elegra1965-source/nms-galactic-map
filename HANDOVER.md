@@ -1988,3 +1988,64 @@ together, `data/overrides.json` excluded as always. Every visual element
 here (hover-popup zoom thresholds, the preview line's growth feel, whether
 the 3 line styles read clearly, the search popup's fit on mobile) still
 needs Tony's own device pass, same standing sandbox limitation as always.
+
+---
+
+### Session 38, one more round — icon size, Manifest collapse, hover-preview scoping bug
+
+Tony is testing the local file directly rather than a deployed build, so
+his feedback here reflects the real current state of `preview.html`. Three
+more screenshots: the hover popup's race/economy/conflict icons too small
+to see; the Warp Manifest card only draggable, not collapsible like Course
+Plotted, "otherwise cluttered"; and, across two follow-up messages, a
+12-hop course rendering with no visible dashing plus "where is the
+expanding line on hover like in game, which happens before clicking star
+to select it."
+
+Also tried opening his local `Phone Preview Tool.html` via the Claude-in-
+Chrome extension first, per his ask, to confirm visually before touching
+anything. Couldn't: the extension's `navigate` tool prepends `https://` to
+any URL that doesn't already start with `http`, so `file:///C:/...`
+becomes a broken `https://file///C:/...`, and once on that broken page
+every keyboard/synthetic-input action the extension offers is blocked
+outright (no interaction is possible on a non-http(s) page at all). No
+working path to a local file through that tool. Said so plainly rather
+than quietly giving up or pretending it worked, then proceeded on the two
+unambiguous fixes.
+
+**Icon size** -- bumped from 15-17px to 21-24px, roughly matching the full
+info panel's own icon sizes. No ambiguity here, just too small.
+
+**Manifest collapse** -- new `#bManifestMin` button in `#riHead`, mirroring
+`#bCourseMin`'s exact toggle pattern (`.min` class + chevron swap).
+`#route-stats`/`#route-steps-list` wrapped in a new `#riBody` div, hidden
+via `#route-itinerary-card.min #riBody{display:none}`. Deliberately did
+*not* make `displayCalculatedItinerary()` force-un-minimize the card the
+way `#course` does on every replot -- today's earlier "any star click
+replots the course" change would otherwise pop the manifest back open on
+every single click, defeating the entire point of collapsing it.
+
+**Solid-looking line** -- `courseLineStyle()`'s own logic checked out fine
+(hops>1 does pick the dashed material), so this is most likely
+`LineDashedMaterial`'s fixed world-unit dash/gap size (1.2/0.8) shrinking
+to sub-pixel at typical zoom and visually reading as solid. Doubled both
+the committed-course and hover-preview dash patterns (2.4/1.6, 2.0/1.4).
+
+**Hover-preview scoping -- a real bug, not a rendering issue.** Tony's
+earlier "only during Set course" answer got implemented as "only once a
+system's info panel is already open" -- his follow-up made clear that's not
+what he meant: the real game shows the preview line on hovering ANY star,
+with nothing clicked or selected first. Removed the
+`panel.classList.contains("show")` gate from `updateCoursePreviewHover()`
+entirely; it now only requires `focusSystem` (you're actually somewhere)
+and that the hovered star isn't your current location or the already-
+committed target. Corrected the matching (now-wrong) sentence in
+`README.md` too.
+
+Verified via `node --check` on all 3 non-empty script blocks, tag-balance
+(`div` 316/316, `a` 5/5, `button` 83/83), an ID-existence check (0
+missing), and a diff confirming exactly the intended hunks at each step.
+**Not deployed** -- same combined `preview.html` + `README.md` push as the
+rest of today. Since Tony's testing the local file directly this time, his
+next look should reflect all of this without needing anything deployed
+first.
