@@ -225,8 +225,15 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border:none;border-ra
 #accessPop.show{display:block}
 #searchPop{position:fixed;z-index:36;width:260px;padding:11px 13px;
   top:calc(var(--top-h,60px) + 8px);right:10px;display:none;
-  max-height:60vh;overflow-y:auto}
+  max-height:60vh;overflow-y:hidden}
 #searchPop.show{display:block}
+/* #searchPop.scroll: only added once real overflow is measured in JS, same
+   fix as #hyperPanel/#tweak/hyperdriveModal -- overflow-y:auto by default
+   shows a themed (very visible) scrollbar even when content visibly fits,
+   a sub-pixel scrollHeight-vs-clientHeight rounding quirk, not a real
+   overflow. Measuring after layout sidesteps it instead of guessing at a
+   CSS fudge factor. */
+#searchPop.scroll{overflow-y:auto}
 #inSearch{width:100%;box-sizing:border-box;margin-bottom:8px}
 .searchRes{padding:6px 4px;border-top:1px solid var(--border-soft);cursor:pointer}
 .searchRes:first-child{border-top:none}
@@ -5674,10 +5681,18 @@ function runSearch(query){
     pop.style.left=left+"px"; pop.style.right="auto";
     pop.style.top=top+"px"; pop.style.bottom="auto";
   }
+  /* Same measure-don't-guess fix as positionHyperPanel()/openHyperNotice()
+     -- only opt into a real scrollbar once actual overflow is confirmed
+     after layout, called right after every content-changing runSearch(). */
+  function remeasureScroll(){
+    pop.classList.remove("scroll");
+    if(pop.scrollHeight>pop.clientHeight+1) pop.classList.add("scroll");
+  }
   function openSearch(){
     pop.classList.add("show");
     if(!pop.style.left) positionUnderSearchBtn();
     runSearch(inp.value);
+    remeasureScroll();
     inp.focus();
   }
   function closeSearch(){ pop.classList.remove("show"); }
@@ -5688,7 +5703,7 @@ function runSearch(query){
   document.addEventListener("click",function(e){
     if(pop.classList.contains("show") && !pop.contains(e.target) && e.target!==btn) closeSearch();
   });
-  inp.addEventListener("input",function(){ runSearch(inp.value); });
+  inp.addEventListener("input",function(){ runSearch(inp.value); remeasureScroll(); });
   document.getElementById("searchResults").addEventListener("click",function(e){
     var row=e.target.closest?e.target.closest(".searchRes"):null;
     if(!row) return;
