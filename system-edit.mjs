@@ -8,9 +8,10 @@
                          giant, ruins, outlaw, phantom, econName, sell, buy, econDesc, conflict, blackHole, atlas, notes,
                          editorName, editorFriendCode,
                          bodies:[{name, moon, orbits, biome, descriptor, water, ring, resources,
-                                  flora, minerals, salvage, fossils, sentinel, autophage, base}, ...]}
+                                  flora, fauna, minerals, salvage, fossils, sentinel, autophage, base}, ...]}
                          (base added 2026-08-17 -- "Has base" per-body marker, same manual-only
-                         pattern as autophage.)
+                         pattern as autophage. fauna added 2026-08-17 -- same shape/24-char-per-item
+                         limit as flora/minerals/salvage/fossils, see filter.mjs's resArr().)
                          (ruins added 2026-08-14; phantom was already validated/shown but is only
                          actually persisted as of the same date -- see getCategoryValue's comment.
                          editorName/editorFriendCode added 2026-08-16 -- optional "who documented

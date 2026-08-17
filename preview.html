@@ -482,6 +482,19 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 .mfld input[type=text],.mfld input[type=number]{width:100%;text-transform:none;font-family:'Rajdhani',sans-serif;
   letter-spacing:.02em;color:var(--text);font-size:12px}
 .mfld textarea{margin-top:0}
+/* Tony (2026-08-17): the per-item 24-char cap on comma-separated fields
+   (Resources/Flora/Fauna/Minerals/Salvageable tech/Fossils) is enforced
+   server-side but the client-side maxlength on these inputs only caps the
+   WHOLE field, not each item -- a single long word could type fine, look
+   saved, then get silently blocked by the server. .fldHint is the static
+   one-time explanation shown once under Resources; .itemLenWarn is the
+   live per-field warning toggled by checkItemLenWarn() the moment a typed
+   item actually goes over the limit, so the block never comes as a
+   surprise after the fact. */
+.fldHint{font-size:10px;color:var(--text-faint);margin:-6px 0 8px;line-height:1.4}
+.itemLenWarn{font-size:10px;color:#ff8a7a;margin-top:3px;display:none}
+.itemLenWarn.show{display:block}
+.mfld input.over24{border-color:#ff5a4a}
 .flagFieldList{max-height:150px;overflow-y:auto;overflow-x:hidden;border:1px solid var(--border-soft);border-radius:var(--r-sm);
   padding:6px 8px;background:#04070c}
 .flagFieldRow{display:flex;align-items:center;gap:7px;padding:3px 0;font-size:12px;color:var(--text)}
@@ -976,6 +989,8 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
       <div><div class="lb">Resources</div><div class="tags" id="bRes"></div></div></div>
     <div class="row" id="bFloraRow" style="margin-top:10px;display:none"><span id="icFlora"></span>
       <div><div class="lb">Flora</div><div class="tags" id="bFlora"></div></div></div>
+    <div class="row" id="bFaunaRow" style="margin-top:10px;display:none"><span id="icFauna"></span>
+      <div><div class="lb">Fauna</div><div class="tags" id="bFauna"></div></div></div>
     <div class="row" id="bMineralRow" style="margin-top:10px;display:none"><span id="icMineral"></span>
       <div><div class="lb">Minerals</div><div class="tags" id="bMineral"></div></div></div>
     <div class="row" id="bSalvageRow" style="margin-top:10px;display:none"><span id="icSalvage"></span>
@@ -1201,6 +1216,18 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
       <button class="btn" id="edCancel">Cancel</button>
     </div>
   </div>
+
+  <!-- Populated live by populateDatalists() from values the user has actually
+       saved before (localStorage-only, see loadKnownTerms()/rememberKnownTerms()) --
+       gives the free-text body fields real browser-native suggestions as you type,
+       without ever sending anything extra to the server. -->
+  <datalist id="dlResources"></datalist>
+  <datalist id="dlFlora"></datalist>
+  <datalist id="dlFauna"></datalist>
+  <datalist id="dlMinerals"></datalist>
+  <datalist id="dlSalvage"></datalist>
+  <datalist id="dlFossils"></datalist>
+  <datalist id="dlDescriptor"></datalist>
 
   <div class="box modal" id="reportModal" style="max-width:340px;display:none">
     <h3>Report this system</h3>
@@ -1662,6 +1689,11 @@ var IC_SENTINEL='<ellipse cx="12" cy="12" rx="9" ry="5.4"/><circle cx="12" cy="1
 var IC_AUTOPHAGE='<rect x="12" y="2.5" width="13.4" height="13.4" transform="rotate(45 12 12)"/><path d="M12 8v8M8 12h8"/>';
 var IC_GIANT='<circle cx="12" cy="12" r="6.4"/><ellipse cx="12" cy="12" rx="10.4" ry="3" transform="rotate(-20 12 12)"/>';
 var IC_FLORA='<path d="M12 20c0-9 4-13.6 8-14.6-1 7.8-4 11.8-8 14.6Z"/><path d="M12 20c0-9-4-13.6-8-14.6 1 7.8 4 11.8 8 14.6Z"/>';
+/* Original placeholder line-art, same style/status as IC_SALVAGE/IC_FOSSIL
+   above -- a simple paw print, not lifted from the game. Swap for a real
+   in-game icon later the same way Race/Economy went from placeholder to
+   real cropped screenshots. */
+var IC_FAUNA='<ellipse cx="12" cy="16.2" rx="4.6" ry="3.6"/><circle cx="7.4" cy="9.4" r="1.7"/><circle cx="11.2" cy="6.8" r="1.7"/><circle cx="15" cy="6.8" r="1.7"/><circle cx="18.4" cy="9.4" r="1.7"/>';
 var IC_MINERAL='<path d="M12 3.4 19.4 8.8l-2.6 11.2H7.2L4.6 8.8Z"/>';
 var IC_SALVAGE='<circle cx="12" cy="12" r="3"/><path d="M12 3.6V6.4M12 17.6v2.8M3.6 12H6.4M17.6 12h2.8M6.5 6.5l2 2M15.5 15.5l2 2M6.5 17.5l2-2M15.5 8.5l2-2"/>';
 var IC_FOSSIL='<path d="M6 9.6C6 6.1 8.4 4.2 10.9 5.6c1 .6 1 1.7 0 2.3-1.3.8-1.3 2.1 0 2.9 1.3.8 1.3 2.1 0 2.9-1 .6-1 1.7 0 2.3 2.5 1.4 5.1-.5 5.1-4"/><circle cx="8.4" cy="8.4" r="0.9" fill="currentColor" stroke="none"/><circle cx="16.2" cy="17.2" r="0.9" fill="currentColor" stroke="none"/>';
@@ -2168,6 +2200,7 @@ function applyOverride(s){
         spin:o?o.spin:0.3,
         resUni:(b.resources&&b.resources.length)?b.resources.slice(0,6):(o?o.resUni:[]),
         flora:(b.flora&&b.flora.length)?b.flora.slice(0,6):[],
+        fauna:(b.fauna&&b.fauna.length)?b.fauna.slice(0,6):[],
         minerals:(b.minerals&&b.minerals.length)?b.minerals.slice(0,6):[],
         salvage:(b.salvage&&b.salvage.length)?b.salvage.slice(0,6):[],
         fossils:(b.fossils&&b.fossils.length)?b.fossils.slice(0,6):[],
@@ -2279,6 +2312,71 @@ function loadTravellerId(){
 function saveTravellerId(name,code){
   try{ localStorage.setItem(TRAVELLER_K,JSON.stringify({name:name||"",code:code||""})); }
   catch(err){}
+}
+/* "Suggestions of words you've already added" (Tony, 2026-08-17) -- a
+   plain localStorage list per field type, grown every time a save actually
+   succeeds (see rememberKnownTerms(), called from submitEditPayload's
+   success path), fed into a <datalist> per field so the browser's own
+   native suggestion dropdown shows terms this traveller has typed before
+   as they start typing again. Local-only, same as notes/marks/waypoints --
+   never sent to the server, never shared between visitors. */
+var KNOWN_TERMS_K="nms-galmap-known-terms";
+var KNOWN_TERMS_FIELDS=["resources","flora","fauna","minerals","salvage","fossils","descriptor"];
+var knownTerms={};
+function loadKnownTerms(){
+  knownTerms={};
+  KNOWN_TERMS_FIELDS.forEach(function(k){ knownTerms[k]=[]; });
+  try{
+    var raw=localStorage.getItem(KNOWN_TERMS_K);
+    if(raw){
+      var o=JSON.parse(raw);
+      KNOWN_TERMS_FIELDS.forEach(function(k){ if(Array.isArray(o[k])) knownTerms[k]=o[k]; });
+    }
+  }catch(err){}
+}
+function saveKnownTerms(){
+  try{ localStorage.setItem(KNOWN_TERMS_K,JSON.stringify(knownTerms)); }catch(err){}
+}
+// Adds new values to the front of a field's list (most-recent-first, so the
+// datalist surfaces recently-used terms ahead of old ones), de-duped
+// case-insensitively, capped at 150 entries so this can't grow forever.
+function rememberTerms(list,values){
+  values.forEach(function(v){
+    v=String(v||"").trim();
+    if(!v) return;
+    var lower=v.toLowerCase();
+    for(var k=list.length-1;k>=0;k--){ if(list[k].toLowerCase()===lower) list.splice(k,1); }
+    list.unshift(v);
+  });
+  if(list.length>150) list.length=150;
+}
+// Called right after a successful save -- payload.bodies[*] already holds
+// arrays (resources/flora/fauna/minerals/salvage/fossils were split from
+// their comma-separated inputs before the request went out) plus a single
+// descriptor string per body.
+function rememberKnownTerms(payload){
+  var bodies=(payload&&payload.bodies)||[];
+  bodies.forEach(function(b){
+    rememberTerms(knownTerms.resources,b.resources||[]);
+    rememberTerms(knownTerms.flora,b.flora||[]);
+    rememberTerms(knownTerms.fauna,b.fauna||[]);
+    rememberTerms(knownTerms.minerals,b.minerals||[]);
+    rememberTerms(knownTerms.salvage,b.salvage||[]);
+    rememberTerms(knownTerms.fossils,b.fossils||[]);
+    if(b.descriptor) rememberTerms(knownTerms.descriptor,[b.descriptor]);
+  });
+  saveKnownTerms();
+  populateDatalists();
+}
+function populateDatalists(){
+  var map={resources:"dlResources",flora:"dlFlora",fauna:"dlFauna",minerals:"dlMinerals",
+    salvage:"dlSalvage",fossils:"dlFossils",descriptor:"dlDescriptor"};
+  Object.keys(map).forEach(function(k){
+    var dl=document.getElementById(map[k]); if(!dl) return;
+    var html="", arr=knownTerms[k]||[];
+    for(var i=0;i<arr.length;i++) html+='<option value="'+escAttr(arr[i])+'">';
+    dl.innerHTML=html;
+  });
 }
 function toast(msg,ms){
   var t=document.getElementById("toast");
@@ -3658,7 +3756,7 @@ function fsBodyKey(b){
   // specific body ever changed -- a false-positive green/edited status.
   return JSON.stringify({n:b.name,bi:b.biome,d:b.descriptor||"",w:!!b.water,r:b.ring||false,
     se:b.sentinel||"None",au:!!b.autophage,ba:!!b.base,ru:(b.resUni||[]).slice().sort(),
-    fl:(b.flora||[]).slice().sort(),mi:(b.minerals||[]).slice().sort(),
+    fl:(b.flora||[]).slice().sort(),fa:(b.fauna||[]).slice().sort(),mi:(b.minerals||[]).slice().sort(),
     sa:(b.salvage||[]).slice().sort(),fo:(b.fossils||[]).slice().sort()});
 }
 function fsCategoryValue(s,category){
@@ -3880,6 +3978,7 @@ function showBody(b,s){
     document.getElementById(tagId).innerHTML=h;
   }
   resGroup("flora","bFloraRow","bFlora","icFlora",IC_FLORA);
+  resGroup("fauna","bFaunaRow","bFauna","icFauna",IC_FAUNA);
   resGroup("minerals","bMineralRow","bMineral","icMineral",IC_MINERAL);
   resGroup("salvage","bSalvageRow","bSalvage","icSalvage",IC_SALVAGE);
   resGroup("fossils","bFossilRow","bFossil","icFossil",IC_FOSSIL);
@@ -5061,6 +5160,27 @@ function buildIconCombo(inputId,listId,groups,blankLabel){
     list.classList.remove("show");
     inp.dispatchEvent(new Event("change",{bubbles:true}));
   });
+  /* commitNow() is the same "does the typed text exactly match a real
+     option?" check the blur handler below runs, pulled into its own
+     function and attached to the input itself (inp._icomboCommit) so it
+     can ALSO be run synchronously on demand -- see flushAllCombos().
+     Real bug this fixes (Tony, 2026-08-17): typing a value straight into
+     the box (not clicking a suggestion from the list) then immediately
+     clicking Save blurs this input -- but blur's own commit used to be
+     deliberately delayed 120ms (to let a mousedown list-selection's own
+     value land first), so Save's click handler ran and read the OLD
+     editBodies value before that 120ms timeout ever fired. The typed text
+     was visibly sitting in the box, looked saved, but silently never made
+     it into the payload -- exactly Tony's "put in Frequent, saved, came
+     back as None" report, and only for typed (not clicked) values, which
+     is why it looked intermittent rather than always-broken. */
+  function commitNow(){
+    var v=inp.value.trim();
+    var valid = v==="" ? !!blankLabel : items.some(function(it2){ return it2.label===v; });
+    inp.value = valid ? inp.value : lastCommitted;
+    if(valid){ lastCommitted=inp.value; inp.dispatchEvent(new Event("change",{bubbles:true})); }
+  }
+  inp._icomboCommit=commitNow;
   inp.addEventListener("blur",function(){
     /* Deliberate typo guard: since typed text now goes straight into the
        real saved field, a partial/misspelled entry left uncommitted (no
@@ -5070,14 +5190,18 @@ function buildIconCombo(inputId,listId,groups,blankLabel){
        and blank is allowed), otherwise snap back to whatever was valid
        before this focus. setTimeout lets a mousedown selection above land
        first (mousedown fires before this blur). */
-    setTimeout(function(){
-      var v=inp.value.trim();
-      var valid = v==="" ? !!blankLabel : items.some(function(it2){ return it2.label===v; });
-      inp.value = valid ? inp.value : lastCommitted;
-      if(valid){ lastCommitted=inp.value; inp.dispatchEvent(new Event("change",{bubbles:true})); }
-      list.classList.remove("show");
-    },120);
+    setTimeout(function(){ commitNow(); list.classList.remove("show"); },120);
   });
+}
+/* Every .icomboInput currently in the DOM registers its own commitNow()
+   here (see inp._icomboCommit above) -- flushAllCombos() forces every one
+   of them to commit its live value RIGHT NOW, synchronously, bypassing
+   blur's 120ms delay entirely. Called at the top of the Save click handler
+   so a typed-not-clicked Biome/Sentinel/Economy/Economy-strength/Conflict
+   value can never lose the race described in commitNow()'s comment. */
+function flushAllCombos(){
+  var els=document.querySelectorAll(".icomboInput");
+  for(var ci=0;ci<els.length;ci++){ if(els[ci]._icomboCommit) els[ci]._icomboCommit(); }
 }
 function buildEconConflictSelects(){
   buildIconCombo("edEcon","edEconList",
@@ -5165,7 +5289,7 @@ function renderBodyEditList(){
              30 chars, and got cut off mid-word at "Radiatio"). Bumped to 50,
              comfortably covers the longest real phrases seen (e.g. "Extreme
              Sentinel Activity", "Planet-wide Radioactive Storm"). */
-          '<div class="mfld" style="margin-bottom:0"><div class="lb">Descriptor</div><input type="text" class="bfDesc" data-i="'+i+'" maxlength="50" placeholder="e.g. Bountiful" value="'+escAttr(b.descriptor)+'"></div>'+
+          '<div class="mfld" style="margin-bottom:0"><div class="lb">Descriptor</div><input type="text" class="bfDesc" data-i="'+i+'" maxlength="50" spellcheck="true" list="dlDescriptor" placeholder="e.g. Bountiful" value="'+escAttr(b.descriptor)+'"></div>'+
         '</div>'+
         '<div class="brow2">'+
           '<label class="chk2"><input type="checkbox" class="bfWater" data-i="'+i+'"'+(b.water?" checked":"")+'> Water</label>'+
@@ -5189,15 +5313,19 @@ function renderBodyEditList(){
         }
         html+='<div class="mfld" style="margin-bottom:0"><div class="lb">Orbits</div><select class="bfOrbits" data-i="'+i+'">'+orbOpts+'</select></div>';
       }
-      html+='<div class="mfld" style="margin-bottom:0"><div class="lb">Sentinel activity</div><div class="icombo"><input type="text" class="bfSentinel icomboInput" data-i="'+i+'" id="bfSentinel-'+i+'" autocomplete="off" value="'+escAttr(b.sentinel||"None")+'"><div class="icomboList" id="bfSentinelList-'+i+'"></div></div></div>'+
-        '<div class="mfld" style="margin-bottom:0"><div class="lb">Resources (comma separated)</div><input type="text" class="bfRes" data-i="'+i+'" maxlength="120" value="'+escAttr(b.resources)+'"></div>'+
+      html+='<div class="brow2">'+
+          '<div class="mfld" style="margin-bottom:0"><div class="lb">Sentinel</div><div class="icombo"><input type="text" class="bfSentinel icomboInput" data-i="'+i+'" id="bfSentinel-'+i+'" autocomplete="off" value="'+escAttr(b.sentinel||"None")+'"><div class="icomboList" id="bfSentinelList-'+i+'"></div></div></div>'+
+          '<div class="mfld" style="margin-bottom:0"><div class="lb">Fossils &amp; curiosities</div><input type="text" class="bfFossils" data-i="'+i+'" maxlength="80" spellcheck="true" list="dlFossils" value="'+escAttr(b.fossils)+'"></div>'+
+        '</div>'+
+        '<div class="mfld" style="margin-bottom:0"><div class="lb">Resources (comma separated)</div><input type="text" class="bfRes" data-i="'+i+'" maxlength="120" spellcheck="true" list="dlResources" value="'+escAttr(b.resources)+'"></div>'+
+        '<div class="fldHint">Separate multiple items with commas -- each individual item can be up to 24 characters.</div>'+
         '<div class="brow2">'+
-          '<div class="mfld" style="margin-bottom:0"><div class="lb">Flora</div><input type="text" class="bfFlora" data-i="'+i+'" maxlength="80" value="'+escAttr(b.flora)+'"></div>'+
-          '<div class="mfld" style="margin-bottom:0"><div class="lb">Minerals</div><input type="text" class="bfMinerals" data-i="'+i+'" maxlength="80" value="'+escAttr(b.minerals)+'"></div>'+
+          '<div class="mfld" style="margin-bottom:0"><div class="lb">Flora</div><input type="text" class="bfFlora" data-i="'+i+'" maxlength="80" spellcheck="true" list="dlFlora" value="'+escAttr(b.flora)+'"></div>'+
+          '<div class="mfld" style="margin-bottom:0"><div class="lb">Fauna</div><input type="text" class="bfFauna" data-i="'+i+'" maxlength="80" spellcheck="true" list="dlFauna" value="'+escAttr(b.fauna)+'"></div>'+
         '</div>'+
         '<div class="brow2">'+
-          '<div class="mfld" style="margin-bottom:0"><div class="lb">Salvageable tech</div><input type="text" class="bfSalvage" data-i="'+i+'" maxlength="80" value="'+escAttr(b.salvage)+'"></div>'+
-          '<div class="mfld" style="margin-bottom:0"><div class="lb">Fossils &amp; curiosities</div><input type="text" class="bfFossils" data-i="'+i+'" maxlength="80" value="'+escAttr(b.fossils)+'"></div>'+
+          '<div class="mfld" style="margin-bottom:0"><div class="lb">Minerals</div><input type="text" class="bfMinerals" data-i="'+i+'" maxlength="80" spellcheck="true" list="dlMinerals" value="'+escAttr(b.minerals)+'"></div>'+
+          '<div class="mfld" style="margin-bottom:0"><div class="lb">Salvageable tech</div><input type="text" class="bfSalvage" data-i="'+i+'" maxlength="80" spellcheck="true" list="dlSalvage" value="'+escAttr(b.salvage)+'"></div>'+
         '</div>';
     }
     html+='</div>';
@@ -5285,6 +5413,7 @@ function openEditModal(){
       ring:!!b.ring,
       resources:(b.resUni||[]).join(", "),
       flora:(b.flora||[]).join(", "),
+      fauna:(b.fauna||[]).join(", "),
       minerals:(b.minerals||[]).join(", "),
       salvage:(b.salvage||[]).join(", "),
       fossils:(b.fossils||[]).join(", "),
@@ -5357,7 +5486,7 @@ function clientPrecheck(){
     document.getElementById("edEditorCode").value];
   for(var i=0;i<editBodies.length;i++){
     fields.push(editBodies[i].name,editBodies[i].descriptor,editBodies[i].flora,
-      editBodies[i].minerals,editBodies[i].salvage,editBodies[i].fossils);
+      editBodies[i].fauna,editBodies[i].minerals,editBodies[i].salvage,editBodies[i].fossils);
   }
   for(i=0;i<fields.length;i++) if(bad(fields[i])) return "Please remove blocked language before saving.";
   if(!document.getElementById("edName").value.trim()) return "System name can't be empty.";
@@ -5399,15 +5528,50 @@ document.getElementById("edAddStar").addEventListener("click",function(){
   editStars.push({uid:starUidSeq++,color:nextColor});
   renderStarEditList();
 });
+/* Live per-item length check for the 5 comma-separated groups (Resources/
+   Flora/Fauna/Minerals/Salvageable tech/Fossils) -- filter.mjs's resArr()
+   caps each INDIVIDUAL item at 24 characters, but the client-side
+   maxlength on these inputs only caps the whole field (120/80), so a
+   single long word could type fine and only get rejected server-side
+   after Save, with no clue which word did it. This flags the exact
+   offending item live, as soon as it goes over, instead of after the
+   fact -- addresses Tony's "must only be max 30 [sic] so tell the user"
+   report (the real per-item limit is 24, not 30 or the old whole-field
+   number he'd been guessing at). */
+var ITEM_LEN_FIELDS=["bfRes","bfFlora","bfFauna","bfMinerals","bfSalvage","bfFossils"];
+function checkItemLenWarn(el){
+  if(!el || !el.classList) return;
+  var isListField=false, k;
+  for(k=0;k<ITEM_LEN_FIELDS.length;k++){ if(el.classList.contains(ITEM_LEN_FIELDS[k])){ isListField=true; break; } }
+  if(!isListField) return;
+  var parts=el.value.split(",").map(function(x){ return x.trim(); }).filter(Boolean);
+  var bad=null;
+  for(k=0;k<parts.length;k++){ if(parts[k].length>24){ bad=parts[k]; break; } }
+  var warnEl=el.nextElementSibling;
+  if(!warnEl || !warnEl.classList || !warnEl.classList.contains("itemLenWarn")){
+    warnEl=document.createElement("div");
+    warnEl.className="itemLenWarn";
+    el.parentNode.insertBefore(warnEl, el.nextSibling);
+  }
+  el.classList.toggle("over24", !!bad);
+  if(bad){
+    warnEl.textContent='"'+bad+'" is '+bad.length+' characters -- each item must be 24 or fewer, or the whole save will be rejected.';
+    warnEl.classList.add("show");
+  } else {
+    warnEl.classList.remove("show");
+  }
+}
 document.getElementById("bodyEditList").addEventListener("input",function(e){
   var iAttr=e.target.getAttribute("data-i"); if(iAttr===null) return; var i=+iAttr;
   if(e.target.classList.contains("bfName")) editBodies[i].name=e.target.value;
   else if(e.target.classList.contains("bfRes")) editBodies[i].resources=e.target.value;
   else if(e.target.classList.contains("bfDesc")) editBodies[i].descriptor=e.target.value;
   else if(e.target.classList.contains("bfFlora")) editBodies[i].flora=e.target.value;
+  else if(e.target.classList.contains("bfFauna")) editBodies[i].fauna=e.target.value;
   else if(e.target.classList.contains("bfMinerals")) editBodies[i].minerals=e.target.value;
   else if(e.target.classList.contains("bfSalvage")) editBodies[i].salvage=e.target.value;
   else if(e.target.classList.contains("bfFossils")) editBodies[i].fossils=e.target.value;
+  checkItemLenWarn(e.target);
 });
 document.getElementById("bodyEditList").addEventListener("change",function(e){
   var iAttr=e.target.getAttribute("data-i"); if(iAttr===null) return; var i=+iAttr;
@@ -5440,7 +5604,7 @@ document.getElementById("edAddBody").addEventListener("click",function(){
   if(editBodies.length>=6){ toast("6 is the limit -- No Man's Sky systems can have at most 6 planets and moons combined."); return; }
   for(var j=0;j<editBodies.length;j++) editBodies[j].open=false;
   editBodies.push({uid:bodyUidSeq++,name:"New body",moon:false,biome:BIOME_KEYS[0],descriptor:"",water:false,
-    resources:"",flora:"",minerals:"",salvage:"",fossils:"",sentinel:"None",autophage:false,base:false,orbits:"",open:true});
+    resources:"",flora:"",fauna:"",minerals:"",salvage:"",fossils:"",sentinel:"None",autophage:false,base:false,orbits:"",open:true});
   renderBodyEditList();
   var rows=document.querySelectorAll("#bodyEditList .bodyEdit");
   var last=rows[rows.length-1];
@@ -5508,6 +5672,18 @@ document.getElementById("modalWrap").addEventListener("click",function(e){
   // system now requires an explicit Save or Cancel.
   if(document.getElementById("editModal").style.display!=="none") return;
   closeModal();
+});
+/* Tony (2026-08-17): clicking into a populated field used to just drop the
+   cursor at that point, so replacing the whole value meant backspacing it
+   out first. Selecting the existing text on focus means typing straight
+   over it instead, matching how most "click to edit" desktop fields
+   behave -- delegated on #modalWrap (via focusin, which bubbles, unlike
+   plain focus) so it covers every text input/textarea in every modal,
+   including body rows that get rebuilt on every renderBodyEditList() call,
+   with no per-field wiring needed. */
+document.getElementById("modalWrap").addEventListener("focusin",function(e){
+  var t=e.target;
+  if(t && ((t.tagName==="INPUT" && t.type==="text") || t.tagName==="TEXTAREA")) t.select();
 });
 
 /* ============ fan-made / procedural-data disclaimer ============ */
@@ -6088,6 +6264,7 @@ function submitEditPayload(address, payload){
       return;
     }
     hideStatusIcon(iconWrap);
+    rememberKnownTerms(payload);
     closeModal(); toast("System saved -- visible to everyone"); loadOverrides();
   }).catch(function(){
     stopWait(); spin.style.display="none"; btn.disabled=false;
@@ -6103,6 +6280,11 @@ document.getElementById("edRetry").addEventListener("click",function(){
 });
 document.getElementById("edSubmit").addEventListener("click",function(){
   if(!selected) return;
+  // Force any in-progress icombo edit (Biome/Sentinel/Economy/Economy
+  // strength/Conflict) to commit its live value NOW -- otherwise a typed
+  // (not clicked) value can lose a race against this same click blurring
+  // the input. See commitNow()'s comment in buildIconCombo.
+  flushAllCombos();
   var err=clientPrecheck();
   var errEl=document.getElementById("editErr"), retryBtn=document.getElementById("edRetry");
   var iconWrap=document.getElementById("editIconWrap"), iconImg=document.getElementById("editIconImg");
@@ -6157,6 +6339,7 @@ document.getElementById("edSubmit").addEventListener("click",function(){
         biome:b.biome, descriptor:(b.descriptor||"").trim(), water:b.water, ring:!b.moon&&!!b.ring,
         resources:b.resources.split(",").map(function(x){ return x.trim(); }).filter(Boolean),
         flora:(b.flora||"").split(",").map(function(x){ return x.trim(); }).filter(Boolean),
+        fauna:(b.fauna||"").split(",").map(function(x){ return x.trim(); }).filter(Boolean),
         minerals:(b.minerals||"").split(",").map(function(x){ return x.trim(); }).filter(Boolean),
         salvage:(b.salvage||"").split(",").map(function(x){ return x.trim(); }).filter(Boolean),
         fossils:(b.fossils||"").split(",").map(function(x){ return x.trim(); }).filter(Boolean),
@@ -6664,6 +6847,8 @@ function openAdminPanel(token){
 
 /* ============ init ============ */
 loadStore();
+loadKnownTerms();
+populateDatalists();
 initLabels();
 buildKeypad();
 updateGalaxyInfo();

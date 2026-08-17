@@ -290,6 +290,7 @@ export function filterSystemEdit(payload){
       ring: (!isMoon && !!b.ring) ? (RING_STYLE_BY_BIOME[biomeR.cleaned] || "tan") : false,
       resources: resOut,
       flora: resArr(b.flora,"Flora"),
+      fauna: resArr(b.fauna,"Fauna"),
       minerals: resArr(b.minerals,"Mineral"),
       salvage: resArr(b.salvage,"Salvageable tech"),
       fossils: resArr(b.fossils,"Fossil/curiosity"),
