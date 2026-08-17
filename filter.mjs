@@ -183,6 +183,15 @@ export function filterSystemEdit(payload){
   // from anything else in the payload.
   out.ruins = !!payload.ruins;
 
+  // Outlaw (2026-08-17, Tony): a system's conflict WORD can be "Pirate
+  // Controlled" (a real tier-3 CONFLICT descriptor) without the separate
+  // s.outlaw flag being set -- that flag drives the skull icon on the
+  // Conflict badge and the "Outlaw" tag, and was procedural-only with no
+  // manual override until now, same manual-only pattern as ruins/giant/
+  // blackHole/atlas above -- not derived from the conflict word itself,
+  // since a traveller should be able to set them independently.
+  out.outlaw = !!payload.outlaw;
+
   // Phantom Star / Shadow Star -- an obscure, wiki-documented NMS oddity
   // (nomanssky.fandom.com/wiki/Phantom_Star, researched in
   // Galactic-Map-Session-Notes.md): most regions contain thousands of

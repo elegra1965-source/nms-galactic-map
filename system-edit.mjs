@@ -5,7 +5,7 @@
    POST body: { action: "edit"|"report"|"resolve-flag", address, payload }
      address = the 12-char portal hex address the edit applies to
      "edit"   payload = {name, race, region, stars:[colourKey,...] (max 3), starClass, water, dissonant,
-                         giant, ruins, phantom, econName, sell, buy, econDesc, conflict, blackHole, atlas, notes,
+                         giant, ruins, outlaw, phantom, econName, sell, buy, econDesc, conflict, blackHole, atlas, notes,
                          editorName, editorFriendCode,
                          bodies:[{name, moon, orbits, biome, descriptor, water, ring, resources,
                                   flora, minerals, salvage, fossils, sentinel, autophage}, ...]}
@@ -13,7 +13,10 @@
                          actually persisted as of the same date -- see getCategoryValue's comment.
                          editorName/editorFriendCode added 2026-08-16 -- optional "who documented
                          this" attribution, always overwrites directly, NOT part of TOP_CATS/the
-                         flag-consensus system below, see filter.mjs's comment on why.)
+                         flag-consensus system below, see filter.mjs's comment on why. outlaw added
+                         2026-08-17 -- Tony caught that picking the "Pirate Controlled" conflict word
+                         didn't set this separate skull/tag flag, same manual-only pattern as
+                         giant/ruins/blackHole/atlas.)
      "report" payload = {reason}
      "resolve-flag" (admin only, requires ?token=<ADMIN_TOKEN> on the URL) payload =
                     {field, resolution:"dispute"|"dismiss"|"set-value", value?}
@@ -127,6 +130,9 @@ function getCategoryValue(out, category){
     // Ruins (2026-08-14, hyperdrive-types.docx task 9): plain boolean, same
     // pattern as giant/blackHole/atlas above.
     case "ruins": return !!out.ruins;
+    // Outlaw (2026-08-17): plain boolean, same pattern as ruins/giant/
+    // blackHole/atlas above.
+    case "outlaw": return !!out.outlaw;
     // Phantom / Shadow Star -- was validated by filterSystemEdit() and shown
     // in the Edit system modal since it was added, but never actually wired
     // into TOP_CATS/getCategoryValue/applyCategoryValue below, so a
@@ -169,6 +175,7 @@ function applyCategoryValue(data, category, value){
     case "blackHole": data.blackHole=!!value; return;
     case "atlas": data.atlas=!!value; return;
     case "ruins": data.ruins=!!value; return;
+    case "outlaw": data.outlaw=!!value; return;
     case "phantom": data.phantom=value; return;
     case "notes": data.notes=value; return;
   }
@@ -423,7 +430,7 @@ export default async (req, context) => {
     // or more categories from flaggedFields/disputedFields.
     var stillUnderReview = sysRec.flaggedFields.concat(sysRec.disputedFields);
 
-    var TOP_CATS = ["name","race","region","starClass","stars","suffix","giant","economy","conflict","blackHole","atlas","ruins","phantom","notes"];
+    var TOP_CATS = ["name","race","region","starClass","stars","suffix","giant","economy","conflict","blackHole","atlas","ruins","outlaw","phantom","notes"];
     for(var ti=0; ti<TOP_CATS.length; ti++){
       if(stillUnderReview.indexOf(TOP_CATS[ti])>=0) continue;
       applyCategoryValue(sysRec.data, TOP_CATS[ti], getCategoryValue(filtered.cleaned, TOP_CATS[ti]));

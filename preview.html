@@ -1167,6 +1167,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
       <label class="chk"><input type="checkbox" id="edAtlas"> Atlas station present</label>
       <label class="chk"><input type="checkbox" id="edGiant"> Gas giant (purple systems only -- limits to 1 planet + up to 5 moons; renamed from "Giant planet" to match the real in-game term)</label>
       <label class="chk" title="Ancient Ruins are a real surface point of interest (Knowledge Stones + a memoir device, sometimes a buried Artifact Ruin) -- not tied to any procedural rule this project could find, so this is manual-only, same as black hole/Atlas."><input type="checkbox" id="edRuins"> Ruins present</label>
+      <label class="chk" title="Tony caught (2026-08-17): choosing the &quot;Pirate Controlled&quot; conflict word alone doesn't flag a system as Outlaw -- that's a separate flag (drives the skull icon on the Conflict badge and the Outlaw tag), procedural-only until now, same manual-only pattern as the others here."><input type="checkbox" id="edOutlaw"> Outlaw system present</label>
     </div>
     <div class="mfld"><div class="lb">Phantom / Shadow Star status</div>
       <select id="edPhantom" title="An obscure NMS oddity, researched from the wiki (nomanssky.fandom.com/wiki/Phantom_Star): most regions contain thousands of unreachable 'phantom' system indices that never show on the real in-game map, normally only reached via a save/portal-index edit. A Shadow Star is a distinct, related anomaly -- the first invalid index right after the portal network's valid range -- that CAN be reached by hyperjump, unlike ordinary phantoms. Leave as None unless you've actually confirmed one of these in-game.">
@@ -2076,6 +2077,7 @@ function applyOverride(s){
   if(d.dissonant!==undefined) s.dissonant=!!d.dissonant;
   if(d.giant!==undefined) s.giant=!!d.giant;
   if(d.ruins!==undefined) s.ruins=!!d.ruins;
+  if(d.outlaw!==undefined) s.outlaw=!!d.outlaw;
   s.publicNotes=d.notes||"";
   s.editorName=d.editorName||"";
   s.editorFriendCode=d.editorFriendCode||"";
@@ -4098,7 +4100,7 @@ function showHoverPop(s,cx,cy){
       '<div class="hpRow">'+raceIcon(s.race)+'<span class="hpLbl">'+s.race+'</span></div>'+
       '<div class="hpRow">'+econIcon(s.econType)+'<span class="hpLbl">'+(s.uncharted?"Uncharted":s.econName)+'</span></div>'+
       (s.uncharted?'':'<div class="hpSub">Sell: '+s.sell+'% Buy: '+s.buy+'% // '+s.econDesc+'</div>')+
-      '<div class="hpRow">'+svg(IC_CONFLICT,CONFLICT_COL[s.conTier])+'<span class="hpLbl">'+s.conflict+'</span></div>'+
+      '<div class="hpRow">'+svg(IC_CONFLICT,CONFLICT_COL[s.conTier])+conBadge(s)+'<span class="hpLbl">'+s.conflict+'</span></div>'+
       '</div>';
   }
   pop.innerHTML=html;
@@ -5179,6 +5181,7 @@ function openEditModal(){
   document.getElementById("edDissonantSuf").checked=!!s.dissonant;
   document.getElementById("edGiant").checked=!!s.giant;
   document.getElementById("edRuins").checked=!!s.ruins;
+  document.getElementById("edOutlaw").checked=!!s.outlaw;
   document.getElementById("edNotes").value=s.publicNotes||"";
   var myId=loadTravellerId();
   document.getElementById("edEditorName").value=myId.name;
@@ -6045,6 +6048,7 @@ document.getElementById("edSubmit").addEventListener("click",function(){
     dissonant:document.getElementById("edDissonantSuf").checked,
     giant:document.getElementById("edGiant").checked,
     ruins:document.getElementById("edRuins").checked,
+    outlaw:document.getElementById("edOutlaw").checked,
     econName:document.getElementById("edEcon").value.trim(),
     sell:document.getElementById("edSell").value.trim(),
     buy:document.getElementById("edBuy").value.trim(),
