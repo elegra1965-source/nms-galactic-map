@@ -43,9 +43,18 @@ not a static image, a real navigable scene you fly through.
 thousands of systems, coloured by spectral class, named and clickable.
 Selecting one opens the info panel on the right: race, economy (with real
 sell/buy percentages), conflict level, star count, and every planet/moon in
-the system.
+the system. Hovering a star (desktop only) shows a lighter zoom-aware
+popup first -- name only from a distance, full stats once you're in close --
+and clicking any star auto-plots a course to it, replacing whatever was
+plotted before.
 
 ![Local view with a system selected](screenshots/02-local-view-select.jpg)
+
+**Course lines, styled like the real game.** Solid means one jump gets you
+there, dashed means it's a multi-hop route, red-dashed means your current
+hyperdrive can't reach that star's colour at all. Hovering a candidate
+while a system's panel is open draws a quick preview line before you commit
+to it.
 
 **Enter system.** Fly into any system for a true 3D orbital view -- binary
 and ternary stars, planets and moons on real orbits with rings where the
@@ -74,6 +83,12 @@ directly -- both stay in sync, so you can decode a screenshot from your own
 game without knowing the hex first.
 
 ![Portal glyph keypad](screenshots/06-glyph-keypad.jpg)
+
+**Search by name.** No reverse index exists across the whole procedural
+galaxy -- names are generated *from* the address, not the other way round --
+but the Search button finds anything this browser already knows a real name
+for: community-documented systems, plus your own bookmarks, waypoints, and
+visited history. Type a name, jump straight there.
 
 **Honest about its limits.** The About modal spells out exactly what's
 generated accurately (star type, system/region names, planet count) versus

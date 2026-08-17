@@ -1765,3 +1765,226 @@ has Issues:write still need a real end-to-end test once live -- try
 submitting one real piece of feedback after deploying and confirm it shows
 up as an Issue on GitHub.
 
+
+---
+
+### Session 35 (2026-08-16) — mini galaxy icon: real disc rotation, not a clock-hand spin
+
+Tony sent two screenshots of the `#galIcon` HUD thumbnail (top-left "Galactic
+Core" readout) and flagged the only thing spoiling it: it spins flat, like a
+clock hand, instead of rotating like an actual tilted galactic disc. Exactly
+right, and a real bug in how the animation was built, not a taste call.
+
+**Root cause:** the icon's rotation was a plain CSS `animation:spinGalIcon
+20s linear infinite` doing `transform:rotate(0deg)->rotate(360deg)` on the
+whole canvas element. That spins the *entire rendered image* -- including
+its tilt -- around the screen-plane center, like a coin lying flat on a
+table spinning face-on. A real tilted galactic disc rotating on its own
+polar axis looks completely different: the ellipse's own shape and
+orientation stay fixed on screen, and only the spiral pattern *inside* that
+fixed ellipse sweeps around. CSS `rotate()` can't produce that -- it was
+never going to look right no matter how it was tuned.
+
+**Fix:** stopped CSS-rotating the element entirely and instead animate the
+draw itself. `drawGalIcon()`'s per-blob polar angle (`ang=arm*(2π/arms)+t*tw
++jitter`) now adds a `galIconRot` offset; the vertical squish (`*0.62`) that
+creates the ellipse is untouched, so the ellipse's tilt/shape never moves --
+only the arm pattern rotates inside it, exactly the "west to east" sweep
+Tony described, and it can never collapse to a line since the squish factor
+is constant, not animated. `galIconRot` is advanced from the main `animate()`
+render loop (same loop that already turns `galaxyGroup.rotation.y` in 3D
+Galaxy view), throttled to every 3rd frame (~20 redraws/sec at 60fps -- cheap
+canvas 2D work, smooth motion) at 0.0157 rad/tick, giving roughly the same
+~20s full rotation period as the old CSS version. Removed the now-dead
+`animation`/`will-change` CSS properties and the unused `@keyframes
+spinGalIcon` rule, replaced with a comment explaining why the CSS approach
+was wrong and pointing at the new mechanism.
+
+Verified via `node --check` on all 4 script blocks (pass), a tag-balance
+pass (pass, 0 mismatches), an ID-existence check (271 unique ids, 437
+`getElementById` calls, 0 missing -- unchanged, this session added no new
+ids), and a diff against a pre-session backup confirming exactly the 5
+intended blocks changed (the CSS rule, the keyframes->comment swap, the
+`ang` line, the new `galIconRot`/`galIconFrame` globals, and the `animate()`
+tick). **Not deployed** -- same `preview.html`-only push needed as every
+prior session, `data/overrides.json` excluded as always. The actual on-
+screen motion (does it read as a real disc rotation now, is the speed
+right) still needs Tony's own device look, same standing sandbox limitation
+as every visual feature in this project.
+
+---
+
+### Session 35, continued — info panel stayed open when returning to Galaxy view
+
+Small cosmetic follow-up in the same session, from a screenshot: clicking a
+star in Local correctly opens the right-hand info panel, but going back to
+Galaxy view left it hanging open, still showing that now-irrelevant system.
+
+**Fix:** `setMode()`'s `m==="galaxy"` branch now clears `selected=null` and
+removes the panel's `.show` class (plus a matching `updateRings()` call so
+the now-stale selection ring doesn't linger either) -- the exact same
+close pattern the address Reset/Clear button already uses (Session 24) for
+the same reason: Galaxy view has no concept of a "selected" star, that only
+exists in Local/System. `updatePanel()`/`updateRings()` already null-guard
+`selected` safely, so nothing else needed touching.
+
+Verified via `node --check` (4 script blocks, pass), tag-balance (pass, 0
+mismatches), ID-existence (271 ids / 438 `getElementById` calls, 0 missing,
+unchanged), and a diff confirming exactly this one block changed. **Not
+deployed** -- same `preview.html`-only push as the rotation fix above,
+`data/overrides.json` excluded as always.
+
+---
+
+### Session 35, continued once more — mini galaxy icon spun the wrong direction and speed vs. the real 3D galaxy
+
+Right after the rotation fix above, Tony looked at the live behaviour and
+flagged it spun the opposite way to the actual 3D galaxy in Galaxy view, and
+at a different speed -- should be the same as each other.
+
+**Fix:** `galIconRot` now advances by the exact same per-frame magnitude as
+`galaxyGroup.rotation.y` (0.0003, previously the icon used an independently-
+tuned 0.0157 applied only on every 3rd frame -- much faster), and with the
+opposite sign (`-=` instead of `+=`), since Tony's live look confirmed the
+old `+=` direction read as backwards relative to the real galaxy's rotation.
+The angle now accumulates every single frame (matching the galaxy's own
+per-frame rate exactly) even though the canvas redraw itself stays throttled
+to every 3rd frame for performance -- only the *draw* is skipped, not the
+angle progression, so the average speed is correct rather than 3x too fast.
+Also now advances regardless of `mode` (galaxy's own rotation only runs
+`if(mode==="galaxy")`, but the icon is meant to keep turning in Local/System
+too, since it's a HUD element visible in all three modes).
+
+Verified via `node --check` (4 blocks, pass), tag-balance (pass), ID-
+existence (271 ids / 438 calls, unchanged), and a diff confirming exactly
+this one block changed. **Not deployed** -- same `preview.html`-only push
+as the rest of this session. Whether the two now genuinely read as
+rotating together still needs Tony's own live look, same as every visual
+fix in this project.
+
+---
+
+### Session 35, continued a fourth time — rotation speed bumped, shared into one constant
+
+Tony liked the direction fix but felt the shared rotation speed (0.0003
+rad/frame, inherited from the pre-existing `galaxyGroup.rotation.y` rate)
+was too slow to actually read as a spinning galaxy -- ~350 seconds per full
+turn, asked to speed both up, "research if need be."
+
+Flagged honestly rather than pretending there's a researchable "correct"
+speed: a real galaxy's rotation period is on the order of 200-250 million
+years (the Milky Way's own figure), so there's no scientifically accurate
+rate that would ever be visible in a live UI -- this was always going to be
+an artistic choice, not a looked-up one. Bumped it to a period of ~20
+seconds per full turn (0.0052 rad/frame at 60fps), fast enough to clearly
+read as rotation without feeling frantic, and pulled the old duplicated
+`0.0003` literal (previously hardcoded separately at both the galaxy line
+and the icon line -- exactly the kind of duplication that caused the
+speed-mismatch bug two rounds ago) into one shared `GAL_ROT_SPD` constant
+that both `galaxyGroup.rotation.y+=` and `galIconRot-=` now read from, so
+they structurally can't drift apart again if the speed gets tuned further.
+
+Verified via `node --check` (4 blocks, pass), tag-balance (pass), ID-
+existence (271/438, unchanged), and a diff confirming exactly the 3
+intended edits (the new constant + its two call sites). **Not deployed** --
+same `preview.html`-only push as the rest of this session. The actual felt
+speed still needs Tony's own look -- easy to retune further (just the one
+`GAL_ROT_SPD` value) if 20s/turn reads as too fast or too slow once live.
+
+---
+
+### Session 38 (2026-08-17) — hover popup, course-line hover-preview, solid/dashed/red line styling, search by name
+
+Tony sent two real in-game screenshots and asked about three authenticity
+features: a hover popup (name, class/suffix, race/economy/conflict) that
+declutters to name-only when zoomed out; the plotted-course line "expanding"
+toward a hovered destination like the real game's own map; and solid vs
+dotted course lines matching the real game's single-jump-vs-needs-upgrade
+convention. He explicitly asked for examples/limitations before any code
+was touched, and separately shared a YouTube reference plus his own
+research.
+
+Read the real code first (`tryPick`, `drawCourse`, `findRoute`,
+`HYPER_DRIVES`/`canReachColor`, `updateLabels`, `updatePanel`) to ground
+feasibility, confirmed the real game's solid/dashed meaning via Steam
+Community + wiki sources (solid = reachable in one jump, dashed = out of
+range/needs upgrade), and showed a 3-panel mockup before writing anything.
+Tony picked: tap-to-preview on touch for the hover popup, course-preview
+gated to only when the info panel is open ("during Set course"), build all
+3 in one combined pass.
+
+**Hover popup.** New `#hoverPop`, mouse-only (`matchMedia(hover:hover)`),
+raycasts the existing `locInstMesh` picking layer on a throttled
+`pointermove`. Declutters by `cam.dist` exactly like the label system
+already does -- name only past `HOVER_ZOOM_FULL=45`, full stats once zoomed
+in closer.
+
+**Course line styling.** New `courseLineStyle()` -- solid gold (single
+direct jump), dashed gold (multi-hop, every leg reachable), dashed red
+(current drive can't reach the target's star colour at all, an extra state
+beyond the vanilla game's own solid/dashed pair).
+
+**Course-preview hover.** While the info panel is open, hovering a
+candidate draws a straight two-point line + a small `hoverRing`, growing
+outward over ~350ms via a new `updatePreviewAnim(dt)` hooked into
+`animate()`. Deliberately NOT a full `findRoute()`/A* search on every
+hover frame -- the real multi-hop route is still only ever computed when
+Set course is actually clicked.
+
+Verified via `node --check` on all 4 script blocks, tag-balance (`div`
+309/309, `a` 5/5, `button` 81/81), an ID-existence check (275 ids, 452
+calls, 0 missing), and a diff confirming exactly the 11 intended hunks
+changed. One deliberate scope simplification: touch has no hover state at
+all, and tapping a star already opens the full info panel with the same
+data, so no separate touch-specific popup gesture was built.
+
+**Follow-up from live feedback.** Tony tried it and sent 4 more screenshots:
+the hover popup showing plain text tags where the real game uses icons, and
+a course scene with an unconnected gold ring after clicking a star,
+described as "the old plot line remains." Swapped the popup's 3 text
+badges for the exact same icon calls the full info panel already uses
+(`raceIcon()`, `econIcon()`, the crossed-swords `IC_CONFLICT` svg) -- same
+assets, no new art. For the ring: asked what he'd actually clicked rather
+than guess from static screenshots -- he'd just selected Elayand VI. The
+ring was the ordinary `selRing` correctly marking the new selection, not a
+bug; the real thing catching his eye was the *previously plotted course*
+staying visible after selecting a different star, always-intentional
+"Lock navigation target" persistence, just far more noticeable now thanks
+to the new red-dashed styling. Tony's preference, after being offered 3
+options: clicking any star should immediately plot a fresh course to it,
+replacing whatever was there before. Implemented in `tryPick()`'s Local
+branch -- clicking a star now also calls `setCourse()` on it, skipped only
+for your own current location.
+
+**Search by name.** Tony asked if it's worth searching for a system by
+name. Flagged the real limit up front: no reverse index across the whole
+procedural galaxy is feasible -- names are generated *from* the address,
+and the address space is too large to brute-force. Scoped instead to
+systems this browser already has a real name for: community-documented
+systems (`OVERRIDES.systems`, already fetched on page load) plus the
+player's own bookmarks/waypoints/visited history (name decoded on the fly
+via `generateSystem()`). New `bSearch` toolbar button opens a `searchPop`
+box (same click-to-open/outside-click-closes pattern as the accessibility
+popup); `buildSearchIndex()` walks the three pools, deduped by address;
+`runSearch()` ranks starts-with above contains-only, caps at 20 results,
+and shows a plain "No match found" message (per Tony's explicit ask) when
+nothing matches, explaining the scope rather than a blank box.
+
+**Docs pass before pushing.** Per Tony's ask, updated everything a player
+would actually see: the Tour's Local-view step now mentions hovering and
+the line-style convention, plus a new Tour step for Search; the "Set
+course" button's tooltip now explains solid/dashed/red; the About/
+disclaimer modal's "Plotting a hyperdrive course" entry got the same
+line-style explanation plus a new "Search by name" entry; `README.md`'s
+"What it can do" section got two new bullets (hover/line-styling under
+Local view, and Search by name near the glyph keypad) -- no new
+screenshots, since none can be captured from this sandbox.
+
+Verified via `node --check` (3 non-empty blocks pass), tag-balance (`div`
+315/315, `a` 5/5, `button` 82/82), an ID-existence check (0 missing), and a
+diff confirming exactly the intended hunks changed at each step. **Not
+deployed** -- `preview.html`, `README.md`, and this file all need pushing
+together, `data/overrides.json` excluded as always. Every visual element
+here (hover-popup zoom thresholds, the preview line's growth feel, whether
+the 3 line styles read clearly, the search popup's fit on mobile) still
+needs Tony's own device pass, same standing sandbox limitation as always.

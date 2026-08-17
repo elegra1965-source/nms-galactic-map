@@ -218,11 +218,22 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border:none;border-ra
    cyan/gold accent colours that already carry meaning (selection, warnings). */
 #bAccess{width:30px;height:30px;padding:0;border-radius:50%;display:flex;
   align-items:center;justify-content:center;font-size:14px;flex:none}
-#top,#leftcol,#tel,#panel,#course,#modalWrap .modal,#galHud,#accessPop,#keys{
+#top,#leftcol,#tel,#panel,#course,#modalWrap .modal,#galHud,#accessPop,#searchPop,#keys{
   zoom:var(--ui-zoom,1)}
 #accessPop{position:fixed;z-index:36;width:198px;padding:11px 13px;
   top:calc(var(--top-h,60px) + 8px);right:10px;display:none}
 #accessPop.show{display:block}
+#searchPop{position:fixed;z-index:36;width:260px;padding:11px 13px;
+  top:calc(var(--top-h,60px) + 8px);right:10px;display:none;
+  max-height:60vh;overflow-y:auto}
+#searchPop.show{display:block}
+#inSearch{width:100%;box-sizing:border-box;margin-bottom:8px}
+.searchRes{padding:6px 4px;border-top:1px solid var(--border-soft);cursor:pointer}
+.searchRes:first-child{border-top:none}
+.searchRes:hover{background:rgba(0,229,255,0.06)}
+.searchResName{color:var(--gold);font-size:11px;letter-spacing:.04em}
+.searchResMeta{color:var(--text-dim);font-size:9px;letter-spacing:.04em;margin-top:1px}
+.searchEmpty{color:var(--text-faint);font-size:10px;line-height:1.5;padding:4px 0}
 .pillrow{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:9px}
 .pill{font-family:'Orbitron',sans-serif;font-size:8.5px;letter-spacing:.06em;
   padding:5px 7px;border-radius:var(--r-sm);border:1px solid var(--border);
@@ -355,9 +366,11 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   padding:6px 10px;transform:translate(-50%,calc(-100% - 14px));white-space:nowrap}
 .hoverpop .hpName{color:var(--gold);font-size:12px;letter-spacing:.06em;margin:0 0 2px}
 .hoverpop .hpCls{color:var(--cyan);font-size:10px;letter-spacing:.05em;margin:0 0 4px}
-.hoverpop .hpTags{display:flex;gap:4px}
-.hoverpop .hpTag{font-size:9px;letter-spacing:.05em;padding:1px 5px;border-radius:3px;
-  background:rgba(0,229,255,0.12);color:var(--cyan)}
+.hoverpop .hpIcons{display:flex;gap:9px;align-items:center}
+.hoverpop .hpIcons svg{width:15px;height:15px;stroke:currentColor;fill:none;
+  stroke-linecap:round;stroke-linejoin:round}
+.hoverpop .hpIcons .icimg{width:17px;height:17px;object-fit:contain}
+.hoverpop .hpIcons .icimg.tint{width:15px;height:15px}
 #toast{position:fixed;left:50%;top:calc(var(--top-h,60px) + 8px);transform:translateX(-50%);z-index:40;
   font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:.12em;color:var(--gold);
   background:rgba(11,17,25,.95);border:1px solid var(--gold);border-radius:var(--r-sm);
@@ -752,6 +765,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   </div>
   <button class="btn" id="bKeys" title="Open the 16-key portal glyph keypad. Tap glyphs to build an address; it stays in sync with the hex box.">Glyphs</button>
   <button class="btn" id="bRand" title="Roll a random valid portal address and jump there.">Random</button>
+  <button class="btn" id="bSearch" title="Search for a system by name -- only ones you or the community have documented, bookmarked, waypointed or visited, not every procedural system.">Search</button>
   <button class="btn" id="bFiltToggle" title="Show or hide the system filters.">Filters</button>
   <div class="sep"></div>
   <button class="btn on" id="bLbl" title="Show names on the nearest stars, or on planets and moons inside a system. Shortcut: H">Labels</button>
@@ -950,6 +964,12 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     <button class="btn" id="kClear">Clear</button>
     <button class="btn" id="kJump">Jump</button>
   </div>
+</div>
+
+<div class="box" id="searchPop" role="dialog" aria-label="Search by system name">
+  <div class="kicker" id="searchHead" style="margin-bottom:8px">Search by name</div>
+  <input type="text" id="inSearch" placeholder="SYSTEM NAME" spellcheck="false">
+  <div id="searchResults"></div>
 </div>
 
 <div class="box" id="accessPop" role="dialog" aria-label="Accessibility settings">
@@ -1199,7 +1219,11 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     </div>
     <div class="mfld">
       <div class="lb">Plotting a hyperdrive course</div>
-      <div style="font-size:12px;color:var(--text-dim);line-height:1.55"><b>Set course</b> / <b>Lock navigation target</b> plots a real multi-jump route to that system for your current hyperdrive type and range (set in Filters). Every jump always lands on a real charted star, never empty space -- same as the real game -- so the reported jump count is usually a bit above the straight-line distance-divided-by-range number, sometimes noticeably so in sparser patches of space. That's not a bug: a real star is rarely sitting exactly on your bearing at exactly your max range, so routes drift slightly to reach one, and that adds up over a long trip. No Man's Sky itself has no multi-hop route planner at all -- you'd normally do this same star-by-star checking manually, this just does it for you and shows the whole path at once.</div>
+      <div style="font-size:12px;color:var(--text-dim);line-height:1.55"><b>Set course</b> / <b>Lock navigation target</b> plots a real multi-jump route to that system for your current hyperdrive type and range (set in Filters). Every jump always lands on a real charted star, never empty space -- same as the real game -- so the reported jump count is usually a bit above the straight-line distance-divided-by-range number, sometimes noticeably so in sparser patches of space. That's not a bug: a real star is rarely sitting exactly on your bearing at exactly your max range, so routes drift slightly to reach one, and that adds up over a long trip. No Man's Sky itself has no multi-hop route planner at all -- you'd normally do this same star-by-star checking manually, this just does it for you and shows the whole path at once. The line itself matches the real game's own convention: <b>solid</b> means a single jump is enough, <b>dashed</b> means it needs multiple hops, and <b>red-dashed</b> means your current drive can't reach that star's colour at all. Clicking any star while browsing automatically replots the line to it, replacing whatever was there before.</div>
+    </div>
+    <div class="mfld">
+      <div class="lb">Search by name</div>
+      <div style="font-size:12px;color:var(--text-dim);line-height:1.55">The <b>Search</b> button finds a system by name and jumps straight there -- but only among systems that already have a real name attached: anything community-documented via Edit system, plus your own bookmarks, waypoints, and visited history. The rest of the galaxy has no name to search until someone actually names it.</div>
     </div>
     <div class="mfld">
       <div class="lb">Boxes in your way?</div>
@@ -3577,7 +3601,7 @@ function updatePanel(s){
   var cb=document.getElementById("bCourse");
   cb.classList.toggle("off",here);
   cb.title = here ? "This is where you are. Select a different star to plot a course to it."
-    : "Plot a route from where you are to this system. Draws a line on the map and works out distance, bearing and how many hyperdrive jumps it takes.";
+    : "Plot a route from where you are to this system. Draws a line on the map and works out distance, bearing and how many hyperdrive jumps it takes -- solid if it's a single jump, dashed if it needs multiple hops, red-dashed if your current drive can't reach that star's colour at all.";
   setKeypad(s.address);
   updateRings();
 }
@@ -3833,6 +3857,16 @@ function tryPick(cx,cy){
          system, Jump to a plotted course) are the ones that hard-block --
          see their own handlers below. */
       if(!canReachColor(pickedSys.type)) toast(driveNeededMsg(pickedSys.type));
+      /* Tony (2026-08-17): wanted clicking any star to immediately plot a
+         fresh course there, replacing whatever was plotted before, instead
+         of the old line sitting there until a separate "Set course" click.
+         setCourse() already clears+redraws drawCourse() at the start of its
+         own flow, so just calling it here on every click naturally replaces
+         the previous line rather than leaving it stuck on screen. Skipped
+         only when the pick IS your current location -- setCourse() already
+         no-ops with a toast for that case, no need to spam it on every
+         click of your own star. */
+      if(focusSystem&&pickedSys.address!==focusSystem.address) setCourse(pickedSys);
     }
   } else if(mode==="system"){
     var bh=ray.intersectObjects(bodyMeshes.concat(starMeshes).concat(featureMeshes));
@@ -3883,9 +3917,13 @@ function showHoverPop(s,cx,cy){
   var html='<div class="hpName">'+s.name+'</div>';
   if(full){
     html+='<div class="hpCls">'+commas(distanceLY(s))+' LY // '+s.spectral+suffix+'</div>';
-    html+='<div class="hpTags"><span class="hpTag">'+s.race+'</span>'+
-      '<span class="hpTag">'+(s.uncharted?"Uncharted":s.econName)+'</span>'+
-      '<span class="hpTag">'+s.conflict+'</span></div>';
+    /* Reuses the exact same icon calls the full info panel already uses
+       (raceIcon/econIcon/IC_CONFLICT via svg()) instead of plain text tags --
+       Tony's own screenshot of the real game's hover popup shows icons, not
+       words, for these three, and this site already has icon assets for all
+       three built and verified back in earlier sessions -- no new art needed. */
+    html+='<div class="hpIcons" title="'+s.race+' · '+(s.uncharted?"Uncharted":s.econName)+' · '+s.conflict+'">'+
+      raceIcon(s.race)+econIcon(s.econType)+svg(IC_CONFLICT,CONFLICT_COL[s.conTier])+'</div>';
   }
   pop.innerHTML=html;
   pop.style.left=cx+"px"; pop.style.top=cy+"px";
@@ -5213,11 +5251,13 @@ var TOUR_STEPS=[
   {sel:"#mGal",title:"A real 3D galaxy",
     body:"You're looking at one of 256 real No Man's Sky galaxies, generated from a portal address -- not a static image, a galaxy you can actually fly through and zoom into."},
   {sel:"#mLoc",title:"Local view",
-    body:"Local shows the real star field around you. Click any star for its race, economy, conflict and planets, then Enter system for a full 3D orbital view -- or add your own in-game data via Edit system."},
+    body:"Local shows the real star field around you. Hover a star (mouse) for a quick popup, or click for the full panel -- race, economy, conflict, planets. Set course draws a line that's solid for a single jump, dashed for multi-hop, red if your drive can't reach it. Enter system for a full 3D view, or add your own in-game data via Edit system."},
   {sel:"#inAddr",title:"Type an address",
     body:"Paste or type a 12-character portal address here and hit Jump to fly straight to that exact system."},
   {sel:"#bKeys",title:"No address handy?",
     body:"Tap Glyphs to enter the address using the game's own 16 symbols instead of hex -- handy for decoding one off a screenshot."},
+  {sel:"#bSearch",title:"Find it by name",
+    body:"Type a name to jump straight there -- scoped to systems you or the community have actually documented, bookmarked, waypointed or visited, since the full procedural galaxy has no names to search until someone gives it one."},
   {sel:"#bFiltToggle",title:"Narrow what you see",
     body:"Filters can limit the star field by colour, race, economy, or special types like black holes and Atlas interfaces -- plus your hyperdrive type and range, which gates what Set course and Enter system will actually let you reach."},
   {sel:"#bAbout",title:"Worth a read",
@@ -5426,6 +5466,114 @@ applyA11y();
   pop.addEventListener("pointerdown",function(){ pinned=true; });
   document.addEventListener("click",function(e){
     if(pop.classList.contains("show") && !pop.contains(e.target) && e.target!==btn) close();
+  });
+})();
+
+/* ============ search by name (Session 38) ============
+   Can't search the whole procedural galaxy by name -- names are generated
+   FROM the address, there's no reverse index, and the address space is far
+   too large to brute-force search. What IS searchable: every system this
+   browser already knows a real name for -- community-documented systems
+   (fetched into OVERRIDES.systems on page load) plus your own bookmarks/
+   waypoints/visited history (their name decoded fresh from the address via
+   generateSystem(), same as everywhere else in this file). Rebuilt fresh
+   every time the popup opens rather than kept live-updated -- these pools
+   are small, so recomputing on open is cheap and avoids hooking every place
+   a bookmark/waypoint/override can change. */
+function buildSearchIndex(){
+  var idx=[], seen={};
+  function addAddr(addr,hint){
+    if(seen[addr]) return; seen[addr]=true;
+    var a=parseAddress(addr);
+    if(!a) return;
+    var sys=generateSystem(a.x,a.y,a.z,a.idx);
+    idx.push({name:sys.name,address:addr,hint:hint});
+  }
+  var ovKeys=Object.keys(OVERRIDES.systems||{});
+  for(var i=0;i<ovKeys.length;i++){
+    var ov=OVERRIDES.systems[ovKeys[i]];
+    if(ov&&ov.data&&ov.data.name) addAddr(ovKeys[i],"Documented");
+  }
+  function addFromStore(obj,hint){
+    var keys=Object.keys(obj);
+    for(var k=0;k<keys.length;k++){
+      var parts=keys[k].split(":");
+      if(parts.length<2||parseInt(parts[0],10)!==GALAXY) continue;
+      addAddr(parts[1],hint);
+    }
+  }
+  addFromStore(store.marks,"Bookmarked");
+  addFromStore(store.waypoints,"Waypoint");
+  addFromStore(store.visited,"Visited");
+  return idx;
+}
+function runSearch(query){
+  var box=document.getElementById("searchResults");
+  var q=query.trim().toLowerCase();
+  if(!q){
+    box.innerHTML='<div class="searchEmpty">Type a name to search systems you or the community have documented, bookmarked, waypointed or visited.</div>';
+    return;
+  }
+  var idx=buildSearchIndex(), starts=[], contains=[], i;
+  for(i=0;i<idx.length;i++){
+    var p=idx[i].name.toLowerCase().indexOf(q);
+    if(p<0) continue;
+    (p===0?starts:contains).push(idx[i]);
+  }
+  var matches=starts.concat(contains).slice(0,20);
+  if(!matches.length){
+    box.innerHTML='<div class="searchEmpty">No match found -- only names you or the community have actually documented, bookmarked, waypointed or visited are searchable, not every procedural system.</div>';
+    return;
+  }
+  var html="";
+  for(i=0;i<matches.length;i++){
+    var m=matches[i];
+    html+='<div class="searchRes" data-addr="'+m.address+'">'+
+      '<div class="searchResName">'+m.name+'</div>'+
+      '<div class="searchResMeta">'+m.address+' &middot; '+m.hint+'</div></div>';
+  }
+  box.innerHTML=html;
+}
+(function(){
+  var btn=document.getElementById("bSearch"), pop=document.getElementById("searchPop");
+  var inp=document.getElementById("inSearch");
+  function positionUnderSearchBtn(){
+    var r=btn.getBoundingClientRect();
+    var pw=pop.offsetWidth||260;
+    var left=Math.min(window.innerWidth-pw-8,Math.max(8,r.left));
+    var top=r.bottom+8;
+    var badge=document.getElementById("galInfo");
+    if(badge){
+      var br=badge.getBoundingClientRect();
+      if(br.height>0) top=Math.max(top,br.bottom+8);
+    }
+    pop.style.position="fixed";
+    pop.style.left=left+"px"; pop.style.right="auto";
+    pop.style.top=top+"px"; pop.style.bottom="auto";
+  }
+  function openSearch(){
+    pop.classList.add("show");
+    if(!pop.style.left) positionUnderSearchBtn();
+    runSearch(inp.value);
+    inp.focus();
+  }
+  function closeSearch(){ pop.classList.remove("show"); }
+  btn.addEventListener("click",function(e){
+    e.stopPropagation();
+    if(pop.classList.contains("show")) closeSearch(); else openSearch();
+  });
+  document.addEventListener("click",function(e){
+    if(pop.classList.contains("show") && !pop.contains(e.target) && e.target!==btn) closeSearch();
+  });
+  inp.addEventListener("input",function(){ runSearch(inp.value); });
+  document.getElementById("searchResults").addEventListener("click",function(e){
+    var row=e.target.closest?e.target.closest(".searchRes"):null;
+    if(!row) return;
+    var addr=row.getAttribute("data-addr");
+    document.getElementById("inAddr").value=addr;
+    setKeypad(addr);
+    jumpTo(addr);
+    closeSearch();
   });
 })();
 
