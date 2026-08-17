@@ -2092,3 +2092,82 @@ whether the instant reset reads as a clean restart or a jarring snap) still
 needs Tony's own look, same standing sandbox limitation as every visual
 change in this project -- though since he's testing the local file
 directly, his next look should already reflect it.
+
+**Session 38, further rounds -- expansion speed halved twice, then real
+line thickness.** Tony reported the loop's grow animation "too fast",
+asked for half speed -- changed `previewAnimT+=dt/0.35` to `dt/0.7`
+(doubling the grow duration). Reported still slightly too fast, halved
+again to `dt/1.4` (grow now takes ~1.4s, was 350ms originally). Both
+one-line changes, verified via `node --check`/tag-balance/ID-check/diff
+each time.
+
+Then asked for the course/preview line **thickness** to be increased, with
+examples first. Built an SVG mockup (six rows on the app's real dark
+navy/gold palette: 1px/2px/3px/5px/8px solid plus a 4px dashed gold/red
+reference) via the visualize tool so Tony could pick a real width rather
+than guess from a number, and flagged the real technical catch up front:
+Three.js's plain `Line`/`LineDashedMaterial` `linewidth` property is capped
+at 1px on most Windows/Chrome setups -- a WebGL/ANGLE driver restriction,
+not a Three.js setting -- so genuinely visible thickness needs actual
+triangle geometry, not a GL line primitive. Tony picked 3px, applied to
+both the committed course line and the hover-preview line (his choice via
+`AskUserQuestion` over "just one or the other").
+
+Rebuilt both as camera-facing "ribbon" meshes -- a flat strip of 2
+triangles per segment, whose half-width is recomputed from the CURRENT
+camera distance every frame (screen-space-constant width, matching a real
+HUD trace: same apparent pixel thickness whether zoomed in or out, not a
+fixed world size that would look chunky up close and vanish from far
+away). New shared helpers in `preview.html` (placed just before
+`courseLineStyle()`): `_ribbonRight(p0,p1,camPos)` (perpendicular-to-
+segment-and-to-camera unit vector, with a world-up fallback for the
+degenerate case where the camera looks straight down the line's own axis,
+and for zero-length segments -- both verified to produce no NaN);
+`_pxHalfWidth(worldPos,camera,px)` (converts a target screen-pixel width
+into a world half-width using the camera's real FOV and the renderer's
+actual canvas height); `_polylineLerp`/`_dashSegments` (walks real
+cumulative arc length along a multi-point path to chop it into only the
+"on" portions of a dash pattern -- correct across hops of very different
+lengths, unlike a naive per-segment dash reset); `_buildRibbonMesh`/
+`_updateRibbonGeometry` (builds/refreshes the actual quad geometry from a
+segment list).
+
+`drawCourse()` now builds its segments once (dash-chunked via
+`_dashSegments` using the existing 2.4/1.6 gold-dashed pattern, or one
+continuous run for solid) and `animate()`'s render loop calls
+`_updateRibbonGeometry(courseLine)` every frame afterward -- cheap, since
+only the camera-facing width/orientation needs recomputing each frame, not
+the dash chunking itself, which stays fixed once plotted. The hover-preview
+line is cheaper still to just fully rebuild (dispose + recreate) every
+active frame in `updatePreviewAnim()`, since its endpoint is already
+changing every frame during the grow/hold/reset loop anyway -- a new
+`previewStyle` state var (color + solid flag) was added so the rebuild has
+what it needs without re-deriving it. `courseDots` (the intermediate-hop
+waypoint markers) were untouched -- only line thickness was in scope.
+
+Verified thoroughly given no live-rendering is possible from this sandbox:
+`node --check` on all 3 non-empty script blocks (pass), tag-balance (`div`
+316/316, `a` 5/5, `button` 83/83, unchanged), an ID-existence check (0
+missing), a diff confirming exactly 5 intended hunks changed, and -- since
+the geometry math itself genuinely needed checking, not just syntax -- a
+from-scratch Node test harness (extracting all 6 helper functions verbatim
+with a minimal `THREE.Vector3` stub) running 51 assertions: the ribbon's
+right-vector is perpendicular to the segment and unit-length in the normal
+case; both degenerate cases (camera looking straight down the line's axis,
+and a zero-length segment) produce a safe non-NaN fallback rather than a
+collapsed/invisible line; half-width scales exactly linearly with camera
+distance (confirming the screen-space-constant-width math); `_polylineLerp`
+interpolates correctly at the start/mid/end of a simple segment and
+correctly crosses a vertex on a bent 3-point path; `_dashSegments` in solid
+mode returns one segment per original edge unchanged; in dashed mode the
+total "on" length matches the expected dashSize/(dashSize+gapSize) ratio
+within 5% over a long straight path, no dash segment ever exceeds dashSize,
+a bent multi-hop dashed path produces only valid non-NaN segments, and a
+path shorter than one full dash correctly clips to a single partial
+segment instead of crashing; and the built quad geometry is symmetric
+around its source point with genuine nonzero width. All 51 pass.
+**Not deployed** -- same `preview.html` push as the rest of this session.
+The actual on-screen thickness/feel (whether 3px reads right at his usual
+zoom levels, whether the billboard orientation looks correct while
+orbiting or flying around a plotted course) still needs Tony's own look --
+his local file should already reflect it without a deploy.
