@@ -1549,7 +1549,7 @@ var RING_STYLE_BY_BIOME={
   Frozen:"icy",
   Barren:"tan", Lush:"tan", Marsh:"tan",
   Volcanic:"ash", Dead:"ash", Toxic:"ash",
-  Scorched:"gold", Irradiated:"gold", "Mega Exotic":"gold",
+  Scorched:"gold", Radioactive:"gold", "Mega Exotic":"gold",
   Exotic:"split"
 };
 var RING_STYLE_LABEL={icy:"Icy",tan:"Dusty",ash:"Ash",gold:"Golden",split:"Split"};
@@ -1684,13 +1684,19 @@ var BIOMES={
   "Scorched":   {base:"#4a2418",land:["#6b3320","#341a12","#8a4526","#26120c"],sea:"#3a2a1a",cap:"#7a4a2a",water:true, atmo:0xff9a4a,glow:"#ff7b2a", res:["Phosphorus","Solanium","Sulphurine"]},
   "Frozen":     {base:"#c6dced",land:["#e8f4ff","#a9c8dd","#ffffff","#8fb4cc"],sea:"#3f6f8f",cap:"#ffffff",water:true, atmo:0xbfe6ff, res:["Dioxite","Frost Crystal","Radon"]},
   "Toxic":      {base:"#49591f",land:["#6b7a2a","#333f18","#8a9a35","#232c10"],sea:"#3f4a1a",cap:"#9aa86a",water:true, atmo:0xc8ff4a,glow:"#c8ff4a", res:["Ammonia","Fungal Mould","Nitrogen"]},
-  "Irradiated": {base:"#2c5638",land:["#3f7a4a","#1e3f28","#5a9a5a","#16301d"],sea:"#20404a",cap:"#8fbf9a",water:true, atmo:0x7bff8a,glow:"#7bff8a", res:["Uranium","Gamma Root","Radon"]},
+  /* Renamed from "Irradiated" 2026-08-17 -- the NMS wiki's own Biome page
+     lists "Irradiated" as this biome's name, but Tony sent a real photo of
+     his own game's discovery/scan popup showing "Radioactive Planet" as the
+     literal on-screen text -- his own primary save data outranks a
+     secondary wiki reading, so this now matches what a player actually
+     sees rather than the wiki's own internal/community naming. */
+  "Radioactive": {base:"#2c5638",land:["#3f7a4a","#1e3f28","#5a9a5a","#16301d"],sea:"#20404a",cap:"#8fbf9a",water:true, atmo:0x7bff8a,glow:"#7bff8a", res:["Uranium","Gamma Root","Radon"]},
   "Marsh":      {base:"#38473a",land:["#4f6b4a","#2a3a2a","#66805a","#1e2a1e"],sea:"#2f4a4a",cap:"#9aa89a",water:true, atmo:0x9ad8b0, res:null},
   "Volcanic":   {base:"#241a18",land:["#3a2a24","#140f0e","#4a3028","#0d0908"],sea:"#2a1a14",cap:"#5a4a44",water:true, atmo:0xff6a3a,glow:"#ff4a1a", res:null}
 };
 var BIOME_KEYS=Object.keys(BIOMES);
 /* Sourced (nomanssky.fandom.com/wiki/Resource, wiki/Biome, /wiki/System_colours): Lush/Barren/Scorched/
-   Frozen/Toxic/Irradiated have fixed [local element, agricultural, atmospheric] resources; Dead has only
+   Frozen/Toxic/Radioactive have fixed [local element, agricultural, atmospheric] resources; Dead has only
    a local element, no agri/atmo. Exotic/Mega Exotic/Marsh/Volcanic are documented as inconsistent/
    undocumented on the wiki -- res:null rather than guessing. Universal elements can appear on any planet.
    Stellar element is set by the star's colour, confirmed per colour (purple = Quartzite). */
@@ -2133,6 +2139,10 @@ function applyOverride(s){
         fossils:(b.fossils&&b.fossils.length)?b.fossils.slice(0,6):[],
         sentinel:(SENTINEL_LEVELS.indexOf(b.sentinel)>=0)?b.sentinel:"None",
         autophage:!!b.autophage,
+        // "Has base" (2026-08-17, Tony): personal-marker-style field, same
+        // manual-only pattern as autophage/rings -- no procedural rule
+        // exists (or could exist) for where a TRAVELLER'S OWN base sits.
+        base:!!b.base,
         seed:o?o.seed:gseed(s.vx,s.vy,s.vz,(s.idx*57)+i)
       });
       if(!isMoon) lastPlanetIndex=idx1;
@@ -2416,7 +2426,7 @@ function makePlanetTexture(b){
       for(k=0;k<5;k++){ sx+=(r()-0.5)*26; sy+=(r()-0.5)*14; g.lineTo(sx,sy); }
       g.stroke();
     }
-    if(b.biome==="Irradiated"){
+    if(b.biome==="Radioactive"){
       for(i=0;i<14;i++){
         var ax=r()*W, ay=r()*H, arr=3+r()*9;
         g.beginPath(); g.arc(ax,ay,arr,0,Math.PI*1.6); g.stroke();
@@ -3613,7 +3623,7 @@ function fsBodyKey(b){
   // would permanently compare as "edited" even though nothing about that
   // specific body ever changed -- a false-positive green/edited status.
   return JSON.stringify({n:b.name,bi:b.biome,d:b.descriptor||"",w:!!b.water,r:b.ring||false,
-    se:b.sentinel||"None",au:!!b.autophage,ru:(b.resUni||[]).slice().sort(),
+    se:b.sentinel||"None",au:!!b.autophage,ba:!!b.base,ru:(b.resUni||[]).slice().sort(),
     fl:(b.flora||[]).slice().sort(),mi:(b.minerals||[]).slice().sort(),
     sa:(b.salvage||[]).slice().sort(),fo:(b.fossils||[]).slice().sort()});
 }
@@ -3809,6 +3819,7 @@ function showBody(b,s){
   if(b.water) t.push(["hot","Water"]);
   if(b.ring) t.push(["hot",(RING_STYLE_LABEL[b.ring]||"")+" rings"]);
   if(b.autophage) t.push(["hot","Autophage camp"]);
+  if(b.base) t.push(["hot","Has base"]);
   var html="",i;
   for(i=0;i<t.length;i++) html+='<span class="tag '+t[i][0]+'">'+t[i][1]+'</span>';
   document.getElementById("bTags").innerHTML=html;
@@ -5099,7 +5110,12 @@ function renderBodyEditList(){
         '</div>'+
         '<div class="brow2">'+
           '<div class="mfld" style="margin-bottom:0"><div class="lb">Biome</div><select class="bfBiome" data-i="'+i+'">'+opts+'</select></div>'+
-          '<div class="mfld" style="margin-bottom:0"><div class="lb">Descriptor</div><input type="text" class="bfDesc" data-i="'+i+'" maxlength="20" placeholder="e.g. Bountiful" value="'+escAttr(b.descriptor)+'"></div>'+
+          /* maxlength was 20 -- too short for real in-game hazard/weather
+             phrases (Tony hit this typing "Planet-wide Radioactive Storm",
+             30 chars, and got cut off mid-word at "Radiatio"). Bumped to 50,
+             comfortably covers the longest real phrases seen (e.g. "Extreme
+             Sentinel Activity", "Planet-wide Radioactive Storm"). */
+          '<div class="mfld" style="margin-bottom:0"><div class="lb">Descriptor</div><input type="text" class="bfDesc" data-i="'+i+'" maxlength="50" placeholder="e.g. Bountiful" value="'+escAttr(b.descriptor)+'"></div>'+
         '</div>'+
         '<div class="brow2">'+
           '<label class="chk2"><input type="checkbox" class="bfWater" data-i="'+i+'"'+(b.water?" checked":"")+'> Water</label>'+
@@ -5111,6 +5127,9 @@ function renderBodyEditList(){
         // the Orbits dropdown below uses in reverse.
         html+='<label class="chk2"><input type="checkbox" class="bfRing" data-i="'+i+'"'+(b.ring?" checked":"")+'> Has rings</label>';
       }
+      // "Has base" checkbox available on every body (planet or moon) --
+      // unlike rings, a base can genuinely sit on a moon in-game.
+      html+='<label class="chk2"><input type="checkbox" class="bfBase" data-i="'+i+'"'+(b.base?" checked":"")+'> Has base</label>';
       if(b.moon){
         var orbOpts='<option value="">'+(isGiantSys?"The Giant (default)":"Nearest preceding planet (default)")+'</option>';
         for(var p=0;p<editBodies.length;p++){
@@ -5213,6 +5232,7 @@ function openEditModal(){
       fossils:(b.fossils||[]).join(", "),
       sentinel:(SENTINEL_LEVELS.indexOf(b.sentinel)>=0)?b.sentinel:"None",
       autophage:!!b.autophage,
+      base:!!b.base,
       parentPos:b.moon?b.parent:0,
       open:false
     };
@@ -5341,6 +5361,7 @@ document.getElementById("bodyEditList").addEventListener("change",function(e){
   else if(e.target.classList.contains("bfRing")) editBodies[i].ring=e.target.checked;
   else if(e.target.classList.contains("bfBiome")) editBodies[i].biome=e.target.value;
   else if(e.target.classList.contains("bfAutophage")) editBodies[i].autophage=e.target.checked;
+  else if(e.target.classList.contains("bfBase")) editBodies[i].base=e.target.checked;
   else if(e.target.classList.contains("bfSentinel")) editBodies[i].sentinel=e.target.value;
   else if(e.target.classList.contains("bfOrbits")) editBodies[i].orbits=e.target.value;
 });
@@ -5361,7 +5382,7 @@ document.getElementById("edAddBody").addEventListener("click",function(){
   if(editBodies.length>=6){ toast("6 is the limit -- No Man's Sky systems can have at most 6 planets and moons combined."); return; }
   for(var j=0;j<editBodies.length;j++) editBodies[j].open=false;
   editBodies.push({uid:bodyUidSeq++,name:"New body",moon:false,biome:BIOME_KEYS[0],descriptor:"",water:false,
-    resources:"",flora:"",minerals:"",salvage:"",fossils:"",sentinel:"None",autophage:false,orbits:"",open:true});
+    resources:"",flora:"",minerals:"",salvage:"",fossils:"",sentinel:"None",autophage:false,base:false,orbits:"",open:true});
   renderBodyEditList();
   var rows=document.querySelectorAll("#bodyEditList .bodyEdit");
   var last=rows[rows.length-1];
@@ -6082,7 +6103,8 @@ document.getElementById("edSubmit").addEventListener("click",function(){
         salvage:(b.salvage||"").split(",").map(function(x){ return x.trim(); }).filter(Boolean),
         fossils:(b.fossils||"").split(",").map(function(x){ return x.trim(); }).filter(Boolean),
         sentinel:b.sentinel||"None",
-        autophage:!!b.autophage
+        autophage:!!b.autophage,
+        base:!!b.base
       };
     })
   };

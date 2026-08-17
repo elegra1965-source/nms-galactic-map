@@ -27,7 +27,7 @@ const RING_STYLE_BY_BIOME = {
   Frozen: "icy",
   Barren: "tan", Lush: "tan", Marsh: "tan",
   Volcanic: "ash", Dead: "ash", Toxic: "ash",
-  Scorched: "gold", Irradiated: "gold", "Mega Exotic": "gold",
+  Scorched: "gold", Radioactive: "gold", "Mega Exotic": "gold",  // renamed 2026-08-17, see preview.html comment
   Exotic: "split"
 };
 
@@ -245,7 +245,11 @@ export function filterSystemEdit(payload){
     if(!bNameR.ok){ errors.push(bNameR.reason); continue; }
     var biomeR = filterText(b.biome, {maxLen:20, fieldName:"Biome"});
     if(!biomeR.ok){ errors.push(biomeR.reason); continue; }
-    var descR = filterText(b.descriptor, {maxLen:20, fieldName:"Descriptor"});
+    // Bumped 20->50 (2026-08-17, Tony): too short for real in-game hazard/
+    // weather phrases like "Planet-wide Radioactive Storm" -- must match
+    // preview.html's own bfDesc maxlength or the server would still reject/
+    // truncate what the client now happily accepts.
+    var descR = filterText(b.descriptor, {maxLen:50, fieldName:"Descriptor"});
     if(!descR.ok){ errors.push(descR.reason); continue; }
     var resOut = [];
     var res = Array.isArray(b.resources) ? b.resources : [];
@@ -279,7 +283,11 @@ export function filterSystemEdit(payload){
       salvage: resArr(b.salvage,"Salvageable tech"),
       fossils: resArr(b.fossils,"Fossil/curiosity"),
       sentinel: SENTINEL_LEVELS.indexOf(sentinelIn)>=0 ? sentinelIn : "None",
-      autophage: !!b.autophage
+      autophage: !!b.autophage,
+      // "Has base" (2026-08-17, Tony): plain boolean, same manual-only
+      // pattern as autophage above -- no procedural rule for a traveller's
+      // own base placement.
+      base: !!b.base
     });
   }
 

@@ -8,7 +8,9 @@
                          giant, ruins, outlaw, phantom, econName, sell, buy, econDesc, conflict, blackHole, atlas, notes,
                          editorName, editorFriendCode,
                          bodies:[{name, moon, orbits, biome, descriptor, water, ring, resources,
-                                  flora, minerals, salvage, fossils, sentinel, autophage}, ...]}
+                                  flora, minerals, salvage, fossils, sentinel, autophage, base}, ...]}
+                         (base added 2026-08-17 -- "Has base" per-body marker, same manual-only
+                         pattern as autophage.)
                          (ruins added 2026-08-14; phantom was already validated/shown but is only
                          actually persisted as of the same date -- see getCategoryValue's comment.
                          editorName/editorFriendCode added 2026-08-16 -- optional "who documented
