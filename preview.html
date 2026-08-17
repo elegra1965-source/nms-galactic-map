@@ -85,7 +85,7 @@ canvas#c{display:block;position:fixed;inset:0;touch-action:none}
    bugs one at a time: instead of guessing every viewport/orientation combination,
    let him move the boxes himself. touch-action:none stops the browser's own
    scroll/zoom gestures from stealing the pointer before the drag handler sees it. */
-#fHead,.phead,.chead,#a11yHead{cursor:grab;touch-action:none}
+#fHead,.phead,.chead,#a11yHead,.edhead{cursor:grab;touch-action:none}
 .box::before,.box::after{content:'';position:absolute;width:9px;height:9px;pointer-events:none}
 .box::before{top:-1px;right:-1px;border-top:1px solid var(--cyan);border-right:1px solid var(--cyan);border-radius:0 12px 0 0}
 .box::after{bottom:-1px;left:-1px;border-bottom:1px solid var(--cyan);border-left:1px solid var(--cyan);border-radius:0 0 0 12px}
@@ -381,6 +381,16 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 #course.min{width:auto}
 #route-itinerary-card.min #riBody{display:none}
 #route-itinerary-card.min{width:auto}
+/* Edit system, made draggable/collapsible like Filters/Course/Manifest
+   (Tony, 2026-08-17) -- .edhead is the drag handle (title + collapse
+   button), #edBody holds everything else so collapsing just hides the
+   long form and leaves the header visible, same pattern as #course/
+   #route-itinerary-card above. */
+.edhead{display:flex;align-items:flex-start;gap:8px;margin-bottom:2px}
+.edhead>div{flex:1;min-width:0}
+.edhead #bEditMin{margin-left:auto;flex:none;padding:4px 9px;font-size:12px}
+#editModal.min #edBody{display:none}
+#editModal.min{width:auto}
 
 #keys{position:fixed;left:50%;transform:translateX(-50%);bottom:10px;z-index:26;
   width:min(560px,calc(100vw - 20px));padding:10px 12px;display:none}
@@ -1130,8 +1140,14 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 
 <div id="modalWrap">
   <div class="box modal" id="editModal">
-    <h3>Edit system</h3>
-    <div class="msub">Enter your real in-game data. This replaces the generated placeholder for everyone who visits this address, including you if you reload -- there's no undo button on the site itself, but every save is a git commit elegra1965 can revert on GitHub.</div>
+    <div class="edhead" id="edHead">
+      <div>
+        <h3>Edit system</h3>
+        <div class="msub">Enter your real in-game data. This replaces the generated placeholder for everyone who visits this address, including you if you reload -- there's no undo button on the site itself, but every save is a git commit elegra1965 can revert on GitHub.</div>
+      </div>
+      <button class="btn" id="bEditMin" type="button" title="Collapse or expand this form.">&#9662;</button>
+    </div>
+    <div id="edBody">
     <div class="mnotice" id="editPrevNotice"></div>
     <div class="merr" id="editErr"><span class="errTxt"></span><span class="errScan"></span></div>
     <button class="btn" id="edRetry" type="button" style="display:none;margin:-4px 0 10px">Retry save</button>
@@ -1219,6 +1235,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     <div class="modalBtns">
       <button class="btn primary" id="edSubmit">Save</button>
       <button class="btn" id="edCancel">Cancel</button>
+    </div>
     </div>
   </div>
 
@@ -4983,6 +5000,11 @@ document.getElementById("bManifestMin").addEventListener("click",function(e){
   var min=document.getElementById("route-itinerary-card").classList.toggle("min");
   this.innerHTML=min?"&#9656;":"&#9662;";
 });
+document.getElementById("bEditMin").addEventListener("click",function(e){
+  e.stopPropagation();
+  var min=document.getElementById("editModal").classList.toggle("min");
+  this.innerHTML=min?"&#9656;":"&#9662;";
+});
 
 /* ============ draggable boxes ============ */
 /* Filters, the system info panel, and Course plotted can all end up in the
@@ -5034,6 +5056,7 @@ makeDraggable(document.getElementById("panel"),document.querySelector("#panel .p
 makeDraggable(document.getElementById("course"),document.querySelector("#course .chead"));
 makeDraggable(document.getElementById("accessPop"),document.getElementById("a11yHead"));
 makeDraggable(document.getElementById("route-itinerary-card"),document.getElementById("riHead"));
+makeDraggable(document.getElementById("editModal"),document.getElementById("edHead"));
 
 /* ---- route loader + warp manifest helpers (spec item 7) ---- */
 var _logStreamInterval=null;
@@ -5546,6 +5569,8 @@ function openEditModal(){
   collidingAUid=(s.collidingA>=1 && editBodies[s.collidingA-1])?editBodies[s.collidingA-1].uid:"";
   collidingBUid=(s.collidingB>=1 && editBodies[s.collidingB-1])?editBodies[s.collidingB-1].uid:"";
   renderBodyEditList();
+  document.getElementById("editModal").classList.remove("min");
+  document.getElementById("bEditMin").innerHTML="&#9662;";
   document.getElementById("editErr").style.display="none";
   document.getElementById("edRetry").style.display="none";
   hideStatusIcon(document.getElementById("editIconWrap"));
