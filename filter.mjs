@@ -15,8 +15,19 @@ export const BAD_WORDS = [
   "rape","rapist","kike","chink","spic","tranny"
 ];
 
-// Server-side mirror of preview.html's SENTINEL_LEVELS -- keep in sync.
-const SENTINEL_LEVELS = ["None","Low","High","Aggressive","Corrupted"];
+// Server-side mirror of preview.html's SENTINEL_WORDS -- keep in sync.
+// Expanded 2026-08-17 from 5 flat tier names to the real per-tier adjective
+// words (sourced from the NMS wiki's Sentinel page, itself extracted from
+// the game's own localisation files) -- see preview.html's own comment on
+// this same change for the full reasoning, including "Dissonant" (Tony's
+// "Dissonance sentinels") being one of the real Corrupted-tier words.
+const SENTINEL_WORDS = [
+  ["Low","Minimal","Low Security","Limited","Infrequent","Sparse","Isolated","Remote","Irregular Patrols","Spread Thin","Intermittent","Few"],
+  ["Attentive","Enforcing","Frequent","Require Orthodoxy","Require Obedience","Regular Patrols","Unwavering","Observant","Ever-present"],
+  ["Aggressive","Frenzied","High Security","Hostile Patrols","Threatening","Hateful","Zealous","Malicious","Inescapable"],
+  ["Corrupted","Forsaken","Rebellious","Answer To None","Sharded from the Atlas","Dissonant","De-Harmonised"]
+];
+const SENTINEL_LEVELS = ["None"].concat(SENTINEL_WORDS[0],SENTINEL_WORDS[1],SENTINEL_WORDS[2],SENTINEL_WORDS[3]);
 
 // Server-side mirror of preview.html's RING_STYLE_BY_BIOME -- keep in sync.
 // The client only ever sends a boolean "does this body have a ring", never
@@ -27,7 +38,7 @@ const RING_STYLE_BY_BIOME = {
   Frozen: "icy",
   Barren: "tan", Lush: "tan", Marsh: "tan",
   Volcanic: "ash", Dead: "ash", Toxic: "ash",
-  Scorched: "gold", Radioactive: "gold", "Mega Exotic": "gold",  // renamed 2026-08-17, see preview.html comment
+  Scorched: "gold", Radioactive: "gold", Irradiated: "gold", "Mega Exotic": "gold",  // Irradiated kept as an alias, see preview.html comment
   Exotic: "split"
 };
 

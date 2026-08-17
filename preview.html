@@ -1549,7 +1549,7 @@ var RING_STYLE_BY_BIOME={
   Frozen:"icy",
   Barren:"tan", Lush:"tan", Marsh:"tan",
   Volcanic:"ash", Dead:"ash", Toxic:"ash",
-  Scorched:"gold", Radioactive:"gold", "Mega Exotic":"gold",
+  Scorched:"gold", Radioactive:"gold", Irradiated:"gold", "Mega Exotic":"gold",
   Exotic:"split"
 };
 var RING_STYLE_LABEL={icy:"Icy",tan:"Dusty",ash:"Ash",gold:"Golden",split:"Split"};
@@ -1624,8 +1624,35 @@ var IC_BIOME='<circle cx="12" cy="12" r="8.4"/><path d="M3.6 12h16.8M12 3.6c2.7 
 var IC_RES='<path d="M12 3.4 20.2 9l-2.6 11.4H6.4L3.8 9Z"/><path d="M3.8 9h16.4M8.6 9 12 3.4l3.4 5.6M6.4 20.4 8.6 9M17.6 20.4 15.4 9"/>';
 var CONFLICT_COL=["#6bffa8","#f0a500","#ff5a4a"];
 
-var SENTINEL_LEVELS=["None","Low","High","Aggressive","Corrupted"];
-var SENTINEL_COL={None:"#5a6a76",Low:"#6bffa8",High:"#f4a623",Aggressive:"#e2564f",Corrupted:"#b06bff"};
+/* Rebuilt 2026-08-17 (Tony): the dropdown used to only offer the 5 coarse
+   tier NAMES (None/Low/High/Aggressive/Corrupted), but the real game shows
+   a specific ADJECTIVE per scan/discovery, e.g. "Frequent Sentinel
+   Activity" -- Tony flagged that a traveller typing a real word like
+   "Frequent" and not finding it would likely assume the site was missing
+   data rather than realise it's folded into "High". Full word list sourced
+   from the NMS wiki's Sentinel page, itself extracted directly from the
+   game's own NMS_LOC5_ENGLISH.MBIN/NMS_LOC8_ENGLISH.MBIN localisation
+   files by a community researcher (Ertosi) -- same "read the real game
+   data, don't guess" standard as every other decompiled table in this
+   project. Same tier+word-list shape as ECON_S/CONFLICT, reusing the
+   existing tierFromWord() helper to go from a saved word back to its tier
+   for colouring. "Dissonant" (Tony: "Dissonance sentinels are sometimes on
+   Dissonance planets in purple systems") is a real word in this same
+   source table, sitting under Corrupted -- no separate label needed, it's
+   just one more selectable word in that tier like every other. */
+var SENTINEL_TIER_LB=["Low","High","Aggressive","Corrupted"];
+var SENTINEL_WORDS=[
+  ["Low","Minimal","Low Security","Limited","Infrequent","Sparse","Isolated","Remote","Irregular Patrols","Spread Thin","Intermittent","Few"],
+  ["Attentive","Enforcing","Frequent","Require Orthodoxy","Require Obedience","Regular Patrols","Unwavering","Observant","Ever-present"],
+  ["Aggressive","Frenzied","High Security","Hostile Patrols","Threatening","Hateful","Zealous","Malicious","Inescapable"],
+  ["Corrupted","Forsaken","Rebellious","Answer To None","Sharded from the Atlas","Dissonant","De-Harmonised"]
+];
+var SENTINEL_TIER_COL=["#6bffa8","#f4a623","#e2564f","#b06bff"];
+var SENTINEL_ALL_WORDS=["None"].concat(SENTINEL_WORDS[0],SENTINEL_WORDS[1],SENTINEL_WORDS[2],SENTINEL_WORDS[3]);
+function sentinelColor(word){
+  var t=tierFromWord(word,SENTINEL_WORDS);
+  return t===null?"#5a6a76":SENTINEL_TIER_COL[t];
+}
 /* Placeholder icon marks for the newer additions -- original line-art in the
    same style as IC_CONFLICT/IC_UNINHAB above, NOT lifted from the game.
    Tony couldn't grab real in-game screenshots for these right now, so these
@@ -1691,6 +1718,13 @@ var BIOMES={
      secondary wiki reading, so this now matches what a player actually
      sees rather than the wiki's own internal/community naming. */
   "Radioactive": {base:"#2c5638",land:["#3f7a4a","#1e3f28","#5a9a5a","#16301d"],sea:"#20404a",cap:"#8fbf9a",water:true, atmo:0x7bff8a,glow:"#7bff8a", res:["Uranium","Gamma Root","Radon"]},
+  /* Kept as a second selectable entry, not just quietly dropped -- Tony's
+     own screenshot confirmed "Radioactive" is what the in-game scan popup
+     shows, but he asked to keep "Irradiated" too "just in case" (the wiki's
+     own Biome page uses it, and other UI contexts in-game may still show
+     it). Same texture/colour data as Radioactive since it's the same
+     underlying biome. */
+  "Irradiated": {base:"#2c5638",land:["#3f7a4a","#1e3f28","#5a9a5a","#16301d"],sea:"#20404a",cap:"#8fbf9a",water:true, atmo:0x7bff8a,glow:"#7bff8a", res:["Uranium","Gamma Root","Radon"]},
   "Marsh":      {base:"#38473a",land:["#4f6b4a","#2a3a2a","#66805a","#1e2a1e"],sea:"#2f4a4a",cap:"#9aa89a",water:true, atmo:0x9ad8b0, res:null},
   "Volcanic":   {base:"#241a18",land:["#3a2a24","#140f0e","#4a3028","#0d0908"],sea:"#2a1a14",cap:"#5a4a44",water:true, atmo:0xff6a3a,glow:"#ff4a1a", res:null}
 };
@@ -2137,7 +2171,7 @@ function applyOverride(s){
         minerals:(b.minerals&&b.minerals.length)?b.minerals.slice(0,6):[],
         salvage:(b.salvage&&b.salvage.length)?b.salvage.slice(0,6):[],
         fossils:(b.fossils&&b.fossils.length)?b.fossils.slice(0,6):[],
-        sentinel:(SENTINEL_LEVELS.indexOf(b.sentinel)>=0)?b.sentinel:"None",
+        sentinel:(SENTINEL_ALL_WORDS.indexOf(b.sentinel)>=0)?b.sentinel:"None",
         autophage:!!b.autophage,
         // "Has base" (2026-08-17, Tony): personal-marker-style field, same
         // manual-only pattern as autophage/rings -- no procedural rule
@@ -2426,7 +2460,7 @@ function makePlanetTexture(b){
       for(k=0;k<5;k++){ sx+=(r()-0.5)*26; sy+=(r()-0.5)*14; g.lineTo(sx,sy); }
       g.stroke();
     }
-    if(b.biome==="Radioactive"){
+    if(b.biome==="Radioactive"||b.biome==="Irradiated"){
       for(i=0;i<14;i++){
         var ax=r()*W, ay=r()*H, arr=3+r()*9;
         g.beginPath(); g.arc(ax,ay,arr,0,Math.PI*1.6); g.stroke();
@@ -3823,7 +3857,7 @@ function showBody(b,s){
   var html="",i;
   for(i=0;i<t.length;i++) html+='<span class="tag '+t[i][0]+'">'+t[i][1]+'</span>';
   document.getElementById("bTags").innerHTML=html;
-  document.getElementById("icSent").innerHTML=svg(IC_SENTINEL,SENTINEL_COL[b.sentinel]||SENTINEL_COL.None);
+  document.getElementById("icSent").innerHTML=svg(IC_SENTINEL,sentinelColor(b.sentinel));
   document.getElementById("bSent").textContent=(b.sentinel&&b.sentinel!=="None")?(b.sentinel+" Sentinel Activity"):"Not reported";
   document.getElementById("icRes").innerHTML=svg(IC_RES,BIOMES[b.biome].base);
   var bd=BIOMES[b.biome], rlist=[];
@@ -5139,8 +5173,15 @@ function renderBodyEditList(){
         }
         html+='<div class="mfld" style="margin-bottom:0"><div class="lb">Orbits</div><select class="bfOrbits" data-i="'+i+'">'+orbOpts+'</select></div>';
       }
-      var sentOpts="";
-      for(k=0;k<SENTINEL_LEVELS.length;k++) sentOpts+='<option value="'+SENTINEL_LEVELS[k]+'"'+(b.sentinel===SENTINEL_LEVELS[k]?" selected":"")+'>'+SENTINEL_LEVELS[k]+'</option>';
+      var sentOpts='<option value="None"'+((!b.sentinel||b.sentinel==="None")?" selected":"")+'>None</option>';
+      for(k=0;k<SENTINEL_WORDS.length;k++){
+        sentOpts+='<optgroup label="'+SENTINEL_TIER_LB[k]+'">';
+        for(var kw=0;kw<SENTINEL_WORDS[k].length;kw++){
+          var sw=SENTINEL_WORDS[k][kw];
+          sentOpts+='<option value="'+sw+'"'+(b.sentinel===sw?" selected":"")+'>'+sw+'</option>';
+        }
+        sentOpts+='</optgroup>';
+      }
       html+='<div class="mfld" style="margin-bottom:0"><div class="lb">Sentinel activity</div><select class="bfSentinel" data-i="'+i+'">'+sentOpts+'</select></div>'+
         '<div class="mfld" style="margin-bottom:0"><div class="lb">Resources (comma separated)</div><input type="text" class="bfRes" data-i="'+i+'" maxlength="120" value="'+escAttr(b.resources)+'"></div>'+
         '<div class="brow2">'+
@@ -5230,7 +5271,7 @@ function openEditModal(){
       minerals:(b.minerals||[]).join(", "),
       salvage:(b.salvage||[]).join(", "),
       fossils:(b.fossils||[]).join(", "),
-      sentinel:(SENTINEL_LEVELS.indexOf(b.sentinel)>=0)?b.sentinel:"None",
+      sentinel:(SENTINEL_ALL_WORDS.indexOf(b.sentinel)>=0)?b.sentinel:"None",
       autophage:!!b.autophage,
       base:!!b.base,
       parentPos:b.moon?b.parent:0,
