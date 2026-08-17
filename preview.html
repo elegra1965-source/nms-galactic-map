@@ -2395,7 +2395,12 @@ var selRing=null, focusRing=null, hoverRing=null;
    frame rather than a separate timer. */
 var hoverSys=null, hoverPopVisible=false, _hoverRayT=0;
 var previewLine=null, previewTargetAddr=null;
-var previewAnimT=0, previewGrowing=false, previewFromPos=null, previewToPos=null;
+/* Session 38 continued: previewGrowing/previewHoldT drive a looping
+   grow-hold-reset cycle (not a one-shot animation) -- per Tony's ask, the
+   line keeps expanding out to the hovered candidate, holds briefly fully
+   extended, then resets back to the source and grows again, repeating for
+   as long as that candidate stays hovered. See updatePreviewAnim(). */
+var previewAnimT=0, previewGrowing=false, previewHoldT=0, previewFromPos=null, previewToPos=null;
 galaxyGroup.add(nebulaGroup);
 var allSystems=[], shown=[];
 var focus={x:0,y:0,z:0}, focusSystem=null, courseTarget=null;
@@ -3980,29 +3985,46 @@ function startPreviewLine(fromSys,toSys,style){
   hoverRing.position.set(previewToPos.x,previewToPos.y,previewToPos.z);
   hoverRing.material.color.setHex(style.color);
   hoverRing.material.opacity=0; hoverRing.visible=true;
-  previewAnimT=0; previewGrowing=true;
+  previewAnimT=0; previewGrowing=true; previewHoldT=0;
 }
 function clearCoursePreview(){
   if(previewLine){ localGroup.remove(previewLine); previewLine.geometry.dispose(); previewLine.material.dispose(); previewLine=null; }
   hoverRing.visible=false;
-  previewTargetAddr=null; previewGrowing=false; previewFromPos=null; previewToPos=null;
+  previewTargetAddr=null; previewGrowing=false; previewHoldT=0; previewFromPos=null; previewToPos=null;
 }
 /* Called every frame from animate() -- cheap no-op unless a preview is
-   actively growing. ~350ms ease-out, matching the "line expands" behaviour
-   Tony described seeing in the real game's own galaxy map. */
+   active. Per Tony's ask ("expanding needs to be continuous... then start
+   again from current, looping till choice click") this is NOT a one-shot
+   animation -- it loops: ~350ms ease-out grow from the current system out
+   to the hovered candidate, ~300ms holding fully extended, then an instant
+   reset back to zero-length at the source and the grow phase begins again.
+   Repeats indefinitely while the same candidate stays hovered; changing the
+   hover target (startPreviewLine) or clearing it (clearCoursePreview, on
+   mouse-leave or a click) is what actually stops the loop. */
 function updatePreviewAnim(dt){
-  if(!previewGrowing||!previewLine||!previewFromPos||!previewToPos) return;
-  previewAnimT+=dt/0.35; if(previewAnimT>1) previewAnimT=1;
-  var t=1-Math.pow(1-previewAnimT,3);
+  if(!previewLine||!previewFromPos||!previewToPos) return;
   var pos=previewLine.geometry.attributes.position;
-  pos.setXYZ(1,
-    previewFromPos.x+(previewToPos.x-previewFromPos.x)*t,
-    previewFromPos.y+(previewToPos.y-previewFromPos.y)*t,
-    previewFromPos.z+(previewToPos.z-previewFromPos.z)*t);
-  pos.needsUpdate=true;
-  if(previewLine.material.isLineDashedMaterial) previewLine.computeLineDistances();
-  hoverRing.material.opacity=0.85*t;
-  if(previewAnimT>=1) previewGrowing=false;
+  if(previewGrowing){
+    previewAnimT+=dt/0.35;
+    if(previewAnimT>=1){ previewAnimT=1; previewGrowing=false; previewHoldT=0; }
+    var t=1-Math.pow(1-previewAnimT,3);
+    pos.setXYZ(1,
+      previewFromPos.x+(previewToPos.x-previewFromPos.x)*t,
+      previewFromPos.y+(previewToPos.y-previewFromPos.y)*t,
+      previewFromPos.z+(previewToPos.z-previewFromPos.z)*t);
+    pos.needsUpdate=true;
+    if(previewLine.material.isLineDashedMaterial) previewLine.computeLineDistances();
+    hoverRing.material.opacity=0.85*t;
+  }else{
+    previewHoldT+=dt;
+    if(previewHoldT>=0.3){
+      previewAnimT=0; previewGrowing=true;
+      pos.setXYZ(1,previewFromPos.x,previewFromPos.y,previewFromPos.z);
+      pos.needsUpdate=true;
+      if(previewLine.material.isLineDashedMaterial) previewLine.computeLineDistances();
+      hoverRing.material.opacity=0;
+    }
+  }
 }
 canvas.addEventListener("pointermove",handleHoverRay);
 canvas.addEventListener("pointerleave",function(){ hideHoverPop(); clearCoursePreview(); });

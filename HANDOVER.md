@@ -2049,3 +2049,46 @@ missing), and a diff confirming exactly the intended hunks at each step.
 rest of today. Since Tony's testing the local file directly this time, his
 next look should reflect all of this without needing anything deployed
 first.
+
+**Session 38, one more round -- hover-preview line made to loop
+continuously.** Tony confirmed everything above works, but flagged the
+hover-preview line was still a one-shot grow-and-stop, not the continuous
+looping "expanding... then start again from current" behaviour he was
+actually after -- described as: grow from the current system out to the
+hovered candidate, then restart from the source and grow again, repeating
+for as long as you're hovering, stopping only on click. He also attached a
+Word doc ("Expanding line in map.docx") in case it helped. Read it via
+python-docx -- it turned out to be a 2D-canvas HTML demo (click-triggered,
+one-shot line growth with camera tracking), a different tech stack
+(canvas 2D, not Three.js) and a different trigger (click, not hover, and
+not looping) -- not directly usable code, but it confirmed the same
+grow-a-line-toward-a-target technique already built here, just missing the
+loop Tony was now asking for explicitly.
+
+Reworked `updatePreviewAnim()` in `preview.html` from a one-shot "grow to
+t=1 and stop" animation into a real grow-hold-reset loop: ~350ms ease-out
+grow (unchanged growth curve/timing), ~300ms holding fully extended
+(new -- previously it just stopped here), then an instant reset of the
+line back to zero-length at the source and the ring's opacity back to 0,
+immediately re-entering the grow phase -- repeating indefinitely. Added a
+new `previewHoldT` state var (declared alongside the existing
+`previewAnimT`/`previewGrowing`/`previewFromPos`/`previewToPos`) to track
+time spent in the hold phase; reset to 0 in both `startPreviewLine()` (new
+hover target) and `clearCoursePreview()` (mouse leaves, or any click --
+both already call this). The loop naturally stops the moment
+`clearCoursePreview()` runs, exactly matching "looping till choice click."
+No changes needed to `updateCoursePreviewHover()`'s own "already previewing
+this one, don't restart" guard -- that's what stops every mousemove tick
+from resetting the loop while hovering the same star.
+
+Verified via `node --check` on all 3 non-empty script blocks, a tag-balance
+pass (`div` 316/316, `a` 5/5, `button` 83/83, unchanged), an ID-existence
+check (282 unique ids, 456 calls, 0 missing), and a diff confirming exactly
+4 intended hunks changed (the state-var declaration + comment, the two
+`previewHoldT=0` resets, and the rewritten `updatePreviewAnim()` itself) --
+nothing else touched. **Not deployed** -- same `preview.html` push as the
+rest of this session. The actual on-screen feel of the loop (hold duration,
+whether the instant reset reads as a clean restart or a jarring snap) still
+needs Tony's own look, same standing sandbox limitation as every visual
+change in this project -- though since he's testing the local file
+directly, his next look should already reflect it.
