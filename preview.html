@@ -5025,8 +5025,13 @@ function buildEconConflictSelects(){
     "— uncharted / none —");
   buildIconCombo("edEconStr","edEconStrList",
     ECON_S.map(function(arr,i){ return {label:ECON_TIER_LB[i]||("Tier "+i),items:arr,iconHtml:ecoStars(i)}; }));
+  /* Tony noticed (2026-08-17) the info panel's Conflict row shows a real
+     tier-number badge (1/2/3, via conBadge()) but the new dropdown list only
+     had the crossed-swords icon with no number -- adding the exact same
+     .conBadge markup used in the panel so the list reads the same way. */
   buildIconCombo("edConflict","edConflictList",
-    CONFLICT.map(function(arr,i){ return {label:CONFLICT_TIER_LB[i]||("Tier "+i),items:arr,iconHtml:svg(IC_CONFLICT,CONFLICT_COL[i])}; }));
+    CONFLICT.map(function(arr,i){ return {label:CONFLICT_TIER_LB[i]||("Tier "+i),items:arr,
+      iconHtml:svg(IC_CONFLICT,CONFLICT_COL[i])+'<span class="conBadge"><b>'+(i+1)+'</b></span>'}; }));
 }
 buildEconConflictSelects();
 var editStars=[];
