@@ -51,7 +51,20 @@
    all). A real scrollbar only ever shows when content genuinely overflows --
    this doesn't change WHETHER one appears, only makes it look like a
    deliberate part of the UI instead of a jarring stock OS widget when it
-   does. Firefox gets the equivalent via scrollbar-width/scrollbar-color. */
+   does. Firefox gets the equivalent via scrollbar-width/scrollbar-color.
+
+   IMPORTANT, hit repeatedly (#hyperPanel/#tweak/hyperdriveModal/#searchPop):
+   "only shows when content genuinely overflows" is NOT reliably true for
+   plain overflow-y:auto -- a sub-pixel scrollHeight-vs-clientHeight
+   rounding quirk (confirmed live as 181 vs 180) shows this themed
+   scrollbar even when content visibly fits. Any NEW box with a max-height
+   must instead default to overflow-y:hidden, add a .scroll class that sets
+   overflow-y:auto, and toggle it from JS after layout:
+     el.classList.remove("scroll");
+     if(el.scrollHeight>el.clientHeight+1) el.classList.add("scroll");
+   called once when the box opens and again after anything that changes its
+   content height. Copy #searchPop's remeasureScroll() as the reference
+   implementation -- do not re-derive this from scratch again. */
 *{scrollbar-width:thin;scrollbar-color:var(--cyan-dim) rgba(0,0,0,.25)}
 *::-webkit-scrollbar{width:7px;height:7px}
 *::-webkit-scrollbar-track{background:rgba(0,0,0,.25)}
@@ -118,6 +131,29 @@ select{font-family:'Rajdhani',sans-serif;font-size:12px;background:#04070c;color
   border:1px solid var(--border);border-radius:var(--r-sm);padding:5px 6px;outline:none;width:100%}
 #galSel{width:auto;max-width:168px;font-family:'Orbitron',sans-serif;font-size:10px;
   letter-spacing:.06em;color:var(--gold)}
+/* Cosmetic rebuild 2026-08-17 (Tony): Economy/Economy strength/Conflict in
+   Edit system used to be plain native <select> elements -- no browser can
+   render an icon inside an <option>, so getting the same per-choice icons
+   Tony wanted (matching the info panel's own race/economy/conflict icons)
+   meant swapping all 3 for a small custom pop-open list instead. Anchored
+   under its own field (position:relative wrapper) rather than floating
+   over the whole viewport like #searchPop/#accessPop, since this lives
+   inside the already-scrollable Edit system modal. */
+.icombo{position:relative}
+.icomboList{position:absolute;left:0;right:0;top:100%;margin-top:4px;z-index:20;
+  background:rgba(11,17,25,.98);border:1px solid var(--border);border-radius:var(--r-sm);
+  max-height:200px;overflow-y:auto;display:none;padding:4px 0}
+.icomboList.show{display:block}
+.icomboGrp{font-size:9px;letter-spacing:.12em;color:var(--text-faint);text-transform:uppercase;
+  padding:6px 10px 3px}
+.icomboOpt{display:flex;align-items:center;gap:8px;padding:5px 10px;cursor:pointer;
+  font-size:11.5px;color:var(--text)}
+.icomboOpt:hover{background:rgba(0,229,255,0.08)}
+.icomboOpt svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-linecap:round;
+  stroke-linejoin:round;flex:none}
+.icomboOpt .icimg{width:15px;height:15px;object-fit:contain;flex:none}
+.icomboOpt .icimg.tint{width:13px;height:13px}
+.icomboEmpty{padding:8px 10px;color:var(--text-faint);font-size:10.5px}
 
 /* Telemetry and Rendering tuning (below) are debug/power-user tools, not
    meant for regular visitors -- per Tony's own call, both are hidden
@@ -380,6 +416,14 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   stroke-linecap:round;stroke-linejoin:round}
 .hoverpop .hpIcons .icimg{width:24px;height:24px;object-fit:contain}
 .hoverpop .hpIcons .icimg.tint{width:21px;height:21px}
+.hoverpop .hpDetail{margin-top:4px}
+.hoverpop .hpRow{display:flex;align-items:center;gap:7px;margin-top:4px}
+.hoverpop .hpRow svg{width:16px;height:16px;stroke:currentColor;fill:none;
+  stroke-linecap:round;stroke-linejoin:round;flex:none}
+.hoverpop .hpRow .icimg{width:17px;height:17px;object-fit:contain;flex:none}
+.hoverpop .hpRow .icimg.tint{width:15px;height:15px}
+.hoverpop .hpLbl{color:var(--text);font-size:11px;letter-spacing:.03em}
+.hoverpop .hpSub{color:var(--text-dim);font-size:9px;letter-spacing:.02em;margin:1px 0 0 23px}
 #toast{position:fixed;left:50%;top:calc(var(--top-h,60px) + 8px);transform:translateX(-50%);z-index:40;
   font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:.12em;color:var(--gold);
   background:rgba(11,17,25,.95);border:1px solid var(--gold);border-radius:var(--r-sm);
@@ -1096,13 +1140,28 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
         <option value="Uninhabited">Uninhabited</option>
       </select>
     </div>
-    <div class="mfld"><div class="lb">Economy</div><select id="edEcon"></select></div>
+    <div class="mfld"><div class="lb">Economy</div>
+      <div class="icombo" id="edEconCombo">
+        <input type="text" id="edEcon" class="icomboInput" placeholder="Uncharted / none -- type to search" autocomplete="off" spellcheck="false">
+        <div class="icomboList" id="edEconList"></div>
+      </div>
+    </div>
     <div class="mfld" style="display:flex;gap:8px">
       <div style="flex:1"><div class="lb">Sell %</div><input type="text" id="edSell" maxlength="10" inputmode="decimal" placeholder="e.g. 71.5"></div>
       <div style="flex:1"><div class="lb">Buy %</div><input type="text" id="edBuy" maxlength="10" inputmode="decimal" placeholder="e.g. -15.7"></div>
     </div>
-    <div class="mfld"><div class="lb">Economy strength</div><select id="edEconStr"></select></div>
-    <div class="mfld"><div class="lb">Conflict level</div><select id="edConflict"></select></div>
+    <div class="mfld"><div class="lb">Economy strength</div>
+      <div class="icombo" id="edEconStrCombo">
+        <input type="text" id="edEconStr" class="icomboInput" placeholder="Type to search" autocomplete="off" spellcheck="false">
+        <div class="icomboList" id="edEconStrList"></div>
+      </div>
+    </div>
+    <div class="mfld"><div class="lb">Conflict level</div>
+      <div class="icombo" id="edConflictCombo">
+        <input type="text" id="edConflict" class="icomboInput" placeholder="Type to search" autocomplete="off" spellcheck="false">
+        <div class="icomboList" id="edConflictList"></div>
+      </div>
+    </div>
     <div class="mfld"><div class="lb">Special features</div>
       <label class="chk"><input type="checkbox" id="edBH"> Black hole present</label>
       <label class="chk"><input type="checkbox" id="edAtlas"> Atlas station present</label>
@@ -4028,12 +4087,19 @@ function showHoverPop(s,cx,cy){
   if(full){
     html+='<div class="hpCls">'+commas(distanceLY(s))+' LY // '+s.spectral+suffix+'</div>';
     /* Reuses the exact same icon calls the full info panel already uses
-       (raceIcon/econIcon/IC_CONFLICT via svg()) instead of plain text tags --
-       Tony's own screenshot of the real game's hover popup shows icons, not
-       words, for these three, and this site already has icon assets for all
-       three built and verified back in earlier sessions -- no new art needed. */
-    html+='<div class="hpIcons" title="'+s.race+' · '+(s.uncharted?"Uncharted":s.econName)+' · '+s.conflict+'">'+
-      raceIcon(s.race)+econIcon(s.econType)+svg(IC_CONFLICT,CONFLICT_COL[s.conTier])+'</div>';
+       (raceIcon/econIcon/IC_CONFLICT via svg()) PLUS the real Sell/Buy/
+       strength line and the conflict-tier word, matching the real game's
+       own hover popup -- Tony's screenshot (2026-08-17) showed race/
+       economy/conflict as full labelled rows with real text visible, not
+       icons hidden behind a hover tooltip like the first pass here had.
+       Reuses the exact same s.sell/s.buy/s.econDesc/s.conflict fields the
+       full info panel already displays at pEcoSub/pCon -- no new data. */
+    html+='<div class="hpDetail">'+
+      '<div class="hpRow">'+raceIcon(s.race)+'<span class="hpLbl">'+s.race+'</span></div>'+
+      '<div class="hpRow">'+econIcon(s.econType)+'<span class="hpLbl">'+(s.uncharted?"Uncharted":s.econName)+'</span></div>'+
+      (s.uncharted?'':'<div class="hpSub">Sell: '+s.sell+'% Buy: '+s.buy+'% // '+s.econDesc+'</div>')+
+      '<div class="hpRow">'+svg(IC_CONFLICT,CONFLICT_COL[s.conTier])+'<span class="hpLbl">'+s.conflict+'</span></div>'+
+      '</div>';
   }
   pop.innerHTML=html;
   pop.style.left=cx+"px"; pop.style.top=cy+"px";
@@ -4882,43 +4948,85 @@ function escAttr(s){
    than a text box a traveller has to type an exact match into by hand. */
 var CONFLICT_TIER_LB=["Low","Medium","High"];
 var ECON_TIER_LB=["Poor","Average","Good"];
+/* Cosmetic rebuild 2026-08-17 (Tony): replaces the 3 native <select>
+   elements above with a small icon+search combo, built once here as a
+   generic helper and reused for all 3 fields. A native <select> can't show
+   an icon inside an <option> in any browser, so getting the same icon-per-
+   choice look Tony wanted (matching the info panel's own icons) requires a
+   custom pop-open list; Tony also asked for type-to-filter, so the same
+   text box that displays/holds the current value doubles as a live search
+   box -- same interaction already proven by the Search-by-name popup
+   (#searchPop) elsewhere in this file, just anchored under its own field
+   instead of floating over the whole viewport. The input's own .value IS
+   the saved field (same as the old select's .value) so every downstream
+   read (openEditModal, validateEdit, the save payload) needed zero changes. */
+function buildIconCombo(inputId,listId,groups,blankLabel){
+  var inp=document.getElementById(inputId), list=document.getElementById(listId);
+  var items=[], i, j;
+  if(blankLabel) items.push({label:"",display:blankLabel,groupLabel:null,iconHtml:svg(IC_UNINHAB)});
+  for(i=0;i<groups.length;i++){
+    var g=groups[i];
+    for(j=0;j<g.items.length;j++){
+      items.push({label:g.items[j],display:g.items[j],groupLabel:g.label,iconHtml:g.iconHtml});
+    }
+  }
+  var lastCommitted=inp.value||"";
+  function render(filterText){
+    var q=(filterText||"").trim().toLowerCase(), html="", lastGrp, shown=0, k, it;
+    for(k=0;k<items.length;k++){
+      it=items[k];
+      if(q && it.display.toLowerCase().indexOf(q)<0) continue;
+      if(it.groupLabel!==lastGrp){
+        if(it.groupLabel) html+='<div class="icomboGrp">'+escAttr(it.groupLabel)+'</div>';
+        lastGrp=it.groupLabel;
+      }
+      html+='<div class="icomboOpt" data-val="'+escAttr(it.label)+'">'+it.iconHtml+
+        '<span>'+escAttr(it.display)+'</span></div>';
+      shown++;
+    }
+    list.innerHTML=shown?html:'<div class="icomboEmpty">No match</div>';
+  }
+  inp.addEventListener("focus",function(){ lastCommitted=inp.value; render(""); list.classList.add("show"); });
+  inp.addEventListener("input",function(){ render(inp.value); list.classList.add("show"); });
+  inp.addEventListener("keydown",function(e){
+    if(e.key==="Escape"){ list.classList.remove("show"); inp.blur(); }
+    else if(e.key==="Enter"){
+      var first=list.querySelector(".icomboOpt");
+      if(first){ inp.value=first.getAttribute("data-val"); lastCommitted=inp.value; list.classList.remove("show"); e.preventDefault(); }
+    }
+  });
+  list.addEventListener("mousedown",function(e){
+    var row=e.target.closest?e.target.closest(".icomboOpt"):null;
+    if(!row) return;
+    inp.value=row.getAttribute("data-val"); lastCommitted=inp.value;
+    list.classList.remove("show");
+  });
+  inp.addEventListener("blur",function(){
+    /* Deliberate typo guard: since typed text now goes straight into the
+       real saved field, a partial/misspelled entry left uncommitted (no
+       click, no Enter) would otherwise submit garbage to a field the site
+       and filter.mjs both treat as a fixed word list -- so on blur, only
+       keep the typed text if it exactly matches a real option (or is blank
+       and blank is allowed), otherwise snap back to whatever was valid
+       before this focus. setTimeout lets a mousedown selection above land
+       first (mousedown fires before this blur). */
+    setTimeout(function(){
+      var v=inp.value.trim();
+      var valid = v==="" ? !!blankLabel : items.some(function(it2){ return it2.label===v; });
+      inp.value = valid ? inp.value : lastCommitted;
+      if(valid) lastCommitted=inp.value;
+      list.classList.remove("show");
+    },120);
+  });
+}
 function buildEconConflictSelects(){
-  var econSel=document.getElementById("edEcon"), i,j;
-  var blank=document.createElement("option");
-  blank.value=""; blank.textContent="— uncharted / none —";
-  econSel.appendChild(blank);
-  for(i=0;i<ECON.length;i++){
-    var grp=document.createElement("optgroup");
-    grp.label=ECON[i][0];
-    for(j=0;j<ECON[i][1].length;j++){
-      var opt=document.createElement("option");
-      opt.value=ECON[i][1][j]; opt.textContent=ECON[i][1][j];
-      grp.appendChild(opt);
-    }
-    econSel.appendChild(grp);
-  }
-  var econStrSel=document.getElementById("edEconStr");
-  for(i=0;i<ECON_S.length;i++){
-    var sgrp=document.createElement("optgroup");
-    sgrp.label=ECON_TIER_LB[i]||("Tier "+i);
-    for(j=0;j<ECON_S[i].length;j++){
-      var sopt=document.createElement("option");
-      sopt.value=ECON_S[i][j]; sopt.textContent=ECON_S[i][j];
-      sgrp.appendChild(sopt);
-    }
-    econStrSel.appendChild(sgrp);
-  }
-  var conSel=document.getElementById("edConflict");
-  for(i=0;i<CONFLICT.length;i++){
-    var cgrp=document.createElement("optgroup");
-    cgrp.label=CONFLICT_TIER_LB[i]||("Tier "+i);
-    for(j=0;j<CONFLICT[i].length;j++){
-      var copt=document.createElement("option");
-      copt.value=CONFLICT[i][j]; copt.textContent=CONFLICT[i][j];
-      cgrp.appendChild(copt);
-    }
-    conSel.appendChild(cgrp);
-  }
+  buildIconCombo("edEcon","edEconList",
+    ECON.map(function(g){ return {label:g[0],items:g[1],iconHtml:econIcon(g[0])}; }),
+    "— uncharted / none —");
+  buildIconCombo("edEconStr","edEconStrList",
+    ECON_S.map(function(arr,i){ return {label:ECON_TIER_LB[i]||("Tier "+i),items:arr,iconHtml:ecoStars(i)}; }));
+  buildIconCombo("edConflict","edConflictList",
+    CONFLICT.map(function(arr,i){ return {label:CONFLICT_TIER_LB[i]||("Tier "+i),items:arr,iconHtml:svg(IC_CONFLICT,CONFLICT_COL[i])}; }));
 }
 buildEconConflictSelects();
 var editStars=[];
