@@ -3596,16 +3596,29 @@ function buildFeature(s,kind,pos){
    since only someone who actually saw the collision in-game can know which
    pair it is; a geometric guess can miss the real pair or flag one that
    isn't actually colliding on screen.
-   Given that exact pair, this unconditionally pulls them to a clean
-   binary-pair touch (see Tony's Ibaraohu reference screenshot) -- pulls them
-   together if the default orbit layout left them apart, or apart if it left
-   them overlapping -- rather than only acting when a measured distance
-   happens to cross a threshold. Only ever nudges mesh.position (and its
-   moonAnchor, so any moons ride along with their parent) -- never touches
-   userData.body -- so each planet keeps its own separate name/biome/
-   resources; nothing is merged or removed. Runs after the full body loop
-   below so every pivot's final rotation is already applied and world
-   positions are accurate. */
+   Real bug found 2026-08-17 (Tony's screenshot vs. his Ibaraohu reference):
+   the original version here only nudged each planet's mesh.position ONCE,
+   right after the scene finished building -- but every planet still orbits
+   on its OWN independent pivot at its OWN independent speed (pivots[].sp is
+   planetIdx-dependent, outer planets orbit slower), so the two planets
+   separated again the very next animation frame. A "collision" that only
+   ever looked right for a single frame wasn't a fix -- confirmed exactly
+   this by reading animate()'s per-frame `pivots[i].p.rotation.y+=...` loop,
+   which has no idea two pivots are supposed to move together.
+   Rewritten to actually JOIN planet B onto planet A's pivot instead of just
+   repositioning it: B's own pivot (and the circular orbit-path ring drawn
+   on it, and B's own entry in the module-level pivots[] array) is removed
+   from the scene entirely, and B's mesh -- plus its atmosphere shell if it
+   has one, plus its moonAnchor (carrying along any of B's OWN moons,
+   unchanged) -- is reparented as a child of A's pivot at a fixed touching
+   offset. Since both planets now hang off the exact same pivot, A's single
+   rotation.y drives both forever -- they stay touching permanently, the
+   same way a planet and its own moon already do in this scene, instead of
+   drifting apart after the first frame. Never touches userData.body on
+   either planet, so each still keeps its own separate name/biome/
+   resources -- nothing is merged or removed, purely how the two meshes are
+   parented and positioned in the 3D scene. Runs after the full body loop
+   below so every planetEntries size/mesh reference is already built. */
 function resolvePlanetCollisions(planetEntries,idxA,idxB){
   if(!idxA||!idxB||idxA===idxB) return;
   var a=null,b=null,i;
@@ -3614,21 +3627,34 @@ function resolvePlanetCollisions(planetEntries,idxA,idxB){
     if(planetEntries[i].index===idxB) b=planetEntries[i];
   }
   if(!a||!b) return; // one or both picks no longer exist (e.g. body removed since last save)
-  var _wa=new THREE.Vector3(), _wb=new THREE.Vector3(), _dir=new THREE.Vector3();
-  a.mesh.getWorldPosition(_wa);
-  b.mesh.getWorldPosition(_wb);
-  var dist=_wa.distanceTo(_wb);
-  var minDist=a.size+b.size+0.4; // small gap so they touch, not fuse
-  var half=(minDist-dist)/2;
-  if(dist<1e-4){ _dir.set(1,0,0); } else { _dir.copy(_wb).sub(_wa).normalize(); }
-  var newWa=_wa.clone().addScaledVector(_dir,-half);
-  var newWb=_wb.clone().addScaledVector(_dir,half);
-  a.pivot.worldToLocal(newWa);
-  b.pivot.worldToLocal(newWb);
-  a.mesh.position.copy(newWa);
-  b.mesh.position.copy(newWb);
-  if(a.moonAnchor) a.moonAnchor.position.copy(a.mesh.position);
-  if(b.moonAnchor) b.moonAnchor.position.copy(b.mesh.position);
+
+  // B no longer orbits independently -- drop its pivot (and the orbit-path
+  // ring + anything else still only attached to that pivot) from the
+  // scene, and drop its entry from pivots[] so animate() isn't still
+  // spinning a pivot nothing renders from any more.
+  systemGroup.remove(b.pivot);
+  for(i=pivots.length-1;i>=0;i--){ if(pivots[i].p===b.pivot) pivots.splice(i,1); }
+  // B's own orbital pivot is gone, but it should still spin gently on its
+  // own axis like every other planet -- give it a throwaway Object3D that's
+  // never added to the scene as a harmless stand-in "pivot" (its
+  // rotation.y ticks up doing nothing) purely so animate()'s existing
+  // per-pivots-entry loop keeps applying B's own axial spin without any
+  // special-casing there.
+  pivots.push({p:new THREE.Object3D(),sp:0,mesh:b.mesh,spin:b.spin});
+
+  // Fixed offset in A's own local space -- a sideways-and-back diagonal
+  // (not pure X) so the pair reads as two spheres genuinely resting against
+  // each other from most camera angles, like the reference screenshot,
+  // rather than lined up dead-centre on the same orbital ring. +0.4 is a
+  // small visible gap so they touch, not fuse into one mesh.
+  var dist=a.size+b.size+0.4;
+  var dir=new THREE.Vector3(0.82,-0.22,0.53).normalize();
+  var newPos=a.mesh.position.clone().addScaledVector(dir,dist);
+
+  a.pivot.add(b.mesh);
+  b.mesh.position.copy(newPos);
+  if(b.atmo){ a.pivot.add(b.atmo); b.atmo.position.copy(newPos); }
+  if(b.moonAnchor){ a.pivot.add(b.moonAnchor); b.moonAnchor.position.copy(newPos); }
 }
 function buildSystemView(s){
   while(systemGroup.children.length){
@@ -3719,7 +3745,7 @@ function buildSystemView(s){
       pivot.add(moonAnchor);
       moonAnchorSize=b.size;
       moonIdx=0;
-      planetEntries.push({pivot:pivot,mesh:mesh,size:b.size,moonAnchor:moonAnchor,index:b.index});
+      planetEntries.push({pivot:pivot,mesh:mesh,size:b.size,moonAnchor:moonAnchor,index:b.index,atmo:atmo});
       planetIdx++;
     } else if(moonAnchor){
       var mR=moonAnchorSize+b.size*1.9+moonIdx*1.5+1.4;
