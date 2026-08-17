@@ -683,13 +683,160 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "12ED2B6869C6": {
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Ureshibar",
+        "race": "Vy'keen",
+        "region": "Mejsaguerr",
+        "starClass": "F5",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Construction",
+        "sell": "42.3",
+        "buy": "-15.0",
+        "econDesc": "Medium Supply",
+        "conflict": "Medium",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "phantom": "",
+        "notes": "",
+        "bodies": [
+          {
+            "name": "Hexhill",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Scorched",
+            "descriptor": "",
+            "water": false,
+            "ring": false,
+            "resources": [
+              "Magnetised Ferrite"
+            ],
+            "flora": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "None",
+            "autophage": false
+          },
+          {
+            "name": "Zehao XVII",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Toxic",
+            "descriptor": "",
+            "water": true,
+            "ring": "ash",
+            "resources": [
+              "Magnetised Ferrite"
+            ],
+            "flora": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "None",
+            "autophage": false
+          },
+          {
+            "name": "Hyiblost",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Irradiated",
+            "descriptor": "",
+            "water": true,
+            "ring": false,
+            "resources": [
+              "Gold",
+              "Cobalt"
+            ],
+            "flora": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "None",
+            "autophage": false
+          },
+          {
+            "name": "Guisi Gamma",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Dead",
+            "descriptor": "",
+            "water": false,
+            "ring": "ash",
+            "resources": [
+              "Sodium",
+              "Silver"
+            ],
+            "flora": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "None",
+            "autophage": false
+          },
+          {
+            "name": "Utsug 27/I7",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Scorched",
+            "descriptor": "",
+            "water": false,
+            "ring": false,
+            "resources": [
+              "Salt",
+              "Magnetised Ferrite"
+            ],
+            "flora": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "None",
+            "autophage": false
+          },
+          {
+            "name": "Irrhegem B9",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Barren",
+            "descriptor": "",
+            "water": false,
+            "ring": false,
+            "resources": [
+              "Cobalt",
+              "Gold"
+            ],
+            "flora": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "None",
+            "autophage": false
+          }
+        ]
+      },
+      "editedAt": "2026-08-17T17:53:31.622Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-08-17T17:53:31.622Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1786973786036,
-      1786974256756
+      1786989211622
     ]
   },
   "flagLog": {}
