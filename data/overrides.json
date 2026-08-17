@@ -465,7 +465,7 @@
         "sell": "71.5",
         "buy": "-15.7",
         "econDesc": "Medium Supply",
-        "conflict": "Pirate Controlled",
+        "conflict": "Alarming",
         "blackHole": false,
         "atlas": false,
         "ruins": false,
@@ -586,7 +586,7 @@
           }
         ]
       },
-      "editedAt": "2026-08-17T10:49:35.094Z",
+      "editedAt": "2026-08-17T10:49:58.709Z",
       "editedByIp": "5.133.46.24",
       "history": [
         {
@@ -624,6 +624,10 @@
         {
           "at": "2026-08-17T10:49:35.094Z",
           "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-08-17T10:49:58.709Z",
+          "text": "edited by a traveller"
         }
       ]
     }
@@ -635,7 +639,8 @@
       1786963321937,
       1786963364805,
       1786963759741,
-      1786963775094
+      1786963775094,
+      1786963798709
     ]
   },
   "flagLog": {}
