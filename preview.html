@@ -5242,7 +5242,7 @@ function openEditModal(){
   var prevNotice=document.getElementById("editPrevNotice");
   if(s.override){
     var prevBy=s.editorName?(" by "+s.editorName):" by another traveller";
-    prevNotice.textContent='Currently saved as "'+(s.name||"Unnamed")+'" -- submitted '+relTime(s.overrideAt)+prevBy+'. Saving will replace it for everyone.';
+    prevNotice.textContent='Currently saved as "'+(s.name||"Unnamed")+'" -- submitted '+relTime(s.overrideAt)+prevBy+'. Saving will replace it for everyone. If this doesn\'t look right, use Report in the system panel instead of overwriting it.';
     prevNotice.style.display="block";
   } else {
     prevNotice.style.display="none";
