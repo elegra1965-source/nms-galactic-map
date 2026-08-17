@@ -458,7 +458,7 @@
         "stars": [
           "yellow"
         ],
-        "water": false,
+        "water": true,
         "dissonant": false,
         "giant": false,
         "econName": "Scientific",
@@ -476,17 +476,24 @@
             "name": "Naupac Minor",
             "moon": false,
             "orbits": 0,
-            "biome": "Barren",
-            "descriptor": "",
+            "biome": "Radioactive",
+            "descriptor": "Radioactive storms",
             "water": true,
             "ring": "tan",
             "resources": [
               "Salt",
-              "Cobalt"
+              "Gamma Roots"
             ],
-            "flora": [],
-            "minerals": [],
-            "salvage": [],
+            "flora": [
+              "Fair"
+            ],
+            "minerals": [
+              "Uranium",
+              "Activated Copper"
+            ],
+            "salvage": [
+              "Salvageable scrap"
+            ],
             "fossils": [],
             "sentinel": "None",
             "autophage": false
@@ -495,16 +502,21 @@
             "name": "Ayne",
             "moon": false,
             "orbits": 0,
-            "biome": "Volcanic",
-            "descriptor": "",
+            "biome": "Hemal",
+            "descriptor": "Raging snowstorms",
             "water": true,
             "ring": false,
             "resources": [
-              "Silver",
-              "Salt"
+              "Frost Crystals"
             ],
-            "flora": [],
-            "minerals": [],
+            "flora": [
+              "Full"
+            ],
+            "minerals": [
+              "Silver",
+              "Dioxide",
+              "Cooper"
+            ],
             "salvage": [],
             "fossils": [],
             "sentinel": "None",
@@ -514,16 +526,19 @@
             "name": "Anmar XIII",
             "moon": false,
             "orbits": 0,
-            "biome": "Irradiated",
-            "descriptor": "",
+            "biome": "Life-Incompatable",
+            "descriptor": "Airless",
             "water": false,
             "ring": false,
-            "resources": [
-              "Magnetised Ferrite",
-              "Silver"
+            "resources": [],
+            "flora": [
+              "Absent"
             ],
-            "flora": [],
-            "minerals": [],
+            "minerals": [
+              "Salt",
+              "Rusted Metal",
+              "Copper"
+            ],
             "salvage": [],
             "fossils": [],
             "sentinel": "None",
@@ -533,35 +548,48 @@
             "name": "Tanh",
             "moon": false,
             "orbits": 0,
-            "biome": "Lush",
-            "descriptor": "",
+            "biome": "Boutiful",
+            "descriptor": "Mostly Calm",
             "water": true,
-            "ring": false,
+            "ring": "tan",
             "resources": [
-              "Gold"
+              "Star Bulbs"
             ],
-            "flora": [],
-            "minerals": [],
+            "flora": [
+              "Full"
+            ],
+            "minerals": [
+              "Cobolt",
+              "Copper",
+              "Paraffinium"
+            ],
             "salvage": [],
             "fossils": [],
-            "sentinel": "None",
+            "sentinel": "Low",
             "autophage": false
           },
           {
             "name": "Sayab 94/B2",
             "moon": false,
             "orbits": 0,
-            "biome": "Irradiated",
-            "descriptor": "",
+            "biome": "Frozen",
+            "descriptor": "Freezing",
             "water": true,
             "ring": false,
             "resources": [
-              "Silver",
-              "Gold"
+              "Frost Crystals"
             ],
-            "flora": [],
-            "minerals": [],
-            "salvage": [],
+            "flora": [
+              "Ample"
+            ],
+            "minerals": [
+              "Salt",
+              "Dioxide",
+              "Copper"
+            ],
+            "salvage": [
+              "Salvageable Scrap"
+            ],
             "fossils": [],
             "sentinel": "None",
             "autophage": false
@@ -570,15 +598,21 @@
             "name": "Fave",
             "moon": false,
             "orbits": 0,
-            "biome": "Barren",
-            "descriptor": "",
+            "biome": "Arid",
+            "descriptor": "Self-Igniting Storms",
             "water": true,
             "ring": false,
             "resources": [
-              "Salt"
+              "Solanium"
             ],
-            "flora": [],
-            "minerals": [],
+            "flora": [
+              "Copious"
+            ],
+            "minerals": [
+              "Magnatised Ferrite",
+              "Phosphorus",
+              "Activated Copper"
+            ],
             "salvage": [],
             "fossils": [],
             "sentinel": "None",
@@ -586,7 +620,7 @@
           }
         ]
       },
-      "editedAt": "2026-08-17T10:52:24.134Z",
+      "editedAt": "2026-08-17T13:36:26.036Z",
       "editedByIp": "5.133.46.24",
       "history": [
         {
@@ -636,6 +670,10 @@
         {
           "at": "2026-08-17T10:52:24.134Z",
           "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-08-17T13:36:26.036Z",
+          "text": "edited by a traveller"
         }
       ]
     }
@@ -643,14 +681,7 @@
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1786960990799,
-      1786963321937,
-      1786963364805,
-      1786963759741,
-      1786963775094,
-      1786963798709,
-      1786963913528,
-      1786963944134
+      1786973786036
     ]
   },
   "flagLog": {}
