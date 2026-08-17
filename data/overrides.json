@@ -502,7 +502,7 @@
             "name": "Ayne",
             "moon": false,
             "orbits": 0,
-            "biome": "Hemal",
+            "biome": "Volcanic",
             "descriptor": "Raging snowstorms",
             "water": true,
             "ring": false,
@@ -526,11 +526,14 @@
             "name": "Anmar XIII",
             "moon": false,
             "orbits": 0,
-            "biome": "Life-Incompatable",
+            "biome": "Radioactive",
             "descriptor": "Airless",
             "water": false,
             "ring": false,
-            "resources": [],
+            "resources": [
+              "Magnetised Ferrite",
+              "Silver"
+            ],
             "flora": [
               "Absent"
             ],
@@ -548,7 +551,7 @@
             "name": "Tanh",
             "moon": false,
             "orbits": 0,
-            "biome": "Boutiful",
+            "biome": "Lush",
             "descriptor": "Mostly Calm",
             "water": true,
             "ring": "tan",
@@ -620,7 +623,7 @@
           }
         ]
       },
-      "editedAt": "2026-08-17T13:36:26.036Z",
+      "editedAt": "2026-08-17T13:44:16.756Z",
       "editedByIp": "5.133.46.24",
       "history": [
         {
@@ -674,6 +677,10 @@
         {
           "at": "2026-08-17T13:36:26.036Z",
           "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-08-17T13:44:16.756Z",
+          "text": "edited by a traveller"
         }
       ]
     }
@@ -681,7 +688,8 @@
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1786973786036
+      1786973786036,
+      1786974256756
     ]
   },
   "flagLog": {}
