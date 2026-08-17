@@ -831,12 +831,124 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "12973214F4BC": {
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Yuseisenik VIII",
+        "race": "Gek",
+        "region": "Ewtonida Expanse",
+        "starClass": "G4",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Mercantile",
+        "sell": "17.7",
+        "buy": "-21.0",
+        "econDesc": "Fledgling",
+        "conflict": "Low",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "phantom": "",
+        "notes": "",
+        "bodies": [
+          {
+            "name": "Mira 42/X9",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Frozen",
+            "descriptor": "",
+            "water": false,
+            "ring": false,
+            "resources": [
+              "Sodium",
+              "Silver"
+            ],
+            "flora": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "None",
+            "autophage": false
+          },
+          {
+            "name": "Taygen XIV",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Mega Exotic",
+            "descriptor": "",
+            "water": false,
+            "ring": "gold",
+            "resources": [
+              "Gold",
+              "Cobalt"
+            ],
+            "flora": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "None",
+            "autophage": false
+          },
+          {
+            "name": "Angdenv Aidor",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Marsh",
+            "descriptor": "",
+            "water": true,
+            "ring": false,
+            "resources": [
+              "Silver"
+            ],
+            "flora": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "None",
+            "autophage": false
+          },
+          {
+            "name": "Recamin",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Exotic",
+            "descriptor": "",
+            "water": false,
+            "ring": false,
+            "resources": [
+              "Cobalt",
+              "Gold"
+            ],
+            "flora": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "None",
+            "autophage": false
+          }
+        ]
+      },
+      "editedAt": "2026-08-17T18:04:31.110Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-08-17T18:04:31.110Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1786989211622
+      1786989211622,
+      1786989871110
     ]
   },
   "flagLog": {}
