@@ -350,6 +350,14 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   color:var(--white);text-shadow:0 1px 2px #000,0 -1px 2px #000,1px 0 2px #000,-1px 0 2px #000,0 0 6px #000;
   white-space:nowrap;transform:translate(-50%,-150%);opacity:.92;
   background:rgba(4,6,10,0.55);padding:2px 6px;border-radius:4px}
+.hoverpop{position:fixed;z-index:36;pointer-events:none;font-family:'Orbitron',sans-serif;
+  background:rgba(11,17,25,.95);border:1px solid var(--border);border-radius:var(--r-sm);
+  padding:6px 10px;transform:translate(-50%,calc(-100% - 14px));white-space:nowrap}
+.hoverpop .hpName{color:var(--gold);font-size:12px;letter-spacing:.06em;margin:0 0 2px}
+.hoverpop .hpCls{color:var(--cyan);font-size:10px;letter-spacing:.05em;margin:0 0 4px}
+.hoverpop .hpTags{display:flex;gap:4px}
+.hoverpop .hpTag{font-size:9px;letter-spacing:.05em;padding:1px 5px;border-radius:3px;
+  background:rgba(0,229,255,0.12);color:var(--cyan)}
 #toast{position:fixed;left:50%;top:calc(var(--top-h,60px) + 8px);transform:translateX(-50%);z-index:40;
   font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:.12em;color:var(--gold);
   background:rgba(11,17,25,.95);border:1px solid var(--gold);border-radius:var(--r-sm);
@@ -694,6 +702,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   <div id="route-steps-list" style="max-height:150px;overflow-y:auto;font-size:11px;color:var(--text);line-height:16px"></div>
 </div>
 <div id="labels"></div>
+<div id="hoverPop" class="hoverpop" style="display:none"></div>
 <div id="toast"></div>
 <div id="galInfo"></div>
 <div id="galHud"><canvas id="galIcon" width="168" height="168"></canvas><div class="galHudTxt"><div id="galHudName">Galactic Core</div><div id="galHudDist">&mdash;</div></div></div>
@@ -2345,7 +2354,19 @@ function makeRingTexture(b){
 var galPts=null, locPts=null, locInstMesh=null, nebulaGroup=new THREE.Group(), coreMesh=null, courseLine=null;
 var backdropPts=null; /* Item 8 — parallax starfield backdrop layer */
 var voxGrid=null, galMarks=null, gridOn=true;
-var selRing=null, focusRing=null;
+var selRing=null, focusRing=null, hoverRing=null;
+/* Session 38 (2026-08-17): hover popup + course-preview state. hoverSys is
+   the system currently under the mouse (null when nothing hovered).
+   previewLine/previewRing are drawn only while hovering a candidate while
+   the info panel is open (i.e. mid course-planning) -- a lightweight
+   straight-line "what would it take to get here" indicator, deliberately
+   NOT a full findRoute()/A* multi-hop search on every hover frame (that
+   would be far too expensive to run continuously). previewAnim* track the
+   outward-growing line animation, driven from animate()'s own dt each
+   frame rather than a separate timer. */
+var hoverSys=null, hoverPopVisible=false, _hoverRayT=0;
+var previewLine=null, previewTargetAddr=null;
+var previewAnimT=0, previewGrowing=false, previewFromPos=null, previewToPos=null;
 galaxyGroup.add(nebulaGroup);
 var allSystems=[], shown=[];
 var focus={x:0,y:0,z:0}, focusSystem=null, courseTarget=null;
@@ -2371,6 +2392,16 @@ focusRing=new THREE.Mesh(new THREE.RingGeometry(1.5,1.72,44),
   new THREE.MeshBasicMaterial({color:0x00e5ff,side:THREE.DoubleSide,transparent:true,
     opacity:0.75,depthWrite:false,blending:THREE.AdditiveBlending}));
 focusRing.visible=false; localGroup.add(focusRing);
+
+/* Session 38: small ring marking the star currently under the mouse during
+   course-preview hover -- separate from selRing (the committed/clicked
+   selection) so hovering a candidate never disturbs whatever's actually
+   selected. Colour swaps live per-hover between gold (reachable) and red
+   (current drive can't reach that star colour), matching the preview line. */
+hoverRing=new THREE.Mesh(new THREE.RingGeometry(1.1,1.3,36),
+  new THREE.MeshBasicMaterial({color:0xf0a500,side:THREE.DoubleSide,transparent:true,
+    opacity:0,depthWrite:false,blending:THREE.AdditiveBlending}));
+hoverRing.visible=false; localGroup.add(hoverRing);
 
 /* lattice of region boundaries — one cube per voxel, ~400 ly across */
 function buildVoxelGrid(){
@@ -2935,6 +2966,19 @@ function findRoute(from,to,rangeLY,driveGateRoute){
   path.push({px:to.px,py:to.py,pz:to.pz,name:to.name,address:to.address,real:true});
   return {path:path,truncated:truncated};
 }
+/* Session 38: solid vs dashed vs red-dashed course line, matching the real
+   game's own convention (confirmed via NMS community sources) -- solid =
+   reachable in a single hyperdrive jump, dashed = needs multiple hops or a
+   drive upgrade. Tony's map already gates Jump-to/Enter system and
+   route-hop selection by canReachColor()/HYPER_DRIVES -- this wires that
+   same reachability into how the plotted line actually LOOKS, which it
+   never did before (every course used to render identically regardless). */
+function courseLineStyle(){
+  if(!courseTarget) return {solid:false,color:0xf0a500};
+  if(!canReachColor(courseTarget.type)) return {solid:false,color:0xe24b4a};
+  var hops=courseWaypoints?courseWaypoints.length-1:0;
+  return {solid:(hops===1),color:0xf0a500};
+}
 function drawCourse(){
   clearCourseLine();
   if(!courseTarget||!focusSystem||!courseWaypoints||courseWaypoints.length<2) return;
@@ -2942,9 +2986,12 @@ function drawCourse(){
   for(i=0;i<n;i++){ arr[i*3]=courseWaypoints[i].px; arr[i*3+1]=courseWaypoints[i].py; arr[i*3+2]=courseWaypoints[i].pz; }
   var g=new THREE.BufferGeometry();
   g.setAttribute("position",new THREE.BufferAttribute(arr,3));
-  courseLine=new THREE.Line(g,new THREE.LineDashedMaterial({
-    color:0xf0a500,dashSize:1.2,gapSize:0.8,transparent:true,opacity:0.85}));
-  courseLine.computeLineDistances();
+  var lstyle=courseLineStyle();
+  courseLine=lstyle.solid?
+    new THREE.Line(g,new THREE.LineBasicMaterial({color:lstyle.color,transparent:true,opacity:0.9})):
+    new THREE.Line(g,new THREE.LineDashedMaterial({
+      color:lstyle.color,dashSize:1.2,gapSize:0.8,transparent:true,opacity:0.85}));
+  if(!lstyle.solid) courseLine.computeLineDistances();
   localGroup.add(courseLine);
   /* The route bends toward real systems along the way, but that bend can be
      subtle to the eye when the detour is small relative to the total distance
@@ -2966,7 +3013,7 @@ function drawCourse(){
     /* depthTest:false + a high renderOrder so a waypoint never gets visually
        swallowed by a brighter/nearer real star sitting in front of it. */
     courseDots=new THREE.Points(dg,new THREE.PointsMaterial({
-      color:0xf0a500,map:RING_SPRITE,size:1.3,transparent:true,
+      color:lstyle.color,map:RING_SPRITE,size:1.3,transparent:true,
       depthWrite:false,depthTest:false,sizeAttenuation:true}));
     courseDots.renderOrder=999;
     localGroup.add(courseDots);
@@ -3701,6 +3748,7 @@ function flyStep(dt){
 var drag=false,lastX=0,lastY=0,pointers={},pinchD=0,moved=0;
 var stick={act:false,x:0,y:0,id:null,ox:0,oy:0};
 canvas.addEventListener("pointerdown",function(e){
+  hideHoverPop(); clearCoursePreview();
   pointers[e.pointerId]={x:e.clientX,y:e.clientY};
   if(ctrl==="fly"&&e.pointerType==="touch"&&e.clientX<window.innerWidth*0.4&&!stick.act){
     stick.act=true; stick.id=e.pointerId; stick.ox=e.clientX; stick.oy=e.clientY; stick.x=0; stick.y=0;
@@ -3795,6 +3843,125 @@ function tryPick(cx,cy){
     }
   }
 }
+
+/* ============ hover popup + course preview (Session 38) ============
+   Two independent hover behaviours, both mouse-only (matchMedia hover:hover
+   gate) -- touch has no hover state at all, and tapping a star already
+   opens the full info panel with the same data, so no separate touch path
+   is built here, same reasoning already used for the accessibility popup.
+   Throttled via _hoverRayT so the raycast against locInstMesh only runs a
+   handful of times a second, not on every pointermove event. */
+var _hoverCapable=window.matchMedia && window.matchMedia("(hover:hover)").matches;
+function handleHoverRay(e){
+  if(!_hoverCapable||e.pointerType!=="mouse"||drag||mode!=="local"||!locInstMesh) return;
+  var now=performance.now();
+  if(now-_hoverRayT<70) return; _hoverRayT=now;
+  var rect=canvas.getBoundingClientRect();
+  ndc.x=((e.clientX-rect.left)/rect.width)*2-1;
+  ndc.y=-((e.clientY-rect.top)/rect.height)*2+1;
+  ray.setFromCamera(ndc,camera);
+  var hits=ray.intersectObject(locInstMesh);
+  if(hits.length&&hits[0].instanceId!==undefined&&shown[hits[0].instanceId]){
+    var hs=shown[hits[0].instanceId];
+    showHoverPop(hs,e.clientX,e.clientY);
+    updateCoursePreviewHover(hs);
+  } else {
+    hideHoverPop();
+    clearCoursePreview();
+  }
+}
+/* Declutters by zoom exactly like updateLabels() already does off cam.dist
+   (range 5-260 in Local) -- name only while zoomed out, full stats (address
+   class/suffix, race/economy/conflict) once zoomed in past HOVER_ZOOM_FULL. */
+var HOVER_ZOOM_FULL=45;
+function showHoverPop(s,cx,cy){
+  hoverSys=s;
+  var pop=document.getElementById("hoverPop");
+  var suffixParts=[]; if(s.water) suffixParts.push("Water"); if(s.dissonant) suffixParts.push("Dissonant");
+  var suffix=suffixParts.length?" // "+suffixParts.join(" "):"";
+  var full=cam.dist<=HOVER_ZOOM_FULL;
+  var html='<div class="hpName">'+s.name+'</div>';
+  if(full){
+    html+='<div class="hpCls">'+commas(distanceLY(s))+' LY // '+s.spectral+suffix+'</div>';
+    html+='<div class="hpTags"><span class="hpTag">'+s.race+'</span>'+
+      '<span class="hpTag">'+(s.uncharted?"Uncharted":s.econName)+'</span>'+
+      '<span class="hpTag">'+s.conflict+'</span></div>';
+  }
+  pop.innerHTML=html;
+  pop.style.left=cx+"px"; pop.style.top=cy+"px";
+  pop.style.display="block";
+  hoverPopVisible=true;
+}
+function hideHoverPop(){
+  if(!hoverPopVisible) return;
+  document.getElementById("hoverPop").style.display="none";
+  hoverPopVisible=false; hoverSys=null;
+}
+/* "Only during Set course" (Tony's choice): the preview line only appears
+   while a system's info panel is open, i.e. while actively looking at one
+   system and considering another -- not on every idle hover across the
+   whole map. Deliberately a straight two-point line (real distance vs
+   current hyperdrive range), NOT a full findRoute() multi-hop search --
+   running the real pathfinder on every hover frame would be far too
+   expensive. The full, real multi-hop route is still only ever computed
+   when Set course is actually clicked, same as before. */
+function updateCoursePreviewHover(s){
+  var panelOpen=document.getElementById("panel").classList.contains("show");
+  if(!panelOpen||!focusSystem||!s||s.address===focusSystem.address||
+     (courseTarget&&s.address===courseTarget.address)){
+    clearCoursePreview(); return;
+  }
+  if(previewTargetAddr===s.address) return; /* already previewing this one */
+  var dist=distanceLY(s);
+  var range=parseInt(document.getElementById("fHyper").value,10);
+  var reachable=canReachColor(s.type);
+  var color=reachable?0xf0a500:0xe24b4a;
+  var solid=reachable&&dist<=range;
+  startPreviewLine(focusSystem,s,{solid:solid,color:color});
+}
+function startPreviewLine(fromSys,toSys,style){
+  clearCoursePreview();
+  previewTargetAddr=toSys.address;
+  previewFromPos={x:fromSys.px,y:fromSys.py,z:fromSys.pz};
+  previewToPos={x:toSys.px,y:toSys.py,z:toSys.pz};
+  var g=new THREE.BufferGeometry();
+  g.setAttribute("position",new THREE.BufferAttribute(new Float32Array([
+    previewFromPos.x,previewFromPos.y,previewFromPos.z,
+    previewFromPos.x,previewFromPos.y,previewFromPos.z]),3));
+  previewLine=style.solid?
+    new THREE.Line(g,new THREE.LineBasicMaterial({color:style.color,transparent:true,opacity:0.75})):
+    new THREE.Line(g,new THREE.LineDashedMaterial({
+      color:style.color,dashSize:1.0,gapSize:0.7,transparent:true,opacity:0.7}));
+  localGroup.add(previewLine);
+  hoverRing.position.set(previewToPos.x,previewToPos.y,previewToPos.z);
+  hoverRing.material.color.setHex(style.color);
+  hoverRing.material.opacity=0; hoverRing.visible=true;
+  previewAnimT=0; previewGrowing=true;
+}
+function clearCoursePreview(){
+  if(previewLine){ localGroup.remove(previewLine); previewLine.geometry.dispose(); previewLine.material.dispose(); previewLine=null; }
+  hoverRing.visible=false;
+  previewTargetAddr=null; previewGrowing=false; previewFromPos=null; previewToPos=null;
+}
+/* Called every frame from animate() -- cheap no-op unless a preview is
+   actively growing. ~350ms ease-out, matching the "line expands" behaviour
+   Tony described seeing in the real game's own galaxy map. */
+function updatePreviewAnim(dt){
+  if(!previewGrowing||!previewLine||!previewFromPos||!previewToPos) return;
+  previewAnimT+=dt/0.35; if(previewAnimT>1) previewAnimT=1;
+  var t=1-Math.pow(1-previewAnimT,3);
+  var pos=previewLine.geometry.attributes.position;
+  pos.setXYZ(1,
+    previewFromPos.x+(previewToPos.x-previewFromPos.x)*t,
+    previewFromPos.y+(previewToPos.y-previewFromPos.y)*t,
+    previewFromPos.z+(previewToPos.z-previewFromPos.z)*t);
+  pos.needsUpdate=true;
+  if(previewLine.material.isLineDashedMaterial) previewLine.computeLineDistances();
+  hoverRing.material.opacity=0.85*t;
+  if(previewAnimT>=1) previewGrowing=false;
+}
+canvas.addEventListener("pointermove",handleHoverRay);
+canvas.addEventListener("pointerleave",function(){ hideHoverPop(); clearCoursePreview(); });
 
 /* ============ labels ============ */
 var labelEls=[], LBL_MAX=28;
@@ -3926,6 +4093,7 @@ function drawKeypad(){
 
 /* ============ modes ============ */
 function setMode(m){
+  hideHoverPop(); clearCoursePreview();
   mode=m;
   galaxyGroup.visible=(m==="galaxy");
   localGroup.visible=(m==="local");
@@ -5908,6 +6076,7 @@ function animate(){
     camera.updateMatrixWorld();
     updateLabels();
     updateTelemetry();
+    updatePreviewAnim(dt);
     renderer.render(scene,camera);
   }catch(err){
     loopDead=true;
