@@ -1189,6 +1189,11 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
       <label class="chk"><input type="checkbox" id="edGiant"> Gas giant (purple systems only -- limits to 1 planet + up to 5 moons; renamed from "Giant planet" to match the real in-game term)</label>
       <label class="chk" title="Ancient Ruins are a real surface point of interest (Knowledge Stones + a memoir device, sometimes a buried Artifact Ruin) -- not tied to any procedural rule this project could find, so this is manual-only, same as black hole/Atlas."><input type="checkbox" id="edRuins"> Ruins present</label>
       <label class="chk" title="Tony caught (2026-08-17): choosing the &quot;Pirate Controlled&quot; conflict word alone doesn't flag a system as Outlaw -- that's a separate flag (drives the skull icon on the Conflict badge and the Outlaw tag), procedural-only until now, same manual-only pattern as the others here."><input type="checkbox" id="edOutlaw"> Outlaw system present</label>
+      <label class="chk" title="Tick if two of this system's planets visually overlap/collide in-game, like a close binary pair. Only YOU can know this from actually seeing it in-game -- pick which two planets below. Display-only -- pulls those two planets apart into a touching binary-style orbit so they no longer intersect, but each keeps its own separate name, biome, and resources. No planet is merged or removed."><input type="checkbox" id="edColliding"> Colliding planets present</label>
+      <div id="edCollidingPair" style="display:none;margin:4px 0 8px 19px">
+        <div class="mfld" style="margin-bottom:6px"><div class="lb">First planet</div><select id="edCollidingA"></select></div>
+        <div class="mfld" style="margin-bottom:0"><div class="lb">Second planet</div><select id="edCollidingB"></select></div>
+      </div>
     </div>
     <div class="mfld"><div class="lb">Phantom / Shadow Star status</div>
       <select id="edPhantom" title="An obscure NMS oddity, researched from the wiki (nomanssky.fandom.com/wiki/Phantom_Star): most regions contain thousands of unreachable 'phantom' system indices that never show on the real in-game map, normally only reached via a save/portal-index edit. A Shadow Star is a distinct, related anomaly -- the first invalid index right after the portal network's valid range -- that CAN be reached by hyperjump, unlike ordinary phantoms. Leave as None unless you've actually confirmed one of these in-game.">
@@ -2161,6 +2166,9 @@ function applyOverride(s){
   if(d.giant!==undefined) s.giant=!!d.giant;
   if(d.ruins!==undefined) s.ruins=!!d.ruins;
   if(d.outlaw!==undefined) s.outlaw=!!d.outlaw;
+  if(d.colliding!==undefined) s.colliding=!!d.colliding;
+  if(d.collidingA!==undefined) s.collidingA=d.collidingA|0;
+  if(d.collidingB!==undefined) s.collidingB=d.collidingB|0;
   s.publicNotes=d.notes||"";
   s.editorName=d.editorName||"";
   s.editorFriendCode=d.editorFriendCode||"";
@@ -3581,6 +3589,47 @@ function buildFeature(s,kind,pos){
   featureMeshes.push(spr);
   return spr;
 }
+/* Display-only fix for the "Colliding planets present" edit flag. Which two
+   planets collide is ALWAYS a traveller pick (s.collidingA/s.collidingB,
+   1-based body.index, set via the two dropdowns in Edit system) -- this
+   deliberately does NOT auto-detect overlap from generated size/position,
+   since only someone who actually saw the collision in-game can know which
+   pair it is; a geometric guess can miss the real pair or flag one that
+   isn't actually colliding on screen.
+   Given that exact pair, this unconditionally pulls them to a clean
+   binary-pair touch (see Tony's Ibaraohu reference screenshot) -- pulls them
+   together if the default orbit layout left them apart, or apart if it left
+   them overlapping -- rather than only acting when a measured distance
+   happens to cross a threshold. Only ever nudges mesh.position (and its
+   moonAnchor, so any moons ride along with their parent) -- never touches
+   userData.body -- so each planet keeps its own separate name/biome/
+   resources; nothing is merged or removed. Runs after the full body loop
+   below so every pivot's final rotation is already applied and world
+   positions are accurate. */
+function resolvePlanetCollisions(planetEntries,idxA,idxB){
+  if(!idxA||!idxB||idxA===idxB) return;
+  var a=null,b=null,i;
+  for(i=0;i<planetEntries.length;i++){
+    if(planetEntries[i].index===idxA) a=planetEntries[i];
+    if(planetEntries[i].index===idxB) b=planetEntries[i];
+  }
+  if(!a||!b) return; // one or both picks no longer exist (e.g. body removed since last save)
+  var _wa=new THREE.Vector3(), _wb=new THREE.Vector3(), _dir=new THREE.Vector3();
+  a.mesh.getWorldPosition(_wa);
+  b.mesh.getWorldPosition(_wb);
+  var dist=_wa.distanceTo(_wb);
+  var minDist=a.size+b.size+0.4; // small gap so they touch, not fuse
+  var half=(minDist-dist)/2;
+  if(dist<1e-4){ _dir.set(1,0,0); } else { _dir.copy(_wb).sub(_wa).normalize(); }
+  var newWa=_wa.clone().addScaledVector(_dir,-half);
+  var newWb=_wb.clone().addScaledVector(_dir,half);
+  a.pivot.worldToLocal(newWa);
+  b.pivot.worldToLocal(newWb);
+  a.mesh.position.copy(newWa);
+  b.mesh.position.copy(newWb);
+  if(a.moonAnchor) a.moonAnchor.position.copy(a.mesh.position);
+  if(b.moonAnchor) b.moonAnchor.position.copy(b.mesh.position);
+}
 function buildSystemView(s){
   while(systemGroup.children.length){
     var ch=systemGroup.children.pop();
@@ -3608,6 +3657,7 @@ function buildSystemView(s){
   if(s.blackHole) systemGroup.add(buildFeature(s,"bh",new THREE.Vector3(featureR*0.82,featureR*0.18,-featureR*0.55)));
   if(s.atlas) systemGroup.add(buildFeature(s,"atlas",new THREE.Vector3(-featureR*0.85,-featureR*0.15,featureR*0.5)));
   var planetIdx=0, moonIdx=0, moonAnchor=null, moonAnchorSize=0;
+  var planetEntries=[]; // for resolvePlanetCollisions(), populated below
   for(var bi=0; bi<s.bodies.length; bi++){
     var b=s.bodies[bi];
     var pal=BIOMES[b.biome];
@@ -3669,6 +3719,7 @@ function buildSystemView(s){
       pivot.add(moonAnchor);
       moonAnchorSize=b.size;
       moonIdx=0;
+      planetEntries.push({pivot:pivot,mesh:mesh,size:b.size,moonAnchor:moonAnchor,index:b.index});
       planetIdx++;
     } else if(moonAnchor){
       var mR=moonAnchorSize+b.size*1.9+moonIdx*1.5+1.4;
@@ -3697,6 +3748,7 @@ function buildSystemView(s){
       moonIdx++;
     }
   }
+  if(s.colliding) resolvePlanetCollisions(planetEntries,s.collidingA,s.collidingB);
 }
 
 /* ============ panel ============ */
@@ -5257,6 +5309,35 @@ function renderStarEditList(){
 }
 var editBodies=[];
 var bodyUidSeq=1; // stable per-row id, survives add/remove reordering during a single edit session
+/* uids (not positions -- same reasoning as bfOrbits above) of the two
+   traveller-picked colliding planets, kept in module scope so a selection
+   survives re-renders triggered by adding/removing/reordering bodies. Only
+   the traveller who actually saw the overlap in-game can know which two --
+   this is deliberately NOT auto-detected from generated size/position, since
+   that's a guess and can miss or misidentify the real pair. */
+var collidingAUid="", collidingBUid="";
+function renderCollidingSelectors(){
+  var wrap=document.getElementById("edCollidingPair");
+  var on=document.getElementById("edColliding").checked;
+  wrap.style.display=on?"block":"none";
+  if(!on) return;
+  var isGiantSys=document.getElementById("edGiant").checked;
+  var planets=editBodies.filter(function(b){ return !b.moon; });
+  function opts(selectedUid){
+    var html='<option value="">Choose a planet&hellip;</option>';
+    for(var p=0;p<planets.length;p++){
+      var pIdx=editBodies.indexOf(planets[p])+1;
+      html+='<option value="'+planets[p].uid+'"'+(String(selectedUid)===String(planets[p].uid)?" selected":"")+
+        '>'+(isGiantSys?"Giant":("Planet #"+pIdx))+' — '+escAttr(planets[p].name||"(unnamed)")+'</option>';
+    }
+    return html;
+  }
+  document.getElementById("edCollidingA").innerHTML=opts(collidingAUid);
+  document.getElementById("edCollidingB").innerHTML=opts(collidingBUid);
+}
+document.getElementById("edColliding").addEventListener("change",renderCollidingSelectors);
+document.getElementById("edCollidingA").addEventListener("change",function(e){ collidingAUid=e.target.value; });
+document.getElementById("edCollidingB").addEventListener("change",function(e){ collidingBUid=e.target.value; });
 // Each row starts collapsed (just a name summary) so a system with several
 // planets doesn't turn the modal into a huge scroll -- only the row the
 // traveller is actively adding/editing expands, accordion-style, so Save
@@ -5341,6 +5422,7 @@ function renderBodyEditList(){
     buildIconCombo("bfBiome-"+i,"bfBiomeList-"+i,biomeComboGroups());
     buildIconCombo("bfSentinel-"+i,"bfSentinelList-"+i,sentinelComboGroups());
   }
+  renderCollidingSelectors();
 }
 /* Plain-English "N days/hours ago" for the Edit-system "currently saved as"
    notice -- overrideAt is an ISO timestamp from the server (system-edit.mjs's
@@ -5398,6 +5480,7 @@ function openEditModal(){
   document.getElementById("edGiant").checked=!!s.giant;
   document.getElementById("edRuins").checked=!!s.ruins;
   document.getElementById("edOutlaw").checked=!!s.outlaw;
+  document.getElementById("edColliding").checked=!!s.colliding;
   document.getElementById("edNotes").value=s.publicNotes||"";
   var myId=loadTravellerId();
   document.getElementById("edEditorName").value=myId.name;
@@ -5432,6 +5515,10 @@ function openEditModal(){
     editBodies[pj].orbits=(pp>=1 && editBodies[pp-1])?editBodies[pp-1].uid:"";
     delete editBodies[pj].parentPos;
   }
+  // resolve the saved 1-based colliding-pair positions to this session's
+  // uids, same reasoning as the moon-orbits resolution just above
+  collidingAUid=(s.collidingA>=1 && editBodies[s.collidingA-1])?editBodies[s.collidingA-1].uid:"";
+  collidingBUid=(s.collidingB>=1 && editBodies[s.collidingB-1])?editBodies[s.collidingB-1].uid:"";
   renderBodyEditList();
   document.getElementById("editErr").style.display="none";
   document.getElementById("edRetry").style.display="none";
@@ -6321,6 +6408,9 @@ document.getElementById("edSubmit").addEventListener("click",function(){
     giant:document.getElementById("edGiant").checked,
     ruins:document.getElementById("edRuins").checked,
     outlaw:document.getElementById("edOutlaw").checked,
+    colliding:document.getElementById("edColliding").checked,
+    collidingA:(document.getElementById("edColliding").checked&&uidToPos[collidingAUid])?uidToPos[collidingAUid]:0,
+    collidingB:(document.getElementById("edColliding").checked&&uidToPos[collidingBUid])?uidToPos[collidingBUid]:0,
     econName:document.getElementById("edEcon").value.trim(),
     sell:document.getElementById("edSell").value.trim(),
     buy:document.getElementById("edBuy").value.trim(),
