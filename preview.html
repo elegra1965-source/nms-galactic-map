@@ -1638,7 +1638,13 @@ var IC_FLORA='<path d="M12 20c0-9 4-13.6 8-14.6-1 7.8-4 11.8-8 14.6Z"/><path d="
 var IC_MINERAL='<path d="M12 3.4 19.4 8.8l-2.6 11.2H7.2L4.6 8.8Z"/>';
 var IC_SALVAGE='<circle cx="12" cy="12" r="3"/><path d="M12 3.6V6.4M12 17.6v2.8M3.6 12H6.4M17.6 12h2.8M6.5 6.5l2 2M15.5 15.5l2 2M6.5 17.5l2-2M15.5 8.5l2-2"/>';
 var IC_FOSSIL='<path d="M6 9.6C6 6.1 8.4 4.2 10.9 5.6c1 .6 1 1.7 0 2.3-1.3.8-1.3 2.1 0 2.9 1.3.8 1.3 2.1 0 2.9-1 .6-1 1.7 0 2.3 2.5 1.4 5.1-.5 5.1-4"/><circle cx="8.4" cy="8.4" r="0.9" fill="currentColor" stroke="none"/><circle cx="16.2" cy="17.2" r="0.9" fill="currentColor" stroke="none"/>';
-var IC_SKULL='M12 3.6c-3.6 0-6 2.6-6 6.2 0 2 .9 3.4 2 4.4v2.6c0 .6.5 1 1 1h1.4v-1.6h1.2V19h1V17.8h1.2V19h1.4c.5 0 1-.4 1-1v-2.6c1.1-1 2-2.4 2-4.4 0-3.6-2.4-6.2-6-6.2Z';
+/* Swapped 2026-08-17 for Tony's own real in-game screenshot instead of a
+   hand-drawn line icon (his first hand-built attempt still "looked nothing
+   like a skull" at small size) -- icons-web/status-outlaw.png, background
+   chroma-keyed out in Python (alpha derived from whiteness-vs-saturation so
+   the screenshot's reddish tile background drops out cleanly, leaving a
+   clean white skull silhouette), same processing approach already used for
+   the black hole/Atlas Station reference photos back in Session 23. */
 var STAR_PATH='M12 3.6l2.2 4.6 5 .7-3.6 3.6.9 5-4.5-2.4-4.5 2.4.9-5-3.6-3.6 5-.7Z';
 function ecoStars(tier){
   var n=Math.max(0,Math.min(3,(tier|0)+1)),html="",i,on;
@@ -1651,8 +1657,7 @@ function ecoStars(tier){
 }
 function conBadge(s){
   var n=Math.max(1,Math.min(3,(s.conTier|0)+1)),html="";
-  if(s.outlaw) html+='<svg viewBox="0 0 24 24" width="13" height="13" style="color:#e2564f"><path d="'+IC_SKULL+
-    '" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  if(s.outlaw) html+='<img class="icimg" style="width:13px;height:13px;object-fit:contain" src="icons-web/status-outlaw.png" alt="Outlaw">';
   html+='<b>'+n+'</b>';
   return html;
 }
