@@ -5050,7 +5050,8 @@ function buildIconCombo(inputId,listId,groups,blankLabel){
     if(e.key==="Escape"){ list.classList.remove("show"); inp.blur(); }
     else if(e.key==="Enter"){
       var first=list.querySelector(".icomboOpt");
-      if(first){ inp.value=first.getAttribute("data-val"); lastCommitted=inp.value; list.classList.remove("show"); e.preventDefault(); }
+      if(first){ inp.value=first.getAttribute("data-val"); lastCommitted=inp.value; list.classList.remove("show"); e.preventDefault();
+        inp.dispatchEvent(new Event("change",{bubbles:true})); }
     }
   });
   list.addEventListener("mousedown",function(e){
@@ -5058,6 +5059,7 @@ function buildIconCombo(inputId,listId,groups,blankLabel){
     if(!row) return;
     inp.value=row.getAttribute("data-val"); lastCommitted=inp.value;
     list.classList.remove("show");
+    inp.dispatchEvent(new Event("change",{bubbles:true}));
   });
   inp.addEventListener("blur",function(){
     /* Deliberate typo guard: since typed text now goes straight into the
@@ -5072,7 +5074,7 @@ function buildIconCombo(inputId,listId,groups,blankLabel){
       var v=inp.value.trim();
       var valid = v==="" ? !!blankLabel : items.some(function(it2){ return it2.label===v; });
       inp.value = valid ? inp.value : lastCommitted;
-      if(valid) lastCommitted=inp.value;
+      if(valid){ lastCommitted=inp.value; inp.dispatchEvent(new Event("change",{bubbles:true})); }
       list.classList.remove("show");
     },120);
   });
@@ -5092,6 +5094,21 @@ function buildEconConflictSelects(){
       iconHtml:svg(IC_CONFLICT,CONFLICT_COL[i])+'<span class="conBadge"><b>'+(i+1)+'</b></span>'}; }));
 }
 buildEconConflictSelects();
+// Per-body Biome/Sentinel combos (added 2026-08-17, Tony: "biome and Sentinel
+// activity could do with being the same as Conflict level as in can type
+// then all consistent") -- unlike Economy/Conflict above, these are rebuilt
+// every time the accordion row they live in is (re)opened, since each body
+// row is its own DOM instance with a unique index-suffixed id, not a single
+// static field. One tiny single-item "group" per biome so each gets its own
+// colour-matched icon rather than sharing one icon across a whole tier.
+function biomeComboGroups(){
+  return BIOME_KEYS.map(function(k){ return {label:null,items:[k],iconHtml:svg(IC_BIOME,BIOMES[k].base)}; });
+}
+function sentinelComboGroups(){
+  var g=[{label:null,items:["None"],iconHtml:svg(IC_SENTINEL,"#5a6a76")}];
+  for(var i=0;i<SENTINEL_WORDS.length;i++) g.push({label:SENTINEL_TIER_LB[i],items:SENTINEL_WORDS[i],iconHtml:svg(IC_SENTINEL,SENTINEL_TIER_COL[i])});
+  return g;
+}
 var editStars=[];
 var starUidSeq=1; // stable per-row id, same pattern as bodyUidSeq below
 // Star colour rows for Edit system -- one row per star (max 3, matching the
@@ -5121,14 +5138,14 @@ var bodyUidSeq=1; // stable per-row id, survives add/remove reordering during a 
 // traveller is actively adding/editing expands, accordion-style, so Save
 // and any error message stay reachable without hunting through open fields.
 function renderBodyEditList(){
-  var el=document.getElementById("bodyEditList"), html="",i,k;
+  var el=document.getElementById("bodyEditList"), html="",i;
   // A Giant system only ever has 1 non-moon body -- the Giant itself -- so
   // this relabels both the row header and the Orbits dropdown to say
   // "Giant" instead of "Planet #1" wherever that single body shows up,
   // matching how the info panel already renders it once saved.
   var isGiantSys=document.getElementById("edGiant").checked;
   for(i=0;i<editBodies.length;i++){
-    var b=editBodies[i], opts="";
+    var b=editBodies[i];
     var summary=escAttr(b.name||"(unnamed)");
     html+='<div class="bodyEdit'+(b.open?" open":"")+'" data-i="'+i+'">'+
       '<div class="bhead">'+
@@ -5137,13 +5154,12 @@ function renderBodyEditList(){
           '<span class="bx" data-remove="'+i+'" title="Remove">&times;</span></span>'+
       '</div>';
     if(b.open){
-      for(k=0;k<BIOME_KEYS.length;k++) opts+='<option value="'+BIOME_KEYS[k]+'"'+(b.biome===BIOME_KEYS[k]?" selected":"")+'>'+BIOME_KEYS[k]+'</option>';
       html+='<div class="brow2">'+
           '<div class="mfld" style="margin-bottom:0"><div class="lb">Name</div><input type="text" class="bfName" data-i="'+i+'" maxlength="30" value="'+escAttr(b.name)+'"></div>'+
           '<label class="chk2"><input type="checkbox" class="bfMoon" data-i="'+i+'"'+(b.moon?" checked":"")+'> Moon</label>'+
         '</div>'+
         '<div class="brow2">'+
-          '<div class="mfld" style="margin-bottom:0"><div class="lb">Biome</div><select class="bfBiome" data-i="'+i+'">'+opts+'</select></div>'+
+          '<div class="mfld" style="margin-bottom:0"><div class="lb">Biome</div><div class="icombo"><input type="text" class="bfBiome icomboInput" data-i="'+i+'" id="bfBiome-'+i+'" autocomplete="off" value="'+escAttr(b.biome)+'"><div class="icomboList" id="bfBiomeList-'+i+'"></div></div></div>'+
           /* maxlength was 20 -- too short for real in-game hazard/weather
              phrases (Tony hit this typing "Planet-wide Radioactive Storm",
              30 chars, and got cut off mid-word at "Radiatio"). Bumped to 50,
@@ -5173,16 +5189,7 @@ function renderBodyEditList(){
         }
         html+='<div class="mfld" style="margin-bottom:0"><div class="lb">Orbits</div><select class="bfOrbits" data-i="'+i+'">'+orbOpts+'</select></div>';
       }
-      var sentOpts='<option value="None"'+((!b.sentinel||b.sentinel==="None")?" selected":"")+'>None</option>';
-      for(k=0;k<SENTINEL_WORDS.length;k++){
-        sentOpts+='<optgroup label="'+SENTINEL_TIER_LB[k]+'">';
-        for(var kw=0;kw<SENTINEL_WORDS[k].length;kw++){
-          var sw=SENTINEL_WORDS[k][kw];
-          sentOpts+='<option value="'+sw+'"'+(b.sentinel===sw?" selected":"")+'>'+sw+'</option>';
-        }
-        sentOpts+='</optgroup>';
-      }
-      html+='<div class="mfld" style="margin-bottom:0"><div class="lb">Sentinel activity</div><select class="bfSentinel" data-i="'+i+'">'+sentOpts+'</select></div>'+
+      html+='<div class="mfld" style="margin-bottom:0"><div class="lb">Sentinel activity</div><div class="icombo"><input type="text" class="bfSentinel icomboInput" data-i="'+i+'" id="bfSentinel-'+i+'" autocomplete="off" value="'+escAttr(b.sentinel||"None")+'"><div class="icomboList" id="bfSentinelList-'+i+'"></div></div></div>'+
         '<div class="mfld" style="margin-bottom:0"><div class="lb">Resources (comma separated)</div><input type="text" class="bfRes" data-i="'+i+'" maxlength="120" value="'+escAttr(b.resources)+'"></div>'+
         '<div class="brow2">'+
           '<div class="mfld" style="margin-bottom:0"><div class="lb">Flora</div><input type="text" class="bfFlora" data-i="'+i+'" maxlength="80" value="'+escAttr(b.flora)+'"></div>'+
@@ -5196,6 +5203,16 @@ function renderBodyEditList(){
     html+='</div>';
   }
   el.innerHTML=html;
+  // buildIconCombo() reads/writes the input by DOM id, so each open body's
+  // Biome/Sentinel combo must be (re)wired after the markup above lands --
+  // static ids like edEcon only need this once (built at load), but these
+  // ids are unique per body index and only exist in the DOM while that row
+  // is open, so they need rebuilding every time this function runs.
+  for(i=0;i<editBodies.length;i++){
+    if(!editBodies[i].open) continue;
+    buildIconCombo("bfBiome-"+i,"bfBiomeList-"+i,biomeComboGroups());
+    buildIconCombo("bfSentinel-"+i,"bfSentinelList-"+i,sentinelComboGroups());
+  }
 }
 /* Plain-English "N days/hours ago" for the Edit-system "currently saved as"
    notice -- overrideAt is an ISO timestamp from the server (system-edit.mjs's
