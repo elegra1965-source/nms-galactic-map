@@ -13,6 +13,62 @@ const ADORNMENTS = [
   'Gamma', 'Delta', 'Omega', 'Sigma', 'Tau',
 ];
 
+// ---------------------------------------------------------------------
+// Biome-flavoured adornment pools -- ORIGINAL work (elegra1965/Claude,
+// 2026-08-18), NOT part of the hadsh/nms_namegen port above. There is no
+// known real algorithm for how the actual game names a planet (confirmed
+// via the decompiled game data, the upstream nms_namegen author's own
+// README, and a direct read of a real save file -- see HANDOVER.md /
+// CLAUDE.md session notes) -- planetName() below is, and always was, a
+// plausible-sounding GUESS, not real save data. This block only makes
+// that guess feel more tied to the planet actually shown on screen: the
+// generic ADORNMENTS pool above ("Prime"/"Tau"/etc, used by roughly a
+// fifth of the STYLES templates) gets swapped for a biome-appropriate
+// word list when the caller knows the body's biome, so a Lush garden
+// world is more likely to land on something like "Verdance" instead of
+// "Omega", and a Volcanic world leans toward "Cinder" instead of "Beta".
+// Still 100% disclosed as a stylistic guess in the About modal -- this
+// does not make names any more "real," just less randomly mismatched to
+// what the player is looking at.
+const BIOME_ADORNMENTS = {
+  Lush:          ['Verdance', 'Bloom', 'Meadow', 'Arbor', 'Petal', 'Grove', 'Thicket', 'Blossom'],
+  Barren:        ['Dust', 'Wastes', 'Husk', 'Ashland', 'Drift', 'Erosion', 'Scrub', 'Flats'],
+  Dead:          ['Husk', 'Silence', 'Void', 'Ruin', 'Ashfall', 'Requiem', 'Hollow', 'Stillness'],
+  Exotic:        ['Anomaly', 'Prism', 'Enigma', 'Paradox', 'Warp', 'Flux', 'Mirage', 'Fold'],
+  'Mega Exotic': ['Chimera', 'Aberration', 'Singularity', 'Nullspace', 'Rift', 'Eclipse', 'Vortex'],
+  Scorched:      ['Ember', 'Ashen', 'Scorch', 'Sunscald', 'Parched', 'Cracked', 'Blaze', 'Char'],
+  Frozen:        ['Rime', 'Glacia', 'Frost', 'Permafrost', 'Hoarfrost', 'Glacier', 'Sleet', 'Boreal'],
+  Toxic:         ['Miasma', 'Blight', 'Fume', 'Noxa', 'Caustic', 'Vapour', 'Sludge', 'Bilious'],
+  Radioactive:   ['Fallout', 'Isotope', 'Gamma', 'Halflife', 'Fission', 'Cinderglow', 'Decay'],
+  Irradiated:    ['Fallout', 'Isotope', 'Gamma', 'Halflife', 'Fission', 'Cinderglow', 'Decay'],
+  Marsh:         ['Mire', 'Bog', 'Fen', 'Sodden', 'Reeds', 'Silt', 'Peat', 'Wetland'],
+  Volcanic:      ['Cinder', 'Ember', 'Magma', 'Ashfall', 'Pyroclast', 'Caldera', 'Flow', 'Vent'],
+};
+
+// Only used when the caller supplies a HIGH sentinel-activity word (the
+// aggressive/corrupted tiers from preview.html's SENTINEL_WORDS) -- takes
+// priority over the biome pool above, since "a hostile Sentinel presence"
+// is a stronger, rarer signal than base biome. Never used for None/low/
+// mid tiers (see SENTINEL_HOSTILE_SET below).
+const SENTINEL_HOSTILE_ADORNMENTS = [
+  'Sentinel', 'Corrupted', 'Purge', 'Vigil', 'Enforced', 'Interdicted', 'Quarantine',
+];
+const SENTINEL_HOSTILE_SET = new Set([
+  'Aggressive', 'Frenzied', 'High Security', 'Hostile Patrols', 'Threatening', 'Hateful',
+  'Zealous', 'Malicious', 'Inescapable', 'Corrupted', 'Forsaken', 'Rebellious',
+  'Answer To None', 'Sharded from the Atlas', 'Dissonant', 'De-Harmonised',
+]);
+
+/** Same peek-and-scale technique as the default adornmentIdx below, just
+ * generalised to any pool length -- reads rng.seed WITHOUT calling
+ * rng.random() (a stateless peek), so picking a differently-sized flavour
+ * pool never disturbs the rng draw sequence every later value in
+ * planetName() depends on. */
+function pickAdornment(rng, pool) {
+  const idx = Number(((rng.seed & 0xFFFFFFFFn) * BigInt(pool.length)) >> 0x20n);
+  return pool[idx];
+}
+
 const STYLES = [
   '%PROCNORM%',
   '%PROCNORM% %ADORNMENT%',
@@ -59,7 +115,7 @@ function formatShortcode(alpha, num) {
  *
  * letterMap: parsed letter_map.json (see README for the lazy-loading pattern).
  */
-function planetName(planetSeedOrCode, galaxy, letterMap) {
+function planetName(planetSeedOrCode, galaxy, letterMap, opts) {
   let seed0 = BigInt(planetSeedOrCode);
   if (galaxy !== undefined && galaxy !== null) {
     seed0 = planetSeed(planetSeedOrCode, galaxy);
@@ -79,7 +135,21 @@ function planetName(planetSeedOrCode, galaxy, letterMap) {
   }
 
   const rng = new PRNG(seed);
-  const adornmentIdx = Number(((rng.seed & 0xFFFFFFFFn) * 10n) >> 0x20n);
+  // Biome/sentinel-flavoured adornment pool -- see the block above
+  // planetName() for why this is a deliberately disclosed stylistic
+  // guess, not a real algorithm. Falls back to the exact original
+  // 10-entry ADORNMENTS pool (untouched) whenever opts/biome isn't
+  // supplied, so every existing caller keeps producing byte-identical
+  // names to before this change.
+  var adornmentPool = ADORNMENTS;
+  if (opts && opts.sentinel && SENTINEL_HOSTILE_SET.has(opts.sentinel)) {
+    adornmentPool = SENTINEL_HOSTILE_ADORNMENTS;
+  } else if (opts && opts.biome && BIOME_ADORNMENTS[opts.biome]) {
+    adornmentPool = BIOME_ADORNMENTS[opts.biome];
+  }
+  const adornmentWord = adornmentPool === ADORNMENTS
+    ? ADORNMENTS[Number(((rng.seed & 0xFFFFFFFFn) * 10n) >> 0x20n)]
+    : pickAdornment(rng, adornmentPool);
   const code = rng.random(50) + 1;
   const shortcode = rng.random(0x1a) + 0x41;
   const numeral = rng.random(0x12) + 2;
@@ -103,7 +173,7 @@ function planetName(planetSeedOrCode, galaxy, letterMap) {
   name = name.replace('%PROCNORM%', capitalize(procnorm));
   name = name.replace('%PROCSHORT%', capitalize(procshort));
   name = name.replace('%PROCLONG%', capitalize(proclong));
-  name = name.replace('%ADORNMENT%', ADORNMENTS[adornmentIdx]);
+  name = name.replace('%ADORNMENT%', adornmentWord);
   name = name.replace('%SHORTCODE%', formatShortcode(shortcode, code % 0x50));
   name = name.replace('%NUMERAL%', toRoman(numeral));
   name = name.replace('%LONGCODE%', formatLongcode(longcode, digit, alpha));
@@ -111,4 +181,4 @@ function planetName(planetSeedOrCode, galaxy, letterMap) {
   return name;
 }
 
-export { planetName, planetSeed };
+export { planetName, planetSeed, BIOME_ADORNMENTS, SENTINEL_HOSTILE_ADORNMENTS, SENTINEL_HOSTILE_SET };

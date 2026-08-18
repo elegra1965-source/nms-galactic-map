@@ -1335,7 +1335,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     </div>
     <div class="mfld">
       <div class="lb">Procedural data</div>
-      <div style="font-size:12px;color:var(--text-dim);line-height:1.55">Star systems are generated procedurally from their portal address, the same way the game does -- they are not scraped from anyone's real save. Star type, system/region names, and planet count are consistently accurate. <b>Individual planet names are not</b> -- the real game's planet-naming logic has never been fully reverse-engineered, so what you see is a plausible guess, not your actual save data. A system only reflects real in-game data once a traveller has entered it via <b>Edit system</b>, marked "Community edited".</div>
+      <div style="font-size:12px;color:var(--text-dim);line-height:1.55">Star systems are generated procedurally from their portal address, the same way the game does -- they are not scraped from anyone's real save. Star type, system/region names, and planet count are consistently accurate. <b>Individual planet names are not</b> -- the real game's planet-naming logic has never been fully reverse-engineered (confirmed against the game's own decompiled data and a real save file), so what you see is a plausible guess, not your actual save data. As of 2026-08-18 that guess leans on the planet's own biome (and Sentinel activity, once known) to pick a more fitting-sounding name -- still a guess, just a less randomly-mismatched one. A system only reflects real in-game data once a traveller has entered it via <b>Edit system</b>, marked "Community edited".</div>
     </div>
     <div class="mfld">
       <div class="lb">Star class letters (e.g. "G7p")</div>
@@ -3978,7 +3978,15 @@ function upgradeBodyNames(s){
     // let the guess win.
     if(b.nameOverridden) continue;
     if(b.index>ps2.planet_seeds.length) continue;
-    try{ b.name=window.NMSCore.planetName(portalCodeBig(b.index,s.idx,s.vx,s.vy,s.vz),s.galaxy,window.nmsLetterMap); }
+    // Biome/sentinel context (2026-08-18) -- see nms-core/planet.js's own
+    // comment on BIOME_ADORNMENTS for why this is still a disclosed
+    // stylistic guess, not real save data, just one that now leans on the
+    // biome/sentinel already shown right next to it instead of a fully
+    // generic word pool. b.sentinel is only ever set after a traveller has
+    // actually edited this body (see the procedural-body-shape note in
+    // generateSystem()) -- undefined on a fresh body, which planetName()
+    // treats the same as "no sentinel context", falling through to biome.
+    try{ b.name=window.NMSCore.planetName(portalCodeBig(b.index,s.idx,s.vx,s.vy,s.vz),s.galaxy,window.nmsLetterMap,{biome:b.biome,sentinel:b.sentinel}); }
     catch(e){ /* keep the existing (legacy) name for this one body */ }
   }
 }
