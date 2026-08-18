@@ -321,7 +321,7 @@ html.hc-on .btn{border-width:2px}
    game's own economy panel (Tony's reference screenshot) rather than the
    badge floating off at the far right of the row like it was before. */
 .iconstack{display:flex;flex-direction:column;align-items:center;gap:2px;flex:none}
-.starRating{display:flex;flex-direction:column;gap:1px;align-items:center}
+.starRating{display:inline-flex;flex-direction:row;gap:2px;align-items:center;vertical-align:middle;margin-left:6px}
 .conBadge{display:flex;align-items:center;gap:4px}
 .conBadge b{font-family:'Orbitron',sans-serif;background:#2a0d0d;color:#ff8a80;font-size:10px;border-radius:8px;padding:1px 6px}
 .bodylist{margin-top:9px;border-top:1px solid var(--border-soft);padding-top:8px}
@@ -360,6 +360,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   width:246px;padding:10px 12px;display:none}
 #course.show{display:block}
 #course .cline{display:flex;justify-content:space-between;font-size:11.5px;padding:2px 0}
+#course #cJumpsNote{display:none;font-size:9.5px;color:var(--text-faint);line-height:1.35;margin:-2px 0 4px}
 #course .cline span:first-child{color:var(--text-faint)}
 /* letter-spacing added 2026-08-16: every other Orbitron stat readout in the
    app (#hyperSummary, #pCore, etc.) sets some, this one didn't -- at this
@@ -960,6 +961,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   <div id="cBody">
     <div class="cline"><span>Distance</span><b id="cDist">—</b></div>
     <div class="cline"><span>Jumps</span><b id="cJumps">—</b></div>
+    <div id="cJumpsNote"></div>
     <div class="cline"><span>Bearing</span><b id="cBear">—</b></div>
     <div class="cline"><span>Target from centre</span><b id="cCore">—</b></div>
     <div class="prow"><button class="btn" id="bGoCourse" title="Travel to the plotted target.">Jump to</button>
@@ -981,8 +983,8 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   <div id="pSys">
     <div class="row" id="pRaceRow"><span id="icRace"></span>
       <div><div class="lb">Race</div><div class="vl" id="pRace">—</div></div></div>
-    <div class="row row-eco" id="pEcoRow"><div class="iconstack"><span id="icEco"></span><span class="starRating" id="pEcoStars"></span></div>
-      <div><div class="lb">Economy</div><div class="vl" id="pEco">—</div><div class="sub" id="pEcoSub">—</div></div></div>
+    <div class="row row-eco" id="pEcoRow"><span id="icEco"></span>
+      <div><div class="lb">Economy<span class="starRating" id="pEcoStars"></span></div><div class="vl" id="pEco">—</div><div class="sub" id="pEcoSub">—</div></div></div>
     <div class="row" id="pConRow"><div class="iconstack"><span id="icCon"></span><span class="conBadge" id="pConBadge"></span></div>
       <div><div class="lb">Conflict</div><div class="vl" id="pCon">—</div></div></div>
     <div class="tags" id="pTags"></div>
@@ -1347,7 +1349,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     </div>
     <div class="mfld">
       <div class="lb">Plotting a hyperdrive course</div>
-      <div style="font-size:12px;color:var(--text-dim);line-height:1.55"><b>Set course</b> / <b>Lock navigation target</b> plots a real multi-jump route to that system for your current hyperdrive type and range (set in Filters). Every jump always lands on a real charted star, never empty space -- same as the real game -- so the reported jump count is usually a bit above the straight-line distance-divided-by-range number, sometimes noticeably so in sparser patches of space. That's not a bug: a real star is rarely sitting exactly on your bearing at exactly your max range, so routes drift slightly to reach one, and that adds up over a long trip. No Man's Sky itself has no multi-hop route planner at all -- you'd normally do this same star-by-star checking manually, this just does it for you and shows the whole path at once. The line itself matches the real game's own convention: <b>solid</b> means a single jump is enough, <b>dashed</b> means it needs multiple hops, and <b>red-dashed</b> means your current drive can't reach that star's colour at all. Clicking any star while browsing automatically replots the line to it, replacing whatever was there before.</div>
+      <div style="font-size:12px;color:var(--text-dim);line-height:1.55"><b>Set course</b> / <b>Lock navigation target</b> plots a real multi-jump route to that system for your current hyperdrive type and range (set in Filters). Every jump always lands on a real charted star, never empty space -- same as the real game -- so the reported jump count is usually a bit above the straight-line distance-divided-by-range number, sometimes noticeably so in sparser patches of space. That's not a bug: a real star is rarely sitting exactly on your bearing at exactly your max range, so routes drift slightly to reach one, and that adds up over a long trip. No Man's Sky itself has no multi-hop route planner at all -- you'd normally do this same star-by-star checking manually, this just does it for you and shows the whole path at once. The line itself matches the real game's own convention: <b>solid</b> means a single jump is enough, <b>dashed</b> means it needs multiple hops, and <b>red-dashed</b> means your current drive can't reach that star's colour at all. Clicking any star while browsing automatically replots the line to it, replacing whatever was there before. If a route's hop count is well above the naive distance-divided-by-range figure, a short reminder appears right on the Course Plotted card itself, not just here -- researched this against real player reports too: NMS's own displayed hyperdrive range has long been known to overstate the actual effective jump distance (a leftover from a past galaxy-distance rescale), so needing noticeably more real hops than the raw numbers suggest is genuinely how the real game behaves, not something unique to this map.</div>
     </div>
     <div class="mfld">
       <div class="lb">Search by name</div>
@@ -3454,7 +3456,7 @@ function mergeWaypointsIntoSlice(){
    match -- No Man's Sky itself has no multi-hop route planner; players
    jump one star at a time and just see which stars are in range each
    time, so there's no canonical "how the real game shows this" to copy. */
-function setCourse(s){
+function setCourse(s,silent){
   if(!focusSystem){ toast("Jump somewhere first"); return; }
   if(s.address===focusSystem.address){ toast("That is where you are — pick another star"); return; }
   maybeShowHyperNotice();
@@ -3468,7 +3470,26 @@ function setCourse(s){
   var range=parseInt(document.getElementById("fHyper").value,10);
   /* terminate any previous worker before starting a fresh one */
   if(_routeWorker){ _routeWorker.terminate(); _routeWorker=null; }
-  showRouteLoader();
+  /* Real bug fixed 2026-08-18 (Tony: "click again seems long as if in a
+     loop... click abort and choose another star its as quick as the first
+     time"): #route-loader is a full-viewport position:fixed overlay with
+     no pointer-events:none, z-index 99999 -- while it's showing, EVERY
+     click (including on a different star) lands on the overlay itself,
+     not the canvas underneath, so nothing the user does short of hitting
+     the overlay's own Abort button gets through. That was fine when Set
+     course was a rare, deliberate button press, but since clicking ANY
+     star now calls setCourse() (see tryPick's Local branch), a route that
+     takes a moment to compute -- like a long/sparse trip needing many hops
+     -- now blocks the whole map from picking a different, faster-to-route
+     star for however long it takes, reading exactly like a hang. silent
+     (passed true only from that passive click-to-replot path, not the
+     explicit "Set course" button) skips the blocking overlay entirely --
+     the worker still runs and updatePanel() already gave the user instant
+     feedback that their click registered, so a quiet background compute
+     is enough; picking yet another star mid-compute still works instantly
+     since the existing worker-termination logic above already handles it,
+     now that nothing is blocking the click from reaching the canvas. */
+  if(!silent) showRouteLoader();
   var _s=s,_ly=ly,_range=range,_dvx=dvx,_dvy=dvy,_dvz=dvz;
   /* world-unit jump range for A* */
   var _rangeW=_range/VOX_LY;
@@ -3560,6 +3581,27 @@ function _finishSetCourse(_s,_ly,_range,_dvx,_dvy,_dvz){
   document.getElementById("cTarget").textContent=_s.name;
   document.getElementById("cDist").textContent=commas(_ly)+" LY";
   document.getElementById("cJumps").textContent=(courseTruncated?(hops+"+"):hops)+" @ "+commas(_range)+" LY"+(courseTruncated?" (simplified)":"");
+  /* Real question from Tony (2026-08-18): 800 LY at 101 LY range "should
+     be max 7-8 jumps" but reported 12 -- not a bug, the About modal already
+     explains why (every hop must land on a real charted star, so routes
+     drift short of max range whenever nothing sits right on the ideal
+     bearing -- confirmed this really does happen in the live game too:
+     NMS's OWN displayed hyperdrive range has long been reported as
+     overstating the actual effective linear jump distance, a leftover
+     from a past galaxy-distance rescale -- so needing well above the
+     naive beeline-distance/range number is expected, not a glitch). The
+     gap is that explanation only ever lived in About, easy to miss. Only
+     surface this note when the route is genuinely inflated (>=35% over
+     the theoretical minimum) so a normal, close-to-ideal route doesn't
+     get cluttered with a caption nobody needs to read. */
+  var cJumpsNote=document.getElementById("cJumpsNote");
+  var naiveJumps=_range>0?Math.max(1,Math.ceil(_ly/_range)):1;
+  if(!courseTruncated&&hops>naiveJumps*1.35&&hops>naiveJumps){
+    cJumpsNote.textContent="More hops than "+commas(_ly)+"÷"+commas(_range)+" suggests -- real stars rarely sit right on the bearing, so routes drift short of max range to reach one (see About).";
+    cJumpsNote.style.display="block";
+  } else {
+    cJumpsNote.style.display="none";
+  }
   document.getElementById("cBear").textContent=(_ly===0)?"—":bearingOf(_dvx,_dvz,_dvy);
   document.getElementById("cCore").textContent=commas(_s.coreLY)+" LY";
   document.getElementById("course").classList.add("show");
@@ -4298,7 +4340,7 @@ function tryPick(cx,cy){
          only when the pick IS your current location -- setCourse() already
          no-ops with a toast for that case, no need to spam it on every
          click of your own star. */
-      if(focusSystem&&pickedSys.address!==focusSystem.address) setCourse(pickedSys);
+      if(focusSystem&&pickedSys.address!==focusSystem.address) setCourse(pickedSys,true);
     }
   } else if(mode==="system"){
     var bh=ray.intersectObjects(bodyMeshes.concat(starMeshes).concat(featureMeshes));
