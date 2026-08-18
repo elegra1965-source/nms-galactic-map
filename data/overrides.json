@@ -942,13 +942,105 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "16CFB79C8A42": {
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Imposu",
+        "race": "Vy'keen",
+        "region": "Kaupay",
+        "starClass": "F8",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Ore Extraction",
+        "sell": "43.1",
+        "buy": "-28.4",
+        "econDesc": "Developing",
+        "conflict": "Rowdy",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "phantom": "",
+        "notes": "",
+        "bodies": [
+          {
+            "name": "Ilfaring Omega",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Barren",
+            "descriptor": "",
+            "water": true,
+            "ring": "tan",
+            "resources": [
+              "Salt",
+              "Silver"
+            ],
+            "flora": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "None",
+            "autophage": false
+          },
+          {
+            "name": "Thniugos IV",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Scorched",
+            "descriptor": "",
+            "water": true,
+            "ring": false,
+            "resources": [
+              "Silver",
+              "Sodium"
+            ],
+            "flora": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "None",
+            "autophage": false
+          },
+          {
+            "name": "Jisat 55/I6",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Lush",
+            "descriptor": "",
+            "water": true,
+            "ring": false,
+            "resources": [
+              "Salt",
+              "Sodium"
+            ],
+            "flora": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "None",
+            "autophage": false
+          }
+        ]
+      },
+      "editedAt": "2026-08-18T12:32:02.559Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-08-18T12:32:02.559Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1786989211622,
-      1786989871110
+      1787056322559
     ]
   },
   "flagLog": {}
