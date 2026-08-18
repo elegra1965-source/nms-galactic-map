@@ -303,7 +303,10 @@ html.hc-on .btn{border-width:2px}
    runs taller than its own text at higher star tiers, which was pushing
    the Conflict row down with a visible dead gap (Tony flagged via a real
    screenshot vs. the game's own tighter layout). */
-.row.row-eco{margin-bottom:4px}
+/* .row-eco tight-margin override removed 2026-08-18 -- only needed while
+   the star rating lived in a tall vertical iconstack column; now it is a
+   single inline line next to the "Economy" label, so this row is back to
+   the default .row margin-bottom like every other row (Race/Conflict). */
 .row svg{width:16px;height:16px;flex:none;margin-top:2px;color:var(--cyan);
   stroke:currentColor;fill:none;stroke-linecap:round;stroke-linejoin:round}
 .row .icimg{width:26px;height:26px;flex:none;margin-top:-2px;object-fit:contain}
@@ -320,7 +323,6 @@ html.hc-on .btn{border-width:2px}
 /* Icon + its rating/badge stacked vertically underneath, matching the real
    game's own economy panel (Tony's reference screenshot) rather than the
    badge floating off at the far right of the row like it was before. */
-.iconstack{display:flex;flex-direction:column;align-items:center;gap:2px;flex:none}
 .starRating{display:inline-flex;flex-direction:row;gap:2px;align-items:center;vertical-align:middle;margin-left:6px}
 .conBadge{display:flex;align-items:center;gap:4px}
 .conBadge b{font-family:'Orbitron',sans-serif;background:#2a0d0d;color:#ff8a80;font-size:10px;border-radius:8px;padding:1px 6px}
@@ -985,8 +987,8 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
       <div><div class="lb">Race</div><div class="vl" id="pRace">—</div></div></div>
     <div class="row row-eco" id="pEcoRow"><span id="icEco"></span>
       <div><div class="lb">Economy<span class="starRating" id="pEcoStars"></span></div><div class="vl" id="pEco">—</div><div class="sub" id="pEcoSub">—</div></div></div>
-    <div class="row" id="pConRow"><div class="iconstack"><span id="icCon"></span><span class="conBadge" id="pConBadge"></span></div>
-      <div><div class="lb">Conflict</div><div class="vl" id="pCon">—</div></div></div>
+    <div class="row" id="pConRow"><span id="icCon"></span>
+      <div><div class="lb">Conflict<span class="conBadge" id="pConBadge" style="margin-left:6px;vertical-align:middle"></span></div><div class="vl" id="pCon">—</div></div></div>
     <div class="tags" id="pTags"></div>
     <div class="bodylist" id="pBodies"></div>
     <div style="font-size:10px;color:var(--text-faint);line-height:1.4;margin-top:5px">Planet names are a procedural guess, not your save data (<span style="text-decoration:underline;cursor:pointer" onclick="openDisclaimer()">see About</span>) -- Edit system to add the real ones.</div>
@@ -4710,7 +4712,7 @@ function jumpTo(str,silent){
   document.getElementById("inAddr").style.borderColor="";
   focus.x=a.x; focus.y=a.y; focus.z=a.z;
   marker.position.copy(voxelToGalaxy(a.x,a.y,a.z));
-  courseTarget=null; courseWaypoints=null;
+  courseTarget=null; courseWaypoints=null; clearCourseLine();
   document.getElementById("course").classList.remove("show");
   generateSlice(a.idx);
   focusSystem=null;
@@ -4983,7 +4985,7 @@ document.getElementById("bGoCourse").addEventListener("click",function(){
     toast(driveNeededMsg(courseTarget.type)+" -- tap Waypoint on its panel to save it for later");
     return;
   }
-  var a=courseTarget.address; setKeypad(a); jumpTo(a);
+  var a=courseTarget.address; setKeypad(a); jumpTo(a); playWarpTransition();
 });
 document.getElementById("bSave").addEventListener("click",function(){
   if(!selected) return;
