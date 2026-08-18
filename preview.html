@@ -1155,13 +1155,6 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     <div id="editSpin"><span id="editSpinTxt">Atlas is working on it...</span></div>
     <div class="mfld"><div class="lb">System name</div><input type="text" id="edName" maxlength="40"></div>
     <div class="mfld"><div class="lb">Region name</div><input type="text" id="edRegion" maxlength="40"></div>
-    <div class="mfld">
-      <div class="lb" style="display:flex;justify-content:space-between;align-items:center">
-        <span>Stars (max 3 -- single / binary / ternary)</span>
-        <button class="btn" id="edAddStar" type="button" style="padding:3px 8px">+ Add star</button>
-      </div>
-      <div id="starEditList"></div>
-    </div>
     <div class="mfld" style="display:flex;gap:8px">
       <div style="flex:1"><div class="lb">Star class (primary star)</div><input type="text" id="edStarClass" maxlength="10" placeholder="e.g. G7p"></div>
       <div style="flex:1"><div class="lb">Suffix</div>
@@ -1192,6 +1185,13 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
         <input type="text" id="edEconStr" class="icomboInput" placeholder="Type to search" autocomplete="off" spellcheck="false">
         <div class="icomboList" id="edEconStrList"></div>
       </div>
+    </div>
+    <div class="mfld">
+      <div class="lb" style="display:flex;justify-content:space-between;align-items:center">
+        <span>Stars (max 3 -- single / binary / ternary)</span>
+        <button class="btn" id="edAddStar" type="button" style="padding:3px 8px">+ Add star</button>
+      </div>
+      <div id="starEditList"></div>
     </div>
     <div class="mfld"><div class="lb">Conflict level</div>
       <div class="icombo" id="edConflictCombo">

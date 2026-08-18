@@ -5,11 +5,25 @@
    POST body: { action: "edit"|"report"|"resolve-flag", address, payload }
      address = the 12-char portal hex address the edit applies to
      "edit"   payload = {name, race, region, stars:[colourKey,...] (max 3), starClass, water, dissonant,
-                         giant, ruins, phantom, econName, sell, buy, econDesc, conflict, blackHole, atlas, notes,
+                         giant, ruins, outlaw, phantom, econName, sell, buy, econDesc, conflict, blackHole, atlas, notes,
+                         editorName, editorFriendCode, colliding, collidingA, collidingB,
                          bodies:[{name, moon, orbits, biome, descriptor, water, ring, resources,
-                                  flora, minerals, salvage, fossils, sentinel, autophage}, ...]}
+                                  flora, fauna, minerals, salvage, fossils, sentinel, autophage, base}, ...]}
+                         (base added 2026-08-17 -- "Has base" per-body marker, same manual-only
+                         pattern as autophage. fauna added 2026-08-17 -- same shape/24-char-per-item
+                         limit as flora/minerals/salvage/fossils, see filter.mjs's resArr().)
                          (ruins added 2026-08-14; phantom was already validated/shown but is only
-                         actually persisted as of the same date -- see getCategoryValue's comment)
+                         actually persisted as of the same date -- see getCategoryValue's comment.
+                         editorName/editorFriendCode added 2026-08-16 -- optional "who documented
+                         this" attribution, always overwrites directly, NOT part of TOP_CATS/the
+                         flag-consensus system below, see filter.mjs's comment on why. outlaw added
+                         2026-08-17 -- Tony caught that picking the "Pirate Controlled" conflict word
+                         didn't set this separate skull/tag flag, same manual-only pattern as
+                         giant/ruins/blackHole/atlas. colliding/collidingA/collidingB added
+                         2026-08-17 -- display-only "these two planets visually overlap" flag, built
+                         client-side in a separate session but never actually added to this
+                         allowlist until now -- see filter.mjs's own comment on that same field for
+                         why it's a manual pick, not derived data.)
      "report" payload = {reason}
      "resolve-flag" (admin only, requires ?token=<ADMIN_TOKEN> on the URL) payload =
                     {field, resolution:"dispute"|"dismiss"|"set-value", value?}
@@ -123,6 +137,9 @@ function getCategoryValue(out, category){
     // Ruins (2026-08-14, hyperdrive-types.docx task 9): plain boolean, same
     // pattern as giant/blackHole/atlas above.
     case "ruins": return !!out.ruins;
+    // Outlaw (2026-08-17): plain boolean, same pattern as ruins/giant/
+    // blackHole/atlas above.
+    case "outlaw": return !!out.outlaw;
     // Phantom / Shadow Star -- was validated by filterSystemEdit() and shown
     // in the Edit system modal since it was added, but never actually wired
     // into TOP_CATS/getCategoryValue/applyCategoryValue below, so a
@@ -132,6 +149,11 @@ function getCategoryValue(out, category){
     // itself, fixed alongside since it's the identical one-line pattern.
     case "phantom": return out.phantom || "";
     case "notes": return out.notes;
+    // Colliding planets (2026-08-17): bundled the same way "suffix" bundles
+    // water+dissonant above -- colliding/collidingA/collidingB are one
+    // traveller pick (display-only pairing), so they go through consensus
+    // together, not as 3 independently-flaggable fields.
+    case "colliding": return { colliding: !!out.colliding, collidingA: out.collidingA||0, collidingB: out.collidingB||0 };
     default: return undefined;
   }
 }
@@ -165,8 +187,12 @@ function applyCategoryValue(data, category, value){
     case "blackHole": data.blackHole=!!value; return;
     case "atlas": data.atlas=!!value; return;
     case "ruins": data.ruins=!!value; return;
+    case "outlaw": data.outlaw=!!value; return;
     case "phantom": data.phantom=value; return;
     case "notes": data.notes=value; return;
+    case "colliding":
+      data.colliding=!!value.colliding; data.collidingA=value.collidingA||0; data.collidingB=value.collidingB||0;
+      return;
   }
 }
 
@@ -419,11 +445,16 @@ export default async (req, context) => {
     // or more categories from flaggedFields/disputedFields.
     var stillUnderReview = sysRec.flaggedFields.concat(sysRec.disputedFields);
 
-    var TOP_CATS = ["name","race","region","starClass","stars","suffix","giant","economy","conflict","blackHole","atlas","ruins","phantom","notes"];
+    var TOP_CATS = ["name","race","region","starClass","stars","suffix","giant","economy","conflict","blackHole","atlas","ruins","outlaw","phantom","notes","colliding"];
     for(var ti=0; ti<TOP_CATS.length; ti++){
       if(stillUnderReview.indexOf(TOP_CATS[ti])>=0) continue;
       applyCategoryValue(sysRec.data, TOP_CATS[ti], getCategoryValue(filtered.cleaned, TOP_CATS[ti]));
     }
+
+    // Attribution metadata -- always a direct overwrite, not gated behind
+    // flag/dispute review like TOP_CATS above (see filter.mjs's comment).
+    sysRec.data.editorName = filtered.cleaned.editorName || "";
+    sysRec.data.editorFriendCode = filtered.cleaned.editorFriendCode || "";
 
     // Bodies: the submitted form always describes the traveller's FULL
     // current body list (there's no partial-body-list concept client-side,
