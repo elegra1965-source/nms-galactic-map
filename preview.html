@@ -485,8 +485,8 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
    they measure genuine overflow, same fix, same reason (Tony hit this on
    feedbackModal on his S26 the same way he'd hit it on hyperdriveModal
    before). */
-#hyperdriveModal,#feedbackModal{overflow-y:hidden}
-#hyperdriveModal.scroll,#feedbackModal.scroll{overflow-y:auto}
+#hyperdriveModal,#feedbackModal,#saveImportModal{overflow-y:hidden}
+#hyperdriveModal.scroll,#feedbackModal.scroll,#saveImportModal.scroll{overflow-y:auto}
 .modal h3{font-family:'Orbitron',sans-serif;font-size:13px;letter-spacing:.1em;
   color:var(--white);margin-bottom:2px;text-transform:uppercase}
 .modal .msub{font-size:11px;color:var(--text-faint);margin-bottom:12px}
@@ -1230,6 +1230,9 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
       <div style="flex:1"><div class="lb">Your name <span style="color:var(--text-faint)">(optional)</span></div><input type="text" id="edEditorName" maxlength="30" placeholder="Shown as who documented this system"></div>
       <div style="flex:1"><div class="lb">Friend code <span style="color:var(--text-faint)">(optional)</span></div><input type="text" id="edEditorCode" maxlength="24" placeholder="e.g. MGD8-C6PP-XKFGT"></div>
     </div>
+    <div class="mfld" style="margin-top:-4px">
+      <button class="btn" id="edOpenSaveImport" type="button" style="padding:4px 10px;font-size:11px" title="Reads a real .hg save file entirely in your own browser -- nothing is uploaded unless you choose to import your bases. Can auto-fill your name above, and/or bulk-add your real base names to the shared map.">&#8963; Import from my save file</button>
+    </div>
     <div class="mfld">
       <div class="lb" style="display:flex;justify-content:space-between;align-items:center">
         <span>Planets &amp; moons (in-game order, max 6)</span>
@@ -1346,6 +1349,10 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
       <div style="font-size:12px;color:var(--text-dim);line-height:1.55">Anything entered via <b>Edit system</b> is trusted as typed -- it isn't checked against Hello Games' own in-game discovery records, which are known to desync between players. Two travellers can occasionally submit different names for the same system in good faith. If something looks wrong, use <b>Report</b> and elegra1965 will sort it out from the save history.</div>
     </div>
     <div class="mfld">
+      <div class="lb">Import from my save file</div>
+      <div style="font-size:12px;color:var(--text-dim);line-height:1.55">In <b>Edit system</b>, "Import from my save file" reads a real .hg save entirely in your own browser -- the file itself is never uploaded anywhere. It can find your in-game name (to auto-fill "Your name" above) and any real bases you've built, which you can then choose to bulk-import to the shared map in one go. Discovery records don't store player-given planet names at all (checked directly against a real save), only base names do, so that's the one thing this can genuinely pull in for you -- everything else still needs typing in by hand, same as always. Friend codes aren't in a save file either (that's an account/platform thing, not game data). One import per device per day, same spirit as the normal edit rate limit but scaled for a much bigger write.</div>
+    </div>
+    <div class="mfld">
       <div class="lb">New to No Man's Sky?</div>
       <div style="font-size:12px;color:var(--text-dim);line-height:1.55">A "portal address" is a 12-symbol code the game uses to pin down a star system's location. Don't have one? Hit <b>Random</b> in the toolbar to jump somewhere, or tap <b>Glyphs</b> to see the code as the game's own symbols instead of letters/numbers.</div>
     </div>
@@ -1404,6 +1411,52 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     <div class="modalBtns">
       <button class="btn primary" id="hyperOpenFilters">Open Filters</button>
       <button class="btn" id="hyperOk">Got it</button>
+    </div>
+  </div>
+
+  <!-- Save-file import (2026-08-18) -- reads a real .hg save file entirely
+       client-side (nms-core/save-import/*, no upload of the raw file ever),
+       offers to auto-fill "Your name" from it, and offers a one-shot
+       bulk-import of every real base name found into the shared community
+       map via the bulk-import Function action. See README.md /
+       nms-core/save-import for the technical writeup and CLAUDE.md for the
+       "why" (Tony asked for both an auto-fill AND a bulk-import option). -->
+  <div class="box modal" id="saveImportModal" style="max-width:420px;display:none">
+    <h3>Import from my save file</h3>
+    <div class="msub" style="margin-bottom:10px">Your save file never leaves this device -- it's read and decoded entirely by your own browser, right here on this page. Nothing is sent anywhere unless you choose to import your real base names below, and even then only the base name(s) + system address are sent, never anything else from your save.</div>
+    <div id="siStep1">
+      <input type="file" id="siFileInput" accept=".hg" style="display:none">
+      <div class="modalBtns" style="justify-content:flex-start;margin-bottom:0">
+        <button class="btn primary" id="siChooseFile" type="button">Choose save file (.hg)</button>
+        <button class="btn" id="siManual" type="button">I'll do it manually</button>
+      </div>
+      <div style="font-size:11px;color:var(--text-faint);margin-top:10px;line-height:1.5">On PC this is usually under <code>...\AppData\Roaming\HelloGames\NMS\st_...\save.hg</code> (or save2.hg/save3.hg for other slots). Consoles can't export a save file this way -- manual entry via the form above is the only option there.</div>
+    </div>
+    <div id="siProgress" style="display:none;margin-top:10px">
+      <div class="iconWrap" id="siIconWrap"><img id="siIconImg" src="" alt=""><span class="driftBeam"></span></div>
+      <div id="siSpin" style="display:flex"><span id="siSpinTxt">Reading your save file...</span></div>
+    </div>
+    <div class="merr" id="siErr" style="display:none;margin-top:10px"><span class="errTxt"></span><span class="errScan"></span></div>
+    <button class="btn" id="siRetry" type="button" style="display:none;margin-top:8px">Choose a different file</button>
+    <div id="siResults" style="display:none;margin-top:10px">
+      <div class="mnotice" id="siSummary"></div>
+      <div class="mfld" id="siNameFld" style="display:none">
+        <div class="lb">Your in-game name</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <div style="flex:1;font-family:'Orbitron',sans-serif;font-size:13px" id="siNameVal"></div>
+          <button class="btn" id="siUseName" type="button" style="padding:3px 10px">Use this name</button>
+        </div>
+        <div style="font-size:11px;color:var(--text-faint);margin-top:4px">Friend codes aren't stored in a save file at all (they're a platform/account thing, not game data) -- you'll still need to type yours in above if you want it shown.</div>
+      </div>
+      <div class="mfld" id="siBasesFld" style="display:none">
+        <div class="lb">Real bases found in your save</div>
+        <div id="siBasesList" style="max-height:140px;overflow-y:auto;font-size:12px;color:var(--text-dim);line-height:1.6;background:rgba(0,0,0,.2);border:1px solid var(--border);border-radius:4px;padding:6px 8px"></div>
+        <div class="msub" style="margin:8px 0 6px">These get added to the shared community map, same as typing them into this form one at a time, just all at once. A system you've already documented, or that another traveller has, gets your base name merged in as a note rather than overwriting their data -- nothing existing is ever clobbered.</div>
+        <button class="btn primary" id="siImportBases" type="button">Import <span id="siImportCount">0</span> base<span id="siImportPlural">s</span> to the shared map</button>
+      </div>
+    </div>
+    <div class="modalBtns">
+      <button class="btn" id="siClose">Close</button>
     </div>
   </div>
 </div>
@@ -5704,6 +5757,7 @@ function closeAllModalBoxes(){
   document.getElementById("disclaimerModal").style.display="none";
   document.getElementById("hyperdriveModal").style.display="none";
   document.getElementById("feedbackModal").style.display="none";
+  document.getElementById("saveImportModal").style.display="none";
 }
 function closeModal(){ document.getElementById("modalWrap").classList.remove("show"); }
 function clientPrecheck(){
@@ -6601,6 +6655,168 @@ document.getElementById("edSubmit").addEventListener("click",function(){
     })
   };
   submitEditPayload(selected.address, payload);
+});
+/* ============ Save-file import (2026-08-18) ============
+   Everything here runs client-side -- the raw .hg file is never uploaded.
+   nms-core/save-import/* does the actual decompress+deobfuscate+extract
+   work (see that folder's own header comments); this block is just the
+   consent UI + wiring: pick a file or decline, see what was found, choose
+   to auto-fill "Your name" and/or bulk-import real base names into the
+   shared map via the bulk-import Function action (a separate, much
+   stricter rate limit than a normal single-system edit -- see
+   system-edit.mjs's handleBulkImport). */
+var siLastSummary=null;
+function siRemeasureScroll(){
+  var m=document.getElementById("saveImportModal");
+  m.classList.remove("scroll");
+  if(m.scrollHeight>m.clientHeight+1) m.classList.add("scroll");
+}
+function siReset(){
+  siLastSummary=null;
+  document.getElementById("siStep1").style.display="block";
+  document.getElementById("siProgress").style.display="none";
+  document.getElementById("siErr").style.display="none";
+  document.getElementById("siResults").style.display="none";
+  document.getElementById("siRetry").style.display="none";
+  document.getElementById("siFileInput").value="";
+  siRemeasureScroll();
+}
+function openSaveImportModal(){
+  closeAllModalBoxes();
+  siReset();
+  document.getElementById("saveImportModal").style.display="";
+  document.getElementById("modalWrap").classList.add("show");
+  siRemeasureScroll();
+}
+document.getElementById("edOpenSaveImport").addEventListener("click",openSaveImportModal);
+document.getElementById("siClose").addEventListener("click",closeModal);
+document.getElementById("siManual").addEventListener("click",closeModal);
+document.getElementById("siChooseFile").addEventListener("click",function(){
+  document.getElementById("siFileInput").click();
+});
+document.getElementById("siRetry").addEventListener("click",siReset);
+function siShowError(msg){
+  var errEl=document.getElementById("siErr");
+  setErrText(errEl,msg);
+  errEl.style.display="block";
+  document.getElementById("siRetry").style.display="inline-block";
+  siRemeasureScroll();
+}
+document.getElementById("siFileInput").addEventListener("change",function(e){
+  var f=e.target.files && e.target.files[0];
+  if(!f) return;
+  document.getElementById("siStep1").style.display="none";
+  document.getElementById("siErr").style.display="none";
+  document.getElementById("siResults").style.display="none";
+  document.getElementById("siRetry").style.display="none";
+  var progress=document.getElementById("siProgress"), spinTxt=document.getElementById("siSpinTxt");
+  var iconWrap=document.getElementById("siIconWrap"), iconImg=document.getElementById("siIconImg");
+  progress.style.display="block";
+  siRemeasureScroll();
+  var stopWait=startAtlasWait(spinTxt, iconWrap, iconImg);
+  var reader=new FileReader();
+  reader.onload=function(){
+    Promise.all([
+      import('./nms-core/save-import/parse-save.js'),
+      import('./nms-core/save-import/extract-summary.js')
+    ]).then(function(mods){
+      var parseMod=mods[0], summaryMod=mods[1];
+      return parseMod.loadSaveMapping('./nms-core/save-import').then(function(mapping){
+        var bytes=new Uint8Array(reader.result);
+        return parseMod.parseSaveFile(bytes, mapping);
+      }).then(function(save){
+        return summaryMod.extractSaveSummary(save);
+      });
+    }).then(function(summary){
+      stopWait(); progress.style.display="none";
+      siLastSummary=summary;
+      siShowResults(summary);
+    }).catch(function(err){
+      stopWait(); progress.style.display="none";
+      siShowError((err && err.message) ? err.message : "Couldn't read that file -- make sure it's a real No Man's Sky save.hg file.");
+    });
+  };
+  reader.onerror=function(){
+    stopWait(); progress.style.display="none";
+    siShowError("Couldn't read that file from your device.");
+  };
+  reader.readAsArrayBuffer(f);
+});
+function siShowResults(summary){
+  var results=document.getElementById("siResults");
+  results.style.display="block";
+  var sumEl=document.getElementById("siSummary");
+  var parts=[];
+  if(summary.saveName) parts.push('Save slot: "'+summary.saveName+'"');
+  parts.push(summary.systemCount+" system"+(summary.systemCount===1?"":"s")+" with a real base name found");
+  sumEl.textContent=parts.join(" \u00b7 ")+(summary.systemCount?"":" -- nothing to auto-fill besides your name below, if found.");
+  var nameFld=document.getElementById("siNameFld");
+  if(summary.username){
+    nameFld.style.display="block";
+    document.getElementById("siNameVal").textContent=summary.username;
+  } else {
+    nameFld.style.display="none";
+  }
+  var basesFld=document.getElementById("siBasesFld");
+  var listEl=document.getElementById("siBasesList");
+  if(summary.bases && summary.bases.length){
+    basesFld.style.display="block";
+    listEl.innerHTML="";
+    summary.bases.forEach(function(b){
+      var row=document.createElement("div");
+      row.textContent=b.names.join(", ")+"  ("+b.address+")";
+      listEl.appendChild(row);
+    });
+    document.getElementById("siImportCount").textContent=summary.bases.length;
+    document.getElementById("siImportPlural").textContent=summary.bases.length===1?"":"s";
+  } else {
+    basesFld.style.display="none";
+  }
+  siRemeasureScroll();
+}
+document.getElementById("siUseName").addEventListener("click",function(){
+  if(!siLastSummary || !siLastSummary.username) return;
+  document.getElementById("edEditorName").value=siLastSummary.username;
+  // Persist immediately -- editModal is currently hidden (not destroyed)
+  // behind this one, and re-opening Edit system later calls openEditModal(),
+  // which re-fills "Your name" from loadTravellerId(), overwriting whatever
+  // is just sitting in the field's DOM value right now. Without this, "Use
+  // this name" would appear to work but silently not survive a modal
+  // round-trip.
+  saveTravellerId(siLastSummary.username, document.getElementById("edEditorCode").value.trim());
+  toast("Filled in your name from your save");
+});
+document.getElementById("siImportBases").addEventListener("click",function(){
+  if(!siLastSummary || !siLastSummary.bases || !siLastSummary.bases.length) return;
+  var btn=this;
+  var editorName=document.getElementById("edEditorName").value.trim() || siLastSummary.username || "";
+  var editorCode=document.getElementById("edEditorCode").value.trim() || "";
+  var entries=siLastSummary.bases.map(function(b){ return {address:b.address, names:b.names}; });
+  btn.disabled=true;
+  document.getElementById("siErr").style.display="none";
+  var progress=document.getElementById("siProgress"), spinTxt=document.getElementById("siSpinTxt");
+  var iconWrap=document.getElementById("siIconWrap"), iconImg=document.getElementById("siIconImg");
+  progress.style.display="block";
+  siRemeasureScroll();
+  var stopWait=startAtlasWait(spinTxt, iconWrap, iconImg);
+  fetch(FUNC_URL,{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({action:"bulk-import", payload:{entries:entries, editorName:editorName, editorFriendCode:editorCode}})
+  }).then(function(r){ return r.json().then(function(j){ return {status:r.status, body:j}; }); })
+  .then(function(res){
+    stopWait(); progress.style.display="none"; btn.disabled=false;
+    if(!res.body.ok){
+      var d=describeSaveError(res.status,res.body,false);
+      siShowError(d.message);
+      return;
+    }
+    if(editorName) saveTravellerId(editorName, editorCode);
+    toast("Imported "+res.body.added+" new system"+(res.body.added===1?"":"s")+", merged into "+res.body.merged+" existing -- visible to everyone");
+    loadOverrides();
+    closeModal();
+  }).catch(function(){
+    stopWait(); progress.style.display="none"; btn.disabled=false;
+    siShowError("Couldn't reach the server -- check your connection and try again.");
+  });
 });
 var lastReportAttempt=null; // {address,reason} of the most recent failed report, so Retry resubmits without retyping
 function submitReportPayload(address, reason){

@@ -334,6 +334,56 @@ export function filterSystemEdit(payload){
   return {ok: errors.length===0, cleaned: out, errors: errors};
 }
 
+/* Bulk save-file import (2026-08-18): a visitor who's parsed their own
+   save.hg client-side (see nms-core/save-import/) can offer to import
+   their own real bases in one batch, rather than one Edit-system
+   submission per system -- which the normal 8-edits/hour rate limit
+   would make impractical for anyone with more than a handful of bases.
+   Same content rules as a normal edit's name/notes fields, just applied
+   to every entry in one array. Caps batch size hard at 300 (a generous
+   real-world base count -- Tony's own real save had 278) so one request
+   can't be used to smuggle in an unbounded write. */
+var MAX_BULK_IMPORT_ENTRIES = 300;
+
+export function filterBulkImport(payload){
+  var errors = [];
+  payload = payload || {};
+  var entriesIn = Array.isArray(payload.entries) ? payload.entries : [];
+  if(entriesIn.length === 0) errors.push("No entries to import");
+  if(entriesIn.length > MAX_BULK_IMPORT_ENTRIES){
+    errors.push("Too many entries in one import (max "+MAX_BULK_IMPORT_ENTRIES+", got "+entriesIn.length+")");
+  }
+
+  var editorNameR = filterText(payload.editorName, {maxLen:30, fieldName:"Your name"});
+  var editorCodeR = filterText(payload.editorFriendCode, {maxLen:24, fieldName:"Friend code"});
+  var editorName = editorNameR.ok ? editorNameR.cleaned : "";
+  var editorFriendCode = editorCodeR.ok ? editorCodeR.cleaned : "";
+
+  var out = [];
+  for(var i=0;i<Math.min(entriesIn.length, MAX_BULK_IMPORT_ENTRIES);i++){
+    var e = entriesIn[i] || {};
+    if(!isValidAddressStr(e.address)) continue; // silently skip malformed addresses rather than failing the whole batch
+    var namesIn = Array.isArray(e.names) ? e.names : (e.name ? [e.name] : []);
+    var cleanedNames = [];
+    for(var j=0;j<Math.min(namesIn.length,10);j++){
+      var nR = filterText(namesIn[j], {maxLen:40, fieldName:"System name"});
+      if(nR.ok && nR.cleaned) cleanedNames.push(nR.cleaned);
+    }
+    if(!cleanedNames.length) continue; // every name for this entry was empty/blocked/too long -- skip it, don't fail the batch
+    out.push({ address: String(e.address).toUpperCase(), names: cleanedNames });
+  }
+
+  return {
+    ok: errors.length===0 && out.length>0,
+    cleaned: { entries: out, editorName: editorName, editorFriendCode: editorFriendCode },
+    errors: errors.length ? errors : (out.length===0 ? ["No valid entries after filtering"] : [])
+  };
+}
+
+function isValidAddressStr(addr){
+  return typeof addr === "string" && /^[0-9A-Fa-f]{12}$/.test(addr);
+}
+
 export function filterReport(payload){
   payload = payload || {};
   var reasonR = filterText(payload.reason, {maxLen:200, allowNewlines:true, fieldName:"Report reason"});
