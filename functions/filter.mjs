@@ -15,8 +15,19 @@ export const BAD_WORDS = [
   "rape","rapist","kike","chink","spic","tranny"
 ];
 
-// Server-side mirror of preview.html's SENTINEL_LEVELS -- keep in sync.
-const SENTINEL_LEVELS = ["None","Low","High","Aggressive","Corrupted"];
+// Server-side mirror of preview.html's SENTINEL_WORDS -- keep in sync.
+// Expanded 2026-08-17 from 5 flat tier names to the real per-tier adjective
+// words (sourced from the NMS wiki's Sentinel page, itself extracted from
+// the game's own localisation files) -- see preview.html's own comment on
+// this same change for the full reasoning, including "Dissonant" (Tony's
+// "Dissonance sentinels") being one of the real Corrupted-tier words.
+const SENTINEL_WORDS = [
+  ["Low","Minimal","Low Security","Limited","Infrequent","Sparse","Isolated","Remote","Irregular Patrols","Spread Thin","Intermittent","Few"],
+  ["Attentive","Enforcing","Frequent","Require Orthodoxy","Require Obedience","Regular Patrols","Unwavering","Observant","Ever-present"],
+  ["Aggressive","Frenzied","High Security","Hostile Patrols","Threatening","Hateful","Zealous","Malicious","Inescapable"],
+  ["Corrupted","Forsaken","Rebellious","Answer To None","Sharded from the Atlas","Dissonant","De-Harmonised"]
+];
+const SENTINEL_LEVELS = ["None"].concat(SENTINEL_WORDS[0],SENTINEL_WORDS[1],SENTINEL_WORDS[2],SENTINEL_WORDS[3]);
 
 // Server-side mirror of preview.html's RING_STYLE_BY_BIOME -- keep in sync.
 // The client only ever sends a boolean "does this body have a ring", never
@@ -27,7 +38,7 @@ const RING_STYLE_BY_BIOME = {
   Frozen: "icy",
   Barren: "tan", Lush: "tan", Marsh: "tan",
   Volcanic: "ash", Dead: "ash", Toxic: "ash",
-  Scorched: "gold", Irradiated: "gold", "Mega Exotic": "gold",
+  Scorched: "gold", Radioactive: "gold", Irradiated: "gold", "Mega Exotic": "gold",  // Irradiated kept as an alias, see preview.html comment
   Exotic: "split"
 };
 
@@ -183,6 +194,15 @@ export function filterSystemEdit(payload){
   // from anything else in the payload.
   out.ruins = !!payload.ruins;
 
+  // Outlaw (2026-08-17, Tony): a system's conflict WORD can be "Pirate
+  // Controlled" (a real tier-3 CONFLICT descriptor) without the separate
+  // s.outlaw flag being set -- that flag drives the skull icon on the
+  // Conflict badge and the "Outlaw" tag, and was procedural-only with no
+  // manual override until now, same manual-only pattern as ruins/giant/
+  // blackHole/atlas above -- not derived from the conflict word itself,
+  // since a traveller should be able to set them independently.
+  out.outlaw = !!payload.outlaw;
+
   // Phantom Star / Shadow Star -- an obscure, wiki-documented NMS oddity
   // (nomanssky.fandom.com/wiki/Phantom_Star, researched in
   // Galactic-Map-Session-Notes.md): most regions contain thousands of
@@ -199,6 +219,19 @@ export function filterSystemEdit(payload){
 
   var notesR = filterText(payload.notes, {maxLen:800, allowNewlines:true, fieldName:"Notes"});
   if(!notesR.ok) errors.push(notesR.reason); else out.notes = notesR.cleaned;
+
+  // Optional attribution -- "who documented this system" -- added per Tony's
+  // ask (2026-08-16) for a way to show which traveller submitted a system's
+  // real in-game data. Deliberately NOT one of the FLAG_FIELDS/TOP_CATS
+  // whole-row categories in system-edit.mjs -- it's just metadata about the
+  // submission itself, not contestable content, so it always overwrites on
+  // every edit (reflects the most recent submitter) rather than going
+  // through the flag/consensus-vote pipeline every other field uses.
+  var editorNameR = filterText(payload.editorName, {maxLen:30, fieldName:"Your name"});
+  if(!editorNameR.ok) errors.push(editorNameR.reason); else out.editorName = editorNameR.cleaned;
+
+  var editorCodeR = filterText(payload.editorFriendCode, {maxLen:24, fieldName:"Friend code"});
+  if(!editorCodeR.ok) errors.push(editorCodeR.reason); else out.editorFriendCode = editorCodeR.cleaned;
 
   // Small helper for the 4 grouped resource fields (Flora/Minerals/
   // Salvageable tech/Fossils) -- same shape and limits as the existing
@@ -223,7 +256,11 @@ export function filterSystemEdit(payload){
     if(!bNameR.ok){ errors.push(bNameR.reason); continue; }
     var biomeR = filterText(b.biome, {maxLen:20, fieldName:"Biome"});
     if(!biomeR.ok){ errors.push(biomeR.reason); continue; }
-    var descR = filterText(b.descriptor, {maxLen:20, fieldName:"Descriptor"});
+    // Bumped 20->50 (2026-08-17, Tony): too short for real in-game hazard/
+    // weather phrases like "Planet-wide Radioactive Storm" -- must match
+    // preview.html's own bfDesc maxlength or the server would still reject/
+    // truncate what the client now happily accepts.
+    var descR = filterText(b.descriptor, {maxLen:50, fieldName:"Descriptor"});
     if(!descR.ok){ errors.push(descR.reason); continue; }
     var resOut = [];
     var res = Array.isArray(b.resources) ? b.resources : [];
@@ -253,11 +290,16 @@ export function filterSystemEdit(payload){
       ring: (!isMoon && !!b.ring) ? (RING_STYLE_BY_BIOME[biomeR.cleaned] || "tan") : false,
       resources: resOut,
       flora: resArr(b.flora,"Flora"),
+      fauna: resArr(b.fauna,"Fauna"),
       minerals: resArr(b.minerals,"Mineral"),
       salvage: resArr(b.salvage,"Salvageable tech"),
       fossils: resArr(b.fossils,"Fossil/curiosity"),
       sentinel: SENTINEL_LEVELS.indexOf(sentinelIn)>=0 ? sentinelIn : "None",
-      autophage: !!b.autophage
+      autophage: !!b.autophage,
+      // "Has base" (2026-08-17, Tony): plain boolean, same manual-only
+      // pattern as autophage above -- no procedural rule for a traveller's
+      // own base placement.
+      base: !!b.base
     });
   }
 
@@ -270,7 +312,76 @@ export function filterSystemEdit(payload){
     if(moonCount>5) errors.push("A Gas giant can have at most 5 moons");
   }
 
+  // "Colliding planets present" (2026-08-17, Tony -- built client-side in a
+  // separate session, but never actually wired into this server-side
+  // allowlist, so the checkbox/pair picker looked like it worked in the
+  // Edit form but a submitted choice was silently dropped before it ever
+  // reached the shared data store -- same "allowlist is authoritative"
+  // pattern every other field on this page already follows, just missed
+  // for this one. Display-only, like ring style: which two planets visually
+  // collide can ONLY be a traveller's own in-game observation, so this is a
+  // manual pick, not derived from anything else in the payload. collidingA/
+  // collidingB are 1-based positions into THIS SAME submitted bodies array
+  // (same shape as a moon's "orbits" field above) -- clamped to a real
+  // position or 0 ("not set"), never trusted blindly, but not hard-rejected
+  // either if the pair looks incomplete/equal, since that just means the
+  // display-only pairing quietly does nothing rather than blocking an
+  // otherwise-valid save over one optional cosmetic field. */
+  out.colliding = !!payload.colliding;
+  out.collidingA = Math.max(0, Math.min(out.bodies.length, parseInt(payload.collidingA,10)||0));
+  out.collidingB = Math.max(0, Math.min(out.bodies.length, parseInt(payload.collidingB,10)||0));
+
   return {ok: errors.length===0, cleaned: out, errors: errors};
+}
+
+/* Bulk save-file import (2026-08-18): a visitor who's parsed their own
+   save.hg client-side (see nms-core/save-import/) can offer to import
+   their own real bases in one batch, rather than one Edit-system
+   submission per system -- which the normal 8-edits/hour rate limit
+   would make impractical for anyone with more than a handful of bases.
+   Same content rules as a normal edit's name/notes fields, just applied
+   to every entry in one array. Caps batch size hard at 300 (a generous
+   real-world base count -- Tony's own real save had 278) so one request
+   can't be used to smuggle in an unbounded write. */
+var MAX_BULK_IMPORT_ENTRIES = 300;
+
+export function filterBulkImport(payload){
+  var errors = [];
+  payload = payload || {};
+  var entriesIn = Array.isArray(payload.entries) ? payload.entries : [];
+  if(entriesIn.length === 0) errors.push("No entries to import");
+  if(entriesIn.length > MAX_BULK_IMPORT_ENTRIES){
+    errors.push("Too many entries in one import (max "+MAX_BULK_IMPORT_ENTRIES+", got "+entriesIn.length+")");
+  }
+
+  var editorNameR = filterText(payload.editorName, {maxLen:30, fieldName:"Your name"});
+  var editorCodeR = filterText(payload.editorFriendCode, {maxLen:24, fieldName:"Friend code"});
+  var editorName = editorNameR.ok ? editorNameR.cleaned : "";
+  var editorFriendCode = editorCodeR.ok ? editorCodeR.cleaned : "";
+
+  var out = [];
+  for(var i=0;i<Math.min(entriesIn.length, MAX_BULK_IMPORT_ENTRIES);i++){
+    var e = entriesIn[i] || {};
+    if(!isValidAddressStr(e.address)) continue; // silently skip malformed addresses rather than failing the whole batch
+    var namesIn = Array.isArray(e.names) ? e.names : (e.name ? [e.name] : []);
+    var cleanedNames = [];
+    for(var j=0;j<Math.min(namesIn.length,10);j++){
+      var nR = filterText(namesIn[j], {maxLen:40, fieldName:"System name"});
+      if(nR.ok && nR.cleaned) cleanedNames.push(nR.cleaned);
+    }
+    if(!cleanedNames.length) continue; // every name for this entry was empty/blocked/too long -- skip it, don't fail the batch
+    out.push({ address: String(e.address).toUpperCase(), names: cleanedNames });
+  }
+
+  return {
+    ok: errors.length===0 && out.length>0,
+    cleaned: { entries: out, editorName: editorName, editorFriendCode: editorFriendCode },
+    errors: errors.length ? errors : (out.length===0 ? ["No valid entries after filtering"] : [])
+  };
+}
+
+function isValidAddressStr(addr){
+  return typeof addr === "string" && /^[0-9A-Fa-f]{12}$/.test(addr);
 }
 
 export function filterReport(payload){

@@ -5,12 +5,35 @@
    POST body: { action: "edit"|"report"|"resolve-flag", address, payload }
      address = the 12-char portal hex address the edit applies to
      "edit"   payload = {name, race, region, stars:[colourKey,...] (max 3), starClass, water, dissonant,
-                         giant, ruins, phantom, econName, sell, buy, econDesc, conflict, blackHole, atlas, notes,
+                         giant, ruins, outlaw, phantom, econName, sell, buy, econDesc, conflict, blackHole, atlas, notes,
+                         editorName, editorFriendCode, colliding, collidingA, collidingB,
                          bodies:[{name, moon, orbits, biome, descriptor, water, ring, resources,
-                                  flora, minerals, salvage, fossils, sentinel, autophage}, ...]}
+                                  flora, fauna, minerals, salvage, fossils, sentinel, autophage, base}, ...]}
+                         (base added 2026-08-17 -- "Has base" per-body marker, same manual-only
+                         pattern as autophage. fauna added 2026-08-17 -- same shape/24-char-per-item
+                         limit as flora/minerals/salvage/fossils, see filter.mjs's resArr().)
                          (ruins added 2026-08-14; phantom was already validated/shown but is only
-                         actually persisted as of the same date -- see getCategoryValue's comment)
+                         actually persisted as of the same date -- see getCategoryValue's comment.
+                         editorName/editorFriendCode added 2026-08-16 -- optional "who documented
+                         this" attribution, always overwrites directly, NOT part of TOP_CATS/the
+                         flag-consensus system below, see filter.mjs's comment on why. outlaw added
+                         2026-08-17 -- Tony caught that picking the "Pirate Controlled" conflict word
+                         didn't set this separate skull/tag flag, same manual-only pattern as
+                         giant/ruins/blackHole/atlas. colliding/collidingA/collidingB added
+                         2026-08-17 -- display-only "these two planets visually overlap" flag, built
+                         client-side in a separate session but never actually added to this
+                         allowlist until now -- see filter.mjs's own comment on that same field for
+                         why it's a manual pick, not derived data.)
      "report" payload = {reason}
+     "bulk-import" payload = {entries:[{address, names:[...]}...], editorName, editorFriendCode}
+                    Added 2026-08-18 alongside nms-core/save-import/ (client-side save.hg
+                    parser) -- a visitor who's parsed their OWN save file in their own
+                    browser can offer to import their real bases in one batch instead of
+                    one Edit-system submission per system. See filterBulkImport() in
+                    filter.mjs and handleBulkImport() below for the full behaviour
+                    (existing community data on a system is never blanked out, only
+                    name-if-blank and notes get touched; rate-limited separately and much
+                    more strictly than a normal edit, since it's a much heavier write).
      "resolve-flag" (admin only, requires ?token=<ADMIN_TOKEN> on the URL) payload =
                     {field, resolution:"dispute"|"dismiss"|"set-value", value?}
                     field is one of FLAG_FIELDS or "bodies.N" -- see lib/shared.mjs.
@@ -86,7 +109,7 @@
                        ?token=... to prove it's really him.
    ============================================================ */
 
-import { filterSystemEdit, filterReport } from "./filter.mjs";
+import { filterSystemEdit, filterReport, filterBulkImport } from "./filter.mjs";
 import {
   json, isValidAddress, githubGetFile, githubPutFile, pruneLog,
   editorHash, getGetCache, setGetCache, invalidateGetCache,
@@ -98,6 +121,7 @@ const MAX_REPORTS_PER_IP_PER_HOUR = 15;
 const GET_CACHE_TTL_MS = 30 * 1000;
 const MAX_VOTES_PER_FIELD = 20;   // oldest dropped once a field's vote ledger passes this
 const MAX_HISTORY_PER_SYSTEM = 30; // oldest dropped once a system's audit log passes this
+const MAX_BULK_IMPORTS_PER_IP_PER_DAY = 1; // save-file import is a much heavier write than a normal edit -- one per IP per day is plenty for a real visitor, and blocks abuse
 
 /* Reads one of the 13 flag categories' current value out of a
    filterSystemEdit()-shaped payload (`out`) or an already-saved `data`
@@ -123,6 +147,9 @@ function getCategoryValue(out, category){
     // Ruins (2026-08-14, hyperdrive-types.docx task 9): plain boolean, same
     // pattern as giant/blackHole/atlas above.
     case "ruins": return !!out.ruins;
+    // Outlaw (2026-08-17): plain boolean, same pattern as ruins/giant/
+    // blackHole/atlas above.
+    case "outlaw": return !!out.outlaw;
     // Phantom / Shadow Star -- was validated by filterSystemEdit() and shown
     // in the Edit system modal since it was added, but never actually wired
     // into TOP_CATS/getCategoryValue/applyCategoryValue below, so a
@@ -132,6 +159,11 @@ function getCategoryValue(out, category){
     // itself, fixed alongside since it's the identical one-line pattern.
     case "phantom": return out.phantom || "";
     case "notes": return out.notes;
+    // Colliding planets (2026-08-17): bundled the same way "suffix" bundles
+    // water+dissonant above -- colliding/collidingA/collidingB are one
+    // traveller pick (display-only pairing), so they go through consensus
+    // together, not as 3 independently-flaggable fields.
+    case "colliding": return { colliding: !!out.colliding, collidingA: out.collidingA||0, collidingB: out.collidingB||0 };
     default: return undefined;
   }
 }
@@ -165,8 +197,12 @@ function applyCategoryValue(data, category, value){
     case "blackHole": data.blackHole=!!value; return;
     case "atlas": data.atlas=!!value; return;
     case "ruins": data.ruins=!!value; return;
+    case "outlaw": data.outlaw=!!value; return;
     case "phantom": data.phantom=value; return;
     case "notes": data.notes=value; return;
+    case "colliding":
+      data.colliding=!!value.colliding; data.collidingA=value.collidingA||0; data.collidingB=value.collidingB||0;
+      return;
   }
 }
 
@@ -294,6 +330,88 @@ async function handleGet(req, token){
   return json(200, out, cacheHeaders);
 }
 
+/* Bulk save-file import (2026-08-18) -- see filter.mjs's filterBulkImport()
+   header comment for why this exists as its own action instead of looping
+   the normal single-system "edit" action. ONE githubGetFile + merge loop +
+   ONE githubPutFile for the whole batch, same "respect existing community
+   data" principle as a normal edit: a system that already has real
+   TOP_CATS data (race/economy/conflict/etc, submitted by some other
+   traveller) never gets that data silently blanked out by an import --
+   only `name` (filled in ONLY if currently blank) and `notes` (appended,
+   deduped) are ever touched on an existing system. A brand-new address
+   gets a fresh minimal record, same shape a normal partial edit already
+   produces. */
+async function handleBulkImport(req, token, body, ip, now){
+  var filtered = filterBulkImport(body.payload);
+  if(!filtered.ok){
+    return json(422, {ok:false, error:"Rejected by content filter", details: filtered.errors});
+  }
+
+  var current;
+  try { current = await githubGetFile(token); }
+  catch(e){ return json(502, {ok:false, error:"Could not read shared data store: "+e.message}); }
+
+  if(!current.data.bulkImportLog) current.data.bulkImportLog = {};
+  var HOUR = 3600*1000, DAY = 24*HOUR;
+  var hits = (current.data.bulkImportLog[ip]||[]).filter(function(ts){ return now-ts < DAY; });
+  if(hits.length >= MAX_BULK_IMPORTS_PER_IP_PER_DAY){
+    return json(429, {ok:false, error:"Only one save-file import per day from this connection. Try again tomorrow, or add systems individually via Edit system."});
+  }
+  hits.push(now);
+  current.data.bulkImportLog[ip] = hits;
+
+  var added=0, merged=0;
+  for(var i=0;i<filtered.cleaned.entries.length;i++){
+    var entry = filtered.cleaned.entries[i];
+    var sysRec = current.data.systems[entry.address];
+    var primaryName = entry.names[0];
+    var noteLine = entry.names.length>1
+      ? "Real bases from a traveller's save: "+entry.names.join("; ")
+      : "Real base from a traveller's save: "+entry.names[0];
+
+    if(!sysRec){
+      current.data.systems[entry.address] = {
+        flaggedFields: [], disputedFields: [],
+        data: {
+          name: primaryName, race:"", region:"", starClass:"", stars:[],
+          water:false, dissonant:false, giant:false,
+          econName:"", sell:"", buy:"", econDesc:"", conflict:"",
+          blackHole:false, atlas:false, ruins:false, outlaw:false, phantom:"",
+          notes: noteLine, colliding:false, collidingA:0, collidingB:0,
+          editorName: filtered.cleaned.editorName, editorFriendCode: filtered.cleaned.editorFriendCode,
+          bodies: []
+        },
+        editedAt: new Date(now).toISOString(),
+        editedByIp: ip,
+        history: [{ at: new Date(now).toISOString(), text: "Imported from a traveller's real save file (base name/address)" }]
+      };
+      added++;
+    } else {
+      if(!sysRec.data) sysRec.data = {};
+      if(!sysRec.data.name) sysRec.data.name = primaryName;
+      var existingNotes = sysRec.data.notes || "";
+      if(existingNotes.indexOf(noteLine) < 0){
+        sysRec.data.notes = existingNotes ? (existingNotes+" | "+noteLine) : noteLine;
+      }
+      sysRec.data.editorName = filtered.cleaned.editorName || sysRec.data.editorName || "";
+      sysRec.data.editorFriendCode = filtered.cleaned.editorFriendCode || sysRec.data.editorFriendCode || "";
+      sysRec.editedAt = new Date(now).toISOString();
+      pushHistory(sysRec, "real base name(s) merged in from a traveller's save-file import", now);
+      merged++;
+    }
+  }
+
+  try {
+    await githubPutFile(token, current.data, current.sha,
+      "Bulk save-file import: "+added+" new, "+merged+" merged ("+(filtered.cleaned.editorName||"anonymous")+")");
+  } catch(e){
+    return json(502, {ok:false, error:"Could not save to shared data store: "+e.message});
+  }
+
+  invalidateGetCache();
+  return json(200, {ok:true, added:added, merged:merged, total:filtered.cleaned.entries.length});
+}
+
 async function handleResolveFlag(req, token, body){
   var url = new URL(req.url);
   var suppliedAdminToken = url.searchParams.get("token");
@@ -361,13 +479,15 @@ export default async (req, context) => {
 
   if(action === "resolve-flag") return handleResolveFlag(req, token, body);
 
-  var address = body.address;
-  if(action !== "edit" && action !== "report") return json(400, {ok:false, error:"action must be 'edit', 'report', or 'resolve-flag'"});
-  if(!isValidAddress(address)) return json(400, {ok:false, error:"address must be a 12-character hex portal address"});
-
   // Netlify supplies the real client IP in this header on their edge network.
   var ip = req.headers.get("x-nf-client-connection-ip") || context.ip || "unknown";
   var now = Date.now();
+
+  if(action === "bulk-import") return handleBulkImport(req, token, body, ip, now);
+
+  var address = body.address;
+  if(action !== "edit" && action !== "report") return json(400, {ok:false, error:"action must be 'edit', 'report', 'bulk-import', or 'resolve-flag'"});
+  if(!isValidAddress(address)) return json(400, {ok:false, error:"address must be a 12-character hex portal address"});
 
   var filtered;
   if(action === "edit"){
@@ -419,11 +539,16 @@ export default async (req, context) => {
     // or more categories from flaggedFields/disputedFields.
     var stillUnderReview = sysRec.flaggedFields.concat(sysRec.disputedFields);
 
-    var TOP_CATS = ["name","race","region","starClass","stars","suffix","giant","economy","conflict","blackHole","atlas","ruins","phantom","notes"];
+    var TOP_CATS = ["name","race","region","starClass","stars","suffix","giant","economy","conflict","blackHole","atlas","ruins","outlaw","phantom","notes","colliding"];
     for(var ti=0; ti<TOP_CATS.length; ti++){
       if(stillUnderReview.indexOf(TOP_CATS[ti])>=0) continue;
       applyCategoryValue(sysRec.data, TOP_CATS[ti], getCategoryValue(filtered.cleaned, TOP_CATS[ti]));
     }
+
+    // Attribution metadata -- always a direct overwrite, not gated behind
+    // flag/dispute review like TOP_CATS above (see filter.mjs's comment).
+    sysRec.data.editorName = filtered.cleaned.editorName || "";
+    sysRec.data.editorFriendCode = filtered.cleaned.editorFriendCode || "";
 
     // Bodies: the submitted form always describes the traveller's FULL
     // current body list (there's no partial-body-list concept client-side,
