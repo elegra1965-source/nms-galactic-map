@@ -990,6 +990,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     <div style="font-size:10px;color:var(--text-faint);line-height:1.4;margin-top:5px">Planet names are a procedural guess, not your save data (<span style="text-decoration:underline;cursor:pointer" onclick="openDisclaimer()">see About</span>) -- Edit system to add the real ones.</div>
   </div>
   <div id="pBody" style="display:none">
+    <button class="btn" id="bBodyBack" type="button" title="Return to this system's planet/moon list." style="margin-bottom:10px">&larr; Back to planet list</button>
     <div class="row"><span id="icBio"></span>
       <div><div class="lb">Biome</div><div class="vl" id="bBiome">—</div><div class="sub" id="bTerr">—</div></div></div>
     <div class="tags" id="bTags"></div>
@@ -1176,6 +1177,13 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
         <div class="icomboList" id="edEconList"></div>
       </div>
     </div>
+    <div class="mfld">
+      <div class="lb" style="display:flex;justify-content:space-between;align-items:center">
+        <span>Stars (max 3 -- single / binary / ternary)</span>
+        <button class="btn" id="edAddStar" type="button" style="padding:3px 8px">+ Add star</button>
+      </div>
+      <div id="starEditList"></div>
+    </div>
     <div class="mfld" style="display:flex;gap:8px">
       <div style="flex:1"><div class="lb">Sell %</div><input type="text" id="edSell" maxlength="10" inputmode="decimal" placeholder="e.g. 71.5"></div>
       <div style="flex:1"><div class="lb">Buy %</div><input type="text" id="edBuy" maxlength="10" inputmode="decimal" placeholder="e.g. -15.7"></div>
@@ -1185,13 +1193,6 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
         <input type="text" id="edEconStr" class="icomboInput" placeholder="Type to search" autocomplete="off" spellcheck="false">
         <div class="icomboList" id="edEconStrList"></div>
       </div>
-    </div>
-    <div class="mfld">
-      <div class="lb" style="display:flex;justify-content:space-between;align-items:center">
-        <span>Stars (max 3 -- single / binary / ternary)</span>
-        <button class="btn" id="edAddStar" type="button" style="padding:3px 8px">+ Add star</button>
-      </div>
-      <div id="starEditList"></div>
     </div>
     <div class="mfld"><div class="lb">Conflict level</div>
       <div class="icombo" id="edConflictCombo">
@@ -2633,20 +2634,30 @@ var selRing=null, focusRing=null, hoverRing=null;
 /* Session 38 (2026-08-17): hover popup + course-preview state. hoverSys is
    the system currently under the mouse (null when nothing hovered).
    previewLine/previewRing are drawn only while hovering a candidate while
-   the info panel is open (i.e. mid course-planning) -- a lightweight
-   straight-line "what would it take to get here" indicator, deliberately
-   NOT a full findRoute()/A* multi-hop search on every hover frame (that
-   would be far too expensive to run continuously). previewAnim* track the
-   outward-growing line animation, driven from animate()'s own dt each
-   frame rather than a separate timer. */
+   the info panel is open (i.e. mid course-planning).
+   Session 39 (2026-08-18, Tony -- his own real-in-game reference research
+   confirmed warp lines run star-to-star, not a single straight diagonal):
+   the preview line now routes through findRoute()'s real intermediate
+   stars, same as the committed Set-course line, instead of a plain 2-point
+   straight line. Running findRoute() on every hover-target CHANGE (not
+   every frame -- that was always the actual cost concern, and hover target
+   only changes when the mouse lands on a genuinely different star) is
+   cheap enough; previewRouteTimer debounces it a further ~140ms so a fast
+   mouse sweep across a dense cluster doesn't fire a route search for every
+   star glanced over, only the one actually settled on. */
 var hoverSys=null, hoverPopVisible=false, _hoverRayT=0;
-var previewLine=null, previewTargetAddr=null;
+var previewLine=null, previewTargetAddr=null, previewPendingAddr=null, previewRouteTimer=null;
 /* Session 38 continued: previewGrowing/previewHoldT drive a looping
    grow-hold-reset cycle (not a one-shot animation) -- per Tony's ask, the
    line keeps expanding out to the hovered candidate, holds briefly fully
    extended, then resets back to the source and grows again, repeating for
-   as long as that candidate stays hovered. See updatePreviewAnim(). */
-var previewAnimT=0, previewGrowing=false, previewHoldT=0, previewFromPos=null, previewToPos=null, previewStyle=null;
+   as long as that candidate stays hovered. See updatePreviewAnim().
+   previewPoints/previewPrefix/previewTotalLen (Session 39) are the real
+   routed waypoint chain and its cumulative arc length, walked by
+   _polylineLerp() to find how far along the BENT path (not a straight
+   line) the growing tip has reached. */
+var previewAnimT=0, previewGrowing=false, previewHoldT=0, previewStyle=null;
+var previewPoints=null, previewPrefix=null, previewTotalLen=0;
 galaxyGroup.add(nebulaGroup);
 var allSystems=[], shown=[];
 var focus={x:0,y:0,z:0}, focusSystem=null, courseTarget=null;
@@ -4376,31 +4387,56 @@ function hideHoverPop(){
 function updateCoursePreviewHover(s){
   if(!focusSystem||!s||s.address===focusSystem.address||
      (courseTarget&&s.address===courseTarget.address)){
+    if(previewRouteTimer){ clearTimeout(previewRouteTimer); previewRouteTimer=null; }
+    previewPendingAddr=null;
     clearCoursePreview(); return;
   }
-  if(previewTargetAddr===s.address) return; /* already previewing this one */
-  var dist=distanceLY(s);
+  if(previewTargetAddr===s.address||previewPendingAddr===s.address) return; /* already showing, or already queued, for this one */
+  if(previewRouteTimer){ clearTimeout(previewRouteTimer); previewRouteTimer=null; }
+  previewPendingAddr=s.address;
   var range=parseInt(document.getElementById("fHyper").value,10);
   var reachable=canReachColor(s.type);
   var color=reachable?0xf0a500:0xe24b4a;
-  var solid=reachable&&dist<=range;
-  startPreviewLine(focusSystem,s,{solid:solid,color:color});
+  var fromSys=focusSystem;
+  /* Debounced, not instant -- findRoute() is cheap for a single call but
+     a fast mouse sweep across a dense cluster can land on many different
+     stars per second, and each one is a real (bounded, but non-trivial)
+     hop-by-hop search. Waiting ~140ms means only the star actually settled
+     on gets routed, not every one glanced over along the way. */
+  previewRouteTimer=setTimeout(function(){
+    previewRouteTimer=null;
+    if(previewPendingAddr!==s.address||!focusSystem||focusSystem.address!==fromSys.address) return; /* hover moved on, or location changed, before this fired */
+    var rt=findRoute(fromSys,s,range,true);
+    var pts=rt.path.map(function(wp){ return {x:wp.px,y:wp.py,z:wp.pz}; });
+    var solid=reachable&&(pts.length-1===1);
+    startPreviewLine(s,{solid:solid,color:color},pts);
+  },140);
 }
-function startPreviewLine(fromSys,toSys,style){
+function startPreviewLine(toSys,style,points){
   clearCoursePreview();
   previewTargetAddr=toSys.address;
-  previewFromPos={x:fromSys.px,y:fromSys.py,z:fromSys.pz};
-  previewToPos={x:toSys.px,y:toSys.py,z:toSys.pz};
+  previewPoints=points;
+  previewPrefix=[0];
+  for(var i=0;i<points.length-1;i++){
+    var a=points[i],b=points[i+1];
+    var d=Math.sqrt((b.x-a.x)*(b.x-a.x)+(b.y-a.y)*(b.y-a.y)+(b.z-a.z)*(b.z-a.z));
+    previewPrefix.push(previewPrefix[previewPrefix.length-1]+d);
+  }
+  previewTotalLen=previewPrefix[previewPrefix.length-1];
   previewStyle=style;
-  hoverRing.position.set(previewToPos.x,previewToPos.y,previewToPos.z);
+  var endPt=points[points.length-1];
+  hoverRing.position.set(endPt.x,endPt.y,endPt.z);
   hoverRing.material.color.setHex(style.color);
   hoverRing.material.opacity=0; hoverRing.visible=true;
   previewAnimT=0; previewGrowing=true; previewHoldT=0;
 }
 function clearCoursePreview(){
+  if(previewRouteTimer){ clearTimeout(previewRouteTimer); previewRouteTimer=null; }
+  previewPendingAddr=null;
   if(previewLine){ localGroup.remove(previewLine); previewLine.geometry.dispose(); previewLine.material.dispose(); previewLine=null; }
   hoverRing.visible=false;
-  previewTargetAddr=null; previewGrowing=false; previewHoldT=0; previewFromPos=null; previewToPos=null; previewStyle=null;
+  previewTargetAddr=null; previewGrowing=false; previewHoldT=0;
+  previewPoints=null; previewPrefix=null; previewTotalLen=0; previewStyle=null;
 }
 /* Called every frame from animate() -- cheap no-op unless a preview is
    active. Per Tony's ask ("expanding needs to be continuous... then start
@@ -4410,12 +4446,18 @@ function clearCoursePreview(){
    back to zero-length at the source and the grow phase begins again.
    Repeats indefinitely while the same candidate stays hovered; changing the
    hover target (startPreviewLine) or clearing it (clearCoursePreview, on
-   mouse-leave or a click) is what actually stops the loop. The ribbon is a
-   small single-segment mesh, cheap enough to fully rebuild every active
-   frame (simpler and safer than mutating it in place, since both its
-   length AND its camera-facing width change together every frame). */
+   mouse-leave or a click) is what actually stops the loop.
+   Session 39 (2026-08-18): the grow now walks along previewPoints, the
+   REAL routed waypoint chain from findRoute() (via _polylineLerp, same
+   cumulative-arc-length approach the committed course line already uses
+   in drawCourse()) instead of a straight line from source to destination
+   -- so the animation visibly bends through each real intermediate star
+   exactly like the committed line does, not a single diagonal cutting
+   across open space. The ribbon is rebuilt every active frame (cheap --
+   at most a handful of segments) since both its length AND its
+   camera-facing width change together every frame. */
 function updatePreviewAnim(dt){
-  if(!previewFromPos||!previewToPos||!previewStyle) return;
+  if(!previewPoints||!previewPrefix||!previewStyle) return;
   var t;
   if(previewGrowing){
     previewAnimT+=dt/1.4; /* half speed again per Tony's ask -- was 0.7, 0.35 originally */
@@ -4431,13 +4473,19 @@ function updatePreviewAnim(dt){
       t=1;
     }
   }
-  var tip={
-    x:previewFromPos.x+(previewToPos.x-previewFromPos.x)*t,
-    y:previewFromPos.y+(previewToPos.y-previewFromPos.y)*t,
-    z:previewFromPos.z+(previewToPos.z-previewFromPos.z)*t
-  };
+  var tipDist=previewTotalLen*t;
+  var tip=_polylineLerp(previewPoints,previewPrefix,tipDist);
+  /* Every real waypoint the grow has already passed, plus the interpolated
+     tip as the final point -- gives _dashSegments() a genuine (partial)
+     bent polyline to draw, not just two endpoints. */
+  var grownPts=[previewPoints[0]];
+  for(var i=1;i<previewPoints.length;i++){
+    if(previewPrefix[i]<=tipDist) grownPts.push(previewPoints[i]);
+    else { grownPts.push(tip); break; }
+  }
+  if(grownPts.length<2) grownPts.push(tip);
   if(previewLine){ localGroup.remove(previewLine); previewLine.geometry.dispose(); previewLine.material.dispose(); }
-  var segs=_dashSegments([previewFromPos,tip],2.0,1.4,previewStyle.solid);
+  var segs=_dashSegments(grownPts,2.0,1.4,previewStyle.solid);
   previewLine=_buildRibbonMesh(segs,previewStyle.color,previewStyle.solid?0.75:0.8,COURSE_LINE_PX);
   localGroup.add(previewLine);
 }
@@ -4900,6 +4948,16 @@ document.getElementById("bSave").addEventListener("click",function(){
   var v=document.getElementById("pNote").value.trim();
   if(v) store.notes[skey(selected)]=v; else delete store.notes[skey(selected)];
   saveStore(); toast("Log saved");
+});
+document.getElementById("bBodyBack").addEventListener("click",function(){
+  // Same pattern already used at bEnter's own "back to local" branch above --
+  // updatePanel() always resets #pBody to hidden and #pSys (the planet/moon
+  // list) back to visible. Real gap found 2026-08-18 (Tony, mobile): once a
+  // planet/moon is clicked open via showBody(), nothing in the panel itself
+  // could get back to the list -- desktop visitors could sometimes click the
+  // star again in the 3D view behind the panel, but that's not reachable at
+  // all on a phone where the panel covers the screen.
+  if(selected) updatePanel(selected);
 });
 document.getElementById("bMark").addEventListener("click",function(){
   if(!selected) return;
