@@ -50,7 +50,16 @@ function decompressSaveBytes(buf) {
     pos += compressedSize;
   }
   if (chunks.length === 0) {
-    throw new Error("This doesn't look like a No Man's Sky save file (no valid save blocks found).");
+    // The most common real-world cause of this (not a corrupt file): the
+    // Microsoft Store / Xbox Game Pass version of NMS on Windows stores its
+    // saves in a different, encrypted container (under
+    // AppData\Local\Packages\HelloGames.NoMansSky_*\SystemAppData\wgs\)
+    // rather than this LZ4-block format -- confirmed via multiple community
+    // save-tool discussions (see nms-core/save-import/README.md). Only the
+    // Steam/GOG save.hg format is supported here. Phrased as a likely cause,
+    // not a certainty, since a genuinely wrong/corrupt file would look the
+    // same from this function's point of view.
+    throw new Error("This doesn't look like a No Man's Sky save file (no valid save blocks found). If you're on the Microsoft Store / Xbox Game Pass version, that uses a different, encrypted save format this tool can't currently read -- Steam and GOG saves are the ones supported here.");
   }
   let total = 0;
   for (const c of chunks) total += c.length;

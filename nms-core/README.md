@@ -6,6 +6,8 @@ Ported from [hadsh/nms_namegen](https://github.com/hadsh/nms_namegen) (itself a 
 
 `economy.js` is separate original work (elegra1965) — the economy/conflict/race/outlaw/ring logic that `nms_namegen` never modelled. Its numeric probability tables were decompiled directly from a legitimately-owned game install; see the file header for detail.
 
+`save-import/` is also separate original work — a client-side-only reader for real NMS `.hg` save files (name + real base list), unrelated to the procedural generation the rest of this module does. See [`save-import/README.md`](./save-import/README.md) for the full writeup; it's covered here only for completeness.
+
 Used by the [NMS Galactic Map](https://nms-galaxy-map.netlify.app) — a free, fan-made 3D portal decoder and galaxy explorer.
 
 ---
@@ -25,6 +27,7 @@ Used by the [NMS Galactic Map](https://nms-galaxy-map.netlify.app) — a free, f
 | `loadLetterMap.js` | ported (hadsh) | Lazy loader for the 8 letter_map JSON shards |
 | `economy.js` | original (elegra1965) | Economy/conflict/race/outlaw/abandoned/ring logic with real decompiled probability tables |
 | `letter-map/` | ported (hadsh) | 8 JSON data shards required by the name generator (~3 MB total) |
+| `save-import/` | original (elegra1965), + real mapping data from oxur/nms-copilot | Client-side `.hg` save file reader — see its own [README](./save-import/README.md) |
 
 ---
 
@@ -116,6 +119,23 @@ const bodyRng = makeRng(planetSeed);
 const ring = rollRing(bodyRng, "Frozen", false); // (rng, biome, isMoon)
 // Returns false | "icy" | "tan" | "ash" | "gold" | "split"
 ```
+
+### Biome/Sentinel-flavoured planet names (optional)
+
+`planetName()` takes an optional 4th `opts` argument: `{biome, sentinel}`. When
+supplied, the generic Prime/Major/Omega-style adornment word swaps for a
+pool matched to that biome (e.g. Lush leans toward "Verdance"/"Bloom",
+Volcanic toward "Cinder"/"Magma"), with a hostile-Sentinel-activity pool
+taking priority over biome when both are given. Omit `opts` entirely (or
+call with the original 3-arg signature) and output is byte-identical to
+before this was added — every existing caller keeps working unchanged.
+
+```js
+const name = NMSCore.planetName(seed, undefined, letterMap, { biome: "Volcanic", sentinel: "Aggressive" });
+```
+
+Still a disclosed stylistic guess, not a real algorithm — see "Known
+limitations" below and `planet.js`'s own header comment for why.
 
 ---
 

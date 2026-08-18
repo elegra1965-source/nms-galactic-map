@@ -2337,3 +2337,163 @@ stay fully separate; purely a scene-graph reparenting fix. Verified via
 pushing; `data/overrides.json` excluded as always. Whether the touching
 angle/offset reads right against the real planet textures and camera
 angles Tony actually uses still needs his own device/local-file look.
+
+## Session 2026-08-18 — biome-flavoured planet names + real save-file import (name auto-fill + bulk base import)
+
+Tony pointed at oxur/nms-copilot (a Rust NMS save-file reader) and asked
+whether anything from it could pull real planet/system data into the map
+faster, and whether he'd already given save-file access earlier (for
+`economy.js`'s decompiled tables) -- confirmed his real `save.hg`/`save2.hg`
+were already sitting in his connected Projects folder. Cloned nms-copilot
+and MBINCompiler for reference (git clone over plain github.com, since
+`api.github.com` and release-asset domains are blocked by this sandbox's
+allowlist -- same standing workaround as every prior session needing
+GitHub data). Validated the save format from first principles against
+Tony's real save before trusting any of it: confirmed the LZ4-block +
+16-byte-header layout, and confirmed via nms-copilot's own source
+(`crates/nms-graph/src/extract.rs`: *"names aren't in discovery records"*)
+plus a direct search of the decoded save for a known real name that
+individual planet/system names are genuinely NOT stored anywhere in a
+save -- only `PersistentPlayerBases` (real base names + addresses) are.
+Found the real deobfuscated-key mapping table already checked into
+nms-copilot's own repo (sourced from MBINCompiler), sidestepping the need
+to port SpookyHash128 myself.
+
+**Phase 1 -- one-off manual import.** Decoded both of Tony's real saves in
+Python, extracted 224 unique real base addresses/names, confirmed the
+packed-GalacticAddress -> 12-hex-char format matches this site's own
+`isValidAddress()` exactly, and merged them into `data/overrides.json` as
+public community data (same status as any Edit-system submission) --
+pushed directly (commit `5a98776`), since this was a one-time seed of
+Tony's own real data, not the reusable feature.
+
+**Phase 2 -- planet name generator ("1" of Tony's two-part ask).** Tony
+picked the "better flavor generator" option over crowdsourcing real names
+(a different thing entirely -- this never claims to be real, it's a
+disclosed guess, just a less randomly-mismatched one). Added
+`BIOME_ADORNMENTS` (13 biome keys -> 7-8 word pools each, e.g. Lush ->
+Verdance/Bloom/Meadow, Volcanic -> Cinder/Magma/Caldera) and
+`SENTINEL_HOSTILE_ADORNMENTS`/`SENTINEL_HOSTILE_SET` (16 real
+aggressive/corrupted-tier Sentinel words) to `nms-core/planet.js`. New
+optional 4th `opts:{biome,sentinel}` arg on `planetName()` swaps the
+generic Prime/Major/Omega-style pool for a matched one (Sentinel-hostile
+takes priority over biome when both given) using the exact same
+stateless-peek technique (`pickAdornment()`) the original `adornmentIdx`
+already used, generalised to any pool size -- falls back byte-identical
+to the original 10-word pool when `opts` is omitted, so every existing
+caller is unaffected. Wired into `preview.html`'s `upgradeBodyNames()` so
+the lazy per-system name upgrade now passes the body's own biome/sentinel
+through. Verified via a Node determinism/crash-sweep harness (1999/1999
+clean across all 13 biomes, 0 crashes, 663/3000 seeds visibly changed
+under biome context, 424/2000 under sentinel override) before pushing
+(commit `79c8ba9`, alongside the About modal's updated wording).
+
+**Phase 3 -- save-file import popup ("2" of Tony's ask).** Tony chose
+"both" when asked: auto-fill name from a save AND offer a bulk base
+import. Built entirely client-side in a new `nms-core/save-import/`
+folder -- `lz4-block.js` (hand-written pure-JS LZ4 **block**-format
+decompressor, distinct from the LZ4 frame format most JS libraries
+implement; verified byte-for-byte against Tony's real save before trusting
+it anywhere else), `parse-save.js` (walks the header/LZ4-payload sequence,
+lenient-decodes the JSON, deobfuscates keys via the bundled mapping),
+`extract-summary.js` (pulls `{username, saveName, bases, baseCount,
+systemCount}` out of a parsed save, deduped and packed to this site's own
+address format), and `save-mapping.json` (the real 1384-entry mapping
+table, attributed to oxur/nms-copilot/MBINCompiler). All four independently
+re-verified end-to-end against the same real save file, reproducing the
+exact same 224-address result as Phase 1's manual Python import --
+confirming the client-side JS pipeline is a faithful, independent
+reimplementation, not just "looks right."
+
+New `saveImportModal` in `preview.html`, reachable from Edit system via a
+new "Import from my save file" button next to "Your name"/"Friend code".
+Consent flow: pick a `.hg` file (parsed 100% locally, never uploaded) or
+click "I'll do it manually" and nothing happens. On success: shows the
+detected username (if any) with a "Use this name" button that fills +
+persists "Your name" via the existing `saveTravellerId()` mechanism, and
+lists every real base found with an "Import N bases to the shared map"
+button. Explicitly disclosed rather than silently omitted: friend codes
+aren't stored in a save file at all (an account/platform thing, not game
+data), so that field still needs typing by hand. Reuses the modal's
+existing status-icon/spinner/error machinery (`startAtlasWait`,
+`showStatusIcon`, `describeSaveError`, `setErrText`) rather than building
+parallel UI, and applies the same "hidden until measured overflow" scroll
+fix already established for `hyperdriveModal`/`feedbackModal`/`searchPop`
+(`.scroll` class only added after a real `scrollHeight>clientHeight`
+check, re-run on every content change including the new `<details>`
+toggle for the file-location help).
+
+Backend: `filter.mjs` gained `filterBulkImport()` (caps at 300
+entries/call, filters each address + up to 10 names/entry at 40 chars
+each, filters editorName/editorFriendCode same as a normal edit).
+`system-edit.mjs` gained a new `"bulk-import"` action + `handleBulkImport()`
+-- rate-limited to **1 per IP per day** (a new, much stricter limit than
+the normal 8-edits/hour, since one call can touch up to 300 systems in a
+single GitHub write), doing exactly ONE GitHub read + ONE GitHub write
+per call regardless of entry count. Per-address logic never blindly
+overwrites: a brand-new address gets a fresh minimal record with the base
+name as its system name; an address that already has community data only
+gets the base name appended as a note (deduped, so re-importing the same
+base twice doesn't create a duplicate line) plus `editorName`/
+`editorFriendCode` updated to the importer -- every other field
+(race/economy/conflict/etc, if already submitted by someone else) is left
+completely untouched. Verified with two separate test harnesses run
+against the real shipped code (not reimplementations): 9/9 checks on
+`filterBulkImport` (valid batch, address uppercasing, multi-name entries,
+invalid-address-skipped-not-failed, empty/over-300-entries rejected,
+blocked-word-only entry dropped, long-name-dropped-short-kept), and 14/14
+checks on `handleBulkImport` itself via a from-scratch mocked-GitHub-API
+harness driving the real unmodified `system-edit.mjs` default export
+(new-address creation, existing-address merge without clobbering, no
+duplicate note text on a repeat import, the 24-hour per-IP rate limit
+actually blocking a second same-day call, a different IP staying
+unaffected, exactly one GitHub write per successful call).
+
+Tony then asked two follow-up questions before this shipped: (1) would a
+visitor actually know where to find their `.hg` file, and does the popup
+offer any help finding it; (2) do the READMEs (nms-core and the repo root)
+need updating. Answer to (1) was genuinely "not really" as first built --
+just one static path sentence, no platform coverage, no acknowledgement
+that a website literally cannot tell a browser's native file picker which
+folder to open to (a real, unworkaroundable security restriction, not a
+missed feature). Researched real save locations rather than guessing
+(Steam Community guides + savelocation.net): Steam/GOG both save under
+`%APPDATA%\HelloGames\NMS\st_<SteamID64>\`; the Microsoft Store/Xbox Game
+Pass version uses a completely different, encrypted container under
+`AppData\Local\Packages\HelloGames.NoMansSky_*\SystemAppData\wgs\` and
+isn't readable by this tool at all; PS4/PS5/Xbox console saves have no
+simple browser-reachable export path. Rebuilt the popup's hint as a
+`<details>`/`<summary>` "Where do I find this file?" block covering all
+three cases plainly, including the "paste the path into the picker's own
+address bar" workaround since the site can't navigate there for you.
+Also improved `parse-save.js`'s "no valid save blocks found" error (the
+exact failure shape an encrypted MS-Store save would produce) to suggest
+that specific likely cause rather than just "this doesn't look like a
+save file" -- phrased as a probable cause, not a certainty, since a
+genuinely corrupt/wrong file would fail identically.
+Answer to (2) was yes on both: `nms-core/README.md` gained a
+`save-import/` row in its file table, a pointer sentence in the intro,
+and a new "Biome/Sentinel-flavoured planet names (optional)" usage
+subsection documenting the `opts` param added in Phase 2. The repo root
+`README.md` gained a "What it can do" bullet (placed right after Edit
+system, since that's where the button lives), a `nms-core/save-import/`
+line in the file tree, and a new "Importing your own save (optional,
+client-side only)" section mirroring the "Real game data" section's tone
+and level of detail.
+
+Verified the whole combined change before pushing: `node --check` on all
+3 non-empty `preview.html` script blocks plus both touched `.mjs` files,
+a tag-balance pass (`div` 358/358, `a` 5/5, `button` 92/92, `details`
+1/1, `summary` 1/1, `datalist` 7/7), an ID-existence check (336 unique
+ids, 522 `getElementById` calls, 0 missing/duplicate), and a diff against
+the pre-session backup confirming exactly 5 intended hunks in
+`preview.html` (CSS scroll-fix line, the entry-point button, the modal
+markup, `closeAllModalBoxes()`, the JS block) plus one clean insertion
+block each in `filter.mjs`/`system-edit.mjs` -- nothing else touched,
+`data/overrides.json` never part of any of it. Pushed as commit
+`3409584` (the feature) with the file-location/README follow-up staged
+to push right after. **Still needs Tony's own device pass** once
+deployed -- particularly trying the popup against his own real save.hg to
+confirm the whole flow (file picker, parsing, name auto-fill, bulk
+import) feels right end-to-end, since everything here was verified
+against the underlying logic in a Node harness, not a live browser.

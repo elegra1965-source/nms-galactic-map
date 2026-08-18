@@ -78,6 +78,14 @@ commit, so nothing is ever silently lost.
 
 ![Edit system modal](screenshots/05-edit-system-modal.jpg)
 
+**Import from my save file.** Inside Edit system, an optional button reads a
+real Steam/GOG `.hg` save file entirely in your own browser -- nothing is
+ever uploaded -- and can auto-fill "Your name" plus offer a one-click
+bulk-import of your real base names/addresses into the shared map. Discovery
+records don't store player-given planet names at all, only base names do
+(confirmed against a real save file), so that's the one thing this can
+recover automatically; everything else still needs typing in by hand.
+
 **Portal glyph keypad.** Type a hex address or tap the real 16 in-game glyphs
 directly -- both stay in sync, so you can decode a screenshot from your own
 game without knowing the hex first.
@@ -169,6 +177,8 @@ nms-core/                  real decompiled game logic (star type, planet count, 
                              hole/Atlas placement, system/region/planet names, economy/
                              conflict/race/ring odds) — see "Real game data" below and
                              nms-core/README.md for the full module docs
+nms-core/save-import/     client-side-only reader for real .hg save files (name + real
+                             base list) — see nms-core/save-import/README.md
 nms-tools/                  nms-lookup.js, a single-call wrapper around nms-core for
                              other NMS developers who don't want to learn its internals
 glyphs/                    the 16 real portal glyph PNGs (keypad)
@@ -215,6 +225,21 @@ list).
 `await init('./nms-core')` then `getSystem(address, galaxy)` — for anyone
 who wants game-accurate system data in their own project without learning
 `nms-core`'s internal structure first.
+
+## Importing your own save (optional, client-side only)
+
+`nms-core/save-import/` is a separate concern from the procedural layer
+above — it doesn't generate anything, it *reads* a real Steam/GOG `.hg`
+save file the visitor already has, entirely in their own browser (a
+hand-written LZ4 block decompressor + the real obfuscated-key mapping
+table from [oxur/nms-copilot](https://github.com/oxur/nms-copilot)). The
+raw file is never uploaded. It can recover the traveller's own in-game
+name and their real base names + addresses — but not individual planet
+names, which (confirmed against a real save) aren't stored in discovery
+records at all, only base names are. Reachable from **Edit system** →
+"Import from my save file"; see
+[`nms-core/save-import/README.md`](nms-core/save-import/README.md) for
+the technical writeup.
 
 ## Shared community edits, and how a submission actually gets in
 

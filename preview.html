@@ -1430,7 +1430,15 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
         <button class="btn primary" id="siChooseFile" type="button">Choose save file (.hg)</button>
         <button class="btn" id="siManual" type="button">I'll do it manually</button>
       </div>
-      <div style="font-size:11px;color:var(--text-faint);margin-top:10px;line-height:1.5">On PC this is usually under <code>...\AppData\Roaming\HelloGames\NMS\st_...\save.hg</code> (or save2.hg/save3.hg for other slots). Consoles can't export a save file this way -- manual entry via the form above is the only option there.</div>
+      <details style="margin-top:10px" id="siWhereDetails">
+        <summary style="font-size:11px;color:var(--cyan);cursor:pointer">Where do I find this file?</summary>
+        <div style="font-size:11px;color:var(--text-faint);margin-top:6px;line-height:1.55">
+          A website can't open a file picker straight to a folder for you -- that's a browser security restriction, not something this site can work around -- so the dialog opens wherever your OS last left it. Most file pickers let you paste a full path into their own address/location bar to jump straight there.<br><br>
+          <b>Steam or GOG (Windows):</b> <code>%APPDATA%\HelloGames\NMS\st_&lt;your Steam ID&gt;\</code> -- paste <code>%APPDATA%\HelloGames\NMS</code> into the picker's address bar, then open the one folder inside it. Pick <code>save.hg</code> (or <code>save2.hg</code>/<code>save3.hg</code> etc for another slot -- if unsure which is current, sort the folder by "Date modified" and pick the newest one). Ignore any file starting with <code>mf_</code>, those are manifests, not the save itself.<br><br>
+          <b>Microsoft Store / Xbox Game Pass (Windows):</b> not currently supported -- that version stores saves in a different, encrypted format this tool can't read yet. Manual entry via the form above is the only option for now.<br><br>
+          <b>PS4/PS5/Xbox console:</b> saves live on the console or in the cloud, with no simple way to get a plain file out of a browser -- manual entry via the form above is the only option there.
+        </div>
+      </details>
     </div>
     <div id="siProgress" style="display:none;margin-top:10px">
       <div class="iconWrap" id="siIconWrap"><img id="siIconImg" src="" alt=""><span class="driftBeam"></span></div>
@@ -6689,6 +6697,7 @@ function openSaveImportModal(){
   siRemeasureScroll();
 }
 document.getElementById("edOpenSaveImport").addEventListener("click",openSaveImportModal);
+document.getElementById("siWhereDetails").addEventListener("toggle",siRemeasureScroll);
 document.getElementById("siClose").addEventListener("click",closeModal);
 document.getElementById("siManual").addEventListener("click",closeModal);
 document.getElementById("siChooseFile").addEventListener("click",function(){
