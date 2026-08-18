@@ -1435,6 +1435,18 @@ tag balance    open vs close counts per tag
 - Max 2 preview iterations guessing before stopping and asking Tony what
   specifically is wrong.
 - No time estimates.
+- **Any new floating box with a `max-height` (popup, modal, panel — anything
+  that might scroll) must NOT use plain `overflow-y:auto`.** That shows this
+  app's themed scrollbar even when content visibly fits — a sub-pixel
+  `scrollHeight`-vs-`clientHeight` rounding quirk (confirmed live as 181 vs
+  180), not real overflow. Hit repeatedly (`#hyperPanel`, `#tweak`,
+  `hyperdriveModal`, `#searchPop`) because each one got built fresh instead
+  of copying the existing fix. The pattern, every time: CSS default
+  `overflow-y:hidden`, plus a `.scroll` class that sets `overflow-y:auto`;
+  in JS, after the box opens AND after any event that changes its content
+  height, call `el.classList.remove("scroll"); if(el.scrollHeight>el.clientHeight+1) el.classList.add("scroll");`
+  (the `+1` is the rounding buffer). Copy `#searchPop`'s `remeasureScroll()`
+  as the reference implementation rather than re-deriving this.
 
 ---
 
@@ -1527,7 +1539,7 @@ warning toast fires above 45,000. 56 FPS at defaults on Tony's laptop.
   drag-and-drop deploy in this project family, just via GitHub's uploader this
   time — plus a repo delete/recreate breaking Netlify's repo link, fixed by
   unlinking and relinking).
-- **Cross-linked from NMS Hub** (`nms-command-network.netlify.app`) — a 4th
+- **Cross-linked from NMS Hub** (`nomansskyhub.app`, formerly `nms-command-network.netlify.app`) — a 4th
   card (NODE 04 — Navigation Systems) added to the Hub's card grid, using
   `assets/bg-glyphs.jpg` (the portal glyph grid photo) since it's the most
   thematically fitting existing asset. Header node count bumped 3→4.
@@ -2171,3 +2183,157 @@ The actual on-screen thickness/feel (whether 3px reads right at his usual
 zoom levels, whether the billboard orientation looks correct while
 orbiting or flying around a plotted course) still needs Tony's own look --
 his local file should already reflect it without a deploy.
+
+**Session 38, one more fix -- phantom scrollbar on the search popup.**
+Tony sent a screenshot of `#searchPop` showing a visible themed scrollbar
+even though the content (search box + a short "no match" message) clearly
+fit inside it. This is a known, already-documented bug class in this file
+-- `#hyperPanel`/`#tweak`/`hyperdriveModal` all carry the same comment:
+plain `overflow-y:auto` shows this app's themed (very visible) scrollbar
+even when content fits, a sub-pixel `scrollHeight`-vs-`clientHeight`
+rounding quirk (confirmed elsewhere as 181 vs 180), not real overflow --
+`#searchPop` was just built this session using plain `overflow-y:auto`
+without picking up that established fix. Applied the same pattern used
+everywhere else in the file: CSS default changed to `overflow-y:hidden`,
+with a `.scroll` class (`overflow-y:auto`) only added by JS once real
+overflow is actually measured. Added `remeasureScroll()` inside the
+search-popup IIFE (`pop.classList.remove("scroll")` then
+`if(pop.scrollHeight>pop.clientHeight+1) pop.classList.add("scroll")` --
+same `+1` rounding buffer as `positionHyperPanel()`/`openHyperNotice()`),
+called right after both places search results actually change: opening
+the popup and every keystroke in the search box. Verified via `node
+--check`, tag-balance (`div` 316/316, `a` 5/5, `button` 83/83, unchanged),
+an ID-existence check (0 missing), and a diff confirming exactly the 2
+intended edits (CSS + JS). **Not deployed** -- same `preview.html` push as
+the rest of this session.
+
+**Session 39 (undocumented same-day work, picked up as-is) + this round --
+Sentinel save race condition, Fauna field, layout reorder, select-on-click,
+suggestions, per-item length warning.** Continuity note: `preview.html`
+already contained real same-day changes with no matching log entry here or
+in CLAUDE.md when this round started -- Sentinel activity rebuilt from 5
+tier names to the full real per-tier word list, Flora/Minerals/Salvageable
+tech/Fossils & curiosities split into 4 separate free-text fields, and
+Descriptor's maxlength bumped 20->50 client+server. Picked up from there
+rather than redone; flagging it here so a future session isn't confused
+about where it came from.
+
+Tony reported (2 screenshots): Sentinel activity sometimes reverting to
+"None" after a save that looked successful, a "Fauna" value he expected
+missing, a requested layout of `Sentinel : Fossils & curiosities` /
+`Resources` / `Flora : Fauna` / `Minerals : Salvageable tech` with
+Sentinel's label shortened, click-to-select-all on text fields, spell-check
+plus suggestions from previously-typed words, and a proactive character-
+limit hint after hitting another blocked save.
+
+Root-caused the Sentinel bug for real rather than patching symptoms: it's
+a race in `buildIconCombo()` (shared by Biome/Sentinel/Economy/Economy-
+strength/Conflict). Typing a value directly (not clicking a suggestion)
+only commits on `blur`, deliberately delayed 120ms so a mousedown-selection
+could land first -- but Save is a real focusable button, so clicking it
+blurs the input and fires Save's own click handler well inside that 120ms
+window, reading the stale pre-edit value. Only affects typed (not clicked)
+entries, which is why it looked intermittent. Fixed with a synchronous
+`commitNow()` attached to each input (`inp._icomboCommit`) and a new
+`flushAllCombos()` run as the first line of Save's click handler --
+structurally closes the race regardless of timing. "Fauna" never actually
+existed as a field before this round (confirmed via grep of the file and
+its backups); Tony's build request folds it into the same fix.
+
+Rebuilt the body-edit layout exactly as specified and wired the new Fauna
+field through the full pipeline the same way Flora/Minerals/Salvage/
+Fossils already work: `#pBody` read panel (new `bFaunaRow` + `IC_FAUNA`
+placeholder paw-print icon), `resGroup()`, `fsBodyKey()`'s diff key,
+`applyOverride()`, `openEditModal()`, the body-row listeners,
+`clientPrecheck()`, the new-body default object, the save payload,
+`filter.mjs`'s `resArr()` (24-char-per-item cap, same as its siblings), and
+`system-edit.mjs`'s doc comment.
+
+Click-to-select-all: one `focusin` listener delegated on `#modalWrap`
+calls `.select()` on any focused text input/textarea across every modal,
+including rebuilt body rows, no per-field wiring.
+
+Suggestions: added `spellcheck="true"` + `list="dl..."` to the free-text
+fields, backed by 7 new `<datalist>`s populated from a localStorage-only
+"known terms" store (`nms-galmap-known-terms`, one array per field, most-
+recent-first, capped 150, never sent to the server) that grows on every
+successful save (`rememberKnownTerms()`) and repopulates at boot.
+
+Length hint: `filter.mjs` already caps each individual comma-separated
+item in Resources/Flora/Fauna/Minerals/Salvageable tech/Fossils at 24
+characters, but the client only capped the whole field, so one long word
+inside a list could type fine and only fail after Save with no clue which
+word did it. Added a static hint under Resources plus a live
+`checkItemLenWarn()` naming the exact offending item/length the moment it
+exceeds 24, red-bordering the input -- the real number is 24, not the 30
+Tony had been guessing at.
+
+Verified via `node --check` on `filter.mjs`/`system-edit.mjs` and all 3
+non-empty `preview.html` script blocks, a tag-balance pass (`div` 326/326,
+`a` 5/5, `button` 83/83, `datalist` 7/7), an ID-existence check (303 ids,
+456 calls, 0 missing/duplicate), and a diff confirming exactly 21 intended
+hunks in `preview.html` plus 1 each in `filter.mjs`/`system-edit.mjs`.
+**Not deployed** -- needs `preview.html` AND both `netlify/functions/
+filter.mjs` and `netlify/functions/system-edit.mjs` pushed together this
+time (Fauna won't validate/save without the server allowlist change too),
+`data/overrides.json` excluded as always. The on-screen result (Fauna row
+spacing, select-on-click feel, datalist appearance, the red-border length
+warning) still needs Tony's own device/local-file look.
+
+**Session 39, continued -- "Colliding planets" never actually saved, then
+never actually stayed joined.** Tony uploaded `preview.html` after a
+separate mobile Claude session built a "Colliding planets present" feature
+while he was out, and hit a save error ("Couldn't reach the shared data
+store... GitHub may be briefly unavailable or busy"). Diffed the upload
+against the Projects copy first (byte-identical) before touching anything.
+Found a real bug: the mobile session built the whole client-side feature
+(checkbox, first/second planet pickers, a 3D position nudge) but never
+touched `filter.mjs`/`system-edit.mjs` -- `colliding`/`collidingA`/
+`collidingB` were sent on every save but completely absent from the
+server allowlist, silently dropped regardless of whether the save
+succeeded. Added them: `filter.mjs` validates/clamps `collidingA`/
+`collidingB` as 1-based body positions (same pattern as a moon's
+`orbits`), `system-edit.mjs` bundles all 3 into one `colliding` category
+(mirrors how `suffix` bundles water+dissonant) added to `TOP_CATS`/
+`getCategoryValue`/`applyCategoryValue`, so it now goes through the same
+flag/dispute consensus pipeline as giant/ruins/blackHole/atlas. This is
+unrelated to the specific 502 itself -- an unrecognised extra payload key
+doesn't crash a JS allowlist, it just silently drops -- so was upfront
+that the "can't reach GitHub" error is a live signal from the deployed
+Function this sandbox has no way to reproduce or diagnose; suggested
+Retry, then checking Netlify function logs for the underlying GitHub
+status code if it recurs.
+
+Tony then sent 3 more screenshots -- the picker saving now, but the two
+"colliding" planets still on two visibly separate orbit rings, barely
+closer than any normal pair, next to a real in-game reference photo
+(Ibaraohu by rkrasny27) of two planets genuinely touching. Read
+`resolvePlanetCollisions()` and found the real root cause: it only ever
+nudged each planet's `mesh.position` ONCE at build time, but every planet
+orbits on its OWN independent pivot at its OWN independent speed
+(`animate()`'s `pivots[i].p.rotation.y+=pivots[i].sp*dt`, slower the
+further out) -- so a one-time nudge looked right for exactly one frame and
+drifted apart on the next, matching Tony's screenshot precisely. Rewrote
+it to actually JOIN planet B onto planet A's pivot instead of just
+repositioning it: B's own pivot (its orbit-path ring, its `pivots[]`
+entry) is removed from the scene, and B's mesh -- plus its atmosphere
+shell if any, plus its `moonAnchor` carrying along any of B's own moons
+untouched -- is reparented as a child of A's pivot at a fixed touching
+offset (`a.size+b.size+0.4` along a sideways-and-back diagonal rather than
+dead-centre on the ring, so it reads as two spheres resting against each
+other from most angles). Since both now hang off the same pivot, A's
+single rotation drives both forever -- permanently touching, same as a
+planet and its own moon already behave here, instead of separating after
+frame one. Gave B a lightweight non-rendered stand-in pivot so it keeps
+its own gentle axial spin (would otherwise have silently stopped once its
+real pivot -- and the `pivots[]` entry driving that spin -- was removed).
+Never touches `userData.body` on either planet, so names/biome/resources
+stay fully separate; purely a scene-graph reparenting fix. Verified via
+`node --check` on all 3 non-empty script blocks, a tag-balance pass (`div`
+331/331, `a` 5/5, `button` 83/83, `datalist` 7/7), an ID-existence check
+(0 missing), and a diff confirming exactly the 3 intended hunks changed.
+**Not deployed** -- `preview.html` (this fix) plus the earlier `filter.mjs`/
+`system-edit.mjs` allowlist fix from the same round both still need
+pushing; `data/overrides.json` excluded as always. Whether the touching
+angle/offset reads right against the real planet textures and camera
+angles Tony actually uses still needs his own device/local-file look.
