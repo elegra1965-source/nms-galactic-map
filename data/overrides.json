@@ -955,7 +955,7 @@
           "yellow"
         ],
         "water": false,
-        "dissonant": false,
+        "dissonant": true,
         "giant": false,
         "econName": "Ore Extraction",
         "sell": "43.1",
@@ -964,7 +964,7 @@
         "conflict": "Rowdy",
         "blackHole": false,
         "atlas": false,
-        "ruins": false,
+        "ruins": true,
         "phantom": "",
         "notes": "",
         "bodies": [
@@ -984,8 +984,10 @@
             "fauna": [],
             "minerals": [],
             "salvage": [],
-            "fossils": [],
-            "sentinel": "None",
+            "fossils": [
+              "bones"
+            ],
+            "sentinel": "Low",
             "autophage": false,
             "base": false
           },
@@ -1014,10 +1016,10 @@
             "name": "Jisat 55/I6",
             "moon": false,
             "orbits": 0,
-            "biome": "Lush",
+            "biome": "Toxic",
             "descriptor": "",
             "water": true,
-            "ring": false,
+            "ring": "ash",
             "resources": [
               "Salt",
               "Sodium"
@@ -1027,8 +1029,8 @@
             "minerals": [],
             "salvage": [],
             "fossils": [],
-            "sentinel": "None",
-            "autophage": false,
+            "sentinel": "Answer To None",
+            "autophage": true,
             "base": false
           }
         ],
@@ -1039,7 +1041,7 @@
         "editorName": "",
         "editorFriendCode": ""
       },
-      "editedAt": "2026-08-18T13:56:50.134Z",
+      "editedAt": "2026-08-18T18:41:33.093Z",
       "editedByIp": "5.133.46.24",
       "history": [
         {
@@ -1052,6 +1054,10 @@
         },
         {
           "at": "2026-08-18T13:56:50.134Z",
+          "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-08-18T18:41:33.093Z",
           "text": "edited by a traveller"
         }
       ]
@@ -9796,8 +9802,7 @@
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1787060708145,
-      1787061410134
+      1787078493093
     ]
   },
   "flagLog": {}
