@@ -1062,7 +1062,7 @@
         }
       ]
     },
-    "C409FE9C1321": {
+    "19C4FE9C1321": {
       "data": {
         "name": "",
         "race": "",
@@ -1101,7 +1101,7 @@
         }
       ]
     },
-    "11090256EC6A": {
+    "19110256EC6A": {
       "data": {
         "name": "",
         "race": "",
@@ -1140,7 +1140,7 @@
         }
       ]
     },
-    "1909FF9B8325": {
+    "1919FF9B8325": {
       "data": {
         "name": "",
         "race": "",
@@ -1179,7 +1179,7 @@
         }
       ]
     },
-    "0E09FD27C60C": {
+    "190EFD27C60C": {
       "data": {
         "name": "",
         "race": "",
@@ -1218,7 +1218,7 @@
         }
       ]
     },
-    "0A09FF9B8325": {
+    "390AFF9B8325": {
       "data": {
         "name": "",
         "race": "",
@@ -1257,7 +1257,7 @@
         }
       ]
     },
-    "F609FE9C1321": {
+    "19F6FE9C1321": {
       "data": {
         "name": "",
         "race": "",
@@ -1296,7 +1296,7 @@
         }
       ]
     },
-    "6009FF9C931C": {
+    "1960FF9C931C": {
       "data": {
         "name": "",
         "race": "",
@@ -1335,7 +1335,7 @@
         }
       ]
     },
-    "D009FE9C3321": {
+    "39D0FE9C3321": {
       "data": {
         "name": "",
         "race": "",
@@ -1374,7 +1374,7 @@
         }
       ]
     },
-    "F809FE9C3321": {
+    "49F8FE9C3321": {
       "data": {
         "name": "",
         "race": "",
@@ -1413,7 +1413,7 @@
         }
       ]
     },
-    "F909FE9C2320": {
+    "19F9FE9C2320": {
       "data": {
         "name": "",
         "race": "",
@@ -1452,7 +1452,7 @@
         }
       ]
     },
-    "0E09FE9C731E": {
+    "490EFE9C731E": {
       "data": {
         "name": "",
         "race": "",
@@ -1491,7 +1491,7 @@
         }
       ]
     },
-    "9909FE9CF319": {
+    "2999FE9CF319": {
       "data": {
         "name": "",
         "race": "",
@@ -1530,7 +1530,7 @@
         }
       ]
     },
-    "F90004962226": {
+    "10F904962226": {
       "data": {
         "name": "",
         "race": "",
@@ -1569,7 +1569,7 @@
         }
       ]
     },
-    "7909FE9CF319": {
+    "6979FE9CF319": {
       "data": {
         "name": "",
         "race": "",
@@ -1608,7 +1608,7 @@
         }
       ]
     },
-    "B509FF9B8326": {
+    "29B5FF9B8326": {
       "data": {
         "name": "",
         "race": "",
@@ -1647,7 +1647,7 @@
         }
       ]
     },
-    "0C09FF9B8325": {
+    "190CFF9B8325": {
       "data": {
         "name": "",
         "race": "",
@@ -1686,7 +1686,7 @@
         }
       ]
     },
-    "8A000496A220": {
+    "408A0496A220": {
       "data": {
         "name": "",
         "race": "",
@@ -1725,7 +1725,7 @@
         }
       ]
     },
-    "7A000496A220": {
+    "307A0496A220": {
       "data": {
         "name": "",
         "race": "",
@@ -1764,7 +1764,7 @@
         }
       ]
     },
-    "FB09FF9BA324": {
+    "29FBFF9BA324": {
       "data": {
         "name": "",
         "race": "",
@@ -1803,7 +1803,7 @@
         }
       ]
     },
-    "5600010DA2FA": {
+    "2056010DA2FA": {
       "data": {
         "name": "",
         "race": "",
@@ -1842,7 +1842,7 @@
         }
       ]
     },
-    "4E09FF9BE322": {
+    "194EFF9BE322": {
       "data": {
         "name": "",
         "race": "",
@@ -1881,7 +1881,7 @@
         }
       ]
     },
-    "5A03043871F3": {
+    "135A043871F3": {
       "data": {
         "name": "",
         "race": "",
@@ -1920,7 +1920,7 @@
         }
       ]
     },
-    "0609FD6540CA": {
+    "1906FD6540CA": {
       "data": {
         "name": "",
         "race": "",
@@ -1940,7 +1940,7 @@
         "ruins": false,
         "outlaw": false,
         "phantom": "",
-        "notes": "Real bases from elegra1965's save: Rdv1 infested world; Icebox",
+        "notes": "Real base from elegra1965's save: Rdv1 infested world",
         "colliding": false,
         "collidingA": 0,
         "collidingB": 0,
@@ -1959,7 +1959,46 @@
         }
       ]
     },
-    "4509FD64F0CA": {
+    "5906FD6540CA": {
+      "data": {
+        "name": "",
+        "race": "",
+        "region": "",
+        "starClass": "",
+        "stars": [],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "",
+        "sell": "",
+        "buy": "",
+        "econDesc": "",
+        "conflict": "",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "phantom": "",
+        "notes": "Real base from elegra1965's save: Icebox",
+        "colliding": false,
+        "collidingA": 0,
+        "collidingB": 0,
+        "editorName": "elegra1965",
+        "editorFriendCode": "MGD8-C6PP-XKFGT",
+        "bodies": []
+      },
+      "editedAt": "2026-08-18T00:00:00.000Z",
+      "editedByIp": "save-import",
+      "flaggedFields": [],
+      "disputedFields": [],
+      "history": [
+        {
+          "at": "2026-08-18T00:00:00.000Z",
+          "text": "Imported from elegra1965's real save file (base name/address)"
+        }
+      ]
+    },
+    "2945FD64F0CA": {
       "data": {
         "name": "",
         "race": "",
@@ -1998,7 +2037,7 @@
         }
       ]
     },
-    "2109FD64D0CA": {
+    "2921FD64D0CA": {
       "data": {
         "name": "",
         "race": "",
@@ -2037,7 +2076,7 @@
         }
       ]
     },
-    "C703033771EA": {
+    "63C7033771EA": {
       "data": {
         "name": "",
         "race": "",
@@ -2076,7 +2115,7 @@
         }
       ]
     },
-    "34030337B1ED": {
+    "23340337B1ED": {
       "data": {
         "name": "",
         "race": "",
@@ -2115,7 +2154,7 @@
         }
       ]
     },
-    "6A01033771EA": {
+    "116A033771EA": {
       "data": {
         "name": "",
         "race": "",
@@ -2154,7 +2193,7 @@
         }
       ]
     },
-    "2700033711E6": {
+    "1027033711E6": {
       "data": {
         "name": "",
         "race": "",
@@ -2193,7 +2232,7 @@
         }
       ]
     },
-    "3E010324CCDE": {
+    "113E0324CCDE": {
       "data": {
         "name": "",
         "race": "",
@@ -2232,7 +2271,7 @@
         }
       ]
     },
-    "DF00FC502B25": {
+    "10DFFC502B25": {
       "data": {
         "name": "",
         "race": "",
@@ -2271,7 +2310,7 @@
         }
       ]
     },
-    "C009FF9BF322": {
+    "19C0FF9BF322": {
       "data": {
         "name": "",
         "race": "",
@@ -2310,7 +2349,7 @@
         }
       ]
     },
-    "5609FF9CD31B": {
+    "1956FF9CD31B": {
       "data": {
         "name": "",
         "race": "",
@@ -2349,7 +2388,7 @@
         }
       ]
     },
-    "1509FF9DF312": {
+    "1915FF9DF312": {
       "data": {
         "name": "",
         "race": "",
@@ -2388,7 +2427,7 @@
         }
       ]
     },
-    "9602FCF386BB": {
+    "1296FCF386BB": {
       "data": {
         "name": "",
         "race": "",
@@ -2427,7 +2466,7 @@
         }
       ]
     },
-    "9202FCF386B9": {
+    "5292FCF386B9": {
       "data": {
         "name": "",
         "race": "",
@@ -2447,7 +2486,7 @@
         "ruins": false,
         "outlaw": false,
         "phantom": "",
-        "notes": "Real bases from elegra1965's save: Tosford Northern Polaris Base AnchorPoint1; Abase",
+        "notes": "Real base from elegra1965's save: Tosford Northern Polaris Base AnchorPoint1",
         "colliding": false,
         "collidingA": 0,
         "collidingB": 0,
@@ -2466,7 +2505,46 @@
         }
       ]
     },
-    "7902FCF396B4": {
+    "2292FCF386B9": {
+      "data": {
+        "name": "",
+        "race": "",
+        "region": "",
+        "starClass": "",
+        "stars": [],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "",
+        "sell": "",
+        "buy": "",
+        "econDesc": "",
+        "conflict": "",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "phantom": "",
+        "notes": "Real base from elegra1965's save: Abase",
+        "colliding": false,
+        "collidingA": 0,
+        "collidingB": 0,
+        "editorName": "elegra1965",
+        "editorFriendCode": "MGD8-C6PP-XKFGT",
+        "bodies": []
+      },
+      "editedAt": "2026-08-18T00:00:00.000Z",
+      "editedByIp": "save-import",
+      "flaggedFields": [],
+      "disputedFields": [],
+      "history": [
+        {
+          "at": "2026-08-18T00:00:00.000Z",
+          "text": "Imported from elegra1965's real save file (base name/address)"
+        }
+      ]
+    },
+    "1279FCF396B4": {
       "data": {
         "name": "",
         "race": "",
@@ -2505,7 +2583,7 @@
         }
       ]
     },
-    "5B020397AE81": {
+    "425B0397AE81": {
       "data": {
         "name": "",
         "race": "",
@@ -2544,7 +2622,7 @@
         }
       ]
     },
-    "2E020397AE82": {
+    "222E0397AE82": {
       "data": {
         "name": "",
         "race": "",
@@ -2583,7 +2661,7 @@
         }
       ]
     },
-    "26020397AE81": {
+    "22260397AE81": {
       "data": {
         "name": "",
         "race": "",
@@ -2603,7 +2681,7 @@
         "ruins": false,
         "outlaw": false,
         "phantom": "",
-        "notes": "Real bases from elegra1965's save: Sandworm Planet Portal; Vile bug disedent New creature; Toxic horror with boundary failure; Колония Cayenn",
+        "notes": "Real bases from elegra1965's save: Sandworm Planet Portal; Колония Cayenn",
         "colliding": false,
         "collidingA": 0,
         "collidingB": 0,
@@ -2622,7 +2700,85 @@
         }
       ]
     },
-    "180204085015": {
+    "52260397AE81": {
+      "data": {
+        "name": "",
+        "race": "",
+        "region": "",
+        "starClass": "",
+        "stars": [],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "",
+        "sell": "",
+        "buy": "",
+        "econDesc": "",
+        "conflict": "",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "phantom": "",
+        "notes": "Real base from elegra1965's save: Vile bug disedent New creature",
+        "colliding": false,
+        "collidingA": 0,
+        "collidingB": 0,
+        "editorName": "elegra1965",
+        "editorFriendCode": "MGD8-C6PP-XKFGT",
+        "bodies": []
+      },
+      "editedAt": "2026-08-18T00:00:00.000Z",
+      "editedByIp": "save-import",
+      "flaggedFields": [],
+      "disputedFields": [],
+      "history": [
+        {
+          "at": "2026-08-18T00:00:00.000Z",
+          "text": "Imported from elegra1965's real save file (base name/address)"
+        }
+      ]
+    },
+    "42260397AE81": {
+      "data": {
+        "name": "",
+        "race": "",
+        "region": "",
+        "starClass": "",
+        "stars": [],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "",
+        "sell": "",
+        "buy": "",
+        "econDesc": "",
+        "conflict": "",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "phantom": "",
+        "notes": "Real base from elegra1965's save: Toxic horror with boundary failure",
+        "colliding": false,
+        "collidingA": 0,
+        "collidingB": 0,
+        "editorName": "elegra1965",
+        "editorFriendCode": "MGD8-C6PP-XKFGT",
+        "bodies": []
+      },
+      "editedAt": "2026-08-18T00:00:00.000Z",
+      "editedByIp": "save-import",
+      "flaggedFields": [],
+      "disputedFields": [],
+      "history": [
+        {
+          "at": "2026-08-18T00:00:00.000Z",
+          "text": "Imported from elegra1965's real save file (base name/address)"
+        }
+      ]
+    },
+    "421804085015": {
       "data": {
         "name": "",
         "race": "",
@@ -2661,7 +2817,7 @@
         }
       ]
     },
-    "FB0204085015": {
+    "22FB04085015": {
       "data": {
         "name": "",
         "race": "",
@@ -2681,7 +2837,7 @@
         "ruins": false,
         "outlaw": false,
         "phantom": "",
-        "notes": "Real bases from elegra1965's save: Volcano with a water view; Water and Volcano Planet",
+        "notes": "Real base from elegra1965's save: Volcano with a water view",
         "colliding": false,
         "collidingA": 0,
         "collidingB": 0,
@@ -2700,7 +2856,7 @@
         }
       ]
     },
-    "77020206300F": {
+    "12FB04085015": {
       "data": {
         "name": "",
         "race": "",
@@ -2720,7 +2876,7 @@
         "ruins": false,
         "outlaw": false,
         "phantom": "",
-        "notes": "Real bases from elegra1965's save: Flat Island Base; Imminent core detinant with diplos",
+        "notes": "Real base from elegra1965's save: Water and Volcano Planet",
         "colliding": false,
         "collidingA": 0,
         "collidingB": 0,
@@ -2739,7 +2895,85 @@
         }
       ]
     },
-    "5400F9555C30": {
+    "12770206300F": {
+      "data": {
+        "name": "",
+        "race": "",
+        "region": "",
+        "starClass": "",
+        "stars": [],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "",
+        "sell": "",
+        "buy": "",
+        "econDesc": "",
+        "conflict": "",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "phantom": "",
+        "notes": "Real base from elegra1965's save: Flat Island Base",
+        "colliding": false,
+        "collidingA": 0,
+        "collidingB": 0,
+        "editorName": "elegra1965",
+        "editorFriendCode": "MGD8-C6PP-XKFGT",
+        "bodies": []
+      },
+      "editedAt": "2026-08-18T00:00:00.000Z",
+      "editedByIp": "save-import",
+      "flaggedFields": [],
+      "disputedFields": [],
+      "history": [
+        {
+          "at": "2026-08-18T00:00:00.000Z",
+          "text": "Imported from elegra1965's real save file (base name/address)"
+        }
+      ]
+    },
+    "42770206300F": {
+      "data": {
+        "name": "",
+        "race": "",
+        "region": "",
+        "starClass": "",
+        "stars": [],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "",
+        "sell": "",
+        "buy": "",
+        "econDesc": "",
+        "conflict": "",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "phantom": "",
+        "notes": "Real base from elegra1965's save: Imminent core detinant with diplos",
+        "colliding": false,
+        "collidingA": 0,
+        "collidingB": 0,
+        "editorName": "elegra1965",
+        "editorFriendCode": "MGD8-C6PP-XKFGT",
+        "bodies": []
+      },
+      "editedAt": "2026-08-18T00:00:00.000Z",
+      "editedByIp": "save-import",
+      "flaggedFields": [],
+      "disputedFields": [],
+      "history": [
+        {
+          "at": "2026-08-18T00:00:00.000Z",
+          "text": "Imported from elegra1965's real save file (base name/address)"
+        }
+      ]
+    },
+    "2054F9555C30": {
       "data": {
         "name": "",
         "race": "",
@@ -2778,7 +3012,7 @@
         }
       ]
     },
-    "20030337B1ED": {
+    "23200337B1ED": {
       "data": {
         "name": "",
         "race": "",
@@ -2817,7 +3051,7 @@
         }
       ]
     },
-    "3D00FF210982": {
+    "403DFF210982": {
       "data": {
         "name": "",
         "race": "",
@@ -2856,7 +3090,7 @@
         }
       ]
     },
-    "D80100FF8FFE": {
+    "11D800FF8FFE": {
       "data": {
         "name": "",
         "race": "",
@@ -2895,7 +3129,7 @@
         }
       ]
     },
-    "0601FCFC0DD9": {
+    "1106FCFC0DD9": {
       "data": {
         "name": "",
         "race": "",
@@ -2934,7 +3168,7 @@
         }
       ]
     },
-    "000A0756F407": {
+    "2A000756F407": {
       "data": {
         "name": "",
         "race": "",
@@ -2973,7 +3207,7 @@
         }
       ]
     },
-    "7D06FF004007": {
+    "267DFF004007": {
       "data": {
         "name": "",
         "race": "",
@@ -3012,7 +3246,7 @@
         }
       ]
     },
-    "B80C04448BA1": {
+    "1CB804448BA1": {
       "data": {
         "name": "",
         "race": "",
@@ -3051,7 +3285,7 @@
         }
       ]
     },
-    "C98D02006005": {
+    "5DC902006005": {
       "data": {
         "name": "",
         "race": "",
@@ -3090,7 +3324,7 @@
         }
       ]
     },
-    "9FFFFFFFF008": {
+    "3F9FFFFFF008": {
       "data": {
         "name": "",
         "race": "",
@@ -3129,7 +3363,7 @@
         }
       ]
     },
-    "0A07FE2D0334": {
+    "170AFE2D0334": {
       "data": {
         "name": "",
         "race": "",
@@ -3168,7 +3402,7 @@
         }
       ]
     },
-    "A312F8FDD018": {
+    "32A3F8FDD018": {
       "data": {
         "name": "",
         "race": "",
@@ -3207,7 +3441,7 @@
         }
       ]
     },
-    "BC06FC5BCCEB": {
+    "16BCFC5BCCEB": {
       "data": {
         "name": "",
         "race": "",
@@ -3246,7 +3480,7 @@
         }
       ]
     },
-    "4BFF397F1B54": {
+    "2F4B397F1B54": {
       "data": {
         "name": "",
         "race": "",
@@ -3285,7 +3519,7 @@
         }
       ]
     },
-    "EA0BFFC32439": {
+    "5BEAFFC32439": {
       "data": {
         "name": "",
         "race": "",
@@ -3324,7 +3558,7 @@
         }
       ]
     },
-    "F10404C63D3C": {
+    "14F104C63D3C": {
       "data": {
         "name": "",
         "race": "",
@@ -3363,7 +3597,7 @@
         }
       ]
     },
-    "D600FC001007": {
+    "30D6FC001007": {
       "data": {
         "name": "",
         "race": "",
@@ -3402,7 +3636,7 @@
         }
       ]
     },
-    "F90000D93696": {
+    "40F900D93696": {
       "data": {
         "name": "",
         "race": "",
@@ -3441,7 +3675,7 @@
         }
       ]
     },
-    "140000D93696": {
+    "101400D93696": {
       "data": {
         "name": "",
         "race": "",
@@ -3480,7 +3714,7 @@
         }
       ]
     },
-    "080002D94696": {
+    "300802D94696": {
       "data": {
         "name": "",
         "race": "",
@@ -3519,7 +3753,7 @@
         }
       ]
     },
-    "0109FF58935E": {
+    "2901FF58935E": {
       "data": {
         "name": "",
         "race": "",
@@ -3558,7 +3792,7 @@
         }
       ]
     },
-    "690900F906E8": {
+    "596900F906E8": {
       "data": {
         "name": "",
         "race": "",
@@ -3578,7 +3812,7 @@
         "ruins": false,
         "outlaw": false,
         "phantom": "",
-        "notes": "Real bases from elegra1965's save: Portal planet; Elfor-Oyst Base; S Class Paraffin mine",
+        "notes": "Real base from elegra1965's save: Portal planet",
         "colliding": false,
         "collidingA": 0,
         "collidingB": 0,
@@ -3597,7 +3831,46 @@
         }
       ]
     },
-    "2800010DA2FA": {
+    "196900F906E8": {
+      "data": {
+        "name": "",
+        "race": "",
+        "region": "",
+        "starClass": "",
+        "stars": [],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "",
+        "sell": "",
+        "buy": "",
+        "econDesc": "",
+        "conflict": "",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "phantom": "",
+        "notes": "Real bases from elegra1965's save: Elfor-Oyst Base; S Class Paraffin mine",
+        "colliding": false,
+        "collidingA": 0,
+        "collidingB": 0,
+        "editorName": "elegra1965",
+        "editorFriendCode": "MGD8-C6PP-XKFGT",
+        "bodies": []
+      },
+      "editedAt": "2026-08-18T00:00:00.000Z",
+      "editedByIp": "save-import",
+      "flaggedFields": [],
+      "disputedFields": [],
+      "history": [
+        {
+          "at": "2026-08-18T00:00:00.000Z",
+          "text": "Imported from elegra1965's real save file (base name/address)"
+        }
+      ]
+    },
+    "1028010DA2FA": {
       "data": {
         "name": "",
         "race": "",
@@ -3636,7 +3909,7 @@
         }
       ]
     },
-    "C503FD517100": {
+    "13C5FD517100": {
       "data": {
         "name": "",
         "race": "",
@@ -3675,7 +3948,7 @@
         }
       ]
     },
-    "1E07FA036920": {
+    "171EFA036920": {
       "data": {
         "name": "",
         "race": "",
@@ -3714,7 +3987,7 @@
         }
       ]
     },
-    "0B000645E54D": {
+    "100B0645E54D": {
       "data": {
         "name": "",
         "race": "",
@@ -3753,7 +4026,7 @@
         }
       ]
     },
-    "79000645E54D": {
+    "30790645E54D": {
       "data": {
         "name": "",
         "race": "",
@@ -3792,7 +4065,7 @@
         }
       ]
     },
-    "9B0004963227": {
+    "209B04963227": {
       "data": {
         "name": "",
         "race": "",
@@ -3831,7 +4104,7 @@
         }
       ]
     },
-    "22F9BBBDB544": {
+    "3922BBBDB544": {
       "data": {
         "name": "",
         "race": "",
@@ -3870,7 +4143,7 @@
         }
       ]
     },
-    "4205EEB52B2A": {
+    "2542EEB52B2A": {
       "data": {
         "name": "",
         "race": "",
@@ -3909,7 +4182,7 @@
         }
       ]
     },
-    "6B0002FF8001": {
+    "106B02FF8001": {
       "data": {
         "name": "",
         "race": "",
@@ -3948,7 +4221,7 @@
         }
       ]
     },
-    "FDFFFFFFBFEF": {
+    "3FFDFFFFBFEF": {
       "data": {
         "name": "",
         "race": "",
@@ -3987,7 +4260,7 @@
         }
       ]
     },
-    "D50004963227": {
+    "10D504963227": {
       "data": {
         "name": "",
         "race": "",
@@ -4007,7 +4280,7 @@
         "ruins": false,
         "outlaw": false,
         "phantom": "",
-        "notes": "Real bases from elegra1965's save: Gitche Manitou Extension; Gitche Manitou extension 4; Gitche Manitou extension 6; Gitche Manitou extension 2; Gitche Manitou extension 3; Gitche Manitou extension 5; Sentinel base",
+        "notes": "Real bases from elegra1965's save: Gitche Manitou Extension; Gitche Manitou extension 4; Gitche Manitou extension 6; Gitche Manitou extension 2; Gitche Manitou extension 3; Gitche Manitou extension 5",
         "colliding": false,
         "collidingA": 0,
         "collidingB": 0,
@@ -4026,7 +4299,46 @@
         }
       ]
     },
-    "14BD4CCC3DD7": {
+    "30D504963227": {
+      "data": {
+        "name": "",
+        "race": "",
+        "region": "",
+        "starClass": "",
+        "stars": [],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "",
+        "sell": "",
+        "buy": "",
+        "econDesc": "",
+        "conflict": "",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "phantom": "",
+        "notes": "Real base from elegra1965's save: Sentinel base",
+        "colliding": false,
+        "collidingA": 0,
+        "collidingB": 0,
+        "editorName": "elegra1965",
+        "editorFriendCode": "MGD8-C6PP-XKFGT",
+        "bodies": []
+      },
+      "editedAt": "2026-08-18T00:00:00.000Z",
+      "editedByIp": "save-import",
+      "flaggedFields": [],
+      "disputedFields": [],
+      "history": [
+        {
+          "at": "2026-08-18T00:00:00.000Z",
+          "text": "Imported from elegra1965's real save file (base name/address)"
+        }
+      ]
+    },
+    "3D144CCC3DD7": {
       "data": {
         "name": "",
         "race": "",
@@ -4065,7 +4377,7 @@
         }
       ]
     },
-    "790003967226": {
+    "307903967226": {
       "data": {
         "name": "",
         "race": "",
@@ -4104,7 +4416,7 @@
         }
       ]
     },
-    "260006C185B0": {
+    "102606C185B0": {
       "data": {
         "name": "",
         "race": "",
@@ -4143,7 +4455,7 @@
         }
       ]
     },
-    "190007C165B1": {
+    "301907C165B1": {
       "data": {
         "name": "",
         "race": "",
@@ -4163,7 +4475,7 @@
         "ruins": false,
         "outlaw": false,
         "phantom": "",
-        "notes": "Real bases from elegra1965's save: EasyS class freighter module; 100% S class freighter module",
+        "notes": "Real base from elegra1965's save: EasyS class freighter module",
         "colliding": false,
         "collidingA": 0,
         "collidingB": 0,
@@ -4182,7 +4494,46 @@
         }
       ]
     },
-    "0A0006C185B0": {
+    "101907C165B1": {
+      "data": {
+        "name": "",
+        "race": "",
+        "region": "",
+        "starClass": "",
+        "stars": [],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "",
+        "sell": "",
+        "buy": "",
+        "econDesc": "",
+        "conflict": "",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "phantom": "",
+        "notes": "Real base from elegra1965's save: 100% S class freighter module",
+        "colliding": false,
+        "collidingA": 0,
+        "collidingB": 0,
+        "editorName": "elegra1965",
+        "editorFriendCode": "MGD8-C6PP-XKFGT",
+        "bodies": []
+      },
+      "editedAt": "2026-08-18T00:00:00.000Z",
+      "editedByIp": "save-import",
+      "flaggedFields": [],
+      "disputedFields": [],
+      "history": [
+        {
+          "at": "2026-08-18T00:00:00.000Z",
+          "text": "Imported from elegra1965's real save file (base name/address)"
+        }
+      ]
+    },
+    "200A06C185B0": {
       "data": {
         "name": "",
         "race": "",
@@ -4221,7 +4572,7 @@
         }
       ]
     },
-    "2800FB6F40A1": {
+    "5028FB6F40A1": {
       "data": {
         "name": "",
         "race": "",
@@ -4260,7 +4611,7 @@
         }
       ]
     },
-    "E5000154DB82": {
+    "10E50154DB82": {
       "data": {
         "name": "",
         "race": "",
@@ -4299,7 +4650,7 @@
         }
       ]
     },
-    "E6022FFB29B3": {
+    "12E62FFB29B3": {
       "data": {
         "name": "",
         "race": "",
@@ -4338,7 +4689,7 @@
         }
       ]
     },
-    "450007C165B1": {
+    "604507C165B1": {
       "data": {
         "name": "",
         "race": "",
@@ -4358,7 +4709,7 @@
         "ruins": false,
         "outlaw": false,
         "phantom": "",
-        "notes": "Real bases from elegra1965's save: Triceratops Planet; Sentinel pillar",
+        "notes": "Real base from elegra1965's save: Triceratops Planet",
         "colliding": false,
         "collidingA": 0,
         "collidingB": 0,
@@ -4377,7 +4728,46 @@
         }
       ]
     },
-    "730007C175B1": {
+    "104507C165B1": {
+      "data": {
+        "name": "",
+        "race": "",
+        "region": "",
+        "starClass": "",
+        "stars": [],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "",
+        "sell": "",
+        "buy": "",
+        "econDesc": "",
+        "conflict": "",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "phantom": "",
+        "notes": "Real base from elegra1965's save: Sentinel pillar",
+        "colliding": false,
+        "collidingA": 0,
+        "collidingB": 0,
+        "editorName": "elegra1965",
+        "editorFriendCode": "MGD8-C6PP-XKFGT",
+        "bodies": []
+      },
+      "editedAt": "2026-08-18T00:00:00.000Z",
+      "editedByIp": "save-import",
+      "flaggedFields": [],
+      "disputedFields": [],
+      "history": [
+        {
+          "at": "2026-08-18T00:00:00.000Z",
+          "text": "Imported from elegra1965's real save file (base name/address)"
+        }
+      ]
+    },
+    "507307C175B1": {
       "data": {
         "name": "",
         "race": "",
@@ -4416,7 +4806,7 @@
         }
       ]
     },
-    "1800F96B9EBA": {
+    "1018F96B9EBA": {
       "data": {
         "name": "",
         "race": "",
@@ -4455,7 +4845,7 @@
         }
       ]
     },
-    "153AF8001000": {
+    "2A15F8001000": {
       "data": {
         "name": "",
         "race": "",
@@ -4494,7 +4884,7 @@
         }
       ]
     },
-    "2C29B8F91804": {
+    "692CB8F91804": {
       "data": {
         "name": "",
         "race": "",
@@ -4533,7 +4923,7 @@
         }
       ]
     },
-    "160E03FC3C3D": {
+    "2E1603FC3C3D": {
       "data": {
         "name": "",
         "race": "",
@@ -4572,7 +4962,7 @@
         }
       ]
     },
-    "A229C0F90801": {
+    "19A2C0F90801": {
       "data": {
         "name": "",
         "race": "",
@@ -4611,7 +5001,7 @@
         }
       ]
     },
-    "B38D02006005": {
+    "4DB302006005": {
       "data": {
         "name": "",
         "race": "",
@@ -4650,7 +5040,7 @@
         }
       ]
     },
-    "E7B242035C16": {
+    "32E742035C16": {
       "data": {
         "name": "",
         "race": "",
@@ -4689,7 +5079,7 @@
         }
       ]
     },
-    "A5B242035C16": {
+    "12A542035C16": {
       "data": {
         "name": "",
         "race": "",
@@ -4728,7 +5118,7 @@
         }
       ]
     },
-    "2673FEFE2FE7": {
+    "5326FEFE2FE7": {
       "data": {
         "name": "",
         "race": "",
@@ -4748,7 +5138,7 @@
         "ruins": false,
         "outlaw": false,
         "phantom": "",
-        "notes": "Real bases from elegra1965's save: New galaxy paradise portal; New galaxy paradise planet; New galaxy",
+        "notes": "Real bases from elegra1965's save: New galaxy paradise portal; New galaxy paradise planet",
         "colliding": false,
         "collidingA": 0,
         "collidingB": 0,
@@ -4767,7 +5157,46 @@
         }
       ]
     },
-    "06D1FCFF9002": {
+    "3326FEFE2FE7": {
+      "data": {
+        "name": "",
+        "race": "",
+        "region": "",
+        "starClass": "",
+        "stars": [],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "",
+        "sell": "",
+        "buy": "",
+        "econDesc": "",
+        "conflict": "",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "phantom": "",
+        "notes": "Real base from elegra1965's save: New galaxy",
+        "colliding": false,
+        "collidingA": 0,
+        "collidingB": 0,
+        "editorName": "elegra1965",
+        "editorFriendCode": "MGD8-C6PP-XKFGT",
+        "bodies": []
+      },
+      "editedAt": "2026-08-18T00:00:00.000Z",
+      "editedByIp": "save-import",
+      "flaggedFields": [],
+      "disputedFields": [],
+      "history": [
+        {
+          "at": "2026-08-18T00:00:00.000Z",
+          "text": "Imported from elegra1965's real save file (base name/address)"
+        }
+      ]
+    },
+    "5106FCFF9002": {
       "data": {
         "name": "",
         "race": "",
@@ -4806,7 +5235,7 @@
         }
       ]
     },
-    "3AD1FCFF8002": {
+    "413AFCFF8002": {
       "data": {
         "name": "",
         "race": "",
@@ -4826,7 +5255,7 @@
         "ruins": false,
         "outlaw": false,
         "phantom": "",
-        "notes": "Real bases from elegra1965's save: Sentinel pillar; Biane-Ribau Outpost",
+        "notes": "Real base from elegra1965's save: Sentinel pillar",
         "colliding": false,
         "collidingA": 0,
         "collidingB": 0,
@@ -4845,7 +5274,46 @@
         }
       ]
     },
-    "8C3106006000": {
+    "313AFCFF8002": {
+      "data": {
+        "name": "",
+        "race": "",
+        "region": "",
+        "starClass": "",
+        "stars": [],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "",
+        "sell": "",
+        "buy": "",
+        "econDesc": "",
+        "conflict": "",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "phantom": "",
+        "notes": "Real base from elegra1965's save: Biane-Ribau Outpost",
+        "colliding": false,
+        "collidingA": 0,
+        "collidingB": 0,
+        "editorName": "elegra1965",
+        "editorFriendCode": "MGD8-C6PP-XKFGT",
+        "bodies": []
+      },
+      "editedAt": "2026-08-18T00:00:00.000Z",
+      "editedByIp": "save-import",
+      "flaggedFields": [],
+      "disputedFields": [],
+      "history": [
+        {
+          "at": "2026-08-18T00:00:00.000Z",
+          "text": "Imported from elegra1965's real save file (base name/address)"
+        }
+      ]
+    },
+    "218C06006000": {
       "data": {
         "name": "",
         "race": "",
@@ -4884,7 +5352,7 @@
         }
       ]
     },
-    "9109F7B03B61": {
+    "5991F7B03B61": {
       "data": {
         "name": "",
         "race": "",
@@ -4923,7 +5391,7 @@
         }
       ]
     },
-    "5300FB9D5346": {
+    "1053FB9D5346": {
       "data": {
         "name": "",
         "race": "",
@@ -4962,7 +5430,7 @@
         }
       ]
     },
-    "7709FE2D0992": {
+    "6977FE2D0992": {
       "data": {
         "name": "",
         "race": "",
@@ -5001,7 +5469,7 @@
         }
       ]
     },
-    "DA09FE2D0992": {
+    "19DAFE2D0992": {
       "data": {
         "name": "",
         "race": "",
@@ -5040,7 +5508,7 @@
         }
       ]
     },
-    "4C0000026FAF": {
+    "404C00026FAF": {
       "data": {
         "name": "",
         "race": "",
@@ -5079,7 +5547,7 @@
         }
       ]
     },
-    "4100F9557C30": {
+    "5041F9557C30": {
       "data": {
         "name": "",
         "race": "",
@@ -5118,7 +5586,7 @@
         }
       ]
     },
-    "B709F8A9A40E": {
+    "59B7F8A9A40E": {
       "data": {
         "name": "",
         "race": "",
@@ -5157,7 +5625,7 @@
         }
       ]
     },
-    "190C03448BA1": {
+    "3C1903448BA1": {
       "data": {
         "name": "",
         "race": "",
@@ -5196,7 +5664,7 @@
         }
       ]
     },
-    "690C03449BA1": {
+    "3C6903449BA1": {
       "data": {
         "name": "",
         "race": "",
@@ -5235,7 +5703,7 @@
         }
       ]
     },
-    "D20405C62D3C": {
+    "14D205C62D3C": {
       "data": {
         "name": "",
         "race": "",
@@ -5274,7 +5742,7 @@
         }
       ]
     },
-    "AE0405C62D3D": {
+    "24AE05C62D3D": {
       "data": {
         "name": "",
         "race": "",
@@ -5313,7 +5781,7 @@
         }
       ]
     },
-    "900B02005006": {
+    "2B9002005006": {
       "data": {
         "name": "",
         "race": "",
@@ -5352,7 +5820,7 @@
         }
       ]
     },
-    "1A0B00347637": {
+    "1B1A00347637": {
       "data": {
         "name": "",
         "race": "",
@@ -5391,7 +5859,7 @@
         }
       ]
     },
-    "940085F8635E": {
+    "109485F8635E": {
       "data": {
         "name": "",
         "race": "",
@@ -5430,7 +5898,7 @@
         }
       ]
     },
-    "841DFE005006": {
+    "6D84FE005006": {
       "data": {
         "name": "",
         "race": "",
@@ -5469,7 +5937,7 @@
         }
       ]
     },
-    "161DFE005006": {
+    "1D16FE005006": {
       "data": {
         "name": "",
         "race": "",
@@ -5508,7 +5976,7 @@
         }
       ]
     },
-    "4E8D02007005": {
+    "5D4E02007005": {
       "data": {
         "name": "",
         "race": "",
@@ -5528,7 +5996,7 @@
         "ruins": false,
         "outlaw": false,
         "phantom": "",
-        "notes": "Real bases from elegra1965's save: Crashed solar ship; Earth 2.0 portal",
+        "notes": "Real base from elegra1965's save: Crashed solar ship",
         "colliding": false,
         "collidingA": 0,
         "collidingB": 0,
@@ -5547,7 +6015,46 @@
         }
       ]
     },
-    "3509FE02B216": {
+    "4D4E02007005": {
+      "data": {
+        "name": "",
+        "race": "",
+        "region": "",
+        "starClass": "",
+        "stars": [],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "",
+        "sell": "",
+        "buy": "",
+        "econDesc": "",
+        "conflict": "",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "phantom": "",
+        "notes": "Real base from elegra1965's save: Earth 2.0 portal",
+        "colliding": false,
+        "collidingA": 0,
+        "collidingB": 0,
+        "editorName": "elegra1965",
+        "editorFriendCode": "MGD8-C6PP-XKFGT",
+        "bodies": []
+      },
+      "editedAt": "2026-08-18T00:00:00.000Z",
+      "editedByIp": "save-import",
+      "flaggedFields": [],
+      "disputedFields": [],
+      "history": [
+        {
+          "at": "2026-08-18T00:00:00.000Z",
+          "text": "Imported from elegra1965's real save file (base name/address)"
+        }
+      ]
+    },
+    "1935FE02B216": {
       "data": {
         "name": "",
         "race": "",
@@ -5586,7 +6093,7 @@
         }
       ]
     },
-    "501DFE005006": {
+    "1D50FE005006": {
       "data": {
         "name": "",
         "race": "",
@@ -5625,7 +6132,7 @@
         }
       ]
     },
-    "79FEFA49B526": {
+    "4E79FA49B526": {
       "data": {
         "name": "",
         "race": "",
@@ -5664,7 +6171,7 @@
         }
       ]
     },
-    "53FEF6CB55DF": {
+    "4E53F6CB55DF": {
       "data": {
         "name": "",
         "race": "",
@@ -5703,7 +6210,7 @@
         }
       ]
     },
-    "DBFEF949B527": {
+    "3EDBF949B527": {
       "data": {
         "name": "",
         "race": "",
@@ -5742,7 +6249,7 @@
         }
       ]
     },
-    "79FEFA49A526": {
+    "2E79FA49A526": {
       "data": {
         "name": "",
         "race": "",
@@ -5781,7 +6288,7 @@
         }
       ]
     },
-    "13B2A88D87FB": {
+    "3213A88D87FB": {
       "data": {
         "name": "",
         "race": "",
@@ -5820,7 +6327,7 @@
         }
       ]
     },
-    "790E029050B4": {
+    "6E79029050B4": {
       "data": {
         "name": "",
         "race": "",
@@ -5859,7 +6366,7 @@
         }
       ]
     },
-    "B200FC702F9C": {
+    "50B2FC702F9C": {
       "data": {
         "name": "",
         "race": "",
@@ -5898,7 +6405,7 @@
         }
       ]
     },
-    "B9620894AF4A": {
+    "32B90894AF4A": {
       "data": {
         "name": "",
         "race": "",
@@ -5937,7 +6444,7 @@
         }
       ]
     },
-    "D216051739BB": {
+    "36D2051739BB": {
       "data": {
         "name": "",
         "race": "",
@@ -5976,7 +6483,7 @@
         }
       ]
     },
-    "E816051739BB": {
+    "36E8051739BB": {
       "data": {
         "name": "",
         "race": "",
@@ -6015,7 +6522,7 @@
         }
       ]
     },
-    "C90004964225": {
+    "10C904964225": {
       "data": {
         "name": "",
         "race": "",
@@ -6054,7 +6561,7 @@
         }
       ]
     },
-    "2800034E7B07": {
+    "1028034E7B07": {
       "data": {
         "name": "",
         "race": "",
@@ -6074,7 +6581,7 @@
         "ruins": false,
         "outlaw": false,
         "phantom": "",
-        "notes": "Real bases from elegra1965's save: Portal; S class freighter module no hostiles",
+        "notes": "Real base from elegra1965's save: Portal",
         "colliding": false,
         "collidingA": 0,
         "collidingB": 0,
@@ -6093,7 +6600,46 @@
         }
       ]
     },
-    "AF1DFE005006": {
+    "6028034E7B07": {
+      "data": {
+        "name": "",
+        "race": "",
+        "region": "",
+        "starClass": "",
+        "stars": [],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "",
+        "sell": "",
+        "buy": "",
+        "econDesc": "",
+        "conflict": "",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "phantom": "",
+        "notes": "Real base from elegra1965's save: S class freighter module no hostiles",
+        "colliding": false,
+        "collidingA": 0,
+        "collidingB": 0,
+        "editorName": "elegra1965",
+        "editorFriendCode": "MGD8-C6PP-XKFGT",
+        "bodies": []
+      },
+      "editedAt": "2026-08-18T00:00:00.000Z",
+      "editedByIp": "save-import",
+      "flaggedFields": [],
+      "disputedFields": [],
+      "history": [
+        {
+          "at": "2026-08-18T00:00:00.000Z",
+          "text": "Imported from elegra1965's real save file (base name/address)"
+        }
+      ]
+    },
+    "2DAFFE005006": {
       "data": {
         "name": "",
         "race": "",
@@ -6132,7 +6678,7 @@
         }
       ]
     },
-    "C51DFE005006": {
+    "1DC5FE005006": {
       "data": {
         "name": "",
         "race": "",
@@ -6171,7 +6717,7 @@
         }
       ]
     },
-    "D2FFFFFFF008": {
+    "1FD2FFFFF008": {
       "data": {
         "name": "",
         "race": "",
@@ -6210,7 +6756,7 @@
         }
       ]
     },
-    "62FF2ED3A99B": {
+    "1F622ED3A99B": {
       "data": {
         "name": "",
         "race": "",
@@ -6249,7 +6795,7 @@
         }
       ]
     },
-    "912B0025B696": {
+    "1B910025B696": {
       "data": {
         "name": "",
         "race": "",
@@ -6288,7 +6834,7 @@
         }
       ]
     },
-    "B90D07F18939": {
+    "1DB907F18939": {
       "data": {
         "name": "",
         "race": "",
@@ -6327,7 +6873,7 @@
         }
       ]
     },
-    "108200000000": {
+    "121000000000": {
       "data": {
         "name": "",
         "race": "",
@@ -6366,7 +6912,7 @@
         }
       ]
     },
-    "8700021222FA": {
+    "5087021222FA": {
       "data": {
         "name": "",
         "race": "",
@@ -6405,7 +6951,7 @@
         }
       ]
     },
-    "8EFFFFFFF008": {
+    "2F8EFFFFF008": {
       "data": {
         "name": "",
         "race": "",
@@ -6444,7 +6990,7 @@
         }
       ]
     },
-    "A39503FFB78C": {
+    "25A303FFB78C": {
       "data": {
         "name": "",
         "race": "",
@@ -6483,7 +7029,7 @@
         }
       ]
     },
-    "A218FBA523C8": {
+    "28A2FBA523C8": {
       "data": {
         "name": "",
         "race": "",
@@ -6522,7 +7068,7 @@
         }
       ]
     },
-    "B7FFFFFFF008": {
+    "2FB7FFFFF008": {
       "data": {
         "name": "",
         "race": "",
@@ -6561,7 +7107,7 @@
         }
       ]
     },
-    "3A9503FFB78E": {
+    "153A03FFB78E": {
       "data": {
         "name": "",
         "race": "",
@@ -6600,7 +7146,7 @@
         }
       ]
     },
-    "B10004963227": {
+    "20B104963227": {
       "data": {
         "name": "",
         "race": "",
@@ -6620,7 +7166,7 @@
         "ruins": false,
         "outlaw": false,
         "phantom": "",
-        "notes": "Real bases from elegra1965's save: Solar ships; Gitche Manitou east; Gitche Manitou west; Gitche Manitou north; Gitche Manitou south; Settlement extension; Waste Management Depot; 1 exotic 2 solar ships; 99.9% perfect planet with portal; Highest",
+        "notes": "Real bases from elegra1965's save: Solar ships; Gitche Manitou east; Gitche Manitou west; Gitche Manitou north; Gitche Manitou south; Waste Management Depot; 1 exotic 2 solar ships; 99.9% perfect planet with portal",
         "colliding": false,
         "collidingA": 0,
         "collidingB": 0,
@@ -6639,7 +7185,85 @@
         }
       ]
     },
-    "7900FFD94696": {
+    "10B104963227": {
+      "data": {
+        "name": "",
+        "race": "",
+        "region": "",
+        "starClass": "",
+        "stars": [],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "",
+        "sell": "",
+        "buy": "",
+        "econDesc": "",
+        "conflict": "",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "phantom": "",
+        "notes": "Real base from elegra1965's save: Settlement extension",
+        "colliding": false,
+        "collidingA": 0,
+        "collidingB": 0,
+        "editorName": "elegra1965",
+        "editorFriendCode": "MGD8-C6PP-XKFGT",
+        "bodies": []
+      },
+      "editedAt": "2026-08-18T00:00:00.000Z",
+      "editedByIp": "save-import",
+      "flaggedFields": [],
+      "disputedFields": [],
+      "history": [
+        {
+          "at": "2026-08-18T00:00:00.000Z",
+          "text": "Imported from elegra1965's real save file (base name/address)"
+        }
+      ]
+    },
+    "00B104963227": {
+      "data": {
+        "name": "",
+        "race": "",
+        "region": "",
+        "starClass": "",
+        "stars": [],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "",
+        "sell": "",
+        "buy": "",
+        "econDesc": "",
+        "conflict": "",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "phantom": "",
+        "notes": "Real base from elegra1965's save: Highest",
+        "colliding": false,
+        "collidingA": 0,
+        "collidingB": 0,
+        "editorName": "elegra1965",
+        "editorFriendCode": "MGD8-C6PP-XKFGT",
+        "bodies": []
+      },
+      "editedAt": "2026-08-18T00:00:00.000Z",
+      "editedByIp": "save-import",
+      "flaggedFields": [],
+      "disputedFields": [],
+      "history": [
+        {
+          "at": "2026-08-18T00:00:00.000Z",
+          "text": "Imported from elegra1965's real save file (base name/address)"
+        }
+      ]
+    },
+    "1079FFD94696": {
       "data": {
         "name": "",
         "race": "",
@@ -6678,7 +7302,7 @@
         }
       ]
     },
-    "951D056671D5": {
+    "2D95056671D5": {
       "data": {
         "name": "",
         "race": "",
@@ -6717,7 +7341,7 @@
         }
       ]
     },
-    "291D046671D5": {
+    "1D29046671D5": {
       "data": {
         "name": "",
         "race": "",
@@ -6756,7 +7380,7 @@
         }
       ]
     },
-    "B5E5EA018379": {
+    "15B5EA018379": {
       "data": {
         "name": "",
         "race": "",
@@ -6795,7 +7419,7 @@
         }
       ]
     },
-    "10E5EA019378": {
+    "4510EA019378": {
       "data": {
         "name": "",
         "race": "",
@@ -6834,7 +7458,7 @@
         }
       ]
     },
-    "39E5EA01A378": {
+    "2539EA01A378": {
       "data": {
         "name": "",
         "race": "",
@@ -6873,7 +7497,7 @@
         }
       ]
     },
-    "25FF01001FFF": {
+    "6F2501001FFF": {
       "data": {
         "name": "",
         "race": "",
@@ -6912,7 +7536,7 @@
         }
       ]
     },
-    "94E5FFFED00C": {
+    "3594FFFED00C": {
       "data": {
         "name": "",
         "race": "",
@@ -6951,7 +7575,7 @@
         }
       ]
     },
-    "4A00006DA18D": {
+    "104A006DA18D": {
       "data": {
         "name": "",
         "race": "",
@@ -6990,7 +7614,7 @@
         }
       ]
     },
-    "3C19F85B93A6": {
+    "193CF85B93A6": {
       "data": {
         "name": "",
         "race": "",
@@ -7029,7 +7653,7 @@
         }
       ]
     },
-    "9C0EF9A3BC59": {
+    "5E9CF9A3BC59": {
       "data": {
         "name": "",
         "race": "",
@@ -7068,7 +7692,7 @@
         }
       ]
     },
-    "341C032DA9FF": {
+    "1C34032DA9FF": {
       "data": {
         "name": "",
         "race": "",
@@ -7107,7 +7731,7 @@
         }
       ]
     },
-    "071C032DB9FF": {
+    "1C07032DB9FF": {
       "data": {
         "name": "",
         "race": "",
@@ -7146,7 +7770,7 @@
         }
       ]
     },
-    "562C00A9C095": {
+    "2C5600A9C095": {
       "data": {
         "name": "",
         "race": "",
@@ -7185,7 +7809,7 @@
         }
       ]
     },
-    "292C00A9D096": {
+    "4C2900A9D096": {
       "data": {
         "name": "",
         "race": "",
@@ -7224,7 +7848,7 @@
         }
       ]
     },
-    "5424FD585BB5": {
+    "6454FD585BB5": {
       "data": {
         "name": "",
         "race": "",
@@ -7263,7 +7887,7 @@
         }
       ]
     },
-    "D71AF8FFBFFB": {
+    "3AD7F8FFBFFB": {
       "data": {
         "name": "",
         "race": "",
@@ -7302,7 +7926,7 @@
         }
       ]
     },
-    "791EF8FFEFFF": {
+    "5E79F8FFEFFF": {
       "data": {
         "name": "",
         "race": "",
@@ -7341,7 +7965,7 @@
         }
       ]
     },
-    "A200DFA101BE": {
+    "10A2DFA101BE": {
       "data": {
         "name": "",
         "race": "",
@@ -7380,7 +8004,7 @@
         }
       ]
     },
-    "C900F8557C2E": {
+    "10C9F8557C2E": {
       "data": {
         "name": "",
         "race": "",
@@ -7419,7 +8043,7 @@
         }
       ]
     },
-    "EE000467827A": {
+    "20EE0467827A": {
       "data": {
         "name": "",
         "race": "",
@@ -7458,7 +8082,7 @@
         }
       ]
     },
-    "9BFFFEFFF008": {
+    "2F9BFEFFF008": {
       "data": {
         "name": "",
         "race": "",
@@ -7497,7 +8121,7 @@
         }
       ]
     },
-    "B021FBFFBFFC": {
+    "11B0FBFFBFFC": {
       "data": {
         "name": "",
         "race": "",
@@ -7536,7 +8160,7 @@
         }
       ]
     },
-    "DC00F8007008": {
+    "30DCF8007008": {
       "data": {
         "name": "",
         "race": "",
@@ -7575,7 +8199,7 @@
         }
       ]
     },
-    "9800F4AAE432": {
+    "1098F4AAE432": {
       "data": {
         "name": "",
         "race": "",
@@ -7614,7 +8238,7 @@
         }
       ]
     },
-    "058000000000": {
+    "200500000000": {
       "data": {
         "name": "",
         "race": "",
@@ -7653,7 +8277,7 @@
         }
       ]
     },
-    "6DADF8000001": {
+    "1D6DF8000001": {
       "data": {
         "name": "",
         "race": "",
@@ -7692,7 +8316,7 @@
         }
       ]
     },
-    "F6F100005019": {
+    "21F600005019": {
       "data": {
         "name": "",
         "race": "",
@@ -7731,7 +8355,7 @@
         }
       ]
     },
-    "8547FBFFC005": {
+    "2785FBFFC005": {
       "data": {
         "name": "",
         "race": "",
@@ -7770,7 +8394,7 @@
         }
       ]
     },
-    "E7F100005019": {
+    "21E700005019": {
       "data": {
         "name": "",
         "race": "",
@@ -7809,7 +8433,7 @@
         }
       ]
     },
-    "5513FD008FFE": {
+    "1355FD008FFE": {
       "data": {
         "name": "",
         "race": "",
@@ -7848,7 +8472,7 @@
         }
       ]
     },
-    "E913FD007FFD": {
+    "13E9FD007FFD": {
       "data": {
         "name": "",
         "race": "",
@@ -7887,7 +8511,7 @@
         }
       ]
     },
-    "490004966226": {
+    "404904966226": {
       "data": {
         "name": "",
         "race": "",
@@ -7926,7 +8550,7 @@
         }
       ]
     },
-    "E9DA00666D37": {
+    "1AE900666D37": {
       "data": {
         "name": "",
         "race": "",
@@ -7965,7 +8589,7 @@
         }
       ]
     },
-    "4100FA10E933": {
+    "4041FA10E933": {
       "data": {
         "name": "",
         "race": "",
@@ -8004,7 +8628,7 @@
         }
       ]
     },
-    "E800FCAF2AE6": {
+    "20E8FCAF2AE6": {
       "data": {
         "name": "",
         "race": "",
@@ -8043,7 +8667,7 @@
         }
       ]
     },
-    "4D0004631333": {
+    "604D04631333": {
       "data": {
         "name": "",
         "race": "",
@@ -8082,7 +8706,7 @@
         }
       ]
     },
-    "B70004630333": {
+    "30B704630333": {
       "data": {
         "name": "",
         "race": "",
@@ -8121,7 +8745,7 @@
         }
       ]
     },
-    "0900FA9B62E0": {
+    "3009FA9B62E0": {
       "data": {
         "name": "",
         "race": "",
@@ -8160,7 +8784,7 @@
         }
       ]
     },
-    "8500FA9B82DD": {
+    "3085FA9B82DD": {
       "data": {
         "name": "",
         "race": "",
@@ -8199,7 +8823,7 @@
         }
       ]
     },
-    "0CDAFD666D37": {
+    "2A0CFD666D37": {
       "data": {
         "name": "",
         "race": "",
@@ -8238,7 +8862,7 @@
         }
       ]
     },
-    "5300FEF29602": {
+    "1053FEF29602": {
       "data": {
         "name": "",
         "race": "",
@@ -8277,7 +8901,7 @@
         }
       ]
     },
-    "E72A0375A287": {
+    "5AE70375A287": {
       "data": {
         "name": "",
         "race": "",
@@ -8316,7 +8940,7 @@
         }
       ]
     },
-    "112A03759287": {
+    "1A1103759287": {
       "data": {
         "name": "",
         "race": "",
@@ -8355,7 +8979,7 @@
         }
       ]
     },
-    "D41005FFCFFB": {
+    "50D405FFCFFB": {
       "data": {
         "name": "",
         "race": "",
@@ -8394,7 +9018,7 @@
         }
       ]
     },
-    "4700FCA78448": {
+    "5047FCA78448": {
       "data": {
         "name": "",
         "race": "",
@@ -8433,7 +9057,7 @@
         }
       ]
     },
-    "ED0F02FFAFFB": {
+    "2FED02FFAFFB": {
       "data": {
         "name": "",
         "race": "",
@@ -8472,7 +9096,7 @@
         }
       ]
     },
-    "F24C03D035C0": {
+    "3CF203D035C0": {
       "data": {
         "name": "",
         "race": "",
@@ -8511,7 +9135,7 @@
         }
       ]
     },
-    "BB00005DD365": {
+    "10BB005DD365": {
       "data": {
         "name": "",
         "race": "",
@@ -8550,7 +9174,7 @@
         }
       ]
     },
-    "6800050166C2": {
+    "4068050166C2": {
       "data": {
         "name": "",
         "race": "",
@@ -8589,7 +9213,7 @@
         }
       ]
     },
-    "265905C0AA59": {
+    "192605C0AA59": {
       "data": {
         "name": "",
         "race": "",
@@ -8628,7 +9252,7 @@
         }
       ]
     },
-    "1100046D8FDA": {
+    "1011046D8FDA": {
       "data": {
         "name": "",
         "race": "",
@@ -8648,7 +9272,7 @@
         "ruins": false,
         "outlaw": false,
         "phantom": "",
-        "notes": "Real bases from elegra1965's save: Viridescent giant; Default",
+        "notes": "Real base from elegra1965's save: Viridescent giant",
         "colliding": false,
         "collidingA": 0,
         "collidingB": 0,
@@ -8667,7 +9291,46 @@
         }
       ]
     },
-    "EB09FD9BE320": {
+    "0011046D8FDA": {
+      "data": {
+        "name": "",
+        "race": "",
+        "region": "",
+        "starClass": "",
+        "stars": [],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "",
+        "sell": "",
+        "buy": "",
+        "econDesc": "",
+        "conflict": "",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "phantom": "",
+        "notes": "Real base from elegra1965's save: Default",
+        "colliding": false,
+        "collidingA": 0,
+        "collidingB": 0,
+        "editorName": "elegra1965",
+        "editorFriendCode": "MGD8-C6PP-XKFGT",
+        "bodies": []
+      },
+      "editedAt": "2026-08-18T00:00:00.000Z",
+      "editedByIp": "save-import",
+      "flaggedFields": [],
+      "disputedFields": [],
+      "history": [
+        {
+          "at": "2026-08-18T00:00:00.000Z",
+          "text": "Imported from elegra1965's real save file (base name/address)"
+        }
+      ]
+    },
+    "19EBFD9BE320": {
       "data": {
         "name": "",
         "race": "",
@@ -8706,7 +9369,7 @@
         }
       ]
     },
-    "0109FF9BE31E": {
+    "3901FF9BE31E": {
       "data": {
         "name": "",
         "race": "",
@@ -8745,7 +9408,7 @@
         }
       ]
     },
-    "1F0005963226": {
+    "101F05963226": {
       "data": {
         "name": "",
         "race": "",
@@ -8784,7 +9447,7 @@
         }
       ]
     },
-    "2426FD54FC2C": {
+    "3624FD54FC2C": {
       "data": {
         "name": "",
         "race": "",
@@ -8823,7 +9486,7 @@
         }
       ]
     },
-    "1C00FF968224": {
+    "501CFF968224": {
       "data": {
         "name": "",
         "race": "",
@@ -8862,7 +9525,7 @@
         }
       ]
     },
-    "7961867FE7FF": {
+    "1179867FE7FF": {
       "data": {
         "name": "",
         "race": "",
@@ -8901,7 +9564,7 @@
         }
       ]
     },
-    "020003962227": {
+    "200203962227": {
       "data": {
         "name": "",
         "race": "",
@@ -8940,7 +9603,7 @@
         }
       ]
     },
-    "6AE869647685": {
+    "586A69647685": {
       "data": {
         "name": "",
         "race": "",
@@ -8979,7 +9642,7 @@
         }
       ]
     },
-    "E51405A94429": {
+    "14E505A94429": {
       "data": {
         "name": "",
         "race": "",
@@ -9018,7 +9681,7 @@
         }
       ]
     },
-    "0A0021048CDE": {
+    "200A21048CDE": {
       "data": {
         "name": "",
         "race": "",
@@ -9057,7 +9720,7 @@
         }
       ]
     },
-    "A90004964226": {
+    "50A904964226": {
       "data": {
         "name": "",
         "race": "",
@@ -9096,7 +9759,7 @@
         }
       ]
     },
-    "2609FBBC5A84": {
+    "1926FBBC5A84": {
       "data": {
         "name": "",
         "race": "",
@@ -9116,7 +9779,7 @@
         "ruins": false,
         "outlaw": false,
         "phantom": "",
-        "notes": "Real bases from elegra1965's save: Portal planet; Freighter 1; Freighter Base 2.0",
+        "notes": "Real bases from elegra1965's save: Portal planet; Freighter 1",
         "colliding": false,
         "collidingA": 0,
         "collidingB": 0,
@@ -9135,7 +9798,7 @@
         }
       ]
     },
-    "5800E1434753": {
+    "0926FBBC5A84": {
       "data": {
         "name": "",
         "race": "",
@@ -9155,7 +9818,7 @@
         "ruins": false,
         "outlaw": false,
         "phantom": "",
-        "notes": "Real bases from elegra1965's save: My ARG portal; Default",
+        "notes": "Real base from elegra1965's save: Freighter Base 2.0",
         "colliding": false,
         "collidingA": 0,
         "collidingB": 0,
@@ -9174,7 +9837,7 @@
         }
       ]
     },
-    "6309FBBC4A84": {
+    "2058E1434753": {
       "data": {
         "name": "",
         "race": "",
@@ -9194,7 +9857,7 @@
         "ruins": false,
         "outlaw": false,
         "phantom": "",
-        "notes": "Real bases from elegra1965's save: Acedon Colony; Fotonha Outpost",
+        "notes": "Real base from elegra1965's save: My ARG portal",
         "colliding": false,
         "collidingA": 0,
         "collidingB": 0,
@@ -9213,7 +9876,124 @@
         }
       ]
     },
-    "9E81EB36CA91": {
+    "0058E1434753": {
+      "data": {
+        "name": "",
+        "race": "",
+        "region": "",
+        "starClass": "",
+        "stars": [],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "",
+        "sell": "",
+        "buy": "",
+        "econDesc": "",
+        "conflict": "",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "phantom": "",
+        "notes": "Real base from elegra1965's save: Default",
+        "colliding": false,
+        "collidingA": 0,
+        "collidingB": 0,
+        "editorName": "elegra1965",
+        "editorFriendCode": "MGD8-C6PP-XKFGT",
+        "bodies": []
+      },
+      "editedAt": "2026-08-18T00:00:00.000Z",
+      "editedByIp": "save-import",
+      "flaggedFields": [],
+      "disputedFields": [],
+      "history": [
+        {
+          "at": "2026-08-18T00:00:00.000Z",
+          "text": "Imported from elegra1965's real save file (base name/address)"
+        }
+      ]
+    },
+    "1963FBBC4A84": {
+      "data": {
+        "name": "",
+        "race": "",
+        "region": "",
+        "starClass": "",
+        "stars": [],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "",
+        "sell": "",
+        "buy": "",
+        "econDesc": "",
+        "conflict": "",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "phantom": "",
+        "notes": "Real base from elegra1965's save: Acedon Colony",
+        "colliding": false,
+        "collidingA": 0,
+        "collidingB": 0,
+        "editorName": "elegra1965",
+        "editorFriendCode": "MGD8-C6PP-XKFGT",
+        "bodies": []
+      },
+      "editedAt": "2026-08-18T00:00:00.000Z",
+      "editedByIp": "save-import",
+      "flaggedFields": [],
+      "disputedFields": [],
+      "history": [
+        {
+          "at": "2026-08-18T00:00:00.000Z",
+          "text": "Imported from elegra1965's real save file (base name/address)"
+        }
+      ]
+    },
+    "0963FBBC4A84": {
+      "data": {
+        "name": "",
+        "race": "",
+        "region": "",
+        "starClass": "",
+        "stars": [],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "",
+        "sell": "",
+        "buy": "",
+        "econDesc": "",
+        "conflict": "",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "phantom": "",
+        "notes": "Real base from elegra1965's save: Fotonha Outpost",
+        "colliding": false,
+        "collidingA": 0,
+        "collidingB": 0,
+        "editorName": "elegra1965",
+        "editorFriendCode": "MGD8-C6PP-XKFGT",
+        "bodies": []
+      },
+      "editedAt": "2026-08-18T00:00:00.000Z",
+      "editedByIp": "save-import",
+      "flaggedFields": [],
+      "disputedFields": [],
+      "history": [
+        {
+          "at": "2026-08-18T00:00:00.000Z",
+          "text": "Imported from elegra1965's real save file (base name/address)"
+        }
+      ]
+    },
+    "319EEB36CA91": {
       "data": {
         "name": "",
         "race": "",
@@ -9252,7 +10032,7 @@
         }
       ]
     },
-    "3326FF54FC2C": {
+    "6633FF54FC2C": {
       "data": {
         "name": "",
         "race": "",
@@ -9291,7 +10071,7 @@
         }
       ]
     },
-    "210005BD3573": {
+    "202105BD3573": {
       "data": {
         "name": "",
         "race": "",
@@ -9330,7 +10110,7 @@
         }
       ]
     },
-    "49CD81E476A9": {
+    "4D4981E476A9": {
       "data": {
         "name": "",
         "race": "",
@@ -9369,7 +10149,7 @@
         }
       ]
     },
-    "DF0003928F6E": {
+    "40DF03928F6E": {
       "data": {
         "name": "",
         "race": "",
@@ -9408,7 +10188,7 @@
         }
       ]
     },
-    "417606EE4923": {
+    "164106EE4923": {
       "data": {
         "name": "",
         "race": "",
@@ -9447,7 +10227,7 @@
         }
       ]
     },
-    "8DFBF8005003": {
+    "2B8DF8005003": {
       "data": {
         "name": "",
         "race": "",
@@ -9486,7 +10266,7 @@
         }
       ]
     },
-    "A5FBF7005FFF": {
+    "3BA5F7005FFF": {
       "data": {
         "name": "",
         "race": "",
@@ -9525,7 +10305,7 @@
         }
       ]
     },
-    "6658034ADAFB": {
+    "2866034ADAFB": {
       "data": {
         "name": "",
         "race": "",
@@ -9564,7 +10344,7 @@
         }
       ]
     },
-    "130FFA01867C": {
+    "5F13FA01867C": {
       "data": {
         "name": "",
         "race": "",
@@ -9603,7 +10383,7 @@
         }
       ]
     },
-    "D51F467BE298": {
+    "2FD5467BE298": {
       "data": {
         "name": "",
         "race": "",
@@ -9642,7 +10422,7 @@
         }
       ]
     },
-    "0F32FE6AE227": {
+    "120FFE6AE227": {
       "data": {
         "name": "",
         "race": "",
@@ -9681,7 +10461,7 @@
         }
       ]
     },
-    "4AFEF9000FFC": {
+    "2E4AF9000FFC": {
       "data": {
         "name": "",
         "race": "",
@@ -9720,7 +10500,7 @@
         }
       ]
     },
-    "B80005005006": {
+    "10B805005006": {
       "data": {
         "name": "",
         "race": "",
@@ -9759,7 +10539,7 @@
         }
       ]
     },
-    "36FE00001008": {
+    "1E3600001008": {
       "data": {
         "name": "",
         "race": "",
