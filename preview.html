@@ -1872,14 +1872,20 @@ var BIOMES={
      literal on-screen text -- his own primary save data outranks a
      secondary wiki reading, so this now matches what a player actually
      sees rather than the wiki's own internal/community naming. */
-  "Radioactive": {base:"#2c5638",land:["#3f7a4a","#1e3f28","#5a9a5a","#16301d"],sea:"#20404a",cap:"#8fbf9a",water:true, atmo:0x7bff8a,glow:"#7bff8a", res:["Uranium","Gamma Root","Radon"]},
+  /* base/land/cap/atmo/glow shifted from a dark forest-green (near-identical
+     to Lush's own #1d5f31 swatch, both read as "just green" in the Edit
+     system biome dropdown -- Tony flagged this 2026-08-21) to a distinctly
+     yellow-green lime, so the two are unmistakable at swatch-dot size and
+     in the 3D scene. sea kept dark/desaturated (not lime) so water still
+     reads as water rather than another lime tone. */
+  "Radioactive": {base:"#8fae1b",land:["#a6c92e","#6e8a14","#c4e83f","#516610"],sea:"#20402a",cap:"#d8f06a",water:true, atmo:0xccff33,glow:"#ccff33", res:["Uranium","Gamma Root","Radon"]},
   /* Kept as a second selectable entry, not just quietly dropped -- Tony's
      own screenshot confirmed "Radioactive" is what the in-game scan popup
      shows, but he asked to keep "Irradiated" too "just in case" (the wiki's
      own Biome page uses it, and other UI contexts in-game may still show
      it). Same texture/colour data as Radioactive since it's the same
      underlying biome. */
-  "Irradiated": {base:"#2c5638",land:["#3f7a4a","#1e3f28","#5a9a5a","#16301d"],sea:"#20404a",cap:"#8fbf9a",water:true, atmo:0x7bff8a,glow:"#7bff8a", res:["Uranium","Gamma Root","Radon"]},
+  "Irradiated": {base:"#8fae1b",land:["#a6c92e","#6e8a14","#c4e83f","#516610"],sea:"#20402a",cap:"#d8f06a",water:true, atmo:0xccff33,glow:"#ccff33", res:["Uranium","Gamma Root","Radon"]},
   "Marsh":      {base:"#38473a",land:["#4f6b4a","#2a3a2a","#66805a","#1e2a1e"],sea:"#2f4a4a",cap:"#9aa89a",water:true, atmo:0x9ad8b0, res:null},
   "Volcanic":   {base:"#241a18",land:["#3a2a24","#140f0e","#4a3028","#0d0908"],sea:"#2a1a14",cap:"#5a4a44",water:true, atmo:0xff6a3a,glow:"#ff4a1a", res:null}
 };
