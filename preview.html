@@ -1482,8 +1482,20 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
       <div class="mfld" id="siBasesFld" style="display:none">
         <div class="lb">Real bases found in your save</div>
         <div id="siBasesList" style="max-height:140px;overflow-y:auto;font-size:12px;color:var(--text-dim);line-height:1.6;background:rgba(0,0,0,.2);border:1px solid var(--border);border-radius:4px;padding:6px 8px"></div>
-        <div class="msub" style="margin:8px 0 6px">These get added to the shared community map, same as typing them into this form one at a time, just all at once. A system you've already documented, or that another traveller has, gets your base name merged in as a note rather than overwriting their data -- nothing existing is ever clobbered.</div>
-        <button class="btn primary" id="siImportBases" type="button">Import <span id="siImportCount">0</span> base<span id="siImportPlural">s</span> to the shared map</button>
+      </div>
+      <div class="mfld" id="siSystemNamesFld" style="display:none">
+        <div class="lb">Real system names found in your save</div>
+        <div id="siSystemNamesList" style="max-height:80px;overflow-y:auto;font-size:12px;color:var(--text-dim);line-height:1.6;background:rgba(0,0,0,.2);border:1px solid var(--border);border-radius:4px;padding:6px 8px"></div>
+        <div class="msub" style="margin:6px 0 0">From systems you've actually renamed in-game (Discoveries screen) -- only fills in the system's name if nobody's documented it yet, never overwrites an existing one.</div>
+      </div>
+      <div class="mfld" id="siPlanetsFld" style="display:none">
+        <div class="lb">Real planet names found in your save</div>
+        <div id="siPlanetsList" style="max-height:140px;overflow-y:auto;font-size:12px;color:var(--text-dim);line-height:1.6;background:rgba(0,0,0,.2);border:1px solid var(--border);border-radius:4px;padding:6px 8px"></div>
+        <div class="msub" style="margin:6px 0 0">Real planets you've renamed in-game, matched to the exact body slot in that system. Only sets the name -- biome/resources/everything else stays whatever's already there (procedural, or someone else's own documentation).</div>
+      </div>
+      <div class="mfld" id="siImportFld" style="display:none">
+        <div class="msub" style="margin:0 0 6px">All of this gets added to the shared community map, same as typing it into this form one at a time, just all at once. Anything already documented by you or another traveller is merged in (or, for names, only fills a blank slot) -- nothing existing is ever clobbered.</div>
+        <button class="btn primary" id="siImportBases" type="button">Import <span id="siImportCount">0</span> item<span id="siImportPlural">s</span> to the shared map</button>
       </div>
     </div>
     <div class="modalBtns">
@@ -6921,10 +6933,14 @@ function siShowResults(summary){
   var results=document.getElementById("siResults");
   results.style.display="block";
   var sumEl=document.getElementById("siSummary");
+  var planets=summary.planets||[], systemNames=summary.systemNames||[];
   var parts=[];
   if(summary.saveName) parts.push('Save slot: "'+summary.saveName+'"');
   parts.push(summary.systemCount+" system"+(summary.systemCount===1?"":"s")+" with a real base name found");
-  sumEl.textContent=parts.join(" \u00b7 ")+(summary.systemCount?"":" -- nothing to auto-fill besides your name below, if found.");
+  if(planets.length) parts.push(planets.length+" real planet name"+(planets.length===1?"":"s"));
+  if(systemNames.length) parts.push(systemNames.length+" real system name"+(systemNames.length===1?"":"s"));
+  var nothingFound = !summary.systemCount && !planets.length && !systemNames.length;
+  sumEl.textContent=parts.join(" \u00b7 ")+(nothingFound?" -- nothing to auto-fill besides your name below, if found.":"");
   var nameFld=document.getElementById("siNameFld");
   if(summary.username){
     nameFld.style.display="block";
@@ -6942,10 +6958,43 @@ function siShowResults(summary){
       row.textContent=b.names.join(", ")+"  ("+b.address+")";
       listEl.appendChild(row);
     });
-    document.getElementById("siImportCount").textContent=summary.bases.length;
-    document.getElementById("siImportPlural").textContent=summary.bases.length===1?"":"s";
   } else {
     basesFld.style.display="none";
+  }
+  var sysNameFld=document.getElementById("siSystemNamesFld");
+  var sysNameList=document.getElementById("siSystemNamesList");
+  if(systemNames.length){
+    sysNameFld.style.display="block";
+    sysNameList.innerHTML="";
+    systemNames.forEach(function(s){
+      var row=document.createElement("div");
+      row.textContent='"'+s.name+'"  ('+s.address+')';
+      sysNameList.appendChild(row);
+    });
+  } else {
+    sysNameFld.style.display="none";
+  }
+  var planetsFld=document.getElementById("siPlanetsFld");
+  var planetsList=document.getElementById("siPlanetsList");
+  if(planets.length){
+    planetsFld.style.display="block";
+    planetsList.innerHTML="";
+    planets.forEach(function(p){
+      var row=document.createElement("div");
+      row.textContent='"'+p.name+'"  (planet #'+p.planetIndex+' in system '+p.systemAddress+')';
+      planetsList.appendChild(row);
+    });
+  } else {
+    planetsFld.style.display="none";
+  }
+  var totalItems = summary.bases.length + planets.length + systemNames.length;
+  var importFld=document.getElementById("siImportFld");
+  if(totalItems){
+    importFld.style.display="block";
+    document.getElementById("siImportCount").textContent=totalItems;
+    document.getElementById("siImportPlural").textContent=totalItems===1?"":"s";
+  } else {
+    importFld.style.display="none";
   }
   siRemeasureScroll();
 }
@@ -6961,12 +7010,49 @@ document.getElementById("siUseName").addEventListener("click",function(){
   saveTravellerId(siLastSummary.username, document.getElementById("edEditorCode").value.trim());
   toast("Filled in your name from your save");
 });
+// Real total body count for a system address, via the same NMSCore.planetSeeds()
+// call the map itself already uses to size a system's body list (line ~2139) --
+// needed so the server can build a correctly-sized bodies array instead of
+// guessing or truncating. Falls back to 0 (server then just uses whatever the
+// highest referenced planet index requires) if nms-core isn't loaded/errors.
+function siBodyCountFor(address){
+  if(!window.NMSCore) return 0;
+  try{
+    var pc=BigInt("0x"+address);
+    var ps=window.NMSCore.planetSeeds(pc, GALAXY);
+    return Math.min(6, Math.max(1, ps.planet_count+ps.moon_count));
+  }catch(e){ return 0; }
+}
 document.getElementById("siImportBases").addEventListener("click",function(){
-  if(!siLastSummary || !siLastSummary.bases || !siLastSummary.bases.length) return;
+  if(!siLastSummary) return;
+  var bases=siLastSummary.bases||[], planets=siLastSummary.planets||[], systemNames=siLastSummary.systemNames||[];
+  if(!bases.length && !planets.length && !systemNames.length) return;
   var btn=this;
   var editorName=document.getElementById("edEditorName").value.trim() || siLastSummary.username || "";
   var editorCode=document.getElementById("edEditorCode").value.trim() || "";
-  var entries=siLastSummary.bases.map(function(b){ return {address:b.address, names:b.names}; });
+
+  // Combine bases + planet names + system names into one entries array keyed
+  // by system address -- MAX_BULK_IMPORTS_PER_IP_PER_DAY is 1, so everything
+  // has to go out in a single request or the second call would just be
+  // rejected as "one import per day already used."
+  var byAddr={};
+  function entryFor(addr){
+    if(!byAddr[addr]) byAddr[addr]={address:addr, names:[], planetNames:[], systemName:"", bodyCount:0};
+    return byAddr[addr];
+  }
+  bases.forEach(function(b){ entryFor(b.address).names=b.names; });
+  planets.forEach(function(p){
+    var e=entryFor(p.systemAddress);
+    e.planetNames.push({index:p.planetIndex, name:p.name});
+    e.bodyCount=siBodyCountFor(p.systemAddress);
+  });
+  systemNames.forEach(function(s){
+    var e=entryFor(s.address);
+    e.systemName=s.name;
+    if(!e.bodyCount) e.bodyCount=siBodyCountFor(s.address);
+  });
+  var entries=Object.keys(byAddr).map(function(k){ return byAddr[k]; });
+
   btn.disabled=true;
   document.getElementById("siErr").style.display="none";
   var progress=document.getElementById("siProgress"), spinTxt=document.getElementById("siSpinTxt");
@@ -6985,7 +7071,12 @@ document.getElementById("siImportBases").addEventListener("click",function(){
       return;
     }
     if(editorName) saveTravellerId(editorName, editorCode);
-    toast("Imported "+res.body.added+" new system"+(res.body.added===1?"":"s")+", merged into "+res.body.merged+" existing -- visible to everyone");
+    var msg="Imported "+res.body.added+" new system"+(res.body.added===1?"":"s")+", merged into "+res.body.merged+" existing";
+    var extra=[];
+    if(res.body.planetsSet) extra.push(res.body.planetsSet+" planet name"+(res.body.planetsSet===1?"":"s"));
+    if(res.body.systemNamesSet) extra.push(res.body.systemNamesSet+" system name"+(res.body.systemNamesSet===1?"":"s"));
+    if(extra.length) msg+=" (incl. "+extra.join(", ")+")";
+    toast(msg+" -- visible to everyone");
     loadOverrides();
     closeModal();
   }).catch(function(){

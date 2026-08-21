@@ -31,7 +31,8 @@
                          allowlist until now -- see filter.mjs's own comment on that same field for
                          why it's a manual pick, not derived data.)
      "report" payload = {reason}
-     "bulk-import" payload = {entries:[{address, names:[...]}...], editorName, editorFriendCode}
+     "bulk-import" payload = {entries:[{address, names:[...], planetNames:[{index,name}...],
+                    systemName}...], editorName, editorFriendCode}
                     Added 2026-08-18 alongside nms-core/save-import/ (client-side save.hg
                     parser) -- a visitor who's parsed their OWN save file in their own
                     browser can offer to import their real bases in one batch instead of
@@ -40,6 +41,12 @@
                     (existing community data on a system is never blanked out, only
                     name-if-blank and notes get touched; rate-limited separately and much
                     more strictly than a normal edit, since it's a much heavier write).
+                    planetNames/systemName added 2026-08-21 -- real per-body and per-system
+                    names read from DiscoveryManagerData, filtered client-side to the
+                    traveller's own discoveries only (see extract-summary.js). Same "never
+                    clobber" rule: systemName only fills a blank system name, planetNames
+                    only ever grows a system's bodies array and only ever sets .name on the
+                    slot(s) named, see applyPlanetNamesToBodies() below.
      "resolve-flag" (admin only, requires ?token=<ADMIN_TOKEN> on the URL) payload =
                     {field, resolution:"dispute"|"dismiss"|"set-value", value?}
                     field is one of FLAG_FIELDS or "bodies.N" -- see lib/shared.mjs.
@@ -350,7 +357,47 @@ async function handleGet(req, token){
    real bug caught 2026-08-18 from a live report: elegra1965's own base
    "Elegraynor Portal" ended up displayed as the star's name). A brand-new
    address gets a fresh minimal record, same shape a normal partial edit already
-   produces. */
+   produces.
+
+   EXTENDED, 2026-08-21: also merges real planet names (entry.planetNames,
+   from DiscoveryManagerData's Planet-type discoveries) and a real system
+   name (entry.systemName, from a SolarSystem-type discovery) -- see
+   extract-summary.js's header and filterBulkImport()'s comment in
+   filter.mjs for the full "why" and the safety rules. systemName only ever
+   fills a blank sysRec.data.name, never overwrites one. planetNames go
+   through applyPlanetNamesToBodies() below, which is deliberately
+   append-only: it only ever GROWS a system's bodies array (to at least
+   entry.bodyCount, the real body count computed client-side, and at least
+   the highest referenced planet index) and only ever touches the specific
+   .name field of the slot(s) named -- every other field on an existing
+   body, and every other body in the array, is left completely untouched.
+   This is the only safe way to do it here: a naive "replace sysRec.data.bodies
+   with a freshly-built array" would either truncate a system that already
+   has more real per-body data than this one import knows about, or blank
+   out fields (biome/resources/ring/etc) another traveller already
+   documented, since preview.html's applyOverride() treats bodies as a
+   dense array replacing the procedural one wholesale, not a sparse patch. */
+function blankBody(){
+  return {
+    name:"", moon:false, orbits:0, biome:"", descriptor:"", water:false, ring:false,
+    resources:[], flora:[], fauna:[], minerals:[], salvage:[], fossils:[],
+    sentinel:"None", autophage:false, base:false, baseName:""
+  };
+}
+function applyPlanetNamesToBodies(existingBodies, bodyCount, planetNames){
+  var bodies = (existingBodies && existingBodies.length) ? existingBodies.slice() : [];
+  var neededLen = Math.max(bodies.length, bodyCount||0);
+  for(var pn=0; pn<planetNames.length; pn++) neededLen = Math.max(neededLen, planetNames[pn].index);
+  neededLen = Math.min(6, neededLen);
+  while(bodies.length < neededLen) bodies.push(blankBody());
+  for(var i=0;i<planetNames.length;i++){
+    var idx = planetNames[i].index;
+    if(idx>=1 && idx<=bodies.length){
+      bodies[idx-1] = Object.assign({}, bodies[idx-1], {name: planetNames[i].name});
+    }
+  }
+  return bodies;
+}
 async function handleBulkImport(req, token, body, ip, now){
   var filtered = filterBulkImport(body.payload);
   if(!filtered.ok){
@@ -370,59 +417,73 @@ async function handleBulkImport(req, token, body, ip, now){
   hits.push(now);
   current.data.bulkImportLog[ip] = hits;
 
-  var added=0, merged=0;
+  var added=0, merged=0, planetsSet=0, systemNamesSet=0;
   for(var i=0;i<filtered.cleaned.entries.length;i++){
     var entry = filtered.cleaned.entries[i];
     var sysRec = current.data.systems[entry.address];
-    var noteLine = entry.names.length>1
+    var noteLine = entry.names.length ? (entry.names.length>1
       ? "Real bases from a traveller's save: "+entry.names.join("; ")
-      : "Real base from a traveller's save: "+entry.names[0];
+      : "Real base from a traveller's save: "+entry.names[0]) : "";
 
     if(!sysRec){
       current.data.systems[entry.address] = {
         flaggedFields: [], disputedFields: [],
         data: {
-          // name deliberately left blank -- a base name is NOT the star
-          // system's name, and a save file never tells us the real one
-          // (see the header comment above). Leaving it blank means the
-          // procedural name still shows until someone actually documents
-          // the real system name via Edit system.
-          name: "", race:"", region:"", starClass:"", stars:[],
+          // name: blank unless this entry carries a real SolarSystem-type
+          // discovery name (entry.systemName) -- a base name is NOT the
+          // star system's name (see the header comment above), but a
+          // renamed discovery genuinely is the real system name.
+          name: entry.systemName || "", race:"", region:"", starClass:"", stars:[],
           water:false, dissonant:false, giant:false,
           econName:"", sell:"", buy:"", econDesc:"", conflict:"",
           blackHole:false, atlas:false, ruins:false, outlaw:false, phantom:"",
           notes: noteLine, colliding:false, collidingA:0, collidingB:0,
           editorName: filtered.cleaned.editorName, editorFriendCode: filtered.cleaned.editorFriendCode,
-          bodies: []
+          bodies: applyPlanetNamesToBodies([], entry.bodyCount, entry.planetNames)
         },
         editedAt: new Date(now).toISOString(),
         editedByIp: ip,
-        history: [{ at: new Date(now).toISOString(), text: "Imported from a traveller's real save file (base name/address)" }]
+        history: [{ at: new Date(now).toISOString(), text: "Imported from a traveller's real save file (base name/address/discovery data)" }]
       };
       added++;
+      if(entry.systemName) systemNamesSet++;
+      if(entry.planetNames.length) planetsSet+=entry.planetNames.length;
     } else {
       if(!sysRec.data) sysRec.data = {};
-      var existingNotes = sysRec.data.notes || "";
-      if(existingNotes.indexOf(noteLine) < 0){
-        sysRec.data.notes = existingNotes ? (existingNotes+" | "+noteLine) : noteLine;
+      if(noteLine){
+        var existingNotes = sysRec.data.notes || "";
+        if(existingNotes.indexOf(noteLine) < 0){
+          sysRec.data.notes = existingNotes ? (existingNotes+" | "+noteLine) : noteLine;
+        }
+      }
+      // Never overwrite an already-documented system name -- only fill it
+      // in when currently blank, same "never clobber" rule as every other
+      // bulk-import field.
+      if(entry.systemName && !sysRec.data.name){
+        sysRec.data.name = entry.systemName;
+        systemNamesSet++;
+      }
+      if(entry.planetNames.length){
+        sysRec.data.bodies = applyPlanetNamesToBodies(sysRec.data.bodies, entry.bodyCount, entry.planetNames);
+        planetsSet += entry.planetNames.length;
       }
       sysRec.data.editorName = filtered.cleaned.editorName || sysRec.data.editorName || "";
       sysRec.data.editorFriendCode = filtered.cleaned.editorFriendCode || sysRec.data.editorFriendCode || "";
       sysRec.editedAt = new Date(now).toISOString();
-      pushHistory(sysRec, "real base name(s) merged in from a traveller's save-file import", now);
+      pushHistory(sysRec, "real base/planet/system name(s) merged in from a traveller's save-file import", now);
       merged++;
     }
   }
 
   try {
     await githubPutFile(token, current.data, current.sha,
-      "Bulk save-file import: "+added+" new, "+merged+" merged ("+(filtered.cleaned.editorName||"anonymous")+")");
+      "Bulk save-file import: "+added+" new, "+merged+" merged, "+planetsSet+" planet name(s), "+systemNamesSet+" system name(s) ("+(filtered.cleaned.editorName||"anonymous")+")");
   } catch(e){
     return json(502, {ok:false, error:"Could not save to shared data store: "+e.message});
   }
 
   invalidateGetCache();
-  return json(200, {ok:true, added:added, merged:merged, total:filtered.cleaned.entries.length});
+  return json(200, {ok:true, added:added, merged:merged, planetsSet:planetsSet, systemNamesSet:systemNamesSet, total:filtered.cleaned.entries.length});
 }
 
 async function handleResolveFlag(req, token, body){

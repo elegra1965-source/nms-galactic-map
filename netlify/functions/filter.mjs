@@ -352,7 +352,19 @@ export function filterSystemEdit(payload){
    Same content rules as a normal edit's name/notes fields, just applied
    to every entry in one array. Caps batch size hard at 300 (a generous
    real-world base count -- Tony's own real save had 278) so one request
-   can't be used to smuggle in an unbounded write. */
+   can't be used to smuggle in an unbounded write.
+
+   EXTENDED, 2026-08-21: entries can now also carry planetNames (real
+   per-body names from DiscoveryManagerData, one traveller's own renamed
+   planets -- see extract-summary.js's header for the full "why") and an
+   optional systemName (from a SolarSystem-type discovery). Both ride in
+   the SAME entries array/single daily-limited request as base names,
+   since MAX_BULK_IMPORTS_PER_IP_PER_DAY is 1 -- a separate second request
+   would just get rejected. bodyCount is the real total planet+moon count
+   for that system (computed client-side via NMSCore.planetSeeds(), which
+   the server has no way to derive on its own) -- needed so handleBulkImport()
+   can build a correctly-sized bodies array instead of guessing, or silently
+   truncating a system that has more real bodies than named entries. */
 var MAX_BULK_IMPORT_ENTRIES = 300;
 
 export function filterBulkImport(payload){
@@ -379,8 +391,30 @@ export function filterBulkImport(payload){
       var nR = filterText(namesIn[j], {maxLen:40, fieldName:"System name"});
       if(nR.ok && nR.cleaned) cleanedNames.push(nR.cleaned);
     }
-    if(!cleanedNames.length) continue; // every name for this entry was empty/blocked/too long -- skip it, don't fail the batch
-    out.push({ address: String(e.address).toUpperCase(), names: cleanedNames });
+
+    var planetNamesIn = Array.isArray(e.planetNames) ? e.planetNames : [];
+    var cleanedPlanetNames = [];
+    for(var k=0;k<Math.min(planetNamesIn.length,6);k++){
+      var pn = planetNamesIn[k] || {};
+      var idx = Math.max(1, Math.min(6, parseInt(pn.index,10)||0));
+      if(!pn.index || idx!==Math.round(Number(pn.index))) continue; // must be a real 1-6 integer, not a guessed clamp
+      var pnR = filterText(pn.name, {maxLen:30, fieldName:"Planet name"});
+      if(pnR.ok && pnR.cleaned) cleanedPlanetNames.push({index:idx, name:pnR.cleaned});
+    }
+
+    var systemNameR = filterText(e.systemName||"", {maxLen:40, fieldName:"System name"});
+    var cleanedSystemName = systemNameR.ok ? systemNameR.cleaned : "";
+
+    var bodyCount = Math.max(0, Math.min(6, parseInt(e.bodyCount,10)||0));
+
+    if(!cleanedNames.length && !cleanedPlanetNames.length && !cleanedSystemName) continue; // nothing usable in this entry -- skip it, don't fail the batch
+    out.push({
+      address: String(e.address).toUpperCase(),
+      names: cleanedNames,
+      planetNames: cleanedPlanetNames,
+      systemName: cleanedSystemName,
+      bodyCount: bodyCount
+    });
   }
 
   return {

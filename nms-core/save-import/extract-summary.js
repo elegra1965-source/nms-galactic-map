@@ -23,14 +23,31 @@
 // see CLAUDE.md's 2026-08-21 session note for the retroactive fix applied
 // to the 224 already-imported systems in data/overrides.json.
 //
-// Was also deliberately NOT reading DiscoveryManagerData here -- that
-// assumption has since been corrected too: real per-discovery player-given
-// names (DiscoveryManagerData['DiscoveryData-v1'].Store.Record[].DM.CN) DO
-// exist for planets/animals/flora/minerals, confirmed by reading a real
-// save directly. Still not wired into this importer yet (separate future
-// work) -- flagging here so nobody re-reads the old claim and trusts it.
+// EXTENDED, 2026-08-21: now also reads DiscoveryManagerData for real player-
+// given planet/system names -- the assumption above (that discoveries never
+// carry a name) was wrong, confirmed by reading a real save directly.
+// DiscoveryManagerData['DiscoveryData-v1'].Store.Record is a flat array
+// covering EVERY discovery synced into this save file, not just the local
+// player's own -- in multiplayer/shared saves it's full of other real
+// travellers' discoveries too (confirmed: 143 of 151 named records in a
+// real test save belonged to other USNs). Every record is filtered to
+// OWS.USN matching the save's own resolved username (the same one already
+// computed from PersistentPlayerBases below) before being surfaced here --
+// never import someone else's discovery as if this traveller documented it.
+// DD.DT is the discovery type ("Planet", "SolarSystem", "Animal", "Flora",
+// "Mineral", "Sector"); DM.CN is only present once a player has actually
+// renamed that discovery in-game. "Planet" records become per-body name
+// overrides; "SolarSystem" records become a candidate real system name
+// (only ever used to FILL a blank system name, never to overwrite one --
+// same "never clobber existing data" rule as every other bulk-import field).
 
-function packedAddressToHex(v) {
+// Shared decode step used by both packedAddressToHex() (below, unchanged
+// public signature -- still returns a plain hex string, exactly as every
+// existing caller expects) and packedAddressToFields() (new -- returns the
+// P/SSI/Y/Z/X pieces separately, needed for discovery records where the
+// PlanetIndex has to be split out from the rest of the address instead of
+// baked into one combined hex string).
+function decodeRawAddress(v) {
   let n;
   if (typeof v === 'string') {
     const h = v.toLowerCase().startsWith('0x') ? v.slice(2) : v;
@@ -47,11 +64,35 @@ function packedAddressToHex(v) {
   const ssi = (((ssiRaw & 0xFFn) << 8n) | ((ssiRaw >> 8n) & 0xFFn)) & 0xFFFn; // byte-swap, then keep the 3 hex digits the portal format actually has room for
   const p = (n >> 52n) & 0xFn; // top nibble; bits 48-51 are RealityIndex, unused here
 
-  const packed = (p << 44n) | (ssi << 32n) | (y << 24n) | (z << 12n) | x;
+  return { p: Number(p), ssi, y, z, x };
+}
+
+function fieldsToHex(f, pOverride) {
+  const p = pOverride === undefined ? BigInt(f.p) : BigInt(pOverride);
+  const packed = (p << 44n) | (f.ssi << 32n) | (f.y << 24n) | (f.z << 12n) | f.x;
   return packed.toString(16).toUpperCase().padStart(12, '0');
 }
 
-/** Returns { username, bases: [{address, name}], baseCount, systemCount } */
+function packedAddressToHex(v) {
+  return fieldsToHex(decodeRawAddress(v));
+}
+
+/** Returns { planetIndex, systemAddress } -- systemAddress is the same
+ * 12-char hex as packedAddressToHex() but with the leading PlanetIndex
+ * nibble zeroed out (P='0'), i.e. the system-level address every other
+ * part of this site keys community data by. planetIndex is that same
+ * nibble on its own, 0-15 (matches the 1-based b.index this site's own
+ * body arrays already use, per generateSystem()/planetSeeds() -- a
+ * discovery's real PlanetIndex tells you exactly which body slot it is). */
+function packedAddressToFields(v) {
+  const f = decodeRawAddress(v);
+  return { planetIndex: f.p, systemAddress: fieldsToHex(f, 0) };
+}
+
+/** Returns { username, bases: [{address, name}], baseCount, systemCount,
+ * planets: [{systemAddress, planetIndex, name}], systemNames:
+ * [{address, name}] }. planets/systemNames come from DiscoveryManagerData,
+ * filtered to this traveller's own USN only -- see the file header comment. */
 function extractSaveSummary(deobfuscatedSave) {
   const contexts = [];
   if (deobfuscatedSave.BaseContext) contexts.push(deobfuscatedSave.BaseContext);
@@ -95,13 +136,54 @@ function extractSaveSummary(deobfuscatedSave) {
     bases.push({ address: addr, names: list.map((e) => e.name) });
   }
 
+  // Real per-discovery names, filtered to this traveller's own username
+  // only (see file header). DiscoveryManagerData sits at the save's top
+  // level, not nested under BaseContext/ExpeditionContext like everything
+  // above -- confirmed by reading a real save directly.
+  const planets = []; // [{systemAddress, planetIndex, name}]
+  const systemNamesMap = new Map(); // systemAddress -> name (first one wins if duplicates)
+  const dm = deobfuscatedSave.DiscoveryManagerData;
+  const records = dm && dm['DiscoveryData-v1'] && dm['DiscoveryData-v1'].Store
+    ? (dm['DiscoveryData-v1'].Store.Record || [])
+    : [];
+  const usnLower = username.toLowerCase();
+  if (usnLower) {
+    for (const rec of records) {
+      const dd = rec && rec.DD;
+      const dmField = rec && rec.DM;
+      const ows = rec && rec.OWS;
+      if (!dd || !dmField) continue;
+      const cn = (dmField.CN || '').trim();
+      if (!cn) continue;
+      const usn = ((ows && ows.USN) || '').toLowerCase();
+      if (usn !== usnLower) continue; // not this traveller's own discovery
+
+      let fields;
+      try { fields = packedAddressToFields(dd.UA); }
+      catch (e) { continue; }
+
+      if (dd.DT === 'Planet') {
+        planets.push({ systemAddress: fields.systemAddress, planetIndex: fields.planetIndex, name: cn });
+      } else if (dd.DT === 'SolarSystem') {
+        if (!systemNamesMap.has(fields.systemAddress)) systemNamesMap.set(fields.systemAddress, cn);
+      }
+      // Animal/Flora/Mineral/Sector discoveries also carry real names but
+      // aren't wired into the importer yet -- see HANDOVER.md/CLAUDE.md if
+      // that's ever worth adding (creature/flora logs, not planet identity).
+    }
+  }
+  const systemNames = [];
+  for (const [addr, name] of systemNamesMap) systemNames.push({ address: addr, name });
+
   return {
     username,
     saveName: (deobfuscatedSave.CommonStateData && deobfuscatedSave.CommonStateData.SaveName) || '',
     bases,
     baseCount: bases.reduce((n, b) => n + b.names.length, 0),
     systemCount: bases.length,
+    planets,
+    systemNames,
   };
 }
 
-export { extractSaveSummary, packedAddressToHex };
+export { extractSaveSummary, packedAddressToHex, packedAddressToFields };
