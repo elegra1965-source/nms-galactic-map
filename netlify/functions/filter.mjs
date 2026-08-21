@@ -271,6 +271,15 @@ export function filterSystemEdit(payload){
     var isMoon = !!b.moon;
     if(isMoon) moonCount++; else planetCount++;
     var sentinelIn = String(b.sentinel||"None");
+    // Base name (2026-08-21, Tony): optional, only meaningful alongside
+    // `base`. Same 30-char cap as a body's own name -- deliberately its own
+    // field, never merged into `name`/`bNameR` above (that's the real bug
+    // the save-file bulk-import hit the same day: a base name silently
+    // became the STAR system's name). The client also weaves this into the
+    // system's own `notes` at save time for visibility, but this field is
+    // the source of truth tying the name to the specific body it belongs to.
+    var baseNameR = filterText(b.baseName||"", {maxLen:30, fieldName:"Base name"});
+    if(!baseNameR.ok){ errors.push(baseNameR.reason); continue; }
     out.bodies.push({
       name: bNameR.cleaned,
       moon: isMoon,
@@ -299,7 +308,8 @@ export function filterSystemEdit(payload){
       // "Has base" (2026-08-17, Tony): plain boolean, same manual-only
       // pattern as autophage above -- no procedural rule for a traveller's
       // own base placement.
-      base: !!b.base
+      base: !!b.base,
+      baseName: baseNameR.cleaned
     });
   }
 

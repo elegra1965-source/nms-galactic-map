@@ -370,9 +370,10 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
    correctly read as looking like a single merged glyph. */
 #course .cline b{color:var(--cyan);font-family:'Orbitron',sans-serif;font-size:10.5px;letter-spacing:.04em}
 #cTarget{font-family:'Orbitron',sans-serif;font-size:11px;color:var(--white);margin:5px 0 6px}
-#course .chead{display:flex;align-items:center;gap:8px}
+#course .chead{display:flex;align-items:center;gap:6px}
 #course .chead>div{flex:1;min-width:0}
-#course .chead #bCourseMin{margin-left:auto;flex:none;padding:4px 9px;font-size:12px}
+#course .chead #bToggleManifest{margin-left:auto;flex:none;padding:4px 8px;font-size:10.5px}
+#course .chead #bCourseMin{flex:none;padding:4px 9px;font-size:12px}
 /* Collapsed state: hide everything below the header row (distance/jumps/bearing/
    target-from-centre/buttons) so the box shrinks to one line instead of a tall
    block sitting over the star field -- Tony's "stays so can not see jumps" report.
@@ -663,18 +664,33 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
      so it's scoped to only matter while debug mode is off. */
   html:not(.debug-on) #tweak,html:not(.debug-on) #tel{display:none}
 
-  /* Toolbar reflow: view-mode toggles first, then the address input on its own
-     line (with a Reset button, since there wasn't one before) plus a label so
-     a first-time visitor knows what that box is for, then the secondary address
-     actions, then Labels/Grid, then the app-level buttons last. Dividers are
-     dropped on mobile since the row breaks already group things visually. */
+  /* Toolbar reflow: title + Tour/About/Accessibility grouped first as one
+     "what is this / help" row (Tony, 2026-08-21: "move title up so has
+     ...tour accessibility etc together" -- title was previously order:1 but
+     #bSearch/#bTour/#bAccess had no order set at all, so they defaulted to
+     0 and landed BEFORE the title on real narrow screens, splitting a row
+     that reads as one unit into two). Then Galaxy + galaxy-type together as
+     their own row (Tony: "Galaxy dropdown, any type dropdown are not
+     together" -- #galTypeFilter had the same missing-order bug, defaulting
+     to 0 and landing all the way up with Search/Tour/Access instead of next
+     to #galSel). Then view-mode toggles, the address input on its own line
+     (with a Reset button, since there wasn't one before) plus a label so a
+     first-time visitor knows what that box is for, then the secondary
+     address actions (Glyphs/Random/Search/Filters -- #bSearch belongs here
+     with the other address-related actions, not defaulting to the very
+     front), then Labels/Grid, then whatever's left. Dividers are dropped on
+     mobile since the row breaks already group things visually. Every
+     toolbar child needs an explicit order here -- anything left unset
+     defaults to 0 and jumps the queue, which is exactly how this bug
+     happened twice already; the /10 gaps leave room to insert more later
+     without renumbering everything. */
   #top .sep{display:none}
-  #title{order:1} #galSel{order:2}
-  #mGal{order:10} #mLoc{order:11} #cOrb{order:12} #cFly{order:13}
-  #addrGrp{order:20;width:100%}
-  #bKeys{order:21} #bRand{order:22} #bFiltToggle{order:23}
-  #bLbl{order:30} #bGrid{order:31}
-  #bInstall{order:40} #bAbout{order:41}
+  #title{order:1} #bTour{order:2} #bAbout{order:3} #bAccess{order:4} #bInstall{order:5}
+  #galSel{order:10} #galTypeFilter{order:11}
+  #mGal{order:20} #mLoc{order:21} #cOrb{order:22} #cFly{order:23}
+  #addrGrp{order:30;width:100%}
+  #bKeys{order:31} #bRand{order:32} #bSearch{order:33} #bFiltToggle{order:34}
+  #bLbl{order:40} #bGrid{order:41}
 }
 @media(max-width:900px) and (orientation:landscape){
   /* Short landscape screens don't have room to stack the toolbar, the left-side
@@ -737,11 +753,16 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
        orientation constant on screen while the arms sweep around inside it,
        the way a real tilted galactic disc actually looks when it spins. ---- */
 /* ---- warp manifest itinerary card (spec item 7) ---- */
+/* No longer independently draggable (Tony, 2026-08-21: "add a button to
+   open warp manifest dropdown instead of separate window") -- it now only
+   ever opens as a dropdown anchored directly under the Course plotted card
+   via #bToggleManifest, repositioned every time it opens rather than being
+   its own movable window. See anchorManifestUnderCourse(). */
 #route-itinerary-card{position:fixed;left:50%;transform:translateX(-50%);
   top:calc(var(--top-h,60px) + 8px);z-index:26;width:300px;display:none}
 #route-itinerary-card.show{display:block}
 #route-itinerary-card .rihead{display:flex;justify-content:space-between;align-items:center;
-  margin-bottom:10px;cursor:grab;user-select:none}
+  margin-bottom:10px;user-select:none}
 /* ---- first-visit feature tour (2026-08-16, Tony's ask: a walkthrough of
    what the site can do, adapted from the README's screenshot walkthrough
    into a real in-site spotlight sequence). Not auto-shown -- reachable via
@@ -958,6 +979,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
       <div class="kicker">Course plotted</div>
       <div id="cTarget">—</div>
     </div>
+    <button class="btn" id="bToggleManifest" type="button" title="Show or hide the Warp Manifest -- the full jump-by-jump itinerary for this course.">&#9662; Manifest</button>
     <button class="btn" id="bCourseMin" title="Collapse or expand the course readout.">&#9662;</button>
   </div>
   <div id="cBody">
@@ -2301,7 +2323,10 @@ function applyOverride(s){
         // "Has base" (2026-08-17, Tony): personal-marker-style field, same
         // manual-only pattern as autophage/rings -- no procedural rule
         // exists (or could exist) for where a TRAVELLER'S OWN base sits.
+        // baseName added 2026-08-21 -- the base's own name, distinct from
+        // (and never written into) the planet or star's own name field.
         base:!!b.base,
+        baseName:(b.baseName||"").trim(),
         seed:o?o.seed:gseed(s.vx,s.vy,s.vz,(s.idx*57)+i)
       });
       if(!isMoon) lastPlanetIndex=idx1;
@@ -3967,7 +3992,7 @@ function fsBodyKey(b){
   // would permanently compare as "edited" even though nothing about that
   // specific body ever changed -- a false-positive green/edited status.
   return JSON.stringify({n:b.name,bi:b.biome,d:b.descriptor||"",w:!!b.water,r:b.ring||false,
-    se:b.sentinel||"None",au:!!b.autophage,ba:!!b.base,ru:(b.resUni||[]).slice().sort(),
+    se:b.sentinel||"None",au:!!b.autophage,ba:!!b.base,bn:b.baseName||"",ru:(b.resUni||[]).slice().sort(),
     fl:(b.flora||[]).slice().sort(),fa:(b.fauna||[]).slice().sort(),mi:(b.minerals||[]).slice().sort(),
     sa:(b.salvage||[]).slice().sort(),fo:(b.fossils||[]).slice().sort()});
 }
@@ -4171,7 +4196,7 @@ function showBody(b,s){
   if(b.water) t.push(["hot","Water"]);
   if(b.ring) t.push(["hot",(RING_STYLE_LABEL[b.ring]||"")+" rings"]);
   if(b.autophage) t.push(["hot","Autophage camp"]);
-  if(b.base) t.push(["hot","Has base"]);
+  if(b.base) t.push(["hot",b.baseName?('Base: "'+b.baseName+'"'):"Has base"]);
   var html="",i;
   for(i=0;i<t.length;i++) html+='<span class="tag '+t[i][0]+'">'+t[i][1]+'</span>';
   document.getElementById("bTags").innerHTML=html;
@@ -4315,7 +4340,7 @@ function flyStep(dt){
   applyCam();
 }
 
-var drag=false,lastX=0,lastY=0,pointers={},pinchD=0,moved=0;
+var drag=false,lastX=0,lastY=0,pointers={},pinchD=0,moved=0,wasPinch=false;
 var stick={act:false,x:0,y:0,id:null,ox:0,oy:0};
 canvas.addEventListener("pointerdown",function(e){
   hideHoverPop(); clearCoursePreview();
@@ -4324,6 +4349,21 @@ canvas.addEventListener("pointerdown",function(e){
     stick.act=true; stick.id=e.pointerId; stick.ox=e.clientX; stick.oy=e.clientY; stick.x=0; stick.y=0;
     return;
   }
+  /* Real bug fixed 2026-08-21 (Tony: "pinch to zoom automatically registers
+     ... and creates plotted course"): a 2nd finger landing mid-pinch fires
+     its OWN pointerdown, which unconditionally reset moved=0 same as a
+     fresh single-finger tap would -- and the pointermove handler's 2-pointer
+     (pinch) branch returns early WITHOUT ever touching moved, so it stayed
+     frozen at that 0 for the entire pinch gesture. When the fingers lift one
+     at a time, endPointer() only fires tryPick() once pointers is back down
+     to 0 -- by then drag was still true and moved was still <6, so the very
+     last finger to lift looked exactly like a clean single-finger tap and
+     picked (then, since 2026-08-17, immediately course-plotted) whatever
+     star happened to be under it. wasPinch latches true the moment a real
+     2nd simultaneous pointer is seen and only clears once every finger is
+     off the glass, so a pinch can never be mistaken for a tap regardless of
+     the order the fingers happen to lift in. */
+  if(Object.keys(pointers).length>=2) wasPinch=true;
   drag=true; lastX=e.clientX; lastY=e.clientY; moved=0;
   canvas.setPointerCapture(e.pointerId);
 });
@@ -4369,8 +4409,9 @@ function endPointer(e){
   if(pointers[e.pointerId]) delete pointers[e.pointerId];
   if(Object.keys(pointers).length<2) pinchD=0;
   if(Object.keys(pointers).length===0){
-    if(drag&&moved<6) tryPick(e.clientX,e.clientY);
+    if(drag&&moved<6&&!wasPinch) tryPick(e.clientX,e.clientY);
     drag=false;
+    wasPinch=false;
   }
 }
 canvas.addEventListener("pointerup",endPointer);
@@ -4847,19 +4888,32 @@ function updateGalInfoBadge(){
   if(mode==="galaxy"){ el.innerHTML=galInfoHTML(); el.style.display="block"; hud.classList.add("withBadge"); }
   else{ el.style.display="none"; hud.classList.remove("withBadge"); }
 }
-document.getElementById("galSel").addEventListener("change",function(){
-  GALAXY=parseInt(this.value,10);
+/* Shared galaxy-switch logic, pulled out of #galSel's own change handler
+   (2026-08-21) so anything that needs to jump a traveller into a DIFFERENT
+   galaxy than the one they're currently in -- e.g. picking a Search result
+   that was documented/bookmarked in another galaxy -- can reuse the exact
+   same state reset instead of only ever switching GALAXY as a side effect
+   of the dropdown itself. Does NOT jump anywhere or update the dropdown's
+   own <select> value -- callers that need those do it themselves right
+   after, since #galSel's change handler needs a slightly different jump
+   fallback (BOOT_ANCHOR when no real location yet) than a Search pick does
+   (always jump straight to the picked address). */
+function switchGalaxy(newGal){
+  GALAXY=newGal;
   updateGalaxyInfo();
   buildGalaxy(); buildNebula(); drawGalIcon();
   focusSystem=null; courseTarget=null; courseWaypoints=null;
   document.getElementById("course").classList.remove("show");
+  updateGalInfoBadge();
+}
+document.getElementById("galSel").addEventListener("change",function(){
+  switchGalaxy(parseInt(this.value,10));
   /* If the visitor hasn't actually jumped anywhere yet, the address box is
      still empty by design (see hasRealLocation) -- re-anchor silently on the
      boot coordinate instead of trying to jump to an empty string, which would
      otherwise flash a red "Address needs 12 glyphs" error on a perfectly
      normal galaxy switch before anyone's typed anything. */
   jumpTo(hasRealLocation?document.getElementById("inAddr").value:BOOT_ANCHOR_ADDR,!hasRealLocation);
-  updateGalInfoBadge();
   if(mode!=="galaxy") toast(galInfoHTML(), 2600);
 });
 
@@ -5227,8 +5281,11 @@ makeDraggable(document.getElementById("filt"),document.getElementById("fHead"));
 makeDraggable(document.getElementById("panel"),document.querySelector("#panel .phead"));
 makeDraggable(document.getElementById("course"),document.querySelector("#course .chead"));
 makeDraggable(document.getElementById("accessPop"),document.getElementById("a11yHead"));
-makeDraggable(document.getElementById("route-itinerary-card"),document.getElementById("riHead"));
 makeDraggable(document.getElementById("editModal"),document.getElementById("edHead"));
+/* route-itinerary-card (Warp Manifest) deliberately NOT draggable as of
+   2026-08-21 -- it's now a dropdown anchored under #course, opened only via
+   #bToggleManifest, not an independent floating window. See
+   anchorManifestUnderCourse() and displayCalculatedItinerary(). */
 
 /* ---- route loader + warp manifest helpers (spec item 7) ---- */
 var _logStreamInterval=null;
@@ -5287,6 +5344,31 @@ function skipWarp(){
   if(ov) ov.style.display='none';
   if(vid){ vid.pause(); vid.onended=null; }
 }
+/* Anchors the Warp Manifest dropdown directly under the Course plotted card
+   -- same measure-don't-guess pattern as positionUnderButton/
+   positionCourseCard elsewhere in this file. Called every time the manifest
+   opens (button click) or its content refreshes while already open (course
+   re-plotted), since #course itself can be dragged/auto-anchored anywhere
+   on screen. */
+function anchorManifestUnderCourse(){
+  var card=document.getElementById("route-itinerary-card");
+  var courseEl=document.getElementById("course");
+  if(!card||!courseEl) return;
+  var r=courseEl.getBoundingClientRect();
+  var cw=card.offsetWidth||300;
+  var left=r.left+r.width/2-cw/2;
+  left=Math.max(8,Math.min(window.innerWidth-cw-8,left));
+  card.style.top=(r.bottom+8)+"px";
+  card.style.left=left+"px";
+  card.style.transform="none";
+}
+/* Fills in the manifest's content. As of 2026-08-21 this no longer forces
+   the card open on every course plot (Tony: clicking any star re-plots the
+   course, so an always-auto-opening manifest popped up on every single
+   click -- exactly the "separate window" behaviour he asked to replace).
+   It now only shows itself if the traveller already had it open (a
+   re-plot while it's open just refreshes + re-anchors it); otherwise it
+   stays closed until #bToggleManifest is clicked. */
 function displayCalculatedItinerary(waypoints,totalLY){
   var card=document.getElementById("route-itinerary-card");
   var stepsList=document.getElementById("route-steps-list");
@@ -5304,27 +5386,30 @@ function displayCalculatedItinerary(waypoints,totalLY){
     stepsList.innerHTML+='<div style="margin-bottom:6px"><b style="color:var(--cyan)">['+label+']</b> '+
       name+'<br><span style="opacity:0.55;font-size:10px">'+addr+'</span></div>';
   });
-  card.classList.add("show");
-  /* position below #course if not yet dragged. Real bug fixed 2026-08-16:
-     this checked card.dataset.dragged, which nothing in the file ever
-     actually sets (makeDraggable() only ever writes a real inline
-     style.left/top on drag, never a dataset flag) -- so this condition was
-     always true and the manifest silently re-snapped under #course on
-     every single course re-plot, discarding any drag Tony had done.
-     Checking the real inline style (same signal every other draggable box
-     in this file already uses) fixes that. */
-  var courseEl=document.getElementById("course");
-  if(courseEl&&!card.style.left){
-    var r=courseEl.getBoundingClientRect();
-    card.style.top=(r.bottom+8)+"px";
-    card.style.left=(r.left+r.width/2-150)+"px";
-    card.style.transform="none";
-  }
+  if(card.classList.contains("show")) anchorManifestUnderCourse();
 }
+document.getElementById("bToggleManifest").addEventListener("click",function(){
+  var card=document.getElementById("route-itinerary-card");
+  var btn=this;
+  if(card.classList.contains("show")){
+    card.classList.remove("show");
+    btn.classList.remove("on");
+    btn.innerHTML="&#9662; Manifest";
+  } else {
+    card.classList.remove("min");
+    document.getElementById("bManifestMin").innerHTML="&#9662;";
+    anchorManifestUnderCourse();
+    card.classList.add("show");
+    btn.classList.add("on");
+    btn.innerHTML="&#9652; Manifest";
+  }
+});
 /* hide manifest when course is cleared */
 document.getElementById("bClrCourse").addEventListener("click",function(){
   var card=document.getElementById("route-itinerary-card");
   if(card) card.classList.remove("show");
+  var btn=document.getElementById("bToggleManifest");
+  if(btn){ btn.classList.remove("on"); btn.innerHTML="&#9662; Manifest"; }
 },true);
 /* copy button */
 (function(){
@@ -5604,8 +5689,18 @@ function renderBodyEditList(){
         html+='<label class="chk2"><input type="checkbox" class="bfRing" data-i="'+i+'"'+(b.ring?" checked":"")+'> Has rings</label>';
       }
       // "Has base" checkbox available on every body (planet or moon) --
-      // unlike rings, a base can genuinely sit on a moon in-game.
+      // unlike rings, a base can genuinely sit on a moon in-game. The name
+      // field only appears once ticked (2026-08-21, Tony: "put name of base
+      // in notes" -- a bare boolean tag was never enough to say WHICH base,
+      // and a base name is never a system/star name -- see the save-import
+      // bulk-import bug fixed the same day for why that distinction
+      // matters). The typed name gets merged into this system's Notes at
+      // Save time (see edSubmit's click handler), same "Base 'X' on Y"
+      // phrasing the save-file bulk-import already uses for consistency.
       html+='<label class="chk2"><input type="checkbox" class="bfBase" data-i="'+i+'"'+(b.base?" checked":"")+'> Has base</label>';
+      if(b.base){
+        html+='<div class="mfld" style="margin-bottom:0"><div class="lb">Base name</div><input type="text" class="bfBaseName" data-i="'+i+'" maxlength="30" placeholder="e.g. Elegraynor Portal" value="'+escAttr(b.baseName||"")+'"></div>';
+      }
       if(b.moon){
         var orbOpts='<option value="">'+(isGiantSys?"The Giant (default)":"Nearest preceding planet (default)")+'</option>';
         for(var p=0;p<editBodies.length;p++){
@@ -5724,6 +5819,7 @@ function openEditModal(){
       sentinel:(SENTINEL_ALL_WORDS.indexOf(b.sentinel)>=0)?b.sentinel:"None",
       autophage:!!b.autophage,
       base:!!b.base,
+      baseName:b.baseName||"",
       parentPos:b.moon?b.parent:0,
       open:false
     };
@@ -5882,6 +5978,7 @@ document.getElementById("bodyEditList").addEventListener("input",function(e){
   else if(e.target.classList.contains("bfMinerals")) editBodies[i].minerals=e.target.value;
   else if(e.target.classList.contains("bfSalvage")) editBodies[i].salvage=e.target.value;
   else if(e.target.classList.contains("bfFossils")) editBodies[i].fossils=e.target.value;
+  else if(e.target.classList.contains("bfBaseName")) editBodies[i].baseName=e.target.value;
   checkItemLenWarn(e.target);
 });
 document.getElementById("bodyEditList").addEventListener("change",function(e){
@@ -5894,7 +5991,10 @@ document.getElementById("bodyEditList").addEventListener("change",function(e){
   else if(e.target.classList.contains("bfRing")) editBodies[i].ring=e.target.checked;
   else if(e.target.classList.contains("bfBiome")) editBodies[i].biome=e.target.value;
   else if(e.target.classList.contains("bfAutophage")) editBodies[i].autophage=e.target.checked;
-  else if(e.target.classList.contains("bfBase")) editBodies[i].base=e.target.checked;
+  else if(e.target.classList.contains("bfBase")){
+    editBodies[i].base=e.target.checked;
+    renderBodyEditList(); // base-name field only appears once ticked -- must show/hide immediately
+  }
   else if(e.target.classList.contains("bfSentinel")) editBodies[i].sentinel=e.target.value;
   else if(e.target.classList.contains("bfOrbits")) editBodies[i].orbits=e.target.value;
 });
@@ -5915,7 +6015,7 @@ document.getElementById("edAddBody").addEventListener("click",function(){
   if(editBodies.length>=6){ toast("6 is the limit -- No Man's Sky systems can have at most 6 planets and moons combined."); return; }
   for(var j=0;j<editBodies.length;j++) editBodies[j].open=false;
   editBodies.push({uid:bodyUidSeq++,name:"New body",moon:false,biome:BIOME_KEYS[0],descriptor:"",water:false,
-    resources:"",flora:"",fauna:"",minerals:"",salvage:"",fossils:"",sentinel:"None",autophage:false,base:false,orbits:"",open:true});
+    resources:"",flora:"",fauna:"",minerals:"",salvage:"",fossils:"",sentinel:"None",autophage:false,base:false,baseName:"",orbits:"",open:true});
   renderBodyEditList();
   var rows=document.querySelectorAll("#bodyEditList .bodyEdit");
   var last=rows[rows.length-1];
@@ -6303,26 +6403,59 @@ applyA11y();
    every time the popup opens rather than kept live-updated -- these pools
    are small, so recomputing on open is cheap and avoids hooking every place
    a bookmark/waypoint/override can change. */
+/* Search results now carry the GALAXY they actually belong to (2026-08-21,
+   Tony: "if the system is in Euclid the galaxy information must change to
+   suit" -- picking a result used to jump within whatever galaxy you were
+   currently browsing, decoding the address there even when it was really
+   bookmarked/waypointed/visited in a different one, which produced a wrong
+   system). Bookmarks/waypoints/visited store a real "galaxyIdx:address" key
+   already -- addFromStore used to just throw away anything not matching
+   the CURRENT galaxy instead of surfacing it with its own galaxy attached,
+   so those were silently unsearchable from any other galaxy at all, not
+   just mis-jumped. Decoding a cross-galaxy address needs the real
+   generateSystem()/GALAXY-global machinery, so addAddr briefly swaps
+   GALAXY to the result's own galaxy, generates, then restores it --
+   synchronous, no other code runs in between, safe.
+   "Documented" (community-edited OVERRIDES.systems) entries are the one
+   remaining gap: those records aren't keyed or tagged with a galaxy at all
+   server-side (a real, separate limitation flagged to Tony, not silently
+   fixed here -- would need a schema/migration change touching the
+   Netlify Functions and all ~236 existing records), so they're still
+   assumed to belong to whichever galaxy you're currently in, same as
+   before this fix -- not worse, just not yet as accurate as the
+   bookmark/waypoint/visited results next to them. */
 function buildSearchIndex(){
   var idx=[], seen={};
-  function addAddr(addr,hint){
-    if(seen[addr]) return; seen[addr]=true;
+  function addAddr(addr,hint,galIdx){
+    var g=(galIdx==null)?GALAXY:galIdx;
+    var key=g+":"+addr;
+    if(seen[key]) return; seen[key]=true;
     var a=parseAddress(addr);
     if(!a) return;
-    var sys=generateSystem(a.x,a.y,a.z,a.idx);
-    idx.push({name:sys.name,address:addr,hint:hint});
+    var sys;
+    if(g===GALAXY){
+      sys=generateSystem(a.x,a.y,a.z,a.idx);
+    } else {
+      var prevGal=GALAXY;
+      GALAXY=g;
+      sys=generateSystem(a.x,a.y,a.z,a.idx);
+      GALAXY=prevGal;
+    }
+    idx.push({name:sys.name,address:addr,hint:hint,galaxy:g});
   }
   var ovKeys=Object.keys(OVERRIDES.systems||{});
   for(var i=0;i<ovKeys.length;i++){
     var ov=OVERRIDES.systems[ovKeys[i]];
-    if(ov&&ov.data&&ov.data.name) addAddr(ovKeys[i],"Documented");
+    if(ov&&ov.data&&ov.data.name) addAddr(ovKeys[i],"Documented",null);
   }
   function addFromStore(obj,hint){
     var keys=Object.keys(obj);
     for(var k=0;k<keys.length;k++){
       var parts=keys[k].split(":");
-      if(parts.length<2||parseInt(parts[0],10)!==GALAXY) continue;
-      addAddr(parts[1],hint);
+      if(parts.length<2) continue;
+      var g=parseInt(parts[0],10);
+      if(isNaN(g)) continue;
+      addAddr(parts[1],hint,g);
     }
   }
   addFromStore(store.marks,"Bookmarked");
@@ -6351,9 +6484,14 @@ function runSearch(query){
   var html="";
   for(i=0;i<matches.length;i++){
     var m=matches[i];
-    html+='<div class="searchRes" data-addr="'+m.address+'">'+
+    /* Flag cross-galaxy results plainly rather than letting a traveller
+       click one and only discover the galaxy changed afterwards -- picking
+       one still switches galaxy automatically (see the click handler
+       below), this is just so it's not a surprise. */
+    var galNote=(m.galaxy!==GALAXY)?(' &middot; <span style="color:var(--gold)">'+(GALAXIES[m.galaxy]||("Galaxy #"+(m.galaxy+1)))+'</span>'):"";
+    html+='<div class="searchRes" data-addr="'+m.address+'" data-galaxy="'+m.galaxy+'">'+
       '<div class="searchResName">'+m.name+'</div>'+
-      '<div class="searchResMeta">'+m.address+' &middot; '+m.hint+'</div></div>';
+      '<div class="searchResMeta">'+m.address+' &middot; '+m.hint+galNote+'</div></div>';
   }
   box.innerHTML=html;
 }
@@ -6401,6 +6539,13 @@ function runSearch(query){
     var row=e.target.closest?e.target.closest(".searchRes"):null;
     if(!row) return;
     var addr=row.getAttribute("data-addr");
+    var galAttr=row.getAttribute("data-galaxy");
+    var gal=galAttr!==null?parseInt(galAttr,10):GALAXY;
+    if(!isNaN(gal)&&gal!==GALAXY){
+      switchGalaxy(gal);
+      document.getElementById("galSel").value=String(gal);
+      toast("Switched to "+GALAXIES[gal]+" -- that's where this result was documented/bookmarked", 3200);
+    }
     document.getElementById("inAddr").value=addr;
     setKeypad(addr);
     jumpTo(addr);
@@ -6437,6 +6582,8 @@ document.addEventListener("pointerdown",function(e){
   if(course.contains(e.target)||manifest.contains(e.target)) return;
   course.classList.remove("show");
   manifest.classList.remove("show");
+  var mBtn=document.getElementById("bToggleManifest");
+  if(mBtn){ mBtn.classList.remove("on"); mBtn.innerHTML="&#9662; Manifest"; }
   if(e.target===canvas) e.stopPropagation();
 },true);
 
@@ -6621,6 +6768,23 @@ document.getElementById("edSubmit").addEventListener("click",function(){
   var edEditorName=document.getElementById("edEditorName").value.trim();
   var edEditorCode=document.getElementById("edEditorCode").value.trim();
   saveTravellerId(edEditorName,edEditorCode); // remember locally so this doesn't need retyping next time
+  /* Merge any "Has base" name(s) into this system's Notes at save time
+     (2026-08-21, Tony: "put name of base in notes") -- a base name lives on
+     its own body (see the bfBaseName field above) so it always stays
+     attached to the right planet/moon even if bodies get reordered, but
+     Tony specifically wants it visible in Notes too, same "Base 'X' on Y"
+     phrasing the save-file bulk-import already writes there for
+     consistency. Appends to whatever the traveller already typed rather
+     than replacing it, and skips a line that's already present so
+     re-saving the same system twice doesn't duplicate it. */
+  var mergedNotes=document.getElementById("edNotes").value.trim();
+  editBodies.forEach(function(b,idx){
+    var bn=(b.baseName||"").trim();
+    if(!b.base||!bn) return;
+    var label=(b.name||"").trim()||((b.moon?"Moon":"Planet")+" #"+(idx+1));
+    var line='Base "'+bn+'" on '+label;
+    if(mergedNotes.indexOf(line)<0) mergedNotes=mergedNotes?(mergedNotes+" | "+line):line;
+  });
   var payload={
     name:document.getElementById("edName").value.trim(),
     race:document.getElementById("edRace").value,
@@ -6643,7 +6807,7 @@ document.getElementById("edSubmit").addEventListener("click",function(){
     blackHole:document.getElementById("edBH").checked,
     atlas:document.getElementById("edAtlas").checked,
     phantom:document.getElementById("edPhantom").value,
-    notes:document.getElementById("edNotes").value.trim(),
+    notes:mergedNotes,
     editorName:edEditorName,
     editorFriendCode:edEditorCode,
     bodies:editBodies.map(function(b){
@@ -6659,7 +6823,8 @@ document.getElementById("edSubmit").addEventListener("click",function(){
         fossils:(b.fossils||"").split(",").map(function(x){ return x.trim(); }).filter(Boolean),
         sentinel:b.sentinel||"None",
         autophage:!!b.autophage,
-        base:!!b.base
+        base:!!b.base,
+        baseName:(b.baseName||"").trim()
       };
     })
   };

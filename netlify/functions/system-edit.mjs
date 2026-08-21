@@ -8,9 +8,15 @@
                          giant, ruins, outlaw, phantom, econName, sell, buy, econDesc, conflict, blackHole, atlas, notes,
                          editorName, editorFriendCode, colliding, collidingA, collidingB,
                          bodies:[{name, moon, orbits, biome, descriptor, water, ring, resources,
-                                  flora, fauna, minerals, salvage, fossils, sentinel, autophage, base}, ...]}
+                                  flora, fauna, minerals, salvage, fossils, sentinel, autophage, base, baseName}, ...]}
                          (base added 2026-08-17 -- "Has base" per-body marker, same manual-only
-                         pattern as autophage. fauna added 2026-08-17 -- same shape/24-char-per-item
+                         pattern as autophage. baseName added 2026-08-21 -- the base's own name,
+                         30-char cap same as a body's own `name`; deliberately its own field, NEVER
+                         merged into a body's or the system's own name (see the save-file
+                         bulk-import bug fixed the same day: a base name silently became the STAR
+                         system's name). The client also copies it into the system's `notes` at
+                         save time for visibility, but this is the field tying the name to the
+                         actual body it belongs to. fauna added 2026-08-17 -- same shape/24-char-per-item
                          limit as flora/minerals/salvage/fossils, see filter.mjs's resArr().)
                          (ruins added 2026-08-14; phantom was already validated/shown but is only
                          actually persisted as of the same date -- see getCategoryValue's comment.
@@ -337,9 +343,13 @@ async function handleGet(req, token){
    data" principle as a normal edit: a system that already has real
    TOP_CATS data (race/economy/conflict/etc, submitted by some other
    traveller) never gets that data silently blanked out by an import --
-   only `name` (filled in ONLY if currently blank) and `notes` (appended,
-   deduped) are ever touched on an existing system. A brand-new address
-   gets a fresh minimal record, same shape a normal partial edit already
+   only `notes` (appended, deduped) is ever touched on an existing system.
+   A base name is NEVER written into `name` (that field is the STAR
+   SYSTEM's name, not a base's -- a save file only ever tells us base
+   names, never the real system name, so writing one into the other was a
+   real bug caught 2026-08-18 from a live report: elegra1965's own base
+   "Elegraynor Portal" ended up displayed as the star's name). A brand-new
+   address gets a fresh minimal record, same shape a normal partial edit already
    produces. */
 async function handleBulkImport(req, token, body, ip, now){
   var filtered = filterBulkImport(body.payload);
@@ -364,7 +374,6 @@ async function handleBulkImport(req, token, body, ip, now){
   for(var i=0;i<filtered.cleaned.entries.length;i++){
     var entry = filtered.cleaned.entries[i];
     var sysRec = current.data.systems[entry.address];
-    var primaryName = entry.names[0];
     var noteLine = entry.names.length>1
       ? "Real bases from a traveller's save: "+entry.names.join("; ")
       : "Real base from a traveller's save: "+entry.names[0];
@@ -373,7 +382,12 @@ async function handleBulkImport(req, token, body, ip, now){
       current.data.systems[entry.address] = {
         flaggedFields: [], disputedFields: [],
         data: {
-          name: primaryName, race:"", region:"", starClass:"", stars:[],
+          // name deliberately left blank -- a base name is NOT the star
+          // system's name, and a save file never tells us the real one
+          // (see the header comment above). Leaving it blank means the
+          // procedural name still shows until someone actually documents
+          // the real system name via Edit system.
+          name: "", race:"", region:"", starClass:"", stars:[],
           water:false, dissonant:false, giant:false,
           econName:"", sell:"", buy:"", econDesc:"", conflict:"",
           blackHole:false, atlas:false, ruins:false, outlaw:false, phantom:"",
@@ -388,7 +402,6 @@ async function handleBulkImport(req, token, body, ip, now){
       added++;
     } else {
       if(!sysRec.data) sysRec.data = {};
-      if(!sysRec.data.name) sysRec.data.name = primaryName;
       var existingNotes = sysRec.data.notes || "";
       if(existingNotes.indexOf(noteLine) < 0){
         sysRec.data.notes = existingNotes ? (existingNotes+" | "+noteLine) : noteLine;
