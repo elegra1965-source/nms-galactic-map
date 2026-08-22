@@ -2,8 +2,13 @@
    NMS Galactic Map — flag-dispute Netlify Function
    Endpoint: /.netlify/functions/flag-dispute
 
-   POST body: { address, fields: ["name","bodies.0",...], note }
+   POST body: { address, galaxy, fields: ["name","bodies.0",...], note }
      address = the 12-char portal hex address
+     galaxy  = the 0-255 galaxy index this address is being flagged in (added
+               2026-08-22 for real per-galaxy addressing -- see TODO.md and
+               lib/shared.mjs's compositeKey() comment; the shared systems
+               dict is keyed "galaxy:ADDRESS" now, not just ADDRESS, since an
+               address alone doesn't say which of the 257 galaxies it's in)
      fields  = which of the FLAG_FIELDS categories (lib/shared.mjs) look
                wrong -- a visitor can flag data even on a purely
                procedural system (no prior edit needed) since the
@@ -38,6 +43,7 @@ import { filterText } from "./filter.mjs";
 import {
   json, isValidAddress, githubGetFile, githubPutFile, pruneLog,
   editorHash, invalidateGetCache, isValidFlagField,
+  isValidGalaxy, compositeKey,
   GITHUB_OWNER, GITHUB_REPO
 } from "./lib/shared.mjs";
 
@@ -81,7 +87,9 @@ export default async (req, context) => {
   catch(e){ return json(400, {ok:false, error:"Invalid JSON body"}); }
 
   var address = body.address;
+  var galaxy = body.galaxy;
   if(!isValidAddress(address)) return json(400, {ok:false, error:"address must be a 12-character hex portal address"});
+  if(!isValidGalaxy(galaxy)) return json(400, {ok:false, error:"galaxy must be an integer 0-255"});
 
   var fieldsIn = Array.isArray(body.fields) ? body.fields : [];
   var fields = [];
@@ -109,8 +117,10 @@ export default async (req, context) => {
   current.data.flagLog[ip] = ipHits;
 
   var edHash = await editorHash(ip);
-  var sysRec = current.data.systems[address];
-  if(!sysRec) sysRec = current.data.systems[address] = { flaggedFields:[], disputedFields:[] };
+  var flagKey = compositeKey(galaxy, address);
+  var sysRec = current.data.systems[flagKey];
+  if(!sysRec) sysRec = current.data.systems[flagKey] = { galaxy:galaxy, flaggedFields:[], disputedFields:[] };
+  if(sysRec.galaxy===undefined) sysRec.galaxy = galaxy; // backfill for a pre-existing record saved before this field existed
   if(!sysRec.flaggedFields) sysRec.flaggedFields=[];
   if(!sysRec.disputedFields) sysRec.disputedFields=[];
   if(!sysRec.flagMeta) sysRec.flagMeta={};
@@ -133,7 +143,7 @@ export default async (req, context) => {
   sysRec.history.push({ at: new Date(now).toISOString(), text: "flagged: "+fields.join(", ")+(noteR.cleaned?" -- \""+noteR.cleaned+"\"":"") });
   if(sysRec.history.length>30) sysRec.history=sysRec.history.slice(-30);
 
-  try { await githubPutFile(token, current.data, current.sha, "Flag "+fields.join(",")+" on "+address); }
+  try { await githubPutFile(token, current.data, current.sha, "Flag "+fields.join(",")+" on "+flagKey); }
   catch(e){ return json(502, {ok:false, error:"Could not save to shared data store: "+e.message}); }
 
   invalidateGetCache();

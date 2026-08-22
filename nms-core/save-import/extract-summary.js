@@ -40,6 +40,37 @@
 // overrides; "SolarSystem" records become a candidate real system name
 // (only ever used to FILL a blank system name, never to overwrite one --
 // same "never clobber existing data" rule as every other bulk-import field).
+//
+// EXTENDED AGAIN, 2026-08-22: real per-galaxy addressing (see TODO.md's
+// "Real per-galaxy addressing" entry) -- a portal address alone never says
+// which of the 257 galaxies it's in, so every base this importer surfaces
+// now also carries its real resolved `galaxy` when one can be found.
+// PersistentPlayerBases[].GalacticAddress has NO galaxy bits at all
+// (confirmed by direct bit-level inspection of a real save -- don't go
+// looking for it there). What DOES carry a real galaxy is a completely
+// separate list, PlayerStateData.TeleportEndpoints[] -- each entry has its
+// own `Name` and a STRUCTURED (not packed) `UniverseAddress` object with a
+// standalone `RealityIndex` field (0-255, literally "galaxy index",
+// sitting alongside VoxelX/VoxelY/VoxelZ/SolarSystemIndex/PlanetIndex the
+// same way PlayerStateData.UniverseAddress does in the worked example
+// above). Name-matching TeleportEndpoints[].Name against
+// PersistentPlayerBases[].Name resolves real galaxy for most (not all --
+// not every base has a teleporter) bases; verified directly against a real
+// save (191 of 278 real bases resolved in the original investigation).
+// Planet/system-NAME discoveries (DiscoveryManagerData) carry no galaxy
+// field of their own and aren't teleport points, so they can't be resolved
+// this same way -- callers fall back to the save's own CURRENT galaxy
+// (PlayerStateData.UniverseAddress.RealityIndex, also returned here as
+// currentGalaxy) for anything that can't be name-matched, and should treat
+// that fallback as a plausible guess, not a verified fact, per TODO.md's
+// own recommendation. Deliberately NOT attempting a broader address-based
+// cross-reference (reconstructing a system address from a TeleportEndpoint's
+// own signed Voxel coordinates would need a new signed-to-unsigned
+// conversion this code has never had to do before, and there's no real
+// save file in this environment to verify it against -- exactly the kind
+// of "easy to get subtly wrong" math this project's own history warns
+// against shipping unverified, see CLAUDE.md). Flagged as a possible
+// future enhancement, not silently skipped.
 
 // Shared decode step used by both packedAddressToHex() (below, unchanged
 // public signature -- still returns a plain hex string, exactly as every
@@ -75,6 +106,40 @@ function fieldsToHex(f, pOverride) {
 
 function packedAddressToHex(v) {
   return fieldsToHex(decodeRawAddress(v));
+}
+
+/** Name -> RealityIndex (0-255 galaxy index), built from every
+ * PlayerStateData.TeleportEndpoints[] entry across all contexts that has
+ * both a real Name and a numeric UniverseAddress.RealityIndex. First match
+ * wins if the same name somehow appears twice. See the file header comment
+ * (2026-08-22 addition) for what this can and can't resolve. */
+function collectTeleportGalaxies(contexts) {
+  const byName = new Map();
+  for (const ctx of contexts) {
+    const psd = ctx && ctx.PlayerStateData;
+    const eps = (psd && psd.TeleportEndpoints) || [];
+    for (const ep of eps) {
+      const name = (ep && ep.Name || '').trim();
+      const ua = ep && ep.UniverseAddress;
+      if (!name || !ua || typeof ua.RealityIndex !== 'number') continue;
+      if (!byName.has(name)) byName.set(name, ua.RealityIndex);
+    }
+  }
+  return byName;
+}
+
+/** The save's own CURRENT galaxy (where the traveller's UniverseAddress
+ * sits right now), used as the best-guess fallback for anything that can't
+ * be resolved via collectTeleportGalaxies() above -- e.g. a planet/system
+ * name discovery with no teleport point of its own. Returns null if no
+ * context has a usable PlayerStateData.UniverseAddress.RealityIndex. */
+function currentSaveGalaxy(contexts) {
+  for (const ctx of contexts) {
+    const psd = ctx && ctx.PlayerStateData;
+    const ua = psd && psd.UniverseAddress;
+    if (ua && typeof ua.RealityIndex === 'number') return ua.RealityIndex;
+  }
+  return null;
 }
 
 /** Returns { planetIndex, systemAddress } -- systemAddress is the same
@@ -130,10 +195,21 @@ function extractSaveSummary(deobfuscatedSave) {
   }
   username = bestUsn;
 
+  const teleportGalaxies = collectTeleportGalaxies(contexts);
+  const currentGalaxy = currentSaveGalaxy(contexts);
+
   const bases = [];
   for (const [addr, list] of byAddress) {
     list.sort((a, b) => b.ts - a.ts);
-    bases.push({ address: addr, names: list.map((e) => e.name) });
+    // First of this base's own names (there can be more than one if the
+    // same address was renamed over time) that also shows up as a real
+    // teleport point wins -- see collectTeleportGalaxies()'s comment. null
+    // if none of them match (not every base has a teleporter).
+    let galaxy = null;
+    for (const e of list) {
+      if (teleportGalaxies.has(e.name)) { galaxy = teleportGalaxies.get(e.name); break; }
+    }
+    bases.push({ address: addr, names: list.map((e) => e.name), galaxy: galaxy });
   }
 
   // Real per-discovery names, filtered to this traveller's own username
@@ -183,6 +259,12 @@ function extractSaveSummary(deobfuscatedSave) {
     systemCount: bases.length,
     planets,
     systemNames,
+    // The save's own current galaxy (see currentSaveGalaxy() above) -- the
+    // caller (preview.html's save-import UI) uses this as the best-guess
+    // fallback for any base/planet/system-name entry that
+    // collectTeleportGalaxies() couldn't resolve a real galaxy for. null if
+    // genuinely unknown.
+    currentGalaxy,
   };
 }
 

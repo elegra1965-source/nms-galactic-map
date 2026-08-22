@@ -31,6 +31,44 @@ export function isValidAddress(addr){
   return typeof addr === "string" && /^[0-9A-Fa-f]{12}$/.test(addr);
 }
 
+/* Real galaxy index, 0-255 (matches GALAXIES.length===257 client-side, and
+   the real in-game galaxy count). Added for per-galaxy addressing
+   (2026-08-22) -- see TODO.md's "Real per-galaxy addressing" entry for the
+   full "why": a 12-glyph portal address has no galaxy digit in it, so the
+   same address means a DIFFERENT real system in each of the 257 galaxies,
+   and data/overrides.json's systems dict needs a galaxy dimension in its
+   keys or two travellers documenting the same address in two different
+   galaxies would silently overwrite each other. */
+export function isValidGalaxy(g){
+  var n = Number(g);
+  return Number.isInteger(n) && n >= 0 && n <= 255;
+}
+
+/* The systems dict's real key from here on: "galaxy:ADDRESS", matching the
+   exact format preview.html's own skey() already uses for the personal
+   marks/waypoints/visited stores (galaxy is always the plain integer, no
+   padding). Centralised here so system-edit.mjs and flag-dispute.mjs build
+   and parse it identically -- see compositeKey()'s call sites for why every
+   systems-dict lookup/write goes through this instead of a bare address. */
+export function compositeKey(galaxy, address){
+  return String(galaxy)+":"+String(address).toUpperCase();
+}
+/* Splits a composite key back into {galaxy, address} -- used by the admin
+   GET view (which needs to show Tony which galaxy a flagged/disputed
+   system is actually in) and by anything iterating current.data.systems by
+   key. Returns null if the key doesn't look like galaxy:ADDRESS (shouldn't
+   happen for anything written by this codebase, but a hand-edited
+   overrides.json or a pre-migration leftover key could be malformed --
+   fail soft rather than throw). */
+export function parseCompositeKey(key){
+  var i = String(key||"").indexOf(":");
+  if(i<0) return null;
+  var g = parseInt(key.slice(0,i),10);
+  var addr = key.slice(i+1);
+  if(!isValidGalaxy(g) || !isValidAddress(addr)) return null;
+  return { galaxy:g, address:addr };
+}
+
 /* The 14 flaggable/disputable field categories a visitor can pick in the
    "Flag this field" picker, and that getFieldStatus() in preview.html
    colours on the info panel. Deliberately coarser than the dot-path-per-

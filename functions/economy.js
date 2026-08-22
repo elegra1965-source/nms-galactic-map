@@ -110,7 +110,7 @@ var RING_STYLE_BY_BIOME = {
   Frozen: "icy",
   Barren: "tan", Lush: "tan", Marsh: "tan",
   Volcanic: "ash", Dead: "ash", Toxic: "ash",
-  Scorched: "gold", Radioactive: "gold", Irradiated: "gold", "Mega Exotic": "gold",  // Irradiated kept as an alias, see preview.html comment
+  Scorched: "gold", Radioactive: "gold", "Mega Exotic": "gold",  // renamed 2026-08-17, see preview.html comment
   Exotic: "split",
 };
 

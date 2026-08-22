@@ -271,6 +271,15 @@ export function filterSystemEdit(payload){
     var isMoon = !!b.moon;
     if(isMoon) moonCount++; else planetCount++;
     var sentinelIn = String(b.sentinel||"None");
+    // Base name (2026-08-21, Tony): optional, only meaningful alongside
+    // `base`. Same 30-char cap as a body's own name -- deliberately its own
+    // field, never merged into `name`/`bNameR` above (that's the real bug
+    // the save-file bulk-import hit the same day: a base name silently
+    // became the STAR system's name). The client also weaves this into the
+    // system's own `notes` at save time for visibility, but this field is
+    // the source of truth tying the name to the specific body it belongs to.
+    var baseNameR = filterText(b.baseName||"", {maxLen:30, fieldName:"Base name"});
+    if(!baseNameR.ok){ errors.push(baseNameR.reason); continue; }
     out.bodies.push({
       name: bNameR.cleaned,
       moon: isMoon,
@@ -299,7 +308,8 @@ export function filterSystemEdit(payload){
       // "Has base" (2026-08-17, Tony): plain boolean, same manual-only
       // pattern as autophage above -- no procedural rule for a traveller's
       // own base placement.
-      base: !!b.base
+      base: !!b.base,
+      baseName: baseNameR.cleaned
     });
   }
 
@@ -342,7 +352,19 @@ export function filterSystemEdit(payload){
    Same content rules as a normal edit's name/notes fields, just applied
    to every entry in one array. Caps batch size hard at 300 (a generous
    real-world base count -- Tony's own real save had 278) so one request
-   can't be used to smuggle in an unbounded write. */
+   can't be used to smuggle in an unbounded write.
+
+   EXTENDED, 2026-08-21: entries can now also carry planetNames (real
+   per-body names from DiscoveryManagerData, one traveller's own renamed
+   planets -- see extract-summary.js's header for the full "why") and an
+   optional systemName (from a SolarSystem-type discovery). Both ride in
+   the SAME entries array/single daily-limited request as base names,
+   since MAX_BULK_IMPORTS_PER_IP_PER_DAY is 1 -- a separate second request
+   would just get rejected. bodyCount is the real total planet+moon count
+   for that system (computed client-side via NMSCore.planetSeeds(), which
+   the server has no way to derive on its own) -- needed so handleBulkImport()
+   can build a correctly-sized bodies array instead of guessing, or silently
+   truncating a system that has more real bodies than named entries. */
 var MAX_BULK_IMPORT_ENTRIES = 300;
 
 export function filterBulkImport(payload){
@@ -363,14 +385,38 @@ export function filterBulkImport(payload){
   for(var i=0;i<Math.min(entriesIn.length, MAX_BULK_IMPORT_ENTRIES);i++){
     var e = entriesIn[i] || {};
     if(!isValidAddressStr(e.address)) continue; // silently skip malformed addresses rather than failing the whole batch
+    if(!isValidGalaxyNum(e.galaxy)) continue; // added 2026-08-22 -- every entry must carry a real galaxy now, see isValidGalaxyNum() above
     var namesIn = Array.isArray(e.names) ? e.names : (e.name ? [e.name] : []);
     var cleanedNames = [];
     for(var j=0;j<Math.min(namesIn.length,10);j++){
       var nR = filterText(namesIn[j], {maxLen:40, fieldName:"System name"});
       if(nR.ok && nR.cleaned) cleanedNames.push(nR.cleaned);
     }
-    if(!cleanedNames.length) continue; // every name for this entry was empty/blocked/too long -- skip it, don't fail the batch
-    out.push({ address: String(e.address).toUpperCase(), names: cleanedNames });
+
+    var planetNamesIn = Array.isArray(e.planetNames) ? e.planetNames : [];
+    var cleanedPlanetNames = [];
+    for(var k=0;k<Math.min(planetNamesIn.length,6);k++){
+      var pn = planetNamesIn[k] || {};
+      var idx = Math.max(1, Math.min(6, parseInt(pn.index,10)||0));
+      if(!pn.index || idx!==Math.round(Number(pn.index))) continue; // must be a real 1-6 integer, not a guessed clamp
+      var pnR = filterText(pn.name, {maxLen:30, fieldName:"Planet name"});
+      if(pnR.ok && pnR.cleaned) cleanedPlanetNames.push({index:idx, name:pnR.cleaned});
+    }
+
+    var systemNameR = filterText(e.systemName||"", {maxLen:40, fieldName:"System name"});
+    var cleanedSystemName = systemNameR.ok ? systemNameR.cleaned : "";
+
+    var bodyCount = Math.max(0, Math.min(6, parseInt(e.bodyCount,10)||0));
+
+    if(!cleanedNames.length && !cleanedPlanetNames.length && !cleanedSystemName) continue; // nothing usable in this entry -- skip it, don't fail the batch
+    out.push({
+      address: String(e.address).toUpperCase(),
+      galaxy: Number(e.galaxy),
+      names: cleanedNames,
+      planetNames: cleanedPlanetNames,
+      systemName: cleanedSystemName,
+      bodyCount: bodyCount
+    });
   }
 
   return {
@@ -382,6 +428,16 @@ export function filterBulkImport(payload){
 
 function isValidAddressStr(addr){
   return typeof addr === "string" && /^[0-9A-Fa-f]{12}$/.test(addr);
+}
+
+/* Local copy of lib/shared.mjs's isValidGalaxy() -- this file is
+   deliberately dependency-free (see the header comment), so small
+   validators like this get duplicated rather than imported, same as
+   SENTINEL_WORDS/RING_STYLE_BY_BIOME above. 0-255, matching GALAXIES.length
+   client-side. Added 2026-08-22 for per-galaxy addressing (TODO.md). */
+function isValidGalaxyNum(g){
+  var n = Number(g);
+  return Number.isInteger(n) && n >= 0 && n <= 255;
 }
 
 export function filterReport(payload){

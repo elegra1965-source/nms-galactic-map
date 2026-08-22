@@ -404,6 +404,16 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 #keys{position:fixed;left:50%;transform:translateX(-50%);bottom:10px;z-index:26;
   width:min(560px,calc(100vw - 20px));padding:10px 12px;display:none}
 #keys.show{display:block}
+/* Searchable galaxy picker docked next to the keypad's own title (2026-08-22,
+   real per-galaxy addressing -- see TODO.md). Reuses the same native
+   <datalist> autocomplete pattern this file already relies on elsewhere
+   (populateDatalists()) rather than a custom dropdown widget. */
+.kheadrow{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.kgalpick{display:flex;align-items:center;gap:5px;text-transform:none}
+.kgalpick label{font-family:'Rajdhani',sans-serif;font-size:9px;letter-spacing:.08em;
+  color:var(--text-faint);text-transform:uppercase;white-space:nowrap}
+#kGalaxyInput{width:150px;font-family:'Rajdhani',sans-serif;font-size:11px;
+  letter-spacing:.02em;text-transform:none}
 .kgrid{display:grid;grid-template-columns:repeat(16,1fr);gap:3px;margin-top:7px}
 .kbtn{background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:3px;cursor:pointer;line-height:0}
 .kbtn:hover{border-color:var(--gold);background:var(--panel-2)}
@@ -1075,7 +1085,12 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 </div>
 
 <div id="keys" class="box">
-  <div class="kicker">Portal glyph keypad</div>
+  <div class="kicker kheadrow"><span>Portal glyph keypad</span>
+    <span class="kgalpick"><label for="kGalaxyInput">Galaxy</label>
+      <input type="text" id="kGalaxyInput" list="dlGalaxyPick" placeholder="Search galaxy..." autocomplete="off" spellcheck="false">
+    </span>
+  </div>
+  <datalist id="dlGalaxyPick"></datalist>
   <div class="kgrid" id="kGrid"></div>
   <div class="kseq" id="kSeq"></div>
   <div class="krow">
@@ -1188,6 +1203,13 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     <button class="btn" id="edRetry" type="button" style="display:none;margin:-4px 0 10px">Retry save</button>
     <div class="iconWrap" id="editIconWrap"><img id="editIconImg" src="" alt=""><span class="driftBeam"></span></div>
     <div id="editSpin"><span id="editSpinTxt">Atlas is working on it...</span></div>
+    <!-- Galaxy (2026-08-22, real per-galaxy addressing -- see TODO.md): a
+         portal address alone doesn't say which of the 257 galaxies it's in,
+         so the editor confirms/picks it here at save time. Pre-filled from
+         the system currently on screen (see openEditModal()) but always
+         editable/overridable, per Tony's own ask -- this also builds a real
+         dataset of address->galaxy submissions over time. -->
+    <div class="mfld"><div class="lb">Galaxy</div><select id="edGalaxy"></select></div>
     <div class="mfld"><div class="lb">System name</div><input type="text" id="edName" maxlength="40"></div>
     <div class="mfld"><div class="lb">Region name</div><input type="text" id="edRegion" maxlength="40"></div>
     <div class="mfld" style="display:flex;gap:8px">
@@ -2243,7 +2265,12 @@ var OVERRIDES={systems:{}};
    generated dynamically per system rather than listed here. */
 var FLAG_CATEGORIES=["name","race","region","starClass","stars","suffix","giant","economy","conflict","blackHole","atlas","phantom","notes"];
 function applyOverride(s){
-  var ov=OVERRIDES.systems && OVERRIDES.systems[s.address];
+  // Real per-galaxy addressing (2026-08-22): the shared systems dict is
+  // keyed "galaxy:ADDRESS" now, not just ADDRESS (see TODO.md's "Real
+  // per-galaxy addressing" entry and lib/shared.mjs's compositeKey()
+  // comment) -- skey() is the exact same helper store.marks/waypoints/
+  // visited already use for this, reused here rather than duplicated.
+  var ov=OVERRIDES.systems && OVERRIDES.systems[skey(s)];
   // Flag/dispute status can exist on a system that's never been edited at
   // all (a visitor can flag a purely procedural value as "this looks
   // wrong" without providing a correction) -- so this has to be read BEFORE
@@ -4887,13 +4914,28 @@ function toggleFold(boxId,headId,label){
 
 /* ============ wiring ============ */
 (function(){
-  var sel=document.getElementById("galSel"),i;
-  for(i=0;i<GALAXIES.length;i++){
+  // Real per-galaxy addressing (2026-08-22): #galSel (toolbar), #edGalaxy
+  // (Edit system form) and #dlGalaxyPick (the glyph keypad's searchable
+  // galaxy picker) all list the exact same 257 galaxies in the exact same
+  // "N. Name" format, built once here so the three can never drift out of
+  // sync with each other or with GALAXIES itself.
+  var sel=document.getElementById("galSel");
+  var edSel=document.getElementById("edGalaxy");
+  var dl=document.getElementById("dlGalaxyPick");
+  for(var i=0;i<GALAXIES.length;i++){
+    var label=(i+1)+". "+GALAXIES[i];
     var o=document.createElement("option");
-    o.value=String(i); o.textContent=(i+1)+". "+GALAXIES[i];
+    o.value=String(i); o.textContent=label;
     sel.appendChild(o);
+    var o2=document.createElement("option");
+    o2.value=String(i); o2.textContent=label;
+    edSel.appendChild(o2);
+    var o3=document.createElement("option");
+    o3.value=label;
+    dl.appendChild(o3);
   }
   sel.value="0";
+  edSel.value="0";
 })();
 function updateGalaxyInfo(){
   var gt=galaxyType(GALAXY);
@@ -4934,6 +4976,7 @@ function switchGalaxy(newGal){
 }
 document.getElementById("galSel").addEventListener("change",function(){
   switchGalaxy(parseInt(this.value,10));
+  syncGalaxyPickInput();
   /* If the visitor hasn't actually jumped anywhere yet, the address box is
      still empty by design (see hasRealLocation) -- re-anchor silently on the
      boot coordinate instead of trying to jump to an empty string, which would
@@ -4943,6 +4986,71 @@ document.getElementById("galSel").addEventListener("change",function(){
   if(mode!=="galaxy") toast(galInfoHTML(), 2600);
 });
 
+/* Keeps the glyph keypad's searchable galaxy picker's displayed text in
+   sync with GALAXY, no matter which of the several ways GALAXY can change
+   (the #galSel dropdown, a Search result switching galaxy, the admin
+   panel's "View system" action, or this picker switching itself). */
+function syncGalaxyPickInput(){
+  var inp=document.getElementById("kGalaxyInput");
+  if(inp) inp.value=(GALAXY+1)+". "+GALAXIES[GALAXY];
+}
+/* Resolves free-typed text in #kGalaxyInput to a galaxy index -- "a search
+   instead of dropdown" per Tony's explicit ask, reusing the native
+   <datalist> autocomplete this file already relies on elsewhere for
+   free-text suggestions (see populateDatalists()) rather than building a
+   custom dropdown widget. Tries, in order: an exact match on the "N. Name"
+   label the datalist itself offers; a plain 1-based galaxy number (matching
+   the "GALAXY #N" convention used everywhere else in this file, e.g.
+   galInfoHTML()); an exact galaxy-name match; then name-starts-with, then
+   name-contains -- same ranking convention buildSearchIndex()/runSearch()
+   already use for system-name search. Returns null if nothing matches. */
+function resolveGalaxyPick(text){
+  text=String(text||"").trim();
+  if(!text) return null;
+  var lower=text.toLowerCase(), i;
+  for(i=0;i<GALAXIES.length;i++){
+    if(((i+1)+". "+GALAXIES[i]).toLowerCase()===lower) return i;
+  }
+  if(/^\d+$/.test(text)){
+    var n=parseInt(text,10);
+    if(n>=1 && n<=GALAXIES.length) return n-1;
+  }
+  for(i=0;i<GALAXIES.length;i++){
+    if(GALAXIES[i].toLowerCase()===lower) return i;
+  }
+  for(i=0;i<GALAXIES.length;i++){
+    if(GALAXIES[i].toLowerCase().indexOf(lower)===0) return i;
+  }
+  for(i=0;i<GALAXIES.length;i++){
+    if(GALAXIES[i].toLowerCase().indexOf(lower)>=0) return i;
+  }
+  return null;
+}
+(function(){
+  var inp=document.getElementById("kGalaxyInput");
+  if(!inp) return;
+  function commit(){
+    var g=resolveGalaxyPick(inp.value);
+    if(g===null){
+      toast("No galaxy matches \""+inp.value+"\"", 2400);
+      syncGalaxyPickInput();
+      return;
+    }
+    if(g===GALAXY){ syncGalaxyPickInput(); return; }
+    switchGalaxy(g);
+    document.getElementById("galSel").value=String(g);
+    syncGalaxyPickInput();
+    /* Same silent-boot-anchor behaviour as #galSel's own change handler
+       above -- see its comment for why. */
+    jumpTo(hasRealLocation?document.getElementById("inAddr").value:BOOT_ANCHOR_ADDR,!hasRealLocation);
+    if(mode!=="galaxy") toast(galInfoHTML(), 2600);
+  }
+  inp.addEventListener("change",commit);
+  inp.addEventListener("keydown",function(e){
+    if(e.key==="Enter"){ e.preventDefault(); commit(); inp.blur(); }
+  });
+  syncGalaxyPickInput();
+})();
 function bindSlider(id,out,fn,fixed){
   var el=document.getElementById(id);
   el.addEventListener("input",function(){
@@ -5805,6 +5913,7 @@ function openEditModal(){
     prevNotice.style.display="none";
     prevNotice.textContent="";
   }
+  document.getElementById("edGalaxy").value=String(s.galaxy);
   document.getElementById("edName").value=s.name||"";
   var raceOk=["Gek","Vy'keen","Korvax","Uninhabited"];
   document.getElementById("edRace").value=(raceOk.indexOf(s.race)>=0)?s.race:"Uninhabited";
@@ -6484,14 +6593,14 @@ applyA11y();
    generateSystem()/GALAXY-global machinery, so addAddr briefly swaps
    GALAXY to the result's own galaxy, generates, then restores it --
    synchronous, no other code runs in between, safe.
-   "Documented" (community-edited OVERRIDES.systems) entries are the one
-   remaining gap: those records aren't keyed or tagged with a galaxy at all
-   server-side (a real, separate limitation flagged to Tony, not silently
-   fixed here -- would need a schema/migration change touching the
-   Netlify Functions and all ~236 existing records), so they're still
-   assumed to belong to whichever galaxy you're currently in, same as
-   before this fix -- not worse, just not yet as accurate as the
-   bookmark/waypoint/visited results next to them. */
+   "Documented" (community-edited OVERRIDES.systems) entries closed that
+   last gap on 2026-08-22: the shared store is now keyed "galaxy:ADDRESS"
+   (see TODO.md's "Real per-galaxy addressing" entry and lib/shared.mjs's
+   compositeKey() comment), so every record already carries its own real
+   galaxy in its key, parsed the exact same way addFromStore() below
+   already parses store.marks/waypoints/visited's own "galaxy:address"
+   keys -- no more silent "assumed to be whichever galaxy you're currently
+   in" fallback for this category. */
 function buildSearchIndex(){
   var idx=[], seen={};
   function addAddr(addr,hint,galIdx){
@@ -6535,7 +6644,12 @@ function buildSearchIndex(){
   var ovKeys=Object.keys(OVERRIDES.systems||{});
   for(var i=0;i<ovKeys.length;i++){
     var ov=OVERRIDES.systems[ovKeys[i]];
-    if(ov&&ov.data&&ov.data.name) addAddr(ovKeys[i],"Documented",null);
+    if(!ov||!ov.data||!ov.data.name) continue;
+    var ovParts=ovKeys[i].split(":");
+    if(ovParts.length<2) continue;
+    var ovGal=parseInt(ovParts[0],10);
+    if(isNaN(ovGal)) continue;
+    addAddr(ovParts[1],"Documented",ovGal);
   }
   function addFromStore(obj,hint){
     var keys=Object.keys(obj);
@@ -6632,6 +6746,7 @@ function runSearch(query){
     if(!isNaN(gal)&&gal!==GALAXY){
       switchGalaxy(gal);
       document.getElementById("galSel").value=String(gal);
+      syncGalaxyPickInput();
       toast("Switched to "+GALAXIES[gal]+" -- that's where this result was documented/bookmarked", 3200);
     }
     document.getElementById("inAddr").value=addr;
@@ -6803,16 +6918,16 @@ function startAtlasWait(txtEl, iconWrap, iconImg){
   }, 5000);
   return function stop(){ clearTimeout(slowTimer); };
 }
-function submitEditPayload(address, payload){
+function submitEditPayload(address, galaxy, payload){
   var errEl=document.getElementById("editErr"), retryBtn=document.getElementById("edRetry");
   var spin=document.getElementById("editSpin"), spinTxt=document.getElementById("editSpinTxt"), btn=document.getElementById("edSubmit");
   var iconWrap=document.getElementById("editIconWrap"), iconImg=document.getElementById("editIconImg");
-  lastEditAttempt={address:address,payload:payload};
+  lastEditAttempt={address:address,galaxy:galaxy,payload:payload};
   retryBtn.style.display="none";
   spin.style.display="flex"; btn.disabled=true;
   var stopWait=startAtlasWait(spinTxt, iconWrap, iconImg);
   fetch(FUNC_URL,{method:"POST",headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({action:"edit",address:address,payload:payload})
+    body:JSON.stringify({action:"edit",address:address,galaxy:galaxy,payload:payload})
   }).then(function(r){ return r.json().then(function(j){ return {status:r.status,body:j}; }); })
   .then(function(res){
     stopWait(); spin.style.display="none"; btn.disabled=false;
@@ -6836,7 +6951,7 @@ function submitEditPayload(address, payload){
 }
 document.getElementById("edRetry").addEventListener("click",function(){
   if(!lastEditAttempt) return;
-  submitEditPayload(lastEditAttempt.address, lastEditAttempt.payload);
+  submitEditPayload(lastEditAttempt.address, lastEditAttempt.galaxy, lastEditAttempt.payload);
 });
 document.getElementById("edSubmit").addEventListener("click",function(){
   if(!selected) return;
@@ -6930,7 +7045,9 @@ document.getElementById("edSubmit").addEventListener("click",function(){
       };
     })
   };
-  submitEditPayload(selected.address, payload);
+  var chosenGalaxy=parseInt(document.getElementById("edGalaxy").value,10);
+  if(isNaN(chosenGalaxy)) chosenGalaxy=selected.galaxy;
+  submitEditPayload(selected.address, chosenGalaxy, payload);
 });
 /* ============ Save-file import (2026-08-18) ============
    Everything here runs client-side -- the raw .hg file is never uploaded.
@@ -7125,12 +7242,29 @@ document.getElementById("siImportBases").addEventListener("click",function(){
   // by system address -- MAX_BULK_IMPORTS_PER_IP_PER_DAY is 1, so everything
   // has to go out in a single request or the second call would just be
   // rejected as "one import per day already used."
+  //
+  // Real per-galaxy addressing (2026-08-22, see TODO.md): every entry needs
+  // a real galaxy now, not just an address. extractSaveSummary() already
+  // resolved each base's real galaxy where possible (b.galaxy, via
+  // TeleportEndpoints name-matching -- see extract-summary.js's header
+  // comment); a base with no matching teleport point, or a bare planet/
+  // system-name discovery with no base at that address at all, has no
+  // ground truth to resolve from, so it falls back to the save's own
+  // CURRENT galaxy (siLastSummary.currentGalaxy) -- a plausible guess, not
+  // a verified fact, disclosed to the traveller below rather than silently
+  // assumed. Falling back further to the client's on-screen GALAXY only
+  // covers the edge case of a save with no recoverable current-galaxy field
+  // at all.
   var byAddr={};
   function entryFor(addr){
-    if(!byAddr[addr]) byAddr[addr]={address:addr, names:[], planetNames:[], systemName:"", bodyCount:0};
+    if(!byAddr[addr]) byAddr[addr]={address:addr, names:[], planetNames:[], systemName:"", bodyCount:0, galaxy:null};
     return byAddr[addr];
   }
-  bases.forEach(function(b){ entryFor(b.address).names=b.names; });
+  bases.forEach(function(b){
+    var e=entryFor(b.address);
+    e.names=b.names;
+    if(b.galaxy!=null) e.galaxy=b.galaxy;
+  });
   planets.forEach(function(p){
     var e=entryFor(p.systemAddress);
     e.planetNames.push({index:p.planetIndex, name:p.name});
@@ -7140,6 +7274,11 @@ document.getElementById("siImportBases").addEventListener("click",function(){
     var e=entryFor(s.address);
     e.systemName=s.name;
     if(!e.bodyCount) e.bodyCount=siBodyCountFor(s.address);
+  });
+  var siFallbackGalaxy=(siLastSummary&&typeof siLastSummary.currentGalaxy==="number")?siLastSummary.currentGalaxy:GALAXY;
+  var siGuessedCount=0;
+  Object.keys(byAddr).forEach(function(k){
+    if(byAddr[k].galaxy==null){ byAddr[k].galaxy=siFallbackGalaxy; siGuessedCount++; }
   });
   var entries=Object.keys(byAddr).map(function(k){ return byAddr[k]; });
 
@@ -7166,7 +7305,8 @@ document.getElementById("siImportBases").addEventListener("click",function(){
     if(res.body.planetsSet) extra.push(res.body.planetsSet+" planet name"+(res.body.planetsSet===1?"":"s"));
     if(res.body.systemNamesSet) extra.push(res.body.systemNamesSet+" system name"+(res.body.systemNamesSet===1?"":"s"));
     if(extra.length) msg+=" (incl. "+extra.join(", ")+")";
-    toast(msg+" -- visible to everyone");
+    if(siGuessedCount) msg+=" -- "+siGuessedCount+" system"+(siGuessedCount===1?"":"s")+" had no confirmed teleporter match, so its galaxy is a best guess (your save's current galaxy)";
+    toast(msg+" -- visible to everyone", siGuessedCount?5200:3200);
     loadOverrides();
     closeModal();
   }).catch(function(){
@@ -7175,16 +7315,16 @@ document.getElementById("siImportBases").addEventListener("click",function(){
   });
 });
 var lastReportAttempt=null; // {address,reason} of the most recent failed report, so Retry resubmits without retyping
-function submitReportPayload(address, reason){
+function submitReportPayload(address, galaxy, reason){
   var errEl=document.getElementById("reportErr"), retryBtn=document.getElementById("repRetry");
   var spin=document.getElementById("reportSpin"), spinTxt=document.getElementById("reportSpinTxt"), btn=document.getElementById("repSubmit");
   var iconWrap=document.getElementById("reportIconWrap"), iconImg=document.getElementById("reportIconImg");
-  lastReportAttempt={address:address,reason:reason};
+  lastReportAttempt={address:address,galaxy:galaxy,reason:reason};
   retryBtn.style.display="none";
   spin.style.display="flex"; btn.disabled=true;
   var stopWait=startAtlasWait(spinTxt, iconWrap, iconImg);
   fetch(FUNC_URL,{method:"POST",headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({action:"report",address:address,payload:{reason:reason}})
+    body:JSON.stringify({action:"report",address:address,galaxy:galaxy,payload:{reason:reason}})
   }).then(function(r){ return r.json().then(function(j){ return {status:r.status,body:j}; }); })
   .then(function(res){
     stopWait(); spin.style.display="none"; btn.disabled=false;
@@ -7206,16 +7346,16 @@ function submitReportPayload(address, reason){
   });
 }
 var lastFlagAttempt=null; // {address,fields,note} of the most recent failed flag submission, so Retry resubmits without re-checking boxes
-function submitFlagPayload(address, fields, note){
+function submitFlagPayload(address, galaxy, fields, note){
   var errEl=document.getElementById("reportErr"), retryBtn=document.getElementById("repRetry");
   var spin=document.getElementById("reportSpin"), spinTxt=document.getElementById("reportSpinTxt"), btn=document.getElementById("repSubmit");
   var iconWrap=document.getElementById("reportIconWrap"), iconImg=document.getElementById("reportIconImg");
-  lastFlagAttempt={address:address,fields:fields,note:note};
+  lastFlagAttempt={address:address,galaxy:galaxy,fields:fields,note:note};
   retryBtn.style.display="none";
   spin.style.display="flex"; btn.disabled=true;
   var stopWait=startAtlasWait(spinTxt, iconWrap, iconImg);
   fetch(FLAG_URL,{method:"POST",headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({address:address,fields:fields,note:note})
+    body:JSON.stringify({address:address,galaxy:galaxy,fields:fields,note:note})
   }).then(function(r){ return r.json().then(function(j){ return {status:r.status,body:j}; }); })
   .then(function(res){
     stopWait(); spin.style.display="none"; btn.disabled=false;
@@ -7240,9 +7380,9 @@ function submitFlagPayload(address, fields, note){
 }
 document.getElementById("repRetry").addEventListener("click",function(){
   if(document.getElementById("repModeFlag").classList.contains("on")){
-    if(lastFlagAttempt) submitFlagPayload(lastFlagAttempt.address, lastFlagAttempt.fields, lastFlagAttempt.note);
+    if(lastFlagAttempt) submitFlagPayload(lastFlagAttempt.address, lastFlagAttempt.galaxy, lastFlagAttempt.fields, lastFlagAttempt.note);
   } else if(lastReportAttempt){
-    submitReportPayload(lastReportAttempt.address, lastReportAttempt.reason);
+    submitReportPayload(lastReportAttempt.address, lastReportAttempt.galaxy, lastReportAttempt.reason);
   }
 });
 document.getElementById("repSubmit").addEventListener("click",function(){
@@ -7252,13 +7392,13 @@ document.getElementById("repSubmit").addEventListener("click",function(){
     var checked=Array.prototype.slice.call(document.querySelectorAll("#flagFieldList input:checked")).map(function(c){ return c.value; });
     if(!checked.length){ setErrText(errEl,"Pick at least one field to flag."); errEl.style.display="block"; retryBtn.style.display="none"; errEl.classList.remove("scanning"); errEl.scrollIntoView({block:"nearest"}); return; }
     errEl.style.display="none"; retryBtn.style.display="none";
-    submitFlagPayload(selected.address, checked, document.getElementById("flagNote").value.trim());
+    submitFlagPayload(selected.address, selected.galaxy, checked, document.getElementById("flagNote").value.trim());
     return;
   }
   var reason=document.getElementById("repReason").value.trim();
   if(!reason){ setErrText(errEl,"Please describe what's wrong."); errEl.style.display="block"; retryBtn.style.display="none"; errEl.classList.remove("scanning"); errEl.scrollIntoView({block:"nearest"}); return; }
   errEl.style.display="none"; retryBtn.style.display="none";
-  submitReportPayload(selected.address, reason);
+  submitReportPayload(selected.address, selected.galaxy, reason);
 });
 
 /* ============ general site feedback (2026-08-16) ============
@@ -7594,10 +7734,10 @@ function animate(){
    See the header comment on adminPanel's HTML above for what's in and out
    of scope here. */
 var ADMIN_TOKEN=null;
-function adminAction(address, field, resolution, value){
+function adminAction(address, galaxy, field, resolution, value){
   return fetch(FUNC_URL+"?token="+encodeURIComponent(ADMIN_TOKEN),{
     method:"POST", headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({action:"resolve-flag", address:address, payload:{field:field, resolution:resolution, value:value}})
+    body:JSON.stringify({action:"resolve-flag", address:address, galaxy:galaxy, payload:{field:field, resolution:resolution, value:value}})
   }).then(function(r){ return r.json(); });
 }
 // Composite categories can't be fixed with a single plain-text prompt() --
@@ -7614,10 +7754,10 @@ function renderAdminQueue(data){
   for(var i=0;i<q.length;i++){
     var it=q[i];
     var label=FLAG_LABELS[it.field]||("Body "+(it.field.split(".")[1]!==undefined?(+it.field.split(".")[1]+1):"?"));
-    html+='<div class="mfld" style="border:1px solid var(--border-soft);border-radius:var(--r-sm);padding:8px 10px" data-addr="'+it.address+'" data-field="'+it.field+'">'+
+    html+='<div class="mfld" style="border:1px solid var(--border-soft);border-radius:var(--r-sm);padding:8px 10px" data-addr="'+it.address+'" data-gal="'+it.galaxy+'" data-field="'+it.field+'">'+
       '<div style="display:flex;justify-content:space-between;gap:8px"><b style="color:var(--text)">'+label+'</b>'+
       '<span style="font-size:10px;color:var(--text-faint)">'+(it.flaggedAt?relTime(new Date(it.flaggedAt).toISOString()):"")+' &middot; '+it.votes+' vote(s)'+(it.issueUrl?' &middot; <a href="'+it.issueUrl+'" target="_blank" style="color:var(--cyan)">Issue</a>':'')+'</span></div>'+
-      '<div style="font-size:11px;color:var(--text-dim);margin:3px 0 6px">'+it.address+(it.note?' -- "'+it.note+'"':'')+'</div>'+
+      '<div style="font-size:11px;color:var(--text-dim);margin:3px 0 6px">'+it.address+' &middot; '+(it.galaxy!=null&&GALAXIES[it.galaxy]?GALAXIES[it.galaxy]:"galaxy "+it.galaxy)+(it.note?' -- "'+it.note+'"':'')+'</div>'+
       '<div style="display:flex;gap:6px;flex-wrap:wrap">'+
         '<button class="btn" data-act="view" style="font-size:10px">View system</button>'+
         '<button class="btn" data-act="dispute" style="font-size:10px">Confirm dispute</button>'+
@@ -7645,19 +7785,26 @@ document.getElementById("adminQueue").addEventListener("click",function(e){
   if(!btn) return;
   var row=btn.closest(".mfld");
   var address=row.getAttribute("data-addr"), field=row.getAttribute("data-field"), act=btn.getAttribute("data-act");
+  var galaxy=parseInt(row.getAttribute("data-gal"),10);
+  if(isNaN(galaxy)) galaxy=0;
   if(act==="view"){
     document.getElementById("adminPanel").style.display="none";
+    if(galaxy!==GALAXY){
+      switchGalaxy(galaxy);
+      document.getElementById("galSel").value=String(galaxy);
+      syncGalaxyPickInput();
+    }
     jumpTo(address);
     return;
   }
   if(act==="fix"){
     var val=prompt("New value for "+(FLAG_LABELS[field]||field)+":");
     if(val===null || !val.trim()) return;
-    adminAction(address,field,"set-value",val.trim()).then(function(){ loadAdminQueue(); loadOverrides(); });
+    adminAction(address,galaxy,field,"set-value",val.trim()).then(function(){ loadAdminQueue(); loadOverrides(); });
     return;
   }
   var resolution = act==="dispute" ? "dispute" : "dismiss";
-  adminAction(address,field,resolution).then(function(){ loadAdminQueue(); loadOverrides(); });
+  adminAction(address,galaxy,field,resolution).then(function(){ loadAdminQueue(); loadOverrides(); });
 });
 document.getElementById("adminClose").addEventListener("click",function(){
   document.getElementById("adminPanel").style.display="none";
