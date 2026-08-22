@@ -105,7 +105,13 @@ function fieldsToHex(f, pOverride) {
 }
 
 function packedAddressToHex(v) {
-  return fieldsToHex(decodeRawAddress(v));
+  // P forced to 1 -- see the 2026-08-22 root-cause-fix comment above the
+  // relevant call sites in this file for why (matches every real
+  // formatAddress(1,...) call site in preview.html; a base's own raw
+  // PlanetIndex nibble was never used for anything downstream of this
+  // call, only the system-level address itself, so preserving it here
+  // was actively harmful, not just imprecise).
+  return fieldsToHex(decodeRawAddress(v), 1);
 }
 
 /** Name -> RealityIndex (0-255 galaxy index), built from every
@@ -144,14 +150,23 @@ function currentSaveGalaxy(contexts) {
 
 /** Returns { planetIndex, systemAddress } -- systemAddress is the same
  * 12-char hex as packedAddressToHex() but with the leading PlanetIndex
- * nibble zeroed out (P='0'), i.e. the system-level address every other
- * part of this site keys community data by. planetIndex is that same
- * nibble on its own, 0-15 (matches the 1-based b.index this site's own
- * body arrays already use, per generateSystem()/planetSeeds() -- a
- * discovery's real PlanetIndex tells you exactly which body slot it is). */
+ * nibble forced to P=1 (CORRECTED 2026-08-22 -- previously zeroed to
+ * '0', which does NOT match this site's real convention: preview.html's
+ * own generateSystem()/formatAddress() always builds a system's canonical
+ * .address with P hardcoded to 1, never 0. A P=0 address is therefore
+ * just as unreachable by the site's real lookup as any other wrong
+ * digit -- this was silently producing orphaned community-store records,
+ * exactly the class of bug found in the "Sranch duplicate" investigation
+ * (see CLAUDE.md's 2026-08-22 session note). planetIndex is the discovery
+ * record's own real PlanetIndex nibble, 0-15 (matches the 1-based
+ * b.index this site's own body arrays already use, per
+ * generateSystem()/planetSeeds() -- a discovery's real PlanetIndex tells
+ * you exactly which body slot it is), returned separately and untouched
+ * by the P=1 normalization above, which only affects the address used as
+ * the system-level storage/lookup key. */
 function packedAddressToFields(v) {
   const f = decodeRawAddress(v);
-  return { planetIndex: f.p, systemAddress: fieldsToHex(f, 0) };
+  return { planetIndex: f.p, systemAddress: fieldsToHex(f, 1) };
 }
 
 /** Returns { username, bases: [{address, name}], baseCount, systemCount,
