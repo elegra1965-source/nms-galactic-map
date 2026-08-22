@@ -233,6 +233,11 @@ export function filterSystemEdit(payload){
   var editorCodeR = filterText(payload.editorFriendCode, {maxLen:24, fieldName:"Friend code"});
   if(!editorCodeR.ok) errors.push(editorCodeR.reason); else out.editorFriendCode = editorCodeR.cleaned;
 
+  // GEN_VERSION tag -- see the isValidGenVersion() comment above. Never
+  // pushed to errors: an old cached client with no genVersion at all, or a
+  // malformed one, should still save normally, just without the tag.
+  if(isValidGenVersion(payload.genVersion)) out.genVersion = payload.genVersion;
+
   // Small helper for the 4 grouped resource fields (Flora/Minerals/
   // Salvageable tech/Fossils) -- same shape and limits as the existing
   // Resources list, just run once per group.
@@ -380,6 +385,7 @@ export function filterBulkImport(payload){
   var editorCodeR = filterText(payload.editorFriendCode, {maxLen:24, fieldName:"Friend code"});
   var editorName = editorNameR.ok ? editorNameR.cleaned : "";
   var editorFriendCode = editorCodeR.ok ? editorCodeR.cleaned : "";
+  var genVersion = isValidGenVersion(payload.genVersion) ? payload.genVersion : "";
 
   var out = [];
   for(var i=0;i<Math.min(entriesIn.length, MAX_BULK_IMPORT_ENTRIES);i++){
@@ -421,7 +427,7 @@ export function filterBulkImport(payload){
 
   return {
     ok: errors.length===0 && out.length>0,
-    cleaned: { entries: out, editorName: editorName, editorFriendCode: editorFriendCode },
+    cleaned: { entries: out, editorName: editorName, editorFriendCode: editorFriendCode, genVersion: genVersion },
     errors: errors.length ? errors : (out.length===0 ? ["No valid entries after filtering"] : [])
   };
 }
@@ -438,6 +444,18 @@ function isValidAddressStr(addr){
 function isValidGalaxyNum(g){
   var n = Number(g);
   return Number.isInteger(n) && n >= 0 && n <= 255;
+}
+
+/* GEN_VERSION -- prep work logged 2026-08-22 for a possible future game
+   update (real, teased, no patch notes yet -- see preview.html's own
+   GEN_VERSION comment for the full why). This is metadata about the
+   submitting browser's own build, not user content, so it's format-checked
+   only (a loose semver-ish shape) rather than run through filterText's
+   profanity/length rules -- an unrecognised or missing value is silently
+   dropped, never an error, since it's purely informational and must never
+   be able to block a real edit from saving. */
+function isValidGenVersion(v){
+  return typeof v === "string" && /^[0-9]+(\.[0-9]+){0,3}$/.test(v) && v.length <= 20;
 }
 
 export function filterReport(payload){

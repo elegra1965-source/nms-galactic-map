@@ -14,7 +14,7 @@
                per-entry galaxy instead, see filterBulkImport() in filter.mjs.)
      "edit"   payload = {name, race, region, stars:[colourKey,...] (max 3), starClass, water, dissonant,
                          giant, ruins, outlaw, phantom, econName, sell, buy, econDesc, conflict, blackHole, atlas, notes,
-                         editorName, editorFriendCode, colliding, collidingA, collidingB,
+                         editorName, editorFriendCode, genVersion, colliding, collidingA, collidingB,
                          bodies:[{name, moon, orbits, biome, descriptor, water, ring, resources,
                                   flora, fauna, minerals, salvage, fossils, sentinel, autophage, base, baseName}, ...]}
                          (base added 2026-08-17 -- "Has base" per-body marker, same manual-only
@@ -30,7 +30,16 @@
                          actually persisted as of the same date -- see getCategoryValue's comment.
                          editorName/editorFriendCode added 2026-08-16 -- optional "who documented
                          this" attribution, always overwrites directly, NOT part of TOP_CATS/the
-                         flag-consensus system below, see filter.mjs's comment on why. outlaw added
+                         flag-consensus system below, see filter.mjs's comment on why. genVersion
+                         added 2026-08-22 -- NOT user content, an automatic marker of which
+                         GEN_VERSION (preview.html) the submitting browser was running, prep work
+                         for detecting when a future game update (e.g. the real, teased "Cosmos")
+                         has made the procedural generator itself out of date relative to already-
+                         submitted data; same always-overwrites/not-in-TOP_CATS treatment as
+                         editorName since it's metadata about the submission, not contestable
+                         content -- see filter.mjs's isValidGenVersion() and preview.html's own
+                         GEN_VERSION comment for the full why. Deliberately not used for anything
+                         yet beyond being recorded. outlaw added
                          2026-08-17 -- Tony caught that picking the "Pirate Controlled" conflict word
                          didn't set this separate skull/tag flag, same manual-only pattern as
                          giant/ruins/blackHole/atlas. colliding/collidingA/collidingB added
@@ -40,7 +49,7 @@
                          why it's a manual pick, not derived data.)
      "report" payload = {reason}
      "bulk-import" payload = {entries:[{address, names:[...], planetNames:[{index,name}...],
-                    systemName}...], editorName, editorFriendCode}
+                    systemName}...], editorName, editorFriendCode, genVersion}
                     Added 2026-08-18 alongside nms-core/save-import/ (client-side save.hg
                     parser) -- a visitor who's parsed their OWN save file in their own
                     browser can offer to import their real bases in one batch instead of
@@ -455,6 +464,7 @@ async function handleBulkImport(req, token, body, ip, now){
           blackHole:false, atlas:false, ruins:false, outlaw:false, phantom:"",
           notes: noteLine, colliding:false, collidingA:0, collidingB:0,
           editorName: filtered.cleaned.editorName, editorFriendCode: filtered.cleaned.editorFriendCode,
+          genVersion: filtered.cleaned.genVersion || "",
           bodies: applyPlanetNamesToBodies([], entry.bodyCount, entry.planetNames)
         },
         editedAt: new Date(now).toISOString(),
@@ -485,6 +495,7 @@ async function handleBulkImport(req, token, body, ip, now){
       }
       sysRec.data.editorName = filtered.cleaned.editorName || sysRec.data.editorName || "";
       sysRec.data.editorFriendCode = filtered.cleaned.editorFriendCode || sysRec.data.editorFriendCode || "";
+      sysRec.data.genVersion = filtered.cleaned.genVersion || sysRec.data.genVersion || "";
       sysRec.editedAt = new Date(now).toISOString();
       pushHistory(sysRec, "real base/planet/system name(s) merged in from a traveller's save-file import", now);
       merged++;
@@ -646,6 +657,10 @@ export default async (req, context) => {
     // flag/dispute review like TOP_CATS above (see filter.mjs's comment).
     sysRec.data.editorName = filtered.cleaned.editorName || "";
     sysRec.data.editorFriendCode = filtered.cleaned.editorFriendCode || "";
+    // genVersion: unlike editorName/editorFriendCode this is never a
+    // deliberate user choice to clear, so keep the previous value rather
+    // than blanking it whenever an older cached client omits the field.
+    sysRec.data.genVersion = filtered.cleaned.genVersion || sysRec.data.genVersion || "";
 
     // Bodies: the submitted form always describes the traveller's FULL
     // current body list (there's no partial-body-list concept client-side,
