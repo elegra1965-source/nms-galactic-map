@@ -491,11 +491,12 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
    they measure genuine overflow, same fix, same reason (Tony hit this on
    feedbackModal on his S26 the same way he'd hit it on hyperdriveModal
    before). */
-#hyperdriveModal,#feedbackModal,#saveImportModal{overflow-y:hidden}
-#hyperdriveModal.scroll,#feedbackModal.scroll,#saveImportModal.scroll{overflow-y:auto}
+#hyperdriveModal,#feedbackModal,#saveImportModal,#disclaimerModal{overflow-y:hidden}
+#hyperdriveModal.scroll,#feedbackModal.scroll,#saveImportModal.scroll,#disclaimerModal.scroll{overflow-y:auto}
 .modal h3{font-family:'Orbitron',sans-serif;font-size:13px;letter-spacing:.1em;
   color:var(--white);margin-bottom:2px;text-transform:uppercase}
 .modal .msub{font-size:11px;color:var(--text-faint);margin-bottom:12px}
+#disclaimerModal .msub{font-style:italic;cursor:default}
 .mfld{margin-bottom:10px}
 .mfld .lb{font-size:9px;letter-spacing:.12em;color:var(--text-faint);text-transform:uppercase;margin-bottom:3px}
 .mfld input[type=text],.mfld input[type=number]{width:100%;text-transform:none;font-family:'Rajdhani',sans-serif;
@@ -1360,7 +1361,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 
   <div class="box modal" id="disclaimerModal" style="max-width:380px;display:none">
     <h3>Before you explore</h3>
-    <div class="msub" style="margin-bottom:12px">Three quick things:</div>
+    <div class="msub" style="margin-bottom:12px">A few quick things:</div>
     <div class="mfld">
       <div class="lb">Fan-made project</div>
       <div style="font-size:12px;color:var(--text-dim);line-height:1.55">This is an unofficial, fan-made tool. It is not affiliated with, endorsed by, or sponsored by Hello Games.</div>
@@ -6129,10 +6130,22 @@ document.getElementById("modalWrap").addEventListener("focusin",function(e){
 
 /* ============ fan-made / procedural-data disclaimer ============ */
 var DISCLAIMER_KEY="nms-galmap-disclaimer-seen";
+/* Same measure-don't-guess phantom-scrollbar fix as #searchPop/#hyperPanel/etc
+   (see the standing comment near the top of this file) -- the modal used to
+   always genuinely overflow before today's accordion, so its scrollbar was
+   real; now that everything starts collapsed it usually fits, and a real
+   scrollbar should only appear once an expanded section actually pushes it
+   past max-height. Called on open and after every section toggle. */
+function remeasureDisclaimerScroll(){
+  var m=document.getElementById("disclaimerModal");
+  m.classList.remove("scroll");
+  if(m.scrollHeight>m.clientHeight+1) m.classList.add("scroll");
+}
 function openDisclaimer(){
   closeAllModalBoxes();
   document.getElementById("disclaimerModal").style.display="";
   document.getElementById("modalWrap").classList.add("show");
+  remeasureDisclaimerScroll();
 }
 document.getElementById("bAbout").addEventListener("click",openDisclaimer);
 /* About accordion (Tony, 2026-08-22): the modal's ~14 .mfld sections were all
@@ -6155,6 +6168,7 @@ document.getElementById("bAbout").addEventListener("click",openDisclaimer);
         var bodies=document.querySelectorAll('#disclaimerModal .mfld > div:last-child');
         for(var j=0;j<bodies.length;j++) bodies[j].style.display="none";
         body.style.display=opening?"":"none";
+        remeasureDisclaimerScroll();
       });
     })(body);
   }
