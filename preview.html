@@ -357,6 +357,18 @@ html.hc-on .btn{border-width:2px}
 .fs-disputed{box-shadow:inset 3px 0 0 var(--fs-disputed)}
 .tag.fs-edited{border-color:var(--fs-edited);color:var(--fs-edited);box-shadow:none;padding-left:7px}
 .tag.fs-flagged{border-color:var(--fs-flagged);color:var(--fs-flagged);box-shadow:none;padding-left:7px}
+/* ============ unverified "guess" fields (race/economy/conflict/rings) ============
+   Added 2026-08-22 per Tony/GoodGuysFree: these four are entirely invented
+   flavour (see nms-core/economy.js's own header) -- not derived from the
+   portal address the way name/region/planet-count are -- so unlike a plain
+   fs-original field (which just means "nobody's edited this yet" on data
+   that's already accurate), these need to visibly read as unconfirmed by
+   default, not just in the About modal. Deliberately its OWN class rather
+   than reusing fs-original: fs-original also covers name/region/starClass/
+   planet-count, which ARE the real ported algorithm and should NOT be
+   greyed out or tagged "Guess" just because nobody's edited them yet. */
+.guessVal{opacity:.55}
+.tag.guess{border-color:var(--text-faint);color:var(--text-faint);border-style:dashed}
 .tag.fs-disputed{border-color:var(--fs-disputed);color:var(--fs-disputed);box-shadow:none;padding-left:7px}
 .seqbox{border:1px solid var(--border-soft);border-radius:var(--r-sm);padding:7px;margin-top:10px;background:#04070c}
 .seqbox .lb{font-size:9px;letter-spacing:.16em;color:var(--gold);text-align:center;margin-bottom:5px}
@@ -1032,11 +1044,11 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   <div id="pCore">—</div>
   <div id="pSys">
     <div class="row" id="pRaceRow"><span id="icRace"></span>
-      <div><div class="lb">Race</div><div class="vl" id="pRace">—</div></div></div>
+      <div><div class="lb">Race<span class="tag guess" id="pRaceGuess" style="margin-left:6px;display:none" title="Invented flavour, not derived from the portal address -- no traveller has confirmed the real race for this system yet. Use Edit system to submit it.">Guess</span></div><div class="vl" id="pRace">—</div></div></div>
     <div class="row row-eco" id="pEcoRow"><span id="icEco"></span>
-      <div><div class="lb">Economy<span class="starRating" id="pEcoStars"></span></div><div class="vl" id="pEco">—</div><div class="sub" id="pEcoSub">—</div></div></div>
+      <div><div class="lb">Economy<span class="starRating" id="pEcoStars"></span><span class="tag guess" id="pEcoGuess" style="margin-left:6px;display:none" title="Invented flavour, not derived from the portal address -- no traveller has confirmed the real economy for this system yet. Use Edit system to submit it.">Guess</span></div><div class="vl" id="pEco">—</div><div class="sub" id="pEcoSub">—</div></div></div>
     <div class="row" id="pConRow"><span id="icCon"></span>
-      <div><div class="lb">Conflict<span class="conBadge" id="pConBadge" style="margin-left:6px;vertical-align:middle"></span></div><div class="vl" id="pCon">—</div></div></div>
+      <div><div class="lb">Conflict<span class="conBadge" id="pConBadge" style="margin-left:6px;vertical-align:middle"></span><span class="tag guess" id="pConGuess" style="margin-left:6px;display:none" title="Invented flavour, not derived from the portal address -- no traveller has confirmed the real conflict level for this system yet. Use Edit system to submit it.">Guess</span></div><div class="vl" id="pCon">—</div></div></div>
     <div class="tags" id="pTags"></div>
     <div class="bodylist" id="pBodies"></div>
     <div style="font-size:10px;color:var(--text-faint);line-height:1.4;margin-top:5px">Planet names are a procedural guess, not your save data (<span style="text-decoration:underline;cursor:pointer" onclick="openDisclaimer()">see About</span>) -- Edit system to add the real ones.</div>
@@ -2200,6 +2212,13 @@ function generateSystem(vx,vy,vz,idx,noOverride){
   s.econType=flavor.econType; s.econName=flavor.econName; s.econTier=flavor.econTier;
   s.econDesc=flavor.econDesc; s.sell=flavor.sell; s.buy=flavor.buy;
   s.conTier=flavor.conTier; s.conflict=flavor.conflict;
+  // Per-field "has a traveller actually confirmed this" flags -- see
+  // applyOverride() below for where these flip true. Deliberately separate
+  // from s.override (whole-system flag): a system can be "Community edited"
+  // for its name/planets while race/economy/conflict are still nobody's
+  // confirmed guess, and the UI (updatePanel's "Guess" tags) needs to know
+  // that per-field, not just per-system.
+  s.raceVerified=false; s.econVerified=false; s.conflictVerified=false;
 
   /* Total body count (planets+moons combined, real 6-body hard cap): accurate
      via nms-core's planetSeeds() when available -- its final planet_count+
@@ -2293,6 +2312,7 @@ function generateSystem(vx,vy,vz,idx,noOverride){
       nameOverridden:false, // this is the placeholder legacy name, not a real traveller submission -- upgradeBodyNames() is free to replace it with the accurate nms-core name
       biome:biome, terrain:hasWater?pickOne(br,TERRAIN.slice(1)):"Pangean", water:hasWater,
       ring:ringStyle,
+      ringOverridden:false, // procedural roll (rollRing()), never a traveller submission -- see the "guess" tag on the panel body list
       size:isMoon?(0.34+br()*0.22):(0.68+br()*0.62),
       tilt:(br()-0.5)*0.7, spin:0.15+br()*0.5,
       resUni:resUni,
@@ -2352,12 +2372,12 @@ function applyOverride(s){
   s.override=true;
   s.overrideAt=ov.editedAt;
   if(d.name) s.name=d.name;
-  if(d.race) s.race=d.race;
-  if(d.econName) s.econName=d.econName;
-  if(d.sell) s.sell=d.sell;
-  if(d.buy) s.buy=d.buy;
-  if(d.econDesc){ s.econDesc=d.econDesc; var et=tierFromWord(d.econDesc,ECON_S); if(et!==null) s.econTier=et; }
-  if(d.conflict){ s.conflict=d.conflict; var ct=tierFromWord(d.conflict,CONFLICT); if(ct!==null) s.conTier=ct; }
+  if(d.race){ s.race=d.race; s.raceVerified=true; }
+  if(d.econName){ s.econName=d.econName; s.econVerified=true; }
+  if(d.sell){ s.sell=d.sell; s.econVerified=true; }
+  if(d.buy){ s.buy=d.buy; s.econVerified=true; }
+  if(d.econDesc){ s.econDesc=d.econDesc; var et=tierFromWord(d.econDesc,ECON_S); if(et!==null) s.econTier=et; s.econVerified=true; }
+  if(d.conflict){ s.conflict=d.conflict; var ct=tierFromWord(d.conflict,CONFLICT); if(ct!==null) s.conTier=ct; s.conflictVerified=true; }
   if(d.blackHole!==undefined) s.blackHole=!!d.blackHole;
   if(d.atlas!==undefined) s.atlas=!!d.atlas;
   if(d.phantom!==undefined) s.phantom=(d.phantom==="phantom"||d.phantom==="shadow")?d.phantom:"";
@@ -2432,6 +2452,7 @@ function applyOverride(s){
         terrain:o?o.terrain:"Pangean",
         water:!!b.water,
         ring:(!isMoon&&!!b.ring)?(RING_STYLE_BY_BIOME[biome]||"tan"):false,
+        ringOverridden:true, // this whole body came from a traveller's Edit system submission (d.bodies), ring checkbox included -- a real answer either way, not a procedural roll
         size:o?o.size:(isMoon?0.42:0.85),
         tilt:o?o.tilt:((i%2?1:-1)*(0.1+0.05*i)),
         spin:o?o.spin:0.3,
@@ -4238,6 +4259,18 @@ function updatePanel(s){
   setFsClass("pRaceRow","race",s);
   setFsClass("pEcoRow","economy",s);
   setFsClass("pConRow","conflict",s);
+  // Grey out + tag "Guess" for race/economy/conflict until a traveller has
+  // actually submitted the real value via Edit system -- these three are
+  // invented flavour (see the About modal's "Procedural data" section), not
+  // derived from the portal address, so unlike everything else on this
+  // panel they default to reading as unconfirmed rather than as fact.
+  document.getElementById("pRaceGuess").style.display=s.raceVerified?"none":"";
+  document.getElementById("pEcoGuess").style.display=s.econVerified?"none":"";
+  document.getElementById("pConGuess").style.display=s.conflictVerified?"none":"";
+  document.getElementById("pRace").classList.toggle("guessVal",!s.raceVerified);
+  document.getElementById("pEco").classList.toggle("guessVal",!s.econVerified);
+  document.getElementById("pEcoSub").classList.toggle("guessVal",!s.econVerified);
+  document.getElementById("pCon").classList.toggle("guessVal",!s.conflictVerified);
 
   var tags=[["",["","Single","Binary","Ternary"][s.stars]+" star"]];
   tags.push(["",s.planets+(s.planets===1?" planet":" planets")]);
@@ -4281,7 +4314,11 @@ function updatePanel(s){
     var bStat=getFieldStatus(s,"bodies."+i);
     bl+='<div class="brow'+(bStat!=="original"?" fs-"+bStat:"")+'" data-b="'+i+'"><span class="bdot" style="background:'+BIOMES[b.biome].base+'"></span>'+
         '<span class="bn">'+(b.moon?"&#8627; ":"")+b.name+'</span>'+
-        '<span class="bb">'+b.biome+(b.water?" &middot; water":"")+(b.ring?" &middot; "+(RING_STYLE_LABEL[b.ring]||"").toLowerCase()+" rings":"")+'</span></div>';
+        // Ring is an invented per-planet roll (rollRing()), same as race/
+        // economy/conflict, until a traveller submits the real answer via
+        // Edit system (b.ringOverridden) -- shown inline rather than as a
+        // separate tag, this row is already a single compact line.
+        '<span class="bb">'+b.biome+(b.water?" &middot; water":"")+(b.ring?" &middot; "+(RING_STYLE_LABEL[b.ring]||"").toLowerCase()+" rings"+(b.ringOverridden?"":" (guess)"):"")+'</span></div>';
   }
   document.getElementById("pBodies").innerHTML=bl;
 
@@ -4317,7 +4354,10 @@ function showBody(b,s){
   if(!BIOMES[b.biome].atmo) t.push(["","No atmosphere"]);
   if(b.biome==="Exotic"||b.biome==="Mega Exotic") t.push(["bh","Anomalous"]);
   if(b.water) t.push(["hot","Water"]);
-  if(b.ring) t.push(["hot",(RING_STYLE_LABEL[b.ring]||"")+" rings"]);
+  // Same invented-flavour distinction as the panel body list -- a ring
+  // nobody's confirmed via Edit system reads as a muted "guess" tag rather
+  // than a confident gold "hot" one.
+  if(b.ring) t.push([b.ringOverridden?"hot":"guess",(RING_STYLE_LABEL[b.ring]||"")+" rings"+(b.ringOverridden?"":" (guess)")]);
   if(b.autophage) t.push(["hot","Autophage camp"]);
   if(b.base) t.push(["hot",b.baseName?('Base: "'+b.baseName+'"'):"Has base"]);
   var html="",i;
