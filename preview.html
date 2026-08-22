@@ -2205,25 +2205,57 @@ function generateSystem(vx,vy,vz,idx,noOverride){
      via nms-core's planetSeeds() when available -- its final planet_count+
      moon_count already folds in the gas-giant collapse (1 planet+5 moons)
      and the real prime-planet/moon-absorption draws, replacing the old flat
-     2-6 guess. Falls back to that same guess otherwise. This only swaps the
-     COUNT; which slots end up flagged as moons, and every biome/terrain/
-     water/ring/resource roll below, is still this site's own long-standing
-     invented flavour generation, untouched -- nms-core doesn't expose a
-     per-slot moon breakdown to port that part accurately (see
-     DEPLOYMENT_BRIEF.md; this is a known scoped-out gap, not an oversight). */
-  var total;
+     2-6 guess. Falls back to that same guess otherwise.
+     Real bug found 2026-08-22 (Tony/GoodGuysFree side-by-side test against
+     Umensk-Feks XVIII): the COUNT was accurate but the planet/moon SPLIT
+     wasn't -- ps.moon_count was computed right below and then silently
+     discarded; each non-giant body instead got its own independent
+     br()<0.28 coin-flip to decide isMoon. For that real system nms-core
+     correctly says moon_count=0 (6 plain planets, matching the in-game
+     Discoveries panel exactly), but the coin-flip still tagged one body as
+     a moon anyway. Fixed below by using ps.moon_count to fix the TOTAL
+     number of moon slots (moonSlots) instead of rolling independently.
+     WHICH specific body ends up flagged is still a guess -- nms-core
+     doesn't expose a per-slot breakdown to port that part accurately (see
+     DEPLOYMENT_BRIEF.md; that half of the gap is real and stays scoped
+     out) -- but the moon COUNT itself no longer contradicts data nms-core
+     already handed us. */
+  var total, ps=null;
   if(attrs){
     try{
-      var ps=window.NMSCore.planetSeeds(pc,GALAXY);
+      ps=window.NMSCore.planetSeeds(pc,GALAXY);
       total=Math.min(6,Math.max(1,ps.planet_count+ps.moon_count));
     }catch(e){ total=2+Math.floor(r()*5); if(total>6) total=6; }
   } else {
     total=2+Math.floor(r()*5); if(total>6) total=6;
   }
+  // Pick exactly ps.moon_count of the non-first slots (index 0 is always a
+  // planet -- same as the old logic's implicit pi>0 requirement) to be
+  // moons, via a seed dedicated to this choice so it never disturbs any
+  // other draw. Giant systems are untouched: s.giant already forces every
+  // trailing body to be a moon of the giant, which was already exactly
+  // right (gasGiant collapses nms-core's own planet_count to 1, so
+  // moon_count there is already total-1 -- verified against system.js).
+  var moonSlots=null;
+  if(!s.giant && ps){
+    var wantMoons=Math.min(ps.moon_count,Math.max(0,total-1));
+    if(wantMoons>0){
+      var candidates=[]; for(var ci=1; ci<total; ci++) candidates.push(ci);
+      var slotR=mulberry32(gseed(vx,vy,vz,idx^0x4001));
+      for(var si=0; si<wantMoons; si++){
+        var jx=si+Math.floor(slotR()*(candidates.length-si));
+        var tmp=candidates[si]; candidates[si]=candidates[jx]; candidates[jx]=tmp;
+      }
+      moonSlots=new Set(candidates.slice(0,wantMoons));
+    } else {
+      moonSlots=new Set();
+    }
+  }
   s.bodies=[]; s.planets=0; s.moons=0;
   for(var pi=0; pi<total; pi++){
     var br=mulberry32(gseed(vx,vy,vz,(idx<<4)^(pi+7)));
-    var isMoon = s.giant ? (pi>0) : (pi>0 && br()<0.28 && s.bodies.length>0);
+    var isMoon = s.giant ? (pi>0)
+      : (moonSlots ? moonSlots.has(pi) : (pi>0 && br()<0.28 && s.bodies.length>0));
     var biome=pickOne(br,BIOME_KEYS);
     var bd=BIOMES[biome];
     var canWater = bd.water && !isMoon;
