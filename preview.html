@@ -366,7 +366,7 @@ html.hc-on .btn{border-width:2px}
    default, not just in the About modal. Deliberately its OWN class rather
    than reusing fs-original: fs-original also covers name/region/starClass/
    planet-count, which ARE the real ported algorithm and should NOT be
-   greyed out or tagged "Guess" just because nobody's edited them yet. */
+   greyed out or tagged "Procedural" just because nobody's edited them yet. */
 .guessVal{opacity:.55}
 .tag.guess{border-color:var(--text-faint);color:var(--text-faint);border-style:dashed}
 .tag.fs-disputed{border-color:var(--fs-disputed);color:var(--fs-disputed);box-shadow:none;padding-left:7px}
@@ -1044,11 +1044,11 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   <div id="pCore">—</div>
   <div id="pSys">
     <div class="row" id="pRaceRow"><span id="icRace"></span>
-      <div><div class="lb">Race<span class="tag guess" id="pRaceGuess" style="margin-left:6px;display:none" title="Invented flavour, not derived from the portal address -- no traveller has confirmed the real race for this system yet. Use Edit system to submit it.">Guess</span></div><div class="vl" id="pRace">—</div></div></div>
+      <div><div class="lb">Race<span class="tag guess" id="pRaceGuess" style="margin-left:6px;display:none" title="Invented flavour, not derived from the portal address -- no traveller has confirmed the real race for this system yet. Use Edit system to submit it.">Procedural</span></div><div class="vl" id="pRace">—</div></div></div>
     <div class="row row-eco" id="pEcoRow"><span id="icEco"></span>
-      <div><div class="lb">Economy<span class="starRating" id="pEcoStars"></span><span class="tag guess" id="pEcoGuess" style="margin-left:6px;display:none" title="Invented flavour, not derived from the portal address -- no traveller has confirmed the real economy for this system yet. Use Edit system to submit it.">Guess</span></div><div class="vl" id="pEco">—</div><div class="sub" id="pEcoSub">—</div></div></div>
+      <div><div class="lb">Economy<span class="starRating" id="pEcoStars"></span><span class="tag guess" id="pEcoGuess" style="margin-left:6px;display:none" title="Invented flavour, not derived from the portal address -- no traveller has confirmed the real economy for this system yet. Use Edit system to submit it.">Procedural</span></div><div class="vl" id="pEco">—</div><div class="sub" id="pEcoSub">—</div></div></div>
     <div class="row" id="pConRow"><span id="icCon"></span>
-      <div><div class="lb">Conflict<span class="conBadge" id="pConBadge" style="margin-left:6px;vertical-align:middle"></span><span class="tag guess" id="pConGuess" style="margin-left:6px;display:none" title="Invented flavour, not derived from the portal address -- no traveller has confirmed the real conflict level for this system yet. Use Edit system to submit it.">Guess</span></div><div class="vl" id="pCon">—</div></div></div>
+      <div><div class="lb">Conflict<span class="conBadge" id="pConBadge" style="margin-left:6px;vertical-align:middle"></span><span class="tag guess" id="pConGuess" style="margin-left:6px;display:none" title="Invented flavour, not derived from the portal address -- no traveller has confirmed the real conflict level for this system yet. Use Edit system to submit it.">Procedural</span></div><div class="vl" id="pCon">—</div></div></div>
     <div class="tags" id="pTags"></div>
     <div class="bodylist" id="pBodies"></div>
     <div style="font-size:10px;color:var(--text-faint);line-height:1.4;margin-top:5px">Planet names are a procedural guess, not your save data (<span style="text-decoration:underline;cursor:pointer" onclick="openDisclaimer()">see About</span>) -- Edit system to add the real ones.</div>
@@ -2216,7 +2216,7 @@ function generateSystem(vx,vy,vz,idx,noOverride){
   // applyOverride() below for where these flip true. Deliberately separate
   // from s.override (whole-system flag): a system can be "Community edited"
   // for its name/planets while race/economy/conflict are still nobody's
-  // confirmed guess, and the UI (updatePanel's "Guess" tags) needs to know
+  // confirmed guess, and the UI (updatePanel's "Procedural" tags) needs to know
   // that per-field, not just per-system.
   s.raceVerified=false; s.econVerified=false; s.conflictVerified=false;
 
@@ -4259,7 +4259,7 @@ function updatePanel(s){
   setFsClass("pRaceRow","race",s);
   setFsClass("pEcoRow","economy",s);
   setFsClass("pConRow","conflict",s);
-  // Grey out + tag "Guess" for race/economy/conflict until a traveller has
+  // Grey out + tag "Procedural" for race/economy/conflict until a traveller has
   // actually submitted the real value via Edit system -- these three are
   // invented flavour (see the About modal's "Procedural data" section), not
   // derived from the portal address, so unlike everything else on this
@@ -4318,7 +4318,7 @@ function updatePanel(s){
         // economy/conflict, until a traveller submits the real answer via
         // Edit system (b.ringOverridden) -- shown inline rather than as a
         // separate tag, this row is already a single compact line.
-        '<span class="bb">'+b.biome+(b.water?" &middot; water":"")+(b.ring?" &middot; "+(RING_STYLE_LABEL[b.ring]||"").toLowerCase()+" rings"+(b.ringOverridden?"":" (guess)"):"")+'</span></div>';
+        '<span class="bb">'+b.biome+(b.water?" &middot; water":"")+(b.ring?" &middot; "+(RING_STYLE_LABEL[b.ring]||"").toLowerCase()+" rings"+(b.ringOverridden?"":" (procedural)"):"")+'</span></div>';
   }
   document.getElementById("pBodies").innerHTML=bl;
 
@@ -4357,7 +4357,7 @@ function showBody(b,s){
   // Same invented-flavour distinction as the panel body list -- a ring
   // nobody's confirmed via Edit system reads as a muted "guess" tag rather
   // than a confident gold "hot" one.
-  if(b.ring) t.push([b.ringOverridden?"hot":"guess",(RING_STYLE_LABEL[b.ring]||"")+" rings"+(b.ringOverridden?"":" (guess)")]);
+  if(b.ring) t.push([b.ringOverridden?"hot":"guess",(RING_STYLE_LABEL[b.ring]||"")+" rings"+(b.ringOverridden?"":" (procedural)")]);
   if(b.autophage) t.push(["hot","Autophage camp"]);
   if(b.base) t.push(["hot",b.baseName?('Base: "'+b.baseName+'"'):"Has base"]);
   var html="",i;
