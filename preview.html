@@ -2271,6 +2271,14 @@ function applyOverride(s){
   // comment) -- skey() is the exact same helper store.marks/waypoints/
   // visited already use for this, reused here rather than duplicated.
   var ov=OVERRIDES.systems && OVERRIDES.systems[skey(s)];
+  // Backward-compat fallback for data/overrides.json records that predate
+  // the 2026-08-22 composite-key migration -- see the long comment above
+  // applyOverride() and TODO.md's "Real per-galaxy addressing" entry for
+  // the full why. Only applies in Euclid (galaxy 0), matching the
+  // migration's own default, and only when no real composite-keyed record
+  // already exists for this address (a fresh post-migration or newly-
+  // edited record always wins).
+  if(!ov && OVERRIDES.systems && s.galaxy===0) ov=OVERRIDES.systems[s.address];
   // Flag/dispute status can exist on a system that's never been edited at
   // all (a visitor can flag a purely procedural value as "this looks
   // wrong" without providing a correction) -- so this has to be read BEFORE
@@ -6646,7 +6654,13 @@ function buildSearchIndex(){
     var ov=OVERRIDES.systems[ovKeys[i]];
     if(!ov||!ov.data||!ov.data.name) continue;
     var ovParts=ovKeys[i].split(":");
-    if(ovParts.length<2) continue;
+    if(ovParts.length<2){
+      // Pre-migration legacy record (bare address, no galaxy digit at all)
+      // -- treat as Euclid, same fallback/reasoning as applyOverride()'s
+      // own comment. Becomes unreachable once the migration runs.
+      if(/^[0-9A-Fa-f]{12}$/.test(ovKeys[i])) addAddr(ovKeys[i],"Documented",0);
+      continue;
+    }
     var ovGal=parseInt(ovParts[0],10);
     if(isNaN(ovGal)) continue;
     addAddr(ovParts[1],"Documented",ovGal);
