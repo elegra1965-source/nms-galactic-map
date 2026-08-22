@@ -1,6 +1,6 @@
 {
   "systems": {
-    "107AFB5ABB2D": {
+    "0:107AFB5ABB2D": {
       "data": {
         "name": "Badun-III",
         "race": "Korvax",
@@ -65,9 +65,10 @@
         ]
       },
       "editedAt": "2026-08-06T21:41:08.629Z",
-      "editedByIp": "5.133.46.24"
+      "editedByIp": "5.133.46.24",
+      "galaxy": 0
     },
-    "11E4E9732CC9": {
+    "0:11E4E9732CC9": {
       "data": {
         "name": "Ritaketh",
         "race": "Vy'keen",
@@ -109,9 +110,10 @@
         ]
       },
       "editedAt": "2026-08-09T05:52:59.338Z",
-      "editedByIp": "185.45.15.46"
+      "editedByIp": "185.45.15.46",
+      "galaxy": 0
     },
-    "1251AF814039": {
+    "0:1251AF814039": {
       "data": {
         "name": "Oklo-I",
         "race": "Uninhabited",
@@ -144,9 +146,10 @@
         ]
       },
       "editedAt": "2026-08-09T06:06:54.314Z",
-      "editedByIp": "185.45.15.46"
+      "editedByIp": "185.45.15.46",
+      "galaxy": 0
     },
-    "119103B0E64D": {
+    "0:119103B0E64D": {
       "data": {
         "name": "Qoonu-III",
         "race": "Uninhabited",
@@ -201,9 +204,10 @@
         ]
       },
       "editedAt": "2026-08-09T06:18:10.527Z",
-      "editedByIp": "185.45.15.46"
+      "editedByIp": "185.45.15.46",
+      "galaxy": 0
     },
-    "11396CD99F7E": {
+    "0:11396CD99F7E": {
       "data": {
         "name": "Kacor-II",
         "race": "Vy'keen",
@@ -267,9 +271,10 @@
         ]
       },
       "editedAt": "2026-08-09T06:35:37.226Z",
-      "editedByIp": "185.45.15.46"
+      "editedByIp": "185.45.15.46",
+      "galaxy": 0
     },
-    "1081D78F0C5E": {
+    "0:1081D78F0C5E": {
       "data": {
         "name": "Yawex-I",
         "race": "Gek",
@@ -345,9 +350,10 @@
         ]
       },
       "editedAt": "2026-08-09T07:00:54.228Z",
-      "editedByIp": "185.45.15.46"
+      "editedByIp": "185.45.15.46",
+      "galaxy": 0
     },
-    "12111056F066": {
+    "0:12111056F066": {
       "data": {
         "name": "Rigalum",
         "race": "Uninhabited",
@@ -411,9 +417,10 @@
         ]
       },
       "editedAt": "2026-08-09T07:09:33.833Z",
-      "editedByIp": "185.45.15.46"
+      "editedByIp": "185.45.15.46",
+      "galaxy": 0
     },
-    "10ADB2FB4C13": {
+    "0:10ADB2FB4C13": {
       "data": {
         "name": "Test",
         "race": "Korvax",
@@ -445,9 +452,10 @@
         ]
       },
       "editedAt": "2026-08-09T23:21:11.742Z",
-      "editedByIp": "82.132.185.221"
+      "editedByIp": "82.132.185.221",
+      "galaxy": 0
     },
-    "1058E1434753": {
+    "0:1058E1434753": {
       "flaggedFields": [],
       "disputedFields": [],
       "data": {
@@ -682,9 +690,10 @@
           "at": "2026-08-17T13:44:16.756Z",
           "text": "edited by a traveller"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "12ED2B6869C6": {
+    "0:12ED2B6869C6": {
       "flaggedFields": [],
       "disputedFields": [],
       "data": {
@@ -830,9 +839,10 @@
           "at": "2026-08-17T17:53:31.622Z",
           "text": "edited by a traveller"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "12973214F4BC": {
+    "0:12973214F4BC": {
       "flaggedFields": [],
       "disputedFields": [],
       "data": {
@@ -941,9 +951,10 @@
           "at": "2026-08-17T18:04:31.110Z",
           "text": "edited by a traveller"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "16CFB79C8A42": {
+    "0:16CFB79C8A42": {
       "flaggedFields": [],
       "disputedFields": [],
       "data": {
@@ -1060,9 +1071,10 @@
           "at": "2026-08-18T18:41:33.093Z",
           "text": "edited by a traveller"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "19C4FE9C1321": {
+    "0:19C4FE9C1321": {
       "data": {
         "name": "",
         "race": "",
@@ -1099,9 +1111,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "19110256EC6A": {
+    "0:19110256EC6A": {
       "data": {
         "name": "",
         "race": "",
@@ -1138,9 +1151,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "1919FF9B8325": {
+    "0:1919FF9B8325": {
       "data": {
         "name": "",
         "race": "",
@@ -1177,9 +1191,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "190EFD27C60C": {
+    "0:190EFD27C60C": {
       "data": {
         "name": "",
         "race": "",
@@ -1216,9 +1231,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "390AFF9B8325": {
+    "0:390AFF9B8325": {
       "data": {
         "name": "",
         "race": "",
@@ -1255,9 +1271,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "19F6FE9C1321": {
+    "0:19F6FE9C1321": {
       "data": {
         "name": "",
         "race": "",
@@ -1294,9 +1311,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "1960FF9C931C": {
+    "0:1960FF9C931C": {
       "data": {
         "name": "",
         "race": "",
@@ -1333,9 +1351,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "39D0FE9C3321": {
+    "0:39D0FE9C3321": {
       "data": {
         "name": "",
         "race": "",
@@ -1372,9 +1391,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "49F8FE9C3321": {
+    "0:49F8FE9C3321": {
       "data": {
         "name": "",
         "race": "",
@@ -1411,9 +1431,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "19F9FE9C2320": {
+    "0:19F9FE9C2320": {
       "data": {
         "name": "",
         "race": "",
@@ -1450,9 +1471,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "490EFE9C731E": {
+    "0:490EFE9C731E": {
       "data": {
         "name": "",
         "race": "",
@@ -1489,9 +1511,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "2999FE9CF319": {
+    "0:2999FE9CF319": {
       "data": {
         "name": "",
         "race": "",
@@ -1528,9 +1551,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "10F904962226": {
+    "0:10F904962226": {
       "data": {
         "name": "",
         "race": "",
@@ -1567,9 +1591,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "6979FE9CF319": {
+    "0:6979FE9CF319": {
       "data": {
         "name": "",
         "race": "",
@@ -1606,9 +1631,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "29B5FF9B8326": {
+    "0:29B5FF9B8326": {
       "data": {
         "name": "",
         "race": "",
@@ -1645,9 +1671,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "190CFF9B8325": {
+    "0:190CFF9B8325": {
       "data": {
         "name": "",
         "race": "",
@@ -1684,9 +1711,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "408A0496A220": {
+    "0:408A0496A220": {
       "data": {
         "name": "",
         "race": "",
@@ -1723,9 +1751,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "307A0496A220": {
+    "0:307A0496A220": {
       "data": {
         "name": "",
         "race": "",
@@ -1762,9 +1791,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "29FBFF9BA324": {
+    "0:29FBFF9BA324": {
       "data": {
         "name": "",
         "race": "",
@@ -1801,9 +1831,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "2056010DA2FA": {
+    "0:2056010DA2FA": {
       "data": {
         "name": "",
         "race": "",
@@ -1840,9 +1871,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "194EFF9BE322": {
+    "0:194EFF9BE322": {
       "data": {
         "name": "",
         "race": "",
@@ -1879,9 +1911,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "135A043871F3": {
+    "0:135A043871F3": {
       "data": {
         "name": "",
         "race": "",
@@ -1918,9 +1951,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "1906FD6540CA": {
+    "0:1906FD6540CA": {
       "data": {
         "name": "",
         "race": "",
@@ -1957,9 +1991,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "5906FD6540CA": {
+    "0:5906FD6540CA": {
       "data": {
         "name": "",
         "race": "",
@@ -1996,9 +2031,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "2945FD64F0CA": {
+    "0:2945FD64F0CA": {
       "data": {
         "name": "",
         "race": "",
@@ -2035,9 +2071,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "2921FD64D0CA": {
+    "0:2921FD64D0CA": {
       "data": {
         "name": "",
         "race": "",
@@ -2074,9 +2111,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "63C7033771EA": {
+    "0:63C7033771EA": {
       "data": {
         "name": "",
         "race": "",
@@ -2113,9 +2151,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "23340337B1ED": {
+    "0:23340337B1ED": {
       "data": {
         "name": "",
         "race": "",
@@ -2152,9 +2191,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "116A033771EA": {
+    "0:116A033771EA": {
       "data": {
         "name": "",
         "race": "",
@@ -2191,9 +2231,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "1027033711E6": {
+    "0:1027033711E6": {
       "data": {
         "name": "",
         "race": "",
@@ -2230,9 +2271,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "113E0324CCDE": {
+    "0:113E0324CCDE": {
       "data": {
         "name": "",
         "race": "",
@@ -2269,9 +2311,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "10DFFC502B25": {
+    "0:10DFFC502B25": {
       "data": {
         "name": "",
         "race": "",
@@ -2308,9 +2351,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "19C0FF9BF322": {
+    "0:19C0FF9BF322": {
       "data": {
         "name": "",
         "race": "",
@@ -2347,9 +2391,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "1956FF9CD31B": {
+    "0:1956FF9CD31B": {
       "data": {
         "name": "",
         "race": "",
@@ -2386,9 +2431,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "1915FF9DF312": {
+    "0:1915FF9DF312": {
       "data": {
         "name": "",
         "race": "",
@@ -2425,9 +2471,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "1296FCF386BB": {
+    "0:1296FCF386BB": {
       "data": {
         "name": "",
         "race": "",
@@ -2464,9 +2511,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "5292FCF386B9": {
+    "0:5292FCF386B9": {
       "data": {
         "name": "",
         "race": "",
@@ -2503,9 +2551,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "2292FCF386B9": {
+    "0:2292FCF386B9": {
       "data": {
         "name": "",
         "race": "",
@@ -2542,9 +2591,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "1279FCF396B4": {
+    "0:1279FCF396B4": {
       "data": {
         "name": "",
         "race": "",
@@ -2581,9 +2631,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "425B0397AE81": {
+    "0:425B0397AE81": {
       "data": {
         "name": "",
         "race": "",
@@ -2620,9 +2671,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "222E0397AE82": {
+    "0:222E0397AE82": {
       "data": {
         "name": "",
         "race": "",
@@ -2659,9 +2711,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "22260397AE81": {
+    "0:22260397AE81": {
       "data": {
         "name": "",
         "race": "",
@@ -2698,9 +2751,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "52260397AE81": {
+    "0:52260397AE81": {
       "data": {
         "name": "",
         "race": "",
@@ -2737,9 +2791,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "42260397AE81": {
+    "0:42260397AE81": {
       "data": {
         "name": "",
         "race": "",
@@ -2776,9 +2831,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "421804085015": {
+    "0:421804085015": {
       "data": {
         "name": "",
         "race": "",
@@ -2815,9 +2871,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "22FB04085015": {
+    "0:22FB04085015": {
       "data": {
         "name": "",
         "race": "",
@@ -2854,9 +2911,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "12FB04085015": {
+    "0:12FB04085015": {
       "data": {
         "name": "",
         "race": "",
@@ -2893,9 +2951,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "12770206300F": {
+    "0:12770206300F": {
       "data": {
         "name": "",
         "race": "",
@@ -2932,9 +2991,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "42770206300F": {
+    "0:42770206300F": {
       "data": {
         "name": "",
         "race": "",
@@ -2971,9 +3031,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "2054F9555C30": {
+    "0:2054F9555C30": {
       "data": {
         "name": "",
         "race": "",
@@ -3010,9 +3071,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "23200337B1ED": {
+    "0:23200337B1ED": {
       "data": {
         "name": "",
         "race": "",
@@ -3049,9 +3111,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "403DFF210982": {
+    "0:403DFF210982": {
       "data": {
         "name": "",
         "race": "",
@@ -3088,9 +3151,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "11D800FF8FFE": {
+    "0:11D800FF8FFE": {
       "data": {
         "name": "",
         "race": "",
@@ -3127,9 +3191,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "1106FCFC0DD9": {
+    "0:1106FCFC0DD9": {
       "data": {
         "name": "",
         "race": "",
@@ -3166,9 +3231,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "2A000756F407": {
+    "0:2A000756F407": {
       "data": {
         "name": "",
         "race": "",
@@ -3205,9 +3271,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "267DFF004007": {
+    "0:267DFF004007": {
       "data": {
         "name": "",
         "race": "",
@@ -3244,9 +3311,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "1CB804448BA1": {
+    "0:1CB804448BA1": {
       "data": {
         "name": "",
         "race": "",
@@ -3283,9 +3351,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "5DC902006005": {
+    "0:5DC902006005": {
       "data": {
         "name": "",
         "race": "",
@@ -3322,9 +3391,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "3F9FFFFFF008": {
+    "0:3F9FFFFFF008": {
       "data": {
         "name": "",
         "race": "",
@@ -3361,9 +3431,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "170AFE2D0334": {
+    "0:170AFE2D0334": {
       "data": {
         "name": "",
         "race": "",
@@ -3400,9 +3471,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "32A3F8FDD018": {
+    "0:32A3F8FDD018": {
       "data": {
         "name": "",
         "race": "",
@@ -3439,9 +3511,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "16BCFC5BCCEB": {
+    "0:16BCFC5BCCEB": {
       "data": {
         "name": "",
         "race": "",
@@ -3478,9 +3551,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "2F4B397F1B54": {
+    "0:2F4B397F1B54": {
       "data": {
         "name": "",
         "race": "",
@@ -3517,9 +3591,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "5BEAFFC32439": {
+    "0:5BEAFFC32439": {
       "data": {
         "name": "",
         "race": "",
@@ -3556,9 +3631,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "14F104C63D3C": {
+    "0:14F104C63D3C": {
       "data": {
         "name": "",
         "race": "",
@@ -3595,9 +3671,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "30D6FC001007": {
+    "0:30D6FC001007": {
       "data": {
         "name": "",
         "race": "",
@@ -3634,9 +3711,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "40F900D93696": {
+    "0:40F900D93696": {
       "data": {
         "name": "",
         "race": "",
@@ -3673,9 +3751,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "101400D93696": {
+    "0:101400D93696": {
       "data": {
         "name": "",
         "race": "",
@@ -3712,9 +3791,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "300802D94696": {
+    "0:300802D94696": {
       "data": {
         "name": "",
         "race": "",
@@ -3751,9 +3831,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "2901FF58935E": {
+    "0:2901FF58935E": {
       "data": {
         "name": "",
         "race": "",
@@ -3790,9 +3871,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "596900F906E8": {
+    "0:596900F906E8": {
       "data": {
         "name": "",
         "race": "",
@@ -3829,9 +3911,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "196900F906E8": {
+    "0:196900F906E8": {
       "data": {
         "name": "",
         "race": "",
@@ -3868,9 +3951,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "1028010DA2FA": {
+    "0:1028010DA2FA": {
       "data": {
         "name": "",
         "race": "",
@@ -3907,9 +3991,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "13C5FD517100": {
+    "0:13C5FD517100": {
       "data": {
         "name": "",
         "race": "",
@@ -3946,9 +4031,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "171EFA036920": {
+    "0:171EFA036920": {
       "data": {
         "name": "",
         "race": "",
@@ -3985,9 +4071,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "100B0645E54D": {
+    "0:100B0645E54D": {
       "data": {
         "name": "",
         "race": "",
@@ -4024,9 +4111,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "30790645E54D": {
+    "0:30790645E54D": {
       "data": {
         "name": "",
         "race": "",
@@ -4063,9 +4151,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "209B04963227": {
+    "0:209B04963227": {
       "data": {
         "name": "",
         "race": "",
@@ -4102,9 +4191,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "3922BBBDB544": {
+    "0:3922BBBDB544": {
       "data": {
         "name": "",
         "race": "",
@@ -4141,9 +4231,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "2542EEB52B2A": {
+    "0:2542EEB52B2A": {
       "data": {
         "name": "",
         "race": "",
@@ -4180,9 +4271,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "106B02FF8001": {
+    "0:106B02FF8001": {
       "data": {
         "name": "",
         "race": "",
@@ -4219,9 +4311,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "3FFDFFFFBFEF": {
+    "0:3FFDFFFFBFEF": {
       "data": {
         "name": "",
         "race": "",
@@ -4258,9 +4351,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "10D504963227": {
+    "0:10D504963227": {
       "data": {
         "name": "",
         "race": "",
@@ -4297,9 +4391,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "30D504963227": {
+    "0:30D504963227": {
       "data": {
         "name": "",
         "race": "",
@@ -4336,9 +4431,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "3D144CCC3DD7": {
+    "0:3D144CCC3DD7": {
       "data": {
         "name": "",
         "race": "",
@@ -4375,9 +4471,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "307903967226": {
+    "0:307903967226": {
       "data": {
         "name": "",
         "race": "",
@@ -4414,9 +4511,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "102606C185B0": {
+    "0:102606C185B0": {
       "data": {
         "name": "",
         "race": "",
@@ -4453,9 +4551,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "301907C165B1": {
+    "0:301907C165B1": {
       "data": {
         "name": "",
         "race": "",
@@ -4492,9 +4591,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "101907C165B1": {
+    "0:101907C165B1": {
       "data": {
         "name": "",
         "race": "",
@@ -4531,9 +4631,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "200A06C185B0": {
+    "0:200A06C185B0": {
       "data": {
         "name": "",
         "race": "",
@@ -4570,9 +4671,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "5028FB6F40A1": {
+    "0:5028FB6F40A1": {
       "data": {
         "name": "",
         "race": "",
@@ -4609,9 +4711,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "10E50154DB82": {
+    "0:10E50154DB82": {
       "data": {
         "name": "",
         "race": "",
@@ -4648,9 +4751,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "12E62FFB29B3": {
+    "0:12E62FFB29B3": {
       "data": {
         "name": "",
         "race": "",
@@ -4687,9 +4791,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "604507C165B1": {
+    "0:604507C165B1": {
       "data": {
         "name": "",
         "race": "",
@@ -4726,9 +4831,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "104507C165B1": {
+    "0:104507C165B1": {
       "data": {
         "name": "",
         "race": "",
@@ -4765,9 +4871,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "507307C175B1": {
+    "0:507307C175B1": {
       "data": {
         "name": "",
         "race": "",
@@ -4804,9 +4911,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "1018F96B9EBA": {
+    "0:1018F96B9EBA": {
       "data": {
         "name": "",
         "race": "",
@@ -4843,9 +4951,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "2A15F8001000": {
+    "0:2A15F8001000": {
       "data": {
         "name": "",
         "race": "",
@@ -4882,9 +4991,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "692CB8F91804": {
+    "0:692CB8F91804": {
       "data": {
         "name": "",
         "race": "",
@@ -4921,9 +5031,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "2E1603FC3C3D": {
+    "0:2E1603FC3C3D": {
       "data": {
         "name": "",
         "race": "",
@@ -4960,9 +5071,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "19A2C0F90801": {
+    "0:19A2C0F90801": {
       "data": {
         "name": "",
         "race": "",
@@ -4999,9 +5111,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "4DB302006005": {
+    "0:4DB302006005": {
       "data": {
         "name": "",
         "race": "",
@@ -5038,9 +5151,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "32E742035C16": {
+    "0:32E742035C16": {
       "data": {
         "name": "",
         "race": "",
@@ -5077,9 +5191,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "12A542035C16": {
+    "0:12A542035C16": {
       "data": {
         "name": "",
         "race": "",
@@ -5116,9 +5231,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "5326FEFE2FE7": {
+    "0:5326FEFE2FE7": {
       "data": {
         "name": "",
         "race": "",
@@ -5155,9 +5271,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "3326FEFE2FE7": {
+    "0:3326FEFE2FE7": {
       "data": {
         "name": "",
         "race": "",
@@ -5194,9 +5311,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "5106FCFF9002": {
+    "0:5106FCFF9002": {
       "data": {
         "name": "",
         "race": "",
@@ -5233,9 +5351,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "413AFCFF8002": {
+    "0:413AFCFF8002": {
       "data": {
         "name": "",
         "race": "",
@@ -5272,9 +5391,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "313AFCFF8002": {
+    "0:313AFCFF8002": {
       "data": {
         "name": "",
         "race": "",
@@ -5311,9 +5431,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "218C06006000": {
+    "0:218C06006000": {
       "data": {
         "name": "",
         "race": "",
@@ -5350,9 +5471,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "5991F7B03B61": {
+    "0:5991F7B03B61": {
       "data": {
         "name": "",
         "race": "",
@@ -5389,9 +5511,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "1053FB9D5346": {
+    "0:1053FB9D5346": {
       "data": {
         "name": "",
         "race": "",
@@ -5428,9 +5551,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "6977FE2D0992": {
+    "0:6977FE2D0992": {
       "data": {
         "name": "",
         "race": "",
@@ -5467,9 +5591,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "19DAFE2D0992": {
+    "0:19DAFE2D0992": {
       "data": {
         "name": "",
         "race": "",
@@ -5506,9 +5631,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "404C00026FAF": {
+    "0:404C00026FAF": {
       "data": {
         "name": "",
         "race": "",
@@ -5545,9 +5671,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "5041F9557C30": {
+    "0:5041F9557C30": {
       "data": {
         "name": "",
         "race": "",
@@ -5584,9 +5711,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "59B7F8A9A40E": {
+    "0:59B7F8A9A40E": {
       "data": {
         "name": "",
         "race": "",
@@ -5623,9 +5751,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "3C1903448BA1": {
+    "0:3C1903448BA1": {
       "data": {
         "name": "",
         "race": "",
@@ -5662,9 +5791,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "3C6903449BA1": {
+    "0:3C6903449BA1": {
       "data": {
         "name": "",
         "race": "",
@@ -5701,9 +5831,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "14D205C62D3C": {
+    "0:14D205C62D3C": {
       "data": {
         "name": "",
         "race": "",
@@ -5740,9 +5871,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "24AE05C62D3D": {
+    "0:24AE05C62D3D": {
       "data": {
         "name": "",
         "race": "",
@@ -5779,9 +5911,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "2B9002005006": {
+    "0:2B9002005006": {
       "data": {
         "name": "",
         "race": "",
@@ -5818,9 +5951,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "1B1A00347637": {
+    "0:1B1A00347637": {
       "data": {
         "name": "",
         "race": "",
@@ -5857,9 +5991,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "109485F8635E": {
+    "0:109485F8635E": {
       "data": {
         "name": "",
         "race": "",
@@ -5896,9 +6031,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "6D84FE005006": {
+    "0:6D84FE005006": {
       "data": {
         "name": "",
         "race": "",
@@ -5935,9 +6071,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "1D16FE005006": {
+    "0:1D16FE005006": {
       "data": {
         "name": "",
         "race": "",
@@ -5974,9 +6111,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "5D4E02007005": {
+    "0:5D4E02007005": {
       "data": {
         "name": "",
         "race": "",
@@ -6013,9 +6151,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "4D4E02007005": {
+    "0:4D4E02007005": {
       "data": {
         "name": "",
         "race": "",
@@ -6052,9 +6191,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "1935FE02B216": {
+    "0:1935FE02B216": {
       "data": {
         "name": "",
         "race": "",
@@ -6091,9 +6231,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "1D50FE005006": {
+    "0:1D50FE005006": {
       "data": {
         "name": "",
         "race": "",
@@ -6130,9 +6271,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "4E79FA49B526": {
+    "0:4E79FA49B526": {
       "data": {
         "name": "",
         "race": "",
@@ -6169,9 +6311,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "4E53F6CB55DF": {
+    "0:4E53F6CB55DF": {
       "data": {
         "name": "",
         "race": "",
@@ -6208,9 +6351,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "3EDBF949B527": {
+    "0:3EDBF949B527": {
       "data": {
         "name": "",
         "race": "",
@@ -6247,9 +6391,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "2E79FA49A526": {
+    "0:2E79FA49A526": {
       "data": {
         "name": "",
         "race": "",
@@ -6286,9 +6431,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "3213A88D87FB": {
+    "0:3213A88D87FB": {
       "data": {
         "name": "",
         "race": "",
@@ -6325,9 +6471,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "6E79029050B4": {
+    "0:6E79029050B4": {
       "data": {
         "name": "",
         "race": "",
@@ -6364,9 +6511,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "50B2FC702F9C": {
+    "0:50B2FC702F9C": {
       "data": {
         "name": "",
         "race": "",
@@ -6403,9 +6551,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "32B90894AF4A": {
+    "0:32B90894AF4A": {
       "data": {
         "name": "",
         "race": "",
@@ -6442,9 +6591,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "36D2051739BB": {
+    "0:36D2051739BB": {
       "data": {
         "name": "",
         "race": "",
@@ -6481,9 +6631,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "36E8051739BB": {
+    "0:36E8051739BB": {
       "data": {
         "name": "",
         "race": "",
@@ -6520,9 +6671,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "10C904964225": {
+    "0:10C904964225": {
       "data": {
         "name": "",
         "race": "",
@@ -6559,9 +6711,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "1028034E7B07": {
+    "0:1028034E7B07": {
       "data": {
         "name": "",
         "race": "",
@@ -6598,9 +6751,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "6028034E7B07": {
+    "0:6028034E7B07": {
       "data": {
         "name": "",
         "race": "",
@@ -6637,9 +6791,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "2DAFFE005006": {
+    "0:2DAFFE005006": {
       "data": {
         "name": "",
         "race": "",
@@ -6676,9 +6831,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "1DC5FE005006": {
+    "0:1DC5FE005006": {
       "data": {
         "name": "",
         "race": "",
@@ -6715,9 +6871,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "1FD2FFFFF008": {
+    "0:1FD2FFFFF008": {
       "data": {
         "name": "",
         "race": "",
@@ -6754,9 +6911,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "1F622ED3A99B": {
+    "0:1F622ED3A99B": {
       "data": {
         "name": "",
         "race": "",
@@ -6793,9 +6951,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "1B910025B696": {
+    "0:1B910025B696": {
       "data": {
         "name": "",
         "race": "",
@@ -6832,9 +6991,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "1DB907F18939": {
+    "0:1DB907F18939": {
       "data": {
         "name": "",
         "race": "",
@@ -6871,9 +7031,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "121000000000": {
+    "0:121000000000": {
       "data": {
         "name": "",
         "race": "",
@@ -6910,9 +7071,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "5087021222FA": {
+    "0:5087021222FA": {
       "data": {
         "name": "",
         "race": "",
@@ -6949,9 +7111,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "2F8EFFFFF008": {
+    "0:2F8EFFFFF008": {
       "data": {
         "name": "",
         "race": "",
@@ -6988,9 +7151,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "25A303FFB78C": {
+    "0:25A303FFB78C": {
       "data": {
         "name": "",
         "race": "",
@@ -7027,9 +7191,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "28A2FBA523C8": {
+    "0:28A2FBA523C8": {
       "data": {
         "name": "",
         "race": "",
@@ -7066,9 +7231,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "2FB7FFFFF008": {
+    "0:2FB7FFFFF008": {
       "data": {
         "name": "",
         "race": "",
@@ -7105,9 +7271,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "153A03FFB78E": {
+    "0:153A03FFB78E": {
       "data": {
         "name": "",
         "race": "",
@@ -7144,9 +7311,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "20B104963227": {
+    "0:20B104963227": {
       "data": {
         "name": "",
         "race": "",
@@ -7183,9 +7351,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "10B104963227": {
+    "0:10B104963227": {
       "data": {
         "name": "",
         "race": "",
@@ -7222,9 +7391,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "00B104963227": {
+    "0:00B104963227": {
       "data": {
         "name": "",
         "race": "",
@@ -7261,9 +7431,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "1079FFD94696": {
+    "0:1079FFD94696": {
       "data": {
         "name": "",
         "race": "",
@@ -7300,9 +7471,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "2D95056671D5": {
+    "0:2D95056671D5": {
       "data": {
         "name": "",
         "race": "",
@@ -7339,9 +7511,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "1D29046671D5": {
+    "0:1D29046671D5": {
       "data": {
         "name": "",
         "race": "",
@@ -7378,9 +7551,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "15B5EA018379": {
+    "0:15B5EA018379": {
       "data": {
         "name": "",
         "race": "",
@@ -7417,9 +7591,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "4510EA019378": {
+    "0:4510EA019378": {
       "data": {
         "name": "",
         "race": "",
@@ -7456,9 +7631,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "2539EA01A378": {
+    "0:2539EA01A378": {
       "data": {
         "name": "",
         "race": "",
@@ -7495,9 +7671,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "6F2501001FFF": {
+    "0:6F2501001FFF": {
       "data": {
         "name": "",
         "race": "",
@@ -7534,9 +7711,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "3594FFFED00C": {
+    "0:3594FFFED00C": {
       "data": {
         "name": "",
         "race": "",
@@ -7573,9 +7751,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "104A006DA18D": {
+    "0:104A006DA18D": {
       "data": {
         "name": "",
         "race": "",
@@ -7612,9 +7791,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "193CF85B93A6": {
+    "0:193CF85B93A6": {
       "data": {
         "name": "",
         "race": "",
@@ -7651,9 +7831,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "5E9CF9A3BC59": {
+    "0:5E9CF9A3BC59": {
       "data": {
         "name": "",
         "race": "",
@@ -7690,9 +7871,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "1C34032DA9FF": {
+    "0:1C34032DA9FF": {
       "data": {
         "name": "",
         "race": "",
@@ -7729,9 +7911,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "1C07032DB9FF": {
+    "0:1C07032DB9FF": {
       "data": {
         "name": "",
         "race": "",
@@ -7768,9 +7951,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "2C5600A9C095": {
+    "0:2C5600A9C095": {
       "data": {
         "name": "",
         "race": "",
@@ -7807,9 +7991,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "4C2900A9D096": {
+    "0:4C2900A9D096": {
       "data": {
         "name": "",
         "race": "",
@@ -7846,9 +8031,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "6454FD585BB5": {
+    "0:6454FD585BB5": {
       "data": {
         "name": "",
         "race": "",
@@ -7885,9 +8071,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "3AD7F8FFBFFB": {
+    "0:3AD7F8FFBFFB": {
       "data": {
         "name": "",
         "race": "",
@@ -7924,9 +8111,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "5E79F8FFEFFF": {
+    "0:5E79F8FFEFFF": {
       "data": {
         "name": "",
         "race": "",
@@ -7963,9 +8151,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "10A2DFA101BE": {
+    "0:10A2DFA101BE": {
       "data": {
         "name": "",
         "race": "",
@@ -8002,9 +8191,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "10C9F8557C2E": {
+    "0:10C9F8557C2E": {
       "data": {
         "name": "",
         "race": "",
@@ -8041,9 +8231,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "20EE0467827A": {
+    "0:20EE0467827A": {
       "data": {
         "name": "",
         "race": "",
@@ -8080,9 +8271,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "2F9BFEFFF008": {
+    "0:2F9BFEFFF008": {
       "data": {
         "name": "",
         "race": "",
@@ -8119,9 +8311,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "11B0FBFFBFFC": {
+    "0:11B0FBFFBFFC": {
       "data": {
         "name": "",
         "race": "",
@@ -8158,9 +8351,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "30DCF8007008": {
+    "0:30DCF8007008": {
       "data": {
         "name": "",
         "race": "",
@@ -8197,9 +8391,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "1098F4AAE432": {
+    "0:1098F4AAE432": {
       "data": {
         "name": "",
         "race": "",
@@ -8236,9 +8431,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "200500000000": {
+    "0:200500000000": {
       "data": {
         "name": "",
         "race": "",
@@ -8275,9 +8471,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "1D6DF8000001": {
+    "0:1D6DF8000001": {
       "data": {
         "name": "",
         "race": "",
@@ -8314,9 +8511,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "21F600005019": {
+    "0:21F600005019": {
       "data": {
         "name": "",
         "race": "",
@@ -8353,9 +8551,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "2785FBFFC005": {
+    "0:2785FBFFC005": {
       "data": {
         "name": "",
         "race": "",
@@ -8392,9 +8591,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "21E700005019": {
+    "0:21E700005019": {
       "data": {
         "name": "",
         "race": "",
@@ -8431,9 +8631,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "1355FD008FFE": {
+    "0:1355FD008FFE": {
       "data": {
         "name": "",
         "race": "",
@@ -8470,9 +8671,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "13E9FD007FFD": {
+    "0:13E9FD007FFD": {
       "data": {
         "name": "",
         "race": "",
@@ -8509,9 +8711,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "404904966226": {
+    "0:404904966226": {
       "data": {
         "name": "",
         "race": "",
@@ -8548,9 +8751,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "1AE900666D37": {
+    "0:1AE900666D37": {
       "data": {
         "name": "",
         "race": "",
@@ -8587,9 +8791,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "4041FA10E933": {
+    "0:4041FA10E933": {
       "data": {
         "name": "",
         "race": "",
@@ -8626,9 +8831,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "20E8FCAF2AE6": {
+    "0:20E8FCAF2AE6": {
       "data": {
         "name": "",
         "race": "",
@@ -8665,9 +8871,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "604D04631333": {
+    "0:604D04631333": {
       "data": {
         "name": "",
         "race": "",
@@ -8704,9 +8911,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "30B704630333": {
+    "0:30B704630333": {
       "data": {
         "name": "",
         "race": "",
@@ -8743,9 +8951,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "3009FA9B62E0": {
+    "0:3009FA9B62E0": {
       "data": {
         "name": "",
         "race": "",
@@ -8782,9 +8991,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "3085FA9B82DD": {
+    "0:3085FA9B82DD": {
       "data": {
         "name": "",
         "race": "",
@@ -8821,9 +9031,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "2A0CFD666D37": {
+    "0:2A0CFD666D37": {
       "data": {
         "name": "",
         "race": "",
@@ -8860,9 +9071,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "1053FEF29602": {
+    "0:1053FEF29602": {
       "data": {
         "name": "",
         "race": "",
@@ -8899,9 +9111,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "5AE70375A287": {
+    "0:5AE70375A287": {
       "data": {
         "name": "",
         "race": "",
@@ -8938,9 +9151,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "1A1103759287": {
+    "0:1A1103759287": {
       "data": {
         "name": "",
         "race": "",
@@ -8977,9 +9191,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "50D405FFCFFB": {
+    "0:50D405FFCFFB": {
       "data": {
         "name": "",
         "race": "",
@@ -9016,9 +9231,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "5047FCA78448": {
+    "0:5047FCA78448": {
       "data": {
         "name": "",
         "race": "",
@@ -9055,9 +9271,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "2FED02FFAFFB": {
+    "0:2FED02FFAFFB": {
       "data": {
         "name": "",
         "race": "",
@@ -9094,9 +9311,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "3CF203D035C0": {
+    "0:3CF203D035C0": {
       "data": {
         "name": "",
         "race": "",
@@ -9133,9 +9351,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "10BB005DD365": {
+    "0:10BB005DD365": {
       "data": {
         "name": "",
         "race": "",
@@ -9172,9 +9391,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "4068050166C2": {
+    "0:4068050166C2": {
       "data": {
         "name": "",
         "race": "",
@@ -9211,9 +9431,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "192605C0AA59": {
+    "0:192605C0AA59": {
       "data": {
         "name": "",
         "race": "",
@@ -9250,9 +9471,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "1011046D8FDA": {
+    "0:1011046D8FDA": {
       "data": {
         "name": "",
         "race": "",
@@ -9289,9 +9511,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "0011046D8FDA": {
+    "0:0011046D8FDA": {
       "data": {
         "name": "",
         "race": "",
@@ -9328,9 +9551,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "19EBFD9BE320": {
+    "0:19EBFD9BE320": {
       "data": {
         "name": "",
         "race": "",
@@ -9367,9 +9591,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "3901FF9BE31E": {
+    "0:3901FF9BE31E": {
       "data": {
         "name": "",
         "race": "",
@@ -9406,9 +9631,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "101F05963226": {
+    "0:101F05963226": {
       "data": {
         "name": "",
         "race": "",
@@ -9445,9 +9671,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "3624FD54FC2C": {
+    "0:3624FD54FC2C": {
       "data": {
         "name": "",
         "race": "",
@@ -9484,9 +9711,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "501CFF968224": {
+    "0:501CFF968224": {
       "data": {
         "name": "",
         "race": "",
@@ -9523,9 +9751,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "1179867FE7FF": {
+    "0:1179867FE7FF": {
       "data": {
         "name": "",
         "race": "",
@@ -9562,9 +9791,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "200203962227": {
+    "0:200203962227": {
       "data": {
         "name": "",
         "race": "",
@@ -9601,9 +9831,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "586A69647685": {
+    "0:586A69647685": {
       "data": {
         "name": "",
         "race": "",
@@ -9640,9 +9871,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "14E505A94429": {
+    "0:14E505A94429": {
       "data": {
         "name": "",
         "race": "",
@@ -9679,9 +9911,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "200A21048CDE": {
+    "0:200A21048CDE": {
       "data": {
         "name": "",
         "race": "",
@@ -9718,9 +9951,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "50A904964226": {
+    "0:50A904964226": {
       "data": {
         "name": "",
         "race": "",
@@ -9757,9 +9991,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "1926FBBC5A84": {
+    "0:1926FBBC5A84": {
       "data": {
         "name": "",
         "race": "",
@@ -9796,9 +10031,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "0926FBBC5A84": {
+    "0:0926FBBC5A84": {
       "data": {
         "name": "",
         "race": "",
@@ -9835,9 +10071,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "2058E1434753": {
+    "0:2058E1434753": {
       "data": {
         "name": "",
         "race": "",
@@ -9874,9 +10111,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "0058E1434753": {
+    "0:0058E1434753": {
       "data": {
         "name": "Sranch Op10079",
         "race": "",
@@ -9917,9 +10155,10 @@
           "at": "2026-08-21T17:53:16.000Z",
           "text": "real planet/system name(s) merged in from elegra1965's save-file import"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "1963FBBC4A84": {
+    "0:1963FBBC4A84": {
       "data": {
         "name": "",
         "race": "",
@@ -9956,9 +10195,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "0963FBBC4A84": {
+    "0:0963FBBC4A84": {
       "data": {
         "name": "",
         "race": "",
@@ -9995,9 +10235,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "319EEB36CA91": {
+    "0:319EEB36CA91": {
       "data": {
         "name": "",
         "race": "",
@@ -10034,9 +10275,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "6633FF54FC2C": {
+    "0:6633FF54FC2C": {
       "data": {
         "name": "",
         "race": "",
@@ -10073,9 +10315,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "202105BD3573": {
+    "0:202105BD3573": {
       "data": {
         "name": "",
         "race": "",
@@ -10112,9 +10355,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "4D4981E476A9": {
+    "0:4D4981E476A9": {
       "data": {
         "name": "",
         "race": "",
@@ -10151,9 +10395,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "40DF03928F6E": {
+    "0:40DF03928F6E": {
       "data": {
         "name": "",
         "race": "",
@@ -10190,9 +10435,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "164106EE4923": {
+    "0:164106EE4923": {
       "data": {
         "name": "",
         "race": "",
@@ -10229,9 +10475,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "2B8DF8005003": {
+    "0:2B8DF8005003": {
       "data": {
         "name": "",
         "race": "",
@@ -10268,9 +10515,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "3BA5F7005FFF": {
+    "0:3BA5F7005FFF": {
       "data": {
         "name": "",
         "race": "",
@@ -10307,9 +10555,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "2866034ADAFB": {
+    "0:2866034ADAFB": {
       "data": {
         "name": "",
         "race": "",
@@ -10346,9 +10595,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "5F13FA01867C": {
+    "0:5F13FA01867C": {
       "data": {
         "name": "",
         "race": "",
@@ -10385,9 +10635,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "2FD5467BE298": {
+    "0:2FD5467BE298": {
       "data": {
         "name": "",
         "race": "",
@@ -10424,9 +10675,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "120FFE6AE227": {
+    "0:120FFE6AE227": {
       "data": {
         "name": "",
         "race": "",
@@ -10463,9 +10715,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "2E4AF9000FFC": {
+    "0:2E4AF9000FFC": {
       "data": {
         "name": "",
         "race": "",
@@ -10502,9 +10755,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "10B805005006": {
+    "0:10B805005006": {
       "data": {
         "name": "",
         "race": "",
@@ -10541,9 +10795,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "1E3600001008": {
+    "0:1E3600001008": {
       "data": {
         "name": "",
         "race": "",
@@ -10580,9 +10835,10 @@
           "at": "2026-08-18T00:00:00.000Z",
           "text": "Imported from elegra1965's real save file (base name/address)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "000203962227": {
+    "0:000203962227": {
       "flaggedFields": [],
       "disputedFields": [],
       "data": {
@@ -10734,9 +10990,10 @@
           "at": "2026-08-21T17:53:16.000Z",
           "text": "Imported from elegra1965's real save file (base name/address/discovery data)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "001EE7DD0C0D": {
+    "0:001EE7DD0C0D": {
       "flaggedFields": [],
       "disputedFields": [],
       "data": {
@@ -10888,9 +11145,10 @@
           "at": "2026-08-21T17:53:16.000Z",
           "text": "Imported from elegra1965's real save file (base name/address/discovery data)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "02F903979E7F": {
+    "0:02F903979E7F": {
       "flaggedFields": [],
       "disputedFields": [],
       "data": {
@@ -11042,9 +11300,10 @@
           "at": "2026-08-21T17:53:16.000Z",
           "text": "Imported from elegra1965's real save file (base name/address/discovery data)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "0901FF9BE31E": {
+    "0:0901FF9BE31E": {
       "flaggedFields": [],
       "disputedFields": [],
       "data": {
@@ -11196,9 +11455,10 @@
           "at": "2026-08-21T17:53:16.000Z",
           "text": "Imported from elegra1965's real save file (base name/address/discovery data)"
         }
-      ]
+      ],
+      "galaxy": 0
     },
-    "001CFF968224": {
+    "0:001CFF968224": {
       "flaggedFields": [],
       "disputedFields": [],
       "data": {
@@ -11350,7 +11610,8 @@
           "at": "2026-08-21T17:53:16.000Z",
           "text": "Imported from elegra1965's real save file (base name/address/discovery data)"
         }
-      ]
+      ],
+      "galaxy": 0
     }
   },
   "reports": [],
