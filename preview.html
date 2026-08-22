@@ -261,7 +261,17 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border:none;border-ra
 #accessPop.show{display:block}
 #searchPop{position:fixed;z-index:36;width:260px;padding:11px 13px;
   top:calc(var(--top-h,60px) + 8px);right:10px;display:none;
-  max-height:60vh;overflow-y:hidden}
+  max-height:60vh;overflow-y:hidden;overflow-x:hidden}
+/* overflow-x:hidden above is the actual fix for the phantom horizontal
+   scrollbar Tony flagged (2026-08-22): per the CSS spec, setting overflow-y
+   to anything other than "visible" while leaving overflow-x unset forces
+   the browser to compute overflow-x as "auto" instead of "visible" -- so
+   any sub-pixel horizontal rounding (the same zoom-driven drift already
+   diagnosed for the vertical axis below) was enough to trigger a real,
+   visible horizontal scrollbar even though content fit. #hyperPanel and
+   #tweak already set overflow-x:hidden explicitly for this exact reason;
+   #searchPop was the one box built without it, which is why it was the
+   only one showing the bar. */
 #searchPop.show{display:block}
 /* #searchPop.scroll: only added once real overflow is measured in JS, same
    fix as #hyperPanel/#tweak/hyperdriveModal -- overflow-y:auto by default
@@ -1709,6 +1719,26 @@ function starTypeForIdx(vx,vy,vz,idx){
    been approximating -- out .15->.05, unc .40->.20, aba .10->.35, now the
    real numbers. (unc here = the real "EmptySystemProbability" name; aba =
    AbandonedSystemProbability; out = PirateSystemProbability.) */
+/* GEN_VERSION -- prep work for handling a future game update (e.g. the
+   real, Hello-Games-confirmed "Cosmos" update teased 2026-08-10, though no
+   patch notes exist yet as of this writing) that could change what the
+   real game actually generates for an address, out from under data
+   travellers already submitted. Every Edit-system save and save-file
+   bulk-import now stamps the record with whichever GEN_VERSION was loaded
+   in the submitting traveller's browser at save time (stored server-side,
+   see system-edit.mjs). Bump this (semver-ish, no strict meaning enforced)
+   whenever a change here could make generateSystem() produce different
+   output for an address that already exists in the shared store --
+   ODDS/GIANT_CHANCE/RING_CHANCE/RING_STYLE_BY_BIOME below, generateSystem()
+   itself, or nms-core/economy.js's tables. Deliberately NOT wired to
+   anything user-facing yet -- there is no reconciliation UI, no diffing,
+   no auto-refresh. This is only the version marker itself, so that
+   whenever a real patch actually changes generation, a future session can
+   diff "records saved under the old GEN_VERSION" against a fresh regen
+   under the new one and flag mismatches through the existing dispute
+   system, instead of either guessing blind or manually re-checking ~260+
+   records by hand. See TODO.md. */
+var GEN_VERSION="1.0.0";
 var ODDS={yellow:{out:.25,unc:0,aba:0},red:{out:.50,unc:.95,aba:0},
   green:{out:.15,unc:.40,aba:.10},blue:{out:.15,unc:.40,aba:.10},purple:{out:.05,unc:.20,aba:.35}};
 /* chance a purple system is also a Giant-planet system -- placeholder,
@@ -7048,6 +7078,7 @@ document.getElementById("edSubmit").addEventListener("click",function(){
     notes:mergedNotes,
     editorName:edEditorName,
     editorFriendCode:edEditorCode,
+    genVersion:GEN_VERSION,
     bodies:editBodies.map(function(b){
       return {
         name:b.name.trim(), moon:b.moon,
@@ -7311,7 +7342,7 @@ document.getElementById("siImportBases").addEventListener("click",function(){
   siRemeasureScroll();
   var stopWait=startAtlasWait(spinTxt, iconWrap, iconImg);
   fetch(FUNC_URL,{method:"POST",headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({action:"bulk-import", payload:{entries:entries, editorName:editorName, editorFriendCode:editorCode}})
+    body:JSON.stringify({action:"bulk-import", payload:{entries:entries, editorName:editorName, editorFriendCode:editorCode, genVersion:GEN_VERSION}})
   }).then(function(r){ return r.json().then(function(j){ return {status:r.status, body:j}; }); })
   .then(function(res){
     stopWait(); progress.style.display="none"; btn.disabled=false;
