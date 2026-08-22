@@ -2,8 +2,16 @@
    NMS Galactic Map — system-edit Netlify Function
    Endpoint: /.netlify/functions/system-edit
 
-   POST body: { action: "edit"|"report"|"resolve-flag", address, payload }
+   POST body: { action: "edit"|"report"|"resolve-flag"|"bulk-import", address, galaxy, payload }
      address = the 12-char portal hex address the edit applies to
+     galaxy  = the 0-255 galaxy index the address is being documented in (added
+               2026-08-22 for real per-galaxy addressing -- see TODO.md's "Real
+               per-galaxy addressing" entry and lib/shared.mjs's compositeKey()
+               comment for the full "why": a portal address alone doesn't say
+               which of the 257 galaxies it's in, so every systems-dict record
+               is now keyed "galaxy:ADDRESS", not just ADDRESS. Required for
+               "edit"/"report"/"resolve-flag"; "bulk-import" carries its own
+               per-entry galaxy instead, see filterBulkImport() in filter.mjs.)
      "edit"   payload = {name, race, region, stars:[colourKey,...] (max 3), starClass, water, dissonant,
                          giant, ruins, outlaw, phantom, econName, sell, buy, econDesc, conflict, blackHole, atlas, notes,
                          editorName, editorFriendCode, colliding, collidingA, collidingB,
@@ -126,7 +134,7 @@ import { filterSystemEdit, filterReport, filterBulkImport } from "./filter.mjs";
 import {
   json, isValidAddress, githubGetFile, githubPutFile, pruneLog,
   editorHash, getGetCache, setGetCache, invalidateGetCache,
-  isValidFlagField
+  isValidFlagField, isValidGalaxy, compositeKey, parseCompositeKey
 } from "./lib/shared.mjs";
 
 const MAX_EDITS_PER_IP_PER_HOUR = 8;
@@ -298,10 +306,14 @@ async function handleGet(req, token){
   // edits over the procedural defaults, so it must never leak submitter IPs
   // or flag notes/reporter identity -- only enough for field-status colours
   // (flaggedFields/disputedFields are just field-name arrays, no detail).
+  // Keys stay exactly as stored ("galaxy:ADDRESS") -- preview.html's own
+  // skey()/loadOverrides() already build and look up that same composite
+  // key client-side (see lib/shared.mjs's compositeKey() comment), so no
+  // reshaping is needed here, just a straight copy of the public fields.
   var publicSystems = {};
-  for(var addr in current.data.systems){
-    var rec = current.data.systems[addr];
-    publicSystems[addr] = {
+  for(var key in current.data.systems){
+    var rec = current.data.systems[key];
+    publicSystems[key] = {
       data: rec.data, editedAt: rec.editedAt,
       flaggedFields: rec.flaggedFields||[], disputedFields: rec.disputedFields||[]
     };
@@ -317,13 +329,14 @@ async function handleGet(req, token){
     // EDIT-TRACKING-AND-DISPUTES.md spec describes as "things I haven't
     // looked at yet".
     var queue=[];
-    for(var a2 in current.data.systems){
-      var r2=current.data.systems[a2];
+    for(var k2 in current.data.systems){
+      var r2=current.data.systems[k2];
+      var parsed2 = parseCompositeKey(k2) || {galaxy:null, address:k2};
       var flags=r2.flaggedFields||[];
       for(var fi=0; fi<flags.length; fi++){
         var meta=(r2.flagMeta&&r2.flagMeta[flags[fi]])||{};
         queue.push({
-          address:a2, field:flags[fi], note:meta.note||"", flaggedAt:meta.flaggedAt||null,
+          galaxy:parsed2.galaxy, address:parsed2.address, field:flags[fi], note:meta.note||"", flaggedAt:meta.flaggedAt||null,
           issueUrl:meta.issueUrl||null,
           votes:(r2.fieldVotes&&r2.fieldVotes[flags[fi]])?r2.fieldVotes[flags[fi]].length:0
         });
@@ -331,10 +344,11 @@ async function handleGet(req, token){
     }
     out.flagQueue=queue;
     out.disputed=[];
-    for(var a3 in current.data.systems){
-      var r3=current.data.systems[a3];
+    for(var k3 in current.data.systems){
+      var r3=current.data.systems[k3];
+      var parsed3 = parseCompositeKey(k3) || {galaxy:null, address:k3};
       var disp=r3.disputedFields||[];
-      for(var di=0; di<disp.length; di++) out.disputed.push({address:a3, field:disp[di]});
+      for(var di=0; di<disp.length; di++) out.disputed.push({galaxy:parsed3.galaxy, address:parsed3.address, field:disp[di]});
     }
     return json(200, out); // admin view: always live, never cached/served-from-cache
   }
@@ -420,13 +434,15 @@ async function handleBulkImport(req, token, body, ip, now){
   var added=0, merged=0, planetsSet=0, systemNamesSet=0;
   for(var i=0;i<filtered.cleaned.entries.length;i++){
     var entry = filtered.cleaned.entries[i];
-    var sysRec = current.data.systems[entry.address];
+    var entryKey = compositeKey(entry.galaxy, entry.address);
+    var sysRec = current.data.systems[entryKey];
     var noteLine = entry.names.length ? (entry.names.length>1
       ? "Real bases from a traveller's save: "+entry.names.join("; ")
       : "Real base from a traveller's save: "+entry.names[0]) : "";
 
     if(!sysRec){
-      current.data.systems[entry.address] = {
+      current.data.systems[entryKey] = {
+        galaxy: entry.galaxy,
         flaggedFields: [], disputedFields: [],
         data: {
           // name: blank unless this entry carries a real SolarSystem-type
@@ -493,9 +509,10 @@ async function handleResolveFlag(req, token, body){
   if(!adminToken || suppliedAdminToken !== adminToken){
     return json(403, {ok:false, error:"Admin token required (add ?token=... to the URL)"});
   }
-  var address=body.address, field=body.payload && body.payload.field;
+  var address=body.address, galaxy=body.galaxy, field=body.payload && body.payload.field;
   var resolution=body.payload && body.payload.resolution;
   if(!isValidAddress(address)) return json(400, {ok:false, error:"address must be a 12-character hex portal address"});
+  if(!isValidGalaxy(galaxy)) return json(400, {ok:false, error:"galaxy must be an integer 0-255"});
   if(!isValidFlagField(field)) return json(400, {ok:false, error:"Unknown field: "+field});
   if(["dispute","dismiss","set-value"].indexOf(resolution)<0) return json(400, {ok:false, error:"resolution must be dispute, dismiss, or set-value"});
 
@@ -503,7 +520,9 @@ async function handleResolveFlag(req, token, body){
   try { current = await githubGetFile(token); }
   catch(e){ return json(502, {ok:false, error:"Could not read shared data store: "+e.message}); }
 
-  var sysRec = current.data.systems[address];
+  var resolveKey = compositeKey(galaxy, address);
+  var sysRec = current.data.systems[resolveKey];
+  if(!sysRec && galaxy===0) sysRec = current.data.systems[address]; // pre-migration legacy fallback, see comment above
   if(!sysRec) return json(404, {ok:false, error:"No record for this system"});
   var now=Date.now();
 
@@ -529,7 +548,7 @@ async function handleResolveFlag(req, token, body){
     pushHistory(sysRec, field+" corrected directly by elegra1965", now);
   }
 
-  try { await githubPutFile(token, current.data, current.sha, "Resolve flag "+field+" on "+address); }
+  try { await githubPutFile(token, current.data, current.sha, "Resolve flag "+field+" on "+resolveKey); }
   catch(e){ return json(502, {ok:false, error:"Could not save to shared data store: "+e.message}); }
 
   invalidateGetCache();
@@ -560,8 +579,10 @@ export default async (req, context) => {
   if(action === "bulk-import") return handleBulkImport(req, token, body, ip, now);
 
   var address = body.address;
+  var galaxy = body.galaxy;
   if(action !== "edit" && action !== "report") return json(400, {ok:false, error:"action must be 'edit', 'report', 'bulk-import', or 'resolve-flag'"});
   if(!isValidAddress(address)) return json(400, {ok:false, error:"address must be a 12-character hex portal address"});
+  if(!isValidGalaxy(galaxy)) return json(400, {ok:false, error:"galaxy must be an integer 0-255"});
 
   var filtered;
   if(action === "edit"){
@@ -590,10 +611,12 @@ export default async (req, context) => {
   current.data.ipLog[ip] = ipHits;
 
   var commitMessage;
+  var editKey = compositeKey(galaxy, address);
   if(action === "edit"){
     var edHash = await editorHash(ip);
-    var sysRec = current.data.systems[address];
-    if(!sysRec) sysRec = current.data.systems[address] = { flaggedFields:[], disputedFields:[] };
+    var sysRec = current.data.systems[editKey];
+    if(!sysRec) sysRec = current.data.systems[editKey] = { galaxy:galaxy, flaggedFields:[], disputedFields:[] };
+    if(sysRec.galaxy===undefined) sysRec.galaxy = galaxy; // backfill for a pre-existing record saved before this field existed
     if(!sysRec.flaggedFields) sysRec.flaggedFields=[];
     if(!sysRec.disputedFields) sysRec.disputedFields=[];
     if(!sysRec.data) sysRec.data={};
@@ -649,16 +672,17 @@ export default async (req, context) => {
     sysRec.editedAt = new Date(now).toISOString();
     sysRec.editedByIp = ip;
     pushHistory(sysRec, "edited by a traveller"+(resolvedAny?" (also resolved a flagged field by consensus)":""), now);
-    commitMessage = "Edit system "+address+" via site";
+    commitMessage = "Edit system "+editKey+" via site";
   } else {
     current.data.reports.push({
+      galaxy: galaxy,
       address: address,
       reason: filtered.cleaned.reason,
       reportedAt: new Date(now).toISOString(),
       reportedByIp: ip,
       resolved: false
     });
-    commitMessage = "Report system "+address+" via site";
+    commitMessage = "Report system "+editKey+" via site";
   }
 
   try {

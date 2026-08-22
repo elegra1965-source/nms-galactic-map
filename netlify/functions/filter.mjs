@@ -385,6 +385,7 @@ export function filterBulkImport(payload){
   for(var i=0;i<Math.min(entriesIn.length, MAX_BULK_IMPORT_ENTRIES);i++){
     var e = entriesIn[i] || {};
     if(!isValidAddressStr(e.address)) continue; // silently skip malformed addresses rather than failing the whole batch
+    if(!isValidGalaxyNum(e.galaxy)) continue; // added 2026-08-22 -- every entry must carry a real galaxy now, see isValidGalaxyNum() above
     var namesIn = Array.isArray(e.names) ? e.names : (e.name ? [e.name] : []);
     var cleanedNames = [];
     for(var j=0;j<Math.min(namesIn.length,10);j++){
@@ -410,6 +411,7 @@ export function filterBulkImport(payload){
     if(!cleanedNames.length && !cleanedPlanetNames.length && !cleanedSystemName) continue; // nothing usable in this entry -- skip it, don't fail the batch
     out.push({
       address: String(e.address).toUpperCase(),
+      galaxy: Number(e.galaxy),
       names: cleanedNames,
       planetNames: cleanedPlanetNames,
       systemName: cleanedSystemName,
@@ -426,6 +428,16 @@ export function filterBulkImport(payload){
 
 function isValidAddressStr(addr){
   return typeof addr === "string" && /^[0-9A-Fa-f]{12}$/.test(addr);
+}
+
+/* Local copy of lib/shared.mjs's isValidGalaxy() -- this file is
+   deliberately dependency-free (see the header comment), so small
+   validators like this get duplicated rather than imported, same as
+   SENTINEL_WORDS/RING_STYLE_BY_BIOME above. 0-255, matching GALAXIES.length
+   client-side. Added 2026-08-22 for per-galaxy addressing (TODO.md). */
+function isValidGalaxyNum(g){
+  var n = Number(g);
+  return Number.isInteger(n) && n >= 0 && n <= 255;
 }
 
 export function filterReport(payload){
