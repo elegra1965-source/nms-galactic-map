@@ -6716,10 +6716,17 @@ function runSearch(query){
   }
   /* Same measure-don't-guess fix as positionHyperPanel()/openHyperNotice()
      -- only opt into a real scrollbar once actual overflow is confirmed
-     after layout, called right after every content-changing runSearch(). */
+     after layout, called right after every content-changing runSearch().
+     Tolerance widened 1px->3px (2026-08-22, real screenshot from Tony still
+     showing a phantom scrollbar): #searchPop also has zoom:var(--ui-zoom,1)
+     applied for the accessibility font-size feature, and CSS zoom is a
+     known extra source of scrollHeight/clientHeight sub-pixel drift on top
+     of this bug class's usual rounding quirk -- a few px of "overflow" here
+     is not something a traveller could ever actually see, so it's safe
+     slack, not a masked real bug. */
   function remeasureScroll(){
     pop.classList.remove("scroll");
-    if(pop.scrollHeight>pop.clientHeight+1) pop.classList.add("scroll");
+    if(pop.scrollHeight>pop.clientHeight+3) pop.classList.add("scroll");
   }
   function openSearch(){
     pop.classList.add("show");
