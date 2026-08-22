@@ -85,7 +85,7 @@ canvas#c{display:block;position:fixed;inset:0;touch-action:none}
    bugs one at a time: instead of guessing every viewport/orientation combination,
    let him move the boxes himself. touch-action:none stops the browser's own
    scroll/zoom gestures from stealing the pointer before the drag handler sees it. */
-#fHead,.phead,.chead,#a11yHead,.edhead{cursor:grab;touch-action:none}
+#fHead,.phead,.chead,#a11yHead,.edhead,#searchHead{cursor:grab;touch-action:none}
 .box::before,.box::after{content:'';position:absolute;width:9px;height:9px;pointer-events:none}
 .box::before{top:-1px;right:-1px;border-top:1px solid var(--cyan);border-right:1px solid var(--cyan);border-radius:0 12px 0 0}
 .box::after{bottom:-1px;left:-1px;border-bottom:1px solid var(--cyan);border-left:1px solid var(--cyan);border-radius:0 0 0 12px}
@@ -1085,10 +1085,12 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   </div>
 </div>
 
-<div class="box" id="searchPop" role="dialog" aria-label="Search by system name">
-  <div class="kicker" id="searchHead" style="margin-bottom:8px">Search by name</div>
-  <input type="text" id="inSearch" placeholder="SYSTEM NAME" spellcheck="false">
-  <div id="searchResults"></div>
+<div class="box fold" id="searchPop" role="dialog" aria-label="Search by system name">
+  <div class="kicker fhead" id="searchHead" style="margin-bottom:8px">&#9662; Search by name</div>
+  <div class="fbody" id="searchBody">
+    <input type="text" id="inSearch" placeholder="SYSTEM NAME" spellcheck="false">
+    <div id="searchResults"></div>
+  </div>
 </div>
 
 <div class="box" id="accessPop" role="dialog" aria-label="Accessibility settings">
@@ -5305,6 +5307,11 @@ makeDraggable(document.getElementById("panel"),document.querySelector("#panel .p
 makeDraggable(document.getElementById("course"),document.querySelector("#course .chead"));
 makeDraggable(document.getElementById("accessPop"),document.getElementById("a11yHead"));
 makeDraggable(document.getElementById("editModal"),document.getElementById("edHead"));
+/* Search by name, made draggable/collapsible like every other floating box
+   (Tony, 2026-08-22) -- #searchPop/#searchHead already had the right markup,
+   they just were never wired into the two shared helpers other windows use. */
+document.getElementById("searchHead").addEventListener("click",function(){ toggleFold("searchPop","searchHead","Search by name"); });
+makeDraggable(document.getElementById("searchPop"),document.getElementById("searchHead"));
 /* route-itinerary-card (Warp Manifest) deliberately NOT draggable as of
    2026-08-21 -- it's now a dropdown anchored under #course, opened only via
    #bToggleManifest, not an independent floating window. See
@@ -6128,6 +6135,30 @@ function openDisclaimer(){
   document.getElementById("modalWrap").classList.add("show");
 }
 document.getElementById("bAbout").addEventListener("click",openDisclaimer);
+/* About accordion (Tony, 2026-08-22): the modal's ~14 .mfld sections were all
+   open at once, making it a long scroll. Collapse every section to just its
+   label; clicking a label opens its body and closes whichever other section
+   was open. Runs once at load -- the modal's DOM exists whether or not it's
+   currently displayed, no need to redo this each time it's opened. */
+(function(){
+  var sections=document.querySelectorAll('#disclaimerModal .mfld');
+  for(var i=0;i<sections.length;i++){
+    var lb=sections[i].querySelector('.lb');
+    var body=sections[i].querySelector(':scope > div:last-child');
+    if(!lb||!body||body===lb) continue;
+    lb.style.cursor="pointer";
+    lb.style.userSelect="none";
+    body.style.display="none";
+    (function(body){
+      lb.addEventListener("click",function(){
+        var opening=body.style.display==="none";
+        var bodies=document.querySelectorAll('#disclaimerModal .mfld > div:last-child');
+        for(var j=0;j<bodies.length;j++) bodies[j].style.display="none";
+        body.style.display=opening?"":"none";
+      });
+    })(body);
+  }
+})();
 document.getElementById("discOk").addEventListener("click",function(){
   try{ localStorage.setItem(DISCLAIMER_KEY,"1"); }catch(e){}
   closeModal();
@@ -6514,13 +6545,11 @@ function runSearch(query){
     box.innerHTML='<div class="searchEmpty">Type a name to search systems, planets/moons and bases you or the community have documented, bookmarked, waypointed or visited.</div>';
     return;
   }
-  var idx=buildSearchIndex(), starts=[], contains=[], i;
+  var idx=buildSearchIndex(), starts=[], i;
   for(i=0;i<idx.length;i++){
-    var p=idx[i].name.toLowerCase().indexOf(q);
-    if(p<0) continue;
-    (p===0?starts:contains).push(idx[i]);
+    if(idx[i].name.toLowerCase().indexOf(q)===0) starts.push(idx[i]);
   }
-  var matches=starts.concat(contains).slice(0,20);
+  var matches=starts.slice(0,20);
   if(!matches.length){
     box.innerHTML='<div class="searchEmpty">No match found -- only names you or the community have actually documented, bookmarked, waypointed or visited are searchable, not every procedural system. Your own bookmarks/waypoints/visited history are already searched across every galaxy, not just the one you\'re currently viewing.</div>';
     return;
