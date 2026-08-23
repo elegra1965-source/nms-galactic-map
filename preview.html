@@ -2559,8 +2559,25 @@ function applyOverride(s){
         minerals:(b.minerals&&b.minerals.length)?b.minerals.slice(0,6):[],
         salvage:(b.salvage&&b.salvage.length)?b.salvage.slice(0,6):[],
         fossils:(b.fossils&&b.fossils.length)?b.fossils.slice(0,6):[],
-        sentinel:(SENTINEL_ALL_WORDS.indexOf(b.sentinel)>=0)?b.sentinel:"None",
-        sentinelOverridden:true, // this whole body came from a traveller's Edit system submission (d.bodies) -- a real answer either way, not a procedural guess, same as ringOverridden above
+        // 2026-08-23, fixed same day: unlike ring's checkbox (where an
+        // unchecked box IS a real, deliberate answer -- "I looked, no
+        // ring"), the Sentinel combo just starts every edit pre-filled with
+        // whatever's already there, "None" before this feature existed --
+        // so treating a submitted "None" as a real confirmed answer here
+        // made EVERY never-touched body on EVERY previously-edited system
+        // permanently show "Not reported" instead of the new procedural
+        // guess, and (since fsBodyKey() below hashes sentinel into its
+        // edited-vs-original diff) made every single body on those systems
+        // wrongly read as "edited" too, since the live "None" no longer
+        // matched the freshly-generated procedural-guess baseline. Only a
+        // real, specific tier word counts as a traveller confirmation now;
+        // a bare "None" falls back to the original procedural body's own
+        // guess (o.sentinel) at this slot, same "reuse the procedural
+        // body's own field" pattern `o` already exists for above -- or
+        // plain "None" if this slot didn't exist procedurally at all (a
+        // traveller-added extra body, nothing to fall back to).
+        sentinel:(b.sentinel && SENTINEL_ALL_WORDS.indexOf(b.sentinel)>=1)?b.sentinel:(o?o.sentinel:"None"),
+        sentinelOverridden:!!(b.sentinel && SENTINEL_ALL_WORDS.indexOf(b.sentinel)>=1),
         autophage:!!b.autophage,
         // "Has base" (2026-08-17, Tony): personal-marker-style field, same
         // manual-only pattern as autophage/rings -- no procedural rule
