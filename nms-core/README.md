@@ -1,6 +1,6 @@
 # nms-core
 
-Game-accurate star type, planet count, black hole / Atlas placement, and system/region/planet name generation for **No Man's Sky**, exported as a vanilla ES module.
+Game-accurate star type, planet count, black hole / Atlas placement, system/region/planet name generation, and (since 2026-08-23) real economy/wealth/conflict/race/uncharted/abandoned/pirate derivation for **No Man's Sky**, exported as a vanilla ES module.
 
 Ported from [hadsh/nms_namegen](https://github.com/hadsh/nms_namegen) (itself a fork of [Stuart Coyle's](https://github.com/stu-/nms_namegen) original work, co-authored with GoodGuysFree). The probability tables, hash function, and name-generation logic here are reverse-engineered from the game — not invented. See attribution below.
 
@@ -18,8 +18,8 @@ Used by the [NMS Galactic Map](https://nms-galaxy-map.netlify.app) — a free, f
 |---|---|---|
 | `iprng.js` | ported (hadsh) | Threefish/Skein-style 64-bit hash — the game's real seed mixer |
 | `prng.js` | ported (hadsh) | 32-bit multiplicative PRNG, seeded from the hash |
-| `region.js` | ported (hadsh) | Voxel→region seed, region name, voxel attributes |
-| `system.js` | ported (hadsh) | Star type, planet/moon counts, black hole/Atlas placement, safe-start planet, system name |
+| `region.js` | ported (hadsh) | Voxel→region seed, region name, voxel attributes — including real black hole/Atlas placement, corrected 2026-08-23 (see Known limitations) |
+| `system.js` | ported (hadsh) | Star type, planet/moon counts, safe-start planet, system name, plus (since 2026-08-23) `economy_type`, `wealth`, `conflict_level`, `dominant_race`, `uncharted`, `abandoned`, `pirate` — the real reverse-engineered algorithm, not a statistical guess |
 | `planet.js` | ported (hadsh) | Per-planet name from the system seed |
 | `generator.js` | ported (hadsh) | Weighted-Markov name assembler |
 | `roman.js` | ported (hadsh) | Roman numeral formatter (moon suffixes) |
@@ -120,6 +120,27 @@ const ring = rollRing(bodyRng, "Frozen", false); // (rng, biome, isMoon)
 // Returns false | "icy" | "tan" | "ash" | "gold" | "split"
 ```
 
+**2026-08-23: the real algorithm, not a guess — and now wired together.** `system.js`'s `systemAttributes()` returns the actual reverse-engineered economy/wealth/conflict/race/uncharted/abandoned/pirate values, drawn from the same RNG stream already used for `star_type`/`planet_count` — corpus-validated to 98–99% accuracy against 1000 real systems, not an approximation:
+
+```js
+const attrs = systemAttributes(portalCodeBigInt, galaxyIndex);
+
+console.log(attrs.economy_type);    // 1-7: trading/advanced materials/scientific/mining/manufacturing/technology/power generation
+console.log(attrs.wealth);          // 1-3: low/medium/high
+console.log(attrs.conflict_level);  // 1-3: low/medium/high
+console.log(attrs.dominant_race);   // 0-3: none/Gek/Korvax/Vy'keen
+console.log(attrs.uncharted);       // true/false
+console.log(attrs.abandoned);       // true/false
+console.log(attrs.pirate);          // true/false
+```
+
+`rollSystemFlavor()` above (independent word-pool rolls, star-colour only) used to be the only way to get race/economy/conflict text out of `economy.js`, with no connection to `attrs` at all. As of this same date, `economy.js` also exports **`rollSystemFlavorFromAttrs(rng, attrs)`** — pass it the real `attrs` object above and it takes economy_type/wealth/conflict_level/dominant_race/uncharted/abandoned/pirate as given, only rolling what `systemAttributes()` still doesn't model: which specific word to show within that type/tier (`econName`/`econDesc`/`conflict`), and sell%/buy% (refit this same day against 822 real corpus records — see the function's own header in `economy.js` for the numbers). This is now the preferred path whenever a portal code is available (i.e. almost always); `rollSystemFlavor()` stays as the fallback for when it isn't. `preview.html`'s `generateSystem()` was updated to call it this way:
+
+```js
+const flavor = rollSystemFlavorFromAttrs(rng, attrs); // preferred: attrs is real
+// vs. flavor = rollSystemFlavor(rng, attrs.starType[0]); // fallback: no portal code
+```
+
 ### Biome/Sentinel-flavoured planet names (optional)
 
 `planetName()` takes an optional 4th `opts` argument: `{biome, sentinel}`. When
@@ -142,8 +163,12 @@ limitations" below and `planet.js`'s own header comment for why.
 ## Known limitations
 
 - **Planet names** are a plausible, unverified reverse-engineering guess. Star type, region names, and system names were validated against a real corpus; planet naming was not. `nms_namegen`'s own README says the same.
-- The hash function (`iprng.js`) crashes on region-local system index 0 in every region — an upstream bug in `hadsh/nms_namegen` itself, confirmed against its published source. Wrap calls in try/catch and fall back gracefully.
-- Black hole / Atlas placement uses raw unsigned portal-code bits, not signed voxel coordinates. The dead-core fix is only symmetric in the positive-coordinate octant.
+- **Economy/wealth/conflict/race/uncharted/abandoned/pirate** (`system.js`'s `systemAttributes()`, added 2026-08-23) *are* the real, reverse-engineered algorithm — validated against upstream's own 10 unit-test vectors, 443 golden regression vectors, and 1000 real ground-truth systems (star colour 99.10%, uncharted 99.80%, dominant race 99.10%, conflict level 99.03%, economy category 99.02%, wealth tier 98.90%, planet count 98.80%). Not currently wired into this project's own live site (`preview.html` still rolls economy/race/conflict through a separate, independently-seeded RNG in `economy.js`) — that's a deliberate, still-open integration task on the consuming site's side, not a limitation of this module.
+
+Two limitations that used to be listed here were fixed 2026-08-23 and no longer apply, kept below for anyone tracking an older copy of this module:
+
+- ~~The hash function (`iprng.js`) crashes on region-local system index 0 in every region.~~ **Fixed.** Python's `o[-1]` list indexing wraps to the last element; a plain JS array returns `undefined` at a negative index instead, which crashed on the exact input that produces `oCounter=-1`. `iprng.js` now wraps the index explicitly to match Python's behaviour.
+- ~~Black hole / Atlas placement uses raw unsigned portal-code bits, not signed voxel coordinates. The dead-core fix is only symmetric in the positive-coordinate octant.~~ **Fixed.** `voxelAttributes()` in `region.js` now folds x/y/z to signed offsets from the galactic centre before computing distance, matching the game's own coordinate model in every octant, not just the positive one. This was also missing an integer-truncation step on the centre-distance calculation, fixed at the same time.
 
 ---
 

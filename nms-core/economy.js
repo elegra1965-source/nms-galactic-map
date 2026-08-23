@@ -14,6 +14,22 @@
 // AbandonedSystemProbability, out = PirateSystemProbability, all keyed by
 // star colour. RING_CHANCE = PlanetRingProbability (flat, not per-colour).
 //
+// 2026-08-23 update -- nms-core/system.js's systemAttributes() now derives
+// economy_type/wealth/conflict_level/dominant_race/uncharted/abandoned/
+// pirate directly off the game's own real RNG stream (ported from
+// hadsh/nms_namegen, ~99% validated against 1000 ground-truth systems --
+// see that file's own header and TODO.md). That supersedes the ODDS-driven
+// abandoned/uncharted/outlaw/race/econType/econTier/conTier draws THIS file
+// used to do independently. rollSystemFlavorFromAttrs() below is the new,
+// preferred entry point when a caller already has that real attrs object
+// (portal-code-based generation, i.e. almost always) -- it takes those
+// fields as given and only rolls what system.js still doesn't model: which
+// specific flavour-text word within a type/tier (econName/econDesc/
+// conflict), and sell%/buy%. rollSystemFlavor() (the original, fully
+// independent ODDS-driven roll) stays exactly as it was, unchanged, as the
+// fallback for callers with no portal address / no systemAttributes() to
+// call (e.g. this project's own file:// fallback path -- see preview.html).
+//
 // Everything else here -- the race list, the economy/conflict NAME pools,
 // the tier-threshold cutoffs, and the biome->ring-style pairing -- is this
 // project's own invented flavour text/logic, written to read naturally next
@@ -23,24 +39,34 @@
 //
 // Usage: pass your own seeded RNG function `r` (must return a float in
 // [0,1) each call, e.g. Math.random, or the PRNG in nms-core/prng.js, or a
-// hand-rolled mulberry32 like this project uses elsewhere) plus the
-// system's star colour key to rollSystemFlavor(). Ring rolling is separate
-// (rollRing) since it happens once per planet, not once per system.
+// hand-rolled mulberry32 like this project uses elsewhere).
 //
-//   import { rollSystemFlavor, rollRing } from './nms-core/economy.js';
+//   import { rollSystemFlavorFromAttrs, rollSystemFlavor, rollRing } from './nms-core/economy.js';
+//
+//   // Preferred: you already have systemAttributes(portalCode, galaxy)'s
+//   // result (see nms-core/system.js) -- economy/wealth/conflict/race/
+//   // uncharted/abandoned/pirate come from that, real and exact:
+//   var flavor = rollSystemFlavorFromAttrs(myRng, attrs);
+//
+//   // Fallback: no portal address available, so no real attrs to draw
+//   // from -- everything is independently guessed, star-colour-only:
 //   var flavor = rollSystemFlavor(myRng, "purple");
-//   // flavor.abandoned, flavor.uncharted, flavor.outlaw, flavor.race,
-//   // flavor.econType, flavor.econName, flavor.econTier, flavor.econDesc,
-//   // flavor.sell, flavor.buy, flavor.conTier, flavor.conflict
+//
+//   // Either way: flavor.abandoned, flavor.uncharted, flavor.outlaw,
+//   // flavor.race, flavor.econType, flavor.econName, flavor.econTier,
+//   // flavor.econDesc, flavor.sell, flavor.buy, flavor.conTier,
+//   // flavor.conflict
 //
 //   var ringStyle = rollRing(myRng, "Frozen", false); // "icy" | false
 //
 // IMPORTANT for anyone porting this into a seeded/reproducible generator:
-// rollSystemFlavor() calls `r()` a fixed number of times per call (some
-// draws are conditionally skipped via short-circuit, exactly mirroring the
-// real game's own "abandoned rolled first, uncharted skipped if already
-// abandoned" behaviour) -- if you also draw more random values from the
-// SAME rng instance afterwards for other fields, calling this function a
+// both rollSystemFlavor() and rollSystemFlavorFromAttrs() call `r()` a
+// fixed number of times per call (some draws are conditionally skipped via
+// short-circuit, exactly mirroring the real game's own "abandoned rolled
+// first, uncharted skipped if already abandoned" behaviour, or -- for
+// rollSystemFlavorFromAttrs() -- simply not drawn at all since attrs
+// already has the answer) -- if you also draw more random values from the
+// SAME rng instance afterwards for other fields, calling either function a
 // different number of times than expected will desync every later draw.
 // Give it its own seeded rng instance per system if in doubt.
 
@@ -74,6 +100,11 @@ var GIANT_CHANCE = 0.12;
 /** Only 3 factions ever control a system in the real game (confirmed via
  * the NMS wiki's Faction page); "Uninhabited" covers abandoned/uncharted. */
 var RACES = ["Gek", "Vy'keen", "Korvax"];
+
+/** nms-core/system.js's own dominant_race numbering (1=Gek, 2=Korvax,
+ * 3=Vy'keen, 0=uncharted/no race) -- NOT the same order as RACES above, so
+ * this is an explicit lookup rather than a reusable array index. */
+var RACE_BY_DOMINANT_CODE = { 1: "Gek", 2: "Korvax", 3: "Vy'keen" };
 
 var ECON = [
   ["Trading", ["Mercantile", "Trading", "Shipping", "Commercial"]],
@@ -155,11 +186,99 @@ function rollSystemFlavor(r, starKey) {
   var tr = r();
   out.econTier = tr < 0.45 ? 0 : (tr < 0.85 ? 1 : 2);
   out.econDesc = pickOne(r, ECON_S[out.econTier]);
-  out.sell = Math.min(80, [5 + r() * 30, 30 + r() * 30, 55 + r() * 25][out.econTier]).toFixed(1);
-  out.buy = (-(5 + r() * 25)).toFixed(1);
+  rollSellBuy(r, out);
 
   var cr = r();
   out.conTier = cr < 0.45 ? 0 : (cr < 0.82 ? 1 : 2);
+  out.conflict = pickOne(r, CONFLICT[out.conTier]);
+
+  return out;
+}
+
+/**
+ * sell%/buy% -- refit 2026-08-23 against 822 real system records pulled
+ * from the live "Edit System" corpus (data/overrides.json), replacing the
+ * original tier-scaled guess. What that check actually found: real sell%
+ * does NOT track wealth tier (tier 0/1/2 means were 59.6/60.2/58.4 --
+ * statistically indistinguishable) or economy type (all 7 types clustered
+ * 58-61%) -- so the draw below is deliberately independent of out.econTier,
+ * unlike the old [5+r()*30, 30+r()*30, 55+r()*25][tier] formula. Real
+ * sell% clustered around mean 60 with sd ~12 (an Irwin-Hall-style summed
+ * draw matches that spread much better than a single flat r()*range roll,
+ * which would be too wide/uniform); real |buy%| was close to a flat
+ * uniform draw, mean ~20, sd ~5.7, range roughly 10-30.
+ *
+ * Caveat, worth knowing if this gets refit again: 819 of those 822 records
+ * trace to a single 2026-08-23 wiki bulk-import (see TODO.md), not hundreds
+ * of independent players, and its observed sell% max (79.9%) may or may not
+ * be a real hard ceiling -- Tony has personally seen values over 100%
+ * in-game and wasn't sure whether that's this same system-wide stat or a
+ * different per-item trade-terminal modifier. On that uncertainty, the old
+ * hard `Math.min(80, ...)` clamp is deliberately REMOVED rather than
+ * re-asserted on thin evidence -- the draw's own spread still keeps values
+ * much above 80 rare, it just no longer forbids them outright.
+ *
+ * Consumes exactly 4 r() calls (3 for sell, 1 for buy) either way -- same
+ * total as the formula this replaces, so draw-count parity with any
+ * existing caller is unaffected.
+ *
+ * @param {() => number} r
+ * @param {object} out - mutated in place: out.sell, out.buy (both strings)
+ */
+function rollSellBuy(r, out) {
+  var s3 = r() + r() + r(); // Irwin-Hall(3): mean 1.5, sd 0.5, range [0,3]
+  out.sell = Math.max(0, 60 + (s3 - 1.5) * 24).toFixed(1);
+  out.buy = (-(10 + r() * 20)).toFixed(1);
+}
+
+/**
+ * Preferred entry point when the caller already has nms-core/system.js's
+ * systemAttributes(portalCode, galaxy) result for this system -- i.e.
+ * almost always, since generateSystem() already computes that for
+ * star_type/gas_giant/planet counts. Takes abandoned/uncharted/pirate/
+ * dominant_race/economy_type/wealth/conflict_level as GIVEN (real, ~99%
+ * validated -- see system.js's own header), and only rolls what
+ * systemAttributes() still doesn't model: which specific word to show
+ * within that type/tier (econName/econDesc/conflict), and sell%/buy% (see
+ * rollSellBuy() above).
+ *
+ * Unlike rollSystemFlavor(), this does NOT draw abandoned/uncharted/outlaw/
+ * race/econTier/conTier from `r` at all -- those come straight from attrs,
+ * so no ODDS/star-colour lookup is needed here. Draw count on `r` varies
+ * (2 draws for econName+econDesc, 4 for sell/buy, 1 for conflict = 7 total,
+ * always -- no short-circuiting, since attrs already resolved every
+ * conditional) -- fixed and predictable either way, same "give it its own
+ * rng instance if in doubt" guidance as rollSystemFlavor() applies.
+ *
+ * @param {() => number} r - seeded RNG returning a float in [0,1) each call
+ * @param {{abandoned:boolean, uncharted:boolean, pirate:boolean,
+ *   dominant_race:number, economy_type:number, wealth:number,
+ *   conflict_level:number}} attrs - nms-core/system.js's
+ *   systemAttributes() result for this exact system
+ * @returns {{abandoned:boolean, uncharted:boolean, outlaw:boolean,
+ *   race:string, econType:string, econName:string, econTier:number,
+ *   econDesc:string, sell:string, buy:string, conTier:number,
+ *   conflict:string}}
+ */
+function rollSystemFlavorFromAttrs(r, attrs) {
+  var out = {};
+
+  out.abandoned = !!attrs.abandoned;
+  out.uncharted = !!attrs.uncharted;
+  out.outlaw = !!attrs.pirate;
+  out.race = (out.uncharted || out.abandoned)
+    ? "Uninhabited"
+    : (RACE_BY_DOMINANT_CODE[attrs.dominant_race] || "Uninhabited");
+
+  var e = ECON[(attrs.economy_type || 1) - 1] || ECON[0];
+  out.econType = e[0];
+  out.econName = pickOne(r, e[1]);
+
+  out.econTier = Math.max(0, Math.min(2, (attrs.wealth || 1) - 1));
+  out.econDesc = pickOne(r, ECON_S[out.econTier]);
+  rollSellBuy(r, out);
+
+  out.conTier = Math.max(0, Math.min(2, (attrs.conflict_level || 1) - 1));
   out.conflict = pickOne(r, CONFLICT[out.conTier]);
 
   return out;
@@ -187,7 +306,7 @@ function rollRing(br, biome, isMoon) {
 }
 
 export {
-  ODDS, RING_CHANCE, GIANT_CHANCE, RACES, ECON, ECON_S, CONFLICT,
+  ODDS, RING_CHANCE, GIANT_CHANCE, RACES, RACE_BY_DOMINANT_CODE, ECON, ECON_S, CONFLICT,
   STELLAR_EL, UNIVERSAL_EL, RING_STYLE_BY_BIOME,
-  rollSystemFlavor, rollRing,
+  rollSystemFlavor, rollSystemFlavorFromAttrs, rollRing,
 };
