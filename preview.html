@@ -1128,7 +1128,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 </div>
 
 <div id="keys" class="box">
-  <div class="kicker kheadrow"><span>Portal glyph keypad</span>
+  <div class="kicker kheadrow"><span id="keysHead">Portal glyph keypad</span>
     <span class="kgalpick"><label for="kGalaxyInput">Galaxy</label>
       <input type="text" id="kGalaxyInput" list="dlGalaxyPick" placeholder="Search galaxy..." autocomplete="off" spellcheck="false">
     </span>
@@ -5665,6 +5665,18 @@ makeDraggable(document.getElementById("editModal"),document.getElementById("edHe
    they just were never wired into the two shared helpers other windows use. */
 document.getElementById("searchHead").addEventListener("click",function(){ toggleFold("searchPop","searchHead","Search by name"); });
 makeDraggable(document.getElementById("searchPop"),document.getElementById("searchHead"));
+/* Glyph keypad (2026-08-23, Tony: "why isn't the glyph window draggable like
+   the rest") -- same story as searchPop above: #keys/#keysHead already had
+   the right .box markup, it just never got wired into makeDraggable() when
+   the other floating windows did. Handle is the "Portal glyph keypad" title
+   span specifically, NOT the whole .kheadrow header bar -- that bar also
+   holds the galaxy search input (#kGalaxyInput), and makeDraggable's own
+   pointerdown handler only excludes clicks on a button element (see its own
+   comment), so wiring the full row would've hijacked clicking into that
+   input to focus/type. Attaching the handler to just the title span sidesteps
+   that -- the input is a sibling, not a descendant, so it never sees these
+   listeners at all. */
+makeDraggable(document.getElementById("keys"),document.getElementById("keysHead"));
 /* route-itinerary-card (Warp Manifest) deliberately NOT draggable as of
    2026-08-21 -- it's now a dropdown anchored under #course, opened only via
    #bToggleManifest, not an independent floating window. See
