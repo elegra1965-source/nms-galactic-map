@@ -1433,7 +1433,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     </div>
     <div class="mfld">
       <div class="lb">Procedural data</div>
-      <div style="font-size:12px;color:var(--text-dim);line-height:1.55">Star systems are generated procedurally from their portal address, the same way the game does -- they are not scraped from anyone's real save. Star type, system/region names, total planet+moon count, and (as of 2026-08-23) <b>race, economy type/tier, and conflict level</b> are all reverse-engineered from the game's own logic and right most of the time, but they're a corpus-verified <b>approximation</b>, not a perfect decompile -- occasional mismatches (e.g. a system that generates as 5 bodies but is really 3 in your save, or a race that doesn't match) are a known, expected gap (roughly 1 in 100, per the 1000-system real corpus this was validated against), not a bug to report. The exact sell%/buy% numbers shown are the one part of that economy panel still this project's own invented figure, not derived from the address -- the real game only exposes economy <i>strength</i> (low/medium/high), not an exact percentage, to reverse-engineer against. <b>Individual planet names are not</b> accurate at all -- the real game's planet-naming logic has never been fully reverse-engineered (confirmed against the game's own decompiled data and a real save file), so what you see is a plausible guess, not your actual save data. As of 2026-08-18 that guess leans on the planet's own biome (and Sentinel activity, once known) to pick a more fitting-sounding name -- still a guess, just a less randomly-mismatched one. <b>Which planets have rings is still a guess too</b> -- No Man's Sky's real ring-placement logic has never been reverse-engineered, so unlike race/economy/conflict above, it's this project's own invented flavour, built to read naturally next to the real in-game panel. The underlying ring odds are real decompiled game data though (the flat 30% chance, pulled from GCSOLARGENERATIONGLOBALS.GLOBAL.MBIN) -- so the overall statistical feel matches the game, but any single planet's actual ring can't match your save any more than its name can. On the rare system where a portal address isn't available to compute the real values from, race/economy/conflict fall back to an invented guess too, same as rings -- a dashed "Procedural" tag next to the field is how you can tell. Importing your save file only ever pulls in real <b>base names</b> (a save doesn't expose anything else about a system) -- everything else, including fixing a wrong planet count, still needs typing in by hand via <b>Edit system</b>. A system only reflects real in-game data once a traveller has entered it that way, marked "Community edited".</div>
+      <div style="font-size:12px;color:var(--text-dim);line-height:1.55">Star systems are generated procedurally from their portal address, the same way the game does -- they are not scraped from anyone's real save. Star type, system/region names, total planet+moon count, and (as of 2026-08-23) <b>race, economy type/tier, and conflict level</b> are all reverse-engineered from the game's own logic and right most of the time, but they're a corpus-verified <b>approximation</b>, not a perfect decompile -- occasional mismatches (e.g. a system that generates as 5 bodies but is really 3 in your save, or a race that doesn't match) are a known, expected gap (roughly 1 in 100, per the 1000-system real corpus this was validated against), not a bug to report. The exact sell%/buy% numbers shown are the one part of that economy panel still this project's own invented figure, not derived from the address -- the real game only exposes economy <i>strength</i> (low/medium/high), not an exact percentage, to reverse-engineer against. <b>Individual planet names are not</b> accurate at all -- the real game's planet-naming logic has never been fully reverse-engineered (confirmed against the game's own decompiled data and a real save file), so what you see is a plausible guess, not your actual save data. As of 2026-08-18 that guess leans on the planet's own biome (and Sentinel activity, once known) to pick a more fitting-sounding name -- still a guess, just a less randomly-mismatched one. <b>Which planets have rings is still a guess too</b> -- No Man's Sky's real ring-placement logic has never been reverse-engineered, so unlike race/economy/conflict above, it's this project's own invented flavour, built to read naturally next to the real in-game panel. The underlying ring odds are real decompiled game data though (the flat 30% chance, pulled from GCSOLARGENERATIONGLOBALS.GLOBAL.MBIN) -- so the overall statistical feel matches the game, but any single planet's actual ring can't match your save any more than its name can. <b>Sentinel activity per planet is the same kind of invented guess</b> (added 2026-08-23) -- No Man's Sky has never exposed this per system in a way that's been reverse-engineered either, so it's this project's own weighting, leaning toward calmer readings in low-conflict systems and more aggressive ones in high-conflict systems, tagged "(procedural)" next to the value the same way rings are, until a traveller confirms the real in-game reading via Edit system. On the rare system where a portal address isn't available to compute the real values from, race/economy/conflict fall back to an invented guess too, same as rings -- a dashed "Procedural" tag next to the field is how you can tell. Importing your save file only ever pulls in real <b>base names</b> (a save doesn't expose anything else about a system) -- everything else, including fixing a wrong planet count, still needs typing in by hand via <b>Edit system</b>. A system only reflects real in-game data once a traveller has entered it that way, marked "Community edited".</div>
     </div>
     <div class="mfld">
       <div class="lb">Star class letters (e.g. "G7p")</div>
@@ -1904,6 +1904,40 @@ var SENTINEL_ALL_WORDS=["None"].concat(SENTINEL_WORDS[0],SENTINEL_WORDS[1],SENTI
 function sentinelColor(word){
   var t=tierFromWord(word,SENTINEL_WORDS);
   return t===null?"#5a6a76":SENTINEL_TIER_COL[t];
+}
+/* 2026-08-23 (Tony): Sentinel activity has never actually been procedural in
+   this codebase -- SENTINEL_WORDS above only ever backed the Edit System
+   suggestion list, and every planet just showed "Not reported" until a
+   traveller typed something in. Tony remembered it feeling generated and
+   asked for an invented per-body guess weighted by the system's conflict
+   level, tagged "(procedural)" the same way rings are -- NOT the muted
+   .guessVal/tag.guess treatment race/economy/conflict used to get before
+   today's real wiring, since this genuinely has no real algorithm to draw
+   on (systemAttributes() has no sentinel field at all; see nms-core/
+   system.js's own header). This table is entirely this project's own
+   invented pairing, same honesty standard as RING_STYLE_BY_BIOME/CONFLICT/
+   ECON_S -- not extracted or reverse-engineered from anything. Each row is
+   conTier (system conflict, 0-2, from economy.js's rollSystemFlavor*) ->
+   the chance of landing in each of the 4 SENTINEL_TIER_LB tiers; low
+   conflict skews toward Low/High sentinel presence, high conflict skews
+   toward Aggressive, with Corrupted kept rare everywhere (it's flavour text
+   for "gone rogue", not just "very hostile"). */
+var SENTINEL_TIER_WEIGHTS_BY_CONTIER=[
+  [0.55,0.35,0.08,0.02], // conTier 0 (low conflict)
+  [0.20,0.45,0.28,0.07], // conTier 1 (medium conflict)
+  [0.05,0.20,0.50,0.25]  // conTier 2 (high conflict)
+];
+/* Consumes exactly 2 br() draws (tier pick, then word-within-tier) -- always
+   called last for a body, after every other br() draw for that body (ring/
+   resUni/size/tilt/spin), so it can never desync anything that came before
+   it. Each body gets its own fresh mulberry32 instance (see the `var br=...`
+   line in generateSystem()'s body loop), so this also can't affect any
+   other body's draws either way. */
+function rollSentinelGuess(br,conTier){
+  var w=SENTINEL_TIER_WEIGHTS_BY_CONTIER[Math.max(0,Math.min(2,conTier|0))];
+  var x=br(),acc=0,tier=w.length-1;
+  for(var i=0;i<w.length;i++){ acc+=w[i]; if(x<acc){ tier=i; break; } }
+  return pickOne(br,SENTINEL_WORDS[tier]);
 }
 /* Placeholder icon marks for the newer additions -- original line-art in the
    same style as IC_CONFLICT/IC_UNINHAB above, NOT lifted from the game.
@@ -2377,6 +2411,8 @@ function generateSystem(vx,vy,vz,idx,noOverride){
       size:isMoon?(0.34+br()*0.22):(0.68+br()*0.62),
       tilt:(br()-0.5)*0.7, spin:0.15+br()*0.5,
       resUni:resUni,
+      sentinel:rollSentinelGuess(br,s.conTier),
+      sentinelOverridden:false, // invented per-body guess (rollSentinelGuess()), never a traveller submission -- see the "guess" tag on the panel body list
       seed:gseed(vx,vy,vz,(idx*57)+pi)
     });
     if(isMoon) s.moons++; else s.planets++;
@@ -2524,6 +2560,7 @@ function applyOverride(s){
         salvage:(b.salvage&&b.salvage.length)?b.salvage.slice(0,6):[],
         fossils:(b.fossils&&b.fossils.length)?b.fossils.slice(0,6):[],
         sentinel:(SENTINEL_ALL_WORDS.indexOf(b.sentinel)>=0)?b.sentinel:"None",
+        sentinelOverridden:true, // this whole body came from a traveller's Edit system submission (d.bodies) -- a real answer either way, not a procedural guess, same as ringOverridden above
         autophage:!!b.autophage,
         // "Has base" (2026-08-17, Tony): personal-marker-style field, same
         // manual-only pattern as autophage/rings -- no procedural rule
@@ -4438,7 +4475,13 @@ function showBody(b,s){
   for(i=0;i<t.length;i++) html+='<span class="tag '+t[i][0]+'">'+t[i][1]+'</span>';
   document.getElementById("bTags").innerHTML=html;
   document.getElementById("icSent").innerHTML=svg(IC_SENTINEL,sentinelColor(b.sentinel));
-  document.getElementById("bSent").textContent=(b.sentinel&&b.sentinel!=="None")?(b.sentinel+" Sentinel Activity"):"Not reported";
+  // Same invented-flavour distinction as rings (see the .bb/tags comment
+  // above) -- an unconfirmed sentinel guess reads as "<word> Sentinel
+  // Activity (procedural)" rather than a confident, unqualified value.
+  // "None" only ever gets here via a real traveller submission (the
+  // procedural roll always picks a real tier word, never "None" -- see
+  // rollSentinelGuess()), so it stays plain "Not reported" either way.
+  document.getElementById("bSent").textContent=(b.sentinel&&b.sentinel!=="None")?(b.sentinel+" Sentinel Activity"+(b.sentinelOverridden?"":" (procedural)")):"Not reported";
   document.getElementById("icRes").innerHTML=svg(IC_RES,BIOMES[b.biome].base);
   var bd=BIOMES[b.biome], rlist=[];
   if(bd.res) for(i=0;i<bd.res.length;i++) rlist.push(bd.res[i]);
