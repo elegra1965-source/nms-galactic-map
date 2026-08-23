@@ -1750,7 +1750,12 @@ function starTypeForIdx(vx,vy,vz,idx){
    under the new one and flag mismatches through the existing dispute
    system, instead of either guessing blind or manually re-checking ~260+
    records by hand. See TODO.md. */
-var GEN_VERSION="1.0.0";
+var GEN_VERSION="1.1.0"; // bumped 2026-08-23: economy/wealth/conflict/race
+  // now wired to nms-core/system.js's real systemAttributes() when
+  // available (was an independent roll before), and the sell%/buy% formula
+  // was refit against the real corpus -- see nms-core/economy.js's header
+  // and TODO.md. Both change generateSystem()'s output for existing
+  // addresses.
 var ODDS={yellow:{out:.25,unc:0,aba:0},red:{out:.50,unc:.95,aba:0},
   green:{out:.15,unc:.40,aba:.10},blue:{out:.15,unc:.40,aba:.10},purple:{out:.05,unc:.20,aba:.35}};
 /* chance a purple system is also a Giant-planet system -- placeholder,
@@ -2171,25 +2176,37 @@ function generateSystem(vx,vy,vz,idx,noOverride){
     s.region=regionName(vx,vy,vz);
   }
 
-  /* Economy/conflict/race/outlaw/abandoned/uncharted: rolled via the
-     standalone nms-core/economy.js module when it loaded successfully (see
-     that file's own header for the real decompiled-GLOBALS sourcing of
-     ODDS/RING_CHANCE), falling back to this identical inline copy of the
-     exact same logic otherwise (file:// / module load failure -- same
-     fallback pattern as window.NMSCore elsewhere in this function). The two
-     paths are verified byte-identical, including RNG-call parity so
-     everything drawn from `r` afterwards (e.g. the fallback body-count
-     total below) stays in sync either way -- see a 200,000-trial parity
-     test run against this exact code before it shipped. Order (abandoned
-     first & unconditional, uncharted only if not abandoned, outlaw only if
-     not uncharted) verified 2026-08-12 against nms-core's own
-     corpus-verified real draw sequence (system.js's ABANDONED_SYSTEM_PCT
-     comment: "when a system is abandoned, the empty-system check draw is
-     SKIPPED") -- this project previously rolled uncharted first instead,
-     which skewed purple's real 35% abandoned rate down to ~28% before the
-     fix. */
+  /* Economy/conflict/race/outlaw/abandoned/uncharted.
+     2026-08-23: now wired to the REAL algorithm when it's available --
+     `attrs` (computed above, same object already driving star_type/
+     gas_giant/planet counts) carries systemAttributes()'s own
+     economy_type/wealth/conflict_level/dominant_race/uncharted/abandoned/
+     pirate, ~99% validated against 1000 ground-truth systems (see
+     nms-core/system.js's header, TODO.md). window.NMSEconomy.
+     rollSystemFlavorFromAttrs() takes those as given and only rolls the
+     flavour-text word within each type/tier plus sell%/buy% (the one piece
+     systemAttributes() doesn't model -- see economy.js's own rollSellBuy()
+     header for the 2026-08-23 corpus refit that replaced the old
+     tier-scaled sell/buy guess).
+     Falls back to the ORIGINAL fully-independent roll -- via
+     window.NMSEconomy.rollSystemFlavor() when the module loaded but attrs
+     didn't (no portal address, e.g. this function called with no valid
+     vx/vy/vz), or this identical inline copy when even the module failed
+     to load (file://) -- unchanged from before this wiring, still the same
+     path verified byte-identical against economy.js via a 200,000-trial
+     parity test, RNG-call parity included so everything drawn from `r`
+     afterwards (e.g. the fallback body-count total below) stays in sync.
+     Order (abandoned first & unconditional, uncharted only if not
+     abandoned, outlaw only if not uncharted) verified 2026-08-12 against
+     nms-core's own corpus-verified real draw sequence (system.js's
+     ABANDONED_SYSTEM_PCT comment: "when a system is abandoned, the
+     empty-system check draw is SKIPPED") -- this project previously rolled
+     uncharted first instead, which skewed purple's real 35% abandoned rate
+     down to ~28% before the fix. */
   var flavor;
-  if(window.NMSEconomy){
+  if(attrs && window.NMSEconomy && window.NMSEconomy.rollSystemFlavorFromAttrs){
+    flavor=window.NMSEconomy.rollSystemFlavorFromAttrs(r,attrs);
+  } else if(window.NMSEconomy){
     flavor=window.NMSEconomy.rollSystemFlavor(r,st.k);
   } else {
     var o=ODDS[st.k];
@@ -2202,8 +2219,11 @@ function generateSystem(vx,vy,vz,idx,noOverride){
     flavor.econType=e[0]; flavor.econName=pickOne(r,e[1]);
     var tr=r(); flavor.econTier=tr<0.45?0:(tr<0.85?1:2);
     flavor.econDesc=pickOne(r,ECON_S[flavor.econTier]);
-    flavor.sell=Math.min(80,[5+r()*30,30+r()*30,55+r()*25][flavor.econTier]).toFixed(1);
-    flavor.buy=(-(5+r()*25)).toFixed(1);
+    // sell%/buy% -- 2026-08-23 refit, see economy.js's rollSellBuy() header
+    // for the full corpus writeup; kept byte-identical to that function.
+    var s3=r()+r()+r();
+    flavor.sell=Math.max(0,60+(s3-1.5)*24).toFixed(1);
+    flavor.buy=(-(10+r()*20)).toFixed(1);
     var cr=r(); flavor.conTier=cr<0.45?0:(cr<0.82?1:2);
     flavor.conflict=pickOne(r,CONFLICT[flavor.conTier]);
   }
