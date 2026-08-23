@@ -276,8 +276,8 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border:none;border-ra
    window width and after any toolbar re-wrap. Real badge art is taller
    than wide (1336x1536 source crop), so the box keeps that ratio rather
    than forcing a square and distorting it. */
-#annivBadge{position:fixed;z-index:31;top:calc(var(--top-h,60px) + 8px);
-  width:26px;height:30px;pointer-events:none}
+#annivBadge{position:fixed;z-index:31;width:26px;height:30px;pointer-events:none;
+  transition:left .15s,top .15s}
 #annivBadge img{width:100%;height:100%;display:block;
   filter:drop-shadow(0 0 5px rgba(240,90,40,.4))}
 #top,#leftcol,#tel,#panel,#course,#modalWrap .modal,#galHud,#accessPop,#searchPop,#keys{
@@ -5227,6 +5227,8 @@ function updateGalInfoBadge(){
   var hud=document.getElementById("galHud");
   if(mode==="galaxy"){ el.innerHTML=galInfoHTML(); el.style.display="block"; hud.classList.add("withBadge"); }
   else{ el.style.display="none"; hud.classList.remove("withBadge"); }
+  positionAnnivBadge();
+  setTimeout(positionAnnivBadge,160); /* settle after #galHud's own top transition */
 }
 /* Shared galaxy-switch logic, pulled out of #galSel's own change handler
    (2026-08-21) so anything that needs to jump a traveller into a DIFFERENT
@@ -7856,16 +7858,13 @@ function syncTopOffset(){
    have changed -- never from anything mode-related, so it never moves or
    hides when switching Galaxy/Local/System. */
 function positionAnnivBadge(){
-  var btn=document.getElementById("bAccess"), el=document.getElementById("annivBadge");
-  if(!btn||!el) return;
-  var r=btn.getBoundingClientRect();
+  var hud=document.getElementById("galHud"), el=document.getElementById("annivBadge");
+  if(!hud||!el) return;
+  var r=hud.getBoundingClientRect();
   if(r.width===0 && r.height===0) return; /* not laid out yet */
-  var w=el.offsetWidth||26;
-  el.style.left=Math.round(r.left+(r.width-w)/2)+"px";
-  /* top intentionally left to the #annivBadge CSS rule's
-     calc(var(--top-h,60px) + 8px) -- same anchor #galInfo already uses,
-     so this lands in the same row as the "...NORMAL" badge and stays
-     correct across every wrapped-toolbar height, not just under #bAccess. */
+  var h=el.offsetHeight||30, gap=10;
+  el.style.left=Math.round(r.right+gap)+"px";
+  el.style.top=Math.round(r.top+(r.height-h)/2)+"px";
 }
 /* The camera frames the FULL window width, but the right-docked info panel
    (desktop, and mobile landscape) visually sits on top of ~280-300px of that
