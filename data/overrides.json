@@ -1341,7 +1341,7 @@
         "ruins": false,
         "outlaw": false,
         "phantom": "",
-        "notes": "Real base from elegra1965's save: Olver-Lumb\u57fa\u5730",
+        "notes": "Real base from elegra1965's save: Olver-Lumb基地",
         "colliding": false,
         "collidingA": 0,
         "collidingB": 0,
@@ -4669,7 +4669,7 @@
         "ruins": false,
         "outlaw": false,
         "phantom": "",
-        "notes": "Real base from elegra1965's save: \u30a4\u30aa\u30a6\u30af\u30b9\u30d5\u30fb\u30d5\u30a9\u30eb\u30c8\u57fa\u5730",
+        "notes": "Real base from elegra1965's save: イオウクスフ・フォルト基地",
         "colliding": false,
         "collidingA": 0,
         "collidingB": 0,
@@ -4757,7 +4757,7 @@
         "ruins": false,
         "outlaw": false,
         "phantom": "",
-        "notes": "Real base from elegra1965's save: Ansviln-Paul\u524d\u54e8\u57fa\u7ad9",
+        "notes": "Real base from elegra1965's save: Ansviln-Paul前哨基站",
         "colliding": false,
         "collidingA": 0,
         "collidingB": 0,
@@ -4837,7 +4837,7 @@
         "ruins": false,
         "outlaw": false,
         "phantom": "",
-        "notes": "Real bases from elegra1965's save: Sandworm Planet Portal; \u041a\u043e\u043b\u043e\u043d\u0438\u044f Cayenn | Real base from elegra1965's save: Vile bug disedent New creature | Real base from elegra1965's save: Toxic horror with boundary failure",
+        "notes": "Real bases from elegra1965's save: Sandworm Planet Portal; Колония Cayenn | Real base from elegra1965's save: Vile bug disedent New creature | Real base from elegra1965's save: Toxic horror with boundary failure",
         "colliding": false,
         "collidingA": 0,
         "collidingB": 0,
@@ -20108,7 +20108,7 @@
         "sell": "67.7",
         "buy": "-21.3",
         "editorName": "Added -- no original editor name available",
-        "notes": "Sourced from a public NMS wiki corpus (compiled by hadsh/nms_namegen, 2026-08-23) -- originally documented at: CHRIST Saint John of \u00c1vila (https://nomanssky.fandom.com/wiki/CHRIST_Saint_John_of_%C3%81vila). If you know the original contributor, or this is your own system, feel free to update it via Edit system."
+        "notes": "Sourced from a public NMS wiki corpus (compiled by hadsh/nms_namegen, 2026-08-23) -- originally documented at: CHRIST Saint John of Ávila (https://nomanssky.fandom.com/wiki/CHRIST_Saint_John_of_%C3%81vila). If you know the original contributor, or this is your own system, feel free to update it via Edit system."
       },
       "editedAt": "2026-08-23T14:58:34.292Z",
       "history": [
@@ -34431,12 +34431,166 @@
           "text": "Imported from a public, wiki-documented ground-truth corpus (hadsh/nms_namegen, compiled 2026-08-23) -- see notes for the source citation."
         }
       ]
+    },
+    "0:106500630D1C": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Idetar-Rosa",
+        "race": "Korvax",
+        "region": "Aspego",
+        "starClass": "F4p",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": true,
+        "giant": false,
+        "econName": "Engineering",
+        "sell": "63.5",
+        "buy": "-29.2",
+        "econDesc": "Sustainable",
+        "conflict": "Unthreatening",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "phantom": "",
+        "notes": "",
+        "colliding": true,
+        "collidingA": 2,
+        "collidingB": 3,
+        "editorName": "",
+        "editorFriendCode": "",
+        "genVersion": "1.1.0",
+        "bodies": [
+          {
+            "name": "Liwelly Q16",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Marsh",
+            "descriptor": "",
+            "water": true,
+            "ring": false,
+            "resources": [
+              "Sodium",
+              "Cobalt"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "None",
+            "autophage": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "Nash 41/C9",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Lush",
+            "descriptor": "",
+            "water": true,
+            "ring": false,
+            "resources": [
+              "Magnetised Ferrite",
+              "Sodium"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "None",
+            "autophage": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "Octa U46",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Radioactive",
+            "descriptor": "",
+            "water": false,
+            "ring": false,
+            "resources": [
+              "Magnetised Ferrite",
+              "Sodium"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "None",
+            "autophage": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "Jessidau",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Dead",
+            "descriptor": "",
+            "water": false,
+            "ring": false,
+            "resources": [
+              "Cobalt",
+              "Gold"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "None",
+            "autophage": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "Iiha 86/X9",
+            "moon": true,
+            "orbits": 4,
+            "biome": "Marsh",
+            "descriptor": "",
+            "water": false,
+            "ring": false,
+            "resources": [
+              "Gold",
+              "Magnetised Ferrite"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "None",
+            "autophage": false,
+            "base": false,
+            "baseName": ""
+          }
+        ]
+      },
+      "editedAt": "2026-08-23T18:00:21.829Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-08-23T18:00:21.829Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1787078493093
+      1787508021829
     ]
   },
   "flagLog": {}
