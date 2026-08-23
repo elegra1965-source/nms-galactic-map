@@ -265,6 +265,20 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border:none;border-ra
    cyan/gold accent colours that already carry meaning (selection, warnings). */
 #bAccess{width:30px;height:30px;padding:0;border-radius:50%;display:flex;
   align-items:center;justify-content:center;font-size:14px;flex:none}
+/* 10th-anniversary fan tribute badge (2026-08-23). Tony's ask: a small,
+   ALWAYS-visible marker -- deliberately unlike #galInfo, which only shows
+   in Galaxy view. There is no `mode` branching anywhere on this element on
+   purpose, so it never hides/moves between Galaxy, Local or System. Not a
+   flex child of #top (so it can't disturb the toolbar's own wrap layout);
+   instead it's positioned by JS measuring #bAccess's real rendered rect
+   (positionAnnivBadge(), same measure-don't-guess pattern as
+   positionUnderButton() below), so it tracks the button correctly on any
+   window width and after any toolbar re-wrap. Real badge art is taller
+   than wide (1336x1536 source crop), so the box keeps that ratio rather
+   than forcing a square and distorting it. */
+#annivBadge{position:fixed;z-index:31;width:26px;height:30px;pointer-events:none}
+#annivBadge img{width:100%;height:100%;display:block;
+  filter:drop-shadow(0 0 5px rgba(240,90,40,.4))}
 #top,#leftcol,#tel,#panel,#course,#modalWrap .modal,#galHud,#accessPop,#searchPop,#keys{
   zoom:var(--ui-zoom,1)}
 #accessPop{position:fixed;z-index:36;width:198px;padding:11px 13px;
@@ -955,6 +969,8 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   <button class="btn" id="bAbout" title="Fan-made disclaimer and a note on procedural vs. real system data.">&#9432; About</button>
   <button class="btn" id="bAccess" title="Accessibility settings: font size, colour-blind filters, high contrast." aria-label="Accessibility settings" aria-haspopup="true" aria-expanded="false">&#9881;</button>
 </div>
+
+<div id="annivBadge" title="10 years of No Man's Sky -- 2016-2026. Fan-made tribute, not an official Hello Games asset."><img src="icons-web/anniv-10th-badge.png" alt="No Man's Sky 10th Anniversary"></div>
 
 <div id="leftcol">
   <div id="filt" class="box fold min">
@@ -5201,7 +5217,7 @@ function updateGalaxyInfo(){
 }
 function galInfoHTML(){
   var gt=galaxyType(GALAXY);
-  var typeLabel=gt.k==="Unknown"?"TYPE UNKNOWN":gt.k.toUpperCase();
+  var typeLabel=gt.k==="Unknown"?"TYPE UNKNOWN":gt.k==="Norm"?"NORMAL":gt.k.toUpperCase();
   return GALAXIES[GALAXY].toUpperCase()+" \u2014 GALAXY #"+(GALAXY+1)+" OF "+GALAXIES.length+
     " \u2014 <span style=\"color:"+gt.c+"\">"+typeLabel+"</span>";
 }
@@ -7812,6 +7828,7 @@ function resize(){
   renderer.setSize(w,h,true);
   camera.aspect=w/h; camera.updateProjectionMatrix();
   syncTopOffset();
+  positionAnnivBadge();
   _lastOccludeW=-1; /* force syncPanelOffset() to recompute against the new size next frame */
 }
 /* The mobile layout (leftcol/keys/stats) positions itself below the top
@@ -7827,6 +7844,25 @@ function syncTopOffset(){
   var top=document.getElementById("top");
   if(!top) return;
   document.documentElement.style.setProperty("--top-h",top.offsetHeight+"px");
+}
+/* Positions the 10th-anniversary badge directly under #bAccess (the gear/
+   accessibility button), matching its real rendered rect rather than a
+   guessed fixed corner -- same reasoning as positionUnderButton() further
+   down: #bAccess's own x-position isn't fixed (the toolbar is a wrapping
+   flex row), so only measuring its live getBoundingClientRect() keeps this
+   correct on every screen width and after every toolbar re-wrap. Called
+   from resize() below so it re-syncs whenever the toolbar layout could
+   have changed -- never from anything mode-related, so it never moves or
+   hides when switching Galaxy/Local/System. */
+function positionAnnivBadge(){
+  var btn=document.getElementById("bAccess"), el=document.getElementById("annivBadge");
+  if(!btn||!el) return;
+  var r=btn.getBoundingClientRect();
+  if(r.width===0 && r.height===0) return; /* not laid out yet */
+  var gap=6; /* same gap #top itself uses between toolbar buttons */
+  var w=el.offsetWidth||26;
+  el.style.left=Math.round(r.left+(r.width-w)/2)+"px";
+  el.style.top=Math.round(r.bottom+gap)+"px";
 }
 /* The camera frames the FULL window width, but the right-docked info panel
    (desktop, and mobile landscape) visually sits on top of ~280-300px of that
@@ -8131,7 +8167,7 @@ window.nmsCoreReady.then(function(){
 /* Web fonts can finish loading a moment after this script runs, subtly
    changing button widths and therefore how many rows the toolbar wraps
    onto -- re-measure once fonts settle so --top-h doesn't end up stale. */
-if(document.fonts && document.fonts.ready) document.fonts.ready.then(syncTopOffset).catch(function(){});
+if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ syncTopOffset(); positionAnnivBadge(); }).catch(function(){});
 </script>
 </body>
 </html>
