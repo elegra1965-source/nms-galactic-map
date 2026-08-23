@@ -85,7 +85,18 @@ canvas#c{display:block;position:fixed;inset:0;touch-action:none}
    bugs one at a time: instead of guessing every viewport/orientation combination,
    let him move the boxes himself. touch-action:none stops the browser's own
    scroll/zoom gestures from stealing the pointer before the drag handler sees it. */
-#fHead,.phead,.chead,#a11yHead,.edhead,#searchHead{cursor:grab;touch-action:none}
+#fHead,.phead,.chead,#a11yHead,.edhead,#searchHead,#keysHead{cursor:grab;touch-action:none}
+/* 2026-08-23: #keysHead alone needed an explicit user-select:none too, unlike
+   the others above -- it's scoped to just the bare "Portal glyph keypad" text
+   (deliberately, so the galaxy search input next to it stays fully clickable,
+   see makeDraggable's own call site comment), which means every single click
+   inside the handle lands directly on a text glyph with zero padding around
+   it to miss. Without this the browser's native click-and-drag-to-select-text
+   behaviour won as visible in Tony's own screenshot (label just highlights
+   blue on drag, box doesn't move) -- none of the wider header handles above
+   hit this in practice since they have padding/icons around their text a
+   drag more often starts on instead. */
+#keysHead{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 .box::before,.box::after{content:'';position:absolute;width:9px;height:9px;pointer-events:none}
 .box::before{top:-1px;right:-1px;border-top:1px solid var(--cyan);border-right:1px solid var(--cyan);border-radius:0 12px 0 0}
 .box::after{bottom:-1px;left:-1px;border-bottom:1px solid var(--cyan);border-left:1px solid var(--cyan);border-radius:0 0 0 12px}
