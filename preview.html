@@ -345,8 +345,17 @@ html.hc-on .btn{border-width:2px}
    a plain class removal after ~2.4s (see the search click handler). */
 .brow.searchHit{background:rgba(240,165,0,.16);box-shadow:0 0 0 1px rgba(240,165,0,.45) inset}
 .bdot{width:12px;height:12px;border-radius:50%;flex:none;border:1px solid rgba(255,255,255,.22)}
-.brow .bn{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.brow .bb{font-size:10px;color:var(--text-faint);letter-spacing:.05em}
+/* 2026-08-23 fix: .bn (name) has flex-basis:0 (from "flex:1"), so when .bb
+   (biome/water/ring text) runs long -- e.g. "Radioactive . water . golden
+   rings (procedural)" -- it was free to claim effectively the whole row,
+   squeezing .bn down to a sliver (a couple of clipped pixels of the name's
+   first letter, easy to mistake for a stray "[" glyph -- not a generator
+   bug, a pure layout one, per Tony/GoodGuysFree's own screenshot). Fix:
+   give .bn a floor it can't be squeezed below, and give .bb the exact same
+   nowrap/ellipsis truncation .bn already had so IT degrades gracefully
+   too instead of just pushing the name out of the row. */
+.brow .bn{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:60px}
+.brow .bb{font-size:10px;color:var(--text-faint);letter-spacing:.05em;flex:0 1 auto;max-width:50%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* ============ field-level edit status (EDIT-TRACKING-AND-DISPUTES.md) ============
    inset box-shadow rather than a real border -- keeps every row's box model
    and existing flex gaps exactly as they were, this is purely a colour cue
@@ -358,15 +367,27 @@ html.hc-on .btn{border-width:2px}
 .tag.fs-edited{border-color:var(--fs-edited);color:var(--fs-edited);box-shadow:none;padding-left:7px}
 .tag.fs-flagged{border-color:var(--fs-flagged);color:var(--fs-flagged);box-shadow:none;padding-left:7px}
 /* ============ unverified "guess" fields (race/economy/conflict/rings) ============
-   Added 2026-08-22 per Tony/GoodGuysFree: these four are entirely invented
-   flavour (see nms-core/economy.js's own header) -- not derived from the
-   portal address the way name/region/planet-count are -- so unlike a plain
-   fs-original field (which just means "nobody's edited this yet" on data
-   that's already accurate), these need to visibly read as unconfirmed by
-   default, not just in the About modal. Deliberately its OWN class rather
-   than reusing fs-original: fs-original also covers name/region/starClass/
-   planet-count, which ARE the real ported algorithm and should NOT be
-   greyed out or tagged "Procedural" just because nobody's edited them yet. */
+   Added 2026-08-22 per Tony/GoodGuysFree: these four used to be entirely
+   invented flavour (see nms-core/economy.js's own pre-2026-08-23 header) --
+   not derived from the portal address the way name/region/planet-count are
+   -- so unlike a plain fs-original field (which just means "nobody's
+   edited this yet" on data that's already accurate), these needed to
+   visibly read as unconfirmed by default, not just in the About modal.
+   Deliberately its OWN class rather than reusing fs-original: fs-original
+   also covers name/region/starClass/planet-count, which ARE the real
+   ported algorithm and should NOT be greyed out or tagged "Procedural"
+   just because nobody's edited them yet.
+
+   2026-08-23 update: race/economy/conflict are now ALSO the real ported
+   algorithm (nms-core/system.js's systemAttributes(), same footing as
+   starClass/planet-count above) whenever a portal address is available --
+   see generateSystem()'s flavorIsReal / s.raceReal/econReal/conflictReal.
+   This class/tag now only actually fires for those three in the rare
+   fallback case (no portal address, or a component failed to load) -- see
+   updatePanel()'s raceIsGuess/econIsGuess/conIsGuess. Rings are the one
+   field here still genuinely, unconditionally invented -- nms_namegen
+   never modelled planet rings at all, nothing to port -- so .guessVal/
+   .tag.guess keeps firing for every ring exactly as before. */
 .guessVal{opacity:.55}
 .tag.guess{border-color:var(--text-faint);color:var(--text-faint);border-style:dashed}
 .tag.fs-disputed{border-color:var(--fs-disputed);color:var(--fs-disputed);box-shadow:none;padding-left:7px}
@@ -1044,11 +1065,11 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   <div id="pCore">—</div>
   <div id="pSys">
     <div class="row" id="pRaceRow"><span id="icRace"></span>
-      <div><div class="lb">Race<span class="tag guess" id="pRaceGuess" style="margin-left:6px;display:none" title="Invented flavour, not derived from the portal address -- no traveller has confirmed the real race for this system yet. Use Edit system to submit it.">Procedural</span></div><div class="vl" id="pRace">—</div></div></div>
+      <div><div class="lb">Race<span class="tag guess" id="pRaceGuess" style="margin-left:6px;display:none" title="Invented flavour -- this system's real race couldn't be computed (no portal address available, or a component failed to load), so this is an unconfirmed guess. Use Edit system to submit the real value.">Procedural</span></div><div class="vl" id="pRace">—</div></div></div>
     <div class="row row-eco" id="pEcoRow"><span id="icEco"></span>
-      <div><div class="lb">Economy<span class="starRating" id="pEcoStars"></span><span class="tag guess" id="pEcoGuess" style="margin-left:6px;display:none" title="Invented flavour, not derived from the portal address -- no traveller has confirmed the real economy for this system yet. Use Edit system to submit it.">Procedural</span></div><div class="vl" id="pEco">—</div><div class="sub" id="pEcoSub">—</div></div></div>
+      <div><div class="lb">Economy<span class="starRating" id="pEcoStars"></span><span class="tag guess" id="pEcoGuess" style="margin-left:6px;display:none" title="Invented flavour -- this system's real economy couldn't be computed (no portal address available, or a component failed to load), so this is an unconfirmed guess. Use Edit system to submit the real value.">Procedural</span></div><div class="vl" id="pEco">—</div><div class="sub" id="pEcoSub">—</div></div></div>
     <div class="row" id="pConRow"><span id="icCon"></span>
-      <div><div class="lb">Conflict<span class="conBadge" id="pConBadge" style="margin-left:6px;vertical-align:middle"></span><span class="tag guess" id="pConGuess" style="margin-left:6px;display:none" title="Invented flavour, not derived from the portal address -- no traveller has confirmed the real conflict level for this system yet. Use Edit system to submit it.">Procedural</span></div><div class="vl" id="pCon">—</div></div></div>
+      <div><div class="lb">Conflict<span class="conBadge" id="pConBadge" style="margin-left:6px;vertical-align:middle"></span><span class="tag guess" id="pConGuess" style="margin-left:6px;display:none" title="Invented flavour -- this system's real conflict level couldn't be computed (no portal address available, or a component failed to load), so this is an unconfirmed guess. Use Edit system to submit the real value.">Procedural</span></div><div class="vl" id="pCon">—</div></div></div>
     <div class="tags" id="pTags"></div>
     <div class="bodylist" id="pBodies"></div>
     <div style="font-size:10px;color:var(--text-faint);line-height:1.4;margin-top:5px">Planet names are a procedural guess, not your save data (<span style="text-decoration:underline;cursor:pointer" onclick="openDisclaimer()">see About</span>) -- Edit system to add the real ones.</div>
@@ -1412,7 +1433,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     </div>
     <div class="mfld">
       <div class="lb">Procedural data</div>
-      <div style="font-size:12px;color:var(--text-dim);line-height:1.55">Star systems are generated procedurally from their portal address, the same way the game does -- they are not scraped from anyone's real save. Star type, system/region names, and total planet+moon count are all reverse-engineered from the game's own logic and right most of the time, but they're a corpus-verified <b>approximation</b>, not a perfect decompile -- occasional mismatches (e.g. a system that generates as 5 bodies but is really 3 in your save) are a known, expected gap, not a bug to report. <b>Individual planet names are not</b> accurate at all -- the real game's planet-naming logic has never been fully reverse-engineered (confirmed against the game's own decompiled data and a real save file), so what you see is a plausible guess, not your actual save data. As of 2026-08-18 that guess leans on the planet's own biome (and Sentinel activity, once known) to pick a more fitting-sounding name -- still a guess, just a less randomly-mismatched one. <b>Race, economy, conflict level, and which planets have rings are guesses too</b> -- No Man's Sky's real generation logic for any of that has never been reverse-engineered either, so none of it is derived from a system's portal address the way its name and planet count are; it's this project's own invented flavour, built to read naturally next to the real in-game panel. The underlying odds are real decompiled game data though (star-colour-based abandoned/uncharted/outlaw probabilities and the 30% ring chance, pulled from GCSOLARGENERATIONGLOBALS.GLOBAL.MBIN) -- so the overall statistical feel matches the game, but any single system's actual roll can't match your save any more than its planet names can. Importing your save file only ever pulls in real <b>base names</b> (a save doesn't expose anything else about a system) -- everything else, including fixing a wrong planet count, still needs typing in by hand via <b>Edit system</b>. A system only reflects real in-game data once a traveller has entered it that way, marked "Community edited".</div>
+      <div style="font-size:12px;color:var(--text-dim);line-height:1.55">Star systems are generated procedurally from their portal address, the same way the game does -- they are not scraped from anyone's real save. Star type, system/region names, total planet+moon count, and (as of 2026-08-23) <b>race, economy type/tier, and conflict level</b> are all reverse-engineered from the game's own logic and right most of the time, but they're a corpus-verified <b>approximation</b>, not a perfect decompile -- occasional mismatches (e.g. a system that generates as 5 bodies but is really 3 in your save, or a race that doesn't match) are a known, expected gap (roughly 1 in 100, per the 1000-system real corpus this was validated against), not a bug to report. The exact sell%/buy% numbers shown are the one part of that economy panel still this project's own invented figure, not derived from the address -- the real game only exposes economy <i>strength</i> (low/medium/high), not an exact percentage, to reverse-engineer against. <b>Individual planet names are not</b> accurate at all -- the real game's planet-naming logic has never been fully reverse-engineered (confirmed against the game's own decompiled data and a real save file), so what you see is a plausible guess, not your actual save data. As of 2026-08-18 that guess leans on the planet's own biome (and Sentinel activity, once known) to pick a more fitting-sounding name -- still a guess, just a less randomly-mismatched one. <b>Which planets have rings is still a guess too</b> -- No Man's Sky's real ring-placement logic has never been reverse-engineered, so unlike race/economy/conflict above, it's this project's own invented flavour, built to read naturally next to the real in-game panel. The underlying ring odds are real decompiled game data though (the flat 30% chance, pulled from GCSOLARGENERATIONGLOBALS.GLOBAL.MBIN) -- so the overall statistical feel matches the game, but any single planet's actual ring can't match your save any more than its name can. On the rare system where a portal address isn't available to compute the real values from, race/economy/conflict fall back to an invented guess too, same as rings -- a dashed "Procedural" tag next to the field is how you can tell. Importing your save file only ever pulls in real <b>base names</b> (a save doesn't expose anything else about a system) -- everything else, including fixing a wrong planet count, still needs typing in by hand via <b>Edit system</b>. A system only reflects real in-game data once a traveller has entered it that way, marked "Community edited".</div>
     </div>
     <div class="mfld">
       <div class="lb">Star class letters (e.g. "G7p")</div>
@@ -2204,7 +2225,18 @@ function generateSystem(vx,vy,vz,idx,noOverride){
      uncharted first instead, which skewed purple's real 35% abandoned rate
      down to ~28% before the fix. */
   var flavor;
-  if(attrs && window.NMSEconomy && window.NMSEconomy.rollSystemFlavorFromAttrs){
+  // flavorIsReal: true only when race/economy/conflict came from the real
+  // systemAttributes()-derived path (rollSystemFlavorFromAttrs) -- i.e.
+  // essentially always. False in the rare fallback branches below (no
+  // portal address, or nms-core/economy.js failed to load), where these
+  // fields really are still an independent invented guess. Drives the
+  // "Procedural" tag/greyed styling in updatePanel() -- 2026-08-23:
+  // previously that tag fired for EVERY system regardless, back when all
+  // three fields were always invented; now it should only fire when they
+  // actually are. See the About modal's "Procedural data" section and the
+  // .guessVal/.tag.guess CSS comment above for the same update.
+  var flavorIsReal=!!(attrs && window.NMSEconomy && window.NMSEconomy.rollSystemFlavorFromAttrs);
+  if(flavorIsReal){
     flavor=window.NMSEconomy.rollSystemFlavorFromAttrs(r,attrs);
   } else if(window.NMSEconomy){
     flavor=window.NMSEconomy.rollSystemFlavor(r,st.k);
@@ -2239,6 +2271,11 @@ function generateSystem(vx,vy,vz,idx,noOverride){
   // confirmed guess, and the UI (updatePanel's "Procedural" tags) needs to know
   // that per-field, not just per-system.
   s.raceVerified=false; s.econVerified=false; s.conflictVerified=false;
+  // Per-field "is this the real algorithm, not an invented guess" flags --
+  // see flavorIsReal above. All three start equal (one flavor roll covers
+  // all of them) but kept separate, same shape as *Verified above, in case
+  // a future partial-attrs path ever needs to split them.
+  s.raceReal=flavorIsReal; s.econReal=flavorIsReal; s.conflictReal=flavorIsReal;
 
   /* Total body count (planets+moons combined, real 6-body hard cap): accurate
      via nms-core's planetSeeds() when available -- its final planet_count+
@@ -4279,18 +4316,25 @@ function updatePanel(s){
   setFsClass("pRaceRow","race",s);
   setFsClass("pEcoRow","economy",s);
   setFsClass("pConRow","conflict",s);
-  // Grey out + tag "Procedural" for race/economy/conflict until a traveller has
-  // actually submitted the real value via Edit system -- these three are
-  // invented flavour (see the About modal's "Procedural data" section), not
-  // derived from the portal address, so unlike everything else on this
-  // panel they default to reading as unconfirmed rather than as fact.
-  document.getElementById("pRaceGuess").style.display=s.raceVerified?"none":"";
-  document.getElementById("pEcoGuess").style.display=s.econVerified?"none":"";
-  document.getElementById("pConGuess").style.display=s.conflictVerified?"none":"";
-  document.getElementById("pRace").classList.toggle("guessVal",!s.raceVerified);
-  document.getElementById("pEco").classList.toggle("guessVal",!s.econVerified);
-  document.getElementById("pEcoSub").classList.toggle("guessVal",!s.econVerified);
-  document.getElementById("pCon").classList.toggle("guessVal",!s.conflictVerified);
+  // Grey out + tag "Procedural" for race/economy/conflict ONLY when neither a
+  // traveller has confirmed it via Edit system NOR the real algorithm
+  // produced it (s.raceReal/econReal/conflictReal -- see generateSystem()'s
+  // flavorIsReal). 2026-08-23: these three used to be invented flavour
+  // unconditionally, so this fired for every unedited system; now
+  // systemAttributes() derives them for real (same footing as star type,
+  // which never got this tag), so it only fires in the rare fallback case
+  // (no portal address, or nms-core/economy.js failed to load) -- see the
+  // About modal's "Procedural data" section for the same update.
+  var raceIsGuess=!s.raceVerified&&!s.raceReal;
+  var econIsGuess=!s.econVerified&&!s.econReal;
+  var conIsGuess=!s.conflictVerified&&!s.conflictReal;
+  document.getElementById("pRaceGuess").style.display=raceIsGuess?"":"none";
+  document.getElementById("pEcoGuess").style.display=econIsGuess?"":"none";
+  document.getElementById("pConGuess").style.display=conIsGuess?"":"none";
+  document.getElementById("pRace").classList.toggle("guessVal",raceIsGuess);
+  document.getElementById("pEco").classList.toggle("guessVal",econIsGuess);
+  document.getElementById("pEcoSub").classList.toggle("guessVal",econIsGuess);
+  document.getElementById("pCon").classList.toggle("guessVal",conIsGuess);
 
   var tags=[["",["","Single","Binary","Ternary"][s.stars]+" star"]];
   tags.push(["",s.planets+(s.planets===1?" planet":" planets")]);
