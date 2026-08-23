@@ -34488,7 +34488,7 @@
             "baseName": ""
           },
           {
-            "name": "Nash 41/C9",
+            "name": "Idetar",
             "moon": false,
             "orbits": 0,
             "biome": "Lush",
@@ -34510,7 +34510,7 @@
             "baseName": ""
           },
           {
-            "name": "Octa U46",
+            "name": "Rosa",
             "moon": false,
             "orbits": 0,
             "biome": "Radioactive",
@@ -34577,11 +34577,15 @@
           }
         ]
       },
-      "editedAt": "2026-08-23T18:00:21.829Z",
+      "editedAt": "2026-08-23T18:02:29.561Z",
       "editedByIp": "5.133.46.24",
       "history": [
         {
           "at": "2026-08-23T18:00:21.829Z",
+          "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-08-23T18:02:29.561Z",
           "text": "edited by a traveller"
         }
       ]
@@ -34590,7 +34594,8 @@
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1787508021829
+      1787508021829,
+      1787508149561
     ]
   },
   "flagLog": {}
