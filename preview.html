@@ -276,7 +276,8 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border:none;border-ra
    window width and after any toolbar re-wrap. Real badge art is taller
    than wide (1336x1536 source crop), so the box keeps that ratio rather
    than forcing a square and distorting it. */
-#annivBadge{position:fixed;z-index:31;width:26px;height:30px;pointer-events:none}
+#annivBadge{position:fixed;z-index:31;top:calc(var(--top-h,60px) + 8px);
+  width:26px;height:30px;pointer-events:none}
 #annivBadge img{width:100%;height:100%;display:block;
   filter:drop-shadow(0 0 5px rgba(240,90,40,.4))}
 #top,#leftcol,#tel,#panel,#course,#modalWrap .modal,#galHud,#accessPop,#searchPop,#keys{
@@ -7859,10 +7860,12 @@ function positionAnnivBadge(){
   if(!btn||!el) return;
   var r=btn.getBoundingClientRect();
   if(r.width===0 && r.height===0) return; /* not laid out yet */
-  var gap=6; /* same gap #top itself uses between toolbar buttons */
   var w=el.offsetWidth||26;
   el.style.left=Math.round(r.left+(r.width-w)/2)+"px";
-  el.style.top=Math.round(r.bottom+gap)+"px";
+  /* top intentionally left to the #annivBadge CSS rule's
+     calc(var(--top-h,60px) + 8px) -- same anchor #galInfo already uses,
+     so this lands in the same row as the "...NORMAL" badge and stays
+     correct across every wrapped-toolbar height, not just under #bAccess. */
 }
 /* The camera frames the FULL window width, but the right-docked info panel
    (desktop, and mobile landscape) visually sits on top of ~280-300px of that
