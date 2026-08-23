@@ -1799,12 +1799,19 @@ function starTypeForIdx(vx,vy,vz,idx){
    under the new one and flag mismatches through the existing dispute
    system, instead of either guessing blind or manually re-checking ~260+
    records by hand. See TODO.md. */
-var GEN_VERSION="1.1.0"; // bumped 2026-08-23: economy/wealth/conflict/race
-  // now wired to nms-core/system.js's real systemAttributes() when
-  // available (was an independent roll before), and the sell%/buy% formula
-  // was refit against the real corpus -- see nms-core/economy.js's header
-  // and TODO.md. Both change generateSystem()'s output for existing
-  // addresses.
+var GEN_VERSION="1.2.0"; // bumped 2026-08-23 (later same day): 2 more
+  // generateSystem() output changes for existing addresses -- (1) a planet
+  // now only ever gets 1 universal resource instead of up to 2 (5 total
+  // resources per planet instead of 6, matching the wiki's own "five
+  // resources" rule and Tony's real in-game count); (2) at most one ringed
+  // planet per system now (previously each non-moon planet rolled its real
+  // 30% PlanetRingProbability fully independently, so 2+ ringed planets in
+  // one system was common -- Tony reports only ever seeing one in real
+  // play; NOT confirmed against decompiled data or the wiki, see the dedup
+  // pass's own comment in generateSystem() for the caveat). Earlier
+  // same-day bump (1.1.0) covered economy/wealth/conflict/race wiring to
+  // nms-core/system.js and the sell%/buy% refit -- see nms-core/economy.js's
+  // header and TODO.md.
 var ODDS={yellow:{out:.25,unc:0,aba:0},red:{out:.50,unc:.95,aba:0},
   green:{out:.15,unc:.40,aba:.10},blue:{out:.15,unc:.40,aba:.10},purple:{out:.05,unc:.20,aba:.35}};
 /* chance a purple system is also a Giant-planet system -- placeholder,
@@ -2411,9 +2418,17 @@ function generateSystem(vx,vy,vz,idx,noOverride){
       ? window.NMSEconomy.rollRing(br,biome,isMoon)
       : (!isMoon && br()<RING_CHANCE ? (RING_STYLE_BY_BIOME[biome]||"tan") : false);
     var hasRing = !!ringStyle;
+    // Resource-count cap -- 2026-08-23, per Tony's own real-gameplay count
+    // (up to ~5 resources shown per planet) plus the wiki's own general
+    // rule ("except for Dead/Exotic, each biome has five resources") --
+    // previously rolled a SECOND universal element too (~83% chance of
+    // landing on a distinct one), pushing most planets to 6 total (3
+    // biome-fixed + 1 stellar + 2 universal) instead of the real ~5. Now
+    // only ever rolls one universal element -- still consumes exactly one
+    // br() call either way, so this is a single deliberate draw-count
+    // change (downstream size/tilt/spin for a given address will shift as
+    // a result -- expected, see the GEN_VERSION bump above).
     var resUni=[UNIVERSAL_EL[Math.floor(br()*UNIVERSAL_EL.length)]];
-    var resU2=UNIVERSAL_EL[Math.floor(br()*UNIVERSAL_EL.length)];
-    if(resU2!==resUni[0]) resUni.push(resU2);
     /* Body names stay on the cheap legacy generator here, even when nms-core
        is available -- benchmarked at ~0.15ms/system for the accurate
        per-body planetName() calls (75% of a system's total generation cost),
@@ -2444,6 +2459,30 @@ function generateSystem(vx,vy,vz,idx,noOverride){
       seed:gseed(vx,vy,vz,(idx*57)+pi)
     });
     if(isMoon) s.moons++; else s.planets++;
+  }
+  // Ring dedup -- 2026-08-23, per Tony's own real-gameplay observation
+  // ("only ever seen one planet with rings in a system"). NOT confirmed
+  // against decompiled game data or the wiki -- GCSOLARGENERATIONGLOBALS'
+  // own PlanetRingProbability (RING_CHANCE=0.30, see nms-core/economy.js)
+  // is a flat PER-PLANET roll with no system-level gating found during the
+  // 2026-08-12 decompile, so this cap is this project's own invented rule
+  // layered on top of that real per-planet roll -- same disclosed-guess
+  // pattern as RING_STYLE_BY_BIOME. Every non-moon body still rolls its own
+  // real 30% chance above (rollRing(), unchanged, so the underlying
+  // per-planet odds stay faithful to the decompiled data); this pass only
+  // trims a system down to at most one ringed planet afterward, picking
+  // uniformly among whichever planets happened to roll true, via a
+  // system-level seeded RNG so the choice stays deterministic/reproducible
+  // for the same address. Flagged to Tony as easy to revert/adjust if he
+  // later confirms multiple ringed planets per system ARE real.
+  var ringedIdx=[];
+  for(var rgi=0; rgi<s.bodies.length; rgi++) if(!s.bodies[rgi].moon && s.bodies[rgi].ring) ringedIdx.push(rgi);
+  if(ringedIdx.length>1){
+    var ringPickR=mulberry32(gseed(vx,vy,vz,idx^0x5201));
+    var keepRingIdx=ringedIdx[Math.floor(ringPickR()*ringedIdx.length)];
+    for(var rgj=0; rgj<ringedIdx.length; rgj++){
+      if(ringedIdx[rgj]!==keepRingIdx) s.bodies[ringedIdx[rgj]].ring=false;
+    }
   }
   s.address=address;
   s.coreLY=coreLY(vx,vy,vz);
