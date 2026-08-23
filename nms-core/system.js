@@ -7,6 +7,25 @@
 // probability tables and branch conditions here are reverse-engineered,
 // not invented — see the inline notes for what each one encodes and how
 // it was verified.
+//
+// Updated 2026-08-23 against hadsh/nms_namegen's 2026-08-21/23 commits,
+// which shipped alongside a 1000-system hand-verified ground truth corpus
+// (test/fixtures/nms-systems-ground-truth-2026-08-23.json in that repo,
+// also copied into this project's root). Three real fixes landed here as
+// part of that update -- a safe_start_planet off-by-one, a missing
+// signed-offset fold in region.js's voxelAttributes(), and a completely
+// rewritten purple-system/gas-giant route -- see the comments at each site
+// below for what changed and the corpus evidence for it. systemAttributes()
+// also now derives economy_type, wealth, conflict_level, dominant_race,
+// uncharted, abandoned and pirate directly from the same real RNG stream
+// already used for planet_count/star_type, all validated at 94.76%-99.80%
+// against the ground truth -- this is the actual reverse-engineered
+// algorithm nms-core/economy.js's rollSystemFlavor() was always meant to
+// be; economy.js's own header already flags its race/economy/conflict
+// tables as invented placeholder text, not decompiled data. Wiring these
+// new fields into economy.js/preview.html in place of that placeholder is
+// tracked in TODO.md and deliberately NOT done in this file -- that's a
+// separate, reviewable change.
 
 import { PRNG, MULTIPLIER } from './prng.js';
 import { indexPrimedPRNG } from './iprng.js';
@@ -21,6 +40,46 @@ const CONST_B = 0xE36AA5C613612997n;
 // abandonedSystemProbability * 100, indexed by star type
 // (yellow, green, blue, red, purple).
 const ABANDONED_SYSTEM_PCT = [0, 10, 10, 0, 35];
+
+// Ported 2026-08-23 from hadsh/nms_namegen's 2026-08-21/23 commits. The
+// three per-star-type probability tables the generator actually reads, as
+// the exact 32-bit floats the game holds them in -- comparisons must be
+// done at float32 precision (see probability() below) to match at the
+// edges; ABANDONED_SYSTEM_PCT above is the same table expressed as a plain
+// percentage, kept only because it was already here.
+const ABANDONED_SYSTEM_THRESHOLD = [
+  0, 0.10000000149011612, 0.10000000149011612, 0, 0.3499999940395355,
+];
+const EMPTY_SYSTEM_THRESHOLD = [
+  0, 0.4000000059604645, 0.4000000059604645, 0.949999988079071, 0.20000000298023224,
+];
+const PIRATE_SYSTEM_THRESHOLD = [
+  0.25, 0.15000000596046448, 0.15000000596046448, 0.5, 0.05000000074505806,
+];
+
+// economy_type: 7-way draw, permutation found by brute-force best match
+// against 7964 wiki-labelled economy codes (94.76% agreement). 1=trading,
+// 2=advanced materials, 3=scientific, 4=mining, 5=manufacturing,
+// 6=technology, 7=power generation.
+const ECONOMY_TYPE_MAP = { 0: 4, 1: 6, 2: 1, 3: 5, 4: 2, 5: 3, 6: 7 };
+// wealth: NOT a plain 3-way draw (that only scored 49.62%) -- a percentage
+// draw with 10%/30% cutoffs, 97.82% agreement on 12929 rows. 1=low,
+// 2=medium, 3=high.
+const WEALTH_BUCKET_MAP = { 0: 3, 1: 1, 2: 2 };
+// conflict_level: 3-way draw, identity mapping, 97.30% agreement on 9246
+// rows (pirate systems excluded, not modeled here). 1=low, 2=medium, 3=high.
+// dominant_race: 3-way draw, 99.10% agreement on the full 2026-08-23 ground
+// truth. 1=Gek, 2=Korvax, 3=Vy'keen.
+const RACE_MAP = { 0: 1, 1: 3, 2: 2 };
+
+/**
+ * Reads a 32-bit draw as a float32 in [0,1), matching the game's own
+ * single-precision comparison against the *_THRESHOLD tables above. Plain
+ * float64 division would agree almost everywhere but drift at the edges.
+ */
+function probability(word) {
+  return Math.fround(Number(word & 0xFFFFFFFFn) / 4294967296);
+}
 
 /**
  * portalCode, galaxy -> { planet_count, prime_planet_count,
@@ -97,14 +156,29 @@ function systemAttributes(portalCode, galaxy) {
     if (va.guide_star_renegade_count >= 10 || starType !== 0 || anomaly !== 0) {
       safeStart = 0;
     } else {
-      safeStart = rng.random(planetCount + 2);
+      // Fixed 2026-08-23 (was `planetCount + 2`): the draw spans
+      // 0..planetCount, not 0..planetCount+1 -- this is the internal class
+      // limit that bounds moon insertion in planetSeeds() below, and it can
+      // never exceed the number of primary bodies. Confirmed directly
+      // against hadsh/nms_namegen's own test vectors: the old `+2` version
+      // mismatched 2 of the library's 10 systemAttributes() test cases,
+      // both landing in this branch.
+      safeStart = rng.random(planetCount + 1);
     }
   }
 
-  rng._updateSeed();
-  rng._updateSeed();
-  rng._updateSeed();
-  rng._updateSeed();
+  // These 4 draws were previously bare _updateSeed() calls (position
+  // unchanged, only their values were discarded). Ported 2026-08-23:
+  // economy_type, wealth, conflict_level and dominant_race are all read
+  // straight off draws the generator was already making. Formulas and
+  // category numbering are hadsh/nms_namegen's own, derived by brute-force
+  // search against a wiki-labelled corpus -- see the *_MAP tables above.
+  const economyType = ECONOMY_TYPE_MAP[rng.random(7)];
+  const wealthBucketPct = rng.random(100);
+  const wealthBucket = wealthBucketPct < 10 ? 0 : (wealthBucketPct < 30 ? 1 : 2);
+  let wealth = WEALTH_BUCKET_MAP[wealthBucket];
+  let conflictLevel = rng.random(3) + 1;
+  let dominantRace = RACE_MAP[rng.random(3)];
 
   if (systemId < BigInt(Math.trunc(va.guide_star_renegade_count))) {
     starType = rng.random(3) + 1;
@@ -119,9 +193,30 @@ function systemAttributes(portalCode, galaxy) {
 
   // Abandoned-system draw: when a system is abandoned, the empty-system
   // check draw is SKIPPED, shifting every subsequent draw back one slot.
-  const abandoned = rng.random(100) < ABANDONED_SYSTEM_PCT[starType];
+  // Ported 2026-08-23: now compared at float32 precision against the real
+  // threshold table (ABANDONED_SYSTEM_THRESHOLD) instead of a plain integer
+  // percentage -- same single draw either way, so the stream position this
+  // page already had was correct; only the comparison got more precise.
+  rng._updateSeed();
+  const abandoned = probability(rng.seed) < ABANDONED_SYSTEM_THRESHOLD[starType];
+
+  // Ported 2026-08-23: this used to be a throwaway "empty-system check"
+  // _updateSeed() call; it's now read as `uncharted`, still the same single
+  // draw only when the system wasn't already abandoned.
+  let uncharted = false;
   if (!abandoned) {
-    rng._updateSeed(); // empty-system check
+    rng._updateSeed();
+    uncharted = probability(rng.seed) < EMPTY_SYSTEM_THRESHOLD[starType];
+  }
+
+  if (uncharted) {
+    dominantRace = 0; // no inhabitants, so no dominant race to report
+  }
+  if (abandoned) {
+    // The generator drops both fields to their lowest bucket on an
+    // abandoned system, whatever the draws said.
+    wealth = 1;
+    conflictLevel = 1;
   }
 
   const diff = 6 - planetCount;
@@ -131,17 +226,43 @@ function systemAttributes(portalCode, galaxy) {
     primePlanetCount = 1;
   }
 
-  // Purple gas-giant gate: first purple draw < 0xF collapses the system to
-  // a single gas giant with five moons, regardless of the rolled counts.
+  // Purple systems take a separate route (replaces the old "purple gas-giant
+  // gate" entirely -- that version never restructured planet/prime counts at
+  // all, which is most of why purple systems used to score so low). Every
+  // body is re-labelled as an extra body (primePlanetCount carries the whole
+  // count, planetCount drops to 0), so planetSeeds() classifies them all
+  // through its extra-body loop instead of the primary one. Then two nested
+  // draws: the first, at 15%, switches the system to the gas-giant layout
+  // (one giant plus moons); the second, at 66% of those, forces the body
+  // count to the maximum of six -- where the classic (1 planet, 5 moons)
+  // systems come from. The second draw is nested, not an alternative branch:
+  // reading it as mutually exclusive (the old code's behaviour) consumes a
+  // draw on the wrong systems and desyncs the stream. Ported 2026-08-23,
+  // corpus-verified on 1,041 purple systems: planet counts 58.1% -> 94.1%,
+  // gas-giant precision 80.3% -> 94.7% (recall 98.4% -> 95.7%).
   let gasGiant = false;
   if (starType === 4) {
-    const g1 = rng.random(100);
-    if (g1 < 0xF) {
+    primePlanetCount += planetCount;
+    planetCount = 0;
+    if (rng.random(100) < 15) {
       gasGiant = true;
+      if (rng.random(100) < 66) {
+        planetCount = 0;
+        primePlanetCount = 6;
+      }
     }
-    if (g1 > 0xF) {
-      rng.random(100); // unknown_attribute2 draw, kept for stream fidelity
-    }
+  }
+
+  // Pirate check: peeks at the next word WITHOUT consuming it, so nothing
+  // downstream shifts -- guarded exactly as the game guards it (never
+  // abandoned/uncharted, and only when the system isn't a plain base-type
+  // safe-start system). Ported 2026-08-23; unvalidated against the ground
+  // truth (the wiki carries no pirate field), reported as-is.
+  let pirate = false;
+  if (!abandoned && !uncharted && (starType !== 0 || safeStart <= 0)) {
+    const peek = new PRNG(rng.seed);
+    peek._updateSeed();
+    pirate = probability(peek.seed) < PIRATE_SYSTEM_THRESHOLD[starType];
   }
 
   return {
@@ -152,6 +273,23 @@ function systemAttributes(portalCode, galaxy) {
     // 0 -> yellow/white (F/G), 1 -> green (E), 2 -> blue (B/O),
     // 3 -> red (K/M), 4 -> purple/exotic (X/Y).
     star_type: starType,
+    // Economy category, 1-7 (1=trading, 2=advanced materials, 3=scientific,
+    // 4=mining, 5=manufacturing, 6=technology, 7=power generation). 94.76%.
+    economy_type: economyType,
+    // Wealth tier, 1-3 (1=low, 2=medium, 3=high). 98.90%.
+    wealth: wealth,
+    // Conflict level, 1-3 (1=low, 2=medium, 3=high). 99.03%.
+    conflict_level: conflictLevel,
+    // Dominant race, 1-3 (1=Gek, 2=Korvax, 3=Vy'keen), 0 if uncharted. 99.10%.
+    dominant_race: dominantRace,
+    // No faction, no space station -- what the game shows as "Uncharted".
+    // Precision and recall both 99.4% on the 2026-08-23 ground truth.
+    uncharted: uncharted,
+    // Derelict-freighter-style abandoned system. Rare (1/1000 in the ground
+    // truth), so this is reported from the route, not corpus-validated.
+    abandoned: abandoned,
+    // Pirate-controlled system. Unvalidated -- see the comment above.
+    pirate: pirate,
   };
 }
 
@@ -164,7 +302,18 @@ function mix64(hi, lo) {
 }
 
 /**
- * portalCode, galaxy -> { planet_seeds: BigInt[], planet_count, moon_count }
+ * portalCode, galaxy -> { planet_seeds: BigInt[], planet_count, moon_count,
+ * sizes }
+ *
+ * Rewritten 2026-08-23 to match hadsh/nms_namegen's 2026-08-21 fix (commit
+ * "rework planet/moon split, correct purple system routing"). The old
+ * version here desynced the RNG stream for every gas-giant system (it kept
+ * drawing size classes even though the real layout is fixed and draws none)
+ * and never let an "extra body" become a moon at all, which -- combined with
+ * the systemAttributes() purple-route bug fixed above -- is most of why
+ * purple systems used to score so low: corpus-verified planet counts
+ * 58.1% -> 94.1%, and Euclid-wide +0.6pt, on records discovered in 2025 or
+ * later.
  */
 function planetSeeds(portalCode, galaxy) {
   const pc = BigInt(portalCode);
@@ -192,26 +341,52 @@ function planetSeeds(portalCode, galaxy) {
   const seed = (seedH << 32n) | seedL;
   const rng = new PRNG(seed);
 
-  const planetSeedsArr = [];
-  let i = 0;
-  let planetCount = 0;
+  const bodySeed = () => {
+    const low = rng.randi() & 0xFFFFFFFFn;
+    const high = rng.randi() & 0xFFFFFFFFn;
+    return mix64(high, low);
+  };
 
-  while (i < attrs.planet_count) {
+  const planetSeedsArr = [];
+  const sizes = [];
+  const primaryCount = attrs.planet_count;
+  const totalCount = primaryCount + attrs.prime_planet_count;
+  // The internal class limit that bounds moon insertion; placement stops
+  // one slot before it.
+  const stop = attrs.safe_start_planet - 1;
+
+  // Gas-giant layout: one giant plus moons. Every body still gets a seed so
+  // per-index name lookups keep working, but no class is drawn -- the
+  // layout is fixed, so the class draws are never in the real stream either.
+  if (gasGiant) {
+    for (let n = 0; n < totalCount; n++) {
+      planetSeedsArr.push(bodySeed());
+    }
+    return {
+      planet_seeds: planetSeedsArr,
+      planet_count: 1,
+      moon_count: totalCount - 1,
+      sizes,
+    };
+  }
+
+  // Primary bodies: all classes first, then all seeds. A size-0 body is a
+  // large planet and pulls 0-2 moons in behind it, each taking the next slot.
+  let i = 0;
+  while (i < primaryCount) {
     i += 1;
     const size = rng.random(3);
-    planetCount += 1;
+    sizes.push(size);
 
     if (size === 0) {
-      // Large planet: attach 1-2 moons.
-      let m = attrs.planet_count - i;
+      let m = primaryCount - i;
       if (m < 0) m = 0;
       if (m > 2) m = 2;
 
       let nMoons = rng.random(m + 1);
       if (nMoons > 0) {
-        while (i !== attrs.safe_start_planet - 1) {
+        while (i !== stop) {
           i += 1;
-          planetCount += 1;
           nMoons -= 1;
           moonCount += 1;
           if (nMoons <= 0) break;
@@ -221,42 +396,43 @@ function planetSeeds(portalCode, galaxy) {
   }
 
   i = 0;
-  while (i < attrs.planet_count) {
-    const low = rng.randi() & 0xFFFFFFFFn;
-    const high = rng.randi() & 0xFFFFFFFFn;
-    const pSeed = mix64(high, low);
-    planetSeedsArr.push(pSeed);
+  while (i < primaryCount) {
+    planetSeedsArr.push(bodySeed());
     i += 1;
   }
 
-  // Extra planet(s)
-  rng._updateSeed();
-
-  while (i < attrs.planet_count + attrs.prime_planet_count) {
-    const low = rng.randi() & 0xFFFFFFFFn;
-    const high = rng.randi() & 0xFFFFFFFFn;
-    const pSeed = mix64(high, low);
-    planetSeedsArr.push(pSeed);
-
+  // Extra bodies: unlike the primary bodies above, these interleave class
+  // and seed per record, and each of them can pull its own moons in.
+  while (i < totalCount) {
     const size = rng.random(3);
-    if (size !== 0) {
-      rng._updateSeed();
-    }
+    sizes.push(size);
+    planetSeedsArr.push(bodySeed());
     i += 1;
-  }
 
-  let finalPlanetCount =
-    attrs.planet_count + attrs.prime_planet_count - moonCount;
-  let finalMoonCount = moonCount;
-  if (gasGiant) {
-    finalPlanetCount = 1;
-    finalMoonCount = 5;
+    if (size === 0) {
+      let m = totalCount - i;
+      if (m < 0) m = 0;
+      if (m > 2) m = 2;
+
+      let nMoons = rng.random(m + 1);
+      while (nMoons > 0 && i !== stop) {
+        planetSeedsArr.push(bodySeed());
+        moonCount += 1;
+        nMoons -= 1;
+        i += 1;
+      }
+    }
   }
 
   return {
     planet_seeds: planetSeedsArr,
-    planet_count: finalPlanetCount,
-    moon_count: finalMoonCount,
+    planet_count: totalCount - moonCount,
+    moon_count: moonCount,
+    // EXPERIMENTAL, not validated at the per-slot level -- see
+    // hadsh/nms_namegen's README (62.67% exact system-level match on 3584
+    // systems, far below every field above). Kept here only for parity
+    // with upstream's return shape.
+    sizes,
   };
 }
 

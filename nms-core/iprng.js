@@ -99,8 +99,16 @@ function indexPrimedPRNG(universalAddress) {
     oCounter = systemId - 1n;
   }
 
-  const index = oCounter >> 1n;
+  let index = oCounter >> 1n;
   oCounter += 1n;
+
+  // Python's `o[index]` wraps a negative index from the end of the list
+  // (o[-1] === o[3]) -- reachable here whenever the raw (undecremented)
+  // system_id field of the universal address is exactly 0 (e.g. portal
+  // code 0 itself), which drives oCounter to -1 and index to -1. A plain
+  // JS array access at a negative index returns undefined instead, so this
+  // has to be wrapped explicitly to match.
+  if (index < 0n) index += 4n;
 
   let out;
   if ((oCounter & 1n) === 0n) {
