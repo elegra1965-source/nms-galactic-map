@@ -1800,7 +1800,11 @@ var RING_STYLE_BY_BIOME={
   Scorched:"gold", Radioactive:"gold", Irradiated:"gold", "Mega Exotic":"gold",
   Exotic:"split"
 };
-var RING_STYLE_LABEL={icy:"Icy",tan:"Dusty",ash:"Ash",gold:"Golden",split:"Split"};
+// RING_STYLE_LABEL (icy/tan/ash/gold/split -> Icy/Dusty/Ash/Golden/Split)
+// removed 2026-08-23 -- was only ever used to spell the ring style name out
+// in the two "rings" tags above, and per Tony/GoodGuysFree neither needs
+// it anymore, just "Rings" if present. RING_PALETTES below still drives
+// the actual ring colour on the 3D body itself -- unaffected.
 var RING_PALETTES={
   icy:  [0xeaf6ff,0xb9dcf0,0xdceefc,0x8fc4e0],
   tan:  [0xd8c9a8,0xcbb694,0xbfa87e,0xe4dcc2],
@@ -4382,7 +4386,7 @@ function updatePanel(s){
         // economy/conflict, until a traveller submits the real answer via
         // Edit system (b.ringOverridden) -- shown inline rather than as a
         // separate tag, this row is already a single compact line.
-        '<span class="bb">'+b.biome+(b.water?" &middot; water":"")+(b.ring?" &middot; "+(RING_STYLE_LABEL[b.ring]||"").toLowerCase()+" rings"+(b.ringOverridden?"":" (procedural)"):"")+'</span></div>';
+        '<span class="bb">'+b.biome+(b.water?" &middot; water":"")+(b.ring?" &middot; rings"+(b.ringOverridden?"":" (procedural)"):"")+'</span></div>';
   }
   document.getElementById("pBodies").innerHTML=bl;
 
@@ -4420,8 +4424,14 @@ function showBody(b,s){
   if(b.water) t.push(["hot","Water"]);
   // Same invented-flavour distinction as the panel body list -- a ring
   // nobody's confirmed via Edit system reads as a muted "guess" tag rather
-  // than a confident gold "hot" one.
-  if(b.ring) t.push([b.ringOverridden?"hot":"guess",(RING_STYLE_LABEL[b.ring]||"")+" rings"+(b.ringOverridden?"":" (procedural)")]);
+  // than a confident gold "hot" one. 2026-08-23: dropped the ring style
+  // name (Golden/Icy/Dusty/Ash/Split) from both this tag and the panel
+  // body list above -- per Tony/GoodGuysFree, just "rings" if present is
+  // all that's needed here (the style name is still shown/used for the
+  // actual ring's visual colour on the 3D body itself, just not spelled
+  // out in text) -- and it was also what pushed the .bb truncation fix
+  // right before this to its limit on a long biome+water+ring line.
+  if(b.ring) t.push([b.ringOverridden?"hot":"guess","Rings"+(b.ringOverridden?"":" (procedural)")]);
   if(b.autophage) t.push(["hot","Autophage camp"]);
   if(b.base) t.push(["hot",b.baseName?('Base: "'+b.baseName+'"'):"Has base"]);
   var html="",i;
