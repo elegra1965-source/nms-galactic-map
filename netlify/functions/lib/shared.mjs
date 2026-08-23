@@ -109,7 +109,34 @@ export async function githubGetFile(token){
     throw new Error("GitHub read failed: "+res.status+" "+(await res.text()));
   }
   var body = await res.json();
-  var decoded = Buffer.from(body.content, "base64").toString("utf8");
+  var decoded;
+  if(body.content){
+    // Normal path: file <=1MB, Contents API returns it inline as base64.
+    decoded = Buffer.from(body.content, "base64").toString("utf8");
+  } else {
+    // 2026-08-23: the wiki-corpus bulk import pushed overrides.json past
+    // 1MB (it's now ~1.3MB), which is the Contents API's hard limit for
+    // returning `content` inline -- above that it comes back with content
+    // omitted/empty, no error, no `truncated` flag set reliably either.
+    // Buffer.from("", "base64") silently decodes to "", so JSON.parse("")
+    // then threw "Unexpected end of JSON input" on every single read AND
+    // write (writes read-merge-write via this same function) -- the whole
+    // shared data store was down for every visitor until this was added.
+    // Fix: re-fetch the identical blob via its own git_url using the raw
+    // media type, which has no 1MB ceiling (good up to 100MB). See
+    // https://docs.github.com/en/rest/repos/contents
+    var blobRes = await fetch(body.git_url, {
+      headers: {
+        "Authorization": "Bearer "+token,
+        "Accept": "application/vnd.github.raw",
+        "User-Agent": "nms-galactic-map-function"
+      }
+    });
+    if(!blobRes.ok){
+      throw new Error("GitHub blob read failed: "+blobRes.status+" "+(await blobRes.text()));
+    }
+    decoded = await blobRes.text();
+  }
   var data;
   try { data = JSON.parse(decoded); }
   catch(e){ throw new Error("overrides.json on GitHub is not valid JSON: "+e.message); }
