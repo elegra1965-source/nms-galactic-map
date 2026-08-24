@@ -775,7 +775,15 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     margin:0 -14px;padding:10px 14px 8px;border-bottom:1px solid var(--border-soft)}
   #course{top:calc(var(--top-h,150px) + 8px);left:50%;transform:translateX(-50%);width:210px}
   #leftcol{bottom:auto;top:calc(var(--top-h,150px) + 140px);flex-direction:column;align-items:flex-start}
-  #filt{width:158px}
+  #filt{width:190px}
+  /* Widened from 158px (2026-08-24, Tony: "the Y in 101ly is outside
+     the box and both export and import logs are clipped" -- also
+     "maybe expand the filter window out a little"). 158px left too
+     little room for this panel's own longer button labels at this
+     font/padding -- desktop's 176px doesn't clip, so mobile needed at
+     least that much, plus some margin since mobile font rendering can
+     run a little wider. See #bHyperOpen below for the other half of
+     this fix (an ellipsis safety net for its own dynamic text). */
   /* Was on #filt itself; moved to just .fbody 2026-08-24 so #hyperPanel
      (now a sibling of .fbody, not a descendant) is never clipped by it
      again -- see the #hyperPanel CSS comment above for the full story. */
@@ -1041,7 +1049,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
       <label class="chk" title="Systems where a traveller has submitted real in-game data via Edit system -- same systems that show the &quot;Community edited&quot; tag on their info panel."><input type="checkbox" id="fEdited">Systems edited by traveller</label>
       <div class="fld" style="margin-top:7px">
         <div class="lb">Hyperdrive</div>
-        <button class="btn" type="button" id="bHyperOpen" style="width:100%;text-align:left"
+        <button class="btn" type="button" id="bHyperOpen" style="width:100%;text-align:left;overflow:hidden;text-overflow:ellipsis"
           title="Set your hyperdrive class and jump range. Drives are backwards-compatible -- an Indium Drive also reaches yellow/red/green, not just blue. Used for reachability warnings and course plotting.">
           <span id="hyperSummary">Standard // 101 LY</span></button>
         <select id="fHyper" style="display:none">
