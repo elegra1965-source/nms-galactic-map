@@ -224,34 +224,42 @@ html.debug-on #tweak{display:block}
 #fHeadLabel{flex:1;min-width:0}
 #fHead #bFiltMin{flex:none;padding:3px 8px;font-size:11px}
 /* Expands SIDEWAYS out of #filt, same proven mechanism #tweak already uses
-   out of #accessPop (position:absolute anchored to the nearest positioned
-   ancestor, #filt itself, which is position:relative) -- NOT position:fixed.
-   Two earlier attempts got this wrong in opposite directions: v1 (.sideL/
-   .sideR with no max-height) let the panel run past the bottom of a short
-   viewport with no way to scroll to it; v2 (position:fixed anchored to the
-   button, escaping to document.body) fixed that but opened the panel BELOW
-   the button instead of beside the Filters box, overlapping the checkbox
-   list -- not what Tony asked for (he wanted the original side-by-side
-   layout, just without the cut-off). This version keeps the correct sideways
-   layout AND copies #tweak's own max-height:calc(100vh - 40px) safety net,
-   which is the one piece v1 was actually missing. */
-#hyperPanel{display:none;position:fixed;width:198px;padding:10px 12px;
-  max-height:calc(100vh - 40px);overflow-y:hidden;overflow-x:hidden;z-index:40}
+   out of #accessPop -- position:absolute anchored to the nearest positioned
+   ancestor (#filt, position:relative), NOT position:fixed. History: v1
+   (.sideL/.sideR with no max-height) let the panel run past the bottom of
+   a short viewport; v2 (position:fixed anchored to the button) fixed that
+   but opened the panel BELOW the button instead of beside Filters; v3
+   (2026-08-24, position:fixed anchored to #filt's own rect, computed in JS)
+   fixed mobile visibility but broke the moment #filt moved for any reason
+   other than the one drag-hook it had wired -- Tony: "as move right the
+   warp drive window gap increases till disappears off screen... worked
+   absolutely fine before". Root cause of v3's regression: JS-computed
+   position:fixed has to be told about every single way #filt can move
+   (drag, resize, rotate, zoom); position:absolute needs telling about NONE
+   of them -- it just re-renders relative to its ancestor's current spot on
+   every paint, automatically, forever. v3 only reached for position:fixed
+   in the first place because #hyperPanel used to be a DOM descendant of
+   #filt's own mobile-only overflow:hidden .fbody, which clipped it
+   invisible out there. Real fix (this version): #hyperPanel now lives
+   OUTSIDE .fbody (still inside #filt -- see the markup) so it's no longer
+   inside anything that clips it, which means going back to plain
+   position:absolute -- the original v1 mechanism -- finally works
+   correctly on both counts at once: never clipped, and never needs any
+   JS repositioning call for ANY way #filt can move, not just a drag. */
+#hyperPanel{display:none}
 #hyperPanel.show{display:block}
-/* #hyperPanel.scroll: only added by positionHyperPanel() once it's actually
-   measured real overflow against max-height. overflow-y:auto by default here
-   (like #tweak has) shows a 1px phantom scrollbar on some viewports even when
+#hyperPanel.sideR,#hyperPanel.sideL{position:absolute;top:0;width:198px;padding:10px 12px;
+  max-height:calc(100vh - 40px);overflow-y:hidden;overflow-x:hidden;z-index:40}
+#hyperPanel.sideR{left:100%;margin-left:8px}
+#hyperPanel.sideL{right:100%;margin-right:8px}
+/* .scroll: only added by positionHyperPanel() once it's actually measured
+   real overflow against max-height. overflow-y:auto by default here (like
+   #tweak has) shows a 1px phantom scrollbar on some viewports even when
    content visibly fits -- a sub-pixel scrollHeight-vs-clientHeight rounding
-   quirk, confirmed live (scrollHeight 181 vs clientHeight 180 with nowhere
-   near max-height reached). Measuring in JS and only opting into scroll when
+   quirk, confirmed live. Measuring in JS and only opting into scroll when
    truly needed sidesteps that rounding entirely instead of guessing at a
    CSS fudge factor. */
 #hyperPanel.scroll{overflow-y:auto}
-/* .sideL/.sideR position:absolute rules removed 2026-08-24 -- #hyperPanel
-   is position:fixed now (see the base rule above) with left/top set
-   directly by positionHyperPanel() each time it opens/moves, so these
-   two classes no longer do any layout work. See positionHyperPanel()'s
-   own comment for the mobile-clipping bug this replaced. */
 #hyperSummary{color:var(--gold);font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:.04em}
 .tag.wp{border-color:#ffb454;color:#ffb454}
 .tag.ruin{border-color:#c9a06a;color:#c9a06a}
@@ -767,7 +775,11 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     margin:0 -14px;padding:10px 14px 8px;border-bottom:1px solid var(--border-soft)}
   #course{top:calc(var(--top-h,150px) + 8px);left:50%;transform:translateX(-50%);width:210px}
   #leftcol{bottom:auto;top:calc(var(--top-h,150px) + 140px);flex-direction:column;align-items:flex-start}
-  #filt{width:158px;max-height:calc(100vh - var(--top-h,150px) - 150px);overflow-y:auto;overflow-x:hidden}
+  #filt{width:158px}
+  /* Was on #filt itself; moved to just .fbody 2026-08-24 so #hyperPanel
+     (now a sibling of .fbody, not a descendant) is never clipped by it
+     again -- see the #hyperPanel CSS comment above for the full story. */
+  #filt .fbody{max-height:calc(100vh - var(--top-h,150px) - 150px);overflow-y:auto;overflow-x:hidden}
   #keys{bottom:auto;top:calc(var(--top-h,150px) + 140px);width:calc(100vw - 20px)}
   #flyhint{display:none!important}
   input[type=text]{width:100%}
@@ -1048,33 +1060,52 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
           <option value="indium">Indium Drive</option>
           <option value="atlantid">Atlantid Drive</option>
         </select>
-        <div class="box" id="hyperPanel" role="dialog" aria-label="Hyperdrive settings">
-          <div class="kicker" style="margin-bottom:8px">Hyperdrive</div>
-          <div class="lb">Drive type <span style="text-transform:none;color:var(--text-faint)">(each also reaches every lower tier)</span></div>
-          <div class="pillrow" id="hyperDriveRow">
-            <button class="pill on" type="button" data-drive="standard" title="Yellow only. Every save starts with this.">Standard</button>
-            <button class="pill" type="button" data-drive="cadmium" title="+ Red/Orange">Cadmium</button>
-            <button class="pill" type="button" data-drive="emeril" title="+ Green">Emeril</button>
-            <button class="pill" type="button" data-drive="indium" title="+ Blue">Indium</button>
-            <button class="pill" type="button" data-drive="atlantid" title="+ Purple -- requires the In Stellar Multitudes questline">Atlantid</button>
-          </div>
-          <div class="lb" style="margin-top:6px">Jump range</div>
-          <div class="pillrow" id="hyperRangeRow">
-            <button class="pill on" type="button" data-range="101">101 LY</button>
-            <button class="pill" type="button" data-range="500">500</button>
-            <button class="pill" type="button" data-range="1000">1000</button>
-            <button class="pill" type="button" data-range="1500">1500</button>
-            <button class="pill" type="button" data-range="2200">2200</button>
-            <button class="pill" type="button" data-range="3000">3000</button>
-            <button class="pill" type="button" data-range="6000">6000</button>
-          </div>
-        </div>
       </div>
       <label class="chk" title="Play a warp-jump animation when entering system view. Click or tap to skip."><input type="checkbox" id="fWarpAnim" checked>Warp animation</label>
       <div class="prow"><button class="btn" id="bReset" title="Clear all filters.">Reset</button>
         <button class="btn" id="bExport" title="Download your notes and bookmarks as a JSON file.">Export</button></div>
       <div class="prow"><button class="btn" id="bImport" title="Load notes and bookmarks from a previously exported JSON file.">Import logs</button></div>
       <input type="file" id="fFile" accept="application/json" style="display:none">
+    </div>
+    <!-- #hyperPanel moved here 2026-08-24 (Tony: "as move right the warp
+         drive window gap increases till disappears off screen... worked
+         absolutely fine before"). It used to live nested inside .fbody,
+         which is why yesterday's position:fixed + JS-tracked-on-every-drag
+         fix was needed at all (.fbody has mobile-only overflow:hidden, and
+         #hyperPanel was a descendant of it). Pulling #hyperPanel out to be
+         a direct sibling of .fbody -- still inside #filt, so #filt is still
+         its positioned ancestor -- means it's no longer inside anything
+         that clips it, so it can go back to plain position:absolute
+         (see the CSS) and NEVER needs explicit repositioning again: an
+         absolutely-positioned child automatically tracks its positioned
+         ancestor's current rendered spot for any reason #filt moves (drag,
+         window resize, orientation change, browser zoom, anything) with
+         zero JS, the same "no extra tracking needed" guarantee #tweak's
+         own version of this pattern already had. That's what "worked fine
+         before" -- yesterday's manual position:fixed tracking only handled
+         the one case (an active #filt drag) that got a hook wired for it,
+         which is exactly the class of bug this redesign removes entirely
+         rather than chasing the next missed case. -->
+    <div class="box" id="hyperPanel" role="dialog" aria-label="Hyperdrive settings">
+      <div class="kicker" style="margin-bottom:8px">Hyperdrive</div>
+      <div class="lb">Drive type <span style="text-transform:none;color:var(--text-faint)">(each also reaches every lower tier)</span></div>
+      <div class="pillrow" id="hyperDriveRow">
+        <button class="pill on" type="button" data-drive="standard" title="Yellow only. Every save starts with this.">Standard</button>
+        <button class="pill" type="button" data-drive="cadmium" title="+ Red/Orange">Cadmium</button>
+        <button class="pill" type="button" data-drive="emeril" title="+ Green">Emeril</button>
+        <button class="pill" type="button" data-drive="indium" title="+ Blue">Indium</button>
+        <button class="pill" type="button" data-drive="atlantid" title="+ Purple -- requires the In Stellar Multitudes questline">Atlantid</button>
+      </div>
+      <div class="lb" style="margin-top:6px">Jump range</div>
+      <div class="pillrow" id="hyperRangeRow">
+        <button class="pill on" type="button" data-range="101">101 LY</button>
+        <button class="pill" type="button" data-range="500">500</button>
+        <button class="pill" type="button" data-range="1000">1000</button>
+        <button class="pill" type="button" data-range="1500">1500</button>
+        <button class="pill" type="button" data-range="2200">2200</button>
+        <button class="pill" type="button" data-range="3000">3000</button>
+        <button class="pill" type="button" data-range="6000">6000</button>
+      </div>
     </div>
   </div>
 
@@ -5507,28 +5538,18 @@ function updateHyperSummary(){
 function positionHyperPanel(){
   var hp=document.getElementById("hyperPanel"), filt=document.getElementById("filt");
   if(!hp.classList.contains("show")) return;
+  /* Back to the .sideL/.sideR CSS-class mechanism (2026-08-24) -- see the
+     #hyperPanel CSS comment for why. This still picks the side ONCE, right
+     here, based on real available room (same "measure don't guess" as
+     positionTweakPanel) -- what's different from yesterday's version is
+     the panel no longer needs its LEFT/TOP re-computed as #filt moves,
+     because position:absolute does that automatically now that #hyperPanel
+     isn't clipped by anything anymore. */
   var fr=filt.getBoundingClientRect();
   var pw=198;
   var roomRight=window.innerWidth-fr.right-8, roomLeft=fr.left-8;
-  /* position:fixed with left/top computed here, NOT the old
-     position:absolute + .sideL/.sideR CSS trick (Tony, 2026-08-24: "the
-     hyperdrive window does not pop out on mobile like on pc"). Root
-     cause: #filt gets overflow-y:auto/overflow-x:hidden on mobile (its
-     own checkbox list needs to scroll on a short screen) -- #hyperPanel
-     is a DOM child of #filt, so a position:absolute panel anchored to
-     #filt (its nearest positioned ancestor) was being silently clipped
-     to invisible the instant it popped outside #filt's own box, which
-     never happened on desktop since #filt has no overflow:hidden there.
-     #filt/#leftcol have no transform/filter/contain, so position:fixed
-     genuinely escapes that clipping (a fixed element is only clipped by
-     an ancestor that establishes a fixed-positioning containing block,
-     which neither of those do) while keeping the same "beside Filters,
-     correct side chosen live" placement PC already had. */
-  var left=(roomRight>=pw||roomRight>=roomLeft)?fr.right+8:fr.left-8-pw;
-  left=Math.max(4,Math.min(window.innerWidth-pw-4,left));
-  var top=Math.max(4,Math.min(window.innerHeight-40,fr.top));
-  hp.style.left=left+"px";
-  hp.style.top=top+"px";
+  hp.classList.remove("sideL","sideR");
+  hp.classList.add(roomRight>=pw||roomRight>=roomLeft?"sideR":"sideL");
   hp.classList.remove("scroll");
   var maxH=window.innerHeight-40;
   if(hp.scrollHeight>maxH+1) hp.classList.add("scroll");
@@ -5830,11 +5851,12 @@ function makeDraggable(boxEl,handleEl){
     var minTop=(topEl?topEl.getBoundingClientRect().bottom:0)+4;
     boxEl.style.left=Math.max(4,Math.min(window.innerWidth-40,ox+ddx))+"px";
     boxEl.style.top=Math.max(minTop,Math.min(window.innerHeight-40,oy+ddy))+"px";
-    /* Hyperdrive's side panel is anchored to #filt's own live rect
-       (positionHyperPanel) -- keep it following if Filters gets dragged
-       while the panel is open. positionHyperPanel() itself no-ops when
-       the panel isn't open, so this is a cheap no-op for every other box. */
-    if(boxEl.id==="filt" && typeof positionHyperPanel==="function") positionHyperPanel();
+    /* No explicit Hyperdrive-panel re-anchor call here any more
+       (2026-08-24) -- #hyperPanel went back to position:absolute anchored
+       to #filt (see its CSS comment), which auto-follows #filt for any
+       reason it moves, drag included, with no JS needed. The removed hook
+       only ever covered this one case (an active #filt drag) and silently
+       missed every other way #filt could move, which is exactly what broke. */
   });
   function end(e){
     if(!dragging||e.pointerId!==ptrId) return;
