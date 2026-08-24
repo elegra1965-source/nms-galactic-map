@@ -179,6 +179,27 @@ html.debug-on #tel{display:block}
 #tCore{font-size:9px;color:var(--text-faint);margin-top:2px}
 
 #leftcol{position:fixed;left:10px;bottom:10px;z-index:25;display:flex;gap:8px;align-items:flex-end}
+/* Filters escapes #leftcol's shared stacking cap while open (Tony,
+   2026-08-24 follow-up: dragged it clear of the toolbar per the fix
+   above, then got stuck behind the "GALAXY #N OF N" badge instead --
+   "can the filter be the only one that is always on top of everything
+   when opened"). Root cause the toolbar-clamp fix above couldn't reach:
+   #filt is a DOM descendant of #leftcol, and #leftcol is itself a
+   stacking context (position:fixed + z-index:25) -- no z-index on
+   #filt itself can ever out-rank something OUTSIDE #leftcol with a
+   higher z-index (like #galInfo's 39), because a nested stacking
+   context never lets a descendant's own z-index compete past its own
+   ancestor's rank in the OUTER context -- that's inherent to how CSS
+   stacking works, not a value that could be raised away. The fix has
+   to raise the ANCESTOR'S rank instead: bumping #leftcol's own
+   z-index, but only while #filt is actually open (:has() keys off
+   #filt:not(.min), so Telemetry and a collapsed Filters pill are both
+   unaffected). 45 clears every other floating HUD/toolbar element in
+   this file (the highest short of this is #toast/#hyperPanel at 40)
+   while staying below real modals (#err 60, #modalWrap 80, the tour
+   overlay, the warp transition) so those can still cover Filters if
+   they ever appear at the same time. */
+#leftcol:has(#filt:not(.min)){z-index:45}
 #tweak{display:none;width:100%;padding:8px 10px;box-sizing:border-box}
 html.debug-on #tweak{display:block}
 /* Rendering tuning expands SIDEWAYS out of #accessPop instead of downward in
