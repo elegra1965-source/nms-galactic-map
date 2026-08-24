@@ -195,6 +195,13 @@ html.debug-on #tweak{display:block}
 #tweak.sideR{left:100%;margin-left:8px}
 #tweak.sideL{right:100%;margin-right:8px}
 #filt{width:176px;padding:10px 12px;position:relative}
+/* Filters header (2026-08-24): needs its own flex layout (unlike the
+   shared .fhead class other fold-headers use unmodified) because it now
+   holds a label span *and* a dedicated #bFiltMin button side by side --
+   see the #bFiltMin wiring comment near toggleFold() for why. */
+#fHead{display:flex;align-items:center;justify-content:space-between;gap:6px}
+#fHeadLabel{flex:1;min-width:0}
+#fHead #bFiltMin{flex:none;padding:3px 8px;font-size:11px}
 /* Expands SIDEWAYS out of #filt, same proven mechanism #tweak already uses
    out of #accessPop (position:absolute anchored to the nearest positioned
    ancestor, #filt itself, which is position:relative) -- NOT position:fixed.
@@ -207,7 +214,7 @@ html.debug-on #tweak{display:block}
    layout, just without the cut-off). This version keeps the correct sideways
    layout AND copies #tweak's own max-height:calc(100vh - 40px) safety net,
    which is the one piece v1 was actually missing. */
-#hyperPanel{display:none;width:198px;padding:10px 12px;
+#hyperPanel{display:none;position:fixed;width:198px;padding:10px 12px;
   max-height:calc(100vh - 40px);overflow-y:hidden;overflow-x:hidden;z-index:40}
 #hyperPanel.show{display:block}
 /* #hyperPanel.scroll: only added by positionHyperPanel() once it's actually
@@ -219,8 +226,11 @@ html.debug-on #tweak{display:block}
    truly needed sidesteps that rounding entirely instead of guessing at a
    CSS fudge factor. */
 #hyperPanel.scroll{overflow-y:auto}
-#hyperPanel.sideR{position:absolute;top:0;left:100%;margin-left:8px}
-#hyperPanel.sideL{position:absolute;top:0;right:100%;margin-right:8px}
+/* .sideL/.sideR position:absolute rules removed 2026-08-24 -- #hyperPanel
+   is position:fixed now (see the base rule above) with left/top set
+   directly by positionHyperPanel() each time it opens/moves, so these
+   two classes no longer do any layout work. See positionHyperPanel()'s
+   own comment for the mobile-clipping bug this replaced. */
 #hyperSummary{color:var(--gold);font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:.04em}
 .tag.wp{border-color:#ffb454;color:#ffb454}
 .tag.ruin{border-color:#c9a06a;color:#c9a06a}
@@ -975,7 +985,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 
 <div id="leftcol">
   <div id="filt" class="box fold min">
-    <div class="kicker fhead" id="fHead">▸ Filters</div>
+    <div class="kicker fhead" id="fHead"><span id="fHeadLabel">▸ Filters</span><button class="btn" id="bFiltMin" type="button" title="Collapse or expand the filters panel.">&#9656;</button></div>
     <div class="fbody">
       <div style="font-size:10.5px;color:var(--text-faint);line-height:1.35;margin-bottom:7px">Applies to Local view — that is where the real systems are.</div>
       <div class="fld"><div class="lb">Star colour</div>
@@ -4668,7 +4678,7 @@ window.addEventListener("keydown",function(e){
      very same keypress. */
   if(e.ctrlKey&&e.shiftKey&&e.code==="KeyF"){ e.preventDefault(); toggleStats(); return; }
   if(e.code==="KeyH") toggleLabels();
-  if(e.code==="KeyF") toggleFold("filt","fHead","Filters");
+  if(e.code==="KeyF") toggleFold("filt","fHeadLabel","Filters","bFiltMin");
   if(e.code==="KeyG") toggleGrid();
 });
 function toggleStats(){
@@ -5247,10 +5257,22 @@ function jumpTo(str,silent){
   updateRings();
   buildGalaxyMarks();
 }
-function toggleFold(boxId,headId,label){
+function toggleFold(boxId,headId,label,minBtnId){
   var t=document.getElementById(boxId);
   t.classList.toggle("min");
-  document.getElementById(headId).textContent=(t.classList.contains("min")?"▸ ":"▾ ")+label;
+  var isMin=t.classList.contains("min");
+  document.getElementById(headId).textContent=(isMin?"▸ ":"▾ ")+label;
+  /* Filters (2026-08-24, Tony: "not collapsible like others") is the only
+     fold-via-header box that also has its own dedicated minimize button
+     (#bFiltMin, mirroring #bCourseMin/#bManifestMin/#bEditMin) -- kept in
+     sync here so every way of toggling Filters (header tap, the button,
+     the toolbar Filters button, and the F hotkey) can never drift out of
+     sync with each other. #tel/#searchPop/#tweak don't pass minBtnId and
+     stay untouched by this. */
+  if(minBtnId){
+    var b=document.getElementById(minBtnId);
+    if(b) b.innerHTML=isMin?"&#9656;":"&#9662;";
+  }
 }
 
 /* ============ wiring ============ */
@@ -5467,8 +5489,25 @@ function positionHyperPanel(){
   var fr=filt.getBoundingClientRect();
   var pw=198;
   var roomRight=window.innerWidth-fr.right-8, roomLeft=fr.left-8;
-  hp.classList.remove("sideL","sideR");
-  hp.classList.add(roomRight>=pw||roomRight>=roomLeft?"sideR":"sideL");
+  /* position:fixed with left/top computed here, NOT the old
+     position:absolute + .sideL/.sideR CSS trick (Tony, 2026-08-24: "the
+     hyperdrive window does not pop out on mobile like on pc"). Root
+     cause: #filt gets overflow-y:auto/overflow-x:hidden on mobile (its
+     own checkbox list needs to scroll on a short screen) -- #hyperPanel
+     is a DOM child of #filt, so a position:absolute panel anchored to
+     #filt (its nearest positioned ancestor) was being silently clipped
+     to invisible the instant it popped outside #filt's own box, which
+     never happened on desktop since #filt has no overflow:hidden there.
+     #filt/#leftcol have no transform/filter/contain, so position:fixed
+     genuinely escapes that clipping (a fixed element is only clipped by
+     an ancestor that establishes a fixed-positioning containing block,
+     which neither of those do) while keeping the same "beside Filters,
+     correct side chosen live" placement PC already had. */
+  var left=(roomRight>=pw||roomRight>=roomLeft)?fr.right+8:fr.left-8-pw;
+  left=Math.max(4,Math.min(window.innerWidth-pw-4,left));
+  var top=Math.max(4,Math.min(window.innerHeight-40,fr.top));
+  hp.style.left=left+"px";
+  hp.style.top=top+"px";
   hp.classList.remove("scroll");
   var maxH=window.innerHeight-40;
   if(hp.scrollHeight>maxH+1) hp.classList.add("scroll");
@@ -5658,9 +5697,25 @@ function positionTweakPanel(){
   tw.classList.add(roomRight>=190||roomRight>=roomLeft?"sideR":"sideL");
   tw.style.marginTop="0";
 }
-document.getElementById("fHead").addEventListener("click",function(){ toggleFold("filt","fHead","Filters"); });
+document.getElementById("fHead").addEventListener("click",function(){ toggleFold("filt","fHeadLabel","Filters","bFiltMin"); });
 document.getElementById("telHead").addEventListener("click",function(){ toggleFold("tel","telHead","Telemetry"); });
-document.getElementById("bFiltToggle").addEventListener("click",function(){ toggleFold("filt","fHead","Filters"); });
+document.getElementById("bFiltToggle").addEventListener("click",function(){ toggleFold("filt","fHeadLabel","Filters","bFiltMin"); });
+/* Dedicated collapse button for Filters (2026-08-24, Tony: "filter its not
+   collapsible like others so have to always click filter button next to
+   search to collapse"). Real root cause: #fHead doubles as makeDraggable's
+   drag handle, and on a real touchscreen a "tap" easily drifts past the
+   6px drag threshold, which silently swallows the click that would've
+   toggled the fold (see makeDraggable's own comment) -- so the header tap
+   worked in theory but was flaky in practice, exactly why Tony fell back
+   to the toolbar button every time. Course/Manifest/Edit system already
+   solved this with a real <button> inside their drag handle, which
+   makeDraggable's pointerdown already excludes from ever starting a drag
+   (e.target.closest("button")) -- mirrors that exact, already-proven
+   pattern instead of inventing a new one. */
+document.getElementById("bFiltMin").addEventListener("click",function(e){
+  e.stopPropagation();
+  toggleFold("filt","fHeadLabel","Filters","bFiltMin");
+});
 function syncResetBtn(){
   var btn=document.getElementById("bAddrReset");
   if(hasRealLocation&&focusSystem){ btn.textContent="Reset"; btn.title="Reset the address box back to where you currently are."; }
@@ -5740,8 +5795,25 @@ function makeDraggable(boxEl,handleEl){
     if(moved<6) return;
     boxEl.style.position="fixed";
     boxEl.style.right="auto"; boxEl.style.bottom="auto"; boxEl.style.transform="none";
+    /* Clamp top to the real toolbar bottom edge, not a flat 4px (Tony,
+       2026-08-24: dragging Filters up near the toolbar left it stuck --
+       #top is z-index:30, every draggable box here is z-index:25 or
+       lower, so once a box's own top overlapped #top's box, #top silently
+       won every future pointerdown at that spot -- including on the
+       box's own drag handle, so there was no way to grab it again to
+       pull it back down. Measuring #top's live bottom edge (same
+       --top-h source of truth used everywhere else in this file) makes
+       it structurally impossible to drag ANY of the 7 draggable boxes
+       into that dead zone, not just Filters. */
+    var topEl=document.getElementById("top");
+    var minTop=(topEl?topEl.getBoundingClientRect().bottom:0)+4;
     boxEl.style.left=Math.max(4,Math.min(window.innerWidth-40,ox+ddx))+"px";
-    boxEl.style.top=Math.max(4,Math.min(window.innerHeight-40,oy+ddy))+"px";
+    boxEl.style.top=Math.max(minTop,Math.min(window.innerHeight-40,oy+ddy))+"px";
+    /* Hyperdrive's side panel is anchored to #filt's own live rect
+       (positionHyperPanel) -- keep it following if Filters gets dragged
+       while the panel is open. positionHyperPanel() itself no-ops when
+       the panel isn't open, so this is a cheap no-op for every other box. */
+    if(boxEl.id==="filt" && typeof positionHyperPanel==="function") positionHyperPanel();
   });
   function end(e){
     if(!dragging||e.pointerId!==ptrId) return;
@@ -6682,7 +6754,7 @@ document.getElementById("hyperOk").addEventListener("click",closeModal);
 document.getElementById("hyperOpenFilters").addEventListener("click",function(){
   closeModal();
   var f=document.getElementById("filt");
-  if(f.classList.contains("min")) toggleFold("filt","fHead","Filters");
+  if(f.classList.contains("min")) toggleFold("filt","fHeadLabel","Filters","bFiltMin");
   // fHyper/fHyperDrive are hidden inputs now (see task 6's slide-out redesign)
   // driven by the Hyperdrive button + pill panel -- open that instead of
   // trying to focus a display:none select.
