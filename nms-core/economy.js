@@ -37,6 +37,59 @@
 // honestly rather than overclaimed, same as every other README in this
 // module.
 //
+// 2026-08-24 addition -- pickBiome() below. Tony asked whether a real
+// pattern exists for which biome (Lush/Frozen/Radioactive/etc.) a planet
+// gets, since the old flat `pickOne(br,BIOME_KEYS)` in preview.html picks
+// uniformly across all 12 biome keys with zero regard for star colour,
+// galaxy type, or whether the body is a "Prime" (Origins-era extra) slot --
+// confirmed "close but not close enough" by his own in-game experience.
+// Research (session 2026-08-24, see NMS_Biome_Pattern_Analysis.xlsx --
+// delivered to Tony, not shipped in this repo) found a citable source:
+// nomanssky.fandom.com/wiki/Biome publishes two weighted tables ("Normal
+// Planets" and "Prime Planets"), broken out by star colour and, for yellow
+// stars only, by galaxy type (Norm/Lush/Empty), stating the numbers were
+// "extracted from the 3.68 version of BIOMELISTPERSTARTYPE.MBIN" -- the
+// same decompiled-data category already trusted above for ODDS/RING_CHANCE.
+// BIOME_WEIGHTS below is that table, transcribed as-is (not independently
+// re-verified against the .MBIN file itself the way ODDS/RING_CHANCE were --
+// this is a second-hand wiki transcription, fetched twice independently and
+// consistent both times, but flagged with less confidence than a direct
+// decompile).
+//
+// Two real, disclosed gaps the wiki table itself doesn't cover, each
+// handled as an invented placeholder rather than silently ignored:
+//   - No Purple/Exotic star column exists on the wiki page at all. Rather
+//     than guess a Purple-specific table, avgPurpleColumn() below averages
+//     the 6 real columns (yellowNorm/yellowLush/yellowEmpty/red/green/blue)
+//     live, so it can never drift out of sync with the real data if that's
+//     ever edited.
+//   - No dedicated Harsh-galaxy column exists either -- a separate wiki page
+//     (Harsh_galaxy) says Harsh galaxies are "much more likely" to generate
+//     Extreme biomes (Scorched/Frozen/Toxic/Radioactive/Volcanic) than Norm,
+//     with no exact multiplier published anywhere found. HARSH_MULTIPLIER
+//     is this project's own invented placeholder (2x on those 5 rows,
+//     applied on top of the Norm-galaxy yellow column, or the relevant
+//     colour column for red/green/blue), same "disclosed guess, easy to
+//     adjust" status as GIANT_CHANCE above.
+//
+// Prime-vs-Normal routing: pickBiome() takes an `isPrime` flag from the
+// caller rather than deriving it itself -- preview.html approximates it per
+// body as `pi >= attrs.planet_count` (attrs from nms-core/system.js's real
+// systemAttributes()), i.e. body slots beyond the real "normal" planet count
+// are treated as Prime/extra. WHICH exact slot is Prime isn't something
+// nms-core exposes per-body (same disclosed gap as the existing moon-slot
+// approximation in generateSystem() -- see its own comment), so this is a
+// reasonable positional approximation, not confirmed ground truth.
+//
+// The wiki's 13 category rows are folded onto this project's 11 real
+// pickable BIOME_KEYS (Irradiated excluded -- see BIOME_ORDER's own comment)
+// as follows: Weird->Exotic, Swamp->Marsh, Lava->Volcanic (all judgement
+// calls, not exact name matches), and the wiki's 3 colour-locked
+// "Red/Green/Blue (star-matched)" rows are SUMMED into this project's single
+// "Mega Exotic" key per column (mutually-exclusive rows, so summing loses no
+// probability mass) -- full reasoning for every mapping decision is in the
+// delivered spreadsheet's "Biome Name Mapping" tab.
+//
 // Usage: pass your own seeded RNG function `r` (must return a float in
 // [0,1) each call, e.g. Math.random, or the PRNG in nms-core/prng.js, or a
 // hand-rolled mulberry32 like this project uses elsewhere).
@@ -305,8 +358,134 @@ function rollRing(br, biome, isMoon) {
   return RING_STYLE_BY_BIOME[biome] || "tan";
 }
 
+/**
+ * The 11 biome keys pickBiome() can actually produce. This project's own
+ * BIOMES object (preview.html) has 12 keys, but "Irradiated" is a manual-
+ * only alias of "Radioactive" (same texture/resource data -- added
+ * 2026-08-17 so travellers can still pick the wiki's own name in Edit
+ * system "just in case", per Tony) with no dedicated wiki row of its own --
+ * folding it out of procedural generation here (rather than giving it a
+ * 12th weight column nobody has real data for) means Radioactive planets no
+ * longer randomly and meaninglessly show two different names for the same
+ * biome. Order matches BIOME_WEIGHTS' column order below; not alphabetical.
+ */
+var BIOME_ORDER = ["Lush", "Barren", "Dead", "Exotic", "Mega Exotic",
+  "Scorched", "Frozen", "Toxic", "Radioactive", "Marsh", "Volcanic"];
+
+/**
+ * Relative weights (NOT percentages -- see pickBiome()/weightedPick() for
+ * how these get normalised) transcribed from nomanssky.fandom.com/wiki/
+ * Biome's "Normal Planets" and "Prime Planets" tables, 2026-08-24. Column
+ * order within each row matches BIOME_ORDER above. yellowNorm/yellowLush/
+ * yellowEmpty are the wiki's own 3 yellow-star-by-galaxy-type columns; red/
+ * green/blue are stated on the wiki as NOT varying by galaxy type. No
+ * purple column exists (see avgPurpleColumn() below).
+ */
+var BIOME_WEIGHTS = {
+  normal: {
+    yellowNorm:  [2, 1, 2,   0,   0, 1, 1, 1, 1, 0, 0],
+    yellowLush:  [4, 1, 0.5, 1,   0, 1, 1, 1, 1, 0, 0],
+    yellowEmpty: [1, 1, 4,   1,   0, 1, 1, 1, 1, 0, 0],
+    red:         [1, 1, 2,   3,   1, 1, 1, 1, 1, 0, 0],
+    green:       [1, 1, 2,   1,   1, 1, 1, 1, 1, 0, 0],
+    blue:        [1, 1, 2,   2,   1, 1, 1, 1, 1, 0, 0],
+  },
+  prime: {
+    yellowNorm:  [2, 1, 0.5, 0,   0, 1, 1, 0.5, 0.5, 1, 1],
+    yellowLush:  [4, 1, 0.5, 0.5, 3, 1, 1, 0.5, 0.5, 1, 1],
+    yellowEmpty: [1, 1, 0.5, 0,   3, 1, 1, 0.5, 0.5, 1, 1],
+    red:         [1, 1, 0.5, 0.5, 3, 1, 1, 1,   0.5, 0, 2],
+    green:       [1, 1, 0.5, 0.5, 3, 1, 1, 1,   0.5, 2, 0],
+    blue:        [1, 1, 0.5, 0.5, 3, 1, 1, 0.5, 0.5, 1, 1],
+  },
+};
+
+/** Disclosed placeholder -- see the 2026-08-24 header addendum above. Not a
+ * decompiled value; the wiki's Harsh_galaxy page describes the direction
+ * ("much more likely") but publishes no exact multiplier. */
+var HARSH_MULTIPLIER = 2;
+var HARSH_BOOST_KEYS = ["Scorched", "Frozen", "Toxic", "Radioactive", "Volcanic"];
+
+/** Averages the 6 real wiki columns live (rather than hardcoding a 7th
+ * "purple" column) so it can never drift out of sync if BIOME_WEIGHTS is
+ * ever edited. Disclosed placeholder -- no purple-star data exists on the
+ * wiki page at all, see header addendum. */
+function avgPurpleColumn(table) {
+  var cols = [table.yellowNorm, table.yellowLush, table.yellowEmpty, table.red, table.green, table.blue];
+  var n = BIOME_ORDER.length, out = new Array(n).fill(0), ci, i;
+  for (ci = 0; ci < cols.length; ci++) for (i = 0; i < n; i++) out[i] += cols[ci][i];
+  for (i = 0; i < n; i++) out[i] = out[i] / cols.length;
+  return out;
+}
+
+/**
+ * Weighted pick that ALWAYS consumes exactly one r() call, same contract as
+ * pickOne(r,arr) elsewhere in this project -- callers reusing the same
+ * seeded rng instance for further draws afterwards depend on this, same
+ * "give it its own instance if in doubt" guidance as every other function
+ * in this file. (The r()*(total>0?total:1) below still calls r() even in
+ * the never-expected-in-practice all-zero-weights case, rather than
+ * short-circuiting before the draw -- every real column here always sums
+ * positive, see the header addendum, but this keeps the guarantee
+ * unconditional rather than data-dependent.)
+ */
+function weightedPick(r, keys, weights) {
+  var total = 0, i;
+  for (i = 0; i < weights.length; i++) total += weights[i];
+  var x = r() * (total > 0 ? total : 1);
+  if (total <= 0) return keys[0];
+  for (i = 0; i < weights.length; i++) {
+    x -= weights[i];
+    if (x < 0) return keys[i];
+  }
+  return keys[keys.length - 1]; // floating-point fallback
+}
+
+/**
+ * Picks a planet/moon's biome using the real wiki-sourced weight table
+ * instead of a flat uniform chance across all keys -- see the 2026-08-24
+ * header addendum for the full research writeup and disclosed placeholders
+ * (Harsh multiplier, Purple column averaging, the isPrime approximation).
+ *
+ * @param {() => number} r - seeded RNG, consumes exactly one call
+ * @param {object} [opts]
+ * @param {"yellow"|"red"|"green"|"blue"|"purple"} [opts.starKey="yellow"]
+ * @param {"Norm"|"Harsh"|"Empty"|"Lush"|"Unknown"} [opts.galaxyType="Norm"]
+ * @param {boolean} [opts.isPrime=false] - true for an approximated "Prime"/
+ *   extra body slot (see header addendum); false (the default) uses the
+ *   "Normal Planets" table, the safe choice when the caller has no real
+ *   attrs.planet_count to compare against (e.g. no portal address).
+ * @returns {string} one of BIOME_ORDER's 11 keys
+ */
+function pickBiome(r, opts) {
+  opts = opts || {};
+  var starKey = opts.starKey || "yellow";
+  var gType = opts.galaxyType || "Norm";
+  var table = opts.isPrime ? BIOME_WEIGHTS.prime : BIOME_WEIGHTS.normal;
+
+  var col;
+  if (starKey === "yellow") {
+    col = (gType === "Lush") ? table.yellowLush
+        : (gType === "Empty") ? table.yellowEmpty
+        : table.yellowNorm; // Norm, Harsh (boosted below) and Unknown all share this base column
+  } else if (starKey === "red") col = table.red;
+  else if (starKey === "green") col = table.green;
+  else if (starKey === "blue") col = table.blue;
+  else if (starKey === "purple") col = avgPurpleColumn(table);
+  else col = table.yellowNorm;
+
+  var weights = col.slice();
+  if (gType === "Harsh") {
+    for (var hi = 0; hi < BIOME_ORDER.length; hi++) {
+      if (HARSH_BOOST_KEYS.indexOf(BIOME_ORDER[hi]) >= 0) weights[hi] = weights[hi] * HARSH_MULTIPLIER;
+    }
+  }
+  return weightedPick(r, BIOME_ORDER, weights);
+}
+
 export {
   ODDS, RING_CHANCE, GIANT_CHANCE, RACES, RACE_BY_DOMINANT_CODE, ECON, ECON_S, CONFLICT,
   STELLAR_EL, UNIVERSAL_EL, RING_STYLE_BY_BIOME,
   rollSystemFlavor, rollSystemFlavorFromAttrs, rollRing,
+  BIOME_ORDER, BIOME_WEIGHTS, HARSH_MULTIPLIER, HARSH_BOOST_KEYS, pickBiome,
 };
