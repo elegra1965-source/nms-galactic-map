@@ -5283,7 +5283,7 @@ function setCtrl(c){
 }
 function jumpTo(str,silent){
   var a=parseAddress(str);
-  if(!a){ toast("Address needs 12 glyphs"); document.getElementById("inAddr").style.borderColor="#ff4a4a"; return; }
+  if(!a){ toast("Address needs 12 glyphs"); document.getElementById("inAddr").style.borderColor="#ff4a4a"; return false; }
   document.getElementById("inAddr").style.borderColor="";
   focus.x=a.x; focus.y=a.y; focus.z=a.z;
   marker.position.copy(voxelToGalaxy(a.x,a.y,a.z));
@@ -5316,6 +5316,7 @@ function jumpTo(str,silent){
   }
   updateRings();
   buildGalaxyMarks();
+  return true;
 }
 function toggleFold(boxId,headId,label,minBtnId){
   var t=document.getElementById(boxId);
@@ -5623,19 +5624,19 @@ document.getElementById("mGal").addEventListener("click",function(){ setMode("ga
 document.getElementById("mLoc").addEventListener("click",function(){ setMode("local"); });
 document.getElementById("cOrb").addEventListener("click",function(){ setCtrl("orbit"); });
 document.getElementById("cFly").addEventListener("click",function(){ setCtrl("fly"); });
-document.getElementById("bJump").addEventListener("click",function(){ jumpTo(document.getElementById("inAddr").value); });
+document.getElementById("bJump").addEventListener("click",function(){ if(jumpTo(document.getElementById("inAddr").value)) playWarpTransition("portal"); });
 document.getElementById("inAddr").addEventListener("input",function(){
   var v=cleanHex(this.value).slice(0,12);
   this.value=v; keySeq=v; drawKeypad();
 });
 document.getElementById("inAddr").addEventListener("keydown",function(e){
-  if(e.key==="Enter") jumpTo(this.value);
+  if(e.key==="Enter"){ if(jumpTo(this.value)) playWarpTransition("portal"); }
 });
 document.getElementById("bRand").addEventListener("click",function(){
   var r=mulberry32((Math.random()*4294967296)>>>0);
   var a=hex(1,1)+hex(Math.floor(r()*0x2FF),3)+hex(Math.floor(r()*0x100),2)+
         hex(Math.floor(r()*0x1000),3)+hex(Math.floor(r()*0x1000),3);
-  setKeypad(a); jumpTo(a);
+  setKeypad(a); if(jumpTo(a)) playWarpTransition("portal");
 });
 document.getElementById("bKeys").addEventListener("click",function(){
   var k=document.getElementById("keys");
@@ -5651,12 +5652,12 @@ function toggleGrid(){
 document.getElementById("bGrid").addEventListener("click",toggleGrid);
 document.getElementById("kBack").addEventListener("click",function(){ keySeq=keySeq.slice(0,-1); drawKeypad(); });
 document.getElementById("kClear").addEventListener("click",function(){ keySeq=""; drawKeypad(); });
-document.getElementById("kJump").addEventListener("click",function(){ jumpTo(keySeq); });
+document.getElementById("kJump").addEventListener("click",function(){ if(jumpTo(keySeq)) playWarpTransition("portal"); });
 document.getElementById("bEnter").addEventListener("click",function(){
   if(mode==="system"){ setMode("local"); if(selected) updatePanel(selected); return; }
   if(!selected) return;
   if(!canReachColor(selected.type)){ toast(driveNeededMsg(selected.type)); return; }
-  buildSystemView(selected); setMode("system"); playWarpTransition();
+  buildSystemView(selected); setMode("system"); playWarpTransition("ship");
   if(selected.editorName||selected.editorFriendCode){
     var who=selected.editorName?("Documented by "+selected.editorName):"Documented by a traveller";
     toast(who+(selected.editorFriendCode?(" \u00b7 Friend code: "+selected.editorFriendCode):""), 3200);
@@ -5675,7 +5676,7 @@ document.getElementById("bGoCourse").addEventListener("click",function(){
     toast(driveNeededMsg(courseTarget.type)+" -- tap Waypoint on its panel to save it for later");
     return;
   }
-  var a=courseTarget.address; setKeypad(a); jumpTo(a); playWarpTransition();
+  var a=courseTarget.address; setKeypad(a); jumpTo(a); playWarpTransition("ship");
 });
 document.getElementById("bSave").addEventListener("click",function(){
   if(!selected) return;
@@ -5945,11 +5946,29 @@ function abortRoute(){
   if(_routeWorker){ _routeWorker.terminate(); _routeWorker=null; }
   hideRouteLoader();
 }
-function playWarpTransition(){
+function playWarpTransition(kind){
   if(!WARP_ENABLED) return;
   var ov=document.getElementById('warp-overlay');
   var vid=document.getElementById('warp-vid');
   if(!ov||!vid) return;
+  /* 2026-08-25, Tony: two distinct clips matching the real game's two
+     separate travel mechanics -- portals are on-foot, walk-through-a-
+     glowing-ring, no ship ever visible; hyperdrive/plotted travel is the
+     ship-flown warp tunnel. 'portal' (default) is Tony's own on-foot
+     portal-ring footage, used for any raw-address lookup (typing hex,
+     glyph keypad, Random, search results, admin "view"). 'ship' is the
+     original ship-hyperdrive footage, reserved for the Set course -> Jump
+     to -> Enter system flow. Swap the <source> targets and reload rather
+     than keeping two separate <video> elements, since only one is ever
+     showing at a time. */
+  var isShip=(kind==="ship");
+  var webmSrc=isShip?"warp_transition.webm":"warp_transition_portal.webm";
+  var mp4Src=isShip?"warp_transition.mp4":"warp_transition_portal.mp4";
+  var sWebm=vid.querySelector('source[type="video/webm"]');
+  var sMp4=vid.querySelector('source[type="video/mp4"]');
+  if(sWebm) sWebm.src=webmSrc;
+  if(sMp4) sMp4.src=mp4Src;
+  vid.load();
   ov.style.display='block';
   vid.currentTime=0;
   vid.play().catch(function(){ ov.style.display='none'; });
@@ -7242,7 +7261,7 @@ function runSearch(query){
     }
     document.getElementById("inAddr").value=addr;
     setKeypad(addr);
-    jumpTo(addr);
+    if(jumpTo(addr)) playWarpTransition("portal");
     closeSearch();
     // Body/base search results (2026-08-21): jumpTo() already opened the
     // panel and rebuilt #pBodies synchronously above, so the matched row's
@@ -8305,7 +8324,7 @@ document.getElementById("adminQueue").addEventListener("click",function(e){
       document.getElementById("galSel").value=String(galaxy);
       syncGalaxyPickInput();
     }
-    jumpTo(address);
+    if(jumpTo(address)) playWarpTransition("portal");
     return;
   }
   if(act==="fix"){
