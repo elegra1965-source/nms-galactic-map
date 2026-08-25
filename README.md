@@ -120,6 +120,14 @@ and tritanopia -- built into the map itself, not bolted on as an afterthought.
 
 ![Accessibility panel](screenshots/08-accessibility-panel.jpg)
 
+**Draggable panels.** Filters, the system info panel, Course plotted, the
+glyph keypad, Search, Edit system, and Accessibility can all be dragged by
+their header to wherever suits your screen -- handy on smaller or rotated
+phones where they'd otherwise overlap, or just to pull a card off the course
+line it's sitting on.
+
+![Course plotted card dragged clear of the jump line](screenshots/09-draggable-panels.jpg)
+
 ## The address, decoded
 
 ```
@@ -230,6 +238,8 @@ against a real corpus, planet names weren't (this is surfaced to players
 directly, see the About modal and the hint under every system's planet
 list).
 
+**Updated 2026-08-23** against a newer release of the same upstream library, which fixed three real bugs in this project's own port (an off-by-one on the safe-start-planet draw, a missing signed-coordinate fold in black-hole/Atlas placement that affected roughly half of all voxels, and a desynced RNG stream on purple/gas-giant systems) and added a genuinely new capability: `nms-core/system.js` now derives real economy type, wealth, conflict level, and dominant race directly from the game's own generator — the actual reverse-engineered algorithm, not `economy.js`'s statistically-approximated word pools — validated against 1000 real, wiki-documented systems to 98–99% accuracy per field. This isn't wired into the live site's economy/race/conflict display yet (still `economy.js`, via a separate RNG stream — see `TODO.md`), but the star-type/planet-count/black-hole/Atlas-placement fixes are live for every visitor.
+
 `nms-tools/nms-lookup.js` wraps the whole module behind one call —
 `await init('./nms-core')` then `getSystem(address, galaxy)` — for anyone
 who wants game-accurate system data in their own project without learning
@@ -283,6 +293,8 @@ field on a body, e.g. rings never apply to moons — enforced there, not just
 hidden in the UI), so a client that tried to sneak in an unlisted field would
 just have it silently dropped, not accepted. `galaxy` itself is validated the
 same way (an integer 0–255) rather than trusted blindly from the client.
+
+**Seeded from a public corpus, 2026-08-23.** 1000 of the records in `data/overrides.json` weren't typed in by a visitor — they were bulk-imported from a public, wiki-documented ground-truth corpus (`nms-systems-ground-truth-2026-08-23.json`, compiled by hadsh/nms_namegen from the NMS Fandom wiki), used here to seed real star class/water/dissonant/black-hole/economy/conflict/race data for 1000 systems nobody had visited yet. Each of those records is honest about its own provenance rather than pretending to be a personal submission: `editorName` reads "Added -- no original editor name available", and `notes` cites the exact wiki page/URL it came from, with an open invite for the real documenter (or you) to claim it properly via Edit system. Only fields the corpus genuinely documents and this form actually supports were written — no system/region names, no planet/moon counts, nothing guessed.
 
 **Edit tracking & disputes.** Every field on a system carries a gold/green/
 amber/red status — gold and green are computed client-side on the fly by

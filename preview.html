@@ -544,7 +544,14 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   white-space:nowrap;transform:translate(-50%,-150%);opacity:.92;
   background:rgba(4,6,10,0.55);padding:2px 6px;border-radius:4px}
 .hoverpop{position:fixed;z-index:36;pointer-events:none;font-family:'Orbitron',sans-serif;
-  background:rgba(11,17,25,.95);border:1px solid var(--border);border-radius:var(--r-sm);
+  /* 2026-08-25, Tony: this popup is pinned centred-above the cursor with no
+     awareness of what's underneath (the course ring/line included), and
+     screenshots showed it sometimes burying the ring depending on luck of
+     where the star happened to sit on screen. Dropping opacity from .95 to
+     .82 -- cheap, fixes every overlap case regardless of direction, no new
+     positioning logic -- lets the ring/line stay faintly visible through the
+     card instead of vanishing behind it. Text/icons stay readable at .82. */
+  background:rgba(11,17,25,.82);border:1px solid var(--border);border-radius:var(--r-sm);
   padding:6px 10px;transform:translate(-50%,calc(-100% - 14px));white-space:nowrap}
 .hoverpop .hpName{color:var(--gold);font-size:12px;letter-spacing:.06em;margin:0 0 2px}
 .hoverpop .hpCls{color:var(--cyan);font-size:10px;letter-spacing:.05em;margin:0 0 4px}
@@ -1568,7 +1575,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     </div>
     <div class="mfld">
       <div class="lb">Boxes in your way?</div>
-      <div style="font-size:12px;color:var(--text-dim);line-height:1.55">Filters, the system info panel, and Course plotted can all be dragged by their header to wherever suits your screen -- handy on smaller or rotated phones where they can otherwise overlap.</div>
+      <div style="font-size:12px;color:var(--text-dim);line-height:1.55">Filters, the system info panel, Course plotted, the glyph keypad, Search, Edit system, and Accessibility can all be dragged by their header to wherever suits your screen -- handy on smaller or rotated phones where they can otherwise overlap.</div>
     </div>
     <div class="mfld">
       <div class="lb">More by elegra1965</div>
