@@ -6077,12 +6077,27 @@ function hideRouteLoader(){
    plotted hop by hop (see findRouteAsync's comment) -- so a slow fallback
    at least visibly shows it's making progress, not stuck/looping, instead
    of leaving the same generic flavour text sitting there for 10+ seconds. */
+var _lastHopLineTs=0; /* throttles _routeLoaderHop's DOM updates, see its comment */
 function _routeLoaderFallbackStart(){
   clearInterval(_logStreamInterval);
+  _lastHopLineTs=0;
   var tc=document.getElementById("terminal-console");
   if(tc) tc.innerHTML="&gt; NO DIRECT LANE IN RANGE -- PLOTTING HOP BY HOP...";
 }
+/* Real fix 2026-08-25 (Tony, after seeing the hop lines live: "scrolling
+   writing to fast"): a short/cheap route can clear 10+ hops in a couple of
+   seconds -- each one still gets its own real, honest line, but at that
+   pace they were flying past faster than anyone could actually read a star
+   name before the next one bumped it off (terminal-console is a small
+   fixed-height box, only ~4 lines visible at once). This doesn't slow the
+   route down at all -- findRouteAsync keeps computing hops exactly as fast
+   as it did before -- it just skips writing a DOM line for a hop that
+   arrives too soon after the last one that got written, so whichever lines
+   DO get shown stay on screen long enough to actually read. */
 function _routeLoaderHop(next,hopNum){
+  var now=performance.now();
+  if(now-_lastHopLineTs<400) return;
+  _lastHopLineTs=now;
   var tc=document.getElementById("terminal-console");
   if(!tc) return;
   var nm=(next&&next.name)?next.name.toUpperCase():"UNKNOWN SYSTEM";
