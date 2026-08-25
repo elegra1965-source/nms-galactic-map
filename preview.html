@@ -4163,11 +4163,18 @@ function setCourse(s,silent){
   function _runRouteFallback(){
     if(!silent) _routeLoaderFallbackStart();
     findRouteAsync(focusSystem,_s,_range,true,
-      function(next,hopNum){ if(!silent&&_myGen===_routeGen) _routeLoaderHop(next,hopNum); },
+      function(next,hopNum){ /* live per-hop line replaced by the post-plot
+        reveal below (_revealRouteHops) -- see its comment */ },
       function(rt){
         if(!rt) return; /* superseded by a newer setCourse() call, or aborted -- nothing more to do */
         courseWaypoints=rt.path; courseTruncated=rt.truncated;
-        _finishSetCourse(_s,_ly,_range,_dvx,_dvy,_dvz);
+        if(!silent){
+          _revealRouteHops(courseWaypoints,_myGen,function(){
+            if(_myGen===_routeGen) _finishSetCourse(_s,_ly,_range,_dvx,_dvy,_dvz);
+          });
+        } else {
+          _finishSetCourse(_s,_ly,_range,_dvx,_dvy,_dvz);
+        }
       },
       function(){ return _myGen!==_routeGen; });
   }
@@ -4183,7 +4190,13 @@ function setCourse(s,silent){
       courseWaypoints[0]=focusSystem;
       courseWaypoints[courseWaypoints.length-1]=_s;
       courseTruncated=false;
-      _finishSetCourse(_s,_ly,_range,_dvx,_dvy,_dvz);
+      if(!silent){
+        _revealRouteHops(courseWaypoints,_myGen,function(){
+          if(_myGen===_routeGen) _finishSetCourse(_s,_ly,_range,_dvx,_dvy,_dvz);
+        });
+      } else {
+        _finishSetCourse(_s,_ly,_range,_dvx,_dvy,_dvz);
+      }
     } else {
       /* A* returned null (target beyond local slice) — fall back to findRouteAsync() */
       _runRouteFallback();
@@ -6071,41 +6084,26 @@ var _SCIFI_LOGS=[
   "RESOLVING LOCAL ANOMALY VECTORS..."
 ];
 var _routePatienceTimer=null;
-/* 2026-08-25, round-2 honest-review fix: the fast A* worker path (see
-   setCourse()) posts exactly one message back when it's fully done and
-   nothing in between, so these randomly-cycling flavour lines used to be
-   the ONLY thing on screen for however long A* actually takes -- for a
-   long/sparse route that can be several real seconds of fabricated jargon
-   that never reflects real progress, reading exactly like a stuck loop
-   (Tony, round 2: "still takes too long looks like in a loop"). The
-   chunked findRouteAsync() FALLBACK already got real per-hop star names in
-   the previous session (_routeLoaderFallbackStart/_routeLoaderHop), but
-   that upgrade only fires once A* has already failed and handed off, so a
-   route that's merely slow -- not failed -- never reaches it. A* runs as
-   one synchronous block inside the worker with no checkpoints to hook a
-   real progress line into short of restructuring the algorithm itself,
-   which isn't a change to make blind here. This fixes what's actually
-   fixable without touching planRoute(): after a few seconds, stop cycling
-   fabricated technical lines forever and settle on one honest, static
-   status, so a genuinely slow route reads as "still working" instead of
-   "stuck repeating itself". */
+/* 2026-08-25, round 3 (Tony: "slowly list the star systems names jump for
+   jump so looks like it is actually plotting a route and user can see not
+   computer text whizzing by"): the randomly-cycling flavour-text feed this
+   used to show is gone completely -- it was never real, just decorative
+   jargon standing in for progress that wasn't actually being reported.
+   While the real computation is in flight this now shows exactly one
+   honest status line (plus the "still searching" note below if it runs
+   long); the actual real content -- the confirmed route, name by name --
+   is shown afterward by _revealRouteHops() once the true final path is
+   known, whichever of the two ways (fast A* worker or the findRouteAsync
+   fallback) actually found it. See _revealRouteHops's own comment. */
 function showRouteLoader(){
   var el=document.getElementById("route-loader");
   var tc=document.getElementById("terminal-console");
   if(!el) return;
-  if(tc) tc.innerHTML="&gt; SYSTEM ONLINE<br>&gt; INITIALISING LOGS...";
+  if(tc) tc.innerHTML="&gt; SYSTEM ONLINE<br>&gt; PLOTTING COURSE...";
   el.style.display="flex";
   clearInterval(_logStreamInterval);
   clearTimeout(_routePatienceTimer);
-  _logStreamInterval=setInterval(function(){
-    if(!tc) return;
-    var phrase=_SCIFI_LOGS[Math.floor(Math.random()*_SCIFI_LOGS.length)];
-    var hex=Math.floor(Math.random()*0xFFFF).toString(16).toUpperCase().padStart(4,"0");
-    tc.innerHTML+="<br>&gt; ["+hex+"] "+phrase;
-    tc.scrollTop=tc.scrollHeight;
-  },180);
   _routePatienceTimer=setTimeout(function(){
-    clearInterval(_logStreamInterval);
     if(tc) tc.innerHTML+="<br>&gt; STILL SEARCHING -- LONG OR SPARSE TRIPS CAN TAKE A LITTLE LONGER...";
   },4000);
 }
@@ -6147,6 +6145,44 @@ function _routeLoaderHop(next,hopNum){
   tc.innerHTML+="<br>&gt; HOP "+hopNum+"/"+ROUTE_MAX_HOPS+" PLOTTED -- "+nm;
   tc.scrollTop=tc.scrollHeight;
 }
+/* 2026-08-25, round 3 (Tony: "slowly list the star systems names jump for
+   jump so looks like it is actually plotting a route... not computer text
+   whizzing by"): called once the REAL, final, confirmed route is known --
+   from either the fast A* worker or the findRouteAsync fallback, see both
+   call sites in setCourse() -- and reveals it here, one confirmed hop at a
+   time, at a deliberate readable pace, using the real system names that
+   are genuinely on the course. Nothing here is invented and no hop is
+   skipped (unlike the old throttled live feed, which dropped a hop's line
+   outright if it arrived too soon after the last one). This runs strictly
+   AFTER the route is already fully computed, so the pacing is purely
+   presentational -- it never adds real search latency, and a route that
+   genuinely computed instantly still gets to visibly show its work instead
+   of the loader just flashing shut. Generation-guarded like every other
+   route callback: if the user picks a different star or hits Abort
+   mid-reveal, _routeGen has already moved on and this quietly stops
+   instead of finishing (and possibly clobbering the map with) an
+   already-superseded route. */
+function _revealRouteHops(waypoints,myGen,onComplete){
+  var tc=document.getElementById("terminal-console");
+  var hops=waypoints.length-1;
+  if(tc) tc.innerHTML="&gt; COURSE CONFIRMED -- PLOTTING "+hops+" JUMP"+(hops===1?"":"S")+"...";
+  var i=0;
+  /* readable per-line pace, but keep a long (up to ROUTE_MAX_HOPS-hop) route's
+     total reveal time from dragging on forever */
+  var step=Math.max(90,Math.min(260,Math.round(2400/Math.max(1,waypoints.length))));
+  (function next(){
+    if(myGen!==_routeGen) return; /* superseded -- stop silently, see comment above */
+    if(i>=waypoints.length){ onComplete(); return; }
+    if(tc){
+      var w=waypoints[i];
+      var label=(i===0)?"START":(i===waypoints.length-1?"ARRIVE":("HOP "+i));
+      tc.innerHTML+="<br>&gt; "+label+" -- "+((w&&w.name)?w.name.toUpperCase():"UNKNOWN SYSTEM");
+      tc.scrollTop=tc.scrollHeight;
+    }
+    i++;
+    setTimeout(next,step);
+  })();
+}
 function abortRoute(){
   if(_routeWorker){ _routeWorker.terminate(); _routeWorker=null; }
   _routeGen++; /* invalidates any in-flight run (A* result or chunked findRouteAsync fallback), see setCourse() */
@@ -6176,8 +6212,8 @@ function playWarpTransition(kind){
   var sMp4=vid.querySelector('source[type="video/mp4"]');
   if(sWebm) sWebm.src=webmSrc;
   if(sMp4) sMp4.src=mp4Src;
-  vid.load();
   ov.style.display='block';
+  vid.load();
   /* 2026-08-25, honest-review fix: this used to have no error path and no
      ceiling on how long it could sit on-screen. If the clip failed to
      decode/load after play() had already resolved (or stalled buffering on
