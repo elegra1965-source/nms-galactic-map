@@ -875,8 +875,17 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 @keyframes loaderBlink{0%,49%{opacity:1}50%,100%{opacity:0}}
 /* ---- warp transition overlay (spec item 9) ---- */
 #warp-overlay{display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;
-  z-index:10000;background:#000;cursor:pointer;user-select:none}
-#warp-overlay video{width:100%;height:100%;object-fit:cover;display:block}
+  z-index:10000;background:#000;cursor:pointer;user-select:none;overflow:hidden}
+#warp-overlay video{width:100%;height:100%;object-fit:cover;display:block;
+  /* 2026-08-25, Tony: the portal clip has a real ~3.5% dark-green pillarbox
+     baked into its own pixels (confirmed frame-by-frame -- flat, unchanging
+     colour at the very edges, not a vignette), which object-fit:cover alone
+     only crops away on very wide viewports. This extra 14% overscan crops a
+     fixed margin off every side regardless of viewport shape, so the bar is
+     gone everywhere, not just on wide windows. Harmless on the ship clip,
+     which is already edge-to-edge content. If the source clip ever gets
+     re-exported without the padding, this can drop back to no transform. */
+  transform:scale(1.14)}
 .warp-skip{position:absolute;bottom:22px;width:100%;text-align:center;
   font-family:'Orbitron',monospace;font-size:10px;letter-spacing:3px;
   color:rgba(0,229,255,0.35);pointer-events:none}
