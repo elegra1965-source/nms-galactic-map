@@ -85,7 +85,8 @@ canvas#c{display:block;position:fixed;inset:0;touch-action:none}
    bugs one at a time: instead of guessing every viewport/orientation combination,
    let him move the boxes himself. touch-action:none stops the browser's own
    scroll/zoom gestures from stealing the pointer before the drag handler sees it. */
-#fHead,.phead,.chead,#a11yHead,.edhead,#searchHead,#keysHead{cursor:grab;touch-action:none}
+#fHead,.phead,.chead,#a11yHead,.edhead,#searchHead,#keysHead{cursor:grab;touch-action:none;
+  padding:6px 6px 0 6px;margin:-6px -6px 0 -6px;border-radius:8px}
 /* 2026-08-23: #keysHead alone needed an explicit user-select:none too, unlike
    the others above -- it's scoped to just the bare "Portal glyph keypad" text
    (deliberately, so the galaxy search input next to it stays fully clickable,
@@ -630,7 +631,8 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
    only thing there to read or click -- so caption-dim contrast was actually
    too low for what functions as a button label. Bumped to full --text plus
    a small chevron (JS toggles .open) so it also reads as interactive. */
-#disclaimerModal .mfld>.lb{color:var(--text);display:flex;align-items:center;gap:6px}
+#disclaimerModal .mfld>.lb{color:var(--text);display:flex;align-items:center;gap:6px;
+  padding:5px 4px;margin:-5px -4px -5px -4px;border-radius:6px;cursor:pointer}
 #disclaimerModal .mfld>.lb::before{content:'\25B8';color:var(--cyan);font-size:8px;transition:transform .15s ease;flex:none}
 #disclaimerModal .mfld>.lb.open::before{transform:rotate(90deg)}
 .mfld input[type=text],.mfld input[type=number]{width:100%;text-transform:none;font-family:'Rajdhani',sans-serif;
@@ -963,7 +965,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 </div>
 <!-- WARP TRANSITION video overlay (spec item 9) -->
 <div id="warp-overlay" onclick="skipWarp()">
-  <video id="warp-vid" autoplay muted playsinline preload="auto">
+  <video id="warp-vid" muted playsinline preload="auto">
     <source src="warp_transition.webm" type="video/webm">
     <source src="warp_transition.mp4" type="video/mp4">
   </video>
@@ -1182,7 +1184,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
       <h2 id="pName">—</h2>
       <div class="reg" id="pReg">region</div>
     </div>
-    <button class="btn" id="bPanelMin" title="Collapse or expand this panel.">&#9662;</button>
+    <button class="btn" id="bPanelMin" title="Collapse or expand this panel." style="margin-right:3px;flex:none">&#9662;</button>
   </div>
   <div class="cls" id="pCls">—</div>
   <div id="pCore">—</div>
@@ -6010,6 +6012,13 @@ function makeDraggable(boxEl,handleEl){
     if(!dragging||e.pointerId!==ptrId) return;
     dragging=false;
     wasDrag=moved>=6;
+    /* 2026-08-25, round-2 honest-review fix: flag that a human actually
+       repositioned this box, so callers (currently just Search, see
+       openSearch()) can tell "never been touched, safe to keep
+       auto-positioning" apart from "user parked it somewhere on purpose,
+       leave it alone" -- a plain tap that doesn't cross the drag threshold
+       does not set this. */
+    if(wasDrag) boxEl.dataset.userMoved="1";
   }
   handleEl.addEventListener("pointerup",end);
   handleEl.addEventListener("pointercancel",end);
@@ -6061,6 +6070,25 @@ var _SCIFI_LOGS=[
   "SYNCHRONISING INTERSTELLAR COORDINATE BUFFERS...",
   "RESOLVING LOCAL ANOMALY VECTORS..."
 ];
+var _routePatienceTimer=null;
+/* 2026-08-25, round-2 honest-review fix: the fast A* worker path (see
+   setCourse()) posts exactly one message back when it's fully done and
+   nothing in between, so these randomly-cycling flavour lines used to be
+   the ONLY thing on screen for however long A* actually takes -- for a
+   long/sparse route that can be several real seconds of fabricated jargon
+   that never reflects real progress, reading exactly like a stuck loop
+   (Tony, round 2: "still takes too long looks like in a loop"). The
+   chunked findRouteAsync() FALLBACK already got real per-hop star names in
+   the previous session (_routeLoaderFallbackStart/_routeLoaderHop), but
+   that upgrade only fires once A* has already failed and handed off, so a
+   route that's merely slow -- not failed -- never reaches it. A* runs as
+   one synchronous block inside the worker with no checkpoints to hook a
+   real progress line into short of restructuring the algorithm itself,
+   which isn't a change to make blind here. This fixes what's actually
+   fixable without touching planRoute(): after a few seconds, stop cycling
+   fabricated technical lines forever and settle on one honest, static
+   status, so a genuinely slow route reads as "still working" instead of
+   "stuck repeating itself". */
 function showRouteLoader(){
   var el=document.getElementById("route-loader");
   var tc=document.getElementById("terminal-console");
@@ -6068,6 +6096,7 @@ function showRouteLoader(){
   if(tc) tc.innerHTML="&gt; SYSTEM ONLINE<br>&gt; INITIALISING LOGS...";
   el.style.display="flex";
   clearInterval(_logStreamInterval);
+  clearTimeout(_routePatienceTimer);
   _logStreamInterval=setInterval(function(){
     if(!tc) return;
     var phrase=_SCIFI_LOGS[Math.floor(Math.random()*_SCIFI_LOGS.length)];
@@ -6075,9 +6104,14 @@ function showRouteLoader(){
     tc.innerHTML+="<br>&gt; ["+hex+"] "+phrase;
     tc.scrollTop=tc.scrollHeight;
   },180);
+  _routePatienceTimer=setTimeout(function(){
+    clearInterval(_logStreamInterval);
+    if(tc) tc.innerHTML+="<br>&gt; STILL SEARCHING -- LONG OR SPARSE TRIPS CAN TAKE A LITTLE LONGER...";
+  },4000);
 }
 function hideRouteLoader(){
   clearInterval(_logStreamInterval);
+  clearTimeout(_routePatienceTimer);
   var el=document.getElementById("route-loader");
   if(el) el.style.display="none";
 }
@@ -6144,7 +6178,6 @@ function playWarpTransition(kind){
   if(sMp4) sMp4.src=mp4Src;
   vid.load();
   ov.style.display='block';
-  vid.currentTime=0;
   /* 2026-08-25, honest-review fix: this used to have no error path and no
      ceiling on how long it could sit on-screen. If the clip failed to
      decode/load after play() had already resolved (or stalled buffering on
@@ -6154,10 +6187,26 @@ function playWarpTransition(kind){
      onerror handler and a hard timeout (a little over the ~3-4s clips'
      real length) now force the overlay closed no matter what went wrong,
      same "always have an escape hatch" spirit as ABORT on the route loader. */
-  vid.onerror=function(){ ov.style.display='none'; vid.onerror=null; if(_warpFailTimer){ clearTimeout(_warpFailTimer); _warpFailTimer=null; } };
-  vid.play().catch(function(){ ov.style.display='none'; });
-  vid.onended=function(){ ov.style.display='none'; vid.onended=null; if(_warpFailTimer){ clearTimeout(_warpFailTimer); _warpFailTimer=null; } };
-  _warpFailTimer=setTimeout(function(){ ov.style.display='none'; },7000);
+  vid.onerror=function(){
+    console.warn('[warp] video element errored, code='+(vid.error?vid.error.code:'?')+' src='+vid.currentSrc);
+    ov.style.display='none'; vid.onerror=null;
+    if(_warpFailTimer){ clearTimeout(_warpFailTimer); _warpFailTimer=null; }
+  };
+  var _warpCleared=false;
+  vid.play().then(function(){
+    console.log('[warp] play() resolved for '+vid.currentSrc);
+  }).catch(function(err){
+    console.warn('[warp] play() rejected: '+err.name+' -- '+err.message);
+    ov.style.display='none';
+  });
+  vid.onended=function(){
+    ov.style.display='none'; vid.onended=null; _warpCleared=true;
+    if(_warpFailTimer){ clearTimeout(_warpFailTimer); _warpFailTimer=null; }
+  };
+  _warpFailTimer=setTimeout(function(){
+    if(!_warpCleared) console.warn('[warp] timed out after 7s, readyState='+vid.readyState+' networkState='+vid.networkState+' paused='+vid.paused+' -- forcing overlay closed');
+    ov.style.display='none';
+  },7000);
 }
 function skipWarp(){
   var ov=document.getElementById('warp-overlay');
@@ -7436,7 +7485,7 @@ function runSearch(query){
   }
   function openSearch(){
     pop.classList.add("show");
-    if(!pop.style.left) positionUnderSearchBtn();
+    if(!pop.dataset.userMoved) positionUnderSearchBtn();
     runSearch(inp.value);
     remeasureScroll();
     inp.focus();
