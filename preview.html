@@ -3622,9 +3622,48 @@ var _ASTAR_WORKER_URL=(function(){
      with a sqrt distance calc, so 200 iterations can take far longer than
      4 seconds -- confirmed live, the worker ran 48+ seconds without ever
      bailing on its own. Now checks the wall clock every iteration instead,
-     so the 4-second cap is actually honoured. */
+     so the 4-second cap is actually honoured.
+     Root-cause fix 2026-08-25, round 3 (Tony, after the display was
+     already fixed: "still taking to long even with 3 jumps"): live-timed
+     this on the real deployed site and a plain 2-hop route was taking
+     ~1.9 REAL seconds inside the worker alone against a ~2200-entry
+     candidate set -- the 4s bail above was masking this as "eventually
+     works" instead of "fast", and the fabricated loader text before this
+     round hid it entirely. The actual cost is that db.filter(...) below
+     scans literally every candidate system, computing a real sqrt
+     distance, for EVERY single node the search pops off open -- O(n) per
+     node instead of only looking at what's actually nearby. The other
+     route path (findRoute()/_routeHop() below, used by the findRouteAsync
+     fallback) already solved this exact problem with regionCandidates()'s
+     spatial lookup; this gives planRoute() the equivalent for its own
+     fixed db array: a uniform grid, cell size = mr (the jump range,
+     already the natural radius), built once before the search starts, so
+     a neighbour query only has to check the ~27 cells around the current
+     node instead of the whole database. This changes nothing about WHICH
+     systems count as neighbours -- same gd() distance, same d>0&&d<=mr
+     condition, same resulting set -- only how that set is found. */
   var src='function gd(a,b){var dx=a.x-b.x,dy=a.y-b.y,dz=a.z-b.z;return Math.sqrt(dx*dx+dy*dy+dz*dz);}\n'+
     'function planRoute(s,e,db,mr){\n'+
+    '  var cell=mr>0?mr:1;\n'+
+    '  function ck(x,y,z){return Math.floor(x/cell)+\",\"+Math.floor(y/cell)+\",\"+Math.floor(z/cell);}\n'+
+    '  var grid=new Map();\n'+
+    '  for(var gi=0;gi<db.length;gi++){\n'+
+    '    var o=db[gi],gk=ck(o.x,o.y,o.z),garr=grid.get(gk);\n'+
+    '    if(!garr){garr=[];grid.set(gk,garr);}\n'+
+    '    garr.push(o);\n'+
+    '  }\n'+
+    '  function neighborsOf(cur){\n'+
+    '    var cx=Math.floor(cur.x/cell),cy=Math.floor(cur.y/cell),cz=Math.floor(cur.z/cell),out=[];\n'+
+    '    for(var ddx=-1;ddx<=1;ddx++) for(var ddy=-1;ddy<=1;ddy++) for(var ddz=-1;ddz<=1;ddz++){\n'+
+    '      var garr=grid.get((cx+ddx)+\",\"+(cy+ddy)+\",\"+(cz+ddz));\n'+
+    '      if(!garr) continue;\n'+
+    '      for(var ai=0;ai<garr.length;ai++){\n'+
+    '        var d=gd(cur,garr[ai]);\n'+
+    '        if(d>0&&d<=mr) out.push(garr[ai]);\n'+
+    '      }\n'+
+    '    }\n'+
+    '    return out;\n'+
+    '  }\n'+
     '  var open=[s],cf=new Map(),gs=new Map(),fs=new Map();\n'+
     '  gs.set(s.address,0); fs.set(s.address,gd(s,e));\n'+
     '  var _t0=Date.now(),_n=0;\n'+
@@ -3639,7 +3678,7 @@ var _ASTAR_WORKER_URL=(function(){
     '      if(cur.address!==e.address) path.push(e);\n'+
     '      return path;\n'+
     '    }\n'+
-    '    var nbrs=db.filter(function(x){var d=gd(cur,x);return d>0&&d<=mr;});\n'+
+    '    var nbrs=neighborsOf(cur);\n'+
     '    for(var i=0;i<nbrs.length;i++){\n'+
     '      var nb=nbrs[i],tg=(gs.get(cur.address)||0)+gd(cur,nb);\n'+
     '      if(tg<(gs.get(nb.address)||Infinity)){\n'+
