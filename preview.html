@@ -3581,6 +3581,10 @@ function clearCourseLine(){
 }
 var courseWaypoints=null, courseTruncated=false;
 var _routeWorker=null; /* active A* web worker, null when idle */
+var _routeGen=0; /* bumped by setCourse() every call and by abortRoute() -- lets any
+  in-flight A* result or chunked findRouteAsync fallback (see its own comment) tell
+  it's been superseded and quietly stop instead of possibly landing after a newer,
+  already-finished course and clobbering it */
 var WARP_ENABLED=localStorage.getItem('nms-galmap-warp')!=='0'; /* spec item 9 */
 /* inline A* worker — blob URL created once at startup, reused for every setCourse() call */
 var _ASTAR_WORKER_URL=(function(){
@@ -3599,14 +3603,22 @@ var _ASTAR_WORKER_URL=(function(){
      nothing" and falls back to the fast, already-solid findRoute() below --
      same safety-net path that already runs whenever A* can't find a
      connected route, just now guaranteed to actually trigger instead of
-     hanging indefinitely first. */
+     hanging indefinitely first.
+     Follow-up fix 2026-08-25 (Tony: "set course taking too long... as if
+     in a loop again, had to click abort"): the bail above was only
+     sampling Date.now() every 200th iteration (_n%200===0). At ~3000
+     systems each iteration does an O(n log n) sort plus an O(n) filter
+     with a sqrt distance calc, so 200 iterations can take far longer than
+     4 seconds -- confirmed live, the worker ran 48+ seconds without ever
+     bailing on its own. Now checks the wall clock every iteration instead,
+     so the 4-second cap is actually honoured. */
   var src='function gd(a,b){var dx=a.x-b.x,dy=a.y-b.y,dz=a.z-b.z;return Math.sqrt(dx*dx+dy*dy+dz*dz);}\n'+
     'function planRoute(s,e,db,mr){\n'+
     '  var open=[s],cf=new Map(),gs=new Map(),fs=new Map();\n'+
     '  gs.set(s.address,0); fs.set(s.address,gd(s,e));\n'+
     '  var _t0=Date.now(),_n=0;\n'+
     '  while(open.length>0){\n'+
-    '    _n++; if(_n%200===0 && Date.now()-_t0>4000) return null;\n'+
+    '    _n++; if(Date.now()-_t0>4000) return null;\n'+
     '    open.sort(function(a,b){return(fs.get(a.address)||Infinity)-(fs.get(b.address)||Infinity);});\n'+
     '    var cur=open.shift();\n'+
     '    if(cur.address===e.address||gd(cur,e)<=mr){\n'+
@@ -3713,6 +3725,65 @@ function wpDist(a,b){ var dx=a.px-b.px,dy=a.py-b.py,dz=a.pz-b.pz; return Math.sq
    strictly closer yet); only if literally no charted system is in range at all
    does the route give up and report itself truncated, same as running out of
    hyperdrive range for real. */
+/* Extracted 2026-08-25 from findRoute()'s while-loop body so the exact same
+   per-hop candidate search can be shared, byte-for-byte, between the
+   original synchronous findRoute() (still used for the cheap single-call
+   hover preview) and the new chunked findRouteAsync() below (used for
+   setCourse()'s slow multi-hop fallback) -- see findRouteAsync's own
+   comment for why. Pure refactor, no logic changed: same operations, same
+   order, same locals (they were already re-declared fresh each loop
+   iteration via var, so moving them into this function's own scope changes
+   nothing). */
+function _routeHop(cur,to,rangeW,visited,driveGateRoute){
+  var remain=wpDist(cur,to);
+  var dir={x:(to.px-cur.px)/remain,y:(to.py-cur.py)/remain,z:(to.pz-cur.pz)/remain};
+  var step=Math.min(rangeW*0.95,remain);
+  var ideal={px:cur.px+dir.x*step,py:cur.py+dir.y*step,pz:cur.pz+dir.z*step};
+  var ivx=Math.round(focus.x+ideal.px/VOX_U), ivy=Math.round(focus.y+ideal.py/VOX_U), ivz=Math.round(focus.z+ideal.pz/VOX_U);
+  var best=null,bestD=Infinity;
+  var fallback=null,fallbackD=Infinity; /* nearest-to-ideal among ALL in-range,
+    not-yet-visited real stars, regardless of whether they beat `remain` --
+    last resort only. Tried "nearest to the TARGET" here first, but a headless
+    test caught it wandering the route further and further away over many
+    hops in a sparse patch (each compromise still had to avoid every star
+    visited so far, so it kept drifting) -- nearest-to-ideal keeps the
+    fallback on roughly the same bearing instead of jumping off in whatever
+    direction happens to be closest overall, which behaves far more sanely. */
+  for(var rad=1;rad<=3&&!best;rad++){
+    for(var ddx=-rad;ddx<=rad;ddx++) for(var ddy=-rad;ddy<=rad;ddy++) for(var ddz=-rad;ddz<=rad;ddz++){
+      if(rad>1 && Math.max(Math.abs(ddx),Math.abs(ddy),Math.abs(ddz))<rad) continue; /* shell only, inner already scanned */
+      var cands=regionCandidates(ivx+ddx,ivy+ddy,ivz+ddz),c;
+      for(var k=0;k<cands.length;k++){
+        c=cands[k];
+        if(visited[c.address]) continue;
+        /* Task 4 ("don't just jump between [the drive's max] colour --
+           sometimes add lower star colours too, since a higher drive is
+           backwards-compatible"): a hop is a valid candidate if its colour
+           is ANYWHERE in the current drive's reach set, not just its top
+           tier -- an Indium Drive route should freely mix blue AND
+           yellow/red/green hops, exactly like the real backwards-
+           compatible mechanic in Tony's own doc. Only the FINAL waypoint
+           (pushed unconditionally after this loop, same as before) is
+           allowed to be a colour outside the current reach -- that's the
+           "I want to plan a trip to a system I can't reach yet" case,
+           handled instead by disabling Jump-to and offering a Waypoint
+           save (see bGoCourse's handler). */
+        if(driveGateRoute && !canReachColor(c.type)) continue;
+        var dHop=wpDist(cur,c);
+        if(dHop>rangeW||dHop<0.05) continue;
+        var dToIdeal=wpDist(ideal,c);
+        if(dToIdeal<fallbackD){ fallbackD=dToIdeal; fallback=c; }
+        /* Being the closest real star to the ideal point isn't enough on its own --
+           without this, a hop could snap to a real system that's within range but
+           actually sideways or slightly BEHIND cur relative to the target, which
+           reads on screen as the route doubling back on itself. */
+        if(wpDist(c,to)>=remain) continue;
+        if(dToIdeal<bestD){ bestD=dToIdeal; best=c; }
+      }
+    }
+  }
+  return best||fallback||null; /* null: no charted, unvisited system in range at all */
+}
 function findRoute(from,to,rangeLY,driveGateRoute){
   var rangeW=rangeLY/VOX_LY;
   var path=[{px:from.px,py:from.py,pz:from.pz,name:from.name,address:from.address,real:true}];
@@ -3734,54 +3805,7 @@ function findRoute(from,to,rangeLY,driveGateRoute){
   while(wpDist(cur,to)>rangeW){
     guard++;
     if(guard>ROUTE_MAX_HOPS){ truncated=true; break; }
-    var remain=wpDist(cur,to);
-    var dir={x:(to.px-cur.px)/remain,y:(to.py-cur.py)/remain,z:(to.pz-cur.pz)/remain};
-    var step=Math.min(rangeW*0.95,remain);
-    var ideal={px:cur.px+dir.x*step,py:cur.py+dir.y*step,pz:cur.pz+dir.z*step};
-    var ivx=Math.round(focus.x+ideal.px/VOX_U), ivy=Math.round(focus.y+ideal.py/VOX_U), ivz=Math.round(focus.z+ideal.pz/VOX_U);
-    var best=null,bestD=Infinity;
-    var fallback=null,fallbackD=Infinity; /* nearest-to-ideal among ALL in-range,
-      not-yet-visited real stars, regardless of whether they beat `remain` --
-      last resort only. Tried "nearest to the TARGET" here first, but a headless
-      test caught it wandering the route further and further away over many
-      hops in a sparse patch (each compromise still had to avoid every star
-      visited so far, so it kept drifting) -- nearest-to-ideal keeps the
-      fallback on roughly the same bearing instead of jumping off in whatever
-      direction happens to be closest overall, which behaves far more sanely. */
-    for(var rad=1;rad<=3&&!best;rad++){
-      for(var ddx=-rad;ddx<=rad;ddx++) for(var ddy=-rad;ddy<=rad;ddy++) for(var ddz=-rad;ddz<=rad;ddz++){
-        if(rad>1 && Math.max(Math.abs(ddx),Math.abs(ddy),Math.abs(ddz))<rad) continue; /* shell only, inner already scanned */
-        var cands=regionCandidates(ivx+ddx,ivy+ddy,ivz+ddz),c;
-        for(var k=0;k<cands.length;k++){
-          c=cands[k];
-          if(visited[c.address]) continue;
-          /* Task 4 ("don't just jump between [the drive's max] colour --
-             sometimes add lower star colours too, since a higher drive is
-             backwards-compatible"): a hop is a valid candidate if its colour
-             is ANYWHERE in the current drive's reach set, not just its top
-             tier -- an Indium Drive route should freely mix blue AND
-             yellow/red/green hops, exactly like the real backwards-
-             compatible mechanic in Tony's own doc. Only the FINAL waypoint
-             (pushed unconditionally after this loop, same as before) is
-             allowed to be a colour outside the current reach -- that's the
-             "I want to plan a trip to a system I can't reach yet" case,
-             handled instead by disabling Jump-to and offering a Waypoint
-             save (see bGoCourse's handler). */
-          if(driveGateRoute && !canReachColor(c.type)) continue;
-          var dHop=wpDist(cur,c);
-          if(dHop>rangeW||dHop<0.05) continue;
-          var dToIdeal=wpDist(ideal,c);
-          if(dToIdeal<fallbackD){ fallbackD=dToIdeal; fallback=c; }
-          /* Being the closest real star to the ideal point isn't enough on its own --
-             without this, a hop could snap to a real system that's within range but
-             actually sideways or slightly BEHIND cur relative to the target, which
-             reads on screen as the route doubling back on itself. */
-          if(wpDist(c,to)>=remain) continue;
-          if(dToIdeal<bestD){ bestD=dToIdeal; best=c; }
-        }
-      }
-    }
-    var next=best||fallback;
+    var next=_routeHop(cur,to,rangeW,visited,driveGateRoute);
     if(!next){ truncated=true; break; } /* no charted, unvisited system in range at all -- report honestly rather than invent one */
     path.push(next);
     if(next.address) visited[next.address]=true;
@@ -3789,6 +3813,76 @@ function findRoute(from,to,rangeLY,driveGateRoute){
   }
   path.push({px:to.px,py:to.py,pz:to.pz,name:to.name,address:to.address,real:true});
   return {path:path,truncated:truncated};
+}
+/* Added 2026-08-25 (Tony, after the A* worker-timeout fix: "quick tweak and
+   if stutter a message saying plotting to next star / rundown list of star
+   names"): findRoute()'s hop loop above was confirmed live to take 12.6s for
+   a single ~679LY/10-hop route, running entirely synchronously on the main
+   thread with no way for Abort to interrupt it once started -- unlike the
+   A* search, this isn't a worker, it can't just be terminated mid-flight.
+   Moving the whole thing into a real worker would mean hand-duplicating
+   regionCandidates()'s seeded-RNG candidate generation (plus wpDist/
+   canReachColor/the hyperdrive table) into an isolated worker script the
+   same fragile, easy-to-transcribe-wrong way the A* worker already is --
+   given how much headless-test tuning findRoute()'s exact hop selection has
+   had across prior sessions, that felt like too much risk to fix what's
+   ultimately a UI freeze. So instead: the EXACT same hop-by-hop logic
+   (_routeHop above, the same function findRoute() itself calls, not a
+   rewritten copy), just run one hop per setTimeout(0) tick instead of all
+   of them back to back -- the browser gets a paint/input turn between every
+   hop, onHop can surface real progress (used by setCourse() to print each
+   plotted star into the loader's terminal console as it's found).
+   isCancelled is a caller-supplied predicate rather than a single shared
+   flag: setCourse() picking a NEW star while a fallback is still chunking
+   away on the OLD one is a real case now that this doesn't block the tab
+   (it couldn't happen before -- the old synchronous version blocked
+   everything else until it finished, so nothing could ever race it). A
+   shared boolean can't tell "abort the run I own" from "abort whatever's
+   currently in flight, which may not be me any more" apart; setCourse()
+   instead hands each run its own generation number and isCancelled closure
+   (see _routeGen there) so a superseded run quietly stops itself without
+   any chance of clobbering the newer one's result, and the explicit Abort
+   button bumps that same counter to cancel whatever's currently running. */
+function findRouteAsync(from,to,rangeLY,driveGateRoute,onHop,onDone,isCancelled){
+  var rangeW=rangeLY/VOX_LY;
+  var path=[{px:from.px,py:from.py,pz:from.pz,name:from.name,address:from.address,real:true}];
+  var visited={}; if(from.address) visited[from.address]=true;
+  var cur=path[0], truncated=false;
+  var total=wpDist(from,to);
+  if(total<=rangeW){
+    path.push({px:to.px,py:to.py,pz:to.pz,name:to.name,address:to.address,real:true});
+    onDone({path:path,truncated:false});
+    return;
+  }
+  var guard=0;
+  function _step(){
+    if(isCancelled&&isCancelled()){ onDone(null); return; } /* superseded or aborted; caller does nothing further */
+    if(wpDist(cur,to)<=rangeW){
+      path.push({px:to.px,py:to.py,pz:to.pz,name:to.name,address:to.address,real:true});
+      onDone({path:path,truncated:truncated});
+      return;
+    }
+    guard++;
+    if(guard>ROUTE_MAX_HOPS){
+      truncated=true;
+      path.push({px:to.px,py:to.py,pz:to.pz,name:to.name,address:to.address,real:true});
+      onDone({path:path,truncated:truncated});
+      return;
+    }
+    var next=_routeHop(cur,to,rangeW,visited,driveGateRoute);
+    if(!next){
+      truncated=true;
+      path.push({px:to.px,py:to.py,pz:to.pz,name:to.name,address:to.address,real:true});
+      onDone({path:path,truncated:truncated});
+      return;
+    }
+    path.push(next);
+    if(next.address) visited[next.address]=true;
+    cur=next;
+    if(onHop) onHop(next,guard);
+    setTimeout(_step,0);
+  }
+  setTimeout(_step,0);
 }
 /* Session 38: solid vs dashed vs red-dashed course line, matching the real
    game's own convention (confirmed via NMS community sources) -- solid =
@@ -4001,6 +4095,11 @@ function setCourse(s,silent){
   var range=parseInt(document.getElementById("fHyper").value,10);
   /* terminate any previous worker before starting a fresh one */
   if(_routeWorker){ _routeWorker.terminate(); _routeWorker=null; }
+  /* 2026-08-25: bump the generation so any still-in-flight A* result or
+     chunked findRouteAsync fallback from a PREVIOUS call (see _routeGen's
+     own comment) knows it's stale the moment its next checkpoint runs,
+     instead of possibly finishing after this new one and overwriting it. */
+  _routeGen++; var _myGen=_routeGen;
   /* Real bug fixed 2026-08-18 (Tony: "click again seems long as if in a
      loop... click abort and choose another star its as quick as the first
      time"): #route-loader is a full-viewport position:fixed overlay with
@@ -4045,7 +4144,24 @@ function setCourse(s,silent){
   /* address→system lookup for mapping A* results back to full objects */
   var _amap={};
   for(var _ai=0;_ai<allSystems.length;_ai++) _amap[allSystems[_ai].address]=allSystems[_ai];
+  /* 2026-08-25: the old synchronous findRoute() fallback (below A* failing)
+     is now chunked via findRouteAsync() -- see its own comment -- so a long
+     fallback route neither freezes the tab nor leaves Abort powerless.
+     Shared by both places findRoute() used to be called inline: A* coming
+     back null (target beyond the local slice) and the worker erroring out. */
+  function _runRouteFallback(){
+    if(!silent) _routeLoaderFallbackStart();
+    findRouteAsync(focusSystem,_s,_range,true,
+      function(next,hopNum){ if(!silent&&_myGen===_routeGen) _routeLoaderHop(next,hopNum); },
+      function(rt){
+        if(!rt) return; /* superseded by a newer setCourse() call, or aborted -- nothing more to do */
+        courseWaypoints=rt.path; courseTruncated=rt.truncated;
+        _finishSetCourse(_s,_ly,_range,_dvx,_dvy,_dvz);
+      },
+      function(){ return _myGen!==_routeGen; });
+  }
   function _applyRoute(apath){
+    if(_myGen!==_routeGen) return; /* a newer setCourse() call has already superseded this one */
     if(apath&&apath.length>=2){
       /* map lightweight A* result back to full system objects */
       courseWaypoints=apath.map(function(wp){
@@ -4056,20 +4172,18 @@ function setCourse(s,silent){
       courseWaypoints[0]=focusSystem;
       courseWaypoints[courseWaypoints.length-1]=_s;
       courseTruncated=false;
+      _finishSetCourse(_s,_ly,_range,_dvx,_dvy,_dvz);
     } else {
-      /* A* returned null (target beyond local slice) — fall back to findRoute() */
-      var rt=findRoute(focusSystem,_s,_range,true);
-      courseWaypoints=rt.path; courseTruncated=rt.truncated;
+      /* A* returned null (target beyond local slice) — fall back to findRouteAsync() */
+      _runRouteFallback();
     }
-    _finishSetCourse(_s,_ly,_range,_dvx,_dvy,_dvz);
   }
   _routeWorker=new Worker(_ASTAR_WORKER_URL);
   _routeWorker.onmessage=function(e){ _routeWorker=null; _applyRoute(e.data); };
   _routeWorker.onerror=function(){
     _routeWorker=null;
-    var rt=findRoute(focusSystem,_s,_range,true);
-    courseWaypoints=rt.path; courseTruncated=rt.truncated;
-    _finishSetCourse(_s,_ly,_range,_dvx,_dvy,_dvz);
+    if(_myGen!==_routeGen) return; /* a newer setCourse() call has already superseded this one */
+    _runRouteFallback();
   };
   _routeWorker.postMessage({s:_startObj,e:_endObj,db:_db,mr:_rangeW});
 }
@@ -5958,8 +6072,26 @@ function hideRouteLoader(){
   var el=document.getElementById("route-loader");
   if(el) el.style.display="none";
 }
+/* 2026-08-25: switches the loader from the decorative random sci-fi log feed
+   over to a real, honest rundown of the fallback route as it's actually
+   plotted hop by hop (see findRouteAsync's comment) -- so a slow fallback
+   at least visibly shows it's making progress, not stuck/looping, instead
+   of leaving the same generic flavour text sitting there for 10+ seconds. */
+function _routeLoaderFallbackStart(){
+  clearInterval(_logStreamInterval);
+  var tc=document.getElementById("terminal-console");
+  if(tc) tc.innerHTML="&gt; NO DIRECT LANE IN RANGE -- PLOTTING HOP BY HOP...";
+}
+function _routeLoaderHop(next,hopNum){
+  var tc=document.getElementById("terminal-console");
+  if(!tc) return;
+  var nm=(next&&next.name)?next.name.toUpperCase():"UNKNOWN SYSTEM";
+  tc.innerHTML+="<br>&gt; HOP "+hopNum+"/"+ROUTE_MAX_HOPS+" PLOTTED -- "+nm;
+  tc.scrollTop=tc.scrollHeight;
+}
 function abortRoute(){
   if(_routeWorker){ _routeWorker.terminate(); _routeWorker=null; }
+  _routeGen++; /* invalidates any in-flight run (A* result or chunked findRouteAsync fallback), see setCourse() */
   hideRouteLoader();
 }
 function playWarpTransition(kind){
