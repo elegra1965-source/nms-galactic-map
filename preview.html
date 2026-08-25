@@ -624,6 +624,15 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 #disclaimerModal .msub{font-style:italic;cursor:default}
 .mfld{margin-bottom:10px}
 .mfld .lb{font-size:9px;letter-spacing:.12em;color:var(--text-faint);text-transform:uppercase;margin-bottom:3px}
+/* About-modal accordion header (2026-08-25, honest-review fix): every .lb
+   elsewhere is a dim caption sitting next to its own bright value, but
+   inside #disclaimerModal the .lb text IS the whole collapsed row -- the
+   only thing there to read or click -- so caption-dim contrast was actually
+   too low for what functions as a button label. Bumped to full --text plus
+   a small chevron (JS toggles .open) so it also reads as interactive. */
+#disclaimerModal .mfld>.lb{color:var(--text);display:flex;align-items:center;gap:6px}
+#disclaimerModal .mfld>.lb::before{content:'\25B8';color:var(--cyan);font-size:8px;transition:transform .15s ease;flex:none}
+#disclaimerModal .mfld>.lb.open::before{transform:rotate(90deg)}
 .mfld input[type=text],.mfld input[type=number]{width:100%;text-transform:none;font-family:'Rajdhani',sans-serif;
   letter-spacing:.02em;color:var(--text);font-size:12px}
 .mfld textarea{margin-top:0}
@@ -6109,11 +6118,13 @@ function abortRoute(){
   _routeGen++; /* invalidates any in-flight run (A* result or chunked findRouteAsync fallback), see setCourse() */
   hideRouteLoader();
 }
+var _warpFailTimer=null;
 function playWarpTransition(kind){
   if(!WARP_ENABLED) return;
   var ov=document.getElementById('warp-overlay');
   var vid=document.getElementById('warp-vid');
   if(!ov||!vid) return;
+  if(_warpFailTimer){ clearTimeout(_warpFailTimer); _warpFailTimer=null; }
   /* 2026-08-25, Tony: two distinct clips matching the real game's two
      separate travel mechanics -- portals are on-foot, walk-through-a-
      glowing-ring, no ship ever visible; hyperdrive/plotted travel is the
@@ -6134,14 +6145,26 @@ function playWarpTransition(kind){
   vid.load();
   ov.style.display='block';
   vid.currentTime=0;
+  /* 2026-08-25, honest-review fix: this used to have no error path and no
+     ceiling on how long it could sit on-screen. If the clip failed to
+     decode/load after play() had already resolved (or stalled buffering on
+     a slow connection), neither onended nor the play().catch() below ever
+     fired, and a traveller was left staring at a plain black screen with
+     only the small "TAP TO SKIP" label as their one way out. Both an
+     onerror handler and a hard timeout (a little over the ~3-4s clips'
+     real length) now force the overlay closed no matter what went wrong,
+     same "always have an escape hatch" spirit as ABORT on the route loader. */
+  vid.onerror=function(){ ov.style.display='none'; vid.onerror=null; if(_warpFailTimer){ clearTimeout(_warpFailTimer); _warpFailTimer=null; } };
   vid.play().catch(function(){ ov.style.display='none'; });
-  vid.onended=function(){ ov.style.display='none'; vid.onended=null; };
+  vid.onended=function(){ ov.style.display='none'; vid.onended=null; if(_warpFailTimer){ clearTimeout(_warpFailTimer); _warpFailTimer=null; } };
+  _warpFailTimer=setTimeout(function(){ ov.style.display='none'; },7000);
 }
 function skipWarp(){
   var ov=document.getElementById('warp-overlay');
   var vid=document.getElementById('warp-vid');
   if(ov) ov.style.display='none';
-  if(vid){ vid.pause(); vid.onended=null; }
+  if(vid){ vid.pause(); vid.onended=null; vid.onerror=null; }
+  if(_warpFailTimer){ clearTimeout(_warpFailTimer); _warpFailTimer=null; }
 }
 /* Anchors the Warp Manifest dropdown directly under the Course plotted card
    -- same measure-don't-guess pattern as positionUnderButton/
@@ -6936,7 +6959,10 @@ document.getElementById("bAbout").addEventListener("click",openDisclaimer);
         var opening=body.style.display==="none";
         var bodies=document.querySelectorAll('#disclaimerModal .mfld > div:last-child');
         for(var j=0;j<bodies.length;j++) bodies[j].style.display="none";
+        var labels=document.querySelectorAll('#disclaimerModal .mfld > .lb');
+        for(var k=0;k<labels.length;k++) labels[k].classList.remove("open");
         body.style.display=opening?"":"none";
+        if(opening) lb.classList.add("open");
         remeasureDisclaimerScroll();
       });
     })(body);
@@ -7375,6 +7401,20 @@ function runSearch(query){
     if(badge){
       var br=badge.getBoundingClientRect();
       if(br.height>0) top=Math.max(top,br.bottom+8);
+    }
+    /* 2026-08-25, honest-review fix: the Search toolbar button sits far
+       enough right that "under the button" used to land the popup directly
+       on top of #panel (the system-info sidebar) whenever one was showing
+       -- two boxes of near-identical width stacked in the same corner.
+       Same measure-don't-guess approach as the rest of this function:
+       check #panel's real rect rather than assuming, and if it's visible
+       and would actually overlap, slide the popup left of it instead. */
+    var panelEl=document.getElementById("panel");
+    if(panelEl && panelEl.classList.contains("show")){
+      var pr=panelEl.getBoundingClientRect();
+      if(pr.width>0 && left+pw>pr.left-8 && left<pr.right){
+        left=Math.max(8,pr.left-pw-8);
+      }
     }
     pop.style.position="fixed";
     pop.style.left=left+"px"; pop.style.right="auto";
