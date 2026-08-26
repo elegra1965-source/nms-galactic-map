@@ -4947,7 +4947,18 @@ function updatePanel(s){
   for(i=0;i<s.bodies.length;i++){
     var b=s.bodies[i];
     var bStat=getFieldStatus(s,"bodies."+i);
-    bl+='<div class="brow'+(b.moon?" isMoon":"")+(bStat!=="original"?" fs-"+bStat:"")+'" data-b="'+i+'"><span class="bdot" style="background:'+biomePal(b.biome).base+'"></span>'+
+    // Tony, 2026-08-26: the &#8627; arrow prefix meant nothing to him at a
+    // glance either (asked "what do these brackets represent"), and if
+    // the person who built it can't tell, a visiting traveller never will
+    // -- a plain hover tooltip spelling it out, same pattern already used
+    // for e.g. the Phantom Star tag's explanation, fixes that without
+    // needing a wider/less compact row.
+    var moonTip="";
+    if(b.moon){
+      var pbod=bodyByIndex(s,b.parent);
+      moonTip=' title="Moon of '+escAttr(pbod?pbod.name:"the planet above")+'"';
+    }
+    bl+='<div class="brow'+(b.moon?" isMoon":"")+(bStat!=="original"?" fs-"+bStat:"")+'" data-b="'+i+'"'+moonTip+'><span class="bdot" style="background:'+biomePal(b.biome).base+'"></span>'+
         '<span class="bn">'+(b.moon?"&#8627; ":"")+b.name+'</span>'+
         // Ring is an invented per-planet roll (rollRing()), same as race/
         // economy/conflict, until a traveller submits the real answer via
