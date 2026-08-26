@@ -404,6 +404,7 @@ html.hc-on .btn{border-width:2px}
 .conBadge b{font-family:'Orbitron',sans-serif;background:#2a0d0d;color:#ff8a80;font-size:10px;border-radius:8px;padding:1px 6px}
 .bodylist{margin-top:9px;border-top:1px solid var(--border-soft);padding-top:8px}
 .brow{display:flex;align-items:center;gap:7px;font-size:12px;padding:3px 0;cursor:pointer;border-radius:4px;transition:background .6s ease,box-shadow .6s ease}
+.brow.isMoon{margin-left:16px}
 .brow:hover{color:var(--white)}
 /* Search-result-matched row highlight, added 2026-08-21 -- brief fade rather
    than a looping keyframe, since it only needs to draw the eye once right
@@ -1181,13 +1182,13 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     <div class="row" style="margin-top:10px"><span id="icSent"></span>
       <div><div class="lb">Sentinel activity</div><div class="vl" id="bSent">Not reported</div></div></div>
     <div class="row" style="margin-top:10px"><span id="icRes"></span>
-      <div><div class="lb">Resources</div><div class="tags" id="bRes"></div></div></div>
+      <div><div class="lb">Common resources</div><div class="tags" id="bRes"></div></div></div>
     <div class="row" id="bFloraRow" style="margin-top:10px;display:none"><span id="icFlora"></span>
       <div><div class="lb">Flora</div><div class="tags" id="bFlora"></div></div></div>
     <div class="row" id="bFaunaRow" style="margin-top:10px;display:none"><span id="icFauna"></span>
       <div><div class="lb">Fauna</div><div class="tags" id="bFauna"></div></div></div>
     <div class="row" id="bMineralRow" style="margin-top:10px;display:none"><span id="icMineral"></span>
-      <div><div class="lb">Minerals</div><div class="tags" id="bMineral"></div></div></div>
+      <div><div class="lb">Uncommon resources</div><div class="tags" id="bMineral"></div></div></div>
     <div class="row" id="bSalvageRow" style="margin-top:10px;display:none"><span id="icSalvage"></span>
       <div><div class="lb">Salvageable tech</div><div class="tags" id="bSalvage"></div></div></div>
     <div class="row" id="bFossilRow" style="margin-top:10px;display:none"><span id="icFossil"></span>
@@ -2143,9 +2144,31 @@ var BIOMES={
      underlying biome. */
   "Irradiated": {base:"#8fae1b",land:["#a6c92e","#6e8a14","#c4e83f","#516610"],sea:"#20402a",cap:"#d8f06a",water:true, atmo:0xccff33,glow:"#ccff33", res:["Uranium","Gamma Root","Radon"]},
   "Marsh":      {base:"#38473a",land:["#4f6b4a","#2a3a2a","#66805a","#1e2a1e"],sea:"#2f4a4a",cap:"#9aa89a",water:true, atmo:0x9ad8b0, res:null},
-  "Volcanic":   {base:"#241a18",land:["#3a2a24","#140f0e","#4a3028","#0d0908"],sea:"#2a1a14",cap:"#5a4a44",water:true, atmo:0xff6a3a,glow:"#ff4a1a", res:null}
+  "Volcanic":   {base:"#241a18",land:["#3a2a24","#140f0e","#4a3028","#0d0908"],sea:"#2a1a14",cap:"#5a4a44",water:true, atmo:0xff6a3a,glow:"#ff4a1a", res:null},
+  /* Added 2026-08-26 (Tony) -- a real, separately-documented type on the
+     wiki (its own "Biome - Waterworld" page, distinct from the 11 above),
+     previously missing entirely. Manual-select only for now: NOT wired into
+     procedural generation (see GEN_BIOME_KEYS below) since a real generation
+     weight for it hasn't been researched yet -- a traveller can tag a real
+     water world via Edit system, but the random generator will never pick
+     it on its own until that research happens. res left null (undocumented)
+     rather than guessed, same convention as Exotic/Marsh/Volcanic above. */
+  "Water World":{base:"#1f5a7a",land:["#2a6f8f","#154258","#3a8aab","#0f3245"],sea:"#0e3a52",cap:"#eaf6ff",water:true, atmo:0x7fd4ff, res:null}
 };
 var BIOME_KEYS=Object.keys(BIOMES);
+/* Generation-only subset of BIOME_KEYS -- excludes "Water World" (manual-
+   select only, see its comment above) so the old flat-uniform fallback pick
+   below (used only if window.NMSEconomy/economy.js fails to load) can never
+   randomly produce it. The weighted pick in economy.js's own BIOME_ORDER
+   already excludes it by simply never having been given it -- this is the
+   matching guard for the degraded-fallback path. */
+var GEN_BIOME_KEYS=BIOME_KEYS.filter(function(k){ return k!=="Water World"; });
+/* Safe palette lookup for any biome VALUE, including a custom/unrecognised
+   traveller-typed name -- BIOMES has no texture/colour data for arbitrary
+   text, so this falls back to Barren's palette (a neutral, fully-featured
+   entry) rather than crashing. The literal string in b.biome/biome is still
+   shown everywhere it's displayed as text -- this only affects rendering. */
+function biomePal(k){ return BIOMES[k]||BIOMES.Barren; }
 /* Sourced (nomanssky.fandom.com/wiki/Resource, wiki/Biome, /wiki/System_colours): Lush/Barren/Scorched/
    Frozen/Toxic/Radioactive have fixed [local element, agricultural, atmospheric] resources; Dead has only
    a local element, no agri/atmo. Exotic/Mega Exotic/Marsh/Volcanic are documented as inconsistent/
@@ -2510,7 +2533,7 @@ function generateSystem(vx,vy,vz,idx,noOverride){
     // count via a dedicated parity test either way.
     var biome = window.NMSEconomy
       ? window.NMSEconomy.pickBiome(br,{starKey:s.type,galaxyType:gxType,isPrime:isPrimeBody})
-      : pickOne(br,BIOME_KEYS);
+      : pickOne(br,GEN_BIOME_KEYS);
     var bd=BIOMES[biome];
     var canWater = bd.water && !isMoon;
     var hasWater = canWater && br()<0.62;
@@ -2695,7 +2718,13 @@ function applyOverride(s){
     for(var i=0;i<d.bodies.length && i<6;i++){
       var b=d.bodies[i]||{};
       var o=orig[i]; /* reuse the procedural body's rendering-only fields (size/tilt/spin/seed) when one exists at this slot, purely cosmetic, never shown to the player */
-      var biome=BIOMES[b.biome]?b.biome:(o?o.biome:"Lush");
+      // Was BIOMES[b.biome]?b.biome:... (silently discarded anything not a
+      // known key) -- relaxed 2026-08-26 (Tony) so a traveller's own typed
+      // custom biome name (not on the official list) survives being saved
+      // and re-loaded, not just the 12 recognised ones. Render call sites
+      // that need real palette/texture data now go through biomePal(),
+      // which falls back to a generic palette for any unrecognised name.
+      var biome=(b.biome&&String(b.biome).trim())?String(b.biome).trim():(o?o.biome:"Lush");
       var isMoon=!!b.moon && i>0;
       var idx1=i+1;
       /* If the traveller explicitly picked which planet a moon orbits
@@ -2895,6 +2924,33 @@ function saveLastPosition(galaxy,address){
    native suggestion dropdown shows terms this traveller has typed before
    as they start typing again. Local-only, same as notes/marks/waypoints --
    never sent to the server, never shared between visitors. */
+/* Real item names sourced 2026-08-26 from nomanssky.fandom.com/wiki/Resource
+   (Common/Uncommon rarity tiers), /wiki/Curiosity and /wiki/Salvaged_Frigate_Module
+   -- seeded into the matching field's datalist below (see populateDatalists())
+   ahead of whatever a traveller has typed before, so the suggestion dropdown
+   shows real game items from day one rather than starting empty. These are
+   suggestions only, same as the learned-terms list -- typing anything else
+   is never blocked, same free-text field as always. Fossil names are
+   themselves procedurally generated in-game (no fixed list exists on the
+   wiki, confirmed via its own Fossil Sample page), so FOSSILS_CANON is
+   deliberately just real curiosity items, not an attempt at a fossil list. */
+var RESOURCES_CANON=["Carbon","Oxygen","Di-hydrogen","Tritium","Ferrite Dust","Silicate Powder",
+  "Sodium","Cobalt","Salt","Copper","Chromatic Metal","Silver","Sulphurine","Radon","Nitrogen",
+  "Activated Copper","Residual Goop","Rusted Metal","Somnal Dust","Ancestral Memories","Liquid Sun"];
+var MINERALS_CANON=["Condensed Carbon","Pure Ferrite","Magnetised Ferrite","Sodium Nitrate",
+  "Ionised Cobalt","Chlorine","Paraffinium","Pyrite","Ammonia","Uranium","Dioxite","Phosphorus",
+  "Tainted Metal","Mordite","Gold","Activated Cadmium","Activated Emeril","Activated Indium",
+  "Fungal Mould","Frost Crystal","Gamma Root","Cactus Flesh","Solanium","Star Bulb","Marrow Bulb",
+  "Kelp Sac","Faecium","Runaway Mould","Living Slime","Viscous Fluids"];
+var SALVAGE_CANON=["Salvaged Technology","Salvaged Frigate Module","Recovered Sentinel Components",
+  "Rogue Technology Echo","Anomalous Data Unit","Anomalous Homing Device","Advanced Research Module",
+  "Biomechanical Construct","Bionic Ark","Capital Ship Wiring Platform","Encrypted Navigation Data",
+  "Cartographic Data","Loop Manifestation Technology","Starship Expansion Module",
+  "Contained Reality Glitch","Living Starship Organ","Access Card","Advanced Crafted Product"];
+var FOSSILS_CANON=["Fossil Sample","Timeless Artifact","Soul Fragment","Energetic Fragment",
+  "Fragment of Life","Communion of Hirk","Cosmic Melody Instrument","Glassy Indeterminance",
+  "Incomplete Data Sequence","Medicinal Substance","Concentrated Deposit","Valuable Mineral Deposit",
+  "Valuable Ore","Aquatic Relic"];
 var KNOWN_TERMS_K="nms-galmap-known-terms";
 var KNOWN_TERMS_FIELDS=["resources","flora","fauna","minerals","salvage","fossils","descriptor"];
 var knownTerms={};
@@ -2943,12 +2999,22 @@ function rememberKnownTerms(payload){
   saveKnownTerms();
   populateDatalists();
 }
+var CANON_TERMS_BY_FIELD={resources:RESOURCES_CANON,minerals:MINERALS_CANON,
+  salvage:SALVAGE_CANON,fossils:FOSSILS_CANON};
 function populateDatalists(){
   var map={resources:"dlResources",flora:"dlFlora",fauna:"dlFauna",minerals:"dlMinerals",
     salvage:"dlSalvage",fossils:"dlFossils",descriptor:"dlDescriptor"};
   Object.keys(map).forEach(function(k){
     var dl=document.getElementById(map[k]); if(!dl) return;
-    var html="", arr=knownTerms[k]||[];
+    // Real wiki-sourced items first (if this field has any), then whatever
+    // the traveller has typed before that isn't already a duplicate --
+    // case-insensitive so "star bulb" typed once doesn't sit right next to
+    // the canonical "Star Bulb".
+    var canon=CANON_TERMS_BY_FIELD[k]||[], learned=knownTerms[k]||[];
+    var seen={}, arr=[];
+    canon.forEach(function(v){ var lo=v.toLowerCase(); if(!seen[lo]){ seen[lo]=1; arr.push(v); } });
+    learned.forEach(function(v){ var lo=v.toLowerCase(); if(!seen[lo]){ seen[lo]=1; arr.push(v); } });
+    var html="";
     for(var i=0;i<arr.length;i++) html+='<option value="'+escAttr(arr[i])+'">';
     dl.innerHTML=html;
   });
@@ -3101,7 +3167,7 @@ function makePlanetTexture(b){
   var W=256,H=128;
   var cv=document.createElement("canvas"); cv.width=W; cv.height=H;
   var g=cv.getContext("2d"), r=mulberry32(b.seed), i, k;
-  var pal=BIOMES[b.biome];
+  var pal=biomePal(b.biome);
   g.fillStyle=(b.water&&pal.sea)?pal.sea:pal.base;
   g.fillRect(0,0,W,H);
   var blobs=b.water?90:150;
@@ -4550,7 +4616,7 @@ function buildSystemView(s){
   var planetEntries=[]; // for resolvePlanetCollisions(), populated below
   for(var bi=0; bi<s.bodies.length; bi++){
     var b=s.bodies[bi];
-    var pal=BIOMES[b.biome];
+    var pal=biomePal(b.biome);
     if(!b.moon){
       var pivot=new THREE.Object3D(); systemGroup.add(pivot);
       var orbitR=8+planetIdx*3.7;
@@ -4881,7 +4947,7 @@ function updatePanel(s){
   for(i=0;i<s.bodies.length;i++){
     var b=s.bodies[i];
     var bStat=getFieldStatus(s,"bodies."+i);
-    bl+='<div class="brow'+(bStat!=="original"?" fs-"+bStat:"")+'" data-b="'+i+'"><span class="bdot" style="background:'+BIOMES[b.biome].base+'"></span>'+
+    bl+='<div class="brow'+(b.moon?" isMoon":"")+(bStat!=="original"?" fs-"+bStat:"")+'" data-b="'+i+'"><span class="bdot" style="background:'+biomePal(b.biome).base+'"></span>'+
         '<span class="bn">'+(b.moon?"&#8627; ":"")+b.name+'</span>'+
         // Ring is an invented per-planet roll (rollRing()), same as race/
         // economy/conflict, until a traveller submits the real answer via
@@ -4909,18 +4975,18 @@ function showBody(b,s){
   document.getElementById("pBody").style.display="";
   document.getElementById("pStars").innerHTML=
     '<span class="starsw" style="background:radial-gradient(circle at 36% 32%,#fff 0%,'+
-    BIOMES[b.biome].base+' 55%,rgba(0,0,0,0) 84%)"></span>';
+    biomePal(b.biome).base+' 55%,rgba(0,0,0,0) 84%)"></span>';
   document.getElementById("pName").textContent=b.name;
   var pbod=b.moon?bodyByIndex(s,b.parent):null;
   document.getElementById("pReg").textContent=
     (b.moon?("MOON OF "+(pbod?pbod.name:("INDEX "+b.parent))):(s.giant?"GIANT":"PLANET"))+" · INDEX "+b.index;
   document.getElementById("pCls").textContent=s.name+" // "+s.spectral;
   document.getElementById("pCore").textContent=commas(s.coreLY)+" LY from galaxy centre";
-  document.getElementById("icBio").innerHTML=svg(IC_BIOME,BIOMES[b.biome].base);
+  document.getElementById("icBio").innerHTML=svg(IC_BIOME,biomePal(b.biome).base);
   document.getElementById("bBiome").textContent=b.biome+(b.descriptor?" ("+b.descriptor+")":"");
   document.getElementById("bTerr").textContent=b.terrain+(b.water?" · has water":" · no water");
   var t=[["",b.moon?"Moon":(s.giant?"Giant":"Planet")]];
-  if(!BIOMES[b.biome].atmo) t.push(["","No atmosphere"]);
+  if(!biomePal(b.biome).atmo) t.push(["","No atmosphere"]);
   if(b.biome==="Exotic"||b.biome==="Mega Exotic") t.push(["bh","Anomalous"]);
   if(b.water) t.push(["hot","Water"]);
   // Same invented-flavour distinction as the panel body list -- a ring
@@ -4946,8 +5012,8 @@ function showBody(b,s){
   // procedural roll always picks a real tier word, never "None" -- see
   // rollSentinelGuess()), so it stays plain "Not reported" either way.
   document.getElementById("bSent").textContent=(b.sentinel&&b.sentinel!=="None")?(b.sentinel+" Sentinel Activity"+(b.sentinelOverridden?"":" (procedural)")):"Not reported";
-  document.getElementById("icRes").innerHTML=svg(IC_RES,BIOMES[b.biome].base);
-  var bd=BIOMES[b.biome], rlist=[];
+  document.getElementById("icRes").innerHTML=svg(IC_RES,biomePal(b.biome).base);
+  var bd=biomePal(b.biome), rlist=[];
   if(bd.res) for(i=0;i<bd.res.length;i++) rlist.push(bd.res[i]);
   var stel=STELLAR_EL[s.starTypes[0]];
   if(stel) rlist.push(stel);
@@ -4962,7 +5028,7 @@ function showBody(b,s){
     var arr=b[key]||[], row=document.getElementById(rowId);
     if(!arr.length){ row.style.display="none"; return; }
     row.style.display="";
-    document.getElementById(iconId).innerHTML=svg(icon,BIOMES[b.biome].base);
+    document.getElementById(iconId).innerHTML=svg(icon,biomePal(b.biome).base);
     var h="",j; for(j=0;j<arr.length;j++) h+='<span class="tag">'+arr[j]+'</span>';
     document.getElementById(tagId).innerHTML=h;
   }
@@ -6508,7 +6574,7 @@ var ECON_TIER_LB=["Poor","Average","Good"];
    instead of floating over the whole viewport. The input's own .value IS
    the saved field (same as the old select's .value) so every downstream
    read (openEditModal, validateEdit, the save payload) needed zero changes. */
-function buildIconCombo(inputId,listId,groups,blankLabel){
+function buildIconCombo(inputId,listId,groups,blankLabel,allowCustom){
   var inp=document.getElementById(inputId), list=document.getElementById(listId);
   var items=[], i, j;
   if(blankLabel) items.push({label:"",display:blankLabel,groupLabel:null,iconHtml:svg(IC_UNINHAB)});
@@ -6532,7 +6598,12 @@ function buildIconCombo(inputId,listId,groups,blankLabel){
         '<span>'+escAttr(it.display)+'</span></div>';
       shown++;
     }
-    list.innerHTML=shown?html:'<div class="icomboEmpty">No match</div>';
+    if(!shown){
+      html = (allowCustom && q)
+        ? '<div class="icomboEmpty">No match -- press Enter to add &quot;'+escAttr(filterText.trim())+'&quot; as a new type</div>'
+        : '<div class="icomboEmpty">No match</div>';
+    }
+    list.innerHTML=html;
   }
   inp.addEventListener("focus",function(){ lastCommitted=inp.value; render(""); list.classList.add("show"); });
   inp.addEventListener("input",function(){ render(inp.value); list.classList.add("show"); });
@@ -6542,6 +6613,10 @@ function buildIconCombo(inputId,listId,groups,blankLabel){
       var first=list.querySelector(".icomboOpt");
       if(first){ inp.value=first.getAttribute("data-val"); lastCommitted=inp.value; list.classList.remove("show"); e.preventDefault();
         inp.dispatchEvent(new Event("change",{bubbles:true})); }
+      else if(allowCustom && inp.value.trim()){
+        inp.value=inp.value.trim(); lastCommitted=inp.value; list.classList.remove("show"); e.preventDefault();
+        inp.dispatchEvent(new Event("change",{bubbles:true}));
+      }
     }
   });
   list.addEventListener("mousedown",function(e){
@@ -6567,7 +6642,7 @@ function buildIconCombo(inputId,listId,groups,blankLabel){
      is why it looked intermittent rather than always-broken. */
   function commitNow(){
     var v=inp.value.trim();
-    var valid = v==="" ? !!blankLabel : items.some(function(it2){ return it2.label===v; });
+    var valid = v==="" ? !!blankLabel : (allowCustom ? true : items.some(function(it2){ return it2.label===v; }));
     inp.value = valid ? inp.value : lastCommitted;
     if(valid){ lastCommitted=inp.value; inp.dispatchEvent(new Event("change",{bubbles:true})); }
   }
@@ -6703,7 +6778,7 @@ function renderBodyEditList(){
           '<label class="chk2"><input type="checkbox" class="bfMoon" data-i="'+i+'"'+(b.moon?" checked":"")+'> Moon</label>'+
         '</div>'+
         '<div class="brow2">'+
-          '<div class="mfld" style="margin-bottom:0"><div class="lb">Biome</div><div class="icombo"><input type="text" class="bfBiome icomboInput" data-i="'+i+'" id="bfBiome-'+i+'" autocomplete="off" value="'+escAttr(b.biome)+'"><div class="icomboList" id="bfBiomeList-'+i+'"></div></div></div>'+
+          '<div class="mfld" style="margin-bottom:0"><div class="lb">Biome</div><div class="icombo"><input type="text" class="bfBiome icomboInput" maxlength="30" data-i="'+i+'" id="bfBiome-'+i+'" autocomplete="off" value="'+escAttr(b.biome)+'"><div class="icomboList" id="bfBiomeList-'+i+'"></div></div></div>'+
           /* maxlength was 20 -- too short for real in-game hazard/weather
              phrases (Tony hit this typing "Planet-wide Radioactive Storm",
              30 chars, and got cut off mid-word at "Radiatio"). Bumped to 50,
@@ -6747,14 +6822,14 @@ function renderBodyEditList(){
           '<div class="mfld" style="margin-bottom:0"><div class="lb">Sentinel</div><div class="icombo"><input type="text" class="bfSentinel icomboInput" data-i="'+i+'" id="bfSentinel-'+i+'" autocomplete="off" value="'+escAttr(b.sentinel||"None")+'"><div class="icomboList" id="bfSentinelList-'+i+'"></div></div></div>'+
           '<div class="mfld" style="margin-bottom:0"><div class="lb">Fossils &amp; curiosities</div><input type="text" class="bfFossils" data-i="'+i+'" maxlength="80" spellcheck="true" list="dlFossils" value="'+escAttr(b.fossils)+'"></div>'+
         '</div>'+
-        '<div class="mfld" style="margin-bottom:0"><div class="lb">Resources (comma separated)</div><input type="text" class="bfRes" data-i="'+i+'" maxlength="120" spellcheck="true" list="dlResources" value="'+escAttr(b.resources)+'"></div>'+
+        '<div class="mfld" style="margin-bottom:0"><div class="lb">Common resources (comma separated)</div><input type="text" class="bfRes" data-i="'+i+'" maxlength="120" spellcheck="true" list="dlResources" value="'+escAttr(b.resources)+'"></div>'+
         '<div class="fldHint">Separate multiple items with commas -- each individual item can be up to 24 characters.</div>'+
         '<div class="brow2">'+
           '<div class="mfld" style="margin-bottom:0"><div class="lb">Flora</div><input type="text" class="bfFlora" data-i="'+i+'" maxlength="80" spellcheck="true" list="dlFlora" value="'+escAttr(b.flora)+'"></div>'+
           '<div class="mfld" style="margin-bottom:0"><div class="lb">Fauna</div><input type="text" class="bfFauna" data-i="'+i+'" maxlength="80" spellcheck="true" list="dlFauna" value="'+escAttr(b.fauna)+'"></div>'+
         '</div>'+
         '<div class="brow2">'+
-          '<div class="mfld" style="margin-bottom:0"><div class="lb">Minerals</div><input type="text" class="bfMinerals" data-i="'+i+'" maxlength="80" spellcheck="true" list="dlMinerals" value="'+escAttr(b.minerals)+'"></div>'+
+          '<div class="mfld" style="margin-bottom:0"><div class="lb">Uncommon resources</div><input type="text" class="bfMinerals" data-i="'+i+'" maxlength="80" spellcheck="true" list="dlMinerals" value="'+escAttr(b.minerals)+'"></div>'+
           '<div class="mfld" style="margin-bottom:0"><div class="lb">Salvageable tech</div><input type="text" class="bfSalvage" data-i="'+i+'" maxlength="80" spellcheck="true" list="dlSalvage" value="'+escAttr(b.salvage)+'"></div>'+
         '</div>';
     }
@@ -6768,7 +6843,7 @@ function renderBodyEditList(){
   // is open, so they need rebuilding every time this function runs.
   for(i=0;i<editBodies.length;i++){
     if(!editBodies[i].open) continue;
-    buildIconCombo("bfBiome-"+i,"bfBiomeList-"+i,biomeComboGroups());
+    buildIconCombo("bfBiome-"+i,"bfBiomeList-"+i,biomeComboGroups(),null,true);
     buildIconCombo("bfSentinel-"+i,"bfSentinelList-"+i,sentinelComboGroups());
   }
   renderCollidingSelectors();
@@ -6840,7 +6915,7 @@ function openEditModal(){
       uid:bodyUidSeq++,
       name:b.name,
       moon:!!b.moon,
-      biome:(BIOME_KEYS.indexOf(b.biome)>=0)?b.biome:BIOME_KEYS[0],
+      biome:(b.biome&&String(b.biome).trim())?b.biome:BIOME_KEYS[0],
       descriptor:b.descriptor||"",
       water:!!b.water,
       ring:!!b.ring,
