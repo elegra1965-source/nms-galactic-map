@@ -471,6 +471,13 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   resize:vertical;min-height:50px;outline:none;margin-top:8px}
 .prow{display:flex;gap:5px;margin-top:6px}
 .prow .btn{flex:1;text-align:center}
+/* 2026-08-26, Tony: "PLOTTED COURSE" button clipped -- .prow rows share width
+   50/50 between two buttons with white-space:nowrap inherited from .btn, and
+   that label is longer than every other .prow button text ever was. Rather
+   than shrink font/padding (fragile against the accessibility zoom feature),
+   let a long label wrap onto a 2nd line -- still centred, still fits inside
+   the button's own box, no clipping regardless of label length or zoom. */
+.prow .btn{white-space:normal;line-height:1.25}
 
 #course{position:fixed;left:50%;transform:translateX(-50%);top:calc(var(--top-h,60px) + 8px);z-index:27;
   width:246px;padding:10px 12px;display:none}
@@ -896,10 +903,17 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
    via #bToggleManifest, repositioned every time it opens rather than being
    its own movable window. See anchorManifestUnderCourse(). */
 #route-itinerary-card{position:fixed;left:50%;transform:translateX(-50%);
-  top:calc(var(--top-h,60px) + 8px);z-index:26;width:300px;display:none}
+  top:calc(var(--top-h,60px) + 8px);z-index:26;width:300px;display:none;
+  padding:12px 14px}
 #route-itinerary-card.show{display:block}
 #route-itinerary-card .rihead{display:flex;justify-content:space-between;align-items:center;
   margin-bottom:10px;user-select:none}
+/* 2026-08-26, Tony: manifest hop rows "look clickable" (bold cyan [HOP N]
+   label) but did nothing -- wired up in displayCalculatedItinerary() below;
+   this just gives the now-real click target a visible hover state. */
+.hopRow{padding:2px 4px;margin:0 -4px;border-radius:4px}
+.hopRow:hover{background:rgba(0,229,255,.1)}
+#bBackToTarget:hover{color:var(--cyan)}
 /* ---- first-visit feature tour (2026-08-16, Tony's ask: a walkthrough of
    what the site can do, adapted from the README's screenshot walkthrough
    into a real in-site spotlight sequence). Not auto-shown -- reachable via
@@ -1137,6 +1151,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 </div>
 
 <div id="panel" class="box">
+  <div id="hopPreviewBar" style="display:none;align-items:center;gap:6px;font-size:10.5px;color:var(--text-faint);margin-bottom:8px;padding:6px 8px;border:1px solid var(--border-soft);border-radius:6px;background:rgba(0,229,255,.05)"><span>Previewing this hop &mdash;</span><span id="bBackToTarget" style="text-decoration:underline;cursor:pointer;color:var(--gold)">&#9668; back to <span id="hopPreviewTarget"></span></span></div>
   <div class="phead">
     <div class="stars" id="pStars"></div>
     <div style="min-width:0">
@@ -1180,7 +1195,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   </div>
   <div class="prow" id="prowEnter">
     <button class="btn" id="bEnter" title="Fly into this system and see its star, planets and moons in 3D.">Enter system</button>
-    <button class="btn" id="bCourse" title="Plot a route from where you are to this system. Draws a line on the map and works out distance, bearing and how many hyperdrive jumps it takes.">Plotted course</button>
+    <button class="btn" id="bCourse" title="Plot a route from where you are to this system and open the Warp Manifest -- click again on the same target to close it. Draws a line on the map and works out distance, bearing and how many hyperdrive jumps it takes.">Plotted course</button>
   </div>
   <div class="prow">
     <button class="btn" id="bMark" title="Save this system to your device. Bookmarked systems turn cyan and show in Galaxy view.">Bookmark</button>
@@ -1537,7 +1552,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     </div>
     <div class="mfld">
       <div class="lb">Plotting a hyperdrive course</div>
-      <div style="font-size:12px;color:var(--text-dim);line-height:1.55"><b>Set course</b> / <b>Lock navigation target</b> plots a real multi-jump route to that system for your current hyperdrive type and range (set in Filters). Every jump always lands on a real charted star, never empty space -- same as the real game -- so the reported jump count is usually a bit above the straight-line distance-divided-by-range number, sometimes noticeably so in sparser patches of space. That's not a bug: a real star is rarely sitting exactly on your bearing at exactly your max range, so routes drift slightly to reach one, and that adds up over a long trip. No Man's Sky itself has no multi-hop route planner at all -- you'd normally do this same star-by-star checking manually, this just does it for you and shows the whole path at once. The line itself matches the real game's own convention: <b>solid</b> means a single jump is enough, <b>dashed</b> means it needs multiple hops, and <b>red-dashed</b> means your current drive can't reach that star's colour at all. Clicking any star while browsing automatically replots the line to it, replacing whatever was there before. If a route's hop count is well above the naive distance-divided-by-range figure, a short reminder appears right on the Course Plotted card itself, not just here -- researched this against real player reports too: NMS's own displayed hyperdrive range has long been known to overstate the actual effective jump distance (a leftover from a past galaxy-distance rescale), so needing noticeably more real hops than the raw numbers suggest is genuinely how the real game behaves, not something unique to this map.</div>
+      <div style="font-size:12px;color:var(--text-dim);line-height:1.55"><b>Plotted course</b> / <b>Lock navigation target</b> plots a real multi-jump route to that system for your current hyperdrive type and range (set in Filters), and opens the Warp Manifest showing the full jump-by-jump itinerary -- click it again on the same target to close the manifest without re-plotting. Every jump always lands on a real charted star, never empty space -- same as the real game -- so the reported jump count is usually a bit above the straight-line distance-divided-by-range number, sometimes noticeably so in sparser patches of space. That's not a bug: a real star is rarely sitting exactly on your bearing at exactly your max range, so routes drift slightly to reach one, and that adds up over a long trip. No Man's Sky itself has no multi-hop route planner at all -- you'd normally do this same star-by-star checking manually, this just does it for you and shows the whole path at once. The line itself matches the real game's own convention: <b>solid</b> means a single jump is enough, <b>dashed</b> means it needs multiple hops, and <b>red-dashed</b> means your current drive can't reach that star's colour at all. Clicking any star while browsing automatically replots the line to it, replacing whatever was there before. If a route's hop count is well above the naive distance-divided-by-range figure, a short reminder appears right on the Course Plotted card itself, not just here -- researched this against real player reports too: NMS's own displayed hyperdrive range has long been known to overstate the actual effective jump distance (a leftover from a past galaxy-distance rescale), so needing noticeably more real hops than the raw numbers suggest is genuinely how the real game behaves, not something unique to this map.</div>
     </div>
     <div class="mfld">
       <div class="lb">Search by name</div>
@@ -3550,6 +3565,13 @@ function clearCourseLine(){
   if(courseDots){ localGroup.remove(courseDots); courseDots.geometry.dispose(); courseDots.material.dispose(); courseDots=null; }
 }
 var courseWaypoints=null, courseTruncated=false;
+/* 2026-08-26: set true by the #bCourse click handler right before a FRESH
+   plot (new target); _finishSetCourse() checks and clears it once the
+   route resolves, opening the Warp Manifest if it is not already open.
+   Re-clicking #bCourse on the SAME already-plotted target skips setCourse()
+   entirely and just clicks #bToggleManifest directly (see #bCourse's own
+   listener) -- so this flag only ever matters for a genuine new plot. */
+var _openManifestOnPlot=false;
 var _routeWorker=null; /* active A* web worker, null when idle */
 var _routeGen=0; /* bumped by setCourse() every call and by abortRoute() -- lets any
   in-flight A* result or chunked findRouteAsync fallback (see its own comment) tell
@@ -4309,6 +4331,11 @@ function _finishSetCourse(_s,_ly,_range,_dvx,_dvy,_dvz){
   applyFilter();
   buildGalaxyMarks();
   displayCalculatedItinerary(courseWaypoints,_ly);
+  if(_openManifestOnPlot){
+    _openManifestOnPlot=false;
+    var _mCard=document.getElementById("route-itinerary-card");
+    if(_mCard&&!_mCard.classList.contains("show")) document.getElementById("bToggleManifest").click();
+  }
 }
 
 /* ============ system view ============ */
@@ -4683,6 +4710,7 @@ function upgradeBodyNames(s){
 }
 function updatePanel(s){
   selected=s;
+  hideHopPreviewBar();
   upgradeBodyNames(s);
   document.getElementById("panel").classList.add("show");
   document.getElementById("pSys").style.display="";
@@ -5842,7 +5870,16 @@ document.getElementById("bEnter").addEventListener("click",function(){
   }
 });
 document.getElementById("bCourse").addEventListener("click",function(){
-  if(selected) setCourse(selected);
+  if(!selected) return;
+  if(courseTarget&&courseTarget.address===selected.address){
+    /* already plotted to this exact system -- Plotted course now doubles
+       as the Warp Manifest open/close toggle for it, rather than silently
+       re-running the route computation for no reason. */
+    document.getElementById("bToggleManifest").click();
+    return;
+  }
+  _openManifestOnPlot=true;
+  setCourse(selected);
 });
 document.getElementById("bClrCourse").addEventListener("click",function(){
   courseTarget=null; courseWaypoints=null; clearCourseLine(); buildGalaxyMarks();
@@ -6208,11 +6245,46 @@ function displayCalculatedItinerary(waypoints,totalLY){
     var label=i===0?"START":i===waypoints.length-1?"DESTINATION":"HOP "+i;
     var name=wp.name||(wp.real?"(system)":"(open space)");
     var addr=wp.address||"";
-    stepsList.innerHTML+='<div style="margin-bottom:6px"><b style="color:var(--cyan)">['+label+']</b> '+
+    /* 2026-08-26: only a hop with a real portal address is a real system
+       to preview -- an "(open space)" stop has none, so it stays plain. */
+    var attrs=addr?(' class="hopRow" data-addr="'+addr+'" title="Click to preview this system\'s info"'):"";
+    stepsList.innerHTML+='<div'+attrs+' style="margin-bottom:6px"><b style="color:var(--cyan)">['+label+']</b> '+
       name+'<br><span style="opacity:0.55;font-size:10px">'+addr+'</span></div>';
   });
   if(card.classList.contains("show")) anchorManifestUnderCourse();
 }
+/* 2026-08-26, Tony: "why aren't the highlighted hop not clickable... show
+   information about that star system but be able to go back to target
+   information in one click" -- delegated so it keeps working across every
+   displayCalculatedItinerary() re-render (innerHTML rebuild). */
+document.getElementById("route-steps-list").addEventListener("click",function(e){
+  var row=e.target.closest?e.target.closest(".hopRow"):null;
+  if(!row) return;
+  var addr=row.getAttribute("data-addr");
+  var a=addr?parseAddress(addr):null;
+  if(!a) return;
+  var sys=null,i;
+  for(i=0;i<allSystems.length;i++){
+    if(allSystems[i].idx===a.idx&&allSystems[i].vx===a.x&&
+       allSystems[i].vy===a.y&&allSystems[i].vz===a.z){ sys=allSystems[i]; break; }
+  }
+  if(!sys) sys=generateSystem(a.x,a.y,a.z,a.idx);
+  updatePanel(sys);
+  if(courseTarget&&sys.address!==courseTarget.address) showHopPreviewBar();
+});
+function showHopPreviewBar(){
+  var bar=document.getElementById("hopPreviewBar");
+  if(!bar||!courseTarget) return;
+  document.getElementById("hopPreviewTarget").textContent=courseTarget.name;
+  bar.style.display="flex";
+}
+function hideHopPreviewBar(){
+  var bar=document.getElementById("hopPreviewBar");
+  if(bar) bar.style.display="none";
+}
+document.getElementById("bBackToTarget").addEventListener("click",function(){
+  if(courseTarget) updatePanel(courseTarget);
+});
 document.getElementById("bToggleManifest").addEventListener("click",function(){
   var card=document.getElementById("route-itinerary-card");
   var btn=this;
@@ -7040,7 +7112,7 @@ var TOUR_STEPS=[
   {sel:"#mGal",title:"A real 3D galaxy",
     body:"You're looking at one of 256 real No Man's Sky galaxies, generated from a portal address -- not a static image, a galaxy you can actually fly through and zoom into."},
   {sel:"#mLoc",title:"Local view",
-    body:"Local shows the real star field around you. Hover a star (mouse) for a quick popup, or click for the full panel -- race, economy, conflict, planets. Set course draws a line that's solid for a single jump, dashed for multi-hop, red if your drive can't reach it. Enter system for a full 3D view, or add your own in-game data via Edit system."},
+    body:"Local shows the real star field around you. Hover a star (mouse) for a quick popup, or click for the full panel -- race, economy, conflict, planets. Plotted course draws a line that's solid for a single jump, dashed for multi-hop, red if your drive can't reach it, and opens the Warp Manifest for the full itinerary. Enter system for a full 3D view, or add your own in-game data via Edit system."},
   {sel:"#inAddr",title:"Type an address",
     body:"Paste or type a 12-character portal address here and hit Jump to fly straight to that exact system."},
   {sel:"#bKeys",title:"No address handy?",
@@ -7048,7 +7120,7 @@ var TOUR_STEPS=[
   {sel:"#bSearch",title:"Find it by name",
     body:"Type a name to jump straight there -- scoped to systems you or the community have actually documented, bookmarked, waypointed or visited, since the full procedural galaxy has no names to search until someone gives it one."},
   {sel:"#bFiltToggle",title:"Narrow what you see",
-    body:"Filters can limit the star field by colour, race, economy, or special types like black holes and Atlas interfaces -- plus your hyperdrive type and range, which gates what Set course and Enter system will actually let you reach."},
+    body:"Filters can limit the star field by colour, race, economy, or special types like black holes and Atlas interfaces -- plus your hyperdrive type and range, which gates what Plotted course and Enter system will actually let you reach."},
   {sel:"#bAbout",title:"Worth a read",
     body:"About explains exactly what's generated accurately versus a plausible guess -- and what's still an unverified guess, like individual planet names. It's also where Feedback lives if you spot a bug or have an idea -- no account needed to send one."},
   {sel:"#bAccess",title:"Accessibility",
