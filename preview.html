@@ -3567,11 +3567,59 @@ function buildGalaxy(){
   galaxyGroup.add(galPts);
 }
 
+/* Guaranteed-visible marked systems (2026-08-26, Tony: "if i filter black
+   holes it shows all systems with black holes yet doesnt show visited...
+   even system edited by travellers still only coming back with current
+   system"). Black holes/Atlas stations always showed reliably because
+   regionAnomalyIdx() below force-includes their real index in every
+   region's slice regardless of the random per-region sample -- but a
+   visited/waypointed/edited system's index is just an ordinary address
+   like any other, so it only ever turned up if the random per-region draw
+   (sPer picks out of a 4096-wide pool) happened to land on it by chance.
+   That's why those two filters only ever showed the system you'd just
+   jumped to (guaranteed in via focusIdx below) and nothing else, even for
+   systems genuinely visited/edited nearby. Fix: decode every
+   store.visited/store.waypoints key plus every real (has .data)
+   OVERRIDES.systems entry for the CURRENT galaxy back into its region+index
+   -- parseAddress() is the exact inverse of formatAddress(), so this needs
+   no new storage -- and guarantee those indices into the slice the same
+   way bh/atlas/focus already are, region by region. Built once per
+   generateSlice() call (not a per-star OVERRIDES scan), so this stays
+   cheap even with thousands of visited/edited systems on record. */
+function markedRegionIdx(){
+  var map={};
+  function add(vx,vy,vz,idx){
+    var k=vx+","+vy+","+vz;
+    if(!map[k]) map[k]=[];
+    if(map[k].indexOf(idx)<0) map[k].push(idx);
+  }
+  function addFromKey(key,assumeGalaxy0){
+    var ci=key.indexOf(":");
+    var gal, addrStr;
+    if(ci<0){ if(!assumeGalaxy0) return; gal=0; addrStr=key; }
+    else { gal=parseInt(key.slice(0,ci),10); addrStr=key.slice(ci+1); }
+    if(gal!==GALAXY) return;
+    var a=parseAddress(addrStr);
+    if(!a) return;
+    add(a.x,a.y,a.z,a.idx);
+  }
+  var k;
+  for(k in store.visited) addFromKey(k,false);
+  for(k in store.waypoints) addFromKey(k,false);
+  if(OVERRIDES.systems) for(k in OVERRIDES.systems){
+    var ov=OVERRIDES.systems[k];
+    // legacy pre-migration records are bare addresses assumed galaxy 0 --
+    // same fallback rule applyOverride() itself uses above.
+    if(ov && ov.data) addFromKey(k,true);
+  }
+  return map;
+}
 /* ============ local slice ============ */
 function generateSlice(focusIdx){
   var R=parseInt(document.getElementById("sR").value,10);
   var per=parseInt(document.getElementById("sPer").value,10);
   allSystems=[];
+  var _marked=markedRegionIdx();
   var dx,dy,dz,i;
   for(dx=-R;dx<=R;dx++) for(dy=-R;dy<=R;dy++) for(dz=-R;dz<=R;dz++){
     var vx=focus.x+dx, vy=focus.y+dy, vz=focus.z+dz;
@@ -3585,6 +3633,10 @@ function generateSlice(focusIdx){
     var idxs=[]; if(_an.bh>=0) idxs.push(_an.bh); if(_an.atlas>=0) idxs.push(_an.atlas);
     /* the system you jumped to must always be in the slice, or nothing gets selected */
     if(focusIdx!=null && dx===0 && dy===0 && dz===0 && idxs.indexOf(focusIdx)<0) idxs.push(focusIdx);
+    /* any visited/waypointed/edited system that falls in this region must also
+       always be in the slice -- see markedRegionIdx() above for why. */
+    var _mk=_marked[vx+","+vy+","+vz];
+    if(_mk){ for(var _mj=0;_mj<_mk.length;_mj++){ if(idxs.indexOf(_mk[_mj])<0) idxs.push(_mk[_mj]); } }
     for(i=0;i<per;i++){
       var pick=Math.floor(vr()*count);
       if(idxs.indexOf(pick)<0) idxs.push(pick);
