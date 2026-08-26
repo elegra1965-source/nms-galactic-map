@@ -1029,7 +1029,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   <div id="filt" class="box fold min">
     <div class="kicker fhead" id="fHead"><span id="fHeadLabel">▸ Filters</span><button class="btn" id="bFiltMin" type="button" title="Collapse or expand the filters panel.">&#9656;</button></div>
     <div class="fbody">
-      <div style="font-size:10.5px;color:var(--text-faint);line-height:1.35;margin-bottom:7px">Applies to Local view — that is where the real systems are.</div>
+      <div style="font-size:10.5px;color:var(--text-faint);line-height:1.35;margin-bottom:7px">Applies to Local view — that is where the real systems are. These dim/hide stars on THIS map; to browse and jump straight back to everywhere you've bookmarked, waypointed or visited, open Search and leave the box empty.</div>
       <div class="fld"><div class="lb">Star colour</div>
         <select id="fCol"><option value="">Any</option><option>yellow</option><option>red</option>
         <option>green</option><option>blue</option><option>purple</option></select></div>
@@ -7682,23 +7682,38 @@ function buildSearchIndex(){
   addFromStore(store.visited,"Visited");
   return idx;
 }
+var SEARCH_PERSONAL_HINTS={Visited:1,Bookmarked:1,Waypoint:1};
 function runSearch(query){
   var box=document.getElementById("searchResults");
   var q=query.trim().toLowerCase();
+  var idx=buildSearchIndex(), i;
   if(!q){
-    box.innerHTML='<div class="searchEmpty">Type a name to search systems, planets/moons and bases you or the community have documented, bookmarked, waypointed or visited.</div>';
+    // Browse mode (2026-08-26, Tony: "filter visited and they all show,
+    // then I click which one I want to go back to") -- an empty box used
+    // to just say "type a name" and show nothing, so the only way back to
+    // an old system was remembering its address or portal glyphs. Personal
+    // history only (Visited/Bookmarked/Waypoint), not every community
+    // "Documented" system -- reads as "my own history", not a general
+    // community browse. Typing a name still searches everything including
+    // Documented, unchanged below.
+    var mine=[];
+    for(i=0;i<idx.length;i++){ if(SEARCH_PERSONAL_HINTS[idx[i].hint]) mine.push(idx[i]); }
+    mine.sort(function(a,b){ return a.name.localeCompare(b.name); });
+    renderMatches(mine.slice(0,60),
+      "Nothing bookmarked, waypointed or visited yet -- jump to a system (Random, an address, or a Search result) and it'll show up here. Type a name above to search the wider community-documented list instead.");
     return;
   }
-  var idx=buildSearchIndex(), starts=[], i;
+  var starts=[];
   for(i=0;i<idx.length;i++){
     if(idx[i].name.toLowerCase().indexOf(q)===0) starts.push(idx[i]);
   }
-  var matches=starts.slice(0,20);
-  if(!matches.length){
-    box.innerHTML='<div class="searchEmpty">No match found -- only names you or the community have actually documented, bookmarked, waypointed or visited are searchable, not every procedural system. Your own bookmarks/waypoints/visited history are already searched across every galaxy, not just the one you\'re currently viewing.</div>';
-    return;
-  }
-  var html="";
+  renderMatches(starts.slice(0,20),
+    "No match found -- only names you or the community have actually documented, bookmarked, waypointed or visited are searchable, not every procedural system. Your own bookmarks/waypoints/visited history are already searched across every galaxy, not just the one you're currently viewing.");
+}
+function renderMatches(matches,emptyMsg){
+  var box=document.getElementById("searchResults");
+  if(!matches.length){ box.innerHTML='<div class="searchEmpty">'+emptyMsg+'</div>'; return; }
+  var html="",i;
   for(i=0;i<matches.length;i++){
     var m=matches[i];
     /* Flag cross-galaxy results plainly rather than letting a traveller
