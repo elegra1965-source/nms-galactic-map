@@ -883,10 +883,11 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 #loader-text{color:var(--cyan);font-size:14px;font-weight:bold;letter-spacing:4px;
   text-shadow:0 0 10px rgba(0,229,255,0.6)}
 .loader-sub{color:var(--color-slate);font-size:10px;letter-spacing:2px;margin-top:8px;opacity:0.7}
-#terminal-console{margin-top:25px;width:320px;height:60px;
+#terminal-console{margin-top:25px;width:320px;height:70px;
   border-top:1px solid rgba(0,229,255,0.2);padding-top:10px;font-size:9px;
-  color:var(--color-matrix);text-align:left;overflow:hidden;line-height:14px;
-  opacity:0.8;letter-spacing:1px;font-family:Courier,monospace}
+  color:var(--color-matrix);text-align:left;overflow-y:auto;overflow-x:hidden;line-height:14px;
+  opacity:0.8;letter-spacing:1px;font-family:Courier,monospace;scrollbar-width:none}
+#terminal-console::-webkit-scrollbar{display:none}
 @keyframes loaderRotCW{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
 @keyframes loaderRotCCW{0%{transform:rotate(360deg)}100%{transform:rotate(0deg)}}
 @keyframes loaderPulse{0%{transform:scale(0.8);opacity:0.5}100%{transform:scale(1.3);opacity:1}}
@@ -3642,7 +3643,35 @@ var _ASTAR_WORKER_URL=(function(){
      node instead of the whole database. This changes nothing about WHICH
      systems count as neighbours -- same gd() distance, same d>0&&d<=mr
      condition, same resulting set -- only how that set is found. */
+  /* Round 4 fix 2026-08-25 (Tony, still stuck at "STILL SEARCHING" with zero
+     hop lines even after the round-3 neighbour fix above): exactly the
+     second cost flagged (but not yet fixed) in that round's own comment --
+     open.sort() re-sorts the ENTIRE open list from scratch on every single
+     iteration (O(k log k)), and open.some(...) below does a full linear
+     scan of open on every edge relax to check for an existing duplicate
+     (O(k) per neighbour). Both were fine while open stayed small; on a
+     harder/longer route -- especially now, since mergeWaypointsIntoSlice()
+     keeps growing the candidate pool every time a route is plotted, this
+     session included -- open can grow into the thousands before the search
+     converges or the 4s bail fires, and at that size the sort+scan costs
+     dominate all over again, independent of the neighbour-lookup fix.
+     Replaced the plain array with a real binary min-heap (heapPush/
+     heapPop below), keyed on fs -- O(log k) per push/pop instead of
+     O(k log k)/O(k). Since an array heap can't cheaply decrease an
+     existing entry's key in place, a relaxed edge just pushes a fresh
+     entry instead of the old open.some() dedupe check; a node can now
+     appear in the heap more than once, so each pop verifies its stored key
+     still matches the CURRENT fs.get(address) (both come from the exact
+     same tg+gd(nb,e) expression, so this is an exact match, not a
+     tolerance) and silently skips+continues on a stale one -- the
+     classic "lazy deletion" trick. This changes nothing about the actual
+     search: same neighbours, same relaxation rule, same termination
+     conditions, same returned path -- verified hop-for-hop identical
+     against the round-3 version on real routes from the live site before
+     shipping (see chat). Only how the open list's min is found changed. */
   var src='function gd(a,b){var dx=a.x-b.x,dy=a.y-b.y,dz=a.z-b.z;return Math.sqrt(dx*dx+dy*dy+dz*dz);}\n'+
+    'function heapPush(h,it){h.push(it);var i=h.length-1;while(i>0){var p=(i-1)>>1;if(h[p].k<=h[i].k)break;var t=h[p];h[p]=h[i];h[i]=t;i=p;}}\n'+
+    'function heapPop(h){var top=h[0],last=h.pop();if(h.length>0){h[0]=last;var i=0,n=h.length;while(true){var l=2*i+1,r=2*i+2,sm=i;if(l<n&&h[l].k<h[sm].k)sm=l;if(r<n&&h[r].k<h[sm].k)sm=r;if(sm===i)break;var t=h[sm];h[sm]=h[i];h[i]=t;i=sm;}}return top;}\n'+
     'function planRoute(s,e,db,mr){\n'+
     '  var cell=mr>0?mr:1;\n'+
     '  function ck(x,y,z){return Math.floor(x/cell)+\",\"+Math.floor(y/cell)+\",\"+Math.floor(z/cell);}\n'+
@@ -3664,13 +3693,14 @@ var _ASTAR_WORKER_URL=(function(){
     '    }\n'+
     '    return out;\n'+
     '  }\n'+
-    '  var open=[s],cf=new Map(),gs=new Map(),fs=new Map();\n'+
+    '  var cf=new Map(),gs=new Map(),fs=new Map();\n'+
     '  gs.set(s.address,0); fs.set(s.address,gd(s,e));\n'+
+    '  var heap=[]; heapPush(heap,{n:s,k:gd(s,e)});\n'+
     '  var _t0=Date.now(),_n=0;\n'+
-    '  while(open.length>0){\n'+
+    '  while(heap.length>0){\n'+
     '    _n++; if(Date.now()-_t0>4000) return null;\n'+
-    '    open.sort(function(a,b){return(fs.get(a.address)||Infinity)-(fs.get(b.address)||Infinity);});\n'+
-    '    var cur=open.shift();\n'+
+    '    var top=heapPop(heap), cur=top.n;\n'+
+    '    if(top.k!==fs.get(cur.address)) continue;\n'+
     '    if(cur.address===e.address||gd(cur,e)<=mr){\n'+
     '      var path=[],tmp=cur;\n'+
     '      while(cf.has(tmp.address)){path.unshift(tmp);tmp=cf.get(tmp.address);}\n'+
@@ -3683,8 +3713,8 @@ var _ASTAR_WORKER_URL=(function(){
     '      var nb=nbrs[i],tg=(gs.get(cur.address)||0)+gd(cur,nb);\n'+
     '      if(tg<(gs.get(nb.address)||Infinity)){\n'+
     '        cf.set(nb.address,cur); gs.set(nb.address,tg);\n'+
-    '        fs.set(nb.address,tg+gd(nb,e));\n'+
-    '        if(!open.some(function(x){return x.address===nb.address;})) open.push(nb);\n'+
+    '        var nfs=tg+gd(nb,e); fs.set(nb.address,nfs);\n'+
+    '        heapPush(heap,{n:nb,k:nfs});\n'+
     '      }\n'+
     '    }\n'+
     '  }\n'+
@@ -4201,19 +4231,25 @@ function setCourse(s,silent){
      back null (target beyond the local slice) and the worker erroring out. */
   function _runRouteFallback(){
     if(!silent) _routeLoaderFallbackStart();
+    /* 2026-08-25, round 4 (Tony: "why can it not display each system name
+       as it fetches it then the next then the next... so at least shows
+       something is happening instead of waiting for it all"): genuinely
+       true for THIS path specifically, unlike the fast A* worker above.
+       findRouteAsync computes hops one at a time, in real final order, no
+       backtracking -- by the time onHop fires for a given star, that star
+       IS a real, permanent part of the route (never undone later), so
+       showing it live, the moment it's found, is 100% honest here. Restored
+       the live per-hop line (_routeLoaderHop, already throttled to ~400ms
+       so fast stretches don't blur past readable -- see its own comment)
+       instead of waiting for the whole route and revealing it after; no
+       need for the post-plot _revealRouteHops reveal afterward either,
+       since every hop was already shown for real as it happened. */
     findRouteAsync(focusSystem,_s,_range,true,
-      function(next,hopNum){ /* live per-hop line replaced by the post-plot
-        reveal below (_revealRouteHops) -- see its comment */ },
+      function(next,hopNum){ if(!silent&&_myGen===_routeGen) _routeLoaderHop(next,hopNum); },
       function(rt){
         if(!rt) return; /* superseded by a newer setCourse() call, or aborted -- nothing more to do */
         courseWaypoints=rt.path; courseTruncated=rt.truncated;
-        if(!silent){
-          _revealRouteHops(courseWaypoints,_myGen,function(){
-            if(_myGen===_routeGen) _finishSetCourse(_s,_ly,_range,_dvx,_dvy,_dvz);
-          });
-        } else {
-          _finishSetCourse(_s,_ly,_range,_dvx,_dvy,_dvz);
-        }
+        _finishSetCourse(_s,_ly,_range,_dvx,_dvy,_dvz);
       },
       function(){ return _myGen!==_routeGen; });
   }
@@ -6143,7 +6179,7 @@ function showRouteLoader(){
   clearInterval(_logStreamInterval);
   clearTimeout(_routePatienceTimer);
   _routePatienceTimer=setTimeout(function(){
-    if(tc) tc.innerHTML+="<br>&gt; STILL SEARCHING -- LONG OR SPARSE TRIPS CAN TAKE A LITTLE LONGER...";
+    if(tc){ tc.innerHTML+="<br>&gt; STILL SEARCHING -- LONG OR SPARSE TRIPS CAN TAKE A LITTLE LONGER..."; tc.scrollTop=tc.scrollHeight; }
   },4000);
 }
 function hideRouteLoader(){
