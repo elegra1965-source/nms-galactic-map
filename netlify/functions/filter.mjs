@@ -259,7 +259,12 @@ export function filterSystemEdit(payload){
     var b = bodies[i] || {};
     var bNameR = filterText(b.name, {maxLen:30, fieldName:"Planet/moon name"});
     if(!bNameR.ok){ errors.push(bNameR.reason); continue; }
-    var biomeR = filterText(b.biome, {maxLen:20, fieldName:"Biome"});
+    // Bumped 20->30 (2026-08-26, Tony): the client now lets a traveller type a
+    // custom biome name (e.g. Water World, or anything not on the official
+    // list) instead of only picking from the fixed list -- 20 was tight for
+    // that, so this now matches the 30-char cap preview.html's own bfBiome
+    // input uses (same convention as the Descriptor/Planet-name caps above).
+    var biomeR = filterText(b.biome, {maxLen:30, fieldName:"Biome"});
     if(!biomeR.ok){ errors.push(biomeR.reason); continue; }
     // Bumped 20->50 (2026-08-17, Tony): too short for real in-game hazard/
     // weather phrases like "Planet-wide Radioactive Storm" -- must match
