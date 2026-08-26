@@ -8682,7 +8682,31 @@ buildBackdrop();
 buildGalaxy();
 buildNebula();
 drawGalIcon();
-var BOOT_ANCHOR_ADDR="1067FA5A9B2C"; /* arbitrary real coordinate purely to seed the initial slice/camera -- not shown to the visitor, see jumpTo's silent flag */
+/* Random per-visit starting coordinate (2026-08-26, Tony: "why is it always
+   that number, shouldn't it be random... every traveller does not start at
+   the same place"). Used to be a single fixed address, "1067FA5A9B2C", so
+   every visitor landed on the exact same system (~761,822 ly out) every
+   single time. A fresh No Man's Sky save actually starts roughly 700,000-
+   750,000 ly from the galactic core -- nowhere near this tool's own
+   theoretical max radius of ~1,159,656 ly (SIZE_XZ/SIZE_Y x LY_PER_VOXEL,
+   which already lines up almost exactly with the real galaxy-edge distance
+   players report, ~1,159,350-1,159,371 ly), so 761,822 ly was always a
+   realistic *distance* -- just never a *different* one. This rolls a new
+   position inside that real 700k-750k ly spawn band on every page load
+   (kept thin on the y/galactic-plane axis, like NMS's actual disc-shaped
+   galaxy), so both the number and the system it seeds differ per visitor
+   and per refresh. p/idx are carried over unchanged from the old fixed
+   anchor -- only the position is randomised. */
+function randomBootAddress(){
+  var minR=1750, maxR=1875; // voxel units; x LY_PER_VOXEL(400) = 700,000-750,000 ly
+  var r=minR+Math.random()*(maxR-minR);
+  var theta=Math.random()*Math.PI*2;
+  var vx=Math.round(Math.cos(theta)*r);
+  var vz=Math.round(Math.sin(theta)*r);
+  var vy=Math.round((Math.random()*2-1)*40); // thin galactic-plane offset
+  return formatAddress(1,0x067,vx,vy,vz);
+}
+var BOOT_ANCHOR_ADDR=randomBootAddress(); /* not shown to the visitor, see jumpTo's silent flag */
 /* Gated behind the nms-core module script above (see DEPLOYMENT_BRIEF.md) so
    the very first generateSlice() call -- inside jumpTo() below -- doesn't run
    before window.nmsLetterMap is populated. window.nmsCoreReady always
