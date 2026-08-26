@@ -34628,11 +34628,13 @@
             "name": "Lilomand Gamma",
             "moon": false,
             "orbits": 0,
-            "biome": "Airless",
+            "biome": "Toxic",
             "descriptor": "",
             "water": false,
             "ring": false,
-            "resources": [],
+            "resources": [
+              "Magnetised Ferrite"
+            ],
             "flora": [],
             "fauna": [],
             "minerals": [
@@ -34649,19 +34651,23 @@
             "baseName": ""
           },
           {
-            "name": "Meseycianus Amamo",
-            "moon": true,
-            "orbits": 1,
-            "biome": "Scorched",
+            "name": "Amamo 38/Y5",
+            "moon": false,
+            "orbits": 0,
+            "biome": "humid",
             "descriptor": "",
             "water": false,
             "ring": false,
             "resources": [
-              "Salt"
+              "Star Bulbs"
             ],
             "flora": [],
             "fauna": [],
-            "minerals": [],
+            "minerals": [
+              "Copper",
+              "Paraffinium",
+              "Cobolt"
+            ],
             "salvage": [],
             "fossils": [],
             "sentinel": "Frenzied",
@@ -34703,7 +34709,7 @@
             "biome": "Radioactive",
             "descriptor": "",
             "water": false,
-            "ring": false,
+            "ring": "gold",
             "resources": [
               "Gamma Roots"
             ],
@@ -34774,11 +34780,15 @@
           }
         ]
       },
-      "editedAt": "2026-08-26T18:59:26.039Z",
+      "editedAt": "2026-08-26T19:03:07.899Z",
       "editedByIp": "5.133.46.24",
       "history": [
         {
           "at": "2026-08-26T18:59:26.039Z",
+          "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-08-26T19:03:07.899Z",
           "text": "edited by a traveller"
         }
       ]
@@ -34787,7 +34797,8 @@
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1787770766039
+      1787770766039,
+      1787770987899
     ]
   },
   "flagLog": {}
