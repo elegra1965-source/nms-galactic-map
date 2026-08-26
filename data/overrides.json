@@ -34654,7 +34654,7 @@
             "name": "Amamo 38/Y5",
             "moon": false,
             "orbits": 0,
-            "biome": "humid",
+            "biome": "Scorched",
             "descriptor": "",
             "water": false,
             "ring": false,
@@ -34780,7 +34780,7 @@
           }
         ]
       },
-      "editedAt": "2026-08-26T19:03:07.899Z",
+      "editedAt": "2026-08-26T19:04:12.994Z",
       "editedByIp": "5.133.46.24",
       "history": [
         {
@@ -34790,6 +34790,10 @@
         {
           "at": "2026-08-26T19:03:07.899Z",
           "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-08-26T19:04:12.994Z",
+          "text": "edited by a traveller"
         }
       ]
     }
@@ -34798,7 +34802,8 @@
   "ipLog": {
     "5.133.46.24": [
       1787770766039,
-      1787770987899
+      1787770987899,
+      1787771052994
     ]
   },
   "flagLog": {}
