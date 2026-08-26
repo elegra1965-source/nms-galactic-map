@@ -62,6 +62,24 @@ hyperdrive can't reach that star's colour at all. Just hovering any star
 (no need to select one first) draws a quick preview line before you commit
 to a course.
 
+**Warp Manifest.** Click **Plotted course** on a selected system and it does
+two things at once: draws the route line above, and opens the Warp Manifest
+-- the full jump-by-jump itinerary behind that line, not just the summary
+card's totals. Every stop is real: START, HOP 1, HOP 2 ... DESTINATION, each
+with the actual system name and portal address the route passes through --
+a hyperdrive in No Man's Sky can only ever warp to a real charted star,
+never empty space, so neither does this. Click any row to open that
+system's full info panel (race, economy, planets, everything) without
+losing your place -- a "back to [target]" link one click above the panel
+returns you to the system you were actually navigating toward. Total Jumps
+and Est. Distance sit at the top of the manifest, COPY STEPS copies the
+whole itinerary as plain text, and Jump to / Clear on the Course plotted
+card commit to the route or cancel it. Click Plotted course again on the
+same target to close the manifest without re-plotting; pick a different
+target and it plots fresh and reopens automatically. Like every other panel
+here, it's draggable by its header and collapsible with the small arrow
+button.
+
 **Enter system.** Fly into any system for a true 3D orbital view -- binary
 and ternary stars, planets and moons on real orbits with rings where the
 generator rolled them, and (where the region has one) a black hole or Atlas
@@ -72,7 +90,7 @@ Interface rendered as its own object rather than swapped in for the star.
 **Filters.** Narrow the local star field by colour, race, economy, or special
 system types (outlaw, black holes, Atlas interfaces, phantom/shadow stars),
 plus a hyperdrive type + range setting that actually gates what you can
-reach -- Set course and Enter system both check it.
+reach -- Plotted course and Enter system both check it.
 
 ![Filters panel](screenshots/04-filters-panel.jpg)
 
@@ -121,7 +139,8 @@ and tritanopia -- built into the map itself, not bolted on as an afterthought.
 ![Accessibility panel](screenshots/08-accessibility-panel.jpg)
 
 **Draggable panels.** Filters, the system info panel, Course plotted, the
-glyph keypad, Search, Edit system, and Accessibility can all be dragged by
+Warp Manifest, the glyph keypad, Search, Edit system, and Accessibility can
+all be dragged by
 their header to wherever suits your screen -- handy on smaller or rotated
 phones where they'd otherwise overlap, or just to pull a card off the course
 line it's sitting on.

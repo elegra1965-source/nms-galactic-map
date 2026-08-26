@@ -897,11 +897,11 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
        orientation constant on screen while the arms sweep around inside it,
        the way a real tilted galactic disc actually looks when it spins. ---- */
 /* ---- warp manifest itinerary card (spec item 7) ---- */
-/* No longer independently draggable (Tony, 2026-08-21: "add a button to
-   open warp manifest dropdown instead of separate window") -- it now only
-   ever opens as a dropdown anchored directly under the Course plotted card
-   via #bToggleManifest, repositioned every time it opens rather than being
-   its own movable window. See anchorManifestUnderCourse(). */
+/* Draggable again as of 2026-08-26 (Tony: "wants to be like all other
+   windows draggable and collapsible") -- opens as a dropdown auto-anchored
+   near the Course plotted card / system info panel the first time each
+   session, via #bToggleManifest, but can be dragged anywhere afterward
+   exactly like every other floating box. See positionManifestCard(). */
 #route-itinerary-card{position:fixed;left:50%;transform:translateX(-50%);
   top:calc(var(--top-h,60px) + 8px);z-index:26;width:300px;display:none;
   padding:12px 14px}
@@ -911,7 +911,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 /* 2026-08-26, Tony: manifest hop rows "look clickable" (bold cyan [HOP N]
    label) but did nothing -- wired up in displayCalculatedItinerary() below;
    this just gives the now-real click target a visible hover state. */
-.hopRow{padding:2px 4px;margin:0 -4px;border-radius:4px}
+.hopRow{padding:2px 4px;margin:0 -4px;border-radius:4px;cursor:pointer}
 .hopRow:hover{background:rgba(0,229,255,.1)}
 #bBackToTarget:hover{color:var(--cyan)}
 /* ---- first-visit feature tour (2026-08-16, Tony's ask: a walkthrough of
@@ -4110,12 +4110,31 @@ function mergeWaypointsIntoSlice(){
   for(var i=0;i<courseWaypoints.length;i++){
     var wp=courseWaypoints[i];
     if(wp.vx===undefined||wp.idx===undefined) continue; /* start/end -- already real & rendered */
-    var dup=false;
-    for(var j=0;j<allSystems.length;j++) if(allSystems[j].address===wp.address){ dup=true; break; }
-    if(dup) continue;
+    var existing=null;
+    for(var j=0;j<allSystems.length;j++) if(allSystems[j].address===wp.address){ existing=allSystems[j]; break; }
+    if(existing){
+      /* 2026-08-26, Tony: manifest showed a fake placeholder name ("Uxra-II")
+         while clicking that same hop opened a totally different real name
+         ("Doganonj") for what was actually the same star. Root cause:
+         regionCandidates() (used by the route search itself, above) names
+         every candidate with the cheap nameFrom() placeholder -- it can't
+         afford the real NMSCore.systemName() lookup for up to 1000
+         candidates per region on every single hop -- while generateSystem()
+         (used everywhere else: the map, the info panel, clicking a hop)
+         always computes the real, accurate name. The address was always
+         correct and always pointed at the same real star; only the NAME
+         baked into courseWaypoints at plot time was ever wrong. Swapping in
+         the authoritative object here (generated below for any hop not yet
+         in allSystems, or already sitting there for one that is) means the
+         manifest list and a clicked hop's info panel are now guaranteed to
+         agree, since both read the exact same object. */
+      courseWaypoints[i]=existing;
+      continue;
+    }
     var full=generateSystem(wp.vx,wp.vy,wp.vz,wp.idx);
     full.px=wp.px; full.py=wp.py; full.pz=wp.pz;
     allSystems.push(full);
+    courseWaypoints[i]=full;
   }
 }
 /* Investigated 2026-08-16 (Tony: "why not go 1 jump back... research how
@@ -6122,10 +6141,13 @@ makeDraggable(document.getElementById("searchPop"),document.getElementById("sear
    that -- the input is a sibling, not a descendant, so it never sees these
    listeners at all. */
 makeDraggable(document.getElementById("keys"),document.getElementById("keysHead"));
-/* route-itinerary-card (Warp Manifest) deliberately NOT draggable as of
-   2026-08-21 -- it's now a dropdown anchored under #course, opened only via
-   #bToggleManifest, not an independent floating window. See
-   anchorManifestUnderCourse() and displayCalculatedItinerary(). */
+/* route-itinerary-card (Warp Manifest) made draggable 2026-08-26 (Tony:
+   "wants to be like all other windows draggable and collapsible") --
+   collapsible already worked (bManifestMin/.min, same as every other box);
+   this was the one piece still missing. See positionManifestCard() and
+   displayCalculatedItinerary() for how it's still auto-placed the first
+   time it opens each session. */
+makeDraggable(document.getElementById("route-itinerary-card"),document.getElementById("riHead"));
 
 /* ---- warp manifest helpers (spec item 7) ---- */
 var _activeRouteData=[];
@@ -6206,22 +6228,46 @@ function skipWarp(){
   if(vid){ vid.pause(); vid.onended=null; vid.onerror=null; }
   if(_warpFailTimer){ clearTimeout(_warpFailTimer); _warpFailTimer=null; }
 }
-/* Anchors the Warp Manifest dropdown directly under the Course plotted card
-   -- same measure-don't-guess pattern as positionUnderButton/
-   positionCourseCard elsewhere in this file. Called every time the manifest
-   opens (button click) or its content refreshes while already open (course
-   re-plotted), since #course itself can be dragged/auto-anchored anywhere
-   on screen. */
-function anchorManifestUnderCourse(){
+/* 2026-08-26, Tony: "opens up way over top left when should only open next
+   to system information, also wants to be like all other windows draggable
+   and collapsible" -- this used to re-measure and re-place the card EVERY
+   time it opened or refreshed, unlike every other box in the file. A
+   transient zero-size #course rect on any one of those calls (e.g. mid
+   reflow) left it pinned in the top-left corner for good, with no way to
+   drag it back out since it wasn't draggable -- same root class of bug
+   positionCourseCard() (see its own comment) already had to fix for
+   #course itself. Now follows that exact same one-shot pattern: auto
+   -anchor once per session (or after a resize clears it, see
+   resetDraggedBoxes()), then leave it alone -- a real drag (now wired up
+   below) or a window resize are the only things that move it after that.
+   Prefers directly under #course (keeps the Course/Manifest pair visually
+   grouped); falls back to immediately left of the system info panel --
+   Tony's own ask, and the same spot #course itself defaults to. */
+function positionManifestCard(){
   var card=document.getElementById("route-itinerary-card");
-  var courseEl=document.getElementById("course");
-  if(!card||!courseEl) return;
-  var r=courseEl.getBoundingClientRect();
+  if(!card) return;
+  if(card.style.left) return; /* already dragged, or already auto-anchored this session */
   var cw=card.offsetWidth||300;
-  var left=r.left+r.width/2-cw/2;
+  var course=document.getElementById("course");
+  var left,top;
+  if(course&&course.classList.contains("show")){
+    var r=course.getBoundingClientRect();
+    if(!r.width) return; /* #course not actually laid out yet -- try again next call rather than anchor at 0,0 */
+    left=r.left; top=r.bottom+8;
+  } else {
+    var panel=document.getElementById("panel");
+    if(panel&&panel.classList.contains("show")){
+      left=panel.getBoundingClientRect().left-cw-16;
+      top=parseFloat(getComputedStyle(card).top)||70;
+    } else {
+      return; /* nothing else open to avoid -- default centred CSS position is fine */
+    }
+  }
   left=Math.max(8,Math.min(window.innerWidth-cw-8,left));
-  card.style.top=(r.bottom+8)+"px";
+  card.style.position="fixed";
   card.style.left=left+"px";
+  card.style.top=top+"px";
+  card.style.right="auto";
   card.style.transform="none";
 }
 /* Fills in the manifest's content. As of 2026-08-21 this no longer forces
@@ -6247,11 +6293,11 @@ function displayCalculatedItinerary(waypoints,totalLY){
     var addr=wp.address||"";
     /* 2026-08-26: only a hop with a real portal address is a real system
        to preview -- an "(open space)" stop has none, so it stays plain. */
-    var attrs=addr?(' class="hopRow" data-addr="'+addr+'" title="Click to preview this system\'s info"'):"";
+    var attrs=addr?(' class="hopRow" data-hop-idx="'+i+'" title="Click to preview this system\'s info"'):"";
     stepsList.innerHTML+='<div'+attrs+' style="margin-bottom:6px"><b style="color:var(--cyan)">['+label+']</b> '+
       name+'<br><span style="opacity:0.55;font-size:10px">'+addr+'</span></div>';
   });
-  if(card.classList.contains("show")) anchorManifestUnderCourse();
+  if(card.classList.contains("show")) positionManifestCard();
 }
 /* 2026-08-26, Tony: "why aren't the highlighted hop not clickable... show
    information about that star system but be able to go back to target
@@ -6260,15 +6306,15 @@ function displayCalculatedItinerary(waypoints,totalLY){
 document.getElementById("route-steps-list").addEventListener("click",function(e){
   var row=e.target.closest?e.target.closest(".hopRow"):null;
   if(!row) return;
-  var addr=row.getAttribute("data-addr");
-  var a=addr?parseAddress(addr):null;
-  if(!a) return;
-  var sys=null,i;
-  for(i=0;i<allSystems.length;i++){
-    if(allSystems[i].idx===a.idx&&allSystems[i].vx===a.x&&
-       allSystems[i].vy===a.y&&allSystems[i].vz===a.z){ sys=allSystems[i]; break; }
-  }
-  if(!sys) sys=generateSystem(a.x,a.y,a.z,a.idx);
+  /* 2026-08-26: index straight into courseWaypoints (the exact array
+     displayCalculatedItinerary() just rendered from) instead of decoding
+     the printed address back into coordinates -- guarantees the system
+     shown here is always the literal same object the row's own name came
+     from, never a second, independently-regenerated one that could
+     disagree with it. */
+  var idx=parseInt(row.getAttribute("data-hop-idx"),10);
+  if(isNaN(idx)||!courseWaypoints||!courseWaypoints[idx]) return;
+  var sys=courseWaypoints[idx];
   updatePanel(sys);
   if(courseTarget&&sys.address!==courseTarget.address) showHopPreviewBar();
 });
@@ -6295,7 +6341,7 @@ document.getElementById("bToggleManifest").addEventListener("click",function(){
   } else {
     card.classList.remove("min");
     document.getElementById("bManifestMin").innerHTML="&#9662;";
-    anchorManifestUnderCourse();
+    positionManifestCard();
     card.classList.add("show");
     btn.classList.add("on");
     btn.innerHTML="&#9652; Manifest";
