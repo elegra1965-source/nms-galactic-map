@@ -6342,13 +6342,20 @@ function playWarpTransition(kind){
   /* 2026-08-25, Tony: two distinct clips matching the real game's two
      separate travel mechanics -- portals are on-foot, walk-through-a-
      glowing-ring, no ship ever visible; hyperdrive/plotted travel is the
-     ship-flown warp tunnel. 'portal' (default) is Tony's own on-foot
-     portal-ring footage, used for any raw-address lookup (typing hex,
-     glyph keypad, Random, search results, admin "view"). 'ship' is the
-     original ship-hyperdrive footage, reserved for the Set course -> Jump
-     to -> Enter system flow. Swap the <source> targets and reload rather
-     than keeping two separate <video> elements, since only one is ever
-     showing at a time. */
+     ship-flown warp tunnel. 'portal' (default) is used for any raw-address
+     lookup (typing hex, glyph keypad, Random, search results, admin
+     "view"). 'ship' is the original ship-hyperdrive footage, reserved for
+     the Set course -> Jump to -> Enter system flow -- left untouched below.
+     Swap the <source> targets and reload rather than keeping two separate
+     <video> elements, since only one is ever showing at a time.
+     2026-08-26, Tony: the portal clip swapped again -- the placeholder
+     green footage replaced with Tony's own real filmed portal-ring warp
+     (actual in-game purple/pink colours), transcoded from his 1920x1080
+     HEVC phone capture down to 960x540 H.264/VP9 (audio stripped -- #warp-
+     vid is muted anyway, so it was dead weight) to match this project's
+     existing web-delivery format for this element. Real clip length is
+     10.4s, up from the old ~4.8s -- see the timeout below, which had to
+     move with it. */
   var isShip=(kind==="ship");
   var webmSrc=isShip?"warp_transition.webm":"warp_transition_portal.webm";
   var mp4Src=isShip?"warp_transition.mp4":"warp_transition_portal.mp4";
@@ -6383,10 +6390,17 @@ function playWarpTransition(kind){
     ov.style.display='none'; vid.onended=null; _warpCleared=true;
     if(_warpFailTimer){ clearTimeout(_warpFailTimer); _warpFailTimer=null; }
   };
+  // Ceiling bumped 7000->15000 (2026-08-26): this is a shared failsafe for
+  // BOTH clips (portal + ship), sized to whichever is longer. The portal
+  // clip is now Tony's real 10.4s footage (was ~4.8s) -- 7s would force-
+  // close it mid-playback on every single normal run, not just genuine
+  // stalls. Harmless for the shorter, untouched ship clip: onended still
+  // fires and closes the overlay the moment IT finishes, same as always --
+  // this ceiling only ever matters on a real stall/error, for either clip.
   _warpFailTimer=setTimeout(function(){
-    if(!_warpCleared) console.warn('[warp] timed out after 7s, readyState='+vid.readyState+' networkState='+vid.networkState+' paused='+vid.paused+' -- forcing overlay closed');
+    if(!_warpCleared) console.warn('[warp] timed out after 15s, readyState='+vid.readyState+' networkState='+vid.networkState+' paused='+vid.paused+' -- forcing overlay closed');
     ov.style.display='none';
-  },7000);
+  },15000);
 }
 function skipWarp(){
   var ov=document.getElementById('warp-overlay');
