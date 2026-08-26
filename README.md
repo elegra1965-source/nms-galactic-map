@@ -45,6 +45,19 @@ edits](#shared-community-edits-and-how-a-submission-actually-gets-in) below).
 
 ![Galaxy view](screenshots/01-galaxy-view.jpg)
 
+**Starting position.** A first-ever visit lands on a random spot roughly
+700,000-750,000 ly from the galactic core in Euclid -- matching where a
+fresh No Man's Sky save actually starts, not a fixed placeholder address
+(the map's own theoretical edge-of-galaxy distance works out to ~1,159,656
+ly, matching the real game's own maximum almost exactly, so the random
+range sits realistically inside it rather than near the edge). It isn't
+tied to your real save, just a reasonable place to start exploring from.
+Once you jump anywhere for real -- typing an address, Random, a Search
+result, Set course, etc. -- the map remembers that position and which of
+the 257 galaxies you were in, in your own browser's local storage only
+(never sent anywhere), so coming back later picks up exactly where you
+left off instead of restarting in Euclid every time.
+
 **Local view.** Zoom into a galaxy and the real star field appears --
 thousands of systems, coloured by spectral class, named and clickable.
 Selecting one opens the info panel on the right: race, economy (with real

@@ -1551,6 +1551,10 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
       <div style="font-size:12px;color:var(--text-dim);line-height:1.55">A "portal address" is a 12-symbol code the game uses to pin down a star system's location. Don't have one? Hit <b>Random</b> in the toolbar to jump somewhere, or tap <b>Glyphs</b> to see the code as the game's own symbols instead of letters/numbers.</div>
     </div>
     <div class="mfld">
+      <div class="lb">Starting position</div>
+      <div style="font-size:12px;color:var(--text-dim);line-height:1.55">A first-ever visit lands you somewhere random -- roughly 700,000-750,000 ly from the galactic core in Euclid, matching where a fresh No Man's Sky save actually starts, not a fixed placeholder every visitor sees. It isn't a real system tied to your own save, just a reasonable place to start exploring from. Once you jump anywhere for real (typing an address, <b>Random</b>, a Search result, and so on), this map remembers that position -- and which of the 257 galaxies you were in -- so coming back later picks up exactly where you left off instead of starting over in Euclid. That's stored locally in your own browser only, never sent anywhere, and it clears if you clear your browser's site data.</div>
+    </div>
+    <div class="mfld">
       <div class="lb">Plotting a hyperdrive course</div>
       <div style="font-size:12px;color:var(--text-dim);line-height:1.55"><b>Plotted course</b> / <b>Lock navigation target</b> plots a real multi-jump route to that system for your current hyperdrive type and range (set in Filters), and opens the Warp Manifest showing the full jump-by-jump itinerary -- click it again on the same target to close the manifest without re-plotting. Every jump always lands on a real charted star, never empty space -- same as the real game -- so the reported jump count is usually a bit above the straight-line distance-divided-by-range number, sometimes noticeably so in sparser patches of space. That's not a bug: a real star is rarely sitting exactly on your bearing at exactly your max range, so routes drift slightly to reach one, and that adds up over a long trip. No Man's Sky itself has no multi-hop route planner at all -- you'd normally do this same star-by-star checking manually, this just does it for you and shows the whole path at once. The line itself matches the real game's own convention: <b>solid</b> means a single jump is enough, <b>dashed</b> means it needs multiple hops, and <b>red-dashed</b> means your current drive can't reach that star's colour at all. Clicking any star while browsing automatically replots the line to it, replacing whatever was there before. If a route's hop count is well above the naive distance-divided-by-range figure, a short reminder appears right on the Course Plotted card itself, not just here -- researched this against real player reports too: NMS's own displayed hyperdrive range has long been known to overstate the actual effective jump distance (a leftover from a past galaxy-distance rescale), so needing noticeably more real hops than the raw numbers suggest is genuinely how the real game behaves, not something unique to this map.</div>
     </div>
@@ -2857,6 +2861,33 @@ function saveTravellerId(name,code){
   try{ localStorage.setItem(TRAVELLER_K,JSON.stringify({name:name||"",code:code||""})); }
   catch(err){}
 }
+/* Last real position/galaxy a visitor jumped to (2026-08-26, Tony: "what if
+   the user logs back in and wants to be at their last/current position
+   rather than having to find/input system... should it not start in their
+   last galaxy visited rather than Euclid each time"). Personal, local-only
+   -- same pattern as store.marks/waypoints/visited and TRAVELLER_K above,
+   never sent anywhere. Only ever written from jumpTo()'s real (non-silent)
+   path, so it always reflects somewhere the visitor actually asked to go,
+   never the anonymous random boot-anchor placeholder (see randomBootAddress()
+   below) or a mid-galaxy-switch silent re-anchor. */
+var LAST_POS_K="nms-galmap-lastpos";
+function loadLastPosition(){
+  try{
+    var raw=localStorage.getItem(LAST_POS_K);
+    if(raw){
+      var o=JSON.parse(raw);
+      if(o && typeof o.address==="string" && parseAddress(o.address) &&
+         typeof o.galaxy==="number" && o.galaxy>=0 && o.galaxy<GALAXIES.length){
+        return {galaxy:o.galaxy, address:o.address};
+      }
+    }
+  }catch(err){}
+  return null;
+}
+function saveLastPosition(galaxy,address){
+  try{ localStorage.setItem(LAST_POS_K,JSON.stringify({galaxy:galaxy,address:address})); }
+  catch(err){}
+}
 /* "Suggestions of words you've already added" (Tony, 2026-08-17) -- a
    plain localStorage list per field type, grown every time a save actually
    succeeds (see rememberKnownTerms(), called from submitEditPayload's
@@ -3188,8 +3219,21 @@ var focus={x:0,y:0,z:0}, focusSystem=null, courseTarget=null;
 var hasRealLocation=false;
 var mode="galaxy", ctrl="orbit", selected=null, labelsOn=true;
 
-var marker=new THREE.Mesh(new THREE.RingGeometry(3.0,4.0,32),
-  new THREE.MeshBasicMaterial({color:0xf0a500,side:THREE.DoubleSide,transparent:true,opacity:0.95}));
+/* "You are here" beacon in the big 3D galaxy view -- always positioned at
+   the last real jump (voxelToGalaxy(focus)), billboarded to face the
+   camera every frame (see marker.lookAt() in animate() below). 2026-08-26:
+   Tony spotted this as "the yellow circle" in the large galaxy view and
+   asked why it never seemed to change -- it always DID track real
+   position, it just always landed on the exact same spot because the old
+   boot sequence always jumped to the same fixed address (see
+   randomBootAddress() further down, and loadLastPosition() for the
+   returning-visitor case). Given additive glow + a gentle pulse here (see
+   the marker.scale/opacity lines in animate()) so it reads as a live
+   indicator rather than blending into the star field/nebula around it,
+   which is what made it look static/decorative in the first place. */
+var marker=new THREE.Mesh(new THREE.RingGeometry(4.0,6.5,40),
+  new THREE.MeshBasicMaterial({color:0xf0a500,side:THREE.DoubleSide,transparent:true,
+    opacity:0.95,depthWrite:false,blending:THREE.AdditiveBlending}));
 galaxyGroup.add(marker);
 function voxelToGalaxy(x,y,z){ return new THREE.Vector3((x/2048)*GAL_R,(y/128)*GAL_H,(z/2048)*GAL_R); }
 
@@ -5538,6 +5582,10 @@ function jumpTo(str,silent){
        jump counts, not the silent boot/galaxy-switch re-anchor. */
     var vk=skey(focusSystem);
     if(!store.visited[vk]){ store.visited[vk]=1; saveStore(); }
+    // Remember this as "where the visitor last was" so a returning visit
+    // (see the boot restore near the bottom of this file) can pick up here
+    // instead of Euclid/a random anonymous spot every time.
+    saveLastPosition(GALAXY,focusSystem.address);
   }
   updateRings();
   buildGalaxyMarks();
@@ -8567,6 +8615,12 @@ function animate(){
        every label lags behind the live camera, landing nowhere near its body. Force the
        refresh first so labels always use the camera position this frame actually renders with. */
     _totalT+=dt; _starTime.value=_totalT;
+    // Gentle breathing pulse on the "you are here" galaxy-view marker
+    // (~4s per cycle) so it reads as a live indicator, not a static prop --
+    // see its own comment above, near "var marker=".
+    var _mp=0.85+Math.sin(_totalT*1.6)*0.15;
+    marker.scale.setScalar(_mp);
+    marker.material.opacity=0.75+Math.sin(_totalT*1.6)*0.2;
     camera.updateMatrixWorld();
     updateLabels();
     updateTelemetry();
@@ -8675,6 +8729,18 @@ loadKnownTerms();
 populateDatalists();
 initLabels();
 buildKeypad();
+/* Restore a returning visitor's last real galaxy/position (2026-08-26,
+   Tony: "should it not start in their last galaxy visited rather than
+   Euclid each time"). Read before the first buildGalaxy()/buildNebula()/
+   drawGalIcon() calls below, so a non-Euclid last galaxy renders correctly
+   from the very first frame instead of flashing Euclid first. A brand-new
+   visitor with nothing saved (LAST_POS null) falls straight through to the
+   existing random-boot-anchor behaviour further down, unchanged. */
+var LAST_POS=loadLastPosition();
+if(LAST_POS){
+  GALAXY=LAST_POS.galaxy;
+  document.getElementById("galSel").value=String(GALAXY);
+}
 updateGalaxyInfo();
 updateHyperSummary();
 resize();
@@ -8713,8 +8779,24 @@ var BOOT_ANCHOR_ADDR=randomBootAddress(); /* not shown to the visitor, see jumpT
    resolves (even if the module failed to load, see its .catch() above), so
    this never hangs the page waiting on it. */
 window.nmsCoreReady.then(function(){
-  jumpTo(BOOT_ANCHOR_ADDR,true);
-  setMode("galaxy");
+  var restored=false;
+  if(LAST_POS){
+    document.getElementById("inAddr").value=LAST_POS.address;
+    setKeypad(LAST_POS.address);
+    syncGalaxyPickInput();
+    // jumpTo's real (non-silent) path sets mode to "local", opens the
+    // panel, marks hasRealLocation, and re-saves this same position --
+    // exactly as if the visitor had just typed/jumped here themselves,
+    // which is the whole point: this IS somewhere real they asked to go,
+    // just remembered from last time rather than typed again.
+    restored=jumpTo(LAST_POS.address,false);
+  }
+  if(!restored){
+    // Either nothing was saved yet, or (belt and braces) a saved address
+    // somehow failed to resolve -- fall back to the anonymous random spot.
+    jumpTo(BOOT_ANCHOR_ADDR,true);
+    setMode("galaxy");
+  }
   syncResetBtn();
   setCtrl("orbit");
   applyCam();
