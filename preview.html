@@ -4958,7 +4958,20 @@ function updatePanel(s){
       var pbod=bodyByIndex(s,b.parent);
       moonTip=' title="Moon of '+escAttr(pbod?pbod.name:"the planet above")+'"';
     }
-    bl+='<div class="brow'+(b.moon?" isMoon":"")+(bStat!=="original"?" fs-"+bStat:"")+'" data-b="'+i+'"'+moonTip+'><span class="bdot" style="background:'+biomePal(b.biome).base+'"></span>'+
+    // Only flagged/disputed get the coloured left-edge marker here, not
+    // the routine "edited" status -- Tony, 2026-08-26: on a fully community-
+    // edited system every row compares as edited against the procedural
+    // baseline, so the green box-shadow on every row (packed tight, no gap)
+    // fused into one continuous bar down the whole list, reading as "all
+    // these bodies are linked together" rather than 6 separate markers.
+    // The system-level "Community edited" tag at the top of the panel
+    // already says the system's been touched, so the routine per-row copy
+    // of that was redundant clutter here -- flagged/disputed are kept since
+    // those flag a genuine live dispute on one specific body (rare, and
+    // exactly the kind of thing worth a traveller's attention), not just
+    // "differs from a random dice roll".
+    var bMark=(bStat==="flagged"||bStat==="disputed")?(" fs-"+bStat):"";
+    bl+='<div class="brow'+(b.moon?" isMoon":"")+bMark+'" data-b="'+i+'"'+moonTip+'><span class="bdot" style="background:'+biomePal(b.biome).base+'"></span>'+
         '<span class="bn">'+(b.moon?"&#8627; ":"")+b.name+'</span>'+
         // Ring is an invented per-planet roll (rollRing()), same as race/
         // economy/conflict, until a traveller submits the real answer via
