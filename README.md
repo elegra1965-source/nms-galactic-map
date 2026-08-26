@@ -56,7 +56,10 @@ Once you jump anywhere for real -- typing an address, Random, a Search
 result, Set course, etc. -- the map remembers that position and which of
 the 257 galaxies you were in, in your own browser's local storage only
 (never sent anywhere), so coming back later picks up exactly where you
-left off instead of restarting in Euclid every time.
+left off instead of restarting in Euclid every time.  That position is marked in Galaxy
+view by a pulsing gold ring -- click or tap it to drop straight into Local
+view at that system, rather than only being able to switch views from the
+toolbar.
 
 **Local view.** Zoom into a galaxy and the real star field appears --
 thousands of systems, coloured by spectral class, named and clickable.

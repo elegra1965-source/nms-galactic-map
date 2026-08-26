@@ -1552,7 +1552,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     </div>
     <div class="mfld">
       <div class="lb">Starting position</div>
-      <div style="font-size:12px;color:var(--text-dim);line-height:1.55">A first-ever visit lands you somewhere random -- roughly 700,000-750,000 ly from the galactic core in Euclid, matching where a fresh No Man's Sky save actually starts, not a fixed placeholder every visitor sees. It isn't a real system tied to your own save, just a reasonable place to start exploring from. Once you jump anywhere for real (typing an address, <b>Random</b>, a Search result, and so on), this map remembers that position -- and which of the 257 galaxies you were in -- so coming back later picks up exactly where you left off instead of starting over in Euclid. That's stored locally in your own browser only, never sent anywhere, and it clears if you clear your browser's site data.</div>
+      <div style="font-size:12px;color:var(--text-dim);line-height:1.55">A first-ever visit lands you somewhere random -- roughly 700,000-750,000 ly from the galactic core in Euclid, matching where a fresh No Man's Sky save actually starts, not a fixed placeholder every visitor sees. It isn't a real system tied to your own save, just a reasonable place to start exploring from. Once you jump anywhere for real (typing an address, <b>Random</b>, a Search result, and so on), this map remembers that position -- and which of the 257 galaxies you were in -- so coming back later picks up exactly where you left off instead of starting over in Euclid. That's stored locally in your own browser only, never sent anywhere, and it clears if you clear your browser's site data. The pulsing gold ring marking it in Galaxy view is clickable -- tap or click it to drop straight into Local view at that system.</div>
     </div>
     <div class="mfld">
       <div class="lb">Plotting a hyperdrive course</div>
@@ -3235,6 +3235,17 @@ var marker=new THREE.Mesh(new THREE.RingGeometry(4.0,6.5,40),
   new THREE.MeshBasicMaterial({color:0xf0a500,side:THREE.DoubleSide,transparent:true,
     opacity:0.95,depthWrite:false,blending:THREE.AdditiveBlending}));
 galaxyGroup.add(marker);
+/* 2026-08-27, Tony: "is it possible to click the yellow circle... to go to
+   the star system" -- yes, wired up in tryPick()'s new galaxy-mode branch
+   below. The visible ring itself (radius 4-6.5) is a thin, easy-to-miss
+   click target at typical Galaxy-view zoom, so this invisible, larger
+   filled disc is a child of marker purely for raycasting -- it inherits
+   marker's position/billboard-rotation/pulse-scale automatically (being a
+   child), so nothing else needs to track it. Never rendered (opacity 0),
+   only ever intersected by tryPick()'s raycast. */
+var markerHitArea=new THREE.Mesh(new THREE.CircleGeometry(9,24),
+  new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false,side:THREE.DoubleSide}));
+marker.add(markerHitArea);
 function voxelToGalaxy(x,y,z){ return new THREE.Vector3((x/2048)*GAL_R,(y/128)*GAL_H,(z/2048)*GAL_R); }
 
 selRing=new THREE.Mesh(new THREE.RingGeometry(0.85,1.05,40),
@@ -5195,6 +5206,18 @@ function tryPick(cx,cy){
       if(ud.star||ud.feature) updatePanel(ud.sys);
       else showBody(ud.body,ud.sys);
     }
+  } else if(mode==="galaxy"){
+    /* 2026-08-27, Tony: click the "you are here" marker to jump straight
+       into Local view at your current position, instead of only being able
+       to switch view modes via the toolbar. Raycasts markerHitArea (the
+       larger invisible click target, see its own comment near "var
+       marker=" above), not the thin visible ring itself. focusSystem is
+       always set by this point (boot always jumps somewhere, real or
+       anonymous), so this is safe to fire unconditionally on a hit. */
+    if(ray.intersectObject(markerHitArea).length && focusSystem){
+      setMode("local");
+      updatePanel(focusSystem);
+    }
   }
 }
 
@@ -5207,7 +5230,26 @@ function tryPick(cx,cy){
    handful of times a second, not on every pointermove event. */
 var _hoverCapable=window.matchMedia && window.matchMedia("(hover:hover)").matches;
 function handleHoverRay(e){
-  if(!_hoverCapable||e.pointerType!=="mouse"||drag||mode!=="local"||!locInstMesh) return;
+  if(!_hoverCapable||e.pointerType!=="mouse"||drag) return;
+  /* 2026-08-27: cursor-pointer affordance for the clickable galaxy-view
+     marker (see tryPick()'s galaxy branch) -- nothing else on this canvas
+     gets a cursor change (stars in Local view rely on the hover popup
+     itself as the affordance), but the marker has no equivalent popup, so
+     without this there's no visual hint it's clickable at all. Kept in
+     this same function/throttle rather than a separate listener since it's
+     the same kind of "raycast on hover, mouse only" concern. */
+  if(mode==="galaxy"){
+    var nowG=performance.now();
+    if(nowG-_hoverRayT<70) return; _hoverRayT=nowG;
+    var rectG=canvas.getBoundingClientRect();
+    ndc.x=((e.clientX-rectG.left)/rectG.width)*2-1;
+    ndc.y=-((e.clientY-rectG.top)/rectG.height)*2+1;
+    ray.setFromCamera(ndc,camera);
+    canvas.style.cursor=ray.intersectObject(markerHitArea).length?"pointer":"";
+    return;
+  }
+  canvas.style.cursor="";
+  if(mode!=="local"||!locInstMesh) return;
   var now=performance.now();
   if(now-_hoverRayT<70) return; _hoverRayT=now;
   var rect=canvas.getBoundingClientRect();
