@@ -34628,10 +34628,10 @@
             "name": "Lilomand Gamma",
             "moon": false,
             "orbits": 0,
-            "biome": "Toxic",
+            "biome": "Airless",
             "descriptor": "",
             "water": false,
-            "ring": false,
+            "ring": "tan",
             "resources": [
               "Magnetised Ferrite"
             ],
@@ -34679,7 +34679,7 @@
             "name": "Acas VI",
             "moon": false,
             "orbits": 0,
-            "biome": "Frozen",
+            "biome": "Icebound",
             "descriptor": "",
             "water": false,
             "ring": false,
@@ -34709,7 +34709,7 @@
             "biome": "Radioactive",
             "descriptor": "",
             "water": false,
-            "ring": "gold",
+            "ring": false,
             "resources": [
               "Gamma Roots"
             ],
@@ -34780,7 +34780,7 @@
           }
         ]
       },
-      "editedAt": "2026-08-26T19:04:12.994Z",
+      "editedAt": "2026-08-26T20:57:52.290Z",
       "editedByIp": "5.133.46.24",
       "history": [
         {
@@ -34794,6 +34794,10 @@
         {
           "at": "2026-08-26T19:04:12.994Z",
           "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-08-26T20:57:52.290Z",
+          "text": "edited by a traveller"
         }
       ]
     }
@@ -34801,9 +34805,7 @@
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1787770766039,
-      1787770987899,
-      1787771052994
+      1787777872290
     ]
   },
   "flagLog": {}
