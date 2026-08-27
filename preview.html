@@ -4286,9 +4286,29 @@ function mergeWaypointsIntoSlice(){
   if(!courseWaypoints) return;
   for(var i=0;i<courseWaypoints.length;i++){
     var wp=courseWaypoints[i];
-    if(wp.vx===undefined||wp.idx===undefined) continue; /* start/end -- already real & rendered */
+    /* Real bug found 2026-08-27 (Tony: clicking a manifest row crashed the
+       whole render loop -- "ERROR: render loop stopped: Cannot read
+       properties of undefined (reading 'toString')"). The old guard here
+       (`wp.vx===undefined||wp.idx===undefined`) assumed a START/DESTINATION
+       waypoint was "already real & rendered" and skipped it untouched -- but
+       findRoute()/findRouteAsync() actually build START/DESTINATION as bare
+       {px,py,pz,name,address,real:true} placeholder copies, never a
+       reference to the real focusSystem/courseTarget object, so they were
+       never a real generated system at all and had no `coreLY` (among other
+       fields) -- the very first thing updateTelemetry() reads off whatever
+       object is `selected` on every single animate() frame once you click
+       one, which is what actually threw and killed the loop. A mid-route
+       HOP waypoint has real vx/vy/vz/idx and got upgraded correctly below;
+       START/DESTINATION never did. The guard is now keyed off `coreLY`
+       (only ever present on a genuine generateSystem() output, whether a
+       hop or an already-real anchor) instead of vx/idx, so anything still
+       lightweight -- hop OR start/end -- gets resolved below rather than
+       silently left broken. */
+    if(wp.coreLY!==undefined) continue;
     var existing=null;
     for(var j=0;j<allSystems.length;j++) if(allSystems[j].address===wp.address){ existing=allSystems[j]; break; }
+    if(!existing && focusSystem && wp.address===focusSystem.address) existing=focusSystem;
+    if(!existing && courseTarget && wp.address===courseTarget.address) existing=courseTarget;
     if(existing){
       /* 2026-08-26, Tony: manifest showed a fake placeholder name ("Uxra-II")
          while clicking that same hop opened a totally different real name
@@ -4304,11 +4324,23 @@ function mergeWaypointsIntoSlice(){
          the authoritative object here (generated below for any hop not yet
          in allSystems, or already sitting there for one that is) means the
          manifest list and a clicked hop's info panel are now guaranteed to
-         agree, since both read the exact same object. */
+         agree, since both read the exact same object. Extended 2026-08-27
+         to also check focusSystem/courseTarget directly, not just
+         allSystems, so a real START/DESTINATION resolves to the exact live
+         object already in use elsewhere instead of a fresh regeneration. */
       courseWaypoints[i]=existing;
       continue;
     }
-    var full=generateSystem(wp.vx,wp.vy,wp.vz,wp.idx);
+    /* No live object found -- either a genuine mid-route hop (has vx/idx
+       already) or a START/DESTINATION placeholder (has only an address,
+       decode it the same way jumpTo()/Search already do -- parseAddress()
+       is the exact inverse of formatAddress()). Either way this always
+       ends up a real generateSystem() output with coreLY set, so it can
+       never reach updateTelemetry() half-formed again. */
+    var pa=(wp.vx===undefined||wp.idx===undefined)?(wp.address?parseAddress(wp.address):null):null;
+    var gvx=pa?pa.x:wp.vx, gvy=pa?pa.y:wp.vy, gvz=pa?pa.z:wp.vz, gidx=pa?pa.idx:wp.idx;
+    if(gvx===undefined||gidx===undefined) continue; /* no address/coords to resolve from at all -- leave the placeholder rather than throw */
+    var full=generateSystem(gvx,gvy,gvz,gidx);
     full.px=wp.px; full.py=wp.py; full.pz=wp.pz;
     allSystems.push(full);
     courseWaypoints[i]=full;
@@ -8781,7 +8813,13 @@ function updateTelemetry(){
      case. tCore above is left alone -- it's explicitly labelled "CAM", so
      it's honestly describing camera position, not misrepresenting a star. */
   var _hudAnchor=selected||focusSystem;
-  document.getElementById("galHudDist").textContent=commas(_hudAnchor?_hudAnchor.coreLY:coreLY(vx,vy,vz))+" LY";
+  /* Defensive fallback added 2026-08-27 alongside the mergeWaypointsIntoSlice()
+     fix above: this used to trust _hudAnchor.coreLY unconditionally, which is
+     exactly what crashed the render loop when a lightweight (no-coreLY)
+     manifest placeholder ended up `selected` -- falls back to the live
+     camera-derived reading instead of throwing if that ever happens again,
+     from here or anywhere else, rather than taking the whole map down. */
+  document.getElementById("galHudDist").textContent=commas((_hudAnchor&&_hudAnchor.coreLY!==undefined)?_hudAnchor.coreLY:coreLY(vx,vy,vz))+" LY";
 }
 var frames=0, fpsT=performance.now(), lastT=fpsT, loopDead=false, _totalT=0;
 /* Galaxy rotation speed, shared by the real 3D galaxy (galaxyGroup.rotation.y)
