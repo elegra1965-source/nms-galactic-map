@@ -7740,20 +7740,48 @@ function buildSearchIndex(){
     }
   }
   var ovKeys=Object.keys(OVERRIDES.systems||{});
+  /* Real gap found 2026-08-27 (Tony: "why isnt even the saved file systems
+     not showing... i have jumped and edited saved a few systems"): every
+     "Documented" (community-edited) system was excluded from the empty-
+     query personal browse by SEARCH_PERSONAL_HINTS below on purpose --
+     otherwise leaving the search box empty would dump every OTHER
+     traveller's edits too, not read as "my own history" any more. But that
+     meant a visitor's OWN edits/bulk-imported bases -- which absolutely
+     should come back when they're just trying to get back to somewhere
+     they personally documented -- were just as invisible as anyone else's.
+     Fix: tag an OVERRIDES.systems record "Documented (you)" instead of
+     "Documented" when its editorName matches this browser's own saved
+     traveller name (same loadTravellerId() used to auto-fill "Your name"
+     in Edit system) -- see SEARCH_PERSONAL_HINTS below for the other half.
+     Separately, this also drops the old `!ov.data.name` gate -- it silently
+     skipped indexing ANY edited system that never had its system-level
+     name field explicitly submitted (exactly what a bulk-imported base
+     record looks like: only a base name + note, per handleBulkImport()'s
+     own "never clobber" rule -- see netlify/functions/system-edit.mjs),
+     even though addAddr() below already generates the system and picks up
+     its real display name (procedural or overridden) via generateSystem()
+     regardless, and separately indexes any real base/planet names on its
+     bodies. A genuinely real edit (`ov.data` exists) is always worth
+     indexing by SOME name, not just the ones where a system name
+     specifically was typed in. */
+  var _myTraveller=(loadTravellerId().name||"").trim().toLowerCase();
   for(var i=0;i<ovKeys.length;i++){
     var ov=OVERRIDES.systems[ovKeys[i]];
-    if(!ov||!ov.data||!ov.data.name) continue;
+    if(!ov||!ov.data) continue;
+    var _mineHint=(_myTraveller && ov.data.editorName &&
+      String(ov.data.editorName).trim().toLowerCase()===_myTraveller) ?
+      "Documented (you)" : "Documented";
     var ovParts=ovKeys[i].split(":");
     if(ovParts.length<2){
       // Pre-migration legacy record (bare address, no galaxy digit at all)
       // -- treat as Euclid, same fallback/reasoning as applyOverride()'s
       // own comment. Becomes unreachable once the migration runs.
-      if(/^[0-9A-Fa-f]{12}$/.test(ovKeys[i])) addAddr(ovKeys[i],"Documented",0);
+      if(/^[0-9A-Fa-f]{12}$/.test(ovKeys[i])) addAddr(ovKeys[i],_mineHint,0);
       continue;
     }
     var ovGal=parseInt(ovParts[0],10);
     if(isNaN(ovGal)) continue;
-    addAddr(ovParts[1],"Documented",ovGal);
+    addAddr(ovParts[1],_mineHint,ovGal);
   }
   function addFromStore(obj,hint){
     var keys=Object.keys(obj);
@@ -7770,7 +7798,7 @@ function buildSearchIndex(){
   addFromStore(store.visited,"Visited");
   return idx;
 }
-var SEARCH_PERSONAL_HINTS={Visited:1,Bookmarked:1,Waypoint:1};
+var SEARCH_PERSONAL_HINTS={Visited:1,Bookmarked:1,Waypoint:1,"Documented (you)":1};
 function runSearch(query){
   var box=document.getElementById("searchResults");
   var q=query.trim().toLowerCase();
@@ -7788,7 +7816,7 @@ function runSearch(query){
     for(i=0;i<idx.length;i++){ if(SEARCH_PERSONAL_HINTS[idx[i].hint]) mine.push(idx[i]); }
     mine.sort(function(a,b){ return a.name.localeCompare(b.name); });
     renderMatches(mine.slice(0,60),
-      "Nothing bookmarked, waypointed or visited yet -- jump to a system (Random, an address, or a Search result) and it'll show up here. Type a name above to search the wider community-documented list instead.");
+      "Nothing bookmarked, waypointed, visited, or edited by you yet -- jump to a system (Random, an address, or a Search result), or submit a real edit, and it'll show up here. Type a name above to search the wider community-documented list instead.");
     return;
   }
   var starts=[];
