@@ -106,16 +106,14 @@ Interface rendered as its own object rather than swapped in for the star.
 **Filters.** Narrow the local star field by colour, race, economy, or special
 system types (outlaw, black holes, Atlas interfaces, phantom/shadow stars),
 plus a hyperdrive type + range setting that actually gates what you can
-reach -- Plotted course and Enter system both check it. **Visited** and
-**Edited by traveller** now reliably surface every matching system within
-whatever range is currently loaded around you (fixed 2026-08-26 -- they
-used to only ever show your current system, since a random per-region
-sample almost never happened to land on one you'd actually visited/edited,
-unlike black holes/Atlas which are always force-included). That's still
-scoped to what's currently rendered nearby, though -- for a complete list of
-everywhere you've ever bookmarked, waypointed, or visited regardless of
-where you currently are, use Search with an empty query instead (see
-"Search by name" below).
+reach -- Plotted course and Enter system both check it. There's no
+"Visited" or "Edited by traveller" filter option here (removed 2026-08-27)
+-- Local view is inherently a spatial sweep of whatever's currently loaded
+nearby, so a filter here could never surface something on the other side of
+the galaxy no matter how it worked. For a complete list of everywhere
+you've ever bookmarked, waypointed, visited, or edited, regardless of where
+you currently are, use Search with an empty query instead (see "Search by
+name" below) -- that's the actual way back to it.
 
 ![Filters panel](screenshots/04-filters-panel.jpg)
 
@@ -155,8 +153,10 @@ for: community-documented systems, plus your own bookmarks, waypoints, and
 visited history. Results are galaxy-aware -- each one is tagged with the real
 galaxy it belongs to, since the same address means something different in
 each of the 256 -- and picking one switches you to that galaxy automatically
-before jumping there. Leave the search box empty (added 2026-08-26) and it
-instead lists everywhere you've bookmarked, waypointed, or visited, sorted
+before jumping there. Leave the search box empty and it instead lists
+everywhere you've bookmarked, waypointed, or visited, plus any system you
+personally have edited or bulk-imported from your save (added 2026-08-27,
+tagged "Documented (you)" -- other travellers' edits stay out), sorted
 alphabetically -- a way to get back to somewhere you've been without needing
 to remember its address or portal glyphs.
 

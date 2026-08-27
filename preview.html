@@ -1029,7 +1029,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   <div id="filt" class="box fold min">
     <div class="kicker fhead" id="fHead"><span id="fHeadLabel">▸ Filters</span><button class="btn" id="bFiltMin" type="button" title="Collapse or expand the filters panel.">&#9656;</button></div>
     <div class="fbody">
-      <div style="font-size:10.5px;color:var(--text-faint);line-height:1.35;margin-bottom:7px">Applies to Local view — that is where the real systems are. These dim/hide stars on THIS map; to browse and jump straight back to everywhere you've bookmarked, waypointed or visited, open Search and leave the box empty.</div>
+      <div style="font-size:10.5px;color:var(--text-faint);line-height:1.35;margin-bottom:7px">Applies to Local view — that is where the real systems are. These dim/hide stars on THIS map; to browse and jump straight back to everywhere you've bookmarked, waypointed, visited, or edited, open Search and leave the box empty.</div>
       <div class="fld"><div class="lb">Star colour</div>
         <select id="fCol"><option value="">Any</option><option>yellow</option><option>red</option>
         <option>green</option><option>blue</option><option>purple</option></select></div>
@@ -1045,9 +1045,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
       <label class="chk" title="Phantom stars are a rare NMS oddity: system indices that exist in the portal address space but don't appear on the real in-game Galactic Map. Normally only reachable via a save/portal-index edit -- entering the map from inside one snaps your position to the nearest real star instead. Tick to show ONLY phantom star systems."><input type="checkbox" id="fPhantom">Phantom stars</label>
       <label class="chk" title="Shadow stars are a distinct, related anomaly: the first invalid system index just past the portal network's valid range. Unlike ordinary phantoms, a shadow star CAN be reached by a normal hyperjump. Tick to show ONLY shadow star systems."><input type="checkbox" id="fShadow">Shadow stars</label>
       <label class="chk" title="Systems you've saved as a travel goal, whether or not your current drive can reach them yet -- see the Waypoint button on a system's panel."><input type="checkbox" id="fWaypoint">Waypoints</label>
-      <label class="chk" title="Systems you've actually jumped to before, tracked automatically on this device."><input type="checkbox" id="fVisited">Visited</label>
       <label class="chk" title="Hides stars your current Hyperdrive drive type can't reach by star colour (yellow/red/green/blue/purple). Nothing to do with phantom or shadow stars -- those are a different kind of &quot;unreachable&quot;, with their own filters below."><input type="checkbox" id="fReachOnly">Drive: reachable only</label>
-      <label class="chk" title="Systems where a traveller has submitted real in-game data via Edit system -- same systems that show the &quot;Community edited&quot; tag on their info panel."><input type="checkbox" id="fEdited">Systems edited by traveller</label>
       <div class="fld" style="margin-top:7px">
         <div class="lb">Hyperdrive</div>
         <button class="btn" type="button" id="bHyperOpen" style="width:100%;text-align:left;overflow:hidden;text-overflow:ellipsis"
@@ -1560,12 +1558,8 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
       <div style="font-size:12px;color:var(--text-dim);line-height:1.55"><b>Plotted course</b> / <b>Lock navigation target</b> plots a real multi-jump route to that system for your current hyperdrive type and range (set in Filters), and opens the Warp Manifest showing the full jump-by-jump itinerary -- click it again on the same target to close the manifest without re-plotting. Every jump always lands on a real charted star, never empty space -- same as the real game -- so the reported jump count is usually a bit above the straight-line distance-divided-by-range number, sometimes noticeably so in sparser patches of space. That's not a bug: a real star is rarely sitting exactly on your bearing at exactly your max range, so routes drift slightly to reach one, and that adds up over a long trip. No Man's Sky itself has no multi-hop route planner at all -- you'd normally do this same star-by-star checking manually, this just does it for you and shows the whole path at once. The line itself matches the real game's own convention: <b>solid</b> means a single jump is enough, <b>dashed</b> means it needs multiple hops, and <b>red-dashed</b> means your current drive can't reach that star's colour at all. Clicking any star while browsing automatically replots the line to it, replacing whatever was there before. If a route's hop count is well above the naive distance-divided-by-range figure, a short reminder appears right on the Course Plotted card itself, not just here -- researched this against real player reports too: NMS's own displayed hyperdrive range has long been known to overstate the actual effective jump distance (a leftover from a past galaxy-distance rescale), so needing noticeably more real hops than the raw numbers suggest is genuinely how the real game behaves, not something unique to this map.</div>
     </div>
     <div class="mfld">
-      <div class="lb">Search by name</div>
-      <div style="font-size:12px;color:var(--text-dim);line-height:1.55">The <b>Search</b> button finds a system, planet, moon or base by name and jumps straight there -- but only among things that already have a real name attached: anything community-documented via Edit system, plus your own bookmarks, waypoints, and visited history (searched across every galaxy, not just the one you're viewing). A planet/moon/base result scrolls and highlights the matching row in the info panel once you land on the system, so you're not left hunting for it in the body list. <b>Leave the search box empty</b> (added 2026-08-26) and it instead lists everywhere you've bookmarked, waypointed, or visited, sorted alphabetically -- a quick way to get back to somewhere you've been without needing to remember its address or portal glyphs. The rest of the galaxy has no name to search until someone actually names it -- and that's a hard limit, not just a small index waiting to be filled in: turning a portal address into a name is a one-way calculation (like a hash), so there's no formula to run backwards from a name to find its address, only checking addresses one at a time to see what they generate. With roughly 18 quintillion possible systems, precomputing and indexing every name in advance isn't practically possible, so a name from somewhere else -- a friend's save, a database, a screenshot -- generally won't be searchable here unless that exact system has also been documented, bookmarked, waypointed or visited on this site. If you have the actual portal address instead of just a name, typing or pasting it into the address box and hitting <b>Jump</b> always works, since generating a system forward from its address is the one direction this map can always compute. And since names aren't tied to a specific galaxy in the shared data store, the same documented address can look identical no matter which of the 257 galaxies you're browsing.</div>
-    </div>
-    <div class="mfld">
-      <div class="lb">Filters, and finding your own Visited / Edited systems again</div>
-      <div style="font-size:12px;color:var(--text-dim);line-height:1.55">Filters narrow down the star field in <b>Local view</b> -- colour, race, economy, black holes, Atlas interfaces, outlaw/phantom/shadow systems, waypointed, <b>Visited</b>, and <b>Edited by traveller</b>. Visited and Edited by traveller now reliably surface every matching system within whatever range is currently loaded around you (fixed 2026-08-26) -- same as Black holes and Atlas interfaces already did. That's still scoped to what's currently rendered nearby, though: for a complete list of everywhere you've ever bookmarked, waypointed, or visited regardless of where you currently are, open <b>Search</b> and leave the box empty instead -- see "Search by name" above.</div>
+      <div class="lb">Search by name -- also how to get back to everywhere you've been</div>
+      <div style="font-size:12px;color:var(--text-dim);line-height:1.55">The <b>Search</b> button finds a system, planet, moon or base by name and jumps straight there -- but only among things that already have a real name attached: anything community-documented via Edit system, plus your own bookmarks, waypoints, and visited history (searched across every galaxy, not just the one you're viewing). A planet/moon/base result scrolls and highlights the matching row in the info panel once you land on the system, so you're not left hunting for it in the body list. <b>Leave the search box empty</b> and it instead lists everywhere you've bookmarked, waypointed, or visited, plus any system <i>you</i> personally have edited or bulk-imported from your save (added 2026-08-27, tagged "Documented (you)") -- sorted alphabetically, click one to jump straight back, no address or portal glyphs to remember. This is the one place that works regardless of where you currently are; <b>Local view's Filters panel is different</b> -- it only ever narrows down whatever's already rendered nearby (colour, race, economy, black holes, Atlas interfaces, outlaw/phantom/shadow systems, waypointed, reachable-by-drive), so there's no "Visited" or "Edited by traveller" filter option there any more -- a system on the other side of the galaxy was never going to appear just because a filter box was ticked, so Search above is the actual way back to it. The rest of the galaxy has no name to search until someone actually names it -- and that's a hard limit, not just a small index waiting to be filled in: turning a portal address into a name is a one-way calculation (like a hash), so there's no formula to run backwards from a name to find its address, only checking addresses one at a time to see what they generate. With roughly 18 quintillion possible systems, precomputing and indexing every name in advance isn't practically possible, so a name from somewhere else -- a friend's save, a database, a screenshot -- generally won't be searchable here unless that exact system has also been documented, bookmarked, waypointed or visited on this site. If you have the actual portal address instead of just a name, typing or pasting it into the address box and hitting <b>Jump</b> always works, since generating a system forward from its address is the one direction this map can always compute. And since names aren't tied to a specific galaxy in the shared data store, the same documented address can look identical no matter which of the 257 galaxies you're browsing.</div>
     </div>
     <div class="mfld">
       <div class="lb">Boxes in your way?</div>
@@ -3589,7 +3583,19 @@ function buildGalaxy(){
    no new storage -- and guarantee those indices into the slice the same
    way bh/atlas/focus already are, region by region. Built once per
    generateSlice() call (not a per-star OVERRIDES scan), so this stays
-   cheap even with thousands of visited/edited systems on record. */
+   cheap even with thousands of visited/edited systems on record.
+   2026-08-27, Tony: the "Visited"/"Systems edited by traveller" FILTER
+   checkboxes this was built for are gone now (removed below, in
+   passFilter() -- Local view is inherently spatial and could never show
+   something outside whatever range is currently loaded no matter what this
+   function did, and Search's empty-query browse already covers "show me
+   everywhere I've been/edited, click to jump back" without that limit --
+   not worth the further time/tokens to keep chasing). Left this function
+   running as-is rather than ripping it out: the Waypoints filter still
+   reads store.waypoints the exact same way and still benefits from the
+   same guarantee, and the Visited/edited entries it also surfaces are
+   harmless -- at worst a system that would've rendered anyway shows its
+   real "Visited"/"Community edited" info-panel tag a little more often. */
 function markedRegionIdx(){
   var map={};
   function add(vx,vy,vz,idx){
@@ -3657,6 +3663,13 @@ function generateSlice(focusIdx){
   if(allSystems.length>45000) toast("Heavy: "+allSystems.length.toLocaleString()+" systems");
   applyFilter();
 }
+/* "Visited" and "Systems edited by traveller" checkboxes removed 2026-08-27
+   (Tony: not worth further time/tokens given Local view's inherent range
+   limit -- see markedRegionIdx()'s own comment above generateSlice() --
+   and Search's empty-query browse already covers the real ask: everywhere
+   you've been/edited, regardless of where you currently are, click to jump
+   back). store.visited/s.override themselves are untouched and still drive
+   the info panel's "Visited"/"Community edited" tags and Search. */
 function passFilter(s){
   var col=document.getElementById("fCol").value;
   var race=document.getElementById("fRace").value;
@@ -3670,9 +3683,7 @@ function passFilter(s){
   if(document.getElementById("fShadow").checked&&s.phantom!=="shadow") return false;
   if(document.getElementById("fOut").checked&&!s.outlaw) return false;
   if(document.getElementById("fGiant").checked&&!s.giant) return false;
-  if(document.getElementById("fEdited").checked&&!s.override) return false;
   if(document.getElementById("fWaypoint").checked&&!store.waypoints[skey(s)]) return false;
-  if(document.getElementById("fVisited").checked&&!store.visited[skey(s)]) return false;
   if(document.getElementById("fReachOnly").checked&&!canReachColor(s.type)) return false;
   return true;
 }
@@ -5994,7 +6005,7 @@ bindSlider("sSz","vSz",function(){
   var sel=document.getElementById("fEco"),i;
   for(i=0;i<ECON.length;i++){ var o=document.createElement("option"); o.textContent=ECON[i][0]; sel.appendChild(o); }
 })();
-["fCol","fRace","fEco","fBH","fAtl","fOut","fGiant","fEdited","fWaypoint","fVisited","fReachOnly","fPhantom","fShadow"].forEach(function(id){
+["fCol","fRace","fEco","fBH","fAtl","fOut","fGiant","fWaypoint","fReachOnly","fPhantom","fShadow"].forEach(function(id){
   document.getElementById(id).addEventListener("change",applyFilter);
 });
 /* spec item 9 -- warp animation toggle */
@@ -6016,8 +6027,7 @@ document.getElementById("bReset").addEventListener("click",function(){
   document.getElementById("fEco").value="";
   document.getElementById("fBH").checked=false; document.getElementById("fAtl").checked=false;
   document.getElementById("fOut").checked=false; document.getElementById("fGiant").checked=false;
-  document.getElementById("fEdited").checked=false;
-  document.getElementById("fWaypoint").checked=false; document.getElementById("fVisited").checked=false;
+  document.getElementById("fWaypoint").checked=false;
   document.getElementById("fReachOnly").checked=false;
   document.getElementById("fPhantom").checked=false;
   document.getElementById("fShadow").checked=false;
