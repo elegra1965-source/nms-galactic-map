@@ -852,7 +852,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   #mGal{order:20} #mLoc{order:21} #cOrb{order:22} #cFly{order:23}
   #addrGrp{order:30;width:100%}
   #bKeys{order:31} #bRand{order:32} #bSearch{order:33} #bFiltToggle{order:34}
-  #bLbl{order:40} #bGrid{order:41}
+  #bLbl{order:40} #bGrid{order:41} #bAtlas{order:42}
 }
 @media(max-width:900px) and (orientation:landscape){
   /* Short landscape screens don't have room to stack the toolbar, the left-side
@@ -958,6 +958,16 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
       Est. Distance: <span id="stat-dist" style="color:var(--white)">0 LY</span>
     </div>
     <div id="route-steps-list" style="max-height:150px;overflow-y:auto;font-size:11px;color:var(--text);line-height:16px"></div>
+    <!-- PLAN JOURNEY entry point (spec item: "Add PLAN JOURNEY to the existing
+         Course Plotted UI") -- opens the Galactic Navigator in a new tab,
+         carrying the real plotted origin/destination/jumps/distance as URL
+         params so the Navigator can show real trip context. The Navigator
+         itself is still a clearly-labelled MOCK preview (own banner: "Sample
+         data only -- not connected to the live Galactic Map"), so this link
+         is honest about what is real (the trip context passed through) vs
+         sample (the itinerary content shown once there). 2026-08-29. -->
+    <button class="btn primary" id="bPlanJourney" type="button" style="width:100%;margin-top:10px"
+      title="Open this plotted route in the Galactic Navigator -- an experimental journey-mode preview. Opens in a new tab.">PLAN JOURNEY</button>
   </div>
 </div>
 <div id="labels"></div>
@@ -999,7 +1009,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   <button class="btn" id="mLoc" title="The real star systems around your current voxel. This is where clicking, filters and labels work.">Local</button>
   <div class="sep"></div>
   <button class="btn on" id="cOrb" title="Orbit camera: drag to swing around the centre point, wheel or pinch to zoom in and out.">Orbit</button>
-  <button class="btn" id="cFly" title="Free flight: WASD or arrows to move, Shift to boost, Space/Q up, E down, drag to look. On touch, drag the left third as a thumbstick.">Fly</button>
+  <button class="btn" id="cFly" title="Free flight: WASD or arrows to move, Shift to boost, Space/Q up, E down, drag to look. On touch, drag the left third as a thumbstick.">Camera Mode</button>
   <div class="sep"></div>
   <div id="addrGrp">
     <div class="addr-lb">Portal address (hex)</div>
@@ -1016,6 +1026,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   <div class="sep"></div>
   <button class="btn on" id="bLbl" title="Show names on the nearest stars, or on planets and moons inside a system. Shortcut: H">Labels</button>
   <button class="btn on" id="bGrid" title="Show the region grid in Local view. Each cube is one region, roughly 400 light years across. Shortcut: G">Grid</button>
+  <button class="btn" id="bAtlas" title="Show community points of interest from Hello Games' own Galactic Atlas (galacticatlas.nomanssky.com), Euclid galaxy only, as clickable diamond markers. Click one to open its real Atlas page in a new tab.">Atlas</button>
   <div class="sep"></div>
   <button class="btn" id="bInstall" title="Install this map as an app on your device." style="display:none">&#9672; Install app</button>
   <button class="btn" id="bTour" title="A quick guided tour of what this map can do.">&#9673; Tour</button>
@@ -3312,6 +3323,55 @@ var markerHitArea=new THREE.Mesh(new THREE.CircleGeometry(9,24),
 marker.add(markerHitArea);
 function voxelToGalaxy(x,y,z){ return new THREE.Vector3((x/2048)*GAL_R,(y/128)*GAL_H,(z/2048)*GAL_R); }
 
+/* Galactic Atlas overlay (2026-08-29): Hello Games' own community POI map
+   for the Euclid galaxy -- https://galacticatlas.nomanssky.com/ -- pulled
+   in as clickable diamond markers. Addresses hand-entered once into
+   atlas-pois.json (no live scraping -- see TODO.md); each one decodes with
+   this project's own parseAddress()/voxelToGalaxy(), exactly like typing
+   it into the Jump box. Diamonds are children of galaxyGroup (same parent
+   as "marker" above), so they orbit with the galaxy's own rotation exactly
+   like the yellow ring does -- confirmed live on the deployed site first
+   (forced galaxyGroup.rotation.y forward in the console and watched the
+   ring sweep with the spiral) before building this, rather than guessing.
+   Billboarded face-on every frame in animate() so the diamond shape itself
+   never looks foreshortened -- position orbits, shape stays fixed, same
+   split as the existing marker. */
+function diamondOutlineGeometry(outerR,innerR){
+  var shape=new THREE.Shape();
+  shape.moveTo(0,outerR); shape.lineTo(outerR,0); shape.lineTo(0,-outerR); shape.lineTo(-outerR,0); shape.closePath();
+  var hole=new THREE.Path();
+  hole.moveTo(0,innerR); hole.lineTo(innerR,0); hole.lineTo(0,-innerR); hole.lineTo(-innerR,0); hole.closePath();
+  shape.holes.push(hole);
+  return new THREE.ShapeGeometry(shape);
+}
+var atlasGroup=new THREE.Group();
+atlasGroup.visible=false;
+galaxyGroup.add(atlasGroup);
+var atlasMarkers=[], atlasHitAreas=[], atlasOn=false;
+function loadAtlasPOIs(){
+  fetch("atlas-pois.json").then(function(r){ return r.json(); }).then(function(list){
+    var geo=diamondOutlineGeometry(3.4,1.7);
+    for(var i=0;i<list.length;i++){
+      var poi=list[i];
+      if(!poi.address) continue;
+      var a=parseAddress(poi.address);
+      if(!a) continue;
+      var mat=new THREE.MeshBasicMaterial({color:0x00e5ff,side:THREE.DoubleSide,transparent:true,
+        opacity:0.85,depthWrite:false,blending:THREE.AdditiveBlending});
+      var amesh=new THREE.Mesh(geo,mat);
+      amesh.position.copy(voxelToGalaxy(a.x,a.y,a.z));
+      amesh.userData={name:poi.name,url:poi.url,phase:i*0.7};
+      atlasGroup.add(amesh);
+      atlasMarkers.push(amesh);
+      var ahit=new THREE.Mesh(new THREE.CircleGeometry(6,16),
+        new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false,side:THREE.DoubleSide}));
+      amesh.add(ahit);
+      atlasHitAreas.push(ahit);
+    }
+  }).catch(function(){ /* no network, or opened via file:// -- overlay just
+    stays empty, same graceful-degrade pattern as the nms-core module loader */ });
+}
+
 selRing=new THREE.Mesh(new THREE.RingGeometry(0.85,1.05,40),
   new THREE.MeshBasicMaterial({color:0xf0a500,side:THREE.DoubleSide,transparent:true,
     opacity:0.95,depthWrite:false,blending:THREE.AdditiveBlending}));
@@ -5403,6 +5463,14 @@ function tryPick(cx,cy){
        marker=" above), not the thin visible ring itself. focusSystem is
        always set by this point (boot always jumps somewhere, real or
        anonymous), so this is safe to fire unconditionally on a hit. */
+    if(atlasOn&&atlasHitAreas.length){
+      var atlasHit=ray.intersectObjects(atlasHitAreas);
+      if(atlasHit.length){
+        var atlasUrl=atlasHit[0].object.parent.userData.url;
+        if(atlasUrl) window.open(atlasUrl,"_blank");
+        return;
+      }
+    }
     if(ray.intersectObject(markerHitArea).length && focusSystem){
       setMode("local");
       updatePanel(focusSystem);
@@ -5434,7 +5502,7 @@ function handleHoverRay(e){
     ndc.x=((e.clientX-rectG.left)/rectG.width)*2-1;
     ndc.y=-((e.clientY-rectG.top)/rectG.height)*2+1;
     ray.setFromCamera(ndc,camera);
-    canvas.style.cursor=ray.intersectObject(markerHitArea).length?"pointer":"";
+    canvas.style.cursor=(ray.intersectObject(markerHitArea).length||(atlasOn&&atlasHitAreas.length&&ray.intersectObjects(atlasHitAreas).length))?"pointer":"";
     return;
   }
   canvas.style.cursor="";
@@ -5898,6 +5966,7 @@ function updateGalInfoBadge(){
    (always jump straight to the picked address). */
 function switchGalaxy(newGal){
   GALAXY=newGal;
+  atlasGroup.visible=atlasOn&&GALAXY===0;
   updateGalaxyInfo();
   buildGalaxy(); buildNebula(); drawGalIcon();
   focusSystem=null; courseTarget=null; courseWaypoints=null;
@@ -6153,6 +6222,13 @@ function toggleGrid(){
   buildVoxelGrid();
 }
 document.getElementById("bGrid").addEventListener("click",toggleGrid);
+function toggleAtlasOverlay(){
+  atlasOn=!atlasOn;
+  document.getElementById("bAtlas").classList.toggle("on",atlasOn);
+  atlasGroup.visible=atlasOn&&GALAXY===0;
+  if(atlasOn&&GALAXY!==0) toast("Galactic Atlas data only exists for Euclid (Galaxy #1)");
+}
+document.getElementById("bAtlas").addEventListener("click",toggleAtlasOverlay);
 document.getElementById("kBack").addEventListener("click",function(){ keySeq=keySeq.slice(0,-1); drawKeypad(); });
 document.getElementById("kClear").addEventListener("click",function(){ keySeq=""; drawKeypad(); });
 document.getElementById("kJump").addEventListener("click",function(){ if(jumpTo(keySeq)) playWarpTransition("portal"); });
@@ -6638,6 +6714,33 @@ document.getElementById("bToggleManifest").addEventListener("click",function(){
     btn.classList.add("on");
     btn.innerHTML="&#9652; Manifest";
   }
+});
+/* PLAN JOURNEY -- opens the Galactic Navigator (a separate page on this same
+   site) in a new tab, passing the real plotted origin/destination/jumps/
+   distance through as URL params. Reads the same live globals bCourse/
+   bGoCourse already read (focusSystem, courseTarget) plus the stats the
+   manifest card is already showing (#stat-jumps/#stat-dist) -- no new state,
+   nothing computed twice, nothing invented. 2026-08-29. */
+document.getElementById("bPlanJourney").addEventListener("click",function(){
+  if(!focusSystem||!courseTarget){ toast("Plot a course first"); return; }
+  /* 2026-08-29: also hand off the real galaxy number and the real drive
+     type/range currently set in Filters, so Navigator can render this
+     journey's actual galaxy art and show the real hyperdrive instead of
+     a generic sample -- same "everything real, nothing invented" rule as
+     the from/to/jumps/dist fields already handed off above. */
+  var qs=new URLSearchParams({
+    from:focusSystem.address||"",
+    fromName:focusSystem.name||"",
+    to:courseTarget.address||"",
+    toName:courseTarget.name||"",
+    jumps:document.getElementById("stat-jumps").textContent||"",
+    dist:document.getElementById("stat-dist").textContent||"",
+    galaxy:String(GALAXY),
+    galaxyName:GALAXIES[GALAXY]||("Galaxy "+GALAXY),
+    drive:currentDrive().k,
+    range:document.getElementById("fHyper").value||""
+  });
+  window.open("navigator/index.html?"+qs.toString(),"_blank","noopener");
 });
 /* hide manifest when course is cleared */
 document.getElementById("bClrCourse").addEventListener("click",function(){
@@ -7975,6 +8078,18 @@ document.addEventListener("pointerdown",function(e){
   var manifestOpen=manifest.classList.contains("show");
   if(!courseOpen&&!manifestOpen) return;
   if(course.contains(e.target)||manifest.contains(e.target)) return;
+  /* 2026-08-29: a click inside ANY modal (disclaimer/hyperdrive/edit/report/
+     feedback/save-import -- all live inside #modalWrap) is not a "click
+     outside the course/manifest" in the sense this listener means -- it's
+     the user dismissing or interacting with a completely different overlay.
+     Real bug Tony hit: clicking "Got it" on the first-time hyperdrive-range
+     notice (which can pop up mid-way through plotting a course) silently
+     closed the Warp Manifest card that had just opened underneath it,
+     because #hyperOk/#discOk/etc. are outside both course and manifest.
+     Route/manifest STATE was never touched by this, only their visibility
+     -- CLEAR still worked, the plotted line stayed on the map -- so this
+     fix is purely about not hiding cards that shouldn't have been hidden. */
+  if(document.getElementById("modalWrap").contains(e.target)) return;
   course.classList.remove("show");
   manifest.classList.remove("show");
   var mBtn=document.getElementById("bToggleManifest");
@@ -8906,6 +9021,7 @@ function animate(){
       for(i=0;i<coronas.length;i++) coronas[i].quaternion.copy(camera.quaternion);
     }
     marker.lookAt(camera.position);
+    if(atlasOn) for(var _ai=0;_ai<atlasMarkers.length;_ai++) atlasMarkers[_ai].lookAt(camera.position);
     if(mode==="local"){
       if(selRing.visible) selRing.quaternion.copy(camera.quaternion);
       if(focusRing.visible) focusRing.quaternion.copy(camera.quaternion);
@@ -8923,6 +9039,11 @@ function animate(){
     var _mp=0.85+Math.sin(_totalT*1.6)*0.15;
     marker.scale.setScalar(_mp);
     marker.material.opacity=0.75+Math.sin(_totalT*1.6)*0.2;
+    if(atlasOn) for(var _aj=0;_aj<atlasMarkers.length;_aj++){
+      var _am=atlasMarkers[_aj], _aph=_am.userData.phase||0;
+      _am.scale.setScalar(0.8+Math.sin(_totalT*1.4+_aph)*0.2);
+      _am.material.opacity=0.55+Math.sin(_totalT*1.4+_aph)*0.3;
+    }
     camera.updateMatrixWorld();
     updateLabels();
     updateTelemetry();
@@ -9050,6 +9171,7 @@ buildBackdrop();
 buildGalaxy();
 buildNebula();
 drawGalIcon();
+loadAtlasPOIs();
 /* Random per-visit starting coordinate (2026-08-26, Tony: "why is it always
    that number, shouldn't it be random... every traveller does not start at
    the same place"). Used to be a single fixed address, "1067FA5A9B2C", so
