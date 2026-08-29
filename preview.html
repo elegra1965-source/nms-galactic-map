@@ -548,6 +548,9 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 #stats.show{display:block}
 #stats b{color:var(--cyan);font-weight:600}
 #labels{position:fixed;inset:0;z-index:15;pointer-events:none;overflow:hidden}
+#atlasBadges{position:fixed;inset:0;z-index:15;pointer-events:none;overflow:hidden}
+.atlasBadge{position:absolute;transform:translate(-50%,-50%) rotate(45deg);width:22px;height:22px;border:1.6px solid var(--cyan);background:rgba(4,10,20,0.85);box-shadow:0 0 8px rgba(0,229,255,.5);pointer-events:auto;cursor:pointer;align-items:center;justify-content:center}
+.atlasBadge span{transform:rotate(-45deg);font-family:'Orbitron',sans-serif;font-size:10px;color:var(--cyan);font-weight:700}
 .lbl{position:absolute;font-family:'Orbitron',sans-serif;font-size:calc(9.5px * var(--ui-zoom,1));letter-spacing:.1em;
   color:var(--white);text-shadow:0 1px 2px #000,0 -1px 2px #000,1px 0 2px #000,-1px 0 2px #000,0 0 6px #000;
   white-space:nowrap;transform:translate(-50%,-150%);opacity:.92;
@@ -971,6 +974,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   </div>
 </div>
 <div id="labels"></div>
+<div id="atlasBadges"></div>
 <div id="hoverPop" class="hoverpop" style="display:none"></div>
 <div id="toast"></div>
 <div id="galInfo"></div>
@@ -1563,6 +1567,10 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     <div class="mfld">
       <div class="lb">Starting position</div>
       <div style="font-size:12px;color:var(--text-dim);line-height:1.55">A first-ever visit lands you somewhere random -- roughly 700,000-750,000 ly from the galactic core in Euclid, matching where a fresh No Man's Sky save actually starts, not a fixed placeholder every visitor sees. It isn't a real system tied to your own save, just a reasonable place to start exploring from. Once you jump anywhere for real (typing an address, <b>Random</b>, a Search result, and so on), this map remembers that position -- and which of the 257 galaxies you were in -- so coming back later picks up exactly where you left off instead of starting over in Euclid. That's stored locally in your own browser only, never sent anywhere, and it clears if you clear your browser's site data. The pulsing gold ring marking it in Galaxy view is clickable -- tap or click it to drop straight into Local view at that system.</div>
+    </div>
+    <div class="mfld">
+      <div class="lb">Galactic Atlas overlay</div>
+      <div style="font-size:12px;color:var(--text-dim);line-height:1.55">The <b>Atlas</b> toggle in Galaxy view overlays real points of interest from Hello Games' own Galactic Atlas website (galacticatlas.nomanssky.com), Euclid galaxy only -- around 50 community regions and planets the developers themselves have featured. Each shows as a diamond marker that orbits with the galaxy exactly like the gold "you are here" ring does; click one to open its real Atlas page in a new tab. Addresses were hand-entered once from the live site rather than scraped on every visit, so it won't reflect a brand-new Atlas addition the same day it's posted -- kept current by hand for now, same spirit as everything else community-sourced on this map. Nearby points collapse into one marker showing a count until you zoom in close enough to tell them apart, matching how the official Atlas site's own map behaves.</div>
     </div>
     <div class="mfld">
       <div class="lb">Plotting a hyperdrive course</div>
@@ -5486,7 +5494,15 @@ function tryPick(cx,cy){
    Throttled via _hoverRayT so the raycast against locInstMesh only runs a
    handful of times a second, not on every pointermove event. */
 var _hoverCapable=window.matchMedia && window.matchMedia("(hover:hover)").matches;
+/* 2026-08-29, Tony: galaxy spins too fast to click an Atlas diamond while
+   it's orbiting past. Slowing the whole galaxy's rotation while the mouse
+   is over the canvas (not stopping it -- still reads as "orbiting", just
+   gives the pointer a real chance to land on a moving target) rather than
+   only slowing near a diamond specifically, since the same problem applies
+   to the "you are here" ring too and any future clickable marker. */
+var galaxyHovered=false;
 function handleHoverRay(e){
+  galaxyHovered=true;
   if(!_hoverCapable||e.pointerType!=="mouse"||drag) return;
   /* 2026-08-27: cursor-pointer affordance for the clickable galaxy-view
      marker (see tryPick()'s galaxy branch) -- nothing else on this canvas
@@ -5677,7 +5693,7 @@ function updatePreviewAnim(dt){
   localGroup.add(previewLine);
 }
 canvas.addEventListener("pointermove",handleHoverRay);
-canvas.addEventListener("pointerleave",function(){ hideHoverPop(); clearCoursePreview(); });
+canvas.addEventListener("pointerleave",function(){ galaxyHovered=false; hideHoverPop(); clearCoursePreview(); });
 
 /* ============ labels ============ */
 var labelEls=[], LBL_MAX=28;
@@ -5694,6 +5710,82 @@ function toggleLabels(){
   labelsOn=!labelsOn;
   document.getElementById("bLbl").classList.toggle("on",labelsOn);
   if(!labelsOn) hideLabels();
+}
+
+/* Galactic Atlas cluster badges (2026-08-29, Tony: "the hello games map has
+   numbers", checked galacticatlas.nomanssky.com's own mobile-width map
+   directly -- it collapses nearby POIs into one diamond with a count, only
+   splitting into separate diamonds once you're zoomed in close enough that
+   they no longer overlap on screen. This reproduces that: every atlas
+   diamond's on-screen position is recomputed each frame (same
+   project()-to-pixels technique as updateLabels() above), greedily grouped
+   with any other diamond within 26px, and any group bigger than one hides
+   its individual 3D diamonds (Three.js raycasting already skips
+   invisible objects, so this doubles as removing them as click targets)
+   in favour of one DOM badge showing the count. A lone diamond is left
+   exactly as before -- still the real clickable 3D marker, still opens its
+   Atlas page directly. Pooled divs, same reuse pattern as labelEls, so a
+   badge is available for reassignment every frame rather than the DOM
+   being rebuilt from scratch. */
+var atlasBadgeEls=[], ATLAS_BADGE_MAX=30, atlasBadgeData=[];
+function initAtlasBadges(){
+  var box=document.getElementById("atlasBadges"),i;
+  for(i=0;i<ATLAS_BADGE_MAX;i++){
+    var d=document.createElement("div");
+    d.className="atlasBadge"; d.style.display="none"; d.dataset.i=i;
+    d.appendChild(document.createElement("span"));
+    box.appendChild(d); atlasBadgeEls.push(d); atlasBadgeData.push(null);
+  }
+  box.addEventListener("click",function(e){
+    var el=e.target.closest(".atlasBadge");
+    if(!el) return;
+    var data=atlasBadgeData[parseInt(el.dataset.i,10)];
+    if(!data) return;
+    cam.target.copy(data.pos);
+    cam.dist*=0.5;
+    applyCam();
+  });
+}
+function hideAtlasBadges(){ for(var i=0;i<atlasBadgeEls.length;i++) atlasBadgeEls[i].style.display="none"; }
+function updateAtlasOverlay(){
+  if(!atlasOn||mode!=="galaxy"||GALAXY!==0||!atlasMarkers.length){ hideAtlasBadges(); return; }
+  var w=window.innerWidth,h=window.innerHeight,i,pts=[];
+  for(i=0;i<atlasMarkers.length;i++){
+    var am=atlasMarkers[i];
+    am.getWorldPosition(_w);
+    _v.copy(_w).project(camera);
+    if(_v.z>1||_v.x<-1.15||_v.x>1.15||_v.y<-1.15||_v.y>1.15){ am.visible=false; continue; }
+    pts.push({i:i,sx:(_v.x*0.5+0.5)*w,sy:(-_v.y*0.5+0.5)*h,wx:_w.x,wy:_w.y,wz:_w.z});
+  }
+  var used=[],clusters=[],a,b;
+  for(a=0;a<pts.length;a++){
+    if(used[a]) continue;
+    var group=[pts[a]]; used[a]=true;
+    for(b=a+1;b<pts.length;b++){
+      if(used[b]) continue;
+      if(Math.hypot(pts[a].sx-pts[b].sx,pts[a].sy-pts[b].sy)<26){ group.push(pts[b]); used[b]=true; }
+    }
+    clusters.push(group);
+  }
+  var badgeI=0;
+  for(var c=0;c<clusters.length;c++){
+    var grp=clusters[c];
+    if(grp.length===1){ atlasMarkers[grp[0].i].visible=true; continue; }
+    var sx=0,sy=0,wx=0,wy=0,wz=0,k;
+    for(k=0;k<grp.length;k++){
+      sx+=grp[k].sx; sy+=grp[k].sy; wx+=grp[k].wx; wy+=grp[k].wy; wz+=grp[k].wz;
+      atlasMarkers[grp[k].i].visible=false;
+    }
+    sx/=grp.length; sy/=grp.length; wx/=grp.length; wy/=grp.length; wz/=grp.length;
+    if(badgeI<ATLAS_BADGE_MAX){
+      var el=atlasBadgeEls[badgeI];
+      el.style.display="flex"; el.style.left=sx+"px"; el.style.top=sy+"px";
+      el.firstChild.textContent=grp.length;
+      atlasBadgeData[badgeI]={pos:new THREE.Vector3(wx,wy,wz)};
+      badgeI++;
+    }
+  }
+  for(;badgeI<ATLAS_BADGE_MAX;badgeI++) atlasBadgeEls[badgeI].style.display="none";
 }
 var _v=new THREE.Vector3(), _w=new THREE.Vector3();
 function updateLabels(){
@@ -6226,6 +6318,7 @@ function toggleAtlasOverlay(){
   atlasOn=!atlasOn;
   document.getElementById("bAtlas").classList.toggle("on",atlasOn);
   atlasGroup.visible=atlasOn&&GALAXY===0;
+  if(!atlasOn) hideAtlasBadges();
   if(atlasOn&&GALAXY!==0) toast("Galactic Atlas data only exists for Euclid (Galaxy #1)");
 }
 document.getElementById("bAtlas").addEventListener("click",toggleAtlasOverlay);
@@ -7571,6 +7664,8 @@ var TOUR_STEPS=[
     body:"Type a name to jump straight there -- scoped to systems you or the community have actually documented, bookmarked, waypointed or visited, since the full procedural galaxy has no names to search until someone gives it one."},
   {sel:"#bFiltToggle",title:"Narrow what you see",
     body:"Filters can limit the star field by colour, race, economy, or special types like black holes and Atlas interfaces -- plus your hyperdrive type and range, which gates what Plotted course and Enter system will actually let you reach."},
+  {sel:"#bAtlas",title:"Hello Games' own Atlas",
+    body:"In Galaxy view, Atlas overlays the real points of interest from Hello Games' own Galactic Atlas website (Euclid only) as diamond markers -- click one to open its real Atlas page. Nearby ones collapse into a numbered marker until you zoom in close enough to tell them apart, same as the official site does."},
   {sel:"#bAbout",title:"Worth a read",
     body:"About explains exactly what's generated accurately versus a plausible guess -- and what's still an unverified guess, like individual planet names. It's also where Feedback lives if you spot a bug or have an idea -- no account needed to send one."},
   {sel:"#bAccess",title:"Accessibility",
@@ -9000,7 +9095,7 @@ function animate(){
       frames=0; fpsT=now;
     }
     if(ctrl==="fly") flyStep(dt);
-    if(mode==="galaxy") galaxyGroup.rotation.y+=GAL_ROT_SPD;
+    if(mode==="galaxy") galaxyGroup.rotation.y+=GAL_ROT_SPD*(galaxyHovered?0.2:1);
     /* Tony confirmed live: the icon spun the opposite way to the real 3D
        galaxy, and at a different speed. Fixed by matching both exactly --
        same per-frame magnitude as galaxyGroup.rotation.y above (0.0003,
@@ -9046,6 +9141,7 @@ function animate(){
     }
     camera.updateMatrixWorld();
     updateLabels();
+    updateAtlasOverlay();
     updateTelemetry();
     if(courseLine) _updateRibbonGeometry(courseLine);
     updatePreviewAnim(dt);
@@ -9151,6 +9247,7 @@ loadStore();
 loadKnownTerms();
 populateDatalists();
 initLabels();
+initAtlasBadges();
 buildKeypad();
 /* Restore a returning visitor's last real galaxy/position (2026-08-26,
    Tony: "should it not start in their last galaxy visited rather than

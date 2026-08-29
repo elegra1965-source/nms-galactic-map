@@ -31,7 +31,7 @@ portal address  ->  12 hex glyphs  ->  signed 3D voxel coordinate
 Screenshots from the live site, in the order you'd actually hit them. The
 site itself also has a live version of this same walkthrough -- hit **Tour**
 in the toolbar (or "Take a quick tour" on the first-visit disclaimer) for a
-7-step guided spotlight over the real UI instead of static images.
+9-step guided spotlight over the real UI instead of static images.
 
 **Galaxy view.** Every one of the 256 real galaxies rendered as a proper 3D
 spiral, colour-matched to its actual type (Normal / Harsh / Empty / Lush) --
@@ -60,6 +60,20 @@ left off instead of restarting in Euclid every time.  That position is marked in
 view by a pulsing gold ring -- click or tap it to drop straight into Local
 view at that system, rather than only being able to switch views from the
 toolbar.
+
+**Galactic Atlas overlay.** Toggle **Atlas** in the Galaxy-view toolbar to
+overlay the real points of interest from Hello Games' own [Galactic
+Atlas](https://galacticatlas.nomanssky.com/) website -- Euclid galaxy only,
+around 50 community-featured regions and planets, hand-entered once into
+`atlas-pois.json` rather than scraped live (see
+[`nms-tools/check-atlas-updates.mjs`](nms-tools/README.md#check-atlas-updatesmjs)
+for how to check whether that list has drifted from the live site). Each
+one decodes with this project's own address maths and renders as a diamond
+marker that orbits with the galaxy exactly like the gold ring above --
+click one to open its real Atlas page in a new tab. Points that sit close
+together on screen collapse into a single numbered marker until you zoom
+in far enough to tell them apart, matching how the official Atlas site's
+own map behaves.
 
 **Local view.** Zoom into a galaxy and the real star field appears --
 thousands of systems, coloured by spectral class, named and clickable.
@@ -228,6 +242,9 @@ This repo is the whole client — one HTML file, no build step, no framework:
 
 ```
 preview.html              the entire app: markup + CSS + JS + Three.js r128 (cdnjs), inline
+atlas-pois.json            Galactic Atlas overlay data -- ~50 real points of interest
+                             from galacticatlas.nomanssky.com, hand-entered (name,
+                             address, url); fetched by preview.html's Atlas toggle
 netlify.toml               serves preview.html at "/", points Netlify at netlify/functions
 netlify/functions/
   system-edit.mjs           edit/report intake: rate-limits by IP, reads-merges-commits
@@ -251,7 +268,9 @@ nms-core/                  real decompiled game logic (star type, planet count, 
 nms-core/save-import/     client-side-only reader for real .hg save files (name + real
                              base list) — see nms-core/save-import/README.md
 nms-tools/                  nms-lookup.js, a single-call wrapper around nms-core for
-                             other NMS developers who don't want to learn its internals
+                             other NMS developers who don't want to learn its internals;
+                             check-atlas-updates.mjs, a manual (not scheduled) check for
+                             whether atlas-pois.json above has drifted from the live site
 glyphs/                    the 16 real portal glyph PNGs (keypad)
 icons-web/, Icons/         race/economy iconography, cropped from real screenshots
 favicon/, manifest.json, sw.js    PWA install + offline support

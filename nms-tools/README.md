@@ -39,6 +39,24 @@ Requires `nms-core/` and `nms-core/letter-map/` to be hosted at the same level a
 
 ---
 
+## check-atlas-updates.mjs
+
+Manual sanity check for whether Hello Games' own [Galactic Atlas](https://galacticatlas.nomanssky.com/) has added or removed any points of interest since `atlas-pois.json` (used by the map's "Atlas" overlay toggle) was last hand-updated.
+
+```
+node nms-tools/check-atlas-updates.mjs
+```
+
+It fetches the live Atlas page, regex-scans it for `region-XXXXXXXXXXXX` / `planet-XXXXXXXXXXXX` addresses, and diffs the result against `atlas-pois.json`, printing anything added or removed. It never edits `atlas-pois.json` itself — that's still hand-maintained, on the theory that the list doesn't change often enough to be worth scraping automatically. If it starts turning up real changes often, that's the signal to build a scheduled scraper instead.
+
+**Known limitation:** `galacticatlas.nomanssky.com` appears to block requests from datacenter IPs (confirmed getting an HTTP 403 even with full browser-style headers) — this looks like Cloudflare or similar bot-blocking rather than a header check. Running it from an ordinary home connection should work fine, but if you also get a 403, the script prints a fallback: open the Atlas site in your own browser, open DevTools' console (F12), and paste this to get the same list of addresses by eye:
+
+```js
+[...document.querySelectorAll('a[href*="/poi/"]')].map(a=>a.getAttribute("href")).join("\n")
+```
+
+---
+
 ## License
 
 MIT — see [../nms-core/LICENSE](../nms-core/LICENSE).
