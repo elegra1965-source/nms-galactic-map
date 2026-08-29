@@ -1,0 +1,1411 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Galactic Map — MOCK</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#070b11; --bg2:#0b1119; --bg3:#0f1620;
+  --cyan:#00e5ff; --cyan-dim:#0096a8;
+  --gold:#f0a500; --gold-dim:#a06800;
+  --text:#cfe0f0; --text-dim:rgba(207,224,240,.62); --text-faint:rgba(207,224,240,.42);
+  --white:#eaf6ff;
+  --border:rgba(0,229,255,.18); --border-soft:rgba(255,255,255,.08);
+  --panel:rgba(255,255,255,.035); --panel-2:rgba(0,229,255,.055);
+  --magenta:#ff0055; --matrix:#00ff66; --r:8px;
+  /* Shared motion language, matching index.html (task: motion-continuity
+     pass across Navigator screens). 2026-08-29. */
+  --motion-dur:220ms; --motion-ease:cubic-bezier(.4,0,.2,1);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:'Rajdhani',system-ui,sans-serif;font-size:15px}
+.app{min-height:100vh;background:radial-gradient(circle at 52% 42%,var(--bg3),var(--bg) 58%)}
+button{font:inherit;cursor:pointer}
+.mockBanner{background:repeating-linear-gradient(135deg,var(--gold-dim),var(--gold-dim) 10px,#3a2900 10px,#3a2900 20px);color:#1a1200;font-family:'Orbitron',sans-serif;font-weight:700;font-size:10px;letter-spacing:.08em;text-align:center;padding:6px 10px;text-shadow:0 1px 0 rgba(255,255,255,.25)}
+.mockBanner b{background:#0b0800;color:var(--gold);padding:2px 6px;border-radius:3px;margin-right:6px}
+
+header{height:60px;border-bottom:1px solid var(--border);background:rgba(4,10,20,.9);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:space-between;padding:0 18px;gap:14px}
+header button{background:var(--panel);color:var(--text);border:1px solid var(--border);padding:8px 12px;border-radius:var(--r);font-family:'Rajdhani',sans-serif;font-weight:600;letter-spacing:.03em}
+header button:hover{border-color:var(--cyan);color:var(--cyan)}
+.title{font-family:'Orbitron',sans-serif;font-weight:700;letter-spacing:.16em;font-size:13px;color:var(--white);white-space:nowrap}
+.title small{display:block;color:var(--cyan-dim);font-size:8px;letter-spacing:.14em;margin-top:3px;font-family:'Rajdhani',sans-serif;font-weight:600}
+.searchWrap{flex:1;max-width:420px;position:relative}
+.searchWrap input{width:100%;background:var(--bg2);border:1px solid var(--border-soft);color:var(--white);padding:9px 12px 9px 32px;border-radius:var(--r);font-size:12px}
+.searchWrap input:focus{outline:0;border-color:var(--cyan)}
+.searchWrap::before{content:"⌕";position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--text-faint);font-size:14px}
+
+main{display:grid;grid-template-columns:270px 1fr;min-height:calc(100vh - 60px - 26px)}
+.filters{background:rgba(8,12,19,.92);border-right:1px solid var(--border-soft);padding:18px;overflow:auto}
+.eyebrow{font-size:9px;letter-spacing:.18em;color:var(--cyan-dim);font-weight:700;font-family:'Orbitron',sans-serif}
+.filters h1{font-family:'Orbitron',sans-serif;font-size:14px;margin:8px 0 10px;color:var(--white)}
+.filterNote{font-size:10px;color:var(--text-faint);line-height:1.4;margin:0 0 14px}
+.fGroup{margin-bottom:13px}
+.fLabel{display:block;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-faint);margin-bottom:5px}
+.fGroup select{width:100%;background:var(--bg2);border:1px solid var(--border-soft);color:var(--white);padding:7px 8px;border-radius:6px;font-size:11.5px;font-family:'Rajdhani',sans-serif}
+.fGroup select:focus{outline:0;border-color:var(--cyan)}
+.chk{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:11.5px;color:var(--text-dim);cursor:pointer}
+.chk input[type=checkbox]{accent-color:var(--cyan);width:13px;height:13px;flex:none}
+.chk .count{margin-left:auto;font-size:9px;color:var(--text-faint);font-family:'Orbitron',sans-serif}
+.chk.inert{color:var(--text-faint);cursor:default}
+.chk.inert input{opacity:.35}
+.fNote{font-size:9.5px;color:var(--text-faint);margin:1px 0 5px 21px;line-height:1.4}
+.secBox{border:1px solid var(--border-soft);border-radius:var(--r);margin-bottom:12px;overflow:hidden;background:rgba(255,255,255,.015)}
+.secHead{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 11px;cursor:pointer;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--cyan-dim);font-weight:700;font-family:'Orbitron',sans-serif;background:rgba(0,229,255,.05);user-select:none}
+.secToggle{background:none;border:0;color:var(--text-dim);font-size:10px;padding:0;width:16px;height:16px;transition:transform .15s;flex:none}
+.secBox.collapsed .secToggle{transform:rotate(-90deg)}
+.secBody{padding:12px}
+.secBox.collapsed .secBody{display:none}
+.lb2{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--cyan-dim);font-weight:700;margin:0 0 6px}
+.lb2 small{display:block;font-size:8.5px;letter-spacing:0;text-transform:none;color:var(--text-faint);font-weight:500;margin-top:2px}
+.pillrow{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
+.pillrow:last-of-type{margin-bottom:0}
+.pill{background:var(--panel);border:1px solid var(--border-soft);color:var(--text-dim);border-radius:20px;padding:5px 9px;font-size:9.5px;font-weight:600;letter-spacing:.02em}
+.pill.on{background:var(--panel-2);border-color:var(--cyan);color:var(--cyan)}
+.hyperSummary{font-size:10px;color:var(--text-faint);margin-top:9px;line-height:1.45}
+.hyperSummary b{color:var(--white)}
+.secBody.legend{padding-top:12px}
+.legend .row{display:flex;align-items:center;gap:8px;font-size:10.5px;color:var(--text-faint);padding:4px 0}
+.legend .swatch{width:9px;height:9px;border-radius:50%;flex:none}
+.legend .sub{font-size:9px;color:var(--text-faint);margin:2px 0 0 17px;line-height:1.35}
+
+.mapArea{position:relative;overflow:hidden}
+/* Twinkling starfield (2026-08-29 rework) -- was a flat, regularly-tiled
+   dot-grid (same bug family as index.html's .galArtTwinkle and complete.html's
+   old .snapPreview::before, see those files' comments for the fuller
+   writeup); replaced with a real per-star canvas (initTwinkleStars() in the
+   script below) so each dot gets its own random position, size, colour and
+   independent twinkle timing instead of a uniform grid. */
+.starfield{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}
+.region-label{position:absolute;top:20px;left:20px;font-size:9px;letter-spacing:.14em;color:var(--cyan-dim);font-family:'Orbitron',sans-serif;background:rgba(4,10,20,.55);padding:6px 9px;border:1px solid var(--border-soft);border-radius:var(--r);z-index:2}
+
+.marker{position:absolute;transform:translate(-50%,-50%);cursor:pointer;z-index:3}
+.marker .pt{width:11px;height:11px;border-radius:50%;box-shadow:0 0 10px currentColor;border:2px solid rgba(255,255,255,.5)}
+.marker.home .pt{color:var(--gold);background:var(--gold)}
+.marker.normal .pt{color:var(--star,var(--cyan-dim));background:var(--star,var(--cyan-dim));width:8px;height:8px}
+.marker.blackhole .pt{color:var(--magenta);background:#000;border-color:var(--magenta);box-shadow:0 0 14px var(--magenta)}
+.marker.atlas .pt{color:var(--white);background:transparent;border:2px solid var(--white);box-shadow:0 0 10px rgba(234,246,255,.7)}
+.marker.community .pt{color:var(--matrix);background:var(--matrix);width:7px;height:7px;opacity:.85}
+.marker .lbl{position:absolute;top:14px;left:50%;transform:translateX(-50%);white-space:nowrap;font-size:8.5px;color:var(--text-dim);background:rgba(4,10,20,.6);padding:2px 6px;border-radius:4px;opacity:0;transition:opacity .15s;pointer-events:none}
+.marker:hover .lbl,.marker.selected .lbl{opacity:1}
+.marker.selected .pt{outline:2px solid var(--white);outline-offset:2px}
+.marker.dim{opacity:.18}
+.marker.origin-pick .pt{outline:2px solid var(--gold);outline-offset:2px}
+.marker.dest-pick .pt{outline:2px solid var(--cyan);outline-offset:2px}
+
+#routeLines{position:absolute;inset:0;pointer-events:none;z-index:2;display:none}
+.routeSeg{position:absolute;height:2px;transform-origin:0 0}
+.routeSeg.solid{background:linear-gradient(90deg,var(--gold),var(--cyan));box-shadow:0 0 10px var(--cyan)}
+.routeSeg.dashed{background-image:repeating-linear-gradient(90deg,var(--cyan) 0,var(--cyan) 6px,transparent 6px,transparent 11px);box-shadow:0 0 8px rgba(0,229,255,.35)}
+.routeSeg.reddashed{background-image:repeating-linear-gradient(90deg,var(--magenta) 0,var(--magenta) 6px,transparent 6px,transparent 11px);box-shadow:0 0 8px rgba(255,0,85,.35)}
+.routeStop{position:absolute;width:7px;height:7px;border-radius:50%;background:var(--white);box-shadow:0 0 8px var(--cyan);transform:translate(-50%,-50%);border:1px solid var(--cyan)}
+
+.hint{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--text-faint);font-family:'Orbitron',sans-serif;letter-spacing:.05em;background:rgba(4,10,20,.55);padding:7px 12px;border:1px solid var(--border-soft);border-radius:var(--r);z-index:2}
+
+/* modal */
+/* Motion-continuity pass (2026-08-29): matches index.html's modal fade --
+   see that file's comment for the full reasoning. */
+.modalOverlay{position:fixed;inset:0;background:rgba(3,6,10,.72);backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;z-index:40;padding:20px;opacity:0;visibility:hidden;transition:opacity var(--motion-dur) var(--motion-ease),visibility 0s linear var(--motion-dur)}
+.modalOverlay.show{opacity:1;visibility:visible;transition:opacity var(--motion-dur) var(--motion-ease)}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);max-width:460px;width:100%;padding:22px;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.6);transform:translateY(10px) scale(.98);transition:transform var(--motion-dur) var(--motion-ease)}
+.modalOverlay.show .modal{transform:translateY(0) scale(1)}
+@media (prefers-reduced-motion:reduce){.modalOverlay,.modal{transition:none}}
+.modal .closeModal{position:absolute;top:14px;right:14px;background:none;border:1px solid var(--border-soft);color:var(--text-dim);width:28px;height:28px;border-radius:50%;font-size:13px;padding:0}
+.modal h2{font-family:'Orbitron',sans-serif;font-size:16px;color:var(--white);margin:6px 0 4px}
+.modal .modalSub{font-size:11px;color:var(--text-faint);margin:0 0 16px}
+.pair{display:flex;align-items:center;justify-content:center;gap:14px;margin:16px 0}
+.pairSys{text-align:center;flex:1}
+.pairSys b{display:block;font-size:12px;color:var(--white)}
+.pairSys small{display:block;font-size:9px;color:var(--text-faint);margin-top:2px}
+.pairArrow{color:var(--cyan-dim);font-size:18px}
+.hyperMini{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:10px;color:var(--text-faint);background:var(--panel);border:1px solid var(--border-soft);border-radius:var(--r);padding:8px 10px;margin:0 0 12px}
+.hyperMini b{color:var(--white);font-weight:600}
+.hyperMini .lineState{font-family:'Orbitron',sans-serif;font-size:8.5px;font-weight:700;letter-spacing:.03em;padding:3px 7px;border-radius:10px}
+.hyperMini .lineState.solid{color:var(--cyan);background:rgba(0,229,255,.12)}
+.hyperMini .lineState.dashed{color:var(--gold);background:rgba(240,165,0,.12)}
+.hyperMini .lineState.red{color:var(--magenta);background:rgba(255,0,85,.14)}
+.routeNote{display:none;font-size:10px;line-height:1.45;color:var(--gold);background:rgba(240,165,0,.08);border:1px solid rgba(240,165,0,.25);border-radius:var(--r);padding:8px 10px;margin:0 0 14px}
+.routeNote.show{display:block}
+.routeNote.danger{color:var(--magenta);background:rgba(255,0,85,.08);border-color:rgba(255,0,85,.3)}
+.modal .summary{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--border-soft);border-radius:var(--r);overflow:hidden;margin-bottom:16px}
+.modal .summary div{padding:11px}
+.modal .summary div+div{border-left:1px solid var(--border-soft)}
+.modal .summary small{display:block;font-size:8px;letter-spacing:.12em;color:var(--text-faint);font-family:'Orbitron',sans-serif}
+.modal .summary strong{display:block;font-size:16px;margin-top:4px;color:var(--gold);font-family:'Orbitron',sans-serif}
+.modalActions{display:flex;gap:8px;flex-wrap:wrap}
+.modalActions button{flex:1;min-width:110px;padding:11px;border-radius:var(--r);font-size:10px;font-weight:700;letter-spacing:.03em;font-family:'Orbitron',sans-serif}
+.modalActions .planBtn{background:var(--gold);color:#1a1200;border:0}
+.modalActions .jumpBtn{background:var(--panel-2);color:var(--cyan);border:1px solid var(--cyan-dim)}
+.modalActions .clearBtn{background:transparent;color:var(--text-dim);border:1px solid var(--border-soft)}
+
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:var(--bg2);border:1px solid var(--cyan);color:var(--white);padding:10px 16px;border-radius:var(--r);font-size:12px;z-index:50;box-shadow:0 4px 20px rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .2s;max-width:86vw;text-align:center}
+.toast.show{opacity:1}
+
+@media(max-width:850px){
+  header{flex-wrap:wrap;height:auto;padding:10px}
+  .searchWrap{order:3;max-width:none;width:100%}
+  main{display:block}
+  .filters{border-right:0;border-bottom:1px solid var(--border-soft)}
+}
+
+/* ---- NMS design-system background atmosphere (grid/orbs/scanlines/vignette) ---- */
+.grid-bg{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(0,229,255,0.035) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,0.035) 1px,transparent 1px);background-size:64px 64px;mask-image:radial-gradient(ellipse 80% 60% at 50% 0%,#000 30%,transparent 80%);animation:gridMove 22s linear infinite}
+@keyframes gridMove{to{background-position:64px 64px}}
+.orb{position:fixed;border-radius:50%;filter:blur(90px);pointer-events:none;z-index:0}
+.orb-a{width:520px;height:520px;top:-160px;left:-140px;background:rgba(0,229,255,0.07)}
+.orb-b{width:440px;height:440px;top:-80px;right:-120px;background:rgba(240,165,0,0.06)}
+.orb-c{width:620px;height:620px;bottom:-260px;left:28%;background:rgba(0,229,255,0.04)}
+.scanlines{position:fixed;inset:0;z-index:9998;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.05) 2px,rgba(0,0,0,0.05) 4px);mix-blend-mode:multiply}
+.vignette{position:fixed;inset:0;z-index:9997;pointer-events:none;box-shadow:inset 0 0 220px rgba(0,0,0,0.7)}
+body.no-fx .grid-bg,body.no-fx .scanlines{animation:none;display:none}
+body.no-fx .orb{display:none}
+@media (prefers-reduced-motion:reduce){.grid-bg,.scanlines{animation:none}}
+</style>
+</head>
+<body>
+  <div class="grid-bg"></div>
+  <div class="orb orb-a"></div>
+  <div class="orb orb-b"></div>
+  <div class="orb orb-c"></div>
+  <div class="scanlines"></div>
+  <div class="vignette"></div>
+
+<div class="mockBanner"><b>WORK IN PROGRESS</b>Design preview only — not yet connected to the live Galactic Map</div>
+<div class="app">
+  <header>
+    <div class="title">GALACTIC MAP <small>DISCOVER / PLAN — PROTOTYPE</small></div>
+    <div class="searchWrap"><input id="search" type="text" placeholder="Search systems by name…"></div>
+    <button id="clearSearch">CLEAR</button>
+  </header>
+  <main>
+    <aside class="filters">
+      <span class="eyebrow">FILTERS</span>
+      <h1>Discover Systems</h1>
+
+      <div class="secBox" id="secDiscover">
+        <div class="secHead"><span>Discovery Filters</span><button class="secToggle" type="button" title="Collapse or expand">&#9662;</button></div>
+        <div class="secBody">
+          <div class="filterNote">Applies to this local view — narrows down the charted stars already shown here. These are the same categories the real Galactic Map filters on.</div>
+
+          <div class="fGroup"><span class="fLabel">Star colour</span>
+            <select id="fCol"><option value="">Any</option></select></div>
+          <div class="fGroup"><span class="fLabel">Race</span>
+            <select id="fRace"><option value="">Any</option></select></div>
+          <div class="fGroup"><span class="fLabel">Economy</span>
+            <select id="fEco"><option value="">Any</option></select></div>
+
+          <label class="chk inert" title="Outlaw is a separate real per-system flag (from the world generator) that isn't part of this mock's baked sample data yet.">Outlaw<input type="checkbox" disabled></label>
+          <div class="fNote">Not modelled in this sample data yet.</div>
+          <label class="chk inert" title="Gas giant systems (purple only) aren't flagged in this mock's sample data yet.">Gas giant<input type="checkbox" disabled></label>
+          <div class="fNote">Not modelled in this sample data yet.</div>
+          <label class="chk" id="chkBH">Black holes<input type="checkbox" id="fBH" checked><span class="count" id="cntBH"></span></label>
+          <label class="chk" id="chkAtlas">Atlas interfaces<input type="checkbox" id="fAtlas" checked><span class="count" id="cntAtlas"></span></label>
+          <label class="chk inert" title="Phantom stars are a rare real oddity not present in this small sample area.">Phantom stars<input type="checkbox" disabled></label>
+          <label class="chk inert" title="Shadow stars are a rare real oddity not present in this small sample area.">Shadow stars<input type="checkbox" disabled></label>
+          <label class="chk inert" title="Waypoint saving (bookmark a system you can't reach yet) isn't built in this mock.">Waypoints<input type="checkbox" disabled></label>
+          <label class="chk" id="chkReach" title="Hides stars your current hyperdrive can't reach by star colour.">Drive: reachable only<input type="checkbox" id="fReachOnly"></label>
+        </div>
+      </div>
+
+      <div class="secBox" id="secHyper">
+        <div class="secHead"><span>Hyperdrive</span><button class="secToggle" type="button" title="Collapse or expand">&#9662;</button></div>
+        <div class="secBody">
+          <div class="lb2">Drive type<small>each tier also reaches every colour below it</small></div>
+          <div class="pillrow" id="driveRow"></div>
+          <div class="lb2" style="margin-top:2px">Jump range</div>
+          <div class="pillrow" id="rangeRow"></div>
+          <div class="hyperSummary" id="hyperSummary"></div>
+        </div>
+      </div>
+
+      <div class="secBox collapsed" id="secLegend">
+        <div class="secHead"><span>Legend</span><button class="secToggle" type="button" title="Collapse or expand">&#9662;</button></div>
+        <div class="secBody legend">
+          <div class="row"><span class="swatch" style="background:var(--gold)"></span>My Systems (home)</div>
+          <div class="row"><span class="swatch" style="background:#ffe08a"></span>Yellow star</div>
+          <div class="row"><span class="swatch" style="background:#ff7a4a"></span>Red/Orange star</div>
+          <div class="row"><span class="swatch" style="background:#6bffa8"></span>Green star</div>
+          <div class="row"><span class="swatch" style="background:#6ba8ff"></span>Blue star</div>
+          <div class="row"><span class="swatch" style="background:#c78aff"></span>Purple star</div>
+          <div class="row"><span class="swatch" style="background:#000;border:1px solid var(--magenta)"></span>Black Hole</div>
+          <div class="row"><span class="swatch" style="background:transparent;border:2px solid var(--white)"></span>Atlas Interface</div>
+          <div class="row"><span class="swatch" style="background:var(--matrix)"></span>Community Shared</div>
+          <div class="sub">Community pins are an illustrative example layer for this mock, not a real feature of the live map yet.</div>
+        </div>
+      </div>
+    </aside>
+    <section class="mapArea" id="mapArea">
+      <canvas class="starfield" id="mapStarfield"></canvas>
+      <div class="region-label">YAPTISB CONFLUX — LOCAL CLUSTER</div>
+      <div id="routeLines"></div>
+      <div id="markers"></div>
+      <div class="hint" id="hint">CLICK A SYSTEM TO SET YOUR ORIGIN</div>
+    </section>
+  </main>
+</div>
+
+<div class="modalOverlay" id="courseOverlay">
+  <div class="modal">
+    <button class="closeModal" id="closeCourse">&times;</button>
+    <span class="eyebrow">COURSE PLOTTED</span>
+    <h2>Route Preview</h2>
+    <p class="modalSub" id="courseSub">Estimated route between the two selected systems.</p>
+    <div class="pair">
+      <div class="pairSys"><b id="pairOriginName">&mdash;</b><small id="pairOriginSub">&mdash;</small></div>
+      <div class="pairArrow">&rarr;</div>
+      <div class="pairSys"><b id="pairDestName">&mdash;</b><small id="pairDestSub">&mdash;</small></div>
+    </div>
+    <div class="hyperMini">
+      <span>Flying <b id="modalDriveLabel">&mdash;</b> — <span class="lineState" id="modalLineState">&mdash;</span></span>
+    </div>
+    <p class="routeNote" id="routeNote"></p>
+    <div class="summary">
+      <div><small>ESTIMATED DISTANCE</small><strong id="pairDistance">&mdash;</strong></div>
+      <div><small>WARP JUMPS</small><strong id="pairJumps">&mdash;</strong></div>
+    </div>
+    <div class="modalActions">
+      <button class="jumpBtn" id="jumpToBtn">JUMP TO</button>
+      <button class="clearBtn" id="clearBtn">CLEAR</button>
+      <button class="planBtn" id="planJourneyBtn">PLAN JOURNEY</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script>
+// AUTO-GENERATED by generate-sample-journeys.mjs — do not hand-edit.
+// Every value here came from a real call into the live nms-core generator
+// (see the script for exactly which addresses and how). Regenerate with:
+//   node generate-sample-journeys.mjs
+window.MOCK_JOURNEYS = [
+  {
+    "version": 1,
+    "id": "local-hop",
+    "label": "Local Hop — 3 jumps, no black hole",
+    "galaxy": 0,
+    "origin": {
+      "address": "1058E1434753",
+      "systemName": "Sranch",
+      "coords": {
+        "x": 1875,
+        "y": -31,
+        "z": 1076
+      }
+    },
+    "destination": {
+      "address": "1001E1433750",
+      "systemName": "Kuybiyshm",
+      "coords": {
+        "x": 1872,
+        "y": -31,
+        "z": 1075
+      }
+    },
+    "route": {
+      "jumps": [
+        {
+          "index": 0,
+          "address": "1058E1434753",
+          "systemName": "Sranch",
+          "region": "Yaptisb Conflux",
+          "starType": "yellow",
+          "race": "Vy'keen",
+          "economy": "Mining",
+          "econType": "Mining",
+          "econTier": 1,
+          "conflict": "Stable",
+          "conTier": 0,
+          "outlaw": true,
+          "abandoned": false,
+          "uncharted": false,
+          "isBlackHole": false,
+          "isAtlas": false,
+          "coords": {
+            "x": 1875,
+            "y": -31,
+            "z": 1076
+          },
+          "distance": 0
+        },
+        {
+          "index": 1,
+          "address": "1001E1433752",
+          "systemName": "Hobendya",
+          "region": "The Arm of Axonorst",
+          "starType": "yellow",
+          "race": "Vy'keen",
+          "economy": "Material Fusion",
+          "econType": "Advanced Materials",
+          "econTier": 2,
+          "conflict": "Mild",
+          "conTier": 0,
+          "outlaw": true,
+          "abandoned": false,
+          "uncharted": false,
+          "isBlackHole": false,
+          "isAtlas": false,
+          "coords": {
+            "x": 1874,
+            "y": -31,
+            "z": 1075
+          },
+          "distance": 566
+        },
+        {
+          "index": 2,
+          "address": "1001E1433751",
+          "systemName": "Hatogq-Aji",
+          "region": "Lemisthe Expanse",
+          "starType": "yellow",
+          "race": "Vy'keen",
+          "economy": "Power Generation",
+          "econType": "Power Generation",
+          "econTier": 2,
+          "conflict": "Testy",
+          "conTier": 1,
+          "outlaw": false,
+          "abandoned": false,
+          "uncharted": false,
+          "isBlackHole": false,
+          "isAtlas": false,
+          "coords": {
+            "x": 1873,
+            "y": -31,
+            "z": 1075
+          },
+          "distance": 400
+        },
+        {
+          "index": 3,
+          "address": "1001E1433750",
+          "systemName": "Kuybiyshm",
+          "region": "Biyerin Quadrant",
+          "starType": "yellow",
+          "race": "Korvax",
+          "economy": "Research",
+          "econType": "Scientific",
+          "econTier": 2,
+          "conflict": "Testy",
+          "conTier": 1,
+          "outlaw": false,
+          "abandoned": false,
+          "uncharted": false,
+          "isBlackHole": false,
+          "isAtlas": false,
+          "coords": {
+            "x": 1872,
+            "y": -31,
+            "z": 1075
+          },
+          "distance": 400
+        }
+      ],
+      "totalJumps": 3,
+      "totalDistance": 1366
+    },
+    "currentJump": 0,
+    "returnContext": {
+      "galaxy": 0,
+      "address": "1058E1434753",
+      "view": "local"
+    }
+  },
+  {
+    "version": 1,
+    "id": "black-hole-shortcut",
+    "label": "Black Hole Crossing — 4 jumps, ends at an unpredictable black-hole exit",
+    "galaxy": 0,
+    "origin": {
+      "address": "1058E1434753",
+      "systemName": "Sranch",
+      "coords": {
+        "x": 1875,
+        "y": -31,
+        "z": 1076
+      }
+    },
+    "destination": {
+      "address": "1001E1434756",
+      "systemName": "Uerlia-Kaus IV",
+      "coords": {
+        "x": 1878,
+        "y": -31,
+        "z": 1076
+      }
+    },
+    "route": {
+      "jumps": [
+        {
+          "index": 0,
+          "address": "1058E1434753",
+          "systemName": "Sranch",
+          "region": "Yaptisb Conflux",
+          "starType": "yellow",
+          "race": "Vy'keen",
+          "economy": "Mining",
+          "econType": "Mining",
+          "econTier": 1,
+          "conflict": "Stable",
+          "conTier": 0,
+          "outlaw": true,
+          "abandoned": false,
+          "uncharted": false,
+          "isBlackHole": false,
+          "isAtlas": false,
+          "coords": {
+            "x": 1875,
+            "y": -31,
+            "z": 1076
+          },
+          "distance": 0
+        },
+        {
+          "index": 1,
+          "address": "1001E1434751",
+          "systemName": "Gatesse",
+          "region": "Deyomist Cluster",
+          "starType": "yellow",
+          "race": "Gek",
+          "economy": "Mercantile",
+          "econType": "Trading",
+          "econTier": 0,
+          "conflict": "Peaceful",
+          "conTier": 0,
+          "outlaw": false,
+          "abandoned": false,
+          "uncharted": false,
+          "isBlackHole": false,
+          "isAtlas": false,
+          "coords": {
+            "x": 1873,
+            "y": -31,
+            "z": 1076
+          },
+          "distance": 800
+        },
+        {
+          "index": 2,
+          "address": "1079E1434751",
+          "systemName": "Ulpers-Iln VII",
+          "region": "Deyomist Cluster",
+          "starType": "yellow",
+          "race": "Gek",
+          "economy": "Mercantile",
+          "econType": "Trading",
+          "econTier": 0,
+          "conflict": "Peaceful",
+          "conTier": 0,
+          "outlaw": false,
+          "abandoned": false,
+          "uncharted": false,
+          "isBlackHole": true,
+          "isAtlas": false,
+          "coords": {
+            "x": 1873,
+            "y": -31,
+            "z": 1076
+          },
+          "distance": 0
+        },
+        {
+          "index": 3,
+          "address": "1001E1434754",
+          "systemName": "Zifelim-Yemov",
+          "region": "Xiocco Terminus",
+          "starType": "yellow",
+          "race": "Gek",
+          "economy": "Scientific",
+          "econType": "Scientific",
+          "econTier": 2,
+          "conflict": "Testy",
+          "conTier": 1,
+          "outlaw": true,
+          "abandoned": false,
+          "uncharted": false,
+          "isBlackHole": false,
+          "isAtlas": false,
+          "coords": {
+            "x": 1876,
+            "y": -31,
+            "z": 1076
+          },
+          "distance": 1200
+        },
+        {
+          "index": 4,
+          "address": "1001E1434756",
+          "systemName": "Uerlia-Kaus IV",
+          "region": "Ejmasems",
+          "starType": "yellow",
+          "race": "Vy'keen",
+          "economy": "Manufacturing",
+          "econType": "Manufacturing",
+          "econTier": 0,
+          "conflict": "Testy",
+          "conTier": 1,
+          "outlaw": true,
+          "abandoned": false,
+          "uncharted": false,
+          "isBlackHole": false,
+          "isAtlas": false,
+          "coords": {
+            "x": 1878,
+            "y": -31,
+            "z": 1076
+          },
+          "distance": 800
+        }
+      ],
+      "totalJumps": 4,
+      "totalDistance": 2800
+    },
+    "currentJump": 0,
+    "returnContext": {
+      "galaxy": 0,
+      "address": "1058E1434753",
+      "view": "local"
+    }
+  },
+  {
+    "version": 1,
+    "id": "extended-survey-run",
+    "label": "Extended Survey Run — 6 jumps, longer manifest",
+    "galaxy": 0,
+    "origin": {
+      "address": "1058E1434753",
+      "systemName": "Sranch",
+      "coords": {
+        "x": 1875,
+        "y": -31,
+        "z": 1076
+      }
+    },
+    "destination": {
+      "address": "1001E1437750",
+      "systemName": "Atsusa",
+      "coords": {
+        "x": 1872,
+        "y": -31,
+        "z": 1079
+      }
+    },
+    "route": {
+      "jumps": [
+        {
+          "index": 0,
+          "address": "1058E1434753",
+          "systemName": "Sranch",
+          "region": "Yaptisb Conflux",
+          "starType": "yellow",
+          "race": "Vy'keen",
+          "economy": "Mining",
+          "econType": "Mining",
+          "econTier": 1,
+          "conflict": "Stable",
+          "conTier": 0,
+          "outlaw": true,
+          "abandoned": false,
+          "uncharted": false,
+          "isBlackHole": false,
+          "isAtlas": false,
+          "coords": {
+            "x": 1875,
+            "y": -31,
+            "z": 1076
+          },
+          "distance": 0
+        },
+        {
+          "index": 1,
+          "address": "1001E1435752",
+          "systemName": "Nowara VI",
+          "region": "Halysiaoh Conflux",
+          "starType": "yellow",
+          "race": "Gek",
+          "economy": "Commercial",
+          "econType": "Trading",
+          "econTier": 0,
+          "conflict": "Trivial",
+          "conTier": 0,
+          "outlaw": false,
+          "abandoned": false,
+          "uncharted": false,
+          "isBlackHole": false,
+          "isAtlas": false,
+          "coords": {
+            "x": 1874,
+            "y": -31,
+            "z": 1077
+          },
+          "distance": 566
+        },
+        {
+          "index": 2,
+          "address": "1001E1435751",
+          "systemName": "Rinosl-Syc III",
+          "region": "Ajrapala",
+          "starType": "yellow",
+          "race": "Vy'keen",
+          "economy": "Mathematical",
+          "econType": "Scientific",
+          "econTier": 1,
+          "conflict": "Pirate Controlled",
+          "conTier": 2,
+          "outlaw": true,
+          "abandoned": false,
+          "uncharted": false,
+          "isBlackHole": false,
+          "isAtlas": false,
+          "coords": {
+            "x": 1873,
+            "y": -31,
+            "z": 1077
+          },
+          "distance": 400
+        },
+        {
+          "index": 3,
+          "address": "1001E1436751",
+          "systemName": "Nogbung-Ofir V",
+          "region": "Zavticruo Spur",
+          "starType": "yellow",
+          "race": "Korvax",
+          "economy": "Material Fusion",
+          "econType": "Advanced Materials",
+          "econTier": 0,
+          "conflict": "Intermittent",
+          "conTier": 1,
+          "outlaw": true,
+          "abandoned": false,
+          "uncharted": false,
+          "isBlackHole": false,
+          "isAtlas": false,
+          "coords": {
+            "x": 1873,
+            "y": -31,
+            "z": 1078
+          },
+          "distance": 400
+        },
+        {
+          "index": 4,
+          "address": "1001E1437751",
+          "systemName": "Aiviase",
+          "region": "Ayweaver Mass",
+          "starType": "yellow",
+          "race": "Korvax",
+          "economy": "Energy Supply",
+          "econType": "Power Generation",
+          "econTier": 1,
+          "conflict": "Sporadic",
+          "conTier": 1,
+          "outlaw": false,
+          "abandoned": false,
+          "uncharted": false,
+          "isBlackHole": false,
+          "isAtlas": false,
+          "coords": {
+            "x": 1873,
+            "y": -31,
+            "z": 1079
+          },
+          "distance": 400
+        },
+        {
+          "index": 5,
+          "address": "1001E1436750",
+          "systemName": "Orhaef-Mihaej",
+          "region": "Lialim Mass",
+          "starType": "yellow",
+          "race": "Vy'keen",
+          "economy": "Ore Extraction",
+          "econType": "Mining",
+          "econTier": 1,
+          "conflict": "Relaxed",
+          "conTier": 0,
+          "outlaw": false,
+          "abandoned": false,
+          "uncharted": false,
+          "isBlackHole": false,
+          "isAtlas": false,
+          "coords": {
+            "x": 1872,
+            "y": -31,
+            "z": 1078
+          },
+          "distance": 566
+        },
+        {
+          "index": 6,
+          "address": "1001E1437750",
+          "systemName": "Atsusa",
+          "region": "Ricovsuzky Quadrant",
+          "starType": "yellow",
+          "race": "Gek",
+          "economy": "Research",
+          "econType": "Scientific",
+          "econTier": 1,
+          "conflict": "Gentle",
+          "conTier": 0,
+          "outlaw": false,
+          "abandoned": false,
+          "uncharted": false,
+          "isBlackHole": false,
+          "isAtlas": false,
+          "coords": {
+            "x": 1872,
+            "y": -31,
+            "z": 1079
+          },
+          "distance": 400
+        }
+      ],
+      "totalJumps": 6,
+      "totalDistance": 2732
+    },
+    "currentJump": 0,
+    "returnContext": {
+      "galaxy": 0,
+      "address": "1058E1434753",
+      "view": "local"
+    }
+  }
+];
+
+</script>
+<script src="./sample-region.js"></script>
+<script>
+(function(){
+  "use strict";
+  var $ = function(id){ return document.getElementById(id); };
+
+  /* ---- twinkling starfield (2026-08-29 rework) -- see the .starfield CSS
+     comment above. Same implementation as index.html/complete.html in this
+     mock family: random per-star position/size/colour/brightness, each on
+     its own independent twinkle timer, redrawn on a throttled timer rather
+     than every rAF frame since a gentle twinkle doesn't need 60fps, frozen
+     at each star's base brightness under reduced-motion. ---- */
+  var TWINKLE_COLOURS = ["#ffffff", "#ffffff", "#ffffff", "#cfe0ff", "#fff3cf", "#ffd8cf"];
+  // A few bright stars get a soft glow + diffraction-spike cross, like the
+  // brightest points in real deep-sky photography (Tony's reference
+  // images) -- kept to their own smaller palette so they read as
+  // genuinely brighter, not just another random dot colour.
+  var FLARE_COLOURS = ["#ffffff", "#eaf2ff", "#fff6df"];
+  function hexA(hex, a) {
+    var v = parseInt(hex.slice(1), 16);
+    return "rgba(" + ((v >> 16) & 255) + "," + ((v >> 8) & 255) + "," + (v & 255) + "," + a + ")";
+  }
+  function makeTwinkleStars(cssW, cssH) {
+    var area = Math.max(1, cssW * cssH);
+    var n = Math.min(260, Math.max(40, Math.round(area / 1800)));
+    var stars = [];
+    for (var i = 0; i < n; i++) {
+      // Depth tiers give the field real near/far variety instead of every
+      // star reading the same size and distance: far stars are small/dim
+      // and most common, near stars are bigger/brighter and rarer -- this
+      // is what makes a starfield read as three-dimensional, matching
+      // Tony's reference space photography rather than a flat dot pattern.
+      var roll = Math.random();
+      var rMin, rMax, aMin, aMax;
+      if (roll < 0.58) { rMin = 0.3; rMax = 0.65; aMin = 0.18; aMax = 0.4; } // far
+      else if (roll < 0.88) { rMin = 0.65; rMax = 1.15; aMin = 0.38; aMax = 0.62; } // mid
+      else { rMin = 1.15; rMax = 1.9; aMin = 0.6; aMax = 0.9; } // near
+      stars.push({
+        x: Math.random() * cssW,
+        y: Math.random() * cssH,
+        r: rMin + Math.random() * (rMax - rMin),
+        col: TWINKLE_COLOURS[Math.floor(Math.random() * TWINKLE_COLOURS.length)],
+        base: aMin + Math.random() * (aMax - aMin),
+        phase: Math.random() * Math.PI * 2,
+        period: 2200 + Math.random() * 4600, // ms per full twinkle cycle -- varies per star so they never pulse in lockstep
+        flare: false
+      });
+    }
+    // A handful of flare stars on top of the normal field -- deliberately
+    // sparse, a whole field of these would look busy/fake rather than real.
+    var flareCount = Math.min(5, Math.max(1, Math.round(n / 45)));
+    for (var f = 0; f < flareCount; f++) {
+      stars.push({
+        x: Math.random() * cssW,
+        y: Math.random() * cssH,
+        r: 1.5 + Math.random() * 1.0,
+        col: FLARE_COLOURS[Math.floor(Math.random() * FLARE_COLOURS.length)],
+        base: 0.78 + Math.random() * 0.2,
+        phase: Math.random() * Math.PI * 2,
+        period: 3200 + Math.random() * 5200,
+        flare: true,
+        spike: 9 + Math.random() * 10 // diffraction-spike half-length in px
+      });
+    }
+    return stars;
+  }
+  // Draws one star -- a plain dot for the normal field, or a soft glow +
+  // cross-shaped diffraction spike for a "flare" star. The spike is two
+  // strokes through the centre (each covers both directions at once), so
+  // it stays cheap even though only a handful of stars ever use it.
+  function drawTwinkleStar(ctx, s, alpha) {
+    if (!s.flare) {
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = s.col;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fill();
+      return;
+    }
+    var spike = s.spike;
+    var glow = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, spike * 0.85);
+    glow.addColorStop(0, hexA(s.col, 1));
+    glow.addColorStop(0.35, hexA(s.col, 0.45));
+    glow.addColorStop(1, hexA(s.col, 0));
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, spike * 0.85, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.globalAlpha = alpha * 0.85;
+    ctx.lineWidth = 0.6;
+    [0, Math.PI / 2].forEach(function (rot) {
+      var dx = Math.cos(rot) * spike, dy = Math.sin(rot) * spike;
+      var g = ctx.createLinearGradient(s.x - dx, s.y - dy, s.x + dx, s.y + dy);
+      g.addColorStop(0, hexA(s.col, 0));
+      g.addColorStop(0.5, hexA(s.col, 0.9));
+      g.addColorStop(1, hexA(s.col, 0));
+      ctx.strokeStyle = g;
+      ctx.beginPath();
+      ctx.moveTo(s.x - dx, s.y - dy);
+      ctx.lineTo(s.x + dx, s.y + dy);
+      ctx.stroke();
+    });
+
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = hexA(s.col, 1);
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  function initTwinkleStars(canvas) {
+    if (!canvas || canvas._twinkleInit) return;
+    canvas._twinkleInit = true;
+    var ctx = canvas.getContext("2d");
+    var stars = [];
+    var lastDraw = 0;
+    var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    function sized() {
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      var cssW = canvas.clientWidth || 1, cssH = canvas.clientHeight || 1;
+      canvas.width = Math.max(1, Math.round(cssW * dpr));
+      canvas.height = Math.max(1, Math.round(cssH * dpr));
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      stars = makeTwinkleStars(cssW, cssH);
+    }
+    function draw(t) {
+      var cssW = canvas.clientWidth || 1, cssH = canvas.clientHeight || 1;
+      ctx.clearRect(0, 0, cssW, cssH);
+      for (var i = 0; i < stars.length; i++) {
+        var s = stars[i];
+        var alpha = s.base;
+        if (!reduced) {
+          var wave = 0.5 + 0.5 * Math.sin((t / s.period) * Math.PI * 2 + s.phase);
+          alpha = s.base * (0.4 + 0.6 * wave);
+        }
+        drawTwinkleStar(ctx, s, alpha);
+      }
+      ctx.globalAlpha = 1;
+    }
+    sized();
+    draw(0);
+    if (!reduced) {
+      (function loop(t) {
+        if (t - lastDraw > 90) { lastDraw = t; draw(t); }
+        canvas._twinkleRAF = requestAnimationFrame(loop);
+      })(0);
+    }
+    window.addEventListener("resize", function () {
+      clearTimeout(canvas._twinkleResizeT);
+      canvas._twinkleResizeT = setTimeout(sized, 200);
+    });
+  }
+  initTwinkleStars($("mapStarfield"));
+
+  var journeys = window.MOCK_JOURNEYS || [];
+  var regionSystems = window.MOCK_REGION_SYSTEMS || [];
+
+  // ---- real star colours + hyperdrive model, transcribed from the live
+  // Galactic Map (preview.html: STAR_TYPES / HYPER_DRIVES / the 101-6000 LY
+  // jump-range tiers) so this mock gates course plotting the exact same
+  // way the real page does — not an invented approximation. ----
+  var STAR_TYPES = {
+    yellow: { label: "Yellow (F/G)", hex: "#ffe08a" },
+    red:    { label: "Red/Orange (K/M)", hex: "#ff7a4a" },
+    green:  { label: "Green (E)", hex: "#6bffa8" },
+    blue:   { label: "Blue (B/O)", hex: "#6ba8ff" },
+    purple: { label: "Purple (X/Y)", hex: "#c78aff" }
+  };
+  var HYPER_DRIVES = [
+    { k: "standard", label: "Standard Hyperdrive", short: "Standard", reach: ["yellow"] },
+    { k: "cadmium",  label: "Cadmium Drive",       short: "Cadmium",  reach: ["yellow","red"] },
+    { k: "emeril",   label: "Emeril Drive",        short: "Emeril",   reach: ["yellow","red","green"] },
+    { k: "indium",   label: "Indium Drive",        short: "Indium",   reach: ["yellow","red","green","blue"] },
+    { k: "atlantid", label: "Atlantid Drive",      short: "Atlantid", reach: ["yellow","red","green","blue","purple"] }
+  ];
+  var RANGE_TIERS = [101, 500, 1000, 1500, 2200, 3000, 6000];
+  var VOX_LY = 400; // LY per coordinate unit — same constant distanceLY() already used
+  function driveByKey(k){ for (var i=0;i<HYPER_DRIVES.length;i++) if (HYPER_DRIVES[i].k===k) return HYPER_DRIVES[i]; return HYPER_DRIVES[0]; }
+  function canReachColor(colorKey, driveKey){ return driveByKey(driveKey).reach.indexOf(colorKey) >= 0; }
+
+  var driveState = { drive: "standard", range: 101 };
+
+  // ---- build the marker set from real baked jump data (dedup by address) ----
+  // Two real sources, merged: the 3 curated sample journeys (kept as-is —
+  // the Navigator hand-off depends on these exact addresses), plus a much
+  // denser real local cluster from generate-region-cluster.mjs (also real
+  // nms-core data, read-only, never fabricated) so there are enough real
+  // candidates nearby for multi-hop routing to zigzag and for real
+  // star-colour variety to make drive-colour gating visible.
+  var HOME_ADDR = journeys.length ? journeys[0].origin.address : null;
+  var byAddr = {};
+  journeys.forEach(function(j){
+    j.route.jumps.forEach(function(s){
+      if (!byAddr[s.address]) byAddr[s.address] = s;
+    });
+  });
+  regionSystems.forEach(function(s){
+    if (!byAddr[s.address]) byAddr[s.address] = s;
+  });
+  var systems = Object.keys(byAddr).map(function(a){ return byAddr[a]; });
+
+  // fictional, clearly-labelled example community pins — not tied to any real person or account
+  var communityPins = [
+    { systemName: "Halcyon's Rest", address: "100BE1434855", note: "Shared by Voyager_9K", coords: { x: 1877, y: -20, z: 1074 } },
+    { systemName: "Kessi Anchorage", address: "1003E1435654", note: "Shared by Nomad_Kessi", coords: { x: 1871, y: -40, z: 1078 } }
+  ];
+
+  var minX = Math.min.apply(null, systems.map(function(s){return s.coords.x;}).concat(communityPins.map(function(s){return s.coords.x;})));
+  var maxX = Math.max.apply(null, systems.map(function(s){return s.coords.x;}).concat(communityPins.map(function(s){return s.coords.x;})));
+  var minZ = Math.min.apply(null, systems.map(function(s){return s.coords.z;}).concat(communityPins.map(function(s){return s.coords.z;})));
+  var maxZ = Math.max.apply(null, systems.map(function(s){return s.coords.z;}).concat(communityPins.map(function(s){return s.coords.z;})));
+  var cx = (minX+maxX)/2, cz = (minZ+maxZ)/2;
+  var span = Math.max(maxX-minX, maxZ-minZ, 1);
+  var SCALE = 72 / span; // keeps everything inside roughly the 14%-86% band
+
+  function project(c){
+    var px = 50 + (c.x - cx) * SCALE;
+    var py = 50 + (c.z - cz) * SCALE;
+    return { x: Math.max(8, Math.min(92, px)), y: Math.max(10, Math.min(88, py)) };
+  }
+
+  var markers = [];
+  // Real charted systems can share the exact same coarse coordinate cell
+  // (the "< 1 region"/"Same region" quirk — see plotCourse()'s distance
+  // note), which is common in the denser region cluster. Rather than
+  // stacking them invisibly on one point, spread any such group into a
+  // small ring around the true projected point so every real system stays
+  // individually visible and clickable.
+  var groupsByKey = {};
+  systems.forEach(function(s){
+    var key = s.coords.x+","+s.coords.y+","+s.coords.z;
+    (groupsByKey[key] = groupsByKey[key] || []).push(s);
+  });
+  // Deterministic per-address jitter (not Math.random — must render the
+  // same on every re-render) so a group scatters like a natural little
+  // star clump instead of sitting in a perfectly even geometric ring.
+  function hashAddr(addr){
+    var h = 0;
+    for (var k = 0; k < addr.length; k++) { h = (h * 31 + addr.charCodeAt(k)) | 0; }
+    return h >>> 0;
+  }
+  Object.keys(groupsByKey).forEach(function(key){
+    var group = groupsByKey[key];
+    group.forEach(function(s, i){
+      var p = project(s.coords);
+      if (group.length > 1) {
+        var h = hashAddr(s.address);
+        var ang = ((h & 0xFFFF) / 0xFFFF) * Math.PI * 2;
+        var rFrac = 0.5 + (((h >> 16) & 0xFF) / 0xFF) * 0.5; // 0.5-1.0 of the clump radius
+        var clumpR = 1.5 + Math.min(group.length, 10) * 0.22;
+        p.x = Math.max(8, Math.min(92, p.x + Math.cos(ang) * clumpR * rFrac));
+        p.y = Math.max(10, Math.min(88, p.y + Math.sin(ang) * clumpR * rFrac));
+      }
+      markers.push({
+        cat: s.address === HOME_ADDR ? "home" : (s.isBlackHole ? "blackhole" : (s.isAtlas ? "atlas" : "normal")),
+        name: s.systemName, address: s.address, sub: s.region + " — " + s.economy,
+        race: s.race, economy: s.economy, starType: s.starType || "yellow",
+        coords: s.coords, pos: p
+      });
+    });
+  });
+  communityPins.forEach(function(s){
+    var p = project(s.coords);
+    markers.push({ cat: "community", name: s.systemName, address: s.address, sub: s.note, coords: s.coords, pos: p });
+  });
+
+  var markersByAddr = {};
+  markers.forEach(function(m){ markersByAddr[m.address] = m; });
+
+  // real, routable systems only — the community layer is a mock-only
+  // illustrative overlay, never a candidate for course plotting
+  function routable(){ return markers.filter(function(m){ return m.cat !== "community"; }); }
+  var allYellowSample = routable().every(function(m){ return m.starType === "yellow"; });
+
+  // ---- filters (mirrors the real map's Filters panel: colour, race,
+  // economy, black holes, Atlas interfaces, drive-reachable-only — plus
+  // outlaw/gas giant/phantom/shadow/waypoints shown but inert, since this
+  // mock's baked sample data doesn't carry those real per-system flags yet) ----
+  var filterState = { color: "", race: "", eco: "", bh: true, atlas: true, reachOnly: false };
+  var selection = { origin: null, dest: null };
+  var searchTerm = "";
+
+  function buildFilterOptions(){
+    var colSel = $("fCol");
+    Object.keys(STAR_TYPES).forEach(function(k){
+      var opt = document.createElement("option");
+      opt.value = k; opt.textContent = STAR_TYPES[k].label;
+      colSel.appendChild(opt);
+    });
+    var races = {};
+    routable().forEach(function(m){ if (m.race) races[m.race] = true; });
+    var raceSel = $("fRace");
+    Object.keys(races).sort().forEach(function(r){
+      var opt = document.createElement("option");
+      opt.value = r; opt.textContent = r;
+      raceSel.appendChild(opt);
+    });
+    var uninhabOpt = document.createElement("option");
+    uninhabOpt.value = "Uninhabited"; uninhabOpt.textContent = "Uninhabited";
+    raceSel.appendChild(uninhabOpt);
+
+    var ecos = {};
+    routable().forEach(function(m){ if (m.economy) ecos[m.economy] = true; });
+    var ecoSel = $("fEco");
+    Object.keys(ecos).sort().forEach(function(e){
+      var opt = document.createElement("option");
+      opt.value = e; opt.textContent = e;
+      ecoSel.appendChild(opt);
+    });
+
+    colSel.onchange = function(){ filterState.color = colSel.value; renderMarkers(); };
+    raceSel.onchange = function(){ filterState.race = raceSel.value; renderMarkers(); };
+    ecoSel.onchange = function(){ filterState.eco = ecoSel.value; renderMarkers(); };
+
+    var bhCount = routable().filter(function(m){ return m.cat === "blackhole"; }).length;
+    var atlasCount = routable().filter(function(m){ return m.cat === "atlas"; }).length;
+    $("cntBH").textContent = bhCount;
+    $("cntAtlas").textContent = atlasCount;
+    if (atlasCount === 0) {
+      var note = document.createElement("div");
+      note.className = "fNote";
+      note.textContent = "None charted in this sample area — Atlas Interfaces work the same way once scanned.";
+      $("chkAtlas").insertAdjacentElement("afterend", note);
+    }
+
+    $("fBH").onchange = function(){ filterState.bh = $("fBH").checked; renderMarkers(); };
+    $("fAtlas").onchange = function(){ filterState.atlas = $("fAtlas").checked; renderMarkers(); };
+    $("fReachOnly").onchange = function(){ filterState.reachOnly = $("fReachOnly").checked; renderMarkers(); };
+  }
+
+  function passesFilters(m){
+    if (m.cat === "community") return true;
+    if (filterState.color && m.starType !== filterState.color) return false;
+    if (filterState.race && m.race !== filterState.race) return false;
+    if (filterState.eco && m.economy !== filterState.eco) return false;
+    if (!filterState.bh && m.cat === "blackhole") return false;
+    if (!filterState.atlas && m.cat === "atlas") return false;
+    if (filterState.reachOnly && m.cat !== "home" && !canReachColor(m.starType, driveState.drive)) return false;
+    return true;
+  }
+
+  // ---- hyperdrive UI — page-level state living in the Filters sidebar,
+  // same as the real map (not per-route-modal), since it also drives the
+  // "Drive: reachable only" filter on the base map, not just course plotting ----
+  function buildHyperUI(){
+    var driveRow = $("driveRow");
+    driveRow.innerHTML = HYPER_DRIVES.map(function(d){
+      return '<button class="pill'+(d.k===driveState.drive?" on":"")+'" type="button" data-drive="'+d.k+'" title="Reaches '+d.reach.map(function(c){return STAR_TYPES[c].label;}).join(", ")+'">'+d.short+'</button>';
+    }).join("");
+    var rangeRow = $("rangeRow");
+    rangeRow.innerHTML = RANGE_TIERS.map(function(r){
+      return '<button class="pill'+(r===driveState.range?" on":"")+'" type="button" data-range="'+r+'">'+r.toLocaleString()+' LY</button>';
+    }).join("");
+    Array.prototype.forEach.call(driveRow.querySelectorAll(".pill"), function(btn){
+      btn.onclick = function(){
+        driveState.drive = btn.dataset.drive;
+        buildHyperUI();
+        renderMarkers();
+        if (selection.origin !== null && selection.dest !== null) plotCourse();
+      };
+    });
+    Array.prototype.forEach.call(rangeRow.querySelectorAll(".pill"), function(btn){
+      btn.onclick = function(){
+        driveState.range = Number(btn.dataset.range);
+        buildHyperUI();
+        if (selection.origin !== null && selection.dest !== null) plotCourse();
+      };
+    });
+    var d = driveByKey(driveState.drive);
+    $("hyperSummary").innerHTML = "<b>" + d.short + "</b> // " + driveState.range.toLocaleString() + " LY" +
+      (allYellowSample ? " — this sample cluster is all yellow stars, so drive-colour gating has nothing to bite on here yet; jump range still fully applies." : "");
+  }
+
+  function renderMarkers(){
+    var el = $("markers");
+    el.innerHTML = markers.map(function(m, i){
+      var visible = passesFilters(m);
+      var matches = !searchTerm || m.name.toLowerCase().indexOf(searchTerm) !== -1;
+      var cls = "marker " + m.cat;
+      if (!visible || !matches) cls += " dim";
+      if (selection.origin === i) cls += " origin-pick";
+      if (selection.dest === i) cls += " dest-pick";
+      var style = "left:"+m.pos.x+"%;top:"+m.pos.y+"%";
+      if (m.cat === "normal" && m.starType && STAR_TYPES[m.starType]) style += ";--star:"+STAR_TYPES[m.starType].hex;
+      return '<div class="'+cls+'" data-i="'+i+'" style="'+style+'">' +
+        '<div class="pt"></div><div class="lbl">'+m.name+'</div></div>';
+    }).join("");
+    Array.prototype.forEach.call(el.querySelectorAll(".marker"), function(node){
+      node.onclick = function(){ pickMarker(Number(node.dataset.i)); };
+    });
+  }
+
+  function pickMarker(i){
+    if (markers[i].cat === "community") {
+      showToast(markers[i].name + " — " + markers[i].sub + ". Community pins are illustrative only in this mock; they aren't routable.", 3600);
+      return;
+    }
+    if (selection.origin === null) {
+      selection.origin = i;
+      $("hint").textContent = "NOW CLICK A DESTINATION SYSTEM";
+      renderMarkers();
+      return;
+    }
+    if (selection.origin === i) return;
+    selection.dest = i;
+    renderMarkers();
+    plotCourse();
+    $("courseOverlay").classList.add("show");
+  }
+
+  function distanceLY(a, b) {
+    var dx = a.x - b.x, dy = a.y - b.y, dz = a.z - b.z;
+    return Math.round(Math.sqrt(dx*dx + dy*dy + dz*dz) * VOX_LY);
+  }
+  function wpDist(a, b) {
+    var dx = a.x - b.x, dy = a.y - b.y, dz = a.z - b.z;
+    return Math.sqrt(dx*dx + dy*dy + dz*dz);
+  }
+
+  function findMatchingJourney(originAddr, destAddr) {
+    for (var i = 0; i < journeys.length; i++) {
+      var j = journeys[i];
+      if (j.origin.address === originAddr && j.destination.address === destAddr) return j.id;
+    }
+    return null;
+  }
+
+  // ---- real multi-hop route finding, ported from the live Galactic Map's
+  // own findRoute()/_routeHop(): every hop must land on a real charted star
+  // (never empty space), each hop is capped at the current jump range, and
+  // a candidate hop's star colour must be within the current drive's reach
+  // set. Scaled down for this mock's ~140-system local cluster (a plain
+  // scan instead of the real page's expanding-region search, since there's
+  // no galaxy-sized index here — same result, much less code). ----
+  var ROUTE_MAX_HOPS = 12;
+  function routeHop(cur, to, rangeVox, visited, driveKey) {
+    var remain = wpDist(cur.coords, to.coords);
+    var best = null, bestD = Infinity, fallback = null, fallbackD = Infinity;
+    routable().forEach(function(c) {
+      if (c.address === cur.address || visited[c.address]) return;
+      if (!canReachColor(c.starType, driveKey)) return;
+      var dHop = wpDist(cur.coords, c.coords);
+      if (dHop > rangeVox || dHop < 0.02) return;
+      var dToTarget = wpDist(c.coords, to.coords);
+      if (dToTarget < fallbackD) { fallbackD = dToTarget; fallback = c; }
+      if (dToTarget >= remain) return; // must make real progress toward the target
+      if (dToTarget < bestD) { bestD = dToTarget; best = c; }
+    });
+    return best || fallback || null;
+  }
+  function findRoute(origin, dest, rangeLY, driveKey) {
+    var rangeVox = rangeLY / VOX_LY;
+    var direct = wpDist(origin.coords, dest.coords);
+    if (direct <= rangeVox) return { path: [origin, dest], truncated: false, gotAnyHop: false };
+    var path = [origin], visited = {}; visited[origin.address] = true;
+    var cur = origin, guard = 0, truncated = false, gotAnyHop = false;
+    while (true) {
+      if (wpDist(cur.coords, dest.coords) <= rangeVox) { path.push(dest); break; }
+      guard++;
+      if (guard > ROUTE_MAX_HOPS) { truncated = true; path.push(dest); break; }
+      var next = routeHop(cur, dest, rangeVox, visited, driveKey);
+      if (!next) { truncated = true; path.push(dest); break; }
+      gotAnyHop = true;
+      path.push(next);
+      visited[next.address] = true;
+      cur = next;
+    }
+    return { path: path, truncated: truncated, gotAnyHop: gotAnyHop };
+  }
+
+  function plotCourse(){
+    var o = markers[selection.origin], d = markers[selection.dest];
+    $("pairOriginName").textContent = o.name;
+    $("pairOriginSub").textContent = o.address;
+    $("pairDestName").textContent = d.name;
+    $("pairDestSub").textContent = d.address;
+
+    var drive = driveByKey(driveState.drive);
+    var dist = distanceLY(o.coords, d.coords);
+    var result = findRoute(o, d, driveState.range, driveState.drive);
+    var hops = result.path.length - 1;
+    var reachableDest = canReachColor(d.starType, driveState.drive);
+    var noRealHopFound = result.truncated && !result.gotAnyHop;
+
+    var courseState = !reachableDest ? "red" : (hops === 1 && !result.truncated ? "solid" : "dashed");
+
+    $("modalDriveLabel").textContent = drive.short + " // " + driveState.range.toLocaleString() + " LY";
+    var lineStateEl = $("modalLineState");
+    lineStateEl.className = "lineState " + courseState;
+    lineStateEl.textContent = courseState === "solid" ? "SOLID — single jump" : courseState === "dashed" ? "DASHED — multi-hop" : "RED — drive can't reach";
+
+    var pairDistEl = $("pairDistance");
+    if (dist === 0) {
+      pairDistEl.textContent = "Same region";
+      pairDistEl.title = "These two charted systems share the same coarse coordinate cell, so the distance calc rounds to under ~400 LY — a real quirk of the portal-address grid (a single cell can hold several real systems), not a bug.";
+    } else {
+      pairDistEl.textContent = dist.toLocaleString() + " LY";
+      pairDistEl.removeAttribute("title");
+    }
+    $("pairJumps").textContent = (result.truncated ? hops + "+" : hops) + " @ " + driveState.range.toLocaleString() + " LY" + (result.truncated ? " (simplified)" : "");
+
+    var note = $("routeNote");
+    note.classList.remove("danger");
+    var naiveJumps = driveState.range > 0 ? Math.max(1, Math.ceil(dist / driveState.range)) : 1;
+    if (!reachableDest) {
+      note.textContent = drive.short + " reaches " + drive.reach.map(function(c){ return STAR_TYPES[c].label; }).join("/") + " only — it can't actually reach " + d.name + "'s " + STAR_TYPES[d.starType].label + " star. Upgrade your hyperdrive to make this jump.";
+      note.classList.add("show", "danger");
+    } else if (noRealHopFound) {
+      if (driveState.range < VOX_LY) {
+        note.textContent = "No real charted star is reachable in a single hop at " + driveState.range.toLocaleString() + " LY. That's not a data gap — distinct charted systems are never closer than ~" + VOX_LY.toLocaleString() + " LY apart (the coordinate grid's own resolution), so a " + drive.short + " hyperdrive at " + driveState.range.toLocaleString() + " LY structurally can't bridge between them, in the real galaxy either. You'll need a longer jump range.";
+      } else {
+        note.textContent = "No real charted star within range was found along this leg — this local cluster thins out here. Try a longer jump range.";
+      }
+      note.classList.add("show");
+    } else if (result.truncated) {
+      note.textContent = "Route simplified after " + hops + " hops — ran out of nearby charted stars within range to keep going.";
+      note.classList.add("show");
+    } else if (hops > naiveJumps * 1.35 && hops > naiveJumps) {
+      note.textContent = "More hops than " + dist.toLocaleString() + "÷" + driveState.range.toLocaleString() + " suggests — real stars rarely sit right on the bearing, so routes drift short of max range to reach one. NMS's own displayed hyperdrive range is known to overstate the real effective jump distance, so this is expected, not a bug.";
+      note.classList.add("show");
+    } else {
+      note.classList.remove("show");
+    }
+
+    $("courseSub").textContent = o.name + " → " + d.name + " — route hops through the charted stars along the way, same as the real map.";
+    drawRoutePath(result.path.map(function(m){ return m.pos; }), courseState === "red" ? "reddashed" : courseState);
+  }
+
+  // Route segments are drawn in absolute pixels (computed once from
+  // mapArea's current size), not percentages, because a straight CSS
+  // rotate+width line needs real px to angle correctly. That means if
+  // mapArea's box changes size AFTER a route is drawn — e.g. a Filters
+  // sidebar section collapsing/expanding, or the window resizing — the
+  // line goes stale and drifts away from the (percentage-based, so
+  // always-correct) markers. lastRouteDraw + redrawRoute() below re-run
+  // the same draw against the current box any time that can happen.
+  var lastRouteDraw = null;
+  function redrawRoute(){
+    if (lastRouteDraw) drawRoutePath(lastRouteDraw.pts, lastRouteDraw.status);
+  }
+  function drawRoutePath(pts, status){
+    lastRouteDraw = { pts: pts, status: status };
+    var container = $("routeLines");
+    container.innerHTML = "";
+    var area = $("mapArea").getBoundingClientRect();
+    var segClass = "routeSeg " + status;
+    for (var i = 0; i < pts.length - 1; i++) {
+      var p1 = pts[i], p2 = pts[i+1];
+      var x1 = area.width * p1.x/100, y1 = area.height * p1.y/100;
+      var x2 = area.width * p2.x/100, y2 = area.height * p2.y/100;
+      var len = Math.hypot(x2-x1, y2-y1);
+      var ang = Math.atan2(y2-y1, x2-x1) * 180/Math.PI;
+      var seg = document.createElement("div");
+      seg.className = segClass;
+      seg.style.left = x1+"px"; seg.style.top = y1+"px";
+      seg.style.width = len+"px";
+      seg.style.transform = "rotate("+ang+"deg)";
+      container.appendChild(seg);
+    }
+    for (var j = 1; j < pts.length - 1; j++) {
+      var stop = document.createElement("div");
+      stop.className = "routeStop";
+      stop.style.left = pts[j].x+"%"; stop.style.top = pts[j].y+"%";
+      container.appendChild(stop);
+    }
+    container.style.display = "block";
+  }
+
+  var toastTimer = null;
+  function showToast(msg, ms){
+    var t = $("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ t.classList.remove("show"); }, ms || 2800);
+  }
+
+  function closeCourse(){ $("courseOverlay").classList.remove("show"); }
+  $("closeCourse").onclick = closeCourse;
+  $("courseOverlay").addEventListener("click", function(e){ if (e.target === $("courseOverlay")) closeCourse(); });
+
+  $("clearBtn").onclick = function(){
+    selection = { origin: null, dest: null };
+    $("hint").textContent = "CLICK A SYSTEM TO SET YOUR ORIGIN";
+    lastRouteDraw = null;
+    $("routeLines").style.display = "none";
+    $("routeLines").innerHTML = "";
+    renderMarkers();
+    closeCourse();
+  };
+
+  $("jumpToBtn").onclick = function(){
+    showToast("This recentres the real 3D map on your destination once V5 is switched on — not wired up in this mock.", 3600);
+  };
+
+  $("planJourneyBtn").onclick = function(){
+    var o = markers[selection.origin], d = markers[selection.dest];
+    var id = findMatchingJourney(o.address, d.address);
+    if (id) {
+      location.href = "./index.html?journey=" + encodeURIComponent(id);
+    } else {
+      showToast("No sample journey is baked for this exact pair yet — try Sranch → Kuybiyshm, Uerlia-Kaus IV, or Atsusa.", 4200);
+    }
+  };
+
+  $("search").oninput = function(){
+    searchTerm = $("search").value.trim().toLowerCase();
+    renderMarkers();
+  };
+  $("clearSearch").onclick = function(){
+    $("search").value = "";
+    searchTerm = "";
+    renderMarkers();
+  };
+
+  Array.prototype.forEach.call(document.querySelectorAll(".secHead"), function(head){
+    head.onclick = function(){
+      head.closest(".secBox").classList.toggle("collapsed");
+      // Collapsing/expanding a sidebar section can change mapArea's box —
+      // wait a frame for the reflow to settle, then re-anchor the route
+      // line (if one is plotted) to the now-current box.
+      requestAnimationFrame(redrawRoute);
+    };
+  });
+  window.addEventListener("resize", redrawRoute);
+
+  buildFilterOptions();
+  buildHyperUI();
+  renderMarkers();
+})();
+</script>
+</body>
+</html>

@@ -1577,6 +1577,10 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
       <div style="font-size:12px;color:var(--text-dim);line-height:1.55"><b>Plotted course</b> / <b>Lock navigation target</b> plots a real multi-jump route to that system for your current hyperdrive type and range (set in Filters), and opens the Warp Manifest showing the full jump-by-jump itinerary -- click it again on the same target to close the manifest without re-plotting. Every jump always lands on a real charted star, never empty space -- same as the real game -- so the reported jump count is usually a bit above the straight-line distance-divided-by-range number, sometimes noticeably so in sparser patches of space. That's not a bug: a real star is rarely sitting exactly on your bearing at exactly your max range, so routes drift slightly to reach one, and that adds up over a long trip. No Man's Sky itself has no multi-hop route planner at all -- you'd normally do this same star-by-star checking manually, this just does it for you and shows the whole path at once. The line itself matches the real game's own convention: <b>solid</b> means a single jump is enough, <b>dashed</b> means it needs multiple hops, and <b>red-dashed</b> means your current drive can't reach that star's colour at all. Clicking any star while browsing automatically replots the line to it, replacing whatever was there before. If a route's hop count is well above the naive distance-divided-by-range figure, a short reminder appears right on the Course Plotted card itself, not just here -- researched this against real player reports too: NMS's own displayed hyperdrive range has long been known to overstate the actual effective jump distance (a leftover from a past galaxy-distance rescale), so needing noticeably more real hops than the raw numbers suggest is genuinely how the real game behaves, not something unique to this map.</div>
     </div>
     <div class="mfld">
+      <div class="lb">Galactic Navigator (new, work in progress)</div>
+      <div style="font-size:12px;color:var(--text-dim);line-height:1.55"><b>PLAN JOURNEY</b> on the Warp Manifest card (2026-08-29) opens a separate page -- the Galactic Navigator -- in a new tab, handing off your real plotted route: every hop's real name, portal address, region, star type, race, economy and conflict level, straight from the same algorithm this map uses everywhere else, not invented for the handoff. It's tagged <b>WORK IN PROGRESS</b> because parts of it are still a preview rather than a finished feature -- turn-by-turn "I am here" progress through the route, in-flight replanning, and the black-hole-exit flow all currently work off the Navigator's own sample data rather than this map's real state. Worth trying if you're curious what a dedicated journey-tracking view could look like; just don't rely on it yet for anything this map already does reliably.</div>
+    </div>
+    <div class="mfld">
       <div class="lb">Search by name -- also how to get back to everywhere you've been</div>
       <div style="font-size:12px;color:var(--text-dim);line-height:1.55">The <b>Search</b> button finds a system, planet, moon or base by name and jumps straight there -- but only among things that already have a real name attached: anything community-documented via Edit system, plus your own bookmarks, waypoints, and visited history (searched across every galaxy, not just the one you're viewing). A planet/moon/base result scrolls and highlights the matching row in the info panel once you land on the system, so you're not left hunting for it in the body list. <b>Leave the search box empty</b> and it instead lists everywhere you've bookmarked, waypointed, or visited, plus any system <i>you</i> personally have edited or bulk-imported from your save (added 2026-08-27, tagged "Documented (you)") -- sorted alphabetically, click one to jump straight back, no address or portal glyphs to remember. This is the one place that works regardless of where you currently are; <b>Local view's Filters panel is different</b> -- it only ever narrows down whatever's already rendered nearby (colour, race, economy, black holes, Atlas interfaces, outlaw/phantom/shadow systems, waypointed, reachable-by-drive), so there's no "Visited" or "Edited by traveller" filter option there any more -- a system on the other side of the galaxy was never going to appear just because a filter box was ticked, so Search above is the actual way back to it. The rest of the galaxy has no name to search until someone actually names it -- and that's a hard limit, not just a small index waiting to be filled in: turning a portal address into a name is a one-way calculation (like a hash), so there's no formula to run backwards from a name to find its address, only checking addresses one at a time to see what they generate. With roughly 18 quintillion possible systems, precomputing and indexing every name in advance isn't practically possible, so a name from somewhere else -- a friend's save, a database, a screenshot -- generally won't be searchable here unless that exact system has also been documented, bookmarked, waypointed or visited on this site. If you have the actual portal address instead of just a name, typing or pasting it into the address box and hitting <b>Jump</b> always works, since generating a system forward from its address is the one direction this map can always compute. And since names aren't tied to a specific galaxy in the shared data store, the same documented address can look identical no matter which of the 257 galaxies you're browsing.</div>
     </div>
@@ -6821,17 +6825,62 @@ document.getElementById("bPlanJourney").addEventListener("click",function(){
      journey's actual galaxy art and show the real hyperdrive instead of
      a generic sample -- same "everything real, nothing invented" rule as
      the from/to/jumps/dist fields already handed off above. */
+
+  /* 2026-08-29 (later same day, Tony: "the mock is not really showing as
+     would live for example the glyph placements etc... i also want the
+     economy etc to be active by pulling whats needed"): the Navigator was
+     still always showing its own baked-in sample route/glyphs/economy no
+     matter what was actually plotted here -- this "PLAN JOURNEY" button
+     only ever sent the two endpoints + aggregate stats, never the real
+     hop-by-hop systems. Fixed by handing off the REAL route: every
+     waypoint courseWaypoints already holds, upgraded to a full
+     generateSystem() object (mergeWaypointsIntoSlice() -- already called
+     when the course was plotted/displayed, called again here defensively
+     in case anything since reverted a waypoint to a placeholder) so each
+     hop carries its real name, glyph address, region, star type, race,
+     economy, conflict and black-hole/Atlas flags -- the exact same
+     algorithm the live map itself uses everywhere else, not a guess made
+     up for this handoff. Per-hop distance is computed the same way the
+     route line itself is drawn (wpDist, world units -> LY via VOX_LY).
+     Encoded as one JSON array in the "hops" param -- static site, no
+     server involved, so a long query string costs nothing and the link
+     stays a genuine, reloadable deep link into this exact real route. */
+  mergeWaypointsIntoSlice();
+  var hops=(courseWaypoints||[]).map(function(wp,i){
+    var prev=i>0?courseWaypoints[i-1]:null;
+    return {
+      systemName:wp.name||"",
+      address:wp.address||"",
+      region:wp.region||"",
+      starType:wp.type||"",
+      race:wp.race||"",
+      economy:wp.econType||"",
+      econType:wp.econType||"",
+      econTier:(wp.econTier!=null?wp.econTier:null),
+      conflict:wp.conflict||"",
+      conTier:(wp.conTier!=null?wp.conTier:null),
+      outlaw:!!wp.outlaw,
+      abandoned:!!wp.abandoned,
+      uncharted:!!wp.uncharted,
+      isBlackHole:!!wp.blackHole,
+      isAtlas:!!wp.atlas,
+      coords:{x:wp.vx,y:wp.vy,z:wp.vz},
+      distance:prev?Math.round(wpDist(prev,wp)*VOX_LY):0
+    };
+  });
+  var totalDist=hops.reduce(function(sum,h){ return sum+(h.distance||0); },0);
   var qs=new URLSearchParams({
     from:focusSystem.address||"",
     fromName:focusSystem.name||"",
     to:courseTarget.address||"",
     toName:courseTarget.name||"",
-    jumps:document.getElementById("stat-jumps").textContent||"",
-    dist:document.getElementById("stat-dist").textContent||"",
+    jumps:String(Math.max(0,hops.length-1)),
+    dist:commas(totalDist)+" LY",
     galaxy:String(GALAXY),
     galaxyName:GALAXIES[GALAXY]||("Galaxy "+GALAXY),
     drive:currentDrive().k,
-    range:document.getElementById("fHyper").value||""
+    range:document.getElementById("fHyper").value||"",
+    hops:JSON.stringify(hops)
   });
   window.open("navigator/index.html?"+qs.toString(),"_blank","noopener");
 });
@@ -7655,7 +7704,7 @@ var TOUR_STEPS=[
   {sel:"#mGal",title:"A real 3D galaxy",
     body:"You're looking at one of 256 real No Man's Sky galaxies, generated from a portal address -- not a static image, a galaxy you can actually fly through and zoom into."},
   {sel:"#mLoc",title:"Local view",
-    body:"Local shows the real star field around you. Hover a star (mouse) for a quick popup, or click for the full panel -- race, economy, conflict, planets. Plotted course draws a line that's solid for a single jump, dashed for multi-hop, red if your drive can't reach it, and opens the Warp Manifest for the full itinerary. Enter system for a full 3D view, or add your own in-game data via Edit system."},
+    body:"Local shows the real star field around you. Hover a star (mouse) for a quick popup, or click for the full panel -- race, economy, conflict, planets. Plotted course draws a line that's solid for a single jump, dashed for multi-hop, red if your drive can't reach it, and opens the Warp Manifest for the full itinerary. Enter system for a full 3D view, or add your own in-game data via Edit system. Once a course is plotted, PLAN JOURNEY on that same Warp Manifest card opens the new Galactic Navigator -- a work-in-progress preview of turn-by-turn tracking for that real route, in a new tab."},
   {sel:"#inAddr",title:"Type an address",
     body:"Paste or type a 12-character portal address here and hit Jump to fly straight to that exact system."},
   {sel:"#bKeys",title:"No address handy?",

@@ -110,6 +110,19 @@ target and it plots fresh and reopens automatically. Like every other panel
 here, it's draggable by its header and collapsible with the small arrow
 button.
 
+**Galactic Navigator (new, work in progress).** **PLAN JOURNEY** on the Warp
+Manifest card opens a separate page -- the Galactic Navigator -- in a new
+tab, handing off the real plotted route: every hop's real name, portal
+address, region, star type, race, economy and conflict level, straight from
+the same address-decoding this map uses everywhere else, not invented for
+the handoff. It's labelled **WORK IN PROGRESS** on the page itself because
+several pieces are still a preview rather than a finished feature --
+turn-by-turn "I am here" progress through the route, in-flight replanning,
+and the black-hole-exit flow currently run on the Navigator's own sample
+data rather than this map's real state. Worth a look if you're curious
+where journey-tracking is headed; not yet a replacement for anything the
+main map already does reliably.
+
 **Enter system.** Fly into any system for a true 3D orbital view -- binary
 and ternary stars, planets and moons on real orbits with rings where the
 generator rolled them, and (where the region has one) a black hole or Atlas
@@ -274,6 +287,10 @@ nms-tools/                  nms-lookup.js, a single-call wrapper around nms-core
 glyphs/                    the 16 real portal glyph PNGs (keypad)
 icons-web/, Icons/         race/economy iconography, cropped from real screenshots
 favicon/, manifest.json, sw.js    PWA install + offline support
+navigator/                  the Galactic Navigator prototype -- index.html, complete.html,
+                             map-mock.html; opened from preview.html's PLAN JOURNEY button
+                             with the real plotted route; WORK IN PROGRESS, see "What it
+                             can do" above
 SPEC.md                    the original address maths and game-data model, wiki-sourced
 SHARED-EDITS-SETUP.md      one-time GitHub token + Netlify env var setup
 HANDOVER.md                full build history, session by session

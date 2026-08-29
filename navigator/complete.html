@@ -1,0 +1,736 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Journey Complete — MOCK</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#070b11;--bg2:#0b1119;--bg3:#0f1620;--cyan:#00e5ff;--cyan-dim:#0096a8;--gold:#f0a500;--gold-dim:#a06800;--text:#cfe0f0;--text-dim:rgba(207,224,240,.62);--text-faint:rgba(207,224,240,.42);--border:rgba(0,229,255,.18);--border-soft:rgba(255,255,255,.08);--magenta:#ff0055;--r:8px;--motion-dur:220ms;--motion-ease:cubic-bezier(.4,0,.2,1)}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle,#122032,var(--bg) 58%);color:var(--text);font-family:'Rajdhani',system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:70px 16px 40px;text-align:center}
+.mockBanner{position:fixed;top:0;left:0;right:0;background:repeating-linear-gradient(135deg,#a06800,#a06800 10px,#3a2900 10px,#3a2900 20px);color:#1a1200;font-family:'Orbitron',sans-serif;font-weight:700;font-size:10px;letter-spacing:.08em;text-align:center;padding:6px 10px;z-index:10}
+.card{padding:40px 35px 30px;max-width:520px;width:100%}
+/* ---- video hero: real looping footage, same treatment as the two
+   black-hole moments in the Navigator, gold instead of magenta/cyan so
+   arrival reads as its own distinct feeling. ---- */
+.videoHero{width:100%;aspect-ratio:16/9;border-radius:var(--r);overflow:hidden;margin:2px auto 20px;display:block;object-fit:cover;background:#000;box-shadow:0 0 30px rgba(240,165,0,.4);border:1px solid rgba(240,165,0,.35)}
+.eyebrow{font-size:9px;letter-spacing:.2em;color:var(--cyan-dim);font-family:'Orbitron',sans-serif;font-weight:700}
+h1{font-family:'Orbitron',sans-serif;font-size:30px;margin:10px 0 6px;color:#eaf6ff}
+p.sub{color:var(--text-dim);margin:0 0 20px}
+.stats{display:grid;grid-template-columns:1fr 1fr 1fr;border:1px solid var(--border);border-radius:8px;overflow:hidden;margin:20px 0}
+.stats div{padding:14px}
+.stats div+div{border-left:1px solid var(--border)}
+.stats small{display:block;font-size:8px;letter-spacing:.13em;color:var(--text-dim);font-family:'Orbitron',sans-serif}
+.stats strong{display:block;font-size:19px;margin-top:5px;color:var(--gold);font-family:'Orbitron',sans-serif}
+.replan{border-left:2px solid var(--magenta);background:var(--bg2);padding:10px 12px;margin:16px 0;text-align:left;font-size:11px;color:var(--text-dim);border-radius:0 8px 8px 0}
+.actions{display:flex;flex-direction:column;gap:9px;margin-top:26px}
+.actions button{padding:13px 16px;border:0;cursor:pointer;font-weight:800;font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:.04em;border-radius:8px;background:var(--bg2);color:var(--text);border:1px solid var(--border)}
+.actions button:hover{border-color:var(--cyan);color:var(--cyan)}
+.actions button.snap{background:var(--gold);color:#1a1200;border:0}
+.actions button.snap:hover{background:#ffb733;color:#1a1200}
+
+/* ---- snapshot modal ---- */
+/* Motion-continuity pass (2026-08-29): matches index.html's modal fade --
+   see that file's comment for the full reasoning. */
+.modalOverlay{position:fixed;inset:0;background:rgba(3,6,10,.78);backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;z-index:40;padding:20px;opacity:0;visibility:hidden;transition:opacity var(--motion-dur) var(--motion-ease),visibility 0s linear var(--motion-dur)}
+.modalOverlay.show{opacity:1;visibility:visible;transition:opacity var(--motion-dur) var(--motion-ease)}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);max-width:520px;width:100%;max-height:90vh;overflow:auto;padding:24px;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.6);text-align:left;transform:translateY(10px) scale(.98);transition:transform var(--motion-dur) var(--motion-ease)}
+.modalOverlay.show .modal{transform:translateY(0) scale(1)}
+@media (prefers-reduced-motion:reduce){.modalOverlay,.modal{transition:none}}
+.modal .closeModal{position:absolute;top:14px;right:14px;background:none;border:1px solid var(--border-soft);color:var(--text-dim);width:28px;height:28px;border-radius:50%;font-size:13px;padding:0;cursor:pointer}
+.modal .closeModal:hover{border-color:var(--magenta);color:var(--magenta)}
+.modal h2{font-family:'Orbitron',sans-serif;font-size:16px;color:#eaf6ff;margin:6px 0 4px;padding-right:30px}
+.modal p.hint{font-size:10.5px;color:var(--text-faint);margin:0 0 16px;line-height:1.5}
+
+/* ---- polaroid frame: the whole preview sits tilted, like a photo just
+   set down on a table, per the reference concept art ---- */
+.polaroidFrame{background:#f4f0e4;padding:12px 12px 30px;border-radius:3px;transform:rotate(-3deg);box-shadow:0 4px 10px rgba(0,0,0,.35),0 22px 40px rgba(0,0,0,.5);position:relative;transform-origin:50% 60%}
+/* Held invisible until the shutter's audible click (see openModal()'s
+   timed reveal) so the picture doesn't appear before the sound+flash that's
+   supposed to produce it. */
+.polaroidFrame.pending{opacity:0}
+.polaroidFrame.pop{animation:polaroidPop .6s cubic-bezier(.22,.9,.32,1.2) both}
+@keyframes polaroidPop{
+  0%{transform:rotate(0deg) scale(.55) translateY(18px);opacity:0}
+  55%{transform:rotate(-5deg) scale(1.03) translateY(-2px);opacity:1}
+  100%{transform:rotate(-3deg) scale(1) translateY(0);opacity:1}
+}
+/* Camera flash — a quick white pulse over the photo area, timed to the
+   shutter sound's actual audible click (not the moment the modal opens). */
+.shutterFlash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;border-radius:2px;z-index:5}
+.shutterFlash.flash{animation:shutterFlashPulse .5s ease-out both}
+@keyframes shutterFlashPulse{
+  0%{opacity:0}
+  12%{opacity:.95}
+  100%{opacity:0}
+}
+.polaroidCaption{text-align:center;font-family:'Caveat',cursive;font-weight:700;font-size:23px;color:#3a3226;letter-spacing:.01em;margin-top:2px} /* real handwriting font (2026-08-29) -- was 'Rajdhani',cursive,sans-serif, which always resolves to Rajdhani (a geometric sans) since it loads successfully, so the cursive fallback never actually applied. Caveat is a genuine script font; sized up since script faces read smaller than a sans at the same px, and tracking pulled back near 0 since letter-spacing fights a connected script's own natural flow. */
+/* Second line under the caption, like a handwritten note under a real
+   Polaroid -- the journey's own real numbers (jumps/distance/time), same
+   data already shown inside the photo's own stat bar, so the postcard
+   still tells the story even before anyone looks closely at the image
+   itself (Tony: "no information of your journey is below the caption"). */
+.polaroidSubCaption{text-align:center;font-family:'Caveat',cursive;font-weight:600;font-size:16px;color:#8a7d68;letter-spacing:.01em;margin-top:-2px}
+.snapPreview{border:1px solid var(--border);border-radius:2px;overflow:hidden;position:relative;background:radial-gradient(circle at 50% 55%,#0d1830,var(--bg) 72%);padding:18px 16px 16px;min-height:236px}
+/* Twinkling starfield behind the galaxy art (2026-08-29 rework) -- was a
+   flat, regularly-tiled dot-grid via a single ::before layer, same bug
+   family as index.html's .galArtTwinkle (see that file's CSS comment);
+   replaced with a real per-star canvas (#snapStarCanvas below, drawn by
+   initTwinkleStars() in the script) so each dot gets its own random
+   position, size, colour and brightness instead of a uniform tiled grid. */
+.snapStarCanvas{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:0}
+/* Fade-to-dark behind the bottom rows (labels/stat-bar/watermark) so they
+   stay legible over the real galaxy art now sitting behind everything --
+   that art's own circle can be bright enough near its centre/lower edge to
+   wash out plain text otherwise (Tony: "words on the bottom are hidden by
+   the galaxy map"). Sits above the art (z-index:0, later in DOM than the
+   canvas so it wins ties at that stacking level) but below the actual text
+   (.inner is z-index:1, always on top regardless of DOM order). */
+.snapBottomFade{position:absolute;left:0;right:0;bottom:0;height:46%;background:linear-gradient(rgba(4,10,20,0) 0%,rgba(4,10,20,.55) 45%,rgba(4,10,20,.9) 100%);pointer-events:none;z-index:0}
+/* Real galaxy art (2026-08-29): a canvas rendering of the same seeded,
+   type-coloured galaxy the live Galactic Map draws for its rotating mini
+   icon (drawRealGalaxyArt() below, ported from preview.html's
+   drawGalIcon()) -- replaces the old flat, always-blue tilted-disc
+   gradient with the journey's actual galaxy, real shape and colours. */
+.snapGalaxyArt{position:absolute;left:50%;top:56%;width:88%;max-width:360px;aspect-ratio:1/1;transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;display:block}
+.snapPreview .inner{position:relative;z-index:1}
+.snapGalaxyTag{font-family:'Orbitron',sans-serif;font-size:8px;letter-spacing:.14em;color:var(--cyan-dim);background:rgba(4,10,20,.6);border:1px solid var(--border-soft);border-radius:6px;padding:4px 8px;display:inline-block;margin-bottom:6px}
+.snapRouteWrap{position:relative;height:150px;margin:2px 0 4px}
+.snapRouteSvg{position:absolute;inset:0;width:100%;height:100%}
+.snapRouteSvg polyline{fill:none;stroke:var(--cyan-dim);stroke-width:.7;stroke-dasharray:2 1.6;opacity:.9;vector-effect:non-scaling-stroke}
+.snapPt{position:absolute;width:8px;height:8px;border-radius:50%;background:var(--cyan-dim);transform:translate(-50%,-50%);box-shadow:0 0 6px var(--cyan-dim)}
+.snapPt.start{width:12px;height:12px;background:#3ee06a;box-shadow:0 0 10px #3ee06a}
+.snapPt.end{width:12px;height:12px;background:var(--gold);box-shadow:0 0 10px var(--gold)}
+.snapPt.bh{background:#000;border:1px solid var(--magenta);box-shadow:0 0 10px var(--magenta)}
+/* Text-shadow added (2026-08-29) so these labels stay legible over the real
+   galaxy art now behind them -- it's brighter and busier than the old flat
+   gradient it replaced. */
+.snapLabels{display:flex;justify-content:space-between;font-family:'Orbitron',sans-serif;font-size:9px;color:var(--text-dim);margin-top:6px;text-shadow:0 1px 4px rgba(0,0,0,.85),0 0 10px rgba(0,0,0,.6)}
+.snapLabels b{display:block;color:#eaf6ff;font-size:10px}
+.snapLabels .start-lbl{color:#3ee06a}
+.snapLabels .end-lbl{color:var(--gold);text-align:right}
+.snapStatBar{display:flex;justify-content:center;gap:10px;margin-top:14px;font-family:'Orbitron',sans-serif;font-size:10px;color:var(--text-dim);letter-spacing:.03em;flex-wrap:wrap;text-shadow:0 1px 4px rgba(0,0,0,.85)}
+.snapBhNote{margin-top:10px;font-size:9.5px;color:var(--magenta);text-align:center;letter-spacing:.02em;text-shadow:0 1px 4px rgba(0,0,0,.85)}
+.snapWatermark{margin-top:14px;text-align:center;font-size:8px;letter-spacing:.18em;color:var(--cyan-dim);font-family:'Orbitron',sans-serif;text-shadow:0 1px 4px rgba(0,0,0,.85)}
+
+.snapActions{display:flex;gap:8px;margin-top:18px}
+.snapActions button{flex:1;padding:12px;border-radius:var(--r);font-size:10px;font-weight:700;letter-spacing:.03em;font-family:'Orbitron',sans-serif;background:var(--panel,rgba(255,255,255,.035));border:1px solid var(--border-soft);color:var(--text);cursor:pointer}
+.snapActions button:hover{border-color:var(--cyan);color:var(--cyan)}
+
+/* ---- NMS design-system background atmosphere (grid/orbs/scanlines/vignette) ---- */
+.grid-bg{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(0,229,255,0.035) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,0.035) 1px,transparent 1px);background-size:64px 64px;mask-image:radial-gradient(ellipse 80% 60% at 50% 0%,#000 30%,transparent 80%);animation:gridMove 22s linear infinite}
+@keyframes gridMove{to{background-position:64px 64px}}
+.orb{position:fixed;border-radius:50%;filter:blur(90px);pointer-events:none;z-index:0}
+.orb-a{width:520px;height:520px;top:-160px;left:-140px;background:rgba(0,229,255,0.07)}
+.orb-b{width:440px;height:440px;top:-80px;right:-120px;background:rgba(240,165,0,0.06)}
+.orb-c{width:620px;height:620px;bottom:-260px;left:28%;background:rgba(0,229,255,0.04)}
+.scanlines{position:fixed;inset:0;z-index:9998;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.05) 2px,rgba(0,0,0,0.05) 4px);mix-blend-mode:multiply}
+.vignette{position:fixed;inset:0;z-index:9997;pointer-events:none;box-shadow:inset 0 0 220px rgba(0,0,0,0.7)}
+body.no-fx .grid-bg,body.no-fx .scanlines{animation:none;display:none}
+body.no-fx .orb{display:none}
+@media (prefers-reduced-motion:reduce){.grid-bg,.scanlines{animation:none}}
+</style>
+</head>
+<body>
+  <div class="grid-bg"></div>
+  <div class="orb orb-a"></div>
+  <div class="orb orb-b"></div>
+  <div class="orb orb-c"></div>
+  <div class="scanlines"></div>
+  <div class="vignette"></div>
+
+<div class="mockBanner" id="mockBanner"><b>WORK IN PROGRESS</b><span id="mockBannerText">Sample data only — not yet connected to the live Galactic Map</span></div>
+<main class="card">
+  <video class="videoHero" autoplay muted loop playsinline poster="assets/video/journey-complete-diamond-poster.jpg">
+    <source src="assets/video/journey-complete-diamond.mp4" type="video/mp4">
+  </video>
+  <div class="eyebrow">JOURNEY COMPLETE</div>
+  <h1 id="destTitle">Destination Reached</h1>
+  <p class="sub" id="summarySub">The planned journey is complete.</p>
+  <div class="stats">
+    <div><small>TOTAL JUMPS</small><strong id="statJumps">&mdash;</strong></div>
+    <div><small>TOTAL DISTANCE</small><strong id="statDist">&mdash;</strong></div>
+    <div><small>TIME TAKEN</small><strong id="statTime">&mdash;</strong></div>
+  </div>
+  <div id="replanBox" style="display:none" class="replan"><b style="color:var(--magenta)">OFF PLANNED ROUTE</b> — this journey included an unconfirmed black-hole emergence, so the real Navigator would have recalculated the route partway through.</div>
+  <div class="actions">
+    <button id="viewMap">VIEW ON GALACTIC MAP</button>
+    <button onclick="location.href='./index.html'">PLAN ANOTHER JOURNEY</button>
+    <button class="snap" id="openSnap">SEE YOUR JOURNEY AS A SNAPSHOT</button>
+  </div>
+</main>
+
+<div class="modalOverlay" id="snapOverlay">
+  <div class="modal">
+    <button class="closeModal" id="closeSnap">&times;</button>
+    <span class="eyebrow">JOURNEY SNAPSHOT</span>
+    <h2>Capture your journey</h2>
+    <p class="hint">A shareable image generated from this journey's own route data — nothing invented, no black-hole exit guessed.</p>
+
+    <div class="polaroidFrame" id="polaroidFrame">
+      <div class="snapPreview" id="snapPreview">
+        <div class="shutterFlash" id="shutterFlash"></div>
+        <canvas class="snapStarCanvas" id="snapStarCanvas"></canvas>
+        <canvas class="snapGalaxyArt" id="snapGalaxyArt"></canvas>
+        <div class="snapBottomFade"></div>
+        <div class="inner">
+          <span class="snapGalaxyTag" id="snapGalaxy">GALAXY</span>
+          <div class="snapRouteWrap" id="snapRouteWrap"><div class="snapRouteSvg" id="snapRouteSvg"></div><div id="snapRoutePts"></div></div>
+          <div class="snapLabels">
+            <div class="start-lbl">START<b id="snapStart">&mdash;</b></div>
+            <div class="end-lbl">DESTINATION<b id="snapEnd">&mdash;</b></div>
+          </div>
+          <div class="snapStatBar">
+            <span id="snapJumps">&mdash;</span><span>&bull;</span><span id="snapDist">&mdash;</span><span id="snapTimeSep">&bull;</span><span id="snapTime"></span>
+          </div>
+          <div class="snapBhNote" id="snapBhNote" style="display:none">Includes an unpredictable black-hole exit — route shown as planned, not guaranteed.</div>
+          <div class="snapWatermark">NMS GALACTIC MAP — GALACTIC NAVIGATOR</div>
+        </div>
+      </div>
+      <div class="polaroidCaption">Snapshot of Your NMS Journey</div>
+      <div class="polaroidSubCaption" id="polaroidSubCaption">&mdash;</div>
+    </div>
+
+    <div class="snapActions">
+      <button id="saveImage">SAVE IMAGE</button>
+      <button id="shareImage">SHARE</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+(function(){
+  var GALAXY_NAMES = ["Euclid","Hilbert Dimension","Calypso","Hesperius Dyson Sphere","Hyades","Ickjamatew","Budullangr","Kikolgallr","Eltiensleen","Eissentam"];
+
+  /* ---- real galaxy art (2026-08-29) -- ported from preview.html's
+     drawGalIcon(); same algorithm as navigator/index.html's copy (kept as
+     its own copy here since this file has no shared script include). ---- */
+  var GALAXY_TYPES_STR="NNHNNNENNLNENNHNNNLNNNHNNNENNLNENNHNNNLNNNHNNNENNLNENNHNNNLNNNHNNNENNLNENNHNNNLNNNHNNNENNLNENNHNNNLNNNHNNNENNLNENNHNNNLNNNHNNNENNLNENNHNNNLNNNHNNNENNLNENNHNNNLNNNHNNNENNLNENNHNNNLNNNHNNNENNLNENNHNNNLNNNHNNNENNLNENNH";
+  function mulberry32(a) {
+    return function () {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      var t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function galaxyTypeKey(n) {
+    if (n == null || isNaN(n)) return "Norm";
+    var code = GALAXY_TYPES_STR[((n % GALAXY_TYPES_STR.length) + GALAXY_TYPES_STR.length) % GALAXY_TYPES_STR.length];
+    return code === "E" ? "Empty" : code === "H" ? "Harsh" : code === "L" ? "Lush" : "Norm";
+  }
+  function drawRealGalaxyArt(canvas, galaxyNum, opts) {
+    if (!canvas) return "Norm";
+    opts = opts || {};
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var cssW = canvas.clientWidth || 300, cssH = canvas.clientHeight || 300;
+    canvas.width = Math.max(1, Math.round(cssW * dpr));
+    canvas.height = Math.max(1, Math.round(cssH * dpr));
+    var ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    var k = galaxyTypeKey(galaxyNum);
+    var inner = k === "Harsh" ? [0xff6a3d, 0xff4a2a, 0xffab5c] :
+                k === "Lush" ? [0xc8ff9a, 0xa8ff7a, 0xe8ffcb] :
+                k === "Empty" ? [0xcfe0f5, 0xaac0e0, 0xe8f0ff] :
+                                [0xffb347, 0xff8a3d, 0xffd88a];
+    var mid = k === "Harsh" ? [0xd94f2f, 0xb03a2a, 0xe07a3a, 0xd9662a] :
+              k === "Lush" ? [0x3fd97a, 0x2f9e5a, 0x5ad98a, 0x2a9e7a] :
+              k === "Empty" ? [0x3a6fb0, 0x2a4f80, 0x4a8fd0, 0x2f5f9a] :
+                              [0x2fd9c0, 0x1f9e8f, 0x3ad1a0, 0x2a8fd9];
+    var outer = k === "Harsh" ? [0x6a1f10, 0x8a2f18, 0x4a1a0c, 0x7a2510] :
+                k === "Lush" ? [0x2a8f5a, 0x1f6f45, 0x3aab6a, 0x256e50] :
+                k === "Empty" ? [0x3a5a80, 0x2a4560, 0x4a6a90, 0x35506f] :
+                                [0x4a6bd9, 0x7a4ad9, 0x9a5ad0, 0x3a4a9a];
+    var coreCol = k === "Harsh" ? 0xffd8b0 : k === "Lush" ? 0xf0ffd8 :
+                  k === "Empty" ? 0xd8e8ff : 0xfff0c8;
+    function hx(n) { return "#" + ("000000" + n.toString(16)).slice(-6); }
+    var W = canvas.width, H = canvas.height;
+    var REF = 168; // preview.html's own galIcon canvas size -- rendering in
+                   // this fixed logical space keeps blob density/size looking
+                   // like that real icon at any output resolution.
+    ctx.save();
+    ctx.scale(W / REF, H / REF);
+    var cx = REF / 2, cy = REF / 2, R = REF * 0.47 * (opts.zoom || 1);
+    var seedBase = (typeof galaxyNum === "number" && !isNaN(galaxyNum)) ? galaxyNum : 0;
+    var r = mulberry32(0x51EB7A + seedBase * 7919);
+    var arms = 4, tw = 3.6;
+    ctx.globalCompositeOperation = "lighter";
+    var N = Math.round(REF * 0.9 * (opts.density || 1));
+    for (var i = 0; i < N; i++) {
+      var t = Math.pow(r(), 0.55);
+      var arm = Math.floor(r() * arms);
+      var ang = arm * (Math.PI * 2 / arms) + t * tw + (r() + r() + r() - 1.5) * 0.7;
+      var rad = t * R;
+      var px = cx + Math.cos(ang) * rad, py = cy + Math.sin(ang) * rad * 0.62;
+      var pal = (t < 0.16) ? inner : ((t < 0.62) ? mid : outer);
+      var col = hx(pal[Math.floor(r() * pal.length)]);
+      var bs = (REF * 0.05) + r() * REF * 0.11;
+      var g = ctx.createRadialGradient(px, py, 0, px, py, bs);
+      g.addColorStop(0, col); g.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.globalAlpha = 0.32 + r() * 0.34;
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(px, py, bs, 0, Math.PI * 2); ctx.fill();
+    }
+    var cg = ctx.createRadialGradient(cx, cy, 0, cx, cy, REF * 0.16);
+    cg.addColorStop(0, hx(coreCol)); cg.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.globalAlpha = 0.95;
+    ctx.fillStyle = cg;
+    ctx.beginPath(); ctx.arc(cx, cy, REF * 0.16, 0, Math.PI * 2); ctx.fill();
+    ctx.globalAlpha = 1; ctx.globalCompositeOperation = "source-over";
+    ctx.restore();
+    return k;
+  }
+
+  // Real wall-clock duration only — never a fabricated time-of-flight estimate.
+  function formatDuration(ms) {
+    if (ms == null || ms < 0) return null;
+    var totalSec = Math.round(ms / 1000);
+    if (totalSec < 60) return totalSec + "s";
+    var min = Math.floor(totalSec / 60);
+    var sec = totalSec % 60;
+    if (min < 60) return min + "m " + sec + "s";
+    var hr = Math.floor(min / 60);
+    return hr + "h " + (min % 60) + "m";
+  }
+
+  // Builds the diagonal "offset angle" route strip: a dashed SVG line plus
+  // absolutely-positioned dots, drawn from this journey's own real jump
+  // list — the shape is decorative, the stops and order are not invented.
+  //
+  // Fix (2026-08-29): the old version placed points in an independent
+  // rectangle (14-86% x, 84-16% y of #snapRouteWrap) that had no relationship
+  // to where the real galaxy-art circle actually renders -- so the
+  // destination (always at t=1, the rectangle's own corner) could land in
+  // the black area OUTSIDE the visible nebula (Tony: "the destination star
+  // is outside the map, should never be"). Fixed by measuring the real
+  // circle's on-screen position (getBoundingClientRect, same "measure,
+  // don't guess" approach used throughout this project) and mapping every
+  // point -- including the endpoints -- into an ellipse safely inscribed
+  // inside it, so the whole route always stays over the nebula regardless
+  // of exact card size/zoom/font-loading timing.
+  function buildRoute(jl) {
+    var n = jl.length;
+    if (!n) { n = 2; jl = [{ systemName: "" }, { systemName: "" }]; }
+
+    var wrap = document.getElementById("snapRouteWrap");
+    var art = document.getElementById("snapGalaxyArt");
+    var wRect = wrap.getBoundingClientRect();
+    var aRect = art.getBoundingClientRect();
+    // Circle centre + radius, expressed as percentages of the route wrap's
+    // own box (so results can plug straight into the existing left/top %
+    // positioning below) -- falls back to a sane centred default if either
+    // box isn't laid out yet (zero size), rather than producing NaN.
+    var cxPct = 50, cyPct = 50, rxPct = 42, ryPct = 42;
+    if (wRect.width > 0 && wRect.height > 0 && aRect.width > 0 && aRect.height > 0) {
+      cxPct = ((aRect.left + aRect.width / 2) - wRect.left) / wRect.width * 100;
+      cyPct = ((aRect.top + aRect.height / 2) - wRect.top) / wRect.height * 100;
+      rxPct = (aRect.width / 2) / wRect.width * 100;
+      ryPct = (aRect.height / 2) / wRect.height * 100;
+    }
+    // drawRealGalaxyArt() paints its spiral out to radius R = REF*0.47 of a
+    // REFxREF logical square (REF/2 = the canvas's own half-width) and, on
+    // top of that, compresses every blob's Y position by 0.62 (py = cy +
+    // sin(ang)*rad*0.62) to make the nebula read as a tilted disc rather
+    // than a sphere -- so the real painted glow is a much flatter ELLIPSE
+    // well inside the canvas's own circular CSS mask, not the full circle
+    // rxPct/ryPct describe above. The old uniform MARGIN=0.62 only guarded
+    // against the corners' sqrt(2) diagonal distance -- it never accounted
+    // for the glow itself being far smaller than the mask, which is why
+    // the destination/start dots (sitting exactly at those corners) still
+    // rendered outside the visible art. Confirmed empirically via a
+    // headless render + pixel brightness scan (2026-08-29): the glow's
+    // real edge sits at ~94% of the mask's radius horizontally but only
+    // ~58% of it vertically -- matching R/(REF/2)=0.94 and 0.94*0.62=0.583
+    // exactly. Shrinking rx/ry to those real fractions (with a small
+    // safety margin) is what keeps every point, corners included, over
+    // the visible art instead of in the dark ring outside it.
+    // A second real bug beyond the ellipse-size one above: the OLD box-corner
+    // parametrisation (nx=-1+2t, ny=1-2t) puts each endpoint at BOTH axis
+    // extremes at once (+-1,+-1) -- the corner of the ellipse's own bounding
+    // RECTANGLE, not a point on the ellipse itself. That corner sits
+    // sqrt(2)=~1.414x further from centre than the ellipse boundary in that
+    // direction, which is exactly why the destination/start still rendered
+    // outside the glow even after the size fix above. Fixed by tracing an
+    // actual bounded arc instead: theta sweeps from the lower-left corner
+    // (135 deg) to the upper-right corner (-45 deg) as t goes 0..1, and
+    // nx=cos(theta)*mag, ny=sin(theta)*mag always has nx^2+ny^2 <= mag^2, so
+    // the scaled point is mathematically guaranteed inside the (rxPct,ryPct)
+    // ellipse -- no corner overshoot possible, regardless of card size.
+    //
+    // ROUTE_RX_FRAC/ROUTE_RY_FRAC then shrink that ellipse further inward
+    // from the glow's own outer edge (NEBULA_RX_FRAC/NEBULA_RY_FRAC above):
+    // the spiral is 4 arms of randomly-placed blobs, not a filled disc, so
+    // the true bright/dark boundary is ragged and rotates differently for
+    // every galaxy seed -- verified via a headless render + angular
+    // brightness scan (2026-08-29) that real bright coverage along this
+    // route's own diagonal ranges roughly 0.6-0.86 of the glow ellipse
+    // across sampled angles/seeds. Landing the route's own corners around
+    // 0.6 of that keeps them solidly inside dense material (the always-
+    // bright core plus inner spiral) instead of hugging the ragged outer
+    // edge where a different galaxy's arm rotation could leave a gap.
+    // (NEBULA_RX_FRAC/NEBULA_RY_FRAC = ~0.90/0.52 describe the glow's own
+    // outer edge, per the comment above; ROUTE_RX_FRAC/ROUTE_RY_FRAC below
+    // are the smaller, already-shrunk-in values actually used.)
+    var ROUTE_RX_FRAC = 0.56, ROUTE_RY_FRAC = 0.34;
+    rxPct *= ROUTE_RX_FRAC;
+    ryPct *= ROUTE_RY_FRAC;
+
+    var pts = jl.map(function (j, i) {
+      var t = n > 1 ? i / (n - 1) : 0;
+      var thetaDeg = 135 - 180 * t;          // lower-left (start) .. upper-right (destination)
+      var theta = thetaDeg * Math.PI / 180;
+      var mag = 1 - 0.30 * Math.sin(t * Math.PI); // gentle inward bow at the midpoint, never > 1
+      var nx = Math.cos(theta) * mag;
+      var ny = Math.sin(theta) * mag;
+      var x = cxPct + nx * rxPct;
+      var y = cyPct + ny * ryPct;
+      return { x: x, y: y, j: j, i: i };
+    });
+    var lineStr = pts.map(function (p) { return p.x.toFixed(1) + "," + p.y.toFixed(1); }).join(" ");
+    document.getElementById("snapRouteSvg").innerHTML =
+      '<svg viewBox="0 0 100 100" preserveAspectRatio="none" style="width:100%;height:100%">' +
+      '<polyline points="' + lineStr + '"/></svg>';
+    document.getElementById("snapRoutePts").innerHTML = pts.map(function (p) {
+      var cls = "snapPt";
+      if (p.i === 0) cls += " start";
+      else if (p.i === n - 1) cls += " end";
+      else if (p.j.isBlackHole) cls += " bh";
+      return '<span class="' + cls + '" style="left:' + p.x.toFixed(1) + '%;top:' + p.y.toFixed(1) + '%" title="' + (p.j.systemName || "") + '"></span>';
+    }).join("");
+  }
+
+  /* ---- twinkling starfield behind the galaxy art (2026-08-29 rework) --
+     replaces the old flat, regularly-tiled .snapPreview::before dot-grid
+     with a real per-star canvas: random position/size/colour/brightness,
+     each on its own independent twinkle timer, same spirit as the live
+     Galactic Map's own per-star twinkle shader (preview.html) and the
+     matching rework in this mock's index.html (see that file's
+     .galArtTwinkle CSS comment for the fuller writeup). Runs its own light
+     rAF loop, throttled since a gentle twinkle doesn't need 60fps, and
+     freezes at each star's base brightness under reduced-motion. ---- */
+  var TWINKLE_COLOURS = ["#ffffff", "#ffffff", "#ffffff", "#cfe0ff", "#fff3cf", "#ffd8cf"];
+  // A few bright stars get a soft glow + diffraction-spike cross, like the
+  // brightest points in real deep-sky photography (Tony's reference
+  // images) -- kept to their own smaller palette so they read as
+  // genuinely brighter, not just another random dot colour.
+  var FLARE_COLOURS = ["#ffffff", "#eaf2ff", "#fff6df"];
+  function hexA(hex, a) {
+    var v = parseInt(hex.slice(1), 16);
+    return "rgba(" + ((v >> 16) & 255) + "," + ((v >> 8) & 255) + "," + (v & 255) + "," + a + ")";
+  }
+  function makeTwinkleStars(cssW, cssH) {
+    var area = Math.max(1, cssW * cssH);
+    var n = Math.min(160, Math.max(30, Math.round(area / 1600)));
+    var stars = [];
+    for (var i = 0; i < n; i++) {
+      // Depth tiers give the field real near/far variety instead of every
+      // star reading the same size and distance: far stars are small/dim
+      // and most common, near stars are bigger/brighter and rarer -- this
+      // is what makes a starfield read as three-dimensional, matching
+      // Tony's reference space photography rather than a flat dot pattern.
+      var roll = Math.random();
+      var rMin, rMax, aMin, aMax;
+      if (roll < 0.58) { rMin = 0.3; rMax = 0.65; aMin = 0.18; aMax = 0.4; } // far
+      else if (roll < 0.88) { rMin = 0.65; rMax = 1.15; aMin = 0.38; aMax = 0.62; } // mid
+      else { rMin = 1.15; rMax = 1.9; aMin = 0.6; aMax = 0.9; } // near
+      stars.push({
+        x: Math.random() * cssW,
+        y: Math.random() * cssH,
+        r: rMin + Math.random() * (rMax - rMin),
+        col: TWINKLE_COLOURS[Math.floor(Math.random() * TWINKLE_COLOURS.length)],
+        base: aMin + Math.random() * (aMax - aMin),
+        phase: Math.random() * Math.PI * 2,
+        period: 2200 + Math.random() * 4600, // ms per full twinkle cycle -- varies per star so they never pulse in lockstep
+        flare: false
+      });
+    }
+    // A handful of flare stars on top of the normal field -- deliberately
+    // sparse, a whole field of these would look busy/fake rather than real.
+    var flareCount = Math.min(5, Math.max(1, Math.round(n / 45)));
+    for (var f = 0; f < flareCount; f++) {
+      stars.push({
+        x: Math.random() * cssW,
+        y: Math.random() * cssH,
+        r: 1.5 + Math.random() * 1.0,
+        col: FLARE_COLOURS[Math.floor(Math.random() * FLARE_COLOURS.length)],
+        base: 0.78 + Math.random() * 0.2,
+        phase: Math.random() * Math.PI * 2,
+        period: 3200 + Math.random() * 5200,
+        flare: true,
+        spike: 9 + Math.random() * 10 // diffraction-spike half-length in px
+      });
+    }
+    return stars;
+  }
+  // Draws one star -- a plain dot for the normal field, or a soft glow +
+  // cross-shaped diffraction spike for a "flare" star. The spike is two
+  // strokes through the centre (each covers both directions at once), so
+  // it stays cheap even though only a handful of stars ever use it.
+  function drawTwinkleStar(ctx, s, alpha) {
+    if (!s.flare) {
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = s.col;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fill();
+      return;
+    }
+    var spike = s.spike;
+    var glow = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, spike * 0.85);
+    glow.addColorStop(0, hexA(s.col, 1));
+    glow.addColorStop(0.35, hexA(s.col, 0.45));
+    glow.addColorStop(1, hexA(s.col, 0));
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = glow;
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, spike * 0.85, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.globalAlpha = alpha * 0.85;
+    ctx.lineWidth = 0.6;
+    [0, Math.PI / 2].forEach(function (rot) {
+      var dx = Math.cos(rot) * spike, dy = Math.sin(rot) * spike;
+      var g = ctx.createLinearGradient(s.x - dx, s.y - dy, s.x + dx, s.y + dy);
+      g.addColorStop(0, hexA(s.col, 0));
+      g.addColorStop(0.5, hexA(s.col, 0.9));
+      g.addColorStop(1, hexA(s.col, 0));
+      ctx.strokeStyle = g;
+      ctx.beginPath();
+      ctx.moveTo(s.x - dx, s.y - dy);
+      ctx.lineTo(s.x + dx, s.y + dy);
+      ctx.stroke();
+    });
+
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = hexA(s.col, 1);
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  function initTwinkleStars(canvas) {
+    if (!canvas || canvas._twinkleInit) return;
+    canvas._twinkleInit = true;
+    var ctx = canvas.getContext("2d");
+    var stars = [];
+    var lastDraw = 0;
+    var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    function sized() {
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      var cssW = canvas.clientWidth || 1, cssH = canvas.clientHeight || 1;
+      canvas.width = Math.max(1, Math.round(cssW * dpr));
+      canvas.height = Math.max(1, Math.round(cssH * dpr));
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      stars = makeTwinkleStars(cssW, cssH);
+    }
+    function draw(t) {
+      var cssW = canvas.clientWidth || 1, cssH = canvas.clientHeight || 1;
+      ctx.clearRect(0, 0, cssW, cssH);
+      for (var i = 0; i < stars.length; i++) {
+        var s = stars[i];
+        var alpha = s.base;
+        if (!reduced) {
+          var wave = 0.5 + 0.5 * Math.sin((t / s.period) * Math.PI * 2 + s.phase);
+          alpha = s.base * (0.4 + 0.6 * wave);
+        }
+        drawTwinkleStar(ctx, s, alpha);
+      }
+      ctx.globalAlpha = 1;
+    }
+    sized();
+    draw(0);
+    if (!reduced) {
+      (function loop(t) {
+        if (t - lastDraw > 90) { lastDraw = t; draw(t); }
+        canvas._twinkleRAF = requestAnimationFrame(loop);
+      })(0);
+    }
+  }
+
+  var raw = null;
+  try { raw = JSON.parse(sessionStorage.getItem("nms-navigator-mock-complete") || "null"); } catch(e){}
+
+  // Top WORK IN PROGRESS strip: say plainly when this postcard is built
+  // from a real plotted route (index.html's PLAN JOURNEY hand-off) rather
+  // than the built-in sample, so a visitor doesn't read "sample data"
+  // while looking at their own real journey. 2026-08-29.
+  (function () {
+    var bannerText = document.getElementById("mockBannerText");
+    if (bannerText && raw && raw.isLivePlot) {
+      bannerText.textContent = "Showing your real plotted route from the live map";
+    }
+  })();
+
+  if (raw) {
+    document.getElementById("destTitle").textContent = raw.destination.systemName + " Reached";
+    document.getElementById("summarySub").textContent = raw.label + " — from " + raw.origin.systemName + " to " + raw.destination.systemName + ".";
+    document.getElementById("statJumps").textContent = raw.totalJumps;
+    var distText = (raw.totalDistance === 0 ? "< 1 region" : raw.totalDistance.toLocaleString() + " LY");
+    document.getElementById("statDist").textContent = distText;
+    var timeText = formatDuration(raw.elapsedMs);
+    document.getElementById("statTime").textContent = timeText || "—";
+    if (raw.needsReplan) document.getElementById("replanBox").style.display = "block";
+
+    var galaxyIdx = raw.galaxy != null ? raw.galaxy : 0;
+    // Prefer the real galaxy name handed off from the live map itself; only
+    // fall back to the small local sample list (or a bare numeric label)
+    // when this journey never carried a real one.
+    var galaxyName = raw.galaxyName || GALAXY_NAMES[galaxyIdx] || ("Galaxy " + galaxyIdx);
+    document.getElementById("snapGalaxy").textContent = (galaxyName || "EUCLID").toUpperCase() + " GALAXY";
+    drawRealGalaxyArt(document.getElementById("snapGalaxyArt"), galaxyIdx);
+    document.getElementById("snapStart").textContent = raw.origin.systemName;
+    document.getElementById("snapEnd").textContent = raw.destination.systemName;
+    document.getElementById("snapJumps").textContent = raw.totalJumps + " JUMPS";
+    document.getElementById("snapDist").textContent = distText.toUpperCase();
+    if (timeText) {
+      document.getElementById("snapTime").textContent = timeText.toUpperCase();
+    } else {
+      document.getElementById("snapTimeSep").style.display = "none";
+    }
+
+    var jl = raw.jumps || [];
+    var hasBH = jl.some(function(j){ return j.isBlackHole; });
+    if (hasBH) document.getElementById("snapBhNote").style.display = "block";
+
+    buildRoute(jl);
+
+    // Real trip stats under the caption, like a handwritten note under a
+    // physical Polaroid (Tony: "no information of your journey is below
+    // the caption") -- same numbers already shown inside the photo itself,
+    // just also readable at a glance without opening the image.
+    var subParts = [raw.totalJumps + (raw.totalJumps === 1 ? " JUMP" : " JUMPS"), distText];
+    if (timeText) subParts.push(timeText);
+    document.getElementById("polaroidSubCaption").textContent = subParts.join(" \u00b7 ");
+  }
+
+  initTwinkleStars(document.getElementById("snapStarCanvas"));
+
+  document.getElementById("viewMap").onclick = function(){
+    location.href = "./map-mock.html";
+  };
+
+  function toast(msg){
+    var t = document.createElement("div");
+    t.textContent = msg;
+    t.style.cssText = "position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:#0b1119;border:1px solid #00e5ff;color:#eaf6ff;padding:10px 16px;border-radius:8px;font-size:12px;z-index:50;box-shadow:0 4px 20px rgba(0,0,0,.5)";
+    document.body.appendChild(t);
+    setTimeout(function(){ t.remove(); }, 3000);
+  }
+
+  // Real camera shutter+flash sound (freesound_community, CC0/free-use —
+  // dropped in by Tony). Falls back to the old synthesised click if the
+  // audio file can't load/play (offline edge cases, autoplay policy, etc.)
+  // so this still degrades gracefully like everything else in this mock.
+  var shutterAudio = new Audio("./assets/audio/camera-shutter.mp3");
+  shutterAudio.preload = "auto";
+  shutterAudio.volume = 0.85;
+
+  function playShutterSoundSynth() {
+    try {
+      var Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return;
+      var ctx = new Ctx();
+      var now = ctx.currentTime;
+      var click = ctx.createOscillator(), clickGain = ctx.createGain();
+      click.type = "square";
+      click.frequency.setValueAtTime(1900, now);
+      click.frequency.exponentialRampToValueAtTime(240, now + 0.05);
+      clickGain.gain.setValueAtTime(0.16, now);
+      clickGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.09);
+      click.connect(clickGain); clickGain.connect(ctx.destination);
+      click.start(now); click.stop(now + 0.1);
+      var thud = ctx.createOscillator(), thudGain = ctx.createGain();
+      thud.type = "sine";
+      thud.frequency.setValueAtTime(150, now + 0.07);
+      thudGain.gain.setValueAtTime(0.11, now + 0.07);
+      thudGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.17);
+      thud.connect(thudGain); thudGain.connect(ctx.destination);
+      thud.start(now + 0.07); thud.stop(now + 0.19);
+      setTimeout(function () { try { ctx.close(); } catch (e) {} }, 400);
+    } catch (e) {}
+  }
+
+  function playShutterSound() {
+    try {
+      shutterAudio.currentTime = 0;
+      var p = shutterAudio.play();
+      if (p && typeof p.catch === "function") {
+        p.catch(function () { playShutterSoundSynth(); });
+      }
+    } catch (e) {
+      playShutterSoundSynth();
+    }
+  }
+
+  // The shutter recording (assets/audio/camera-shutter.mp3) isn't just a
+  // click — it's ~1s of camera-raise/anticipation before the actual
+  // click+flash hits (confirmed by measuring its amplitude envelope: the
+  // audible transient peaks around 1.0-1.3s in, not at 0:00). So the photo
+  // reveal is timed to that real moment, not to when the modal opens —
+  // sound (and a matching visual flash) first, picture after, like an
+  // actual camera.
+  var SHUTTER_CLICK_DELAY_MS = 1000;
+  var revealTimer = null;
+  function openModal(){
+    document.getElementById("snapOverlay").classList.add("show");
+    var frame = document.getElementById("polaroidFrame");
+    var flash = document.getElementById("shutterFlash");
+    clearTimeout(revealTimer);
+    frame.classList.remove("pop");
+    frame.classList.add("pending"); // invisible until the click+flash moment
+    flash.classList.remove("flash");
+    playShutterSound();
+    revealTimer = setTimeout(function () {
+      flash.classList.remove("flash");
+      void flash.offsetWidth; // restart the flash animation
+      flash.classList.add("flash");
+      frame.classList.remove("pending");
+      void frame.offsetWidth; // restart the pop animation every time the modal opens
+      frame.classList.add("pop");
+    }, SHUTTER_CLICK_DELAY_MS);
+  }
+  function closeModal(){ clearTimeout(revealTimer); document.getElementById("snapOverlay").classList.remove("show"); }
+  document.getElementById("openSnap").onclick = openModal;
+  document.getElementById("closeSnap").onclick = closeModal;
+  document.getElementById("snapOverlay").addEventListener("click", function(e){
+    if (e.target === document.getElementById("snapOverlay")) closeModal();
+  });
+  document.addEventListener("keydown", function(e){ if (e.key === "Escape") closeModal(); });
+
+  function captureSnapshot(cb) {
+    if (typeof html2canvas === "undefined") { toast("Snapshot renderer failed to load (offline?)."); return; }
+    html2canvas(document.getElementById("snapPreview"), { backgroundColor: "#070b11", scale: 2 }).then(cb);
+  }
+
+  document.getElementById("saveImage").onclick = function () {
+    captureSnapshot(function (canvas) {
+      var a = document.createElement("a");
+      a.download = "nms-journey-snapshot.png";
+      a.href = canvas.toDataURL("image/png");
+      a.click();
+      toast("Snapshot saved.");
+    });
+  };
+
+  document.getElementById("shareImage").onclick = function () {
+    captureSnapshot(function (canvas) {
+      canvas.toBlob(function (blob) {
+        if (!blob) { toast("Could not generate image."); return; }
+        var file = new File([blob], "nms-journey-snapshot.png", { type: "image/png" });
+        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+          navigator.share({ files: [file], title: "My No Man's Sky journey" }).catch(function(){});
+        } else {
+          var a = document.createElement("a");
+          a.download = "nms-journey-snapshot.png";
+          a.href = canvas.toDataURL("image/png");
+          a.click();
+          toast("Sharing isn't available in this browser — image downloaded instead.");
+        }
+      });
+    });
+  };
+})();
+</script>
+</body>
+</html>
