@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Galactic Navigator — MOCK</title>
+  <title>Galactic Navigator — Work in Progress</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
@@ -114,7 +114,7 @@ details.pickerFold .journeyPicker{padding:0 9px 9px;margin-bottom:0}
 .summary strong{display:block;font-size:17px;margin-top:4px;color:var(--gold);font-family:'Orbitron',sans-serif}
 
 .warpRange{border:1px solid var(--border-soft);background:var(--bg2);padding:11px;margin-top:14px;border-radius:var(--r)}
-.warpRange .rangeHead{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.warpRange .rangeHead{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;row-gap:2px}
 .warpRange label{font-size:8px;letter-spacing:.14em;color:var(--text-faint);font-family:'Orbitron',sans-serif;font-weight:700}
 .warpRange strong{color:var(--gold);font-family:'Orbitron',sans-serif;font-size:11px}
 .warpRange input[type=range]{width:100%;accent-color:var(--gold);height:3px}
@@ -123,8 +123,7 @@ details.pickerFold .journeyPicker{padding:0 9px 9px;margin-bottom:0}
 .warpRangeControls select{flex:1;background:var(--bg);border:1px solid var(--border-soft);color:var(--text);font-size:10px;padding:5px 4px;border-radius:5px;font-family:inherit}
 /* Locked = real ship data pulled from the map at the moment PLAN JOURNEY was
    clicked (2026-08-29) -- not guessed, so not user-editable here. */
-.warpRange.locked .warpRangeControls{display:none}
-.warpRange.locked .rangeHead::after{content:"FROM YOUR SHIP";font-size:7px;letter-spacing:.1em;color:var(--cyan-dim);font-family:'Orbitron',sans-serif}
+.warpRange.locked .rangeHead::after{content:"FROM YOUR SHIP";font-size:7px;letter-spacing:.1em;color:var(--cyan-dim);font-family:'Orbitron',sans-serif;width:100%;text-align:right}
 
 .warning{border-left:2px solid var(--gold-dim);background:var(--bg2);padding:10px;margin-top:16px;font-size:10px;color:var(--text-dim);border-radius:0 var(--r) var(--r) 0}
 .warning b{letter-spacing:.1em;color:var(--gold);font-family:'Orbitron',sans-serif;font-size:9px}
@@ -192,10 +191,11 @@ details.pickerFold .journeyPicker{padding:0 9px 9px;margin-bottom:0}
 
 /* ---- glyph strip (stylised portal-address glyphs) ---- */
 .glyphStrip{display:inline-flex;flex-wrap:wrap;gap:2px}
-.glyph{width:16px;height:18px;display:inline-flex;align-items:center;justify-content:center;clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);font-family:'Orbitron',sans-serif;font-size:8px;font-weight:700}
-.glyphStrip.lg .glyph{width:22px;height:25px;font-size:10px}
+.glyph{width:16px;height:18px;display:inline-flex;align-items:center;justify-content:center}
+.glyph img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 0 3px rgba(0,229,255,.45))}
+.glyphStrip.lg .glyph{width:22px;height:25px}
 .glyphAvatar{width:44px;height:44px;flex:none;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:2px;padding:3px;border:1px solid var(--border-soft);border-radius:var(--r);background:var(--bg2)}
-.glyphAvatar .glyph{width:100%;height:100%;font-size:8px}
+.glyphAvatar .glyph{width:100%;height:100%}
 
 /* ---- manifest jump rows ---- */
 .jumpRow{border-bottom:1px solid var(--border-soft)}
@@ -479,7 +479,8 @@ body.no-fx .orb{display:none}
       </div>
       <div class="title">GALACTIC NAVIGATOR <small>V5 JOURNEY MODE — PROTOTYPE</small></div>
       <div class="right">
-        <span class="status on">&#9679; MOCK DATA LOADED</span>
+        <span class="status on" id="dataStatus">&#9679; SAMPLE DATA LOADED</span>
+        <button id="warpFxToggle" class="ambienceToggle on" type="button" title="Toggle the warp-jump animation on I AM HERE -- on by default, same as the live map. Turn off if it gets repetitive on a long route.">&#9889; WARP FX</button>
         <button id="ambienceToggle" class="ambienceToggle" type="button" title="Toggle a low ambient hum -- synthesized, off by default, only starts when you turn it on.">&#9835; AMBIENCE</button>
       </div>
     </header>
@@ -1234,7 +1235,7 @@ window.MOCK_JOURNEYS = [
     catch (e) { return false; }
   }
   function playHyperspaceJump(cb) {
-    if (reducedMotion()) { cb(); return; }
+    if (reducedMotion() || !warpFxOn) { cb(); return; }
     var ov = $("warpOverlay"), vid = $("warpVid");
     if (!ov || !vid) { cb(); return; }
     var cbFired = false, done = false, failTimer = null;
@@ -1574,7 +1575,6 @@ window.MOCK_JOURNEYS = [
   ];
   function driveLabel(k) { for (var i = 0; i < HYPER_DRIVES.length; i++) if (HYPER_DRIVES[i].k === k) return HYPER_DRIVES[i].label; return "Standard"; }
   var currentDriveKey = "standard";
-  var handoffLocked = false; // real ship data from the map, not user-editable here
 
   // Basic hyperdrive range every save starts with (confirmed against the
   // NMS wiki: 101 LY, not a round 100) -- matches preview.html's own default.
@@ -1830,21 +1830,15 @@ window.MOCK_JOURNEYS = [
     return conflictIcon(t) + outlawIcon + '<span class="conflictBadge ' + cls + '" title="Conflict level: ' + (j.conflict || "—") + (j.outlaw ? " (pirate-controlled)" : "") + '">' + label + "</span>";
   }
 
-  // ---- stylised portal-address glyphs -------------------------------------
-  // Each of the 12 hex characters in a real portal address is rendered as a
-  // small coloured "glyph" tile — the colour is derived from the character's
-  // hex value so the same address always renders the same glyphs. This is a
-  // stylised representation of real address data, not a claim to reproduce
-  // the exact in-game glyph artwork.
-  function glyphHue(ch) {
-    var v = parseInt(ch, 16);
-    if (isNaN(v)) v = 0;
-    return Math.round((v / 15) * 280);
+  // ---- real portal-address glyphs -----------------------------------------
+  // Each of the 12 hex characters in a real portal address is rendered as
+  // the actual in-game glyph icon (same glyphs/glyph-mask-*.png artwork the
+  // live map's keypad and address readouts use), not a stylised stand-in.
+  function glyphSrc(ch) {
+    return "../glyphs/glyph-mask-" + ch.toUpperCase() + ".png";
   }
   function glyphTile(ch) {
-    var hue = glyphHue(ch);
-    var style = "background:hsl(" + hue + ",55%,13%);border:1px solid hsl(" + hue + ",70%,42%);color:hsl(" + hue + ",85%,72%)";
-    return '<span class="glyph" style="' + style + '">' + ch.toUpperCase() + "</span>";
+    return '<span class="glyph"><img alt="' + ch.toUpperCase() + '" src="' + glyphSrc(ch) + '"></span>';
   }
   function glyphStrip(address) {
     return (address || "").split("").map(glyphTile).join("");
@@ -2498,6 +2492,30 @@ window.MOCK_JOURNEYS = [
     if (ambienceOn) startHum(); else stopHum();
   };
 
+  // Warp-jump animation toggle -- mirrors the live map's own "Warp
+  // animation" checkbox (localStorage 'nms-galmap-warp'): on by default,
+  // persists per-browser, and playHyperspaceJump() above just skips
+  // straight to the next system when it's off. Its own key rather than
+  // sharing the map's, since this is a separate page a visitor may want
+  // set differently (e.g. off here because a long multi-hop route gets
+  // repetitive, still on over on the map).
+  var warpFxOn = (function () {
+    try { return localStorage.getItem("nms-navigator-warp") !== "0"; }
+    catch (e) { return true; }
+  })();
+  function updateWarpFxBtn() {
+    var b = $("warpFxToggle");
+    if (!b) return;
+    b.classList.toggle("on", warpFxOn);
+    b.innerHTML = warpFxOn ? "&#9889; WARP FX" : "&#9889; WARP FX OFF";
+  }
+  $("warpFxToggle").onclick = function () {
+    warpFxOn = !warpFxOn;
+    try { localStorage.setItem("nms-navigator-warp", warpFxOn ? "1" : "0"); } catch (e) {}
+    updateWarpFxBtn();
+  };
+  updateWarpFxBtn();
+
   $("resetJourney").onclick = function () {
     session = startJourney(session.id);
     autoOpenedBH = null; autoOpenedEmerge = null;
@@ -2659,6 +2677,10 @@ window.MOCK_JOURNEYS = [
       if (bannerText && session.isLivePlot) {
         bannerText.textContent = "Showing your real plotted route from the live map — some interactions (e.g. black-hole exits) still use placeholder data";
       }
+      var dataStatus = $("dataStatus");
+      if (dataStatus && session.isLivePlot) {
+        dataStatus.innerHTML = "&#9679; LIVE ROUTE LOADED";
+      }
 
       // Real galaxy number + real drive/range, also pulled straight off the
       // map at the moment PLAN JOURNEY was clicked -- same honesty rule as
@@ -2671,9 +2693,14 @@ window.MOCK_JOURNEYS = [
       }
       if (galaxyNameParam) handoffGalaxyName = galaxyNameParam;
       if (driveParam || rangeParam) {
+        // Pre-fill with the real hyperdrive/range your ship had at the
+        // moment PLAN JOURNEY was clicked, but leave the dropdowns live and
+        // editable -- same as a sample journey -- so you can still try a
+        // different drive/range without leaving the page. (An earlier
+        // version hid these controls entirely here, which read as broken
+        // rather than helpful.) The "FROM YOUR SHIP" badge stays as context.
         if (driveParam) currentDriveKey = driveParam;
         if (rangeParam && !isNaN(Number(rangeParam))) warpRangeLY = Number(rangeParam);
-        handoffLocked = true;
         var whBox = $("warpRangeBox");
         if (whBox) whBox.classList.add("locked");
         var dSel = $("driveSelect"), rSel = $("rangeSelect");
