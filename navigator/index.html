@@ -2100,13 +2100,29 @@ window.MOCK_JOURNEYS = [
     var cur = jl[ci];
 
     $("currentSystem").textContent = cur.systemName;
+    /* 2026-08-30, honest-review fix (Tony: "when economy is manufacturing
+       the stars split... 1 next to manufacturing but the other 2 dropped
+       down a line"): this used to be one long inline string with the star
+       type, race, economy (+ its wealth stars) and conflict badge all
+       flowing together separated by bullets, so a long economy name like
+       "Manufacturing" had nowhere to wrap but straight through the middle
+       of the wealth-star/conflict icons sitting right after it. Split into
+       two explicit rows instead -- star type + race on row 1, economy +
+       conflict on row 2 -- so a long word on one row can never drag icons
+       from the other row down with it. */
+    var line1 = starDot(cur.starType) + (cur.starType || "").toUpperCase() + " STAR &nbsp;•&nbsp; " +
+      raceBadge(cur.race) + " " + (cur.race || "Uninhabited");
+    var line2;
+    if (cur.isBlackHole) {
+      line2 = '<span style="color:var(--magenta)">BLACK HOLE</span>';
+    } else {
+      line2 = econIcon(cur.econType) + " " + (cur.economy || "—") + " " + wealthStars(cur.econTier) +
+        " &nbsp;•&nbsp; " + conflictBadge(cur);
+    }
+    if (cur.isAtlas) line2 += ' &nbsp;•&nbsp; <span style="color:var(--gold)">ATLAS INTERFACE</span>';
     $("currentSystemInfo").innerHTML =
-      starDot(cur.starType) + (cur.starType || "").toUpperCase() + " STAR &nbsp;•&nbsp; " +
-      raceBadge(cur.race) + " " + (cur.race || "Uninhabited") +
-      (cur.isBlackHole ? "" : " &nbsp;•&nbsp; " + econIcon(cur.econType) + " " + (cur.economy || "—") + " " + wealthStars(cur.econTier) +
-        " &nbsp;•&nbsp; " + conflictBadge(cur)) +
-      (cur.isBlackHole ? ' &nbsp;•&nbsp; <span style="color:var(--magenta)">BLACK HOLE</span>' : "") +
-      (cur.isAtlas ? ' &nbsp;•&nbsp; <span style="color:var(--gold)">ATLAS INTERFACE</span>' : "");
+      '<div class="sysMetaRow">' + line1 + '</div>' +
+      '<div class="sysMetaRow" style="margin-top:4px">' + line2 + '</div>';
 
     $("progress").style.width = (jl.length <= 1 ? 100 : (ci / (jl.length - 1)) * 100) + "%";
     // XYZ stays out of #coordsXYZ's rendered text position until revealed
