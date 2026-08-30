@@ -197,8 +197,6 @@ details.pickerFold .journeyPicker{padding:0 9px 9px;margin-bottom:0}
 .glyph{width:16px;height:18px;display:inline-flex;align-items:center;justify-content:center}
 .glyph img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 0 3px rgba(0,229,255,.45))}
 .glyphStrip.lg .glyph{width:22px;height:25px}
-.glyphAvatar{width:44px;height:44px;flex:none;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:2px;padding:3px;border:1px solid var(--border-soft);border-radius:var(--r);background:var(--bg2)}
-.glyphAvatar .glyph{width:100%;height:100%}
 
 /* ---- manifest jump rows ---- */
 .jumpRow{border-bottom:1px solid var(--border-soft)}
@@ -650,8 +648,7 @@ window.nmsCoreReady = new Promise(function (res) { window.__nmsCoreResolve = res
       </div>
 
       <span class="eyebrow">PORTAL ADDRESS</span>
-      <div style="display:flex;align-items:center;gap:12px;margin:8px 0 14px">
-        <div class="glyphAvatar" id="jdGlyphAvatar"></div>
+      <div style="margin:8px 0 14px">
         <div class="glyphStrip lg" id="jdGlyphStrip"></div>
       </div>
       <span class="eyebrow">STAR SYSTEM INFORMATION</span>
@@ -1867,11 +1864,6 @@ window.MOCK_JOURNEYS = [
   function glyphStrip(address) {
     return (address || "").split("").map(glyphTile).join("");
   }
-  function glyphAvatar(address) {
-    var chars = (address || "").slice(0, 4).split("");
-    while (chars.length < 4) chars.push("0");
-    return chars.map(glyphTile).join("");
-  }
 
   // ---- rendering ----------------------------------------------------------
 
@@ -2398,7 +2390,6 @@ window.MOCK_JOURNEYS = [
     $("jdToName").textContent = j.systemName;
     $("jdToSub").textContent = j.region + " — " + (j.economy || "—");
 
-    $("jdGlyphAvatar").innerHTML = glyphAvatar(j.address);
     $("jdGlyphStrip").innerHTML = glyphStrip(j.address);
     $("jdStarType").innerHTML = starDot(j.starType) + (j.starType || "—").toUpperCase();
     $("jdRace").innerHTML = raceBadge(j.race) + " " + (j.race || "Uninhabited");
