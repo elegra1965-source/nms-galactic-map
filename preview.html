@@ -897,23 +897,67 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
      defaults to 0 and jumps the queue, which is exactly how this bug
      happened twice already; the /10 gaps leave room to insert more later
      without renumbering everything. */
-  #top .sep{display:none}
-  /* 2026-08-30, Tony: mirrors the same desktop regrouping (see #top .sep's
-     comment up in the base stylesheet) -- Camera (Orbit/Camera Mode) moved
-     out of the view-mode row and in next to the other settings-ish controls
-     up top, since it's a viewport preference rather than a "go somewhere" or
-     "what's visible" action; Filters moved out of the travel row and into
-     the display row, alongside the other "what shows on the map" toggles it
-     actually belongs with. Everything else here is untouched from the
-     original mobile-only fix -- still real device-tested, not re-verified
-     this round beyond the Phone Preview Tool. */
-  #title{order:1} #bTour{order:2} #bAbout{order:3} #bAccess{order:4} #bInstall{order:5}
-  #cOrb{order:6} #cFly{order:7}
+  /* 2026-08-30, Tony (round 5): brought dividers back on mobile instead of
+     dropping them, since the round-4 regroup packs items across wrapping
+     rows and a group can now land mid-row next to its neighbour with
+     nothing to mark the seam. A vertical bar (the desktop .sep) doesn't
+     read as a break once things wrap, so on mobile each #sep* becomes a
+     full-width rule instead: flex:1 0 100% makes it consume the rest of
+     its own row and forces whatever comes next to start a fresh line,
+     turning it into a guaranteed group boundary regardless of how the
+     button widths happen to pack. Each of the 5 sep elements gets an
+     order value sitting between two groups' order ranges (see below) so
+     it lands at the right seam instead of wherever it happens to be in
+     the HTML. */
+  #top .sep{display:block;width:auto;height:1px;flex:1 0 100%;
+    margin:8px 0 4px;background:rgba(0,229,255,.35);align-self:stretch}
+  #sepA{order:15} #sepB{order:27} #sepC{order:37} #sepD{order:47} #sepE{order:55}
+  /* 2026-08-30, Tony (round 2 -- moved Info to the end): first pass just
+     dropped Camera in next to the pre-existing Tour/About/Access/Install
+     cluster without questioning why that cluster was order 2-5 in the first
+     place -- it put four help/settings buttons as the very first thing a
+     phone user sees, above the actual map controls, which reads backwards
+     and doesn't match the desktop bar (where that same cluster is the LAST
+     group, after the sep before it). Renumbered the whole block to mirror
+     the desktop group order exactly: Galaxy picker -> View mode -> Travel ->
+     Display -> Camera -> Info, Info now last instead of first. */
+  /* 2026-08-30, Tony (round 3): #title forced to flex-basis:100% so it
+     always claims the whole first row on its own -- previously it had no
+     explicit basis, so anything narrow enough (e.g. #galSel before its
+     options are populated) could end up squeezed onto the title's row
+     instead of wrapping below it. */
+  #title{order:1;flex:1 1 100%}
+  /* 2026-08-30, Tony (round 4): a full-width hex box on its own row (round 3)
+     read as too long/prominent by itself. Tony's own regroup instead:
+     Galaxy dropdown, Any type dropdown, then [Galaxy, Local, hex address,
+     Clear] as one group, then [Glyphs, Random, Search, Jump] as one group
+     (Jump moves next to the other address-entry actions instead of sitting
+     glued to the input), then [Filter, Labels, Grid, Atlas], then
+     [Orbit, Camera], then [Install, Tour, About, Access] last. #addrGrp and
+     .addr-row are normally their own flex boxes (so Jump/Clear/the label
+     stay bundled with the hex input on desktop) -- display:contents here
+     dissolves both of those boxes on mobile only, promoting the label,
+     input, Jump and Clear to be direct flex children of #top so each can
+     take its own order and land in a different visual group than its
+     siblings. */
   #galSel{order:10} #galTypeFilter{order:11}
   #mGal{order:20} #mLoc{order:21}
-  #addrGrp{order:30;width:100%}
-  #bKeys{order:31} #bRand{order:32} #bSearch{order:33}
-  #bFiltToggle{order:39} #bLbl{order:40} #bGrid{order:41} #bAtlas{order:42}
+  #addrGrp{display:contents}
+  #addrGrp .addr-row{display:contents}
+  /* Label hidden here, not just reordered -- it's redundant with the input's
+     own "HEX ADDRESS" placeholder, and at 158px wide (see .addr-lb's base
+     rule) it wouldn't fit in this row alongside Galaxy/Local/Clear anyway.
+     The other mobile-only rule -- input[type=text]{width:100%} -- also has
+     to be overridden here or the hex box eats the whole row by itself and
+     shoves Clear onto the next line, same as it did before this box was
+     grouped inline. */
+  #addrGrp .addr-lb{display:none}
+  #inAddr{order:23;width:128px;flex:0 0 auto}
+  #bAddrReset{order:24}
+  #bKeys{order:30} #bRand{order:31} #bSearch{order:32} #bJump{order:33}
+  #bFiltToggle{order:40} #bLbl{order:41} #bGrid{order:42} #bAtlas{order:43}
+  #cOrb{order:50} #cFly{order:51}
+  #bInstall{order:60} #bTour{order:61} #bAbout{order:62} #bAccess{order:63}
 }
 @media(max-width:900px) and (orientation:landscape){
   /* Short landscape screens don't have room to stack the toolbar, the left-side
@@ -1067,10 +1111,10 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     <option value="Empty">Empty</option>
     <option value="Lush">Lush</option>
   </select>
-  <div class="sep"></div>
+  <div class="sep" id="sepA"></div>
   <button class="btn on" id="mGal" title="Whole-galaxy view. Decorative starfield plus your focus marker, bookmarks and course target.">Galaxy</button>
   <button class="btn" id="mLoc" title="The real star systems around your current voxel. This is where clicking, filters and labels work.">Local</button>
-  <div class="sep"></div>
+  <div class="sep" id="sepB"></div>
   <div id="addrGrp">
     <div class="addr-lb">Portal address (hex)</div>
     <div class="addr-row">
@@ -1082,15 +1126,15 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   <button class="btn" id="bKeys" title="Open the 16-key portal glyph keypad. Tap glyphs to build an address; it stays in sync with the hex box.">Glyphs</button>
   <button class="btn" id="bRand" title="Roll a random valid portal address and jump there.">Random</button>
   <button class="btn" id="bSearch" title="Search for a system by name -- only ones you or the community have documented, bookmarked, waypointed or visited, not every procedural system.">Search</button>
-  <div class="sep"></div>
+  <div class="sep" id="sepC"></div>
   <button class="btn" id="bFiltToggle" title="Show or hide the system filters.">Filters</button>
   <button class="btn on" id="bLbl" title="Show names on the nearest stars, or on planets and moons inside a system. Shortcut: H">Labels</button>
   <button class="btn on" id="bGrid" title="Show the region grid in Local view. Each cube is one region, roughly 400 light years across. Shortcut: G">Grid</button>
   <button class="btn" id="bAtlas" title="Show community points of interest from Hello Games' own Galactic Atlas (galacticatlas.nomanssky.com), Euclid galaxy only, as clickable diamond markers. Click one to open its real Atlas page in a new tab.">Atlas</button>
-  <div class="sep"></div>
+  <div class="sep" id="sepD"></div>
   <button class="btn on" id="cOrb" title="Orbit camera: drag to swing around the centre point, wheel or pinch to zoom in and out.">Orbit</button>
-  <button class="btn" id="cFly" title="Free flight: WASD or arrows to move, Shift to boost, Space/Q up, E down, drag to look. On touch, drag the left third as a thumbstick.">Camera Mode</button>
-  <div class="sep"></div>
+  <button class="btn" id="cFly" title="Free flight: WASD or arrows to move, Shift to boost, Space/Q up, E down, drag to look. On touch, drag the left third as a thumbstick.">Camera</button>
+  <div class="sep" id="sepE"></div>
   <button class="btn" id="bInstall" title="Install this map as an app on your device." style="display:none">&#9672; Install app</button>
   <button class="btn" id="bTour" title="A quick guided tour of what this map can do.">&#9673; Tour</button>
   <button class="btn" id="bAbout" title="Fan-made disclaimer and a note on procedural vs. real system data.">&#9432; About</button>
