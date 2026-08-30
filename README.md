@@ -26,6 +26,19 @@ portal address  ->  12 hex glyphs  ->  signed 3D voxel coordinate
                                           data/overrides.json (lives only on GitHub, see below)
 ```
 
+**Contents**
+
+- [What it can do](#what-it-can-do)
+- [The address, decoded](#the-address-decoded)
+- [What's in here, and what's not](#whats-in-here-and-whats-not)
+- [Real game data (nms-core)](#real-game-data-nms-core)
+- [Importing your own save](#importing-your-own-save-optional-client-side-only)
+- [Shared community edits](#shared-community-edits-and-how-a-submission-actually-gets-in)
+- [Running it locally](#running-it-locally)
+- [Verifying the generator yourself](#verifying-the-generator-yourself)
+- [Accessibility](#accessibility)
+- [Credits](#credits)
+
 ## What it can do
 
 Screenshots from the live site, in the order you'd actually hit them. The
@@ -217,7 +230,8 @@ line it's sitting on.
 
 ![Course plotted card dragged clear of the jump line](screenshots/09-draggable-panels.jpg)
 
-## The address, decoded
+<details id="the-address-decoded">
+<summary><strong>The address, decoded</strong></summary>
 
 ```
 [P][SSS][YY][ZZZ][XXX]     12 hex glyphs
@@ -257,7 +271,10 @@ original derivation, sourced from the NMS wiki, with citations; `nms-core/`
 (see below) later replaced the star-type/planet-count/placement/naming part
 of that with an actual ported decompilation of the game's own logic.
 
-## What's in here, and what's not
+</details>
+
+<details id="whats-in-here-and-whats-not">
+<summary><strong>What's in here, and what's not</strong></summary>
 
 This repo is the whole client — one HTML file, no build step, no framework:
 
@@ -316,7 +333,10 @@ delete it before committing rather than letting it go up — it can only ever
 be a stale snapshot, and pushing it would overwrite real player-submitted
 data with whatever was on disk at clone time.
 
-## Real game data (nms-core)
+</details>
+
+<details id="real-game-data-nms-core">
+<summary><strong>Real game data (nms-core)</strong></summary>
 
 The procedural layer described above started as a from-scratch reverse
 engineering (see `SPEC.md`). `nms-core/` replaced the star-type, planet-count,
@@ -343,7 +363,10 @@ list).
 who wants game-accurate system data in their own project without learning
 `nms-core`'s internal structure first.
 
-## Importing your own save (optional, client-side only)
+</details>
+
+<details id="importing-your-own-save-optional-client-side-only">
+<summary><strong>Importing your own save (optional, client-side only)</strong></summary>
 
 `nms-core/save-import/` is a separate concern from the procedural layer
 above — it doesn't generate anything, it *reads* a real Steam/GOG `.hg`
@@ -358,7 +381,10 @@ records at all, only base names are. Reachable from **Edit system** →
 [`nms-core/save-import/README.md`](nms-core/save-import/README.md) for
 the technical writeup.
 
-## Shared community edits, and how a submission actually gets in
+</details>
+
+<details id="shared-community-edits-and-how-a-submission-actually-gets-in">
+<summary><strong>Shared community edits, and how a submission actually gets in</strong></summary>
 
 The procedural layer is complete on its own — every system has plausible
 data the moment you jump to it. But it's still a guess. **Edit system** lets
@@ -407,7 +433,10 @@ left unresolved after 7 days without touching a genuine confirmed dispute.
 An admin-only queue at `?admin=<ADMIN_TOKEN>` (never linked from the normal
 UI) can confirm, dismiss, or directly fix a disputed field.
 
-## Running it locally
+</details>
+
+<details id="running-it-locally">
+<summary><strong>Running it locally</strong></summary>
 
 No build step, no dependencies:
 
@@ -433,7 +462,10 @@ Full walkthrough (creating the token, wiring Netlify to GitHub) is in
 [`SHARED-EDITS-SETUP.md`](SHARED-EDITS-SETUP.md). Deployed here via Netlify,
 auto-deploying on push to `main`.
 
-## Verifying the generator yourself
+</details>
+
+<details id="verifying-the-generator-yourself">
+<summary><strong>Verifying the generator yourself</strong></summary>
 
 Determinism is the whole basis of the procedural layer, and it's directly
 checkable — no black box:
@@ -451,6 +483,8 @@ biome can never disagree on what their rings look like. The one thing that
 *won't* verify cleanly against your own save: individual planet names, per
 the known `nms-core` limitation noted above — everything else (star type,
 system/region name, planet count, economy/conflict/race) should match.
+
+</details>
 
 ## Accessibility
 
