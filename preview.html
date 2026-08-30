@@ -1195,7 +1195,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
       <div><div class="lb">Conflict<span class="conBadge" id="pConBadge" style="margin-left:6px;vertical-align:middle"></span><span class="tag guess" id="pConGuess" style="margin-left:6px;display:none" title="Invented flavour -- this system's real conflict level couldn't be computed (no portal address available, or a component failed to load), so this is an unconfirmed guess. Use Edit system to submit the real value.">Procedural</span></div><div class="vl" id="pCon">—</div></div></div>
     <div class="tags" id="pTags"></div>
     <div class="bodylist" id="pBodies"></div>
-    <div style="font-size:10px;color:var(--text-faint);line-height:1.4;margin-top:5px">Planet names are a procedural guess, not your save data (<span style="text-decoration:underline;cursor:pointer" onclick="openDisclaimer()">see About</span>) -- Edit system to add the real ones.</div>
+    <div id="pNameDisclaimer" style="font-size:10px;color:var(--text-faint);line-height:1.4;margin-top:5px">Planet names are a procedural guess, not your save data (<span style="text-decoration:underline;cursor:pointer" onclick="openDisclaimer()">see About</span>) -- Edit system to add the real ones.</div>
   </div>
   <div id="pBody" style="display:none">
     <button class="btn" id="bBodyBack" type="button" title="Return to this system's planet/moon list." style="margin-bottom:10px">&larr; Back to planet list</button>
@@ -5161,6 +5161,16 @@ function updatePanel(s){
         '<span class="bb">'+b.biome+(b.water?" &middot; water":"")+(b.ring?" &middot; rings"+(b.ringOverridden?"":" (procedural)"):"")+'</span></div>';
   }
   document.getElementById("pBodies").innerHTML=bl;
+  // 2026-08-30, honest-review fix: this blanket "names are a guess" line
+  // used to show unconditionally, even under a fully community-documented
+  // system (e.g. Sranch Op10079) whose bodies are ALL real traveller
+  // submissions -- directly under the "Community edited" tag saying the
+  // opposite. Now it only shows while at least one body in THIS system is
+  // still an unconfirmed procedural guess; once every body has a real
+  // submitted name (b.nameOverridden), there's nothing left to disclaim.
+  var allBodyNamesReal=s.bodies.length>0;
+  for(i=0;i<s.bodies.length;i++){ if(!s.bodies[i].nameOverridden){ allBodyNamesReal=false; break; } }
+  document.getElementById("pNameDisclaimer").style.display=allBodyNamesReal?"none":"";
 
   renderSeq(document.getElementById("pSeq"),s.address);
   document.getElementById("pAddr").textContent=s.address;
@@ -6651,12 +6661,24 @@ var _SCIFI_LOGS=[
   "RESOLVING LOCAL ANOMALY VECTORS..."
 ];
 var _warpFailTimer=null;
+var _warpGen=0;
 function playWarpTransition(kind){
   if(!WARP_ENABLED) return;
   var ov=document.getElementById('warp-overlay');
   var vid=document.getElementById('warp-vid');
   if(!ov||!vid) return;
   if(_warpFailTimer){ clearTimeout(_warpFailTimer); _warpFailTimer=null; }
+  // 2026-08-30, honest-review fix: jumping again (Random/search/glyph
+  // keypad, all typically fast repeat clicks) while a clip was still
+  // loading/playing called this a second time, and vid.load() below aborts
+  // the FIRST call's still-pending play() promise. That promise's own
+  // .catch() then fired --- after the second call had already re-shown the
+  // overlay for the NEW jump --- and its "rejected, hide the overlay"
+  // fallback logic hid the SECOND warp's overlay too, plus logged a scary
+  // console.warn for what's actually an expected, harmless interruption.
+  // myGen/_warpGen lets every callback below check "am I still the most
+  // recent warp, or did a newer one already start" before touching the
+  // overlay or the console -- a stale call now quietly no-ops instead.
   /* 2026-08-25, Tony: two distinct clips matching the real game's two
      separate travel mechanics -- portals are on-foot, walk-through-a-
      glowing-ring, no ship ever visible; hyperdrive/plotted travel is the
@@ -6674,6 +6696,7 @@ function playWarpTransition(kind){
      existing web-delivery format for this element. Real clip length is
      10.4s, up from the old ~4.8s -- see the timeout below, which had to
      move with it. */
+  var myGen=++_warpGen;
   var isShip=(kind==="ship");
   var webmSrc=isShip?"warp_transition.webm":"warp_transition_portal.webm";
   var mp4Src=isShip?"warp_transition.mp4":"warp_transition_portal.mp4";
@@ -6693,18 +6716,26 @@ function playWarpTransition(kind){
      real length) now force the overlay closed no matter what went wrong,
      same "always have an escape hatch" spirit as ABORT on the route loader. */
   vid.onerror=function(){
+    if(myGen!==_warpGen) return;
     console.warn('[warp] video element errored, code='+(vid.error?vid.error.code:'?')+' src='+vid.currentSrc);
     ov.style.display='none'; vid.onerror=null;
     if(_warpFailTimer){ clearTimeout(_warpFailTimer); _warpFailTimer=null; }
   };
   var _warpCleared=false;
   vid.play().then(function(){
+    if(myGen!==_warpGen) return;
     console.log('[warp] play() resolved for '+vid.currentSrc);
   }).catch(function(err){
+    // A stale call being interrupted by a newer jump rejects with
+    // AbortError here every time -- expected, not a real failure, so it's
+    // dropped silently rather than warned about or allowed to touch an
+    // overlay that now belongs to the newer warp.
+    if(myGen!==_warpGen) return;
     console.warn('[warp] play() rejected: '+err.name+' -- '+err.message);
     ov.style.display='none';
   });
   vid.onended=function(){
+    if(myGen!==_warpGen) return;
     ov.style.display='none'; vid.onended=null; _warpCleared=true;
     if(_warpFailTimer){ clearTimeout(_warpFailTimer); _warpFailTimer=null; }
   };
