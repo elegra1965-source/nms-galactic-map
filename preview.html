@@ -611,14 +611,14 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:.16em;color:var(--gold);
   border:1px solid var(--gold);border-radius:var(--r-sm);padding:10px 16px;
   background:rgba(11,17,25,.9);pointer-events:none;text-transform:uppercase}
-#flyhint{position:fixed;left:220px;bottom:10px;z-index:20;max-width:250px;
-  font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:.06em;color:var(--white);
-  text-align:left;pointer-events:none;display:none;line-height:1.9;
-  background:rgba(11,17,25,.9);border:1px solid var(--cyan-dim);border-radius:var(--r-sm);
-  padding:7px 10px;text-shadow:0 1px 2px rgba(0,0,0,.7)}
-#flyhint b{color:var(--cyan);background:rgba(0,229,255,.12);border:1px solid var(--cyan-dim);
-  border-radius:4px;padding:1px 5px;font-weight:700;letter-spacing:.04em;white-space:nowrap}
+#flyhint{position:fixed;left:220px;bottom:10px;z-index:20;width:230px;
+  pointer-events:none;display:none}
+#flyhint img{display:block;width:100%;height:auto;filter:drop-shadow(0 2px 6px rgba(0,0,0,.6))}
 @media(max-width:900px){#flyhint{left:10px;bottom:64px}}
+#joyBase{position:fixed;width:96px;height:96px;margin:-48px 0 0 -48px;border:2px solid var(--cyan-dim);
+  border-radius:50%;background:rgba(0,229,255,.06);pointer-events:none;z-index:19;display:none}
+#joyKnob{position:absolute;left:28px;top:28px;width:40px;height:40px;border-radius:50%;
+  background:rgba(0,229,255,.3);border:1.5px solid var(--cyan);box-shadow:0 0 10px rgba(0,229,255,.65)}
 
 /* ============ edit / report modal ============ */
 #modalWrap{position:fixed;inset:0;z-index:80;display:none;background:rgba(2,4,7,.72);
@@ -986,7 +986,8 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 <div id="galHud"><canvas id="galIcon" width="168" height="168"></canvas><div class="galHudTxt"><div id="galHudName">Galactic Core</div><div id="galHudDist">&mdash;</div></div></div>
 <div id="err"></div>
 <div id="empty">No systems match these filters</div>
-<div id="flyhint"><div><b>WASD</b> / <b>ARROWS</b> move</div><div><b>SHIFT</b> boost &middot; <b>SPACE/Q</b> up &middot; <b>E</b> down</div><div><b>DRAG</b> to look</div></div>
+<div id="flyhint"><img src="assets/hud/flycam-keys.png" alt="WASD / arrows move, Shift boost, Space/Q up, E down, drag to look"></div>
+<div id="joyBase"><div id="joyKnob"></div></div>
 
 <!-- First-visit feature tour (see CSS comment for why it's opt-in, not auto-shown) -->
 <div id="tourOverlay">
@@ -5357,6 +5358,14 @@ canvas.addEventListener("pointerdown",function(e){
   pointers[e.pointerId]={x:e.clientX,y:e.clientY};
   if(ctrl==="fly"&&e.pointerType==="touch"&&e.clientX<window.innerWidth*0.4&&!stick.act){
     stick.act=true; stick.id=e.pointerId; stick.ox=e.clientX; stick.oy=e.clientY; stick.x=0; stick.y=0;
+    /* Visual thumbstick, 2026-08-30 (Tony: this drag zone already worked,
+       it just had zero on-screen indication -- mobile has no WASD keys to
+       show, so a real base+knob graphic is the actual "interactive
+       choice" equivalent, same as any touch game's virtual stick). Pure
+       visual layer, pointer-events:none, never touches stick.x/y itself --
+       the existing pointermove/endPointer logic above is unchanged. */
+    var jb=document.getElementById("joyBase");
+    if(jb){ jb.style.left=stick.ox+"px"; jb.style.top=stick.oy+"px"; jb.style.display="block"; }
     return;
   }
   /* Real bug fixed 2026-08-21 (Tony: "pinch to zoom automatically registers
@@ -5383,6 +5392,8 @@ canvas.addEventListener("pointermove",function(e){
   if(stick.act&&e.pointerId===stick.id){
     stick.x=Math.max(-1,Math.min(1,(e.clientX-stick.ox)/70));
     stick.y=Math.max(-1,Math.min(1,(e.clientY-stick.oy)/70));
+    var jk=document.getElementById("joyKnob");
+    if(jk) jk.style.transform="translate("+(stick.x*28)+"px,"+(stick.y*28)+"px)";
     return;
   }
   var ids=Object.keys(pointers);
@@ -5415,7 +5426,12 @@ canvas.addEventListener("pointermove",function(e){
   applyCam();
 });
 function endPointer(e){
-  if(stick.act&&e.pointerId===stick.id){ stick.act=false; stick.x=0; stick.y=0; stick.id=null; }
+  if(stick.act&&e.pointerId===stick.id){
+    stick.act=false; stick.x=0; stick.y=0; stick.id=null;
+    var jb=document.getElementById("joyBase"), jk=document.getElementById("joyKnob");
+    if(jb) jb.style.display="none";
+    if(jk) jk.style.transform="translate(0,0)";
+  }
   if(pointers[e.pointerId]) delete pointers[e.pointerId];
   if(Object.keys(pointers).length<2) pinchD=0;
   if(Object.keys(pointers).length===0){
@@ -5944,6 +5960,15 @@ function setCtrl(c){
   document.getElementById("cOrb").classList.toggle("on",c==="orbit");
   document.getElementById("cFly").classList.toggle("on",c==="fly");
   document.getElementById("flyhint").style.display=(c==="fly")?"block":"none";
+  if(c!=="fly"&&stick.act){
+    // Leaving fly mode mid-drag (e.g. Orbit clicked while a finger is still
+    // down) -- drop the virtual stick and its visual so neither lingers
+    // stuck "on" once back in Orbit.
+    stick.act=false; stick.x=0; stick.y=0; stick.id=null;
+    var jb=document.getElementById("joyBase"), jk=document.getElementById("joyKnob");
+    if(jb) jb.style.display="none";
+    if(jk) jk.style.transform="translate(0,0)";
+  }
   if(c==="fly"){
     flyPos.copy(camera.position);
     aimFly(cam.target);
