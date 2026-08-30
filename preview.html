@@ -987,8 +987,14 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     0%{opacity:1;transform:translateY(0)}
     100%{opacity:0;transform:translateY(-6px)}
   }
-  .tb-revealing{animation:toolbarRowReveal .28s ease-out both}
-  .tb-hiding{animation:toolbarRowHide .16s ease-in both}
+  /* 2026-08-30, Tony: "don't really see the glow apart from the first...
+     slowed down half the speed so can experience the full effect" -- both
+     the CSS animation-duration here and REVEAL_MS/HIDE_MS/STAGGER in the
+     boot script must move together (the script removes .tb-revealing after
+     REVEAL_MS, so if that timeout doesn't match this animation's own
+     duration the glow gets cut off mid-fade rather than finishing). */
+  .tb-revealing{animation:toolbarRowReveal .56s ease-out both}
+  .tb-hiding{animation:toolbarRowHide .32s ease-in both}
   @media(prefers-reduced-motion:reduce){
     .tb-revealing,.tb-hiding{animation:none}
   }
@@ -9724,7 +9730,7 @@ if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){
   ].map(function(ids){
     return ids.map(function(id){ return document.getElementById(id); }).filter(Boolean);
   });
-  var STAGGER=90, REVEAL_MS=280, HIDE_MS=160;
+  var STAGGER=180, REVEAL_MS=560, HIDE_MS=320; // half speed (see round-9 CSS comment)
   var reduceMotion=false;
   try{ reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches; }catch(e){}
   var timers=[];
