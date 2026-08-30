@@ -134,12 +134,9 @@ details.pickerFold .journeyPicker{padding:0 9px 9px;margin-bottom:0}
 .toolbar{position:absolute;top:16px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:2px;background:rgba(4,10,20,.72);border:1px solid var(--border-soft);border-radius:var(--r);padding:3px;z-index:3;backdrop-filter:blur(4px)}
 .toolbar button{background:none;border:0;color:var(--text-faint);font-size:9px;letter-spacing:.08em;font-family:'Orbitron',sans-serif;font-weight:700;padding:7px 11px;border-radius:6px}
 .toolbar button.active{background:var(--panel-2);color:var(--cyan)}
-.toolbar .zoomGroup{display:flex;gap:2px;margin-left:6px;padding-left:6px;border-left:1px solid var(--border-soft)}
+.toolbar .zoomGroup{display:flex;gap:2px}
 .toolbar .zoomGroup button{width:26px;padding:7px 0;text-align:center}
 .galaxy-view{position:absolute;inset:0;transition:transform var(--motion-dur) var(--motion-ease)}
-.galaxy.freeCam .galaxy-view{cursor:grab}
-.galaxy.freeCam.dragging .galaxy-view{cursor:grabbing}
-.galaxy.dragging{user-select:none}
 /* Real galaxy art (2026-08-29): a canvas rendering of the same seeded,
    type-coloured galaxy the live Galactic Map draws for its rotating mini
    icon (see drawRealGalaxyArt() in the script below, ported from
@@ -181,7 +178,7 @@ details.pickerFold .journeyPicker{padding:0 9px 9px;margin-bottom:0}
 .jumpLabel{position:absolute;left:9%;bottom:calc(16% + 18px);font-size:10px;color:var(--text-dim);font-family:'Orbitron',sans-serif;letter-spacing:.06em;background:rgba(4,10,20,.55);padding:5px 9px;border:1px solid var(--border-soft);border-radius:var(--r)}
 
 .coords{border:1px solid var(--border-soft);background:var(--bg2);padding:11px;margin:14px 0;border-radius:var(--r);font-size:11px;letter-spacing:.04em;color:var(--text-dim)}
-.coordsRow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;row-gap:6px}
+.coordsRow{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;row-gap:6px}
 .coordsRow .glyphStrip{min-width:0}
 .panelBody>button:not(.primary):not(.danger){width:100%;background:var(--panel);border:1px solid var(--border-soft);color:var(--text-dim);padding:9px;margin-bottom:8px;font-size:10px;border-radius:var(--r);letter-spacing:.03em}
 .primary{width:100%;background:var(--gold);color:#1a1200;border:0;padding:12px;font-weight:800;font-size:11px;letter-spacing:.06em;border-radius:var(--r);font-family:'Orbitron',sans-serif}
@@ -565,8 +562,6 @@ window.nmsCoreReady = new Promise(function (res) { window.__nmsCoreResolve = res
 
       <section id="galaxy" class="galaxy">
         <div class="toolbar">
-          <button id="followRoute" class="active">FOLLOW ROUTE</button>
-          <button id="freeCamera">FREE CAMERA</button>
           <div class="zoomGroup">
             <button id="zoomOut">&minus;</button>
             <button id="zoomIn">+</button>
@@ -2004,8 +1999,6 @@ window.MOCK_JOURNEYS = [
   }
 
   var zoomLevel = 1;
-  var followMode = true;
-  var panX = 0, panY = 0; // free-camera drag offset, px, reset on Follow Route
 
   /* Builds the same curved, dashed diagonal route strip as the Journey
      Snapshot's buildRoute() (complete.html) -- one real point per jump in
@@ -2118,7 +2111,7 @@ window.MOCK_JOURNEYS = [
     $("progress").style.width = (jl.length <= 1 ? 100 : (ci / (jl.length - 1)) * 100) + "%";
     // XYZ stays out of #coordsXYZ's rendered text position until revealed
     // (CSS hides it by default) — the address portion is always visible.
-    $("coordsAddr").textContent = "ADDRESS " + cur.address;
+    $("coordsAddr").textContent = "HEX ADDRESS " + cur.address;
     $("coordsGlyphs").innerHTML = glyphStrip(cur.address);
     $("coordsXYZ").textContent = "   X " + cur.coords.x + " Y " + cur.coords.y + " Z " + cur.coords.z;
 
@@ -2578,56 +2571,18 @@ window.MOCK_JOURNEYS = [
     showToast("Journey restarted.");
   };
 
-  // ---- toolbar: follow route / free camera / zoom --------------------------
-  // Free camera is real drag-to-pan on the same 2D view everything else
-  // renders on (galArtCanvas/galArtTwinkle/routeSvg all live inside
-  // #galaxyView, so panning that one element moves them together) --
-  // there's no 3D scene here to orbit, so "drag to pan, +/- to zoom" is
-  // what free camera honestly means in this view, not a placeholder for
-  // a future renderer.
-  var galaxyEl = $("galaxy"), viewEl = $("galaxyView");
-  var dragging = false, dragStartX = 0, dragStartY = 0, panStartX = 0, panStartY = 0;
-  function applyView(skipTransition) {
-    viewEl.style.transition = skipTransition ? "none" : "";
-    viewEl.style.transform = "translate(" + panX + "px," + panY + "px) scale(" + zoomLevel + ")";
+  // ---- toolbar: zoom -----------------------------------------------------
+  // 2026-08-30 (Tony: "remove the free camera"): this used to be a
+  // follow-route/free-camera toggle pair, where free camera let you
+  // drag-to-pan the same 2D view (galArtCanvas/galArtTwinkle/routeSvg all
+  // live inside #galaxyView, so panning that one element moved them
+  // together -- there's no 3D scene here to orbit). Removed outright, not
+  // just hidden: the view now simply always sits in its default position,
+  // and zoom is the only thing left to control.
+  var viewEl = $("galaxyView");
+  function applyView() {
+    viewEl.style.transform = "scale(" + zoomLevel + ")";
   }
-  $("followRoute").onclick = function () {
-    followMode = true;
-    $("followRoute").classList.add("active");
-    $("freeCamera").classList.remove("active");
-    galaxyEl.classList.remove("freeCam");
-    panX = 0; panY = 0;
-    applyView();
-    showToast("Camera following the charted route.");
-  };
-  $("freeCamera").onclick = function () {
-    followMode = false;
-    $("freeCamera").classList.add("active");
-    $("followRoute").classList.remove("active");
-    galaxyEl.classList.add("freeCam");
-    showToast("Free camera — drag to pan, use +/- to zoom.");
-  };
-  viewEl.addEventListener("mousedown", function (e) {
-    if (followMode) return;
-    dragging = true;
-    dragStartX = e.clientX; dragStartY = e.clientY;
-    panStartX = panX; panStartY = panY;
-    galaxyEl.classList.add("dragging");
-    applyView(true);
-    e.preventDefault();
-  });
-  window.addEventListener("mousemove", function (e) {
-    if (!dragging) return;
-    panX = panStartX + (e.clientX - dragStartX);
-    panY = panStartY + (e.clientY - dragStartY);
-    applyView(true);
-  });
-  window.addEventListener("mouseup", function () {
-    if (!dragging) return;
-    dragging = false;
-    galaxyEl.classList.remove("dragging");
-    applyView();
-  });
   function applyZoom() { applyView(); }
   $("zoomIn").onclick = function () { zoomLevel = Math.min(2, zoomLevel + 0.2); applyZoom(); };
   $("zoomOut").onclick = function () { zoomLevel = Math.max(0.6, zoomLevel - 0.2); applyZoom(); };
