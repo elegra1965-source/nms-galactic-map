@@ -156,6 +156,10 @@ automatically, or paste one into the box at the top of My Routes without
 needing the link to open on its own. Saved routes travel with Export/Import
 logs the same way bookmarks and waypoints do.
 
+![Course plotted card showing the Save Route and Copy Link buttons](screenshots/14-saved-routes.jpg)
+
+![My Routes popover listing a saved route, with a paste-a-link box at the top](screenshots/15-my-routes-popover.jpg)
+
 **Enter system.** Fly into any system for a true 3D orbital view -- binary
 and ternary stars, planets and moons on real orbits with rings where the
 generator rolled them, and (where the region has one) a black hole or Atlas
