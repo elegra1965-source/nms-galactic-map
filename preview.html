@@ -979,7 +979,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
          is honest about what is real (the trip context passed through) vs
          sample (the itinerary content shown once there). 2026-08-29. -->
     <button class="btn primary" id="bPlanJourney" type="button" style="width:100%;margin-top:10px"
-      title="Open this plotted route in the Galactic Navigator -- an experimental journey-mode preview. Opens in a new tab.">PLAN JOURNEY</button>
+      title="Open this plotted route in the Galactic Navigator -- an experimental journey-mode preview. Opens in its own tab -- planning another journey re-uses that same tab instead of opening a new one.">PLAN JOURNEY</button>
   </div>
 </div>
 <div id="labels"></div>
@@ -1588,7 +1588,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     </div>
     <div class="mfld">
       <div class="lb">Galactic Navigator (new, work in progress)</div>
-      <div style="font-size:12px;color:var(--text-dim);line-height:1.55"><b>PLAN JOURNEY</b> on the Warp Manifest card (2026-08-29) opens a separate page -- the Galactic Navigator -- in a new tab, handing off your real plotted route: every hop's real name, portal address, region, star type, race, economy and conflict level, straight from the same algorithm this map uses everywhere else, not invented for the handoff. It's tagged <b>WORK IN PROGRESS</b> because one piece is still a simplified preview rather than a finished feature -- confirming a real black-hole exit inserts that detour and resumes toward the originally planned next stop, rather than recalculating a whole new multi-hop route through the rest of your journey. The exit candidates themselves are real, though (2026-08-30): generated live from nms-core, the same generator this map uses everywhere else, centred on the black hole's own real region -- not a fixed sample cluster unrelated to your actual route. Worth trying if you're curious what a dedicated journey-tracking view could look like; just don't rely on the replanning step yet for anything this map already does reliably.</div>
+      <div style="font-size:12px;color:var(--text-dim);line-height:1.55"><b>PLAN JOURNEY</b> on the Warp Manifest card (2026-08-29) opens a separate page -- the Galactic Navigator -- in a new tab, handing off your real plotted route: every hop's real name, portal address, region, star type, race, economy and conflict level, straight from the same algorithm this map uses everywhere else, not invented for the handoff. It's tagged <b>WORK IN PROGRESS</b> because one piece is still a simplified preview rather than a finished feature -- confirming a real black-hole exit inserts that detour and resumes toward the originally planned next stop, rather than recalculating a whole new multi-hop route through the rest of your journey. Planning another journey (2026-08-30) re-uses that same Navigator tab instead of opening a new one each time, as long as it's still open -- close it and PLAN JOURNEY again opens a fresh one. The exit candidates themselves are real, though (2026-08-30): generated live from nms-core, the same generator this map uses everywhere else, centred on the black hole's own real region -- not a fixed sample cluster unrelated to your actual route. Worth trying if you're curious what a dedicated journey-tracking view could look like; just don't rely on the replanning step yet for anything this map already does reliably.</div>
     </div>
     <div class="mfld">
       <div class="lb">Search by name -- also how to get back to everywhere you've been</div>
@@ -6847,11 +6847,22 @@ document.getElementById("bToggleManifest").addEventListener("click",function(){
   }
 });
 /* PLAN JOURNEY -- opens the Galactic Navigator (a separate page on this same
-   site) in a new tab, passing the real plotted origin/destination/jumps/
+   site) in its own tab, passing the real plotted origin/destination/jumps/
    distance through as URL params. Reads the same live globals bCourse/
    bGoCourse already read (focusSystem, courseTarget) plus the stats the
    manifest card is already showing (#stat-jumps/#stat-dist) -- no new state,
-   nothing computed twice, nothing invented. 2026-08-29. */
+   nothing computed twice, nothing invented. 2026-08-29.
+   2026-08-30 (Tony: planning multiple journeys was piling up a new tab
+   every click): window.open's 2nd argument is a target NAME, not just a
+   flag -- with the old hardcoded "_blank" (plus "noopener", which itself
+   also forces a fresh tab even if a name is given), every single click
+   was guaranteed a brand-new browsing context, no matter what. Switched
+   to a fixed name ("nms_navigator") and dropped noopener (safe here --
+   both pages are this same static site, no untrusted origin involved) so
+   the browser's own built-in behaviour takes over: if that tab is still
+   open from a previous journey, this now navigates and re-focuses THAT
+   tab instead of opening another; only opens fresh if the traveller
+   closed it (or this is the first journey this session). */
 document.getElementById("bPlanJourney").addEventListener("click",function(){
   if(!focusSystem||!courseTarget){ toast("Plot a course first"); return; }
   /* 2026-08-29: also hand off the real galaxy number and the real drive
@@ -6916,7 +6927,8 @@ document.getElementById("bPlanJourney").addEventListener("click",function(){
     range:document.getElementById("fHyper").value||"",
     hops:JSON.stringify(hops)
   });
-  window.open("navigator/index.html?"+qs.toString(),"_blank","noopener");
+  var navWin=window.open("navigator/index.html?"+qs.toString(),"nms_navigator");
+  if(navWin) navWin.focus();
 });
 /* hide manifest when course is cleared */
 document.getElementById("bClrCourse").addEventListener("click",function(){
@@ -7738,7 +7750,7 @@ var TOUR_STEPS=[
   {sel:"#mGal",title:"A real 3D galaxy",
     body:"You're looking at one of 256 real No Man's Sky galaxies, generated from a portal address -- not a static image, a galaxy you can actually fly through and zoom into."},
   {sel:"#mLoc",title:"Local view",
-    body:"Local shows the real star field around you. Hover a star (mouse) for a quick popup, or click for the full panel -- race, economy, conflict, planets. Plotted course draws a line that's solid for a single jump, dashed for multi-hop, red if your drive can't reach it, and opens the Warp Manifest for the full itinerary. Enter system for a full 3D view, or add your own in-game data via Edit system. Once a course is plotted, PLAN JOURNEY on that same Warp Manifest card opens the new Galactic Navigator -- a work-in-progress preview of turn-by-turn tracking for that real route, in a new tab."},
+    body:"Local shows the real star field around you. Hover a star (mouse) for a quick popup, or click for the full panel -- race, economy, conflict, planets. Plotted course draws a line that's solid for a single jump, dashed for multi-hop, red if your drive can't reach it, and opens the Warp Manifest for the full itinerary. Enter system for a full 3D view, or add your own in-game data via Edit system. Once a course is plotted, PLAN JOURNEY on that same Warp Manifest card opens the new Galactic Navigator -- a work-in-progress preview of turn-by-turn tracking for that real route, in its own tab (planning another journey re-uses that same tab)."},
   {sel:"#inAddr",title:"Type an address",
     body:"Paste or type a 12-character portal address here and hit Jump to fly straight to that exact system."},
   {sel:"#bKeys",title:"No address handy?",
