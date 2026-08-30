@@ -1146,7 +1146,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   <div id="riBody">
     <div id="route-stats" style="color:var(--color-slate);font-size:11px;margin-bottom:10px;border-bottom:1px solid rgba(112,161,255,0.2);padding-bottom:8px">
       Total Jumps: <span id="stat-jumps" style="color:var(--white)">0</span><br>
-      Est. Distance: <span id="stat-dist" style="color:var(--white)">0 LY</span>
+      Route Distance: <span id="stat-dist" style="color:var(--white)">0 LY</span>
     </div>
     <div id="route-steps-list" style="max-height:150px;overflow-y:auto;font-size:11px;color:var(--text);line-height:16px"></div>
     <!-- PLAN JOURNEY entry point (spec item: "Add PLAN JOURNEY to the existing
@@ -1346,7 +1346,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     <button class="btn" id="bCourseMin" title="Collapse or expand the course readout.">&#9662;</button>
   </div>
   <div id="cBody">
-    <div class="cline"><span>Distance</span><b id="cDist">—</b></div>
+    <div class="cline"><span title="Straight-line distance to the target -- the Warp Manifest's Route Distance is the real jump-by-jump total, which is usually longer.">Direct Distance</span><b id="cDist">—</b></div>
     <div class="cline"><span>Jumps</span><b id="cJumps">—</b></div>
     <div id="cJumpsNote"></div>
     <div class="cline"><span>Bearing</span><b id="cBear">—</b></div>
@@ -4017,6 +4017,18 @@ function clearCourseLine(){
   if(courseDots){ localGroup.remove(courseDots); courseDots.geometry.dispose(); courseDots.material.dispose(); courseDots=null; }
 }
 var courseWaypoints=null, courseTruncated=false;
+/* 2026-08-30, honest-review fix: the actual jump-by-jump route distance
+   (sum of each hop's real length), computed once in _finishSetCourse()
+   from the final courseWaypoints and reused everywhere a "how far is this
+   route" number is shown -- the Warp Manifest's own Est. Distance line and
+   the PLAN JOURNEY handoff to the Navigator both used to compute this
+   independently (the manifest showed the straight-line beeline distance
+   from setCourse() instead, PLAN JOURNEY re-summed the hops itself), so
+   the two could -- and on any route that isn't a straight line, did --
+   disagree, sometimes by 20%+, one click apart in the same flow. Keeping
+   one shared number here means every "route distance" readout on the site
+   is now, by construction, the same value. */
+var courseRouteLY=0;
 /* 2026-08-26: set true by the #bCourse click handler right before a FRESH
    plot (new target); _finishSetCourse() checks and clears it once the
    route resolves, opening the Warp Manifest if it is not already open.
@@ -4797,7 +4809,22 @@ function positionCourseCard(){
 }
 function _finishSetCourse(_s,_ly,_range,_dvx,_dvy,_dvz){
   var hops=courseWaypoints.length-1;
+  /* 2026-08-30, honest-review fix: the real route distance -- the sum of
+     each hop's own jump length, exactly the way PLAN JOURNEY's handoff to
+     the Navigator computes it -- so the Warp Manifest and the Navigator
+     always agree on "how far is this route" instead of the manifest
+     showing a straight-line beeline number instead. _ly (the beeline
+     distance) is kept for its own purpose just below: the "more hops than
+     X÷Y suggests" note specifically needs the naive beeline/range math to
+     explain itself, and the "course" card's own Distance line is
+     deliberately the beeline reading (see its own comment). */
+  courseRouteLY=0;
+  for(var _ci=1;_ci<courseWaypoints.length;_ci++) courseRouteLY+=Math.round(wpDist(courseWaypoints[_ci-1],courseWaypoints[_ci])*VOX_LY);
   document.getElementById("cTarget").textContent=_s.name;
+  /* Beeline distance -- deliberately NOT courseRouteLY. This line answers
+     "how far as the crow flies," which is what the jumps-vs-range sanity
+     note right below needs; the actual jump-by-jump route length is the
+     Warp Manifest's job (see displayCalculatedItinerary() below). */
   document.getElementById("cDist").textContent=commas(_ly)+" LY";
   document.getElementById("cJumps").textContent=(courseTruncated?(hops+"+"):hops)+" @ "+commas(_range)+" LY"+(courseTruncated?" (simplified)":"");
   /* Real question from Tony (2026-08-18): 800 LY at 101 LY range "should
@@ -4833,7 +4860,7 @@ function _finishSetCourse(_s,_ly,_range,_dvx,_dvy,_dvz){
   mergeWaypointsIntoSlice();
   applyFilter();
   buildGalaxyMarks();
-  displayCalculatedItinerary(courseWaypoints,_ly);
+  displayCalculatedItinerary(courseWaypoints,courseRouteLY);
   if(_openManifestOnPlot){
     _openManifestOnPlot=false;
     var _mCard=document.getElementById("route-itinerary-card");
@@ -6177,7 +6204,7 @@ function jumpTo(str,silent){
   document.getElementById("inAddr").style.borderColor="";
   focus.x=a.x; focus.y=a.y; focus.z=a.z;
   marker.position.copy(voxelToGalaxy(a.x,a.y,a.z));
-  courseTarget=null; courseWaypoints=null; clearCourseLine();
+  courseTarget=null; courseWaypoints=null; courseRouteLY=0; clearCourseLine();
   document.getElementById("course").classList.remove("show");
   generateSlice(a.idx);
   focusSystem=null;
@@ -6578,7 +6605,7 @@ document.getElementById("bCourse").addEventListener("click",function(){
   setCourse(selected);
 });
 document.getElementById("bClrCourse").addEventListener("click",function(){
-  courseTarget=null; courseWaypoints=null; clearCourseLine(); buildGalaxyMarks();
+  courseTarget=null; courseWaypoints=null; courseRouteLY=0; clearCourseLine(); buildGalaxyMarks();
   document.getElementById("course").classList.remove("show");
 });
 document.getElementById("bGoCourse").addEventListener("click",function(){
@@ -7140,14 +7167,19 @@ document.getElementById("bPlanJourney").addEventListener("click",function(){
       distance:prev?Math.round(wpDist(prev,wp)*VOX_LY):0
     };
   });
-  var totalDist=hops.reduce(function(sum,h){ return sum+(h.distance||0); },0);
+  /* 2026-08-30, honest-review fix: reuse the exact same route-distance
+     total the Warp Manifest is already showing (courseRouteLY, set in
+     _finishSetCourse from these same per-hop distances) instead of
+     re-summing hops[].distance here -- two summations of the same numbers
+     should never be able to drift apart, and this removes the only other
+     place a "total route distance" was ever computed independently. */
   var qs=new URLSearchParams({
     from:focusSystem.address||"",
     fromName:focusSystem.name||"",
     to:courseTarget.address||"",
     toName:courseTarget.name||"",
     jumps:String(Math.max(0,hops.length-1)),
-    dist:commas(totalDist)+" LY",
+    dist:commas(courseRouteLY)+" LY",
     galaxy:String(GALAXY),
     galaxyName:GALAXIES[GALAXY]||("Galaxy "+GALAXY),
     drive:currentDrive().k,
