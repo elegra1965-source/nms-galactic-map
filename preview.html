@@ -118,6 +118,12 @@ canvas#c{display:block;position:fixed;inset:0;touch-action:none}
    on for the mobile stacked layout where the full grouped toolbar can run
    to 7+ rows and bury the system view underneath it. */
 #toolbarToggle{display:none}
+/* #toolbarBody only becomes a real box on mobile (see the media query) so it
+   can be animated as one collapsible unit -- here on desktop it's invisible
+   scaffolding, not a layout box, so every button/select/sep inside it still
+   flows as a direct flex child of #top exactly as before this wrapper was
+   added. */
+#toolbarBody{display:contents}
 /* 2026-08-30, Tony: the title used to be plain 12px text sitting in the same
    flex row as the toolbar buttons -- same size class as the secondary GRID/
    ATLAS/TOUR row, easy to lose among 24 other flex items. Now it's its own
@@ -923,19 +929,59 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
      (rounds 4-5) is easy to read but tall, up to 7 stacked rows, and stays
      fixed over the map the whole time. #toolbarToggle gets its own full-width
      row right under the title (order:2, flex-basis:100% so nothing else can
-     share its line) and toggles html.toolbar-collapsed, which hides every
-     #top child except the title and the toggle itself -- title stays as a
-     permanent anchor so the bar never disappears completely, and the toggle
-     button's own label always says which way it currently goes (Hide vs.
-     Show), so there's nothing to separately explain. State is remembered
-     across visits via localStorage (see the boot script near the end of the
-     file) so once someone hides it, it stays hidden until they choose to
-     bring it back, on this device. */
+     share its line); title stays as a permanent anchor so the bar never
+     disappears completely, and the toggle button's own label always says
+     which way it currently goes (Hide vs. Show), so there's nothing to
+     separately explain. State is remembered across visits via localStorage
+     (see the boot script near the end of the file) so once someone hides
+     it, it stays hidden until they choose to bring it back, on this device. */
   #toolbarToggle{display:flex;order:2;flex:0 0 100%;justify-content:flex-end;
     background:transparent;border:none;color:var(--cyan);
     font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:.08em;
     text-transform:uppercase;padding:2px 2px 4px;cursor:pointer}
-  html.toolbar-collapsed #top>*:not(#title):not(#toolbarToggle){display:none}
+  @keyframes toolbarTogglePress{
+    0%{color:var(--cyan);text-shadow:none}
+    35%{color:#fff;text-shadow:0 0 10px rgba(0,229,255,1),0 0 22px rgba(0,229,255,.7)}
+    100%{color:var(--cyan);text-shadow:none}
+  }
+  #toolbarToggle.flash{animation:toolbarTogglePress .35s ease-out}
+  /* 2026-08-30, Tony (round 8): "reveal one row at a time smoothly with same
+     glow as title but then looses glow... remove one at a time... not too
+     quick not too slow" -- round 7's single max-height slide on the whole
+     #toolbarBody replaced with a per-GROUP cascade instead: each of the 6
+     groups (see the TIERS list in the boot script -- same 6 groups as the
+     dividers already mark) reveals or hides on its own staggered delay, so
+     rows genuinely appear/disappear one at a time rather than the whole
+     block resizing as one unit. #toolbarBody itself is now just a plain
+     flex-wrap box again (no max-height/overflow -- overflow:hidden would
+     have clipped the glow below), and each element's own show/hide state is
+     a class (.tb-hidden/.tb-revealing/.tb-hiding below) toggled by the boot
+     script rather than anything driven from here. */
+  #toolbarBody{display:flex;flex-wrap:wrap;align-items:flex-end;gap:6px;
+    order:3;flex:0 0 100%}
+  /* #top .tb-hidden, not plain .tb-hidden -- the dividers' own base rule
+     (#top .sep{display:block...} above) is an ID+class selector, so a bare
+     class selector here would lose the specificity fight and the divider
+     lines would stay visible even while "hidden" (exactly what happened
+     the first time this was written as plain .tb-hidden -- buttons hid
+     correctly since .btn is the same specificity as .tb-hidden and source
+     order broke the tie, but #top .sep always won regardless of order). */
+  #top .tb-hidden{display:none}
+  @keyframes toolbarRowReveal{
+    0%{opacity:0;transform:translateY(-6px);filter:drop-shadow(0 0 0 rgba(0,229,255,0))}
+    35%{opacity:1;transform:translateY(0)}
+    55%{filter:drop-shadow(0 0 6px rgba(0,229,255,.9)) drop-shadow(0 0 14px rgba(0,229,255,.55))}
+    100%{filter:drop-shadow(0 0 0 rgba(0,229,255,0))}
+  }
+  @keyframes toolbarRowHide{
+    0%{opacity:1;transform:translateY(0)}
+    100%{opacity:0;transform:translateY(-6px)}
+  }
+  .tb-revealing{animation:toolbarRowReveal .28s ease-out both}
+  .tb-hiding{animation:toolbarRowHide .16s ease-in both}
+  @media(prefers-reduced-motion:reduce){
+    .tb-revealing,.tb-hiding{animation:none}
+  }
   /* 2026-08-30, Tony (round 2 -- moved Info to the end): first pass just
      dropped Camera in next to the pre-existing Tour/About/Access/Install
      cluster without questioning why that cluster was order 2-5 in the first
@@ -1128,6 +1174,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 <div id="top">
   <div id="title" aria-label="NMS Galactic Map"><img id="titleIcon" src="favicon/favicon-32x32.png" alt=""><span id="titleText" aria-hidden="true">NMS GALACTIC MAP</span></div>
   <button type="button" id="toolbarToggle" aria-expanded="true" title="Hide or show the map controls below the title.">&#9650; Hide controls</button>
+  <div id="toolbarBody">
   <select id="galSel"></select>
   <select id="galTypeFilter" title="Narrow the galaxy list above to just one type -- Normal, Harsh, Empty or Lush -- picked from Tony's own reference list of all 255 real galaxy types." style="max-width:104px;font-family:'Orbitron',sans-serif;font-size:9px">
     <option value="">Any type</option>
@@ -1164,6 +1211,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   <button class="btn" id="bTour" title="A quick guided tour of what this map can do.">&#9673; Tour</button>
   <button class="btn" id="bAbout" title="Fan-made disclaimer and a note on procedural vs. real system data.">&#9432; About</button>
   <button class="btn" id="bAccess" title="Accessibility settings: font size, colour-blind filters, high contrast." aria-label="Accessibility settings" aria-haspopup="true" aria-expanded="false">&#9881;</button>
+  </div>
 </div>
 
 <div id="annivBadge" title="10 years of No Man's Sky -- 2016-2026. Fan-made tribute, not an official Hello Games asset."><img src="icons-web/anniv-10th-badge.png" alt="No Man's Sky 10th Anniversary"></div>
@@ -9639,25 +9687,94 @@ if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){
   typeStep();
 })();
 (function(){
-  /* 2026-08-30, Tony (round 6): mobile "hide controls" toggle -- see the
-     #toolbarToggle rule in the @media(max-width:900px) block for why. The
-     button's own text always states the action it performs next (Hide vs.
-     Show), so it's self-explanatory without a separate hint or tooltip. */
+  /* 2026-08-30, Tony (round 8): mobile "hide controls" toggle, now a
+     per-group cascade instead of round 7's single whole-block slide --
+     "reveal one row at a time smoothly with same glow as title but then
+     looses glow... remove one at a time... not too quick not too slow".
+     TIERS mirrors the same 6 groups the dividers (sepA-E) already mark, so
+     no HTML restructuring was needed -- each tier reveals/hides on its own
+     staggered delay (90ms apart), with a one-shot glow (see
+     @keyframes toolbarRowReveal) on the way in that fades back to each
+     element's own normal, undisturbed appearance rather than trying to
+     fake "returning" a color (buttons with the .on class are gold, not
+     white, so the glow is a pure drop-shadow overlay, never touches the
+     element's actual text colour). Hiding a tier waits for its own fade-out
+     to finish before switching to display:none, so the layout shrinks in
+     the same staggered rhythm rather than all at once. */
   var KEY='nms_mobileToolbarCollapsed';
   var btn=document.getElementById('toolbarToggle');
   if(!btn) return;
-  function setState(collapsed){
-    document.documentElement.classList.toggle('toolbar-collapsed',collapsed);
+  var TIERS=[
+    ['galSel','galTypeFilter'],
+    ['sepA','mGal','mLoc','inAddr','bAddrReset'],
+    ['sepB','bKeys','bRand','bSearch','bJump'],
+    ['sepC','bFiltToggle','bLbl','bGrid','bAtlas'],
+    ['sepD','cOrb','cFly'],
+    ['sepE','bInstall','bTour','bAbout','bAccess']
+  ].map(function(ids){
+    return ids.map(function(id){ return document.getElementById(id); }).filter(Boolean);
+  });
+  var STAGGER=90, REVEAL_MS=280, HIDE_MS=160;
+  var reduceMotion=false;
+  try{ reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches; }catch(e){}
+  var timers=[];
+  function clearTimers(){ timers.forEach(clearTimeout); timers=[]; }
+  function setLabel(collapsed){
     btn.textContent=(collapsed?'▼ Show controls':'▲ Hide controls');
     btn.setAttribute('aria-expanded',String(!collapsed));
   }
+  function showInstant(tier){
+    tier.forEach(function(el){ el.classList.remove('tb-hidden','tb-revealing','tb-hiding'); });
+  }
+  function hideInstant(tier){
+    tier.forEach(function(el){ el.classList.remove('tb-revealing','tb-hiding'); el.classList.add('tb-hidden'); });
+  }
+  function revealAll(){
+    clearTimers();
+    if(reduceMotion){ TIERS.forEach(showInstant); return; }
+    TIERS.forEach(function(tier,i){
+      timers.push(setTimeout(function(){
+        tier.forEach(function(el){
+          el.classList.remove('tb-hidden','tb-hiding','tb-revealing');
+          void el.offsetWidth;
+          el.classList.add('tb-revealing');
+        });
+        timers.push(setTimeout(function(){
+          tier.forEach(function(el){ el.classList.remove('tb-revealing'); });
+        },REVEAL_MS));
+      },i*STAGGER));
+    });
+  }
+  function hideAll(){
+    clearTimers();
+    if(reduceMotion){ TIERS.forEach(hideInstant); return; }
+    TIERS.slice().reverse().forEach(function(tier,ri){
+      timers.push(setTimeout(function(){
+        tier.forEach(function(el){
+          el.classList.remove('tb-revealing','tb-hiding');
+          void el.offsetWidth;
+          el.classList.add('tb-hiding');
+        });
+        timers.push(setTimeout(function(){
+          tier.forEach(function(el){ el.classList.remove('tb-hiding'); el.classList.add('tb-hidden'); });
+        },HIDE_MS));
+      },ri*STAGGER));
+    });
+  }
+  // First paint only: jump straight to the saved state with no animation --
+  // the cascade should only ever play in response to an actual tap.
   var initial=false;
   try{ initial=localStorage.getItem(KEY)==='1'; }catch(e){}
-  setState(initial);
+  TIERS.forEach(initial?hideInstant:showInstant);
+  document.documentElement.classList.toggle('toolbar-collapsed',initial);
+  setLabel(initial);
   btn.addEventListener('click',function(){
-    var next=!document.documentElement.classList.contains('toolbar-collapsed');
-    setState(next);
-    try{ localStorage.setItem(KEY,next?'1':'0'); }catch(e){}
+    var collapsing=!document.documentElement.classList.contains('toolbar-collapsed');
+    document.documentElement.classList.toggle('toolbar-collapsed',collapsing);
+    setLabel(collapsing);
+    if(collapsing) hideAll(); else revealAll();
+    btn.classList.remove('flash'); void btn.offsetWidth; btn.classList.add('flash');
+    try{ localStorage.setItem(KEY,collapsing?'1':'0'); }catch(e){}
   });
 })();
 </script>
