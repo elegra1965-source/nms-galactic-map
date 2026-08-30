@@ -1214,6 +1214,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   <button class="btn" id="bKeys" title="Open the 16-key portal glyph keypad. Tap glyphs to build an address; it stays in sync with the hex box.">Glyphs</button>
   <button class="btn" id="bRand" title="Roll a random valid portal address and jump there.">Random</button>
   <button class="btn" id="bSearch" title="Search for a system by name -- only ones you or the community have documented, bookmarked, waypointed or visited, not every procedural system.">Search</button>
+  <button class="btn" id="bWarpToggle" title="Play a warp-jump animation when entering system view. Same setting as Filters -> Warp animation, just easier to reach. Click to turn on/off.">&#9889; Warp FX</button>
   <div class="sep" id="sepC"></div>
   <button class="btn" id="bFiltToggle" title="Show or hide the system filters.">Filters</button>
   <button class="btn on" id="bLbl" title="Show names on the nearest stars, or on planets and moons inside a system. Shortcut: H">Labels</button>
@@ -6428,9 +6429,23 @@ bindSlider("sSz","vSz",function(){
 });
 /* spec item 9 -- warp animation toggle */
 document.getElementById("fWarpAnim").checked=WARP_ENABLED;
+/* 2026-08-30, honest-review to-do: the only way to turn this off used to be
+   buried inside the Filters panel, which nobody finds by accident -- add a
+   one-click toggle right in the main toolbar next to Random/Search too.
+   Both controls drive the exact same WARP_ENABLED flag/localStorage key, so
+   flipping either one immediately updates the other's visible state. */
+var bWarpToggle=document.getElementById("bWarpToggle");
+function syncWarpToggleBtn(){ bWarpToggle.classList.toggle("on",WARP_ENABLED); }
+syncWarpToggleBtn();
+bWarpToggle.addEventListener("click",function(){
+  var cb=document.getElementById("fWarpAnim");
+  cb.checked=!cb.checked;
+  cb.dispatchEvent(new Event("change"));
+});
 document.getElementById("fWarpAnim").addEventListener("change",function(){
   WARP_ENABLED=this.checked;
   localStorage.setItem('nms-galmap-warp',WARP_ENABLED?'1':'0');
+  syncWarpToggleBtn();
 });
 document.getElementById("fHyper").addEventListener("change",function(){
   if(courseTarget) setCourse(courseTarget);
@@ -9847,9 +9862,24 @@ if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){
      neighbours in the @media block) turns each step into a smooth glide
      instead of a snap -- which is also the "moving up and down" motion
      Tony was actually asking for. */
+  /* 2026-08-30, Tony: "picture 1 moves... but picture 2 doesn't... they
+     suppose to be together" -- #annivBadge (the 10th-anniversary badge) is
+     positioned in JS off #galHud's own live rect (positionAnnivBadge(),
+     defined above), specifically so it always sits glued to galHud's right
+     edge. But this cascade only ever called syncTopOffset() at each tier
+     step -- which is what makes #galHud itself glide via --top-h -- and
+     never called positionAnnivBadge() alongside it, so the badge stayed
+     frozen at wherever it was last measured while galHud slid out from
+     under it, same category of bug as the --top-h one just above. One
+     shared step for both, same reasoning as keeping one shared distance
+     number elsewhere in this file: whatever moves galHud should always be
+     the same thing that re-glues the badge to it, so they can't drift apart
+     again. (#annivBadge's own CSS already has `transition:left .15s,top
+     .15s`, so recomputing it here rides the same glide, not a snap.) */
+  function syncOverlays(){ syncTopOffset(); positionAnnivBadge(); }
   function revealAll(){
     clearTimers();
-    if(reduceMotion){ TIERS.forEach(showInstant); syncTopOffset(); return; }
+    if(reduceMotion){ TIERS.forEach(showInstant); syncOverlays(); return; }
     TIERS.forEach(function(tier,i){
       timers.push(setTimeout(function(){
         tier.forEach(function(el){
@@ -9857,7 +9887,7 @@ if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){
           void el.offsetWidth;
           el.classList.add('tb-revealing');
         });
-        syncTopOffset();
+        syncOverlays();
         timers.push(setTimeout(function(){
           tier.forEach(function(el){ el.classList.remove('tb-revealing'); });
         },REVEAL_MS));
@@ -9866,7 +9896,7 @@ if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){
   }
   function hideAll(){
     clearTimers();
-    if(reduceMotion){ TIERS.forEach(hideInstant); syncTopOffset(); return; }
+    if(reduceMotion){ TIERS.forEach(hideInstant); syncOverlays(); return; }
     TIERS.slice().reverse().forEach(function(tier,ri){
       timers.push(setTimeout(function(){
         tier.forEach(function(el){
@@ -9876,7 +9906,7 @@ if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){
         });
         timers.push(setTimeout(function(){
           tier.forEach(function(el){ el.classList.remove('tb-hiding'); el.classList.add('tb-hidden'); });
-          syncTopOffset();
+          syncOverlays();
         },HIDE_MS));
       },ri*STAGGER));
     });
@@ -9888,7 +9918,7 @@ if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){
   TIERS.forEach(initial?hideInstant:showInstant);
   document.documentElement.classList.toggle('toolbar-collapsed',initial);
   setLabel(initial);
-  if(typeof syncTopOffset==='function') syncTopOffset();
+  syncOverlays();
   btn.addEventListener('click',function(){
     var collapsing=!document.documentElement.classList.contains('toolbar-collapsed');
     document.documentElement.classList.toggle('toolbar-collapsed',collapsing);
