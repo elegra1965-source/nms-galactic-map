@@ -456,6 +456,41 @@ body.no-fx .orb{display:none}
 </style>
 </head>
 <body>
+<script>
+/* Synchronous placeholder promise, created before the nms-core module
+   script below even begins loading -- same pattern as the live map's
+   preview.html (see its own comment), needed for the same reason: a
+   plain classic <script> further down this page runs synchronously as
+   the parser reaches it, while <script type="module"> is deferred until
+   the whole document has parsed. Defining the real Promise object here
+   first (only its RESOLUTION is deferred) means code below can safely
+   attach .then() to window.nmsCoreReady regardless of load order. */
+window.nmsCoreReady = new Promise(function (res) { window.__nmsCoreResolve = res; });
+</script>
+<script type="module">
+/* Real, game-accurate system generation -- the same ported nms-core
+   module (+ the economy/conflict/race module) the live map itself uses
+   -- loaded here so black-hole-exit candidates can be genuinely real
+   regional data instead of one fixed, unrelated sample cluster. Paths
+   are one level up since this page lives in navigator/. If this fails
+   to load, window.NMSCore/window.NMSEconomy simply stay unset and the
+   black-hole-exit code below falls back to the old static sample pool,
+   same graceful-degrade rule the live map already follows everywhere
+   nms-core is used. */
+import * as NMSCore from '../nms-core/index.js';
+import { loadLetterMap } from '../nms-core/loadLetterMap.js';
+import * as NMSEconomy from '../nms-core/economy.js';
+window.NMSCore = NMSCore;
+window.NMSEconomy = NMSEconomy;
+loadLetterMap('../nms-core/letter-map').then(function (lm) {
+  window.nmsLetterMap = lm;
+  window.__nmsCoreResolve();
+}).catch(function (err) {
+  console.error('nms-core letter map failed to load in Navigator -- black-hole exits will fall back to the sample pool', err);
+  window.NMSCore = null;
+  window.__nmsCoreResolve();
+});
+</script>
   <!-- Real ship-hyperdrive warp clip (see CSS comment above) -- same
        muted/playsinline/preload pattern as preview.html's #warp-vid. -->
   <div id="warpOverlay">
@@ -1900,19 +1935,154 @@ window.MOCK_JOURNEYS = [
     return Math.round(Math.sqrt(dx * dx + dy * dy + dz * dz) * VOX_LY);
   }
 
+  // ---- Real regional data for black-hole exits (2026-08-30) ----
+  // Was: always drawn from sample-region.js, one fixed 126-system cluster
+  // around a single hardcoded "home" point -- real, validly-decoded
+  // systems, but the SAME cluster no matter where your actual route was,
+  // so an exit near a black hole out in, say, the Hommel Quadrant would
+  // still offer you systems from a cluster hundreds of thousands of LY
+  // away. Now: candidates are generated live off the black hole's own
+  // real region coordinates (every hop already carries these, handed off
+  // by PLAN JOURNEY -- see readLivePlot() above), through the exact same
+  // nms-core generator + economy/conflict/race module the live map itself
+  // uses (loaded just above). Falls back to the old static pool only if
+  // nms-core genuinely failed to load (e.g. this page opened via file://).
+  var SIZE_XZ = 0x1000, SIZE_Y = 0x100, LY_PER_VOXEL = 400;
+  function hexPad(n, w) { var s = n.toString(16).toUpperCase(); while (s.length < w) s = "0" + s; return s; }
+  function toRawSigned(s, size) { return s < 0 ? s + size : s; }
+  function formatAddressLocal(p, idx, x, y, z) {
+    return hexPad(p & 0xF, 1) + hexPad(idx & 0xFFF, 3) + hexPad(toRawSigned(y, SIZE_Y) & 0xFF, 2) +
+           hexPad(toRawSigned(z, SIZE_XZ) & 0xFFF, 3) + hexPad(toRawSigned(x, SIZE_XZ) & 0xFFF, 3);
+  }
+  function h32Local(x, y, z, i) {
+    var h = 2166136261 >>> 0, v = [x | 0, y | 0, z | 0, i | 0], k, b;
+    for (k = 0; k < 4; k++) for (b = 0; b < 4; b++) { h ^= ((v[k] >>> (b * 8)) & 0xff); h = Math.imul(h, 16777619) >>> 0; }
+    return h >>> 0;
+  }
+  function gseedLocal(galaxy, x, y, z, i) { return (h32Local(x, y, z, i) ^ Math.imul(galaxy + 1, 2654435761)) >>> 0; }
+  function mulberry32Local(a) {
+    return function () {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      var t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function regionDistanceLY(a, b) {
+    var dx = a.x - b.x, dy = a.y - b.y, dz = a.z - b.z;
+    return Math.round(Math.sqrt(dx * dx + dy * dy + dz * dz) * LY_PER_VOXEL);
+  }
+  var STAR_TYPE_BY_INDEX = ["yellow", "green", "blue", "red", "purple"];
+
+  var realRegionPoolCache = {};
+  // Builds real candidate systems around (originVx,originVy,originVz):
+  // the black hole's own region plus a handful of scattered neighbouring
+  // regions (0-6 regions away per axis, ~0-2400 LY), so exits land
+  // anywhere from right next door to genuinely far off course -- matching
+  // the BLACK HOLE AHEAD modal's own "sometimes thousands of LY... 
+  // occasionally closer than planned" copy with real generated data
+  // instead of contradicting it with one fixed unrelated cluster.
+  function realRegionCandidates(originVx, originVy, originVz, galaxy) {
+    var key = galaxy + ":" + originVx + "," + originVy + "," + originVz;
+    if (realRegionPoolCache[key]) return realRegionPoolCache[key];
+    if (!window.NMSCore || !window.nmsLetterMap) return null; // caller falls back
+
+    var out = [];
+    var seenRegion = {};
+    var pr = mulberry32Local(gseedLocal(galaxy, originVx, originVy, originVz, 0xE317));
+    var REGION_SPREAD = 6;
+    var regionOffsets = [[0, 0, 0]];
+    while (regionOffsets.length < 5) {
+      regionOffsets.push([
+        Math.floor((pr() - 0.5) * 2 * REGION_SPREAD),
+        Math.floor((pr() - 0.5) * 2 * REGION_SPREAD),
+        Math.floor((pr() - 0.5) * 2 * REGION_SPREAD)
+      ]);
+    }
+
+    regionOffsets.forEach(function (off) {
+      var vx = originVx + off[0], vy = originVy + off[1], vz = originVz + off[2];
+      var rk = vx + "," + vy + "," + vz;
+      if (seenRegion[rk]) return;
+      seenRegion[rk] = true;
+
+      // A region's own black-hole/Atlas guide-star indices are a separate
+      // overlay (regionAnomalyIdx-style), not something systemAttributes()
+      // itself flags -- skip them here so a suggested "where you emerged"
+      // system is never secretly the region's own black hole or Atlas
+      // Interface position.
+      var anomaly = { bh: -1, atlas: -1 };
+      try {
+        var va = window.NMSCore.voxelAttributes(BigInt("0x" + formatAddressLocal(1, 0, vx, vy, vz)));
+        anomaly.bh = va.black_hole_count > 0 ? (va.guide_star_count + 1) : -1;
+        anomaly.atlas = va.atlas_station_count > 0 ? (va.guide_star_count + va.black_hole_count + 1) : -1;
+      } catch (e) {}
+
+      var vr = mulberry32Local(gseedLocal(galaxy, vx, vy, vz, 0xF00D));
+      var pickedIdx = {}, attempts = 0, picks = 6;
+      while (Object.keys(pickedIdx).length < picks && attempts < 60) {
+        attempts++;
+        var idx = Math.floor(vr() * 4096);
+        var jitter = Math.round(vr() * 350); // spread within a region, ~one region's own span
+        if (idx > 0xFFE || idx === anomaly.bh || idx === anomaly.atlas || pickedIdx[idx]) continue;
+        pickedIdx[idx] = true;
+
+        var address = formatAddressLocal(1, idx, vx, vy, vz);
+        var pc;
+        try { pc = BigInt("0x" + address); } catch (e) { continue; }
+        var attrs = null;
+        try { attrs = window.NMSCore.systemAttributes(pc, galaxy); } catch (e) { attrs = null; }
+        if (!attrs) continue;
+
+        var name = null, region = null;
+        try { name = window.NMSCore.systemName(pc, galaxy, window.nmsLetterMap); } catch (e) { name = null; }
+        try { region = window.NMSCore.regionName(pc, galaxy, window.nmsLetterMap); } catch (e) { region = null; }
+        if (!name) continue; // a real name is the whole point -- skip rather than invent one
+
+        var flavor = null;
+        if (window.NMSEconomy && window.NMSEconomy.rollSystemFlavorFromAttrs) {
+          var fr = mulberry32Local(gseedLocal(galaxy, vx, vy, vz, idx));
+          try { flavor = window.NMSEconomy.rollSystemFlavorFromAttrs(fr, attrs); } catch (e) { flavor = null; }
+        }
+
+        out.push({
+          address: address,
+          systemName: name,
+          region: region || "",
+          starType: STAR_TYPE_BY_INDEX[attrs.star_type] || "yellow",
+          race: flavor ? flavor.race : "",
+          economy: flavor ? flavor.econType : "",
+          econType: flavor ? flavor.econType : "",
+          econTier: flavor ? flavor.econTier : null,
+          conflict: flavor ? flavor.conflict : "",
+          conTier: flavor ? flavor.conTier : null,
+          outlaw: flavor ? !!flavor.outlaw : false,
+          coords: { x: vx, y: vy, z: vz },
+          distanceFromHome: regionDistanceLY({ x: originVx, y: originVy, z: originVz }, { x: vx, y: vy, z: vz }) + jitter
+        });
+      }
+    });
+
+    realRegionPoolCache[key] = out;
+    return out;
+  }
+
   // Real black-hole unpredictability, illustrated with real data — not a
   // seamless "continue as planned." When you confirm you emerged somewhere
-  // other than expected, this picks 1-3 real nearby systems (from the same
-  // read-only nms-core scan behind the Galactic Map's denser local cluster,
-  // sample-region.js) that aren't already on your route, and inserts them
-  // as unplanned stops before you continue on to the originally planned
-  // next system. Real charted systems, real distances between them — just
-  // not part of the route you set out on, which is the actual point: a
-  // black hole cost you extra jumps to get back on course.
-  function pickBlackHoleDetour() {
+  // other than expected, this picks 1-3 real nearby systems -- generated
+  // live around the black hole's own real coordinates via realRegionCandidates()
+  // above, falling back to the old sample-region.js cluster only if
+  // nms-core isn't available -- that aren't already on your route, and
+  // inserts them as unplanned stops before you continue on to the
+  // originally planned next system. Real charted systems, real distances
+  // between them — just not part of the route you set out on, which is
+  // the actual point: a black hole cost you extra jumps to get back on
+  // course.
+  function pickBlackHoleDetour(originCoords, galaxy) {
     var have = {};
     jumps().forEach(function (j) { have[j.address] = true; });
-    var pool = (window.MOCK_REGION_SYSTEMS || []).filter(function (s) { return !have[s.address]; });
+    var live = originCoords ? realRegionCandidates(originCoords.x, originCoords.y, originCoords.z, galaxy) : null;
+    var pool = (live || window.MOCK_REGION_SYSTEMS || []).filter(function (s) { return !have[s.address]; });
     if (!pool.length) return [];
     var count = Math.min(1 + Math.floor(Math.random() * 3), pool.length); // 1-3 extra jumps
     var picked = [], used = {};
@@ -1926,9 +2096,9 @@ window.MOCK_JOURNEYS = [
   }
 
   function insertBlackHoleDetour(ni) {
-    var extra = pickBlackHoleDetour();
-    if (!extra.length) return 0;
     var jl = jumps();
+    var extra = pickBlackHoleDetour(jl[ni].coords, currentGalaxyNum());
+    if (!extra.length) return 0;
     var prevCoords = jl[ni].coords;
     var detourJumps = extra.map(function (s) {
       var d = distanceLY(prevCoords, s.coords);
@@ -2184,7 +2354,8 @@ window.MOCK_JOURNEYS = [
         jumps().forEach(function (j) { have[j.address] = true; });
         var results = $("emergeResults");
         if (!q) { results.innerHTML = ""; return; }
-        var pool = (window.MOCK_REGION_SYSTEMS || []).filter(function (s) {
+        var live = next.coords ? realRegionCandidates(next.coords.x, next.coords.y, next.coords.z, currentGalaxyNum()) : null;
+        var pool = (live || window.MOCK_REGION_SYSTEMS || []).filter(function (s) {
           return !have[s.address] && (s.systemName || s.name || "").toLowerCase().indexOf(q) !== -1;
         }).slice(0, 8);
         results.innerHTML = pool.map(function (s, idx) {
@@ -2716,7 +2887,7 @@ window.MOCK_JOURNEYS = [
       // real journey. 2026-08-29.
       var bannerText = $("mockBannerText");
       if (bannerText && session.isLivePlot) {
-        bannerText.textContent = "Showing your real plotted route from the live map — some interactions (e.g. black-hole exits) still use placeholder data";
+        bannerText.textContent = "Showing your real plotted route from the live map — black-hole exits now use real regional data; full route replanning after a detour is still a simplified preview";
       }
       var dataStatus = $("dataStatus");
       if (dataStatus && session.isLivePlot) {
