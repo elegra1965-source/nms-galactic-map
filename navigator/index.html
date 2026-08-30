@@ -1599,7 +1599,30 @@ window.MOCK_JOURNEYS = [
 
   var requestedId = readQueryJourney();
   var livePlot = readLivePlot();
-  var session = livePlot ? (loadSession() || livePlot) : (requestedId ? startJourney(requestedId) : (loadSession() || startJourney(journeys[0].id)));
+  // 2026-08-30 (Tony: "a way to save a route for later instead of just
+  // planning it in one sitting, since expeditions rarely happen in one
+  // browser tab"): resumedFromStorage records whether `session` below is
+  // actually the loadSession() result (a previously-saved in-progress
+  // journey), purely so boot can show a "welcome back" toast -- it must
+  // only be set true in the exact branches that use loadSession()'s
+  // return value, not just because *some* stale session exists in
+  // storage, otherwise an explicit ?journey=/?hops= request that ignores
+  // a leftover saved session would still wrongly claim to be "resuming".
+  // Precedence is unchanged from before this feature: live plot / explicit
+  // requested id / saved session, in that order.
+  var resumedFromStorage = false;
+  var session;
+  if (livePlot) {
+    var loaded = loadSession();
+    session = loaded || livePlot;
+    resumedFromStorage = !!loaded;
+  } else if (requestedId) {
+    session = startJourney(requestedId);
+  } else {
+    var loaded2 = loadSession();
+    session = loaded2 || startJourney(journeys[0].id);
+    resumedFromStorage = !!loaded2;
+  }
 
   function readQueryJourney() {
     try {
@@ -1726,13 +1749,18 @@ window.MOCK_JOURNEYS = [
     return def;
   }
 
+  // 2026-08-30: was sessionStorage, which threw away in-progress state the
+  // moment the tab closed -- exactly the "expeditions rarely happen in one
+  // browser tab" problem Tony raised. localStorage survives across tabs,
+  // browser restarts and reboots, so closing the tab mid-journey and coming
+  // back tomorrow now actually resumes instead of silently starting over.
   function persist() {
-    try { sessionStorage.setItem(STORAGE_KEY, JSON.stringify(session)); } catch (e) {}
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(session)); } catch (e) {}
   }
 
   function loadSession() {
     try {
-      var raw = sessionStorage.getItem(STORAGE_KEY);
+      var raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return null;
       var s = JSON.parse(raw);
       if (!s) return null;
@@ -2310,6 +2338,10 @@ window.MOCK_JOURNEYS = [
         isLivePlot: !!session.isLivePlot
       }));
     } catch (e) {}
+    // Journey's actually finished -- clear the resumable in-progress state
+    // so a later visit to this same URL (or ?journey=/?hops= link) doesn't
+    // resurrect a completed trip as if it were still underway.
+    try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
     location.href = "./complete.html";
   }
 
@@ -2769,6 +2801,12 @@ window.MOCK_JOURNEYS = [
   })();
 
   renderAll();
+
+  // 2026-08-30: friendly confirmation that this isn't a fresh journey --
+  // without this, silently picking up mid-route with no explanation could
+  // easily read as a bug ("didn't I start over?") rather than the feature
+  // it is.
+  if (resumedFromStorage) showToast("Welcome back — resuming your in-progress trip.", 3200);
 })();
 
 </script>
