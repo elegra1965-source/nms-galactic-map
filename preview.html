@@ -112,8 +112,42 @@ canvas#c{display:block;position:fixed;inset:0;touch-action:none}
    would look stuck to the floor instead of centred between the buttons. */
 #top{position:fixed;top:0;left:0;right:0;z-index:30;display:flex;align-items:flex-end;
   gap:6px;padding:8px 10px;background:linear-gradient(#070b11f2,#070b1100);flex-wrap:wrap}
-#title{font-family:'Orbitron',sans-serif;font-weight:700;font-size:12px;letter-spacing:.14em;
-  color:var(--white);text-shadow:0 0 18px rgba(0,229,255,.45);white-space:nowrap;margin-right:2px}
+/* 2026-08-30, Tony: the title used to be plain 12px text sitting in the same
+   flex row as the toolbar buttons -- same size class as the secondary GRID/
+   ATLAS/TOUR row, easy to lose among 24 other flex items. Now it's its own
+   bordered badge (same bordered-box language the tag/panel UI already uses
+   elsewhere) with the site's real favicon as a spinning icon, and the text
+   types itself out once per page load before settling into a slow ambient
+   glow -- see the boot script near the end of this file for the one-shot
+   typewriter, and prefers-reduced-motion below for the escape hatch. */
+#title{display:flex;align-items:center;gap:9px;
+  font-family:'Orbitron',sans-serif;font-weight:700;font-size:20px;letter-spacing:.1em;
+  color:var(--white);white-space:nowrap;margin-right:10px;
+  padding:6px 14px;border-radius:var(--r-sm);
+  border:1px solid rgba(0,229,255,.15);background:rgba(0,229,255,.02);
+  animation:titleBoxBreathe 3.6s ease-in-out infinite}
+#title.typing{animation:none;border-color:rgba(0,229,255,.15);background-color:rgba(0,229,255,.02)}
+#titleIcon{width:26px;height:26px;flex:none;display:block;
+  animation:titleIconSpin 5s linear infinite}
+#titleText{animation:titleTextBreathe 3.6s ease-in-out infinite}
+#title.typing #titleText{animation:none;color:var(--white);text-shadow:none}
+@keyframes titleIconSpin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes titleTextBreathe{
+  0%{color:rgb(140,200,220);text-shadow:none}
+  50%{color:rgb(235,246,255);text-shadow:0 0 18px rgba(0,229,255,.85),0 0 40px rgba(0,229,255,.6),0 0 60px rgba(0,229,255,.3)}
+  100%{color:rgb(140,200,220);text-shadow:none}
+}
+@keyframes titleBoxBreathe{
+  0%{border-color:rgba(0,229,255,.15);background-color:rgba(0,229,255,.02)}
+  50%{border-color:rgba(0,229,255,.9);background-color:rgba(0,229,255,.11)}
+  100%{border-color:rgba(0,229,255,.15);background-color:rgba(0,229,255,.02)}
+}
+/* A visitor with reduced-motion set gets the finished title and a static
+   icon -- no spin, no breathing, no typewriter (guarded again in the boot
+   script below, so it never even starts building the animation timers). */
+@media (prefers-reduced-motion: reduce){
+  #titleIcon,#title,#titleText{animation:none}
+}
 .btn{font-family:'Orbitron',sans-serif;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;
   background:var(--panel);border:1px solid var(--border);color:var(--text);
   padding:6px 10px;border-radius:var(--r-sm);cursor:pointer;white-space:nowrap}
@@ -1009,7 +1043,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 </div>
 
 <div id="top">
-  <div id="title">NMS GALACTIC MAP</div>
+  <div id="title" aria-label="NMS Galactic Map"><img id="titleIcon" src="favicon/favicon-32x32.png" alt=""><span id="titleText" aria-hidden="true">NMS GALACTIC MAP</span></div>
   <select id="galSel"></select>
   <select id="galTypeFilter" title="Narrow the galaxy list above to just one type -- Normal, Harsh, Empty or Lush -- picked from Tony's own reference list of all 255 real galaxy types." style="max-width:104px;font-family:'Orbitron',sans-serif;font-size:9px">
     <option value="">Any type</option>
@@ -9477,6 +9511,49 @@ window.nmsCoreReady.then(function(){
    changing button widths and therefore how many rows the toolbar wraps
    onto -- re-measure once fonts settle so --top-h doesn't end up stale. */
 if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ syncTopOffset(); positionAnnivBadge(); }).catch(function(){});
+
+/* 2026-08-30, Tony: one-shot header intro -- types "NMS GALACTIC MAP" out
+   character by character with a blinking cursor, blinks a few more times
+   once fully typed, then hands off to the CSS titleTextBreathe/titleBoxBreathe
+   keyframes (see #title's rule above) for the rest of the session. The
+   favicon icon spins the whole time regardless of which phase the text is
+   in -- that's a plain always-on CSS animation, not gated by this script.
+   Reads the real text back out of the DOM rather than hardcoding it again,
+   so this can never drift from whatever #titleText actually says. Bails
+   out immediately (showing the finished title, static icon) for a visitor
+   with prefers-reduced-motion set, same escape hatch as the CSS side. */
+(function(){
+  var box=document.getElementById('title');
+  var textEl=document.getElementById('titleText');
+  if(!box||!textEl) return;
+  var FULL=textEl.textContent.trim();
+  if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    textEl.textContent=FULL;
+    return;
+  }
+  var CURSOR=String.fromCharCode(0x258C); // "▌"
+  box.classList.add('typing');
+  var i=0;
+  function typeStep(){
+    if(i<=FULL.length){
+      textEl.textContent=FULL.slice(0,i)+CURSOR;
+      i++;
+      setTimeout(typeStep,65+Math.random()*50);
+    } else {
+      blink(5);
+    }
+  }
+  function blink(remaining){
+    if(remaining<=0){
+      textEl.textContent=FULL;
+      box.classList.remove('typing'); // hands off to the CSS breathing animation
+      return;
+    }
+    textEl.textContent=FULL+(remaining%2===0?'':CURSOR);
+    setTimeout(function(){ blink(remaining-1); },380);
+  }
+  typeStep();
+})();
 </script>
 </body>
 </html>
