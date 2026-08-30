@@ -2524,27 +2524,27 @@ window.MOCK_JOURNEYS = [
     copyText(cur.systemName + ": " + cur.address, "Copied glyphs for " + cur.systemName + ".");
   };
 
-  // Land on the map at wherever you actually are right now, not always
-  // back at a fixed demo start point -- same "the journey should end
-  // somewhere real" rule as completeJourney()'s hand-off to complete.html
-  // below, just for a mid-journey bail-out instead of a finished one.
-  // 2026-08-30.
+  // Land on the REAL live Galactic Map at wherever you actually are right
+  // now, not always back at a fixed demo start point -- same "the journey
+  // should end somewhere real" rule as completeJourney()'s hand-off below,
+  // just for a mid-journey bail-out instead of a finished one. Goes to the
+  // live map itself (../ -- see netlify.toml's "/" -> preview.html rewrite),
+  // not the map-mock.html prototype: this IS a real address, so it deserves
+  // the real map, not a mock page pretending to be one. preview.html reads
+  // these same params on boot (readArrivalHandoff(), 2026-08-30) and jumps
+  // straight there. 2026-08-30.
   function mapReturnQuery(pos, galaxy) {
     if (!pos || !pos.coords) return "";
     var params = new URLSearchParams();
     params.set("arrival", "1");
     params.set("addr", pos.address || "");
-    params.set("name", pos.systemName || "");
     params.set("galaxy", String(galaxy || 0));
-    params.set("x", String(pos.coords.x));
-    params.set("y", String(pos.coords.y));
-    params.set("z", String(pos.coords.z));
     return "?" + params.toString();
   }
 
   $("backToMap").onclick = function () {
     var here = jumps()[currentIndex()];
-    location.href = "./map-mock.html" + mapReturnQuery(here, currentGalaxyNum());
+    location.href = "../" + mapReturnQuery(here, currentGalaxyNum());
   };
 
   var ambienceOn = false;

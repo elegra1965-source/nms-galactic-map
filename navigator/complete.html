@@ -606,27 +606,26 @@ body.no-fx .orb{display:none}
 
   initTwinkleStars(document.getElementById("snapStarCanvas"));
 
-  // Land the map on the system you actually finished at -- not always the
-  // one fixed demo cluster -- so going "back to map" after a journey is
-  // the natural next step rather than undoing it. Only meaningful when
+  // Land on the REAL live Galactic Map at the system you actually finished
+  // at -- not the map-mock.html prototype, and not always the one fixed
+  // demo cluster -- so going "back to map" after a journey is the natural
+  // next step rather than undoing it (Tony, 2026-08-30: "otherwise what
+  // was the point"). Goes to ../ (see netlify.toml's "/" -> preview.html
+  // rewrite), which reads these same params on boot via its own
+  // readArrivalHandoff() and jumps straight there. Only meaningful when
   // this postcard has real destination data to hand off (raw.destination
   // always exists when raw does, live plot or sample journey alike -- see
   // index.html's readLivePlot()/MOCK_JOURNEYS, both carry real coords).
-  // 2026-08-30.
   document.getElementById("viewMap").onclick = function(){
     var q = "";
-    if (raw && raw.destination && raw.destination.coords) {
+    if (raw && raw.destination && raw.destination.address) {
       var params = new URLSearchParams();
       params.set("arrival", "1");
-      params.set("addr", raw.destination.address || "");
-      params.set("name", raw.destination.systemName || "");
+      params.set("addr", raw.destination.address);
       params.set("galaxy", String(raw.galaxy || 0));
-      params.set("x", String(raw.destination.coords.x));
-      params.set("y", String(raw.destination.coords.y));
-      params.set("z", String(raw.destination.coords.z));
       q = "?" + params.toString();
     }
-    location.href = "./map-mock.html" + q;
+    location.href = "../" + q;
   };
 
   function toast(msg){
