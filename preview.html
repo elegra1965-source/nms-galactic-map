@@ -611,9 +611,13 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:.16em;color:var(--gold);
   border:1px solid var(--gold);border-radius:var(--r-sm);padding:10px 16px;
   background:rgba(11,17,25,.9);pointer-events:none;text-transform:uppercase}
-#flyhint{position:fixed;left:220px;bottom:10px;z-index:20;width:230px;
-  pointer-events:none;display:none}
-#flyhint img{display:block;width:100%;height:auto;filter:drop-shadow(0 2px 6px rgba(0,0,0,.6))}
+#flyhint{position:fixed;left:220px;bottom:10px;z-index:20;max-width:250px;
+  font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:.06em;color:var(--white);
+  text-align:left;pointer-events:none;display:none;line-height:1.9;
+  background:rgba(11,17,25,.9);border:1px solid var(--cyan-dim);border-radius:var(--r-sm);
+  padding:7px 10px;text-shadow:0 1px 2px rgba(0,0,0,.7)}
+#flyhint b{color:var(--cyan);background:rgba(0,229,255,.12);border:1px solid var(--cyan-dim);
+  border-radius:4px;padding:1px 5px;font-weight:700;letter-spacing:.04em;white-space:nowrap}
 @media(max-width:900px){#flyhint{left:10px;bottom:64px}}
 #joyBase{position:fixed;width:96px;height:96px;margin:-48px 0 0 -48px;border:2px solid var(--cyan-dim);
   border-radius:50%;background:rgba(0,229,255,.06);pointer-events:none;z-index:19;display:none}
@@ -986,7 +990,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 <div id="galHud"><canvas id="galIcon" width="168" height="168"></canvas><div class="galHudTxt"><div id="galHudName">Galactic Core</div><div id="galHudDist">&mdash;</div></div></div>
 <div id="err"></div>
 <div id="empty">No systems match these filters</div>
-<div id="flyhint"><img src="assets/hud/flycam-keys.png" alt="WASD / arrows move, Shift boost, Space/Q up, E down, drag to look"></div>
+<div id="flyhint"><div><b>WASD</b> / <b>ARROWS</b> move</div><div><b>SHIFT</b> boost &middot; <b>SPACE/Q</b> up &middot; <b>E</b> down</div><div><b>DRAG</b> to look</div></div>
 <div id="joyBase"><div id="joyKnob"></div></div>
 
 <!-- First-visit feature tour (see CSS comment for why it's opt-in, not auto-shown) -->
