@@ -127,24 +127,34 @@ button.
 
 ![Warp Manifest open next to the Course plotted card](screenshots/11-warp-manifest.jpg)
 
-**Galactic Navigator (new, work in progress).** **PLAN JOURNEY** on the Warp
-Manifest card opens a separate page -- the Galactic Navigator -- in a new
-tab, handing off the real plotted route: every hop's real name, portal
-address, region, star type, race, economy and conflict level, straight from
-the same address-decoding this map uses everywhere else, not invented for
-the handoff. It's labelled **WORK IN PROGRESS** on the page itself because
-one piece is still a simplified preview rather than a finished feature --
-confirming a real black-hole exit inserts that detour and resumes toward
-the originally planned next stop, rather than recalculating a whole new
-multi-hop route through the rest of your journey. The exit candidates
-themselves are real, though (2026-08-30): generated live from `nms-core` --
-the same generator this map uses everywhere else -- centred on the black
-hole's own real region, not a fixed sample cluster unrelated to your
-actual route. Worth a look if you're curious where journey-tracking is
-headed; not yet a replacement for anything the main map already does
-reliably.
+**Galactic Navigator.** **PLAN JOURNEY** on the Warp Manifest card takes
+you to a separate page -- the Galactic Navigator -- in this same tab (no
+second window), handing off the real plotted route: every hop's real name,
+portal address, region, star type, race, economy and conflict level,
+straight from the same address-decoding this map uses everywhere else, not
+invented for the handoff. Close the tab or come back another day and it
+picks the journey back up right where you left it -- saved on this device
+the same way bookmarks and waypoints are. One piece is still a simplified
+preview rather than a finished feature: confirming a real black-hole exit
+inserts that detour and resumes toward the originally planned next stop,
+rather than recalculating a whole new multi-hop route through the rest of
+your journey. The exit candidates themselves are real, though (2026-08-30):
+generated live from `nms-core` -- the same generator this map uses
+everywhere else -- centred on the black hole's own real region, not a
+fixed sample cluster unrelated to your actual route.
 
 ![Galactic Navigator page showing a plotted route](screenshots/12-galactic-navigator.jpg)
+
+**Saved & shareable routes.** Once a course is plotted, the Course plotted
+card gets two more buttons below Jump to / Clear. **Save Route** stores
+that exact route into **My Routes** (the Routes button in the toolbar) so
+it's there on this device even after closing the tab -- expeditions rarely
+get planned start-to-finish in one sitting. **Copy Link** hands the same
+route out as a URL instead, for pasting to yourself on another device or
+sending to someone else -- opening it loads (and saves) the route
+automatically, or paste one into the box at the top of My Routes without
+needing the link to open on its own. Saved routes travel with Export/Import
+logs the same way bookmarks and waypoints do.
 
 **Enter system.** Fly into any system for a true 3D orbital view -- binary
 and ternary stars, planets and moons on real orbits with rings where the
@@ -316,10 +326,9 @@ nms-tools/                  nms-lookup.js, a single-call wrapper around nms-core
 glyphs/                    the 16 real portal glyph PNGs (keypad)
 icons-web/, Icons/         race/economy iconography, cropped from real screenshots
 favicon/, manifest.json, sw.js    PWA install + offline support
-navigator/                  the Galactic Navigator prototype -- index.html, complete.html,
+navigator/                  the Galactic Navigator -- index.html, complete.html,
                              map-mock.html; opened from preview.html's PLAN JOURNEY button
-                             with the real plotted route; WORK IN PROGRESS, see "What it
-                             can do" above
+                             with the real plotted route; see "What it can do" above
 SPEC.md                    the original address maths and game-data model, wiki-sourced
 SHARED-EDITS-SETUP.md      one-time GitHub token + Netlify env var setup
 HANDOVER.md                full build history, session by session
