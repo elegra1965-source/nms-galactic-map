@@ -75,6 +75,8 @@ together on screen collapse into a single numbered marker until you zoom
 in far enough to tell them apart, matching how the official Atlas site's
 own map behaves.
 
+![Galactic Atlas overlay showing diamond markers over the galaxy](screenshots/10-atlas-overlay.jpg)
+
 **Local view.** Zoom into a galaxy and the real star field appears --
 thousands of systems, coloured by spectral class, named and clickable.
 Selecting one opens the info panel on the right: race, economy (with real
@@ -110,6 +112,8 @@ target and it plots fresh and reopens automatically. Like every other panel
 here, it's draggable by its header and collapsible with the small arrow
 button.
 
+![Warp Manifest open next to the Course plotted card](screenshots/11-warp-manifest.jpg)
+
 **Galactic Navigator (new, work in progress).** **PLAN JOURNEY** on the Warp
 Manifest card opens a separate page -- the Galactic Navigator -- in a new
 tab, handing off the real plotted route: every hop's real name, portal
@@ -122,6 +126,8 @@ and the black-hole-exit flow currently run on the Navigator's own sample
 data rather than this map's real state. Worth a look if you're curious
 where journey-tracking is headed; not yet a replacement for anything the
 main map already does reliably.
+
+![Galactic Navigator page showing a plotted route](screenshots/12-galactic-navigator.jpg)
 
 **Enter system.** Fly into any system for a true 3D orbital view -- binary
 and ternary stars, planets and moons on real orbits with rings where the
@@ -186,6 +192,8 @@ personally have edited or bulk-imported from your save (added 2026-08-27,
 tagged "Documented (you)" -- other travellers' edits stay out), sorted
 alphabetically -- a way to get back to somewhere you've been without needing
 to remember its address or portal glyphs.
+
+![Search by name panel showing matching results](screenshots/13-search-panel.jpg)
 
 **Honest about its limits.** The About modal spells out exactly what's
 generated accurately (star type, system/region names, planet count) versus
