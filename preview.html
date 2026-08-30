@@ -112,6 +112,12 @@ canvas#c{display:block;position:fixed;inset:0;touch-action:none}
    would look stuck to the floor instead of centred between the buttons. */
 #top{position:fixed;top:0;left:0;right:0;z-index:30;display:flex;align-items:flex-end;
   gap:6px;padding:8px 10px;background:linear-gradient(#070b11f2,#070b1100);flex-wrap:wrap}
+/* 2026-08-30, Tony: mobile-only "hide controls" toggle (see #top>*:not(...)
+   rule in the @media(max-width:900px) block) -- desktop's single-row bar
+   never covers the map, so this button stays hidden there and only turns
+   on for the mobile stacked layout where the full grouped toolbar can run
+   to 7+ rows and bury the system view underneath it. */
+#toolbarToggle{display:none}
 /* 2026-08-30, Tony: the title used to be plain 12px text sitting in the same
    flex row as the toolbar buttons -- same size class as the secondary GRID/
    ATLAS/TOUR row, easy to lose among 24 other flex items. Now it's its own
@@ -912,6 +918,24 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   #top .sep{display:block;width:auto;height:1px;flex:1 0 100%;
     margin:8px 0 4px;background:rgba(0,229,255,.35);align-self:stretch}
   #sepA{order:15} #sepB{order:27} #sepC{order:37} #sepD{order:47} #sepE{order:55}
+  /* 2026-08-30, Tony (round 6): "intrusive, overwhelming, can't see the full
+     system picture because of the menu" -- the grouped+divided toolbar
+     (rounds 4-5) is easy to read but tall, up to 7 stacked rows, and stays
+     fixed over the map the whole time. #toolbarToggle gets its own full-width
+     row right under the title (order:2, flex-basis:100% so nothing else can
+     share its line) and toggles html.toolbar-collapsed, which hides every
+     #top child except the title and the toggle itself -- title stays as a
+     permanent anchor so the bar never disappears completely, and the toggle
+     button's own label always says which way it currently goes (Hide vs.
+     Show), so there's nothing to separately explain. State is remembered
+     across visits via localStorage (see the boot script near the end of the
+     file) so once someone hides it, it stays hidden until they choose to
+     bring it back, on this device. */
+  #toolbarToggle{display:flex;order:2;flex:0 0 100%;justify-content:flex-end;
+    background:transparent;border:none;color:var(--cyan);
+    font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:.08em;
+    text-transform:uppercase;padding:2px 2px 4px;cursor:pointer}
+  html.toolbar-collapsed #top>*:not(#title):not(#toolbarToggle){display:none}
   /* 2026-08-30, Tony (round 2 -- moved Info to the end): first pass just
      dropped Camera in next to the pre-existing Tour/About/Access/Install
      cluster without questioning why that cluster was order 2-5 in the first
@@ -1103,6 +1127,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 
 <div id="top">
   <div id="title" aria-label="NMS Galactic Map"><img id="titleIcon" src="favicon/favicon-32x32.png" alt=""><span id="titleText" aria-hidden="true">NMS GALACTIC MAP</span></div>
+  <button type="button" id="toolbarToggle" aria-expanded="true" title="Hide or show the map controls below the title.">&#9650; Hide controls</button>
   <select id="galSel"></select>
   <select id="galTypeFilter" title="Narrow the galaxy list above to just one type -- Normal, Harsh, Empty or Lush -- picked from Tony's own reference list of all 255 real galaxy types." style="max-width:104px;font-family:'Orbitron',sans-serif;font-size:9px">
     <option value="">Any type</option>
@@ -9612,6 +9637,28 @@ if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){
     setTimeout(function(){ blink(remaining-1); },380);
   }
   typeStep();
+})();
+(function(){
+  /* 2026-08-30, Tony (round 6): mobile "hide controls" toggle -- see the
+     #toolbarToggle rule in the @media(max-width:900px) block for why. The
+     button's own text always states the action it performs next (Hide vs.
+     Show), so it's self-explanatory without a separate hint or tooltip. */
+  var KEY='nms_mobileToolbarCollapsed';
+  var btn=document.getElementById('toolbarToggle');
+  if(!btn) return;
+  function setState(collapsed){
+    document.documentElement.classList.toggle('toolbar-collapsed',collapsed);
+    btn.textContent=(collapsed?'▼ Show controls':'▲ Hide controls');
+    btn.setAttribute('aria-expanded',String(!collapsed));
+  }
+  var initial=false;
+  try{ initial=localStorage.getItem(KEY)==='1'; }catch(e){}
+  setState(initial);
+  btn.addEventListener('click',function(){
+    var next=!document.documentElement.classList.contains('toolbar-collapsed');
+    setState(next);
+    try{ localStorage.setItem(KEY,next?'1':'0'); }catch(e){}
+  });
 })();
 </script>
 </body>
