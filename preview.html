@@ -6908,12 +6908,27 @@ function playWarpTransition(kind){
     if(myGen!==_warpGen) return;
     console.log('[warp] play() resolved for '+vid.currentSrc);
   }).catch(function(err){
-    // A stale call being interrupted by a newer jump rejects with
-    // AbortError here every time -- expected, not a real failure, so it's
-    // dropped silently rather than warned about or allowed to touch an
-    // overlay that now belongs to the newer warp.
+    // 2026-08-30, honest-review recheck: the myGen!==_warpGen guard above
+    // only catches a stale call whose play() promise settles AFTER a newer
+    // jump has already bumped _warpGen -- true rapid-click bursts (mashing
+    // Random, glyph keypad, search results) can still get an AbortError on
+    // what IS the current generation at the moment the promise settles,
+    // because browsers can reject play() for a request that's about to be
+    // superseded before the next click's own gen bump has actually run yet.
+    // AbortError specifically is Chrome's own documented "play() request
+    // was interrupted" case (https://goo.gl/LdLk22) -- it is ALWAYS benign,
+    // never a sign of a real failure, regardless of which generation it
+    // belongs to. Genuine problems (decode errors, unsupported source,
+    // autoplay blocked) surface as a different err.name here, or via
+    // vid.onerror / the timeout failsafe below -- never as AbortError -- so
+    // only those non-AbortError cases are still worth a console warning.
+    if(err.name!=='AbortError'){
+      if(myGen===_warpGen) console.warn('[warp] play() rejected: '+err.name+' -- '+err.message);
+    }
+    // Hiding the overlay is still gated on gen match: a stale call's own
+    // rejection (of either kind) must never hide an overlay that already
+    // belongs to a newer warp.
     if(myGen!==_warpGen) return;
-    console.warn('[warp] play() rejected: '+err.name+' -- '+err.message);
     ov.style.display='none';
   });
   vid.onended=function(){
@@ -8346,11 +8361,20 @@ function renderMatches(matches,emptyMsg){
   var html="",i;
   for(i=0;i<matches.length;i++){
     var m=matches[i];
-    /* Flag cross-galaxy results plainly rather than letting a traveller
-       click one and only discover the galaxy changed afterwards -- picking
-       one still switches galaxy automatically (see the click handler
-       below), this is just so it's not a surprise. */
-    var galNote=(m.galaxy!==GALAXY)?(' &middot; <span style="color:var(--gold)">'+(GALAXIES[m.galaxy]||("Galaxy #"+(m.galaxy+1)))+'</span>'):"";
+    /* 2026-08-30, honest-review fix: this used to only print the galaxy
+       name for a CROSS-galaxy result, on the theory that "no tag" plainly
+       enough meant "same as what you're currently browsing". Real usage
+       (and Tony's own follow-up ask) showed that's not obvious in the
+       moment -- a traveller scanning a list of "Documented"/"Visited"
+       results has no way to tell an untagged one is safely local without
+       already remembering which galaxy is current, especially once
+       there's more than a couple of results on screen. Every result's
+       galaxy is now always printed; the gold highlight is kept exactly as
+       before (cross-galaxy only) so that "picking this switches your
+       galaxy" heads-up isn't lost or diluted by the now-routine same-
+       galaxy label sitting right next to it in the same plain colour. */
+    var galNote=' &middot; <span'+(m.galaxy!==GALAXY?' style="color:var(--gold)"':'')+'>'+
+      (GALAXIES[m.galaxy]||("Galaxy #"+(m.galaxy+1)))+'</span>';
     var bodyAttr=(m.bodyIdx!=null)?(' data-body="'+m.bodyIdx+'"'):"";
     html+='<div class="searchRes" data-addr="'+m.address+'" data-galaxy="'+m.galaxy+'"'+bodyAttr+'>'+
       '<div class="searchResName">'+m.name+'</div>'+
