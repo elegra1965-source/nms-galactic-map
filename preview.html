@@ -9339,7 +9339,28 @@ buildKeypad();
    from the very first frame instead of flashing Euclid first. A brand-new
    visitor with nothing saved (LAST_POS null) falls straight through to the
    existing random-boot-anchor behaviour further down, unchanged. */
-var LAST_POS=loadLastPosition();
+/* Real-position hand-off from the Galactic Navigator's "GALACTIC MAP"
+   buttons (2026-08-30, Tony: "going back to map should land where you
+   ended up, not the start, otherwise what was the point") -- see
+   navigator/index.html's mapReturnQuery() and complete.html's viewMap
+   button, which both link here with ?arrival=1&addr=...&galaxy=... for
+   exactly this. Takes priority over a returning visitor's remembered
+   last position for this one boot, since a hand-off is a more specific
+   "go here" request -- jumpTo() below then saves it as the new last
+   position anyway, so a plain revisit afterwards just continues from
+   here, same as any other real jump. */
+function readArrivalHandoff(){
+  try{
+    var q=new URLSearchParams(location.search);
+    if(q.get("arrival")!=="1") return null;
+    var addr=q.get("addr");
+    if(!addr||!parseAddress(addr)) return null;
+    var g=parseInt(q.get("galaxy"),10);
+    if(!(g>=0&&g<GALAXIES.length)) g=0;
+    return {galaxy:g, address:addr};
+  }catch(e){ return null; }
+}
+var LAST_POS=readArrivalHandoff()||loadLastPosition();
 if(LAST_POS){
   GALAXY=LAST_POS.galaxy;
   document.getElementById("galSel").value=String(GALAXY);
