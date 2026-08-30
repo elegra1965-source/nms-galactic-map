@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Galactic Navigator — Work in Progress</title>
+  <title>Galactic Navigator</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
@@ -33,17 +33,13 @@ button{font:inherit;cursor:pointer}
 ::-webkit-scrollbar{width:8px;height:8px}
 ::-webkit-scrollbar-thumb{background:var(--border-soft);border-radius:4px}
 
-/* ---- mock banner ---- */
-.mockBanner{background:repeating-linear-gradient(135deg,var(--gold-dim),var(--gold-dim) 10px,#3a2900 10px,#3a2900 20px);color:#fff8ea;font-family:'Orbitron',sans-serif;font-weight:700;font-size:10px;letter-spacing:.08em;text-align:center;padding:6px 10px;text-shadow:0 1px 2px rgba(0,0,0,.75),0 0 1px rgba(0,0,0,.75)}
-.mockBanner b{background:#0b0800;color:var(--gold);padding:2px 6px;border-radius:3px;margin-right:6px}
 /* Requested-from-Galaxy-Map banner (2026-08-29) -- shows the real
    origin/destination/jumps/distance a visitor arrived with via the live
    Galactic Map's PLAN JOURNEY button (see preview.html's #bPlanJourney).
-   Sits directly under .mockBanner and stays honest about the split: the
-   trip CONTEXT above is real, the itinerary CONTENT below is still one of
-   the sample journeys, since this mock has no live route-computation of
-   its own yet. Hidden by default -- only shown when from/to params are
-   present in the URL. */
+   2026-08-30: used to sit directly under the WORK IN PROGRESS mock banner
+   (removed -- Tony: bugs are fixed, this isn't a work in progress anymore);
+   now it's the top strip on its own. Hidden by default -- only shown when
+   from/to params are present in the URL. */
 .handoffBanner{display:none;background:rgba(0,229,255,.1);border-bottom:1px solid rgba(0,229,255,.3);color:var(--cyan);font-family:'Orbitron',sans-serif;font-weight:700;font-size:10px;letter-spacing:.05em;text-align:center;padding:6px 10px}
 .handoffBanner.show{display:block}
 .handoffBanner b{color:var(--white)}
@@ -488,7 +484,12 @@ window.nmsCoreReady = new Promise(function (res) { window.__nmsCoreResolve = res
   <div class="scanlines"></div>
   <div class="vignette"></div>
 
-  <div class="mockBanner" id="mockBanner"><b>WORK IN PROGRESS</b><span id="mockBannerText">Sample data only — not yet connected to the live Galactic Map</span></div>
+  <!-- 2026-08-30, Tony: "why is work in progress banner still there needs
+       removing now we fixed bugs" -- the caution-stripe WORK IN PROGRESS
+       banner (and its sample-vs-live text swap) is gone; the header's own
+       #dataStatus pill already carries that same sample/live distinction
+       (SAMPLE DATA LOADED / LIVE ROUTE LOADED) without framing the whole
+       feature as unfinished. -->
   <div class="handoffBanner" id="handoffBanner"></div>
   <div class="navigator-app">
     <header>
@@ -496,7 +497,7 @@ window.nmsCoreReady = new Promise(function (res) { window.__nmsCoreResolve = res
         <button class="hamburger" id="hamburger" aria-label="Menu"><span></span></button>
         <button id="backToMap">&larr; GALACTIC MAP</button>
       </div>
-      <div class="title">GALACTIC NAVIGATOR <small>V5 JOURNEY MODE — PROTOTYPE</small></div>
+      <div class="title">GALACTIC NAVIGATOR</div>
       <div class="right">
         <span class="status on" id="dataStatus">&#9679; SAMPLE DATA LOADED</span>
         <button id="warpFxToggle" class="ambienceToggle on" type="button" title="Toggle the warp-jump animation on I AM HERE -- on by default, same as the live map. Turn off if it gets repetitive on a long route.">&#9889; WARP FX</button>
@@ -2731,14 +2732,8 @@ window.MOCK_JOURNEYS = [
         (session.isLivePlot ? " &mdash; showing your real plotted route" : " &mdash; showing a sample journey below");
       banner.classList.add("show");
 
-      // Top WORK IN PROGRESS strip: also say plainly when what's on screen
-      // is a real plotted route rather than the built-in sample, so a
-      // visitor doesn't read "sample data" while looking at their own
-      // real journey. 2026-08-29.
-      var bannerText = $("mockBannerText");
-      if (bannerText && session.isLivePlot) {
-        bannerText.textContent = "Showing your real plotted route from the live map — black-hole exits now use real regional data; full route replanning after a detour is still a simplified preview";
-      }
+      // dataStatus (top-right header pill) is the one place that still
+      // marks sample-vs-live now that the WORK IN PROGRESS strip is gone.
       var dataStatus = $("dataStatus");
       if (dataStatus && session.isLivePlot) {
         dataStatus.innerHTML = "&#9679; LIVE ROUTE LOADED";

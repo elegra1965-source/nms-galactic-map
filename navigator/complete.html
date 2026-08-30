@@ -2,14 +2,17 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Journey Complete — MOCK</title>
+<title>Journey Complete</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#070b11;--bg2:#0b1119;--bg3:#0f1620;--cyan:#00e5ff;--cyan-dim:#0096a8;--gold:#f0a500;--gold-dim:#a06800;--text:#cfe0f0;--text-dim:rgba(207,224,240,.62);--text-faint:rgba(207,224,240,.42);--border:rgba(0,229,255,.18);--border-soft:rgba(255,255,255,.08);--magenta:#ff0055;--r:8px;--motion-dur:220ms;--motion-ease:cubic-bezier(.4,0,.2,1)}
 *{box-sizing:border-box}
-body{margin:0;background:radial-gradient(circle,#122032,var(--bg) 58%);color:var(--text);font-family:'Rajdhani',system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:70px 16px 40px;text-align:center}
-.mockBanner{position:fixed;top:0;left:0;right:0;background:repeating-linear-gradient(135deg,#a06800,#a06800 10px,#3a2900 10px,#3a2900 20px);color:#1a1200;font-family:'Orbitron',sans-serif;font-weight:700;font-size:10px;letter-spacing:.08em;text-align:center;padding:6px 10px;z-index:10}
+body{margin:0;background:radial-gradient(circle,#122032,var(--bg) 58%);color:var(--text);font-family:'Rajdhani',system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:32px 16px 40px;text-align:center}
+/* 2026-08-30, Tony: "why is work in progress banner still there needs
+   removing now we fixed bugs" -- the fixed caution-stripe WORK IN PROGRESS
+   banner that used to sit here (and the top padding reserved for it above)
+   is gone; index.html's matching banner was removed the same way. */
 .card{padding:40px 35px 30px;max-width:520px;width:100%}
 /* ---- video hero: real looping footage, same treatment as the two
    black-hole moments in the Navigator, gold instead of magenta/cyan so
@@ -140,7 +143,6 @@ body.no-fx .orb{display:none}
   <div class="scanlines"></div>
   <div class="vignette"></div>
 
-<div class="mockBanner" id="mockBanner"><b>WORK IN PROGRESS</b><span id="mockBannerText">Sample data only — not yet connected to the live Galactic Map</span></div>
 <main class="card">
   <video class="videoHero" autoplay muted loop playsinline poster="assets/video/journey-complete-diamond-poster.jpg">
     <source src="assets/video/journey-complete-diamond.mp4" type="video/mp4">
@@ -550,17 +552,6 @@ body.no-fx .orb{display:none}
 
   var raw = null;
   try { raw = JSON.parse(sessionStorage.getItem("nms-navigator-mock-complete") || "null"); } catch(e){}
-
-  // Top WORK IN PROGRESS strip: say plainly when this postcard is built
-  // from a real plotted route (index.html's PLAN JOURNEY hand-off) rather
-  // than the built-in sample, so a visitor doesn't read "sample data"
-  // while looking at their own real journey. 2026-08-29.
-  (function () {
-    var bannerText = document.getElementById("mockBannerText");
-    if (bannerText && raw && raw.isLivePlot) {
-      bannerText.textContent = "Showing your real plotted route from the live map";
-    }
-  })();
 
   if (raw) {
     document.getElementById("destTitle").textContent = raw.destination.systemName + " Reached";
