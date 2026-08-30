@@ -141,7 +141,7 @@ canvas#c{display:block;position:fixed;inset:0;touch-action:none}
 #title.typing{animation:none;border-color:rgba(0,229,255,.15);background-color:rgba(0,229,255,.02)}
 #titleIcon{width:26px;height:26px;flex:none;display:block;
   animation:titleIconSpin 5s linear infinite}
-#titleText{animation:titleTextBreathe 3.6s ease-in-out infinite}
+#titleText{display:inline-block;animation:titleTextBreathe 3.6s ease-in-out infinite}
 #title.typing #titleText{animation:none;color:var(--white);text-shadow:none}
 @keyframes titleIconSpin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 @keyframes titleTextBreathe{
@@ -9704,6 +9704,36 @@ if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){
     return;
   }
   var CURSOR=String.fromCharCode(0x258C); // "▌"
+  // 2026-08-30 (round 4), honest-review fix: #title is a plain flex row
+  // with no fixed width, so growing #titleText char-by-char widened the
+  // whole box and shoved every toolbar button to its right sideways for
+  // as long as typing (+ the blink tail afterward) lasted -- a real,
+  // measurable click-target shift caught by actually mistiming a click
+  // during the animation, not a cosmetic nit. Reserving up front the
+  // width of the WIDEST string this element will ever show mid-animation
+  // (the full text plus one cursor character -- typing never shows more
+  // than that, and the blink tail only ever alternates between this and
+  // the plain final text, which is shorter) fixes both the growth during
+  // typing and the blink jitter afterward in one move: nothing to the
+  // title's right ever has to move again, regardless of what's mid-typed.
+  // Measured on the real element (inherits the parent's white-space:nowrap
+  // and the same font-family/size it'll actually render with) rather than
+  // a detached clone, and re-measured once more after webfonts settle --
+  // Orbitron may not have painted yet at this exact point, same race
+  // syncTopOffset() already guards against elsewhere in this file, so a
+  // fallback-font measurement taken before Orbitron loads can't leave the
+  // reservation too narrow. Only ever widens (never shrinks) an existing
+  // reservation, so a second, later measurement can't reintroduce a shift.
+  function reserveWidth(){
+    var prevText=textEl.textContent, prevMin=parseFloat(textEl.style.minWidth)||0;
+    textEl.style.minWidth='0';
+    textEl.textContent=FULL+CURSOR;
+    var natural=textEl.getBoundingClientRect().width;
+    textEl.style.minWidth=Math.max(prevMin,Math.ceil(natural))+'px';
+    textEl.textContent=prevText;
+  }
+  reserveWidth();
+  if(document.fonts&&document.fonts.ready) document.fonts.ready.then(reserveWidth).catch(function(){});
   box.classList.add('typing');
   var i=0;
   function typeStep(){
