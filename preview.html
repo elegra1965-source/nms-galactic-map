@@ -371,7 +371,7 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border:none;border-ra
   transition:left .15s,top .15s}
 #annivBadge img{width:100%;height:100%;display:block;
   filter:drop-shadow(0 0 5px rgba(240,90,40,.4))}
-#top,#leftcol,#tel,#panel,#course,#modalWrap .modal,#galHud,#accessPop,#searchPop,#keys{
+#top,#leftcol,#tel,#panel,#course,#modalWrap .modal,#galHud,#accessPop,#searchPop,#routesPop,#keys{
   zoom:var(--ui-zoom,1)}
 #accessPop{position:fixed;z-index:36;width:198px;padding:11px 13px;
   top:calc(var(--top-h,60px) + 8px);right:10px;display:none}
@@ -403,6 +403,24 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border:none;border-ra
 .searchRes:hover{background:rgba(0,229,255,0.06)}
 .searchResName{color:var(--gold);font-size:11px;letter-spacing:.04em}
 .searchResMeta{color:var(--text-dim);font-size:9px;letter-spacing:.04em;margin-top:1px}
+/* #routesPop: same popover box as #searchPop, just wide enough for a row's
+   action buttons; #inRouteLink reuses #inSearch's own input styling via the
+   shared input rule elsewhere in this file, no separate rule needed. Rows
+   aren't a single click target like .searchRes (each has its own Load/
+   Link/Rename/Delete buttons instead), so cursor stays default there. */
+#routesPop{position:fixed;z-index:36;width:300px;padding:11px 13px;
+  top:calc(var(--top-h,60px) + 8px);right:10px;display:none;
+  max-height:60vh;overflow-y:hidden;overflow-x:hidden}
+#routesPop.show{display:block}
+#routesPop.scroll{overflow-y:auto}
+#inRouteLink{box-sizing:border-box}
+.routeRes{cursor:default}
+.routeRowActions{display:flex;gap:5px;margin-top:5px;flex-wrap:wrap}
+.routeActBtn{background:transparent;border:1px solid var(--border-soft);color:var(--text-dim);
+  font-size:9px;letter-spacing:.05em;padding:3px 7px;border-radius:4px;cursor:pointer;
+  font-family:inherit}
+.routeActBtn:hover{border-color:var(--cyan);color:var(--cyan)}
+.routeActBtn.danger:hover{border-color:#ff5a4a;color:#ff5a4a}
 .searchEmpty{color:var(--text-faint);font-size:10px;line-height:1.5;padding:4px 0}
 .pillrow{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:9px}
 .pill{font-family:'Orbitron',sans-serif;font-size:8.5px;letter-spacing:.06em;
@@ -1215,6 +1233,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   <button class="btn" id="bRand" title="Roll a random valid portal address and jump there.">Random</button>
   <button class="btn" id="bSearch" title="Search for a system by name -- only ones you or the community have documented, bookmarked, waypointed or visited, not every procedural system.">Search</button>
   <button class="btn" id="bWarpToggle" title="Play a warp-jump animation when entering system view. Same setting as Filters -> Warp animation, just easier to reach. Click to turn on/off.">&#9889; Warp FX</button>
+  <button class="btn" id="bRoutes" title="Save the route you've plotted so you can pick it back up later, share it with a link, or load one someone sent you.">&#9776; Routes</button>
   <div class="sep" id="sepC"></div>
   <button class="btn" id="bFiltToggle" title="Show or hide the system filters.">Filters</button>
   <button class="btn on" id="bLbl" title="Show names on the nearest stars, or on planets and moons inside a system. Shortcut: H">Labels</button>
@@ -1278,8 +1297,8 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
       </div>
       <label class="chk" title="Play a warp-jump animation when entering system view. Click or tap to skip."><input type="checkbox" id="fWarpAnim" checked>Warp animation</label>
       <div class="prow"><button class="btn" id="bReset" title="Clear all filters.">Reset</button>
-        <button class="btn" id="bExport" title="Download your notes and bookmarks as a JSON file.">Export</button></div>
-      <div class="prow"><button class="btn" id="bImport" title="Load notes and bookmarks from a previously exported JSON file.">Import logs</button></div>
+        <button class="btn" id="bExport" title="Download your notes, bookmarks and saved routes as a JSON file.">Export</button></div>
+      <div class="prow"><button class="btn" id="bImport" title="Load notes, bookmarks and saved routes from a previously exported JSON file.">Import logs</button></div>
       <input type="file" id="fFile" accept="application/json" style="display:none">
     </div>
     <!-- #hyperPanel moved here 2026-08-24 (Tony: "as move right the warp
@@ -1354,6 +1373,18 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     <div class="cline"><span>Target from centre</span><b id="cCore">—</b></div>
     <div class="prow"><button class="btn" id="bGoCourse" title="Travel to the plotted target.">Jump to</button>
       <button class="btn" id="bClrCourse" title="Cancel the plotted course.">Clear</button></div>
+    <!-- 2026-08-30, Tony: "I'd want a way to save a route for later instead
+         of just planning it in one sitting, since expeditions rarely happen
+         in one browser tab" -- Save Route stores this exact plotted course
+         (same waypoints the manifest/line already use) into a personal,
+         local "My Routes" list (see #routesPop), the same localStorage-only
+         mechanism as Bookmarks/Waypoints -- and rides along in the existing
+         Export/Import logs for free. Copy Link hands the same route out as
+         a URL (?route=...), for pasting to yourself on another device or to
+         someone else, without needing to save it here first. -->
+
+    <div class="prow"><button class="btn" id="bSaveRoute" title="Save this exact plotted course to My Routes on this device, so you can reload it later even after closing the tab.">Save Route</button>
+      <button class="btn" id="bCopyRouteLink" title="Copy a link to this exact route -- paste it into another tab, another device, or send it to someone else. Opening it loads (and saves) the route automatically.">Copy Link</button></div>
   </div>
 </div>
 
@@ -1455,6 +1486,22 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   <div class="fbody" id="searchBody">
     <input type="text" id="inSearch" placeholder="SYSTEM NAME" spellcheck="false">
     <div id="searchResults"></div>
+  </div>
+</div>
+
+<!-- 2026-08-30, Tony: saved/shareable routes ("My Routes"), same personal
+     local-storage pattern and popover styling as #searchPop above. Paste a
+     route link at the top to load (and keep) a route someone sent you --
+     opening a ?route=... link directly does the exact same thing on boot,
+     see readSharedRoute()/receiveSharedRoute(). -->
+<div class="box fold" id="routesPop" role="dialog" aria-label="Saved routes">
+  <div class="kicker fhead" id="routesHead" style="margin-bottom:8px">&#9662; My Routes</div>
+  <div class="fbody" id="routesBody">
+    <div class="prow" style="margin-bottom:8px">
+      <input type="text" id="inRouteLink" placeholder="PASTE ROUTE LINK" spellcheck="false" style="flex:1;min-width:0">
+      <button class="btn" id="bLoadRouteLink" title="Paste a route link someone sent you (or one you copied earlier) to load and save it.">Load</button>
+    </div>
+    <div id="routesResults"></div>
   </div>
 </div>
 
@@ -3077,7 +3124,13 @@ var TRAVELLER_K="nms-galmap-traveller"; // remembers "your name"/"friend code" l
    the general public map") both explicitly asked for personal-device-only
    tracking, so this reuses the exact same pattern rather than inventing a
    new storage mechanism. */
-var store={notes:{},marks:{},waypoints:{},visited:{}};
+/* store.routes (2026-08-30, Tony: "a way to save a route for later... since
+   expeditions rarely happen in one browser tab"): an ARRAY, not a keyed
+   object like the others above -- a route isn't tied to one system address,
+   it's its own thing with an id of its own. Same personal, local-only
+   mechanism otherwise, and rides along in Export/Import exactly like the
+   rest of store (see saveRoutesMerge() near bImport's handler). */
+var store={notes:{},marks:{},waypoints:{},visited:{},routes:[]};
 function skey(s){ return s.galaxy+":"+s.address; }
 function loadStore(){
   try{
@@ -3086,8 +3139,9 @@ function loadStore(){
       var o=JSON.parse(raw);
       store.notes=o.notes||{}; store.marks=o.marks||{};
       store.waypoints=o.waypoints||{}; store.visited=o.visited||{};
+      store.routes=Array.isArray(o.routes)?o.routes:[];
     }
-  }catch(err){ store={notes:{},marks:{},waypoints:{},visited:{}}; }
+  }catch(err){ store={notes:{},marks:{},waypoints:{},visited:{},routes:[]}; }
 }
 function saveStore(){
   try{ localStorage.setItem(STORE_K,JSON.stringify(store)); }
@@ -4869,6 +4923,200 @@ function _finishSetCourse(_s,_ly,_range,_dvx,_dvy,_dvz){
   }
 }
 
+/* ============ saved / shareable routes ============
+   2026-08-30, Tony: "I'd want a way to save a route for later instead of
+   just planning it in one sitting, since expeditions rarely happen in one
+   browser tab." Two related but separate needs, both built here: a personal
+   "My Routes" list (save/reload/rename/delete, local to this device, rides
+   along in Export/Import for free -- see store.routes above), and a
+   shareable ?route=... link that works without ever touching this device's
+   storage at all (paste it on a phone, send it to someone else). Both save
+   and reload the exact SAME waypoints the map already plotted -- nothing is
+   ever recomputed differently on load than it was when the course was first
+   found, since that's exactly the kind of "two numbers that should agree
+   don't" bug this whole session has been about fixing, not repeating in a
+   new feature. */
+
+/* A courseWaypoints entry is a full generateSystem() object (has coreLY,
+   possibly a whole planet/moon list) -- overkill to store per hop, and
+   mergeWaypointsIntoSlice() (already used everywhere a plotted course is
+   drawn) already knows how to turn exactly this lightweight shape back into
+   a full real one from just its address, the same way findRoute()'s own
+   raw hop/placeholder output looks before that upgrade happens. So this is
+   the natural, already-supported "unresolved" shape to persist, not a new
+   invented one. */
+function snapshotWaypoint(wp){
+  return {name:wp.name||"",address:wp.address||"",px:wp.px,py:wp.py,pz:wp.pz};
+}
+/* Builds a route record from whatever's plotted right now -- shared by
+   Save Route, Copy Link, and every row's own Link button, so there is only
+   ever one place that decides what a "route" actually contains. */
+function buildRouteRecord(name){
+  if(!focusSystem||!courseTarget||!courseWaypoints||courseWaypoints.length<2) return null;
+  var dvx=courseTarget.vx-focusSystem.vx, dvy=courseTarget.vy-focusSystem.vy, dvz=courseTarget.vz-focusSystem.vz;
+  var directLY=Math.round(Math.sqrt(dvx*dvx+dvy*dvy+dvz*dvz)*LY_PER_VOXEL);
+  if(directLY===0){
+    var dx=courseTarget.px-focusSystem.px, dy=courseTarget.py-focusSystem.py, dz=courseTarget.pz-focusSystem.pz;
+    directLY=Math.round(Math.sqrt(dx*dx+dy*dy+dz*dz)/VOX_U*LY_PER_VOXEL);
+  }
+  return {
+    id:"r"+Date.now().toString(36)+Math.random().toString(36).slice(2,8),
+    name:name||(focusSystem.name+" → "+courseTarget.name),
+    savedAt:Date.now(),
+    galaxy:GALAXY,
+    fromAddress:focusSystem.address, fromName:focusSystem.name,
+    toAddress:courseTarget.address, toName:courseTarget.name,
+    jumps:courseWaypoints.length-1,
+    routeLY:courseRouteLY,
+    directLY:directLY,
+    driveKey:currentDrive().k,
+    rangeLY:parseInt(document.getElementById("fHyper").value,10)||null,
+    waypoints:courseWaypoints.map(snapshotWaypoint)
+  };
+}
+function saveCurrentRoute(){
+  if(!focusSystem||!courseTarget||!courseWaypoints||courseWaypoints.length<2){
+    toast("Plot a course first"); return;
+  }
+  var suggested=focusSystem.name+" → "+courseTarget.name;
+  var name=prompt("Name this route:",suggested);
+  if(name===null) return; /* cancelled */
+  name=name.trim()||suggested;
+  var rec=buildRouteRecord(name);
+  store.routes=store.routes||[];
+  store.routes.unshift(rec);
+  saveStore();
+  renderRoutesList();
+  toast("Route saved: “"+name+"”");
+}
+function copyRouteLink(route){
+  var rec=route||buildRouteRecord();
+  if(!rec){ toast("Plot a course first"); return; }
+  var link=location.origin+location.pathname+"?route="+encodeRoutePayload(rec);
+  if(navigator.clipboard&&navigator.clipboard.writeText)
+    navigator.clipboard.writeText(link).then(function(){ toast("Route link copied"); },function(){ toast(link); });
+  else toast(link);
+}
+function encodeRoutePayload(rec){
+  return encodeURIComponent(JSON.stringify({
+    v:1,n:rec.name,g:rec.galaxy,fa:rec.fromAddress,fn:rec.fromName,
+    ta:rec.toAddress,tn:rec.toName,w:rec.waypoints,dk:rec.driveKey||null,rl:rec.rangeLY||null
+  }));
+}
+/* The inverse of encodeRoutePayload() -- deliberately tolerant of a whole
+   pasted URL (not just the raw param value), see bLoadRouteLink below. */
+function decodeRoutePayload(raw){
+  try{
+    var s=String(raw);
+    var m=s.match(/[?&]route=([^&]+)/);
+    if(m) s=m[1];
+    var o=JSON.parse(decodeURIComponent(s));
+    if(!o||!Array.isArray(o.w)||o.w.length<2||!o.fa) return null;
+    return {
+      id:"r"+Date.now().toString(36)+Math.random().toString(36).slice(2,8),
+      name:o.n||"Shared route",
+      savedAt:Date.now(),
+      galaxy:(typeof o.g==="number"&&o.g>=0&&o.g<GALAXIES.length)?o.g:0,
+      fromAddress:o.fa, fromName:o.fn||"", toAddress:o.ta||"", toName:o.tn||"",
+      jumps:o.w.length-1, routeLY:null, directLY:null,
+      driveKey:o.dk||null, rangeLY:o.rl||null,
+      waypoints:o.w
+    };
+  }catch(e){ return null; }
+}
+/* Loads a saved/shared route back onto the live map -- jumps to its real
+   origin (exactly like typing the address in yourself), restores the exact
+   saved waypoints, then reuses _finishSetCourse() (the same function a live
+   plot ends on) to draw the line, populate the manifest and open it. Never
+   re-runs pathfinding -- the whole point is that this reproduces the exact
+   route that was saved, not a fresh search that might disagree with it. */
+function loadSavedRoute(route){
+  if(!route||!route.waypoints||route.waypoints.length<2){ toast("This route looks corrupted"); return; }
+  if(typeof route.galaxy==="number"&&route.galaxy!==GALAXY&&route.galaxy>=0&&route.galaxy<GALAXIES.length){
+    switchGalaxy(route.galaxy);
+    document.getElementById("galSel").value=String(route.galaxy);
+    syncGalaxyPickInput();
+  }
+  if(!jumpTo(route.fromAddress)){ toast("Could not jump to this route's start -- the address looks invalid"); return; }
+  courseWaypoints=route.waypoints.map(function(w){ return {name:w.name,address:w.address,px:w.px,py:w.py,pz:w.pz}; });
+  mergeWaypointsIntoSlice(); /* upgrades every hop, start/dest included, to real generateSystem() objects */
+  courseTarget=courseWaypoints[courseWaypoints.length-1];
+  if(route.driveKey) applyDrivePill(route.driveKey);
+  if(route.rangeLY) applyRangePill(route.rangeLY);
+  var dvx=courseTarget.vx-focusSystem.vx, dvy=courseTarget.vy-focusSystem.vy, dvz=courseTarget.vz-focusSystem.vz;
+  var ly=Math.round(Math.sqrt(dvx*dvx+dvy*dvy+dvz*dvz)*LY_PER_VOXEL);
+  if(ly===0){
+    var dx=courseTarget.px-focusSystem.px, dy=courseTarget.py-focusSystem.py, dz=courseTarget.pz-focusSystem.pz;
+    ly=Math.round(Math.sqrt(dx*dx+dy*dy+dz*dz)/VOX_U*LY_PER_VOXEL);
+  }
+  var range=parseInt(document.getElementById("fHyper").value,10)||101;
+  _openManifestOnPlot=true;
+  _finishSetCourse(courseTarget,ly,range,dvx,dvy,dvz);
+  toast("Loaded route: “"+(route.name||(route.fromName+" → "+route.toName))+"”");
+}
+/* A route received via a link (pasted, or opened directly via ?route=...)
+   is both loaded AND kept in My Routes -- same reasoning as jumpTo() always
+   saving last-position: if you went to the trouble of opening someone's
+   route, you'll probably want it to still be there next time too, not just
+   for this one visit. */
+function receiveSharedRoute(shared){
+  if(!shared) return;
+  loadSavedRoute(shared);
+  store.routes=store.routes||[];
+  store.routes.unshift(Object.assign({},shared,{
+    id:"r"+Date.now().toString(36)+Math.random().toString(36).slice(2,8),
+    savedAt:Date.now()
+  }));
+  saveStore();
+  renderRoutesList();
+}
+/* Small helpers so loadSavedRoute() can restore the drive/range that was
+   active when a route was saved, using the exact same pill-click state sync
+   (on class, the hidden select, updateHyperSummary()) the real pill click
+   handlers below already do -- one shared way to change these, whether a
+   person clicks a pill or a saved route restores one. */
+function applyDrivePill(driveKey){
+  var b=document.querySelector('#hyperDriveRow .pill[data-drive="'+driveKey+'"]');
+  if(!b) return;
+  document.querySelectorAll("#hyperDriveRow .pill").forEach(function(p){ p.classList.remove("on"); });
+  b.classList.add("on");
+  document.getElementById("fHyperDrive").value=driveKey;
+  document.getElementById("fHyperDrive").dispatchEvent(new Event("change"));
+  updateHyperSummary();
+}
+function applyRangePill(range){
+  var b=document.querySelector('#hyperRangeRow .pill[data-range="'+range+'"]');
+  document.querySelectorAll("#hyperRangeRow .pill").forEach(function(p){ p.classList.remove("on"); });
+  document.getElementById("fHyper").value=String(range);
+  if(b) b.classList.add("on");
+  document.getElementById("fHyper").dispatchEvent(new Event("change"));
+  updateHyperSummary();
+}
+function renderRoutesList(){
+  var box=document.getElementById("routesResults");
+  if(!box) return;
+  var routes=(store.routes||[]).slice().sort(function(a,b){ return (b.savedAt||0)-(a.savedAt||0); });
+  if(!routes.length){
+    box.innerHTML='<div class="searchEmpty">No saved routes yet -- plot a course and hit Save Route on it, or paste a route link above.</div>';
+    return;
+  }
+  var html="";
+  routes.forEach(function(r){
+    html+='<div class="searchRes routeRes" data-id="'+escAttr(r.id)+'">'+
+      '<div class="searchResName">'+escAttr(r.name)+'</div>'+
+      '<div class="searchResMeta">'+(r.jumps!=null?r.jumps:"?")+" jumps"+
+        (r.routeLY!=null?" &middot; "+commas(r.routeLY)+" LY":"")+
+        " &middot; "+(GALAXIES[r.galaxy]||("Galaxy #"+(r.galaxy+1)))+'</div>'+
+      '<div class="routeRowActions">'+
+        '<button type="button" class="routeActBtn" data-act="load">Load</button>'+
+        '<button type="button" class="routeActBtn" data-act="link" title="Copy a shareable link for this route">Link</button>'+
+        '<button type="button" class="routeActBtn" data-act="rename">Rename</button>'+
+        '<button type="button" class="routeActBtn danger" data-act="delete" title="Delete this saved route">&#10005;</button>'+
+      '</div></div>';
+  });
+  box.innerHTML=html;
+}
+
 /* ============ system view ============ */
 var bodyMeshes=[], pivots=[], starMeshes=[], coronas=[], featureMeshes=[];
 function buildStar(s,i,pos){
@@ -6533,6 +6781,41 @@ document.getElementById("bWaypoint").addEventListener("click",function(){
   saveStore(); applyFilter(); updatePanel(selected); buildGalaxyMarks();
   toast(store.waypoints[k]?"Saved as waypoint":"Waypoint removed");
 });
+document.getElementById("bSaveRoute").addEventListener("click",saveCurrentRoute);
+document.getElementById("bCopyRouteLink").addEventListener("click",function(){ copyRouteLink(); });
+document.getElementById("bLoadRouteLink").addEventListener("click",function(){
+  var raw=document.getElementById("inRouteLink").value.trim();
+  if(!raw){ toast("Paste a route link first"); return; }
+  var shared=decodeRoutePayload(raw);
+  if(!shared){ toast("That route link looks broken"); return; }
+  document.getElementById("inRouteLink").value="";
+  receiveSharedRoute(shared);
+  if(typeof closeRoutesPop==="function") closeRoutesPop();
+});
+document.getElementById("routesResults").addEventListener("click",function(e){
+  var btn=e.target.closest?e.target.closest(".routeActBtn"):null;
+  if(!btn) return;
+  var row=btn.closest(".routeRes");
+  var id=row&&row.getAttribute("data-id");
+  var route=(store.routes||[]).filter(function(r){ return r.id===id; })[0];
+  if(!route) return;
+  var act=btn.getAttribute("data-act");
+  if(act==="load"){
+    loadSavedRoute(route);
+    if(typeof closeRoutesPop==="function") closeRoutesPop();
+  } else if(act==="link"){
+    copyRouteLink(route);
+  } else if(act==="rename"){
+    var nn=prompt("Rename route:",route.name);
+    if(nn===null) return;
+    nn=nn.trim(); if(!nn) return;
+    route.name=nn; saveStore(); renderRoutesList();
+  } else if(act==="delete"){
+    store.routes=(store.routes||[]).filter(function(r){ return r.id!==id; });
+    saveStore(); renderRoutesList();
+    toast("Route deleted");
+  }
+});
 document.getElementById("galTypeFilter").addEventListener("change",function(){
   var want=this.value;
   var sel=document.getElementById("galSel");
@@ -6679,7 +6962,18 @@ document.getElementById("fFile").addEventListener("change",function(e){
       store.marks=Object.assign(store.marks,o.marks||{});
       store.waypoints=Object.assign(store.waypoints,o.waypoints||{});
       store.visited=Object.assign(store.visited,o.visited||{});
-      saveStore(); applyFilter(); buildGalaxyMarks(); toast("Logs imported");
+      /* Routes are an array (see store.routes' own comment), so this can't
+         be an Object.assign merge like the keyed lists above -- merge by id
+         instead, an imported route overwriting one already here with the
+         same id (a re-import of the same export) rather than duplicating it. */
+      if(Array.isArray(o.routes)){
+        var byId={};
+        (store.routes||[]).forEach(function(r){ byId[r.id]=r; });
+        o.routes.forEach(function(r){ if(r&&r.id) byId[r.id]=r; });
+        store.routes=Object.keys(byId).map(function(k){ return byId[k]; })
+          .sort(function(a,b){ return (b.savedAt||0)-(a.savedAt||0); });
+      }
+      saveStore(); applyFilter(); buildGalaxyMarks(); renderRoutesList(); toast("Logs imported");
     }catch(err){ toast("Import failed — bad file"); }
   };
   rd.readAsText(f);
@@ -8522,6 +8816,56 @@ function renderMatches(matches,emptyMsg){
     }
   });
 })();
+/* #routesPop open/close/position -- same pattern as #searchPop just above,
+   right down to the #panel-overlap dodge, so the two popovers behave
+   identically to a traveller even though what they list is different.
+   closeRoutesPop is exported on window so the row-action and paste-link
+   handlers elsewhere (registered outside this IIFE) can close the popover
+   after they act, the same way closeSearch() only needs to be reachable
+   from inside its own IIFE. */
+(function(){
+  var btn=document.getElementById("bRoutes"), pop=document.getElementById("routesPop");
+  function positionUnderRoutesBtn(){
+    var r=btn.getBoundingClientRect();
+    var pw=pop.offsetWidth||300;
+    var left=Math.min(window.innerWidth-pw-8,Math.max(8,r.left));
+    var top=r.bottom+8;
+    var badge=document.getElementById("galInfo");
+    if(badge){
+      var br=badge.getBoundingClientRect();
+      if(br.height>0) top=Math.max(top,br.bottom+8);
+    }
+    var panelEl=document.getElementById("panel");
+    if(panelEl && panelEl.classList.contains("show")){
+      var pr=panelEl.getBoundingClientRect();
+      if(pr.width>0 && left+pw>pr.left-8 && left<pr.right){
+        left=Math.max(8,pr.left-pw-8);
+      }
+    }
+    pop.style.position="fixed";
+    pop.style.left=left+"px"; pop.style.right="auto";
+    pop.style.top=top+"px"; pop.style.bottom="auto";
+  }
+  function remeasureScroll(){
+    pop.classList.remove("scroll");
+    if(pop.scrollHeight>pop.clientHeight+3) pop.classList.add("scroll");
+  }
+  function openRoutes(){
+    pop.classList.add("show");
+    positionUnderRoutesBtn();
+    renderRoutesList();
+    remeasureScroll();
+  }
+  function closeRoutes(){ pop.classList.remove("show"); }
+  window.closeRoutesPop=closeRoutes;
+  btn.addEventListener("click",function(e){
+    e.stopPropagation();
+    if(pop.classList.contains("show")) closeRoutes(); else openRoutes();
+  });
+  document.addEventListener("click",function(e){
+    if(pop.classList.contains("show") && !pop.contains(e.target) && e.target!==btn) closeRoutes();
+  });
+})();
 
 /* Real bug fixed 2026-08-16 (Tony: "on other windows clicking outside
    closes it, but with these it just clicks a different star"). Every other
@@ -9725,6 +10069,22 @@ window.nmsCoreReady.then(function(){
     var adminQ=new URLSearchParams(location.search).get("admin");
     if(adminQ) openAdminPanel(adminQ);
   }catch(e){}
+  /* 2026-08-30, Tony: shareable route links -- opening a ?route=... link
+     directly (someone pasted it into their address bar, or it's a bookmark
+     from Copy Link) loads that route the same way pasting it into the
+     Routes popover would, right on boot. Runs after the position restore
+     above on purpose (same "hand-off wins" precedent as ?arrival=1) -- a
+     route link is a more specific "go here" request than wherever this
+     visitor happened to be last. */
+  try{
+    var routeQ=new URLSearchParams(location.search).get("route");
+    if(routeQ){
+      var shared=decodeRoutePayload(routeQ);
+      if(shared) receiveSharedRoute(shared);
+      else toast("That route link looks broken");
+    }
+  }catch(e){}
+  renderRoutesList();
 });
 /* Web fonts can finish loading a moment after this script runs, subtly
    changing button widths and therefore how many rows the toolbar wraps
