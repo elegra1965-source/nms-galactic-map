@@ -9876,7 +9876,23 @@ if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){
      the same thing that re-glues the badge to it, so they can't drift apart
      again. (#annivBadge's own CSS already has `transition:left .15s,top
      .15s`, so recomputing it here rides the same glide, not a snap.) */
-  function syncOverlays(){ syncTopOffset(); positionAnnivBadge(); }
+  function syncOverlays(){
+    syncTopOffset();
+    positionAnnivBadge();
+    /* 2026-08-30 (later same day, Tony: still out of sync once controls were
+       fully shown again): the immediate call above still isn't enough on its
+       own -- this cascade fires a syncOverlays() every STAGGER(180ms) as each
+       tier hides/reveals, but #galHud's own top move is a .15s CSS
+       transition, so a call made the instant one tier's --top-h changes
+       reads galHud's rect mid-glide from the PREVIOUS tier's move, not the
+       settled position of the CURRENT one -- everything stays one tier
+       behind, which is exactly the small persistent gap Tony saw after the
+       whole cascade finished revealing. Scheduling one more positionAnnivBadge()
+       just past the transition's own duration catches it once it's actually
+       settled -- same fix already used for this exact class of race
+       elsewhere in this file (see updateGalInfoBadge() above). */
+    timers.push(setTimeout(positionAnnivBadge,180));
+  }
   function revealAll(){
     clearTimers();
     if(reduceMotion){ TIERS.forEach(showInstant); syncOverlays(); return; }
