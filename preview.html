@@ -864,6 +864,16 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     margin:0 -14px;padding:10px 14px 8px;border-bottom:1px solid var(--border-soft)}
   #course{top:calc(var(--top-h,150px) + 8px);left:50%;transform:translateX(-50%);width:210px}
   #leftcol{bottom:auto;top:calc(var(--top-h,150px) + 140px);flex-direction:column;align-items:flex-start}
+  /* 2026-08-30, Tony: the toolbar hide/show cascade now keeps --top-h in
+     sync at each step (see the boot script), but without this, every one
+     of these repositions would still SNAP instantly since --top-h changes
+     in six discrete steps, not continuously. Transitioning `top` turns each
+     step into a glide, which combined with the cascade's own stagger reads
+     as the whole overlay stack smoothly following the toolbar up and down
+     rather than jumping. #galHud/#course/#toast/#galInfo get the same
+     treatment just below/above since their own top:calc(--top-h...) rules
+     live in the un-mediaed base stylesheet, not here. */
+  #course,#leftcol,#keys,#toast,#galInfo{transition:top .2s ease-out}
   #filt{width:190px}
   /* Widened from 158px (2026-08-24, Tony: "the Y in 101ly is outside
      the box and both export and import logs are clipped" -- also
@@ -9729,9 +9739,25 @@ if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){
   function hideInstant(tier){
     tier.forEach(function(el){ el.classList.remove('tb-revealing','tb-hiding'); el.classList.add('tb-hidden'); });
   }
+  /* 2026-08-30, Tony: "shouldn't picture 1 be moving up and down with
+     collapse and expand -- buttons see through, can't see some words" --
+     the Galactic Core distance readout (#galHud) and a few other overlays
+     (#course, #toast, #galInfo, #leftcol, #keys) all position themselves
+     off the --top-h CSS variable, which syncTopOffset() sets from #top's
+     real measured height -- but that function only ever runs on window
+     resize or once when fonts settle (see its own definition above), never
+     when THIS cascade changes #top's height. So --top-h went stale the
+     moment a tier revealed or hid, and #galHud kept rendering at whatever
+     height the toolbar happened to be at page load, bleeding through
+     semi-transparent buttons once the real toolbar grew past that stale
+     value. Calling syncTopOffset() at each tier step keeps it honest, and
+     the transition added on #galHud/#course/etc. (see the .tb-hidden rule's
+     neighbours in the @media block) turns each step into a smooth glide
+     instead of a snap -- which is also the "moving up and down" motion
+     Tony was actually asking for. */
   function revealAll(){
     clearTimers();
-    if(reduceMotion){ TIERS.forEach(showInstant); return; }
+    if(reduceMotion){ TIERS.forEach(showInstant); syncTopOffset(); return; }
     TIERS.forEach(function(tier,i){
       timers.push(setTimeout(function(){
         tier.forEach(function(el){
@@ -9739,6 +9765,7 @@ if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){
           void el.offsetWidth;
           el.classList.add('tb-revealing');
         });
+        syncTopOffset();
         timers.push(setTimeout(function(){
           tier.forEach(function(el){ el.classList.remove('tb-revealing'); });
         },REVEAL_MS));
@@ -9747,7 +9774,7 @@ if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){
   }
   function hideAll(){
     clearTimers();
-    if(reduceMotion){ TIERS.forEach(hideInstant); return; }
+    if(reduceMotion){ TIERS.forEach(hideInstant); syncTopOffset(); return; }
     TIERS.slice().reverse().forEach(function(tier,ri){
       timers.push(setTimeout(function(){
         tier.forEach(function(el){
@@ -9757,6 +9784,7 @@ if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){
         });
         timers.push(setTimeout(function(){
           tier.forEach(function(el){ el.classList.remove('tb-hiding'); el.classList.add('tb-hidden'); });
+          syncTopOffset();
         },HIDE_MS));
       },ri*STAGGER));
     });
@@ -9768,6 +9796,7 @@ if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){
   TIERS.forEach(initial?hideInstant:showInstant);
   document.documentElement.classList.toggle('toolbar-collapsed',initial);
   setLabel(initial);
+  if(typeof syncTopOffset==='function') syncTopOffset();
   btn.addEventListener('click',function(){
     var collapsing=!document.documentElement.classList.contains('toolbar-collapsed');
     document.documentElement.classList.toggle('toolbar-collapsed',collapsing);
