@@ -133,12 +133,16 @@ tab, handing off the real plotted route: every hop's real name, portal
 address, region, star type, race, economy and conflict level, straight from
 the same address-decoding this map uses everywhere else, not invented for
 the handoff. It's labelled **WORK IN PROGRESS** on the page itself because
-several pieces are still a preview rather than a finished feature --
-turn-by-turn "I am here" progress through the route, in-flight replanning,
-and the black-hole-exit flow currently run on the Navigator's own sample
-data rather than this map's real state. Worth a look if you're curious
-where journey-tracking is headed; not yet a replacement for anything the
-main map already does reliably.
+one piece is still a simplified preview rather than a finished feature --
+confirming a real black-hole exit inserts that detour and resumes toward
+the originally planned next stop, rather than recalculating a whole new
+multi-hop route through the rest of your journey. The exit candidates
+themselves are real, though (2026-08-30): generated live from `nms-core` --
+the same generator this map uses everywhere else -- centred on the black
+hole's own real region, not a fixed sample cluster unrelated to your
+actual route. Worth a look if you're curious where journey-tracking is
+headed; not yet a replacement for anything the main map already does
+reliably.
 
 ![Galactic Navigator page showing a plotted route](screenshots/12-galactic-navigator.jpg)
 
