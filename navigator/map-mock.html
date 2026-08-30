@@ -172,7 +172,7 @@ body.no-fx .orb{display:none}
   <div class="scanlines"></div>
   <div class="vignette"></div>
 
-<div class="mockBanner"><b>WORK IN PROGRESS</b>Design preview only — not yet connected to the live Galactic Map</div>
+<div class="mockBanner"><b>WORK IN PROGRESS</b><span id="mockBannerText">Design preview only — not yet connected to the live Galactic Map</span></div>
 <div class="app">
   <header>
     <div class="title">GALACTIC MAP <small>DISCOVER / PLAN — PROTOTYPE</small></div>
@@ -777,7 +777,18 @@ window.MOCK_JOURNEYS = [
 </script>
 <script src="./sample-region.js"></script>
 <script>
-(function(){
+/* Synchronous placeholder promise -- same pattern, and same reason, as
+   index.html: a plain classic <script> (this whole page's app logic)
+   runs synchronously as the parser reaches it, while the
+   <script type="module"> below is deferred until the whole document has
+   parsed. Defining the real Promise object here first means the app
+   script below can safely wait on window.nmsCoreReady regardless of load
+   order. 2026-08-30. */
+window.nmsCoreReady = new Promise(function (res) { window.__nmsCoreResolve = res; });
+</script>
+<script type="module" src="./real-region.js"></script>
+<script>
+window.nmsCoreReady.then(function(){
   "use strict";
   var $ = function(id){ return document.getElementById(id); };
 
@@ -933,6 +944,44 @@ window.MOCK_JOURNEYS = [
   var journeys = window.MOCK_JOURNEYS || [];
   var regionSystems = window.MOCK_REGION_SYSTEMS || [];
 
+  // ---- Real-arrival mode (2026-08-30) ----
+  // Set when this page was opened via a "BACK TO MAP" hand-off from a
+  // finished or bailed-out journey (index.html/complete.html): shows the
+  // system the player actually ended up at as the map's home marker, with
+  // a real regional cluster generated live around ITS coordinates -- via
+  // window.realRegionCandidates(), the exact same generator the
+  // black-hole-exit fix uses -- rather than always resetting back to the
+  // one fixed Sranch demo cluster. That fixed cluster is real data too,
+  // but it's unrelated to an arbitrary real destination (which could be
+  // hundreds of thousands of LY away), so it's left out of the view
+  // entirely in this mode instead of being mixed in at a confusing scale.
+  var qs = new URLSearchParams(location.search);
+  var arrivalPos = null;
+  if (qs.get("arrival") === "1" && qs.get("x") !== null && qs.get("y") !== null && qs.get("z") !== null) {
+    arrivalPos = {
+      address: qs.get("addr") || "",
+      systemName: qs.get("name") || "Unknown System",
+      galaxy: Number(qs.get("galaxy") || 0),
+      coords: { x: Number(qs.get("x")), y: Number(qs.get("y")), z: Number(qs.get("z")) }
+    };
+  }
+  var arrivalCluster = (arrivalPos && window.realRegionCandidates)
+    ? window.realRegionCandidates(arrivalPos.coords.x, arrivalPos.coords.y, arrivalPos.coords.z, arrivalPos.galaxy)
+    : null;
+  var arrivalActive = !!(arrivalPos && arrivalCluster);
+  if (arrivalPos && !arrivalCluster) {
+    // nms-core didn't load (e.g. this page opened via file://) -- fall
+    // back to the fixed demo cluster rather than an empty map, same
+    // graceful-degrade rule used everywhere else nms-core is used.
+    showToast("Couldn't load live regional data for your destination — showing the built-in sample cluster instead.", 4200);
+  }
+  (function () {
+    var bannerText = document.getElementById("mockBannerText");
+    if (bannerText && arrivalActive) {
+      bannerText.textContent = "Showing the real region around where your last journey left you — course plotting between arbitrary real systems isn't wired up yet";
+    }
+  })();
+
   // ---- real star colours + hyperdrive model, transcribed from the live
   // Galactic Map (preview.html: STAR_TYPES / HYPER_DRIVES / the 101-6000 LY
   // jump-range tiers) so this mock gates course plotting the exact same
@@ -965,20 +1014,40 @@ window.MOCK_JOURNEYS = [
   // nms-core data, read-only, never fabricated) so there are enough real
   // candidates nearby for multi-hop routing to zigzag and for real
   // star-colour variety to make drive-colour gating visible.
-  var HOME_ADDR = journeys.length ? journeys[0].origin.address : null;
-  var byAddr = {};
-  journeys.forEach(function(j){
-    j.route.jumps.forEach(function(s){
+  var HOME_ADDR, byAddr = {};
+  if (arrivalActive) {
+    HOME_ADDR = arrivalPos.address;
+    // The arrival system itself might not be among the generated
+    // candidates (it's excluded as a possible pick in realRegionCandidates
+    // when it happens to be a black hole/Atlas anomaly index, and isn't
+    // guaranteed to be re-rolled otherwise) -- add it explicitly so "where
+    // you ended up" is always on the map, not just its neighbours.
+    byAddr[arrivalPos.address] = {
+      address: arrivalPos.address, systemName: arrivalPos.systemName,
+      region: "", economy: "", race: "", starType: "yellow",
+      coords: arrivalPos.coords
+    };
+    arrivalCluster.forEach(function(s){
       if (!byAddr[s.address]) byAddr[s.address] = s;
     });
-  });
-  regionSystems.forEach(function(s){
-    if (!byAddr[s.address]) byAddr[s.address] = s;
-  });
+  } else {
+    HOME_ADDR = journeys.length ? journeys[0].origin.address : null;
+    journeys.forEach(function(j){
+      j.route.jumps.forEach(function(s){
+        if (!byAddr[s.address]) byAddr[s.address] = s;
+      });
+    });
+    regionSystems.forEach(function(s){
+      if (!byAddr[s.address]) byAddr[s.address] = s;
+    });
+  }
   var systems = Object.keys(byAddr).map(function(a){ return byAddr[a]; });
 
-  // fictional, clearly-labelled example community pins — not tied to any real person or account
-  var communityPins = [
+  // fictional, clearly-labelled example community pins — not tied to any
+  // real person or account. Anchored near the fixed Sranch demo cluster,
+  // so they're left out of real-arrival mode rather than shown floating
+  // nowhere near an arbitrary real destination.
+  var communityPins = arrivalActive ? [] : [
     { systemName: "Halcyon's Rest", address: "100BE1434855", note: "Shared by Voyager_9K", coords: { x: 1877, y: -20, z: 1074 } },
     { systemName: "Kessi Anchorage", address: "1003E1435654", note: "Shared by Nomad_Kessi", coords: { x: 1871, y: -40, z: 1078 } }
   ];
@@ -1376,6 +1445,12 @@ window.MOCK_JOURNEYS = [
     var id = findMatchingJourney(o.address, d.address);
     if (id) {
       location.href = "./index.html?journey=" + encodeURIComponent(id);
+    } else if (arrivalActive) {
+      // The 3 canned sample journeys aren't even shown in real-arrival
+      // mode (see communityPins/systems above), so pointing back at them
+      // here would be confusing -- plotting a fresh route between two
+      // arbitrary real systems isn't wired up yet, full stop.
+      showToast("Plotting a new route between real systems isn't wired up in this mock yet — head to the live Galactic Map to plan a journey from here.", 4400);
     } else {
       showToast("No sample journey is baked for this exact pair yet — try Sranch → Kuybiyshm, Uerlia-Kaus IV, or Atsusa.", 4200);
     }
@@ -1405,7 +1480,7 @@ window.MOCK_JOURNEYS = [
   buildFilterOptions();
   buildHyperUI();
   renderMarkers();
-})();
+});
 </script>
 </body>
 </html>
