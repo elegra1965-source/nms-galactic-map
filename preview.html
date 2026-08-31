@@ -4,6 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>NMS Galactic Map — Preview v4</title>
+<meta name="description" content="NMS Galactic Map — a fan-made 3D No Man's Sky galaxy map and portal address decoder, by elegra1965.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="NMS Galactic Map">
+<meta property="og:title" content="NMS Galactic Map">
+<meta property="og:description" content="A fan-made 3D No Man's Sky galaxy map and portal address decoder, by elegra1965.">
+<meta property="og:image" content="https://nms-galaxy-map.netlify.app/screenshots/10-atlas-overlay.jpg">
+<meta property="og:url" content="https://nms-galaxy-map.netlify.app/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="NMS Galactic Map">
+<meta name="twitter:description" content="A fan-made 3D No Man's Sky galaxy map and portal address decoder, by elegra1965.">
+<meta name="twitter:image" content="https://nms-galaxy-map.netlify.app/screenshots/10-atlas-overlay.jpg">
 <link rel="icon" type="image/x-icon" href="favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
@@ -319,6 +330,14 @@ html.debug-on #tweak{display:block}
 
 .fold.min .fbody{display:none}
 .fold.min{width:auto}
+/* The floating minimized "▸ Filters" pill duplicates the toolbar's own
+   Filters button (#bFiltToggle, inside the collapsible controls section)
+   one-for-one -- two ways to open the same panel. First scoped to mobile
+   only (2026-08-31), then Tony confirmed he wants it gone everywhere, not
+   just on phones -- it's redundant on desktop too, same toolbar button
+   sits right there. Only hides it while minimized (.min); an OPEN Filters
+   panel still renders normally on every width. */
+#filt.min{display:none}
 .fhead{cursor:pointer;user-select:none;white-space:nowrap}
 .fbody{margin-top:8px}
 .sl{margin-bottom:8px}
@@ -996,23 +1015,34 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
      order broke the tie, but #top .sep always won regardless of order). */
   #top .tb-hidden{display:none}
   @keyframes toolbarRowReveal{
-    0%{opacity:0;transform:translateY(-6px);filter:drop-shadow(0 0 0 rgba(0,229,255,0))}
-    35%{opacity:1;transform:translateY(0)}
-    55%{filter:drop-shadow(0 0 6px rgba(0,229,255,.9)) drop-shadow(0 0 14px rgba(0,229,255,.55))}
-    100%{filter:drop-shadow(0 0 0 rgba(0,229,255,0))}
+    0%{opacity:0;transform:translateY(-6px)}
+    100%{opacity:1;transform:translateY(0)}
   }
   @keyframes toolbarRowHide{
     0%{opacity:1;transform:translateY(0)}
     100%{opacity:0;transform:translateY(-6px)}
   }
-  /* 2026-08-30, Tony: "don't really see the glow apart from the first...
-     slowed down half the speed so can experience the full effect" -- both
-     the CSS animation-duration here and REVEAL_MS/HIDE_MS/STAGGER in the
-     boot script must move together (the script removes .tb-revealing after
-     REVEAL_MS, so if that timeout doesn't match this animation's own
-     duration the glow gets cut off mid-fade rather than finishing). */
-  .tb-revealing{animation:toolbarRowReveal .56s ease-out both}
-  .tb-hiding{animation:toolbarRowHide .32s ease-in both}
+  /* 2026-08-31, Tony: "jittery collapse and expand... needs a smoother
+     animation" (video attached, real jank confirmed frame-by-frame -- not
+     a report to retune timing again). This animation had already been
+     through 8+ rounds of pure timing tuning (stagger/duration halved twice)
+     without fixing it, which was the tell that the problem was never speed
+     -- it was cost-per-frame. The `filter:drop-shadow(...)` glow this
+     keyframe used to animate is the likely real culprit: unlike opacity and
+     transform (both compositor-only, cheap on any GPU), `filter` forces the
+     browser to rasterize/repaint the element every frame, and this was
+     firing on up to 5 buttons at once per tier, 6 tiers in a row -- exactly
+     the kind of per-frame repaint that a fast desktop Chrome hides but a
+     real phone GPU can't keep up with, matching what the video actually
+     shows. Dropped the glow, kept the same fade+slide motion (now pure
+     opacity/transform, GPU-compositable, no repaint) -- see the boot
+     script's own reflow-batching change alongside this for the other half
+     of the fix. If Tony wants the glow back once this is confirmed smooth,
+     it's a separate, much cheaper way to add it (e.g. box-shadow on a
+     single wrapping element instead of filter on every button) rather than
+     restoring this version. */
+  .tb-revealing{animation:toolbarRowReveal .56s ease-out both;will-change:opacity,transform}
+  .tb-hiding{animation:toolbarRowHide .32s ease-in both;will-change:opacity,transform}
   @media(prefers-reduced-motion:reduce){
     .tb-revealing,.tb-hiding{animation:none}
   }
@@ -10174,14 +10204,15 @@ if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){
      looses glow... remove one at a time... not too quick not too slow".
      TIERS mirrors the same 6 groups the dividers (sepA-E) already mark, so
      no HTML restructuring was needed -- each tier reveals/hides on its own
-     staggered delay (90ms apart), with a one-shot glow (see
-     @keyframes toolbarRowReveal) on the way in that fades back to each
-     element's own normal, undisturbed appearance rather than trying to
-     fake "returning" a color (buttons with the .on class are gold, not
-     white, so the glow is a pure drop-shadow overlay, never touches the
-     element's actual text colour). Hiding a tier waits for its own fade-out
-     to finish before switching to display:none, so the layout shrinks in
-     the same staggered rhythm rather than all at once. */
+     staggered delay, fading in/out via @keyframes toolbarRowReveal/Hide.
+     Hiding a tier waits for its own fade-out to finish before switching to
+     display:none, so the layout shrinks in the same staggered rhythm rather
+     than all at once.
+     2026-08-31, Tony: real jank on his actual phone (video), not fixed by
+     any of the above timing tuning -- the drop-shadow glow this cascade
+     used to add on reveal was dropped (see the keyframes' own comment) as
+     the real cost-per-frame culprit, so what's below is now a plain
+     opacity+transform fade with no glow step. */
   var KEY='nms_mobileToolbarCollapsed';
   var btn=document.getElementById('toolbarToggle');
   if(!btn) return;
@@ -10257,16 +10288,25 @@ if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){
        elsewhere in this file (see updateGalInfoBadge() above). */
     timers.push(setTimeout(positionAnnivBadge,180));
   }
+  /* 2026-08-31: was one forced synchronous reflow (`void el.offsetWidth`)
+     PER BUTTON in a tier -- needed once, to make the browser notice the
+     class was removed-then-re-added so the animation actually restarts,
+     but reading layout from every element in the tier repeats the same
+     forced flush for no extra benefit (the whole tier reflows together
+     regardless of which single element you read). Reading it off just the
+     tier's first element gets the same restart guarantee for the cost of
+     one layout read instead of up to five -- real savings multiplied by
+     6 tiers every time the cascade runs, and part of the same jank fix as
+     dropping the drop-shadow glow above. */
+  function restartAnim(tier){ if(tier[0]) void tier[0].offsetWidth; }
   function revealAll(){
     clearTimers();
     if(reduceMotion){ TIERS.forEach(showInstant); syncOverlays(); return; }
     TIERS.forEach(function(tier,i){
       timers.push(setTimeout(function(){
-        tier.forEach(function(el){
-          el.classList.remove('tb-hidden','tb-hiding','tb-revealing');
-          void el.offsetWidth;
-          el.classList.add('tb-revealing');
-        });
+        tier.forEach(function(el){ el.classList.remove('tb-hidden','tb-hiding','tb-revealing'); });
+        restartAnim(tier);
+        tier.forEach(function(el){ el.classList.add('tb-revealing'); });
         syncOverlays();
         timers.push(setTimeout(function(){
           tier.forEach(function(el){ el.classList.remove('tb-revealing'); });
@@ -10279,11 +10319,9 @@ if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){
     if(reduceMotion){ TIERS.forEach(hideInstant); syncOverlays(); return; }
     TIERS.slice().reverse().forEach(function(tier,ri){
       timers.push(setTimeout(function(){
-        tier.forEach(function(el){
-          el.classList.remove('tb-revealing','tb-hiding');
-          void el.offsetWidth;
-          el.classList.add('tb-hiding');
-        });
+        tier.forEach(function(el){ el.classList.remove('tb-revealing','tb-hiding'); });
+        restartAnim(tier);
+        tier.forEach(function(el){ el.classList.add('tb-hiding'); });
         timers.push(setTimeout(function(){
           tier.forEach(function(el){ el.classList.remove('tb-hiding'); el.classList.add('tb-hidden'); });
           syncOverlays();
