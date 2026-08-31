@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="format-detection" content="telephone=no">
+<title>Jump Failed — NMS Galactic Map</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#f0a500; --cyan:#00e5ff; --cyan-dim:#0096a8;
+  --bg:#070b11; --bg2:#0b1119; --bg3:#0f1620;
+  --panel:rgba(255,255,255,0.035); --border:rgba(0,229,255,0.16); --border-soft:rgba(255,255,255,0.07);
+  --text:#cfe0f0; --text-dim:rgba(207,224,240,0.6); --text-faint:rgba(207,224,240,0.4);
+  --white:#eaf6ff; --danger:#ff5a4a;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+*{scrollbar-width:thin;scrollbar-color:var(--cyan-dim) rgba(0,0,0,.25)}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);
+  font-family:'Rajdhani',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+canvas#stars{display:block;position:fixed;inset:0;z-index:0}
+
+.wrap{position:relative;z-index:2;min-height:100%;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;padding:24px;text-align:center;gap:18px}
+
+.kicker{font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:.3em;
+  color:var(--danger);text-transform:uppercase;animation:kickerPulse 2.4s ease-in-out infinite}
+@keyframes kickerPulse{0%,100%{opacity:.75}50%{opacity:1;text-shadow:0 0 10px rgba(255,90,74,.6)}}
+
+/* The centerpiece: a collapsed jump point instead of a static glyph grid.
+   Canvas draws particles spiraling INTO the core (the visual metaphor for
+   "the drive tried to resolve this address and the jump collapsed"), CSS
+   handles the core glow itself since a pulsing radial-gradient div is far
+   cheaper than redrawing it every frame on canvas. */
+.core-wrap{position:relative;width:180px;height:180px;margin:4px 0}
+#coreCanvas{position:absolute;inset:0;width:100%;height:100%}
+.core{position:absolute;left:50%;top:50%;width:34px;height:34px;border-radius:50%;
+  transform:translate(-50%,-50%);
+  background:radial-gradient(circle,var(--white) 0%,var(--danger) 40%,rgba(255,90,74,0) 70%);
+  box-shadow:0 0 24px 6px rgba(255,90,74,.55),0 0 60px 20px rgba(255,90,74,.18);
+  animation:corePulse 1.6s ease-in-out infinite}
+.ring{position:absolute;left:50%;top:50%;border:1px solid rgba(255,90,74,.4);
+  border-radius:50%;transform:translate(-50%,-50%);animation:ringPulse 2.2s ease-out infinite}
+.ring.r2{animation-delay:.7s}
+.ring.r3{animation-delay:1.4s}
+@keyframes corePulse{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(.82)}}
+@keyframes ringPulse{
+  0%{width:34px;height:34px;opacity:.7}
+  100%{width:180px;height:180px;opacity:0}
+}
+@media (prefers-reduced-motion:reduce){
+  .core,.ring,.kicker{animation:none}
+  .ring{width:100px;height:100px;opacity:.25}
+}
+
+h1{font-family:'Orbitron',sans-serif;font-weight:700;font-size:clamp(22px,5vw,34px);
+  letter-spacing:.05em;color:var(--white);text-shadow:0 0 18px rgba(255,90,74,.35)}
+
+.sub{max-width:440px;font-size:15px;line-height:1.6;color:var(--text-dim)}
+.sub b{color:var(--text)}
+
+.code{font-family:'Orbitron',monospace;font-size:11px;letter-spacing:.1em;
+  color:var(--text-faint);word-break:break-all;max-width:420px}
+
+.actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:4px}
+.btn{font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:.12em;
+  text-transform:uppercase;text-decoration:none;color:var(--text);
+  background:var(--panel);border:1px solid var(--border);border-radius:8px;
+  padding:11px 20px;transition:background .2s,border-color .2s}
+.btn:hover{background:rgba(0,229,255,.06);border-color:var(--cyan)}
+.btn.primary{border-color:var(--gold);color:var(--gold)}
+.btn.primary:hover{background:rgba(240,165,0,.08)}
+
+.foot{position:fixed;bottom:14px;left:0;right:0;text-align:center;font-size:9px;
+  letter-spacing:.14em;color:var(--text-faint);z-index:2}
+</style>
+</head>
+<body>
+<canvas id="stars"></canvas>
+
+<div class="wrap">
+  <div class="kicker">Hyperdrive fault</div>
+
+  <div class="core-wrap">
+    <canvas id="coreCanvas"></canvas>
+    <div class="ring r1"></div>
+    <div class="ring r2"></div>
+    <div class="ring r3"></div>
+    <div class="core"></div>
+  </div>
+
+  <h1>Jump failed — no system at this address</h1>
+  <p class="sub">The portal address in your last jump doesn't resolve to a
+    charted location. Either it was mistyped, or whatever you followed here
+    points somewhere that <b>never generated</b>.</p>
+  <p class="code" id="path"></p>
+
+  <div class="actions">
+    <a class="btn primary" href="/">Return to Galactic Map</a>
+    <a class="btn" href="/#bSearch" id="backBtn">Go back</a>
+  </div>
+</div>
+
+<div class="foot">NMS GALACTIC MAP — BUILT BY ELEGRA1965</div>
+
+<script>
+(function(){
+  var p = location.pathname.replace(/^\//,'') || '(no path given)';
+  document.getElementById('path').textContent = p;
+})();
+
+(function(){
+  var back = document.getElementById('backBtn');
+  back.addEventListener('click', function(e){
+    if (history.length > 1) { e.preventDefault(); history.back(); }
+  });
+})();
+
+var reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* Particles spiraling into the failed jump point -- capped count, small
+   canvas (180x180 CSS px), so this is cheap even though it's the busiest
+   visual on the page. Skipped entirely under reduced-motion: a few static
+   rings (see the CSS above) already carry the idea without motion. */
+(function(){
+  if(reduceMotion) return;
+  var c = document.getElementById('coreCanvas'), ctx = c.getContext('2d');
+  var SIZE = 180, CX = SIZE/2, CY = SIZE/2;
+  var dpr = Math.min(devicePixelRatio||1, 2);
+  c.width = SIZE*dpr; c.height = SIZE*dpr; ctx.scale(dpr,dpr);
+  var COLORS = ['#00e5ff','#ff5a4a','#eaf6ff'];
+  var particles = [];
+  function spawn(){
+    var ang = Math.random()*Math.PI*2;
+    var r = 85 + Math.random()*10;
+    particles.push({
+      ang: ang, r: r,
+      speed: 0.55 + Math.random()*0.5,
+      spin: (Math.random()<0.5?-1:1) * (0.015 + Math.random()*0.02),
+      col: COLORS[Math.floor(Math.random()*COLORS.length)],
+      life: 1
+    });
+  }
+  for(var i=0;i<14;i++) spawn();
+  function draw(){
+    ctx.clearRect(0,0,SIZE,SIZE);
+    for(var i=particles.length-1;i>=0;i--){
+      var p = particles[i];
+      p.r -= p.speed;
+      p.ang += p.spin;
+      p.life = Math.max(0, p.r/95);
+      if(p.r <= 6){ particles.splice(i,1); spawn(); continue; }
+      var x = CX + Math.cos(p.ang)*p.r, y = CY + Math.sin(p.ang)*p.r;
+      ctx.globalAlpha = 0.15 + p.life*0.55;
+      ctx.fillStyle = p.col;
+      ctx.beginPath(); ctx.arc(x,y,1.6,0,Math.PI*2); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* Same lightweight drifting starfield as the map's other companion pages. */
+(function(){
+  var c = document.getElementById('stars'), ctx = c.getContext('2d');
+  var stars = [], w, h;
+  function resize(){
+    w = c.width = innerWidth; h = c.height = innerHeight;
+    stars = [];
+    var n = Math.min(220, Math.floor((w*h)/6000));
+    for(var i=0;i<n;i++){
+      stars.push({x:Math.random()*w, y:Math.random()*h, r:Math.random()*1.3+0.2,
+        a:Math.random()*0.6+0.2, tw:Math.random()*0.02+0.005,
+        dx:Math.random()*0.06+0.02, dy:Math.random()*0.03+0.01});
+    }
+  }
+  var animate = !reduceMotion;
+  function draw(){
+    ctx.fillStyle = '#070b11';
+    ctx.fillRect(0,0,w,h);
+    for(var i=0;i<stars.length;i++){
+      var s = stars[i];
+      if(animate){
+        s.a += s.tw; if(s.a>0.9||s.a<0.15) s.tw*=-1;
+        s.x += s.dx; s.y += s.dy;
+        if(s.x>w) s.x=0; if(s.y>h) s.y=0;
+      }
+      ctx.globalAlpha = Math.max(0,Math.min(1,s.a));
+      ctx.fillStyle = '#cfe0f0';
+      ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    if(animate) requestAnimationFrame(draw);
+  }
+  addEventListener('resize', resize);
+  resize();
+  draw();
+})();
+</script>
+</body>
+</html>
