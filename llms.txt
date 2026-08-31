@@ -1,0 +1,17 @@
+# NMS Galactic Map
+
+> A fan-made 3D No Man's Sky galaxy map and portal address decoder, by elegra1965. This is an unofficial, fan-made tool -- it is not affiliated with, endorsed by, or sponsored by Hello Games.
+
+NMS Galactic Map decodes any No Man's Sky 12-character portal address into a true 3D galaxy position, lets you fly the procedural galaxy, enter individual star systems in 3D, plot hyperdrive-aware multi-hop routes, and log real in-game system data that other players can see (a shared, community-editable database, moderated via flags/reports).
+
+## Pages
+
+- [Galactic Map](https://nms-galaxy-map.netlify.app/): the main 3D galaxy map, portal address decoder, and system browser.
+- [Galactic Navigator](https://nms-galaxy-map.netlify.app/navigator/index.html): plots and displays a hyperdrive-aware multi-hop route between two systems.
+
+## Notes for automated readers
+
+- Star type, system/region names, and body (planet/moon) count are generated deterministically from the portal address using publicly documented No Man's Sky game mechanics -- they are not scraped from Hello Games or any other source.
+- Individual planet names are disclosed in-app as an unverified best-effort guess, not guaranteed to match a player's real save data.
+- Community-submitted system data (name, race, economy, resources, notes) is trusted as entered and not automatically checked against Hello Games' own records, which are known to occasionally desync between players.
+- Full technical background: [README](https://github.com/elegra1965-source/nms-galactic-map/blob/main/README.md).

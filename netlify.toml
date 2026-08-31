@@ -10,3 +10,18 @@
 
 [functions]
   node_bundler = "esbuild"
+
+# 2026-08-31: a few low-risk, standard hardening headers before going live.
+# Deliberately NOT setting X-Frame-Options or a CSP frame-ancestors directive
+# here -- Tony's own Phone Preview Tool (a local dev utility, see CLAUDE.md)
+# loads this live site cross-origin inside an iframe to test mobile layout,
+# and either DENY or SAMEORIGIN would break that on this specific site the
+# moment it deployed. If frame-blocking is ever wanted later, it needs an
+# explicit carve-out for wherever that tool is actually used from, not a
+# blanket header added without checking this first.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"

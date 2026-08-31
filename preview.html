@@ -15,6 +15,23 @@
 <meta name="twitter:title" content="NMS Galactic Map">
 <meta name="twitter:description" content="A fan-made 3D No Man's Sky galaxy map and portal address decoder, by elegra1965.">
 <meta name="twitter:image" content="https://nms-galaxy-map.netlify.app/screenshots/10-atlas-overlay.jpg">
+<link rel="canonical" href="https://nms-galaxy-map.netlify.app/">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "NMS Galactic Map",
+  "url": "https://nms-galaxy-map.netlify.app/",
+  "description": "A fan-made 3D No Man's Sky galaxy map and portal address decoder, by elegra1965.",
+  "applicationCategory": "UtilitiesApplication",
+  "operatingSystem": "Any (web browser)",
+  "browserRequirements": "Requires JavaScript",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "isAccessibleForFree": true,
+  "author": { "@type": "Person", "name": "elegra1965" },
+  "isPartOf": { "@type": "WebSite", "name": "elegra1965 NMS projects" }
+}
+</script>
 <link rel="icon" type="image/x-icon" href="favicon.ico">
 <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
@@ -28,6 +45,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="format-detection" content="telephone=no">
 <meta name="apple-mobile-web-app-title" content="Galactic Map">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -1175,6 +1193,19 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 </style>
 </head>
 <body>
+<noscript>
+  <div style="position:fixed;inset:0;z-index:9999;background:#070b11;color:#cfe0f0;
+    font-family:Rajdhani,system-ui,sans-serif;display:flex;align-items:center;
+    justify-content:center;text-align:center;padding:24px">
+    <div style="max-width:420px">
+      <h1 style="font-family:Orbitron,sans-serif;color:#00e5ff;font-size:18px;
+        letter-spacing:.08em;margin:0 0 12px">NMS GALACTIC MAP</h1>
+      <p style="margin:0;line-height:1.5">This is an interactive 3D galaxy map and
+      requires JavaScript to run. Please enable JavaScript in your browser
+      settings and reload the page.</p>
+    </div>
+  </div>
+</noscript>
 <canvas id="c"></canvas>
 <!-- WARP TRANSITION video overlay (spec item 9) -->
 <div id="warp-overlay" onclick="skipWarp()">
@@ -2051,14 +2082,34 @@ loadLetterMap('./nms-core/letter-map').then(function(lm){
 "use strict";
 
 /* ---- error surfacing so a runtime fault is visible, not a blank screen ---- */
+var __nmsThreeMissing=false;
 function showErr(msg){
   var e=document.getElementById("err");
   e.style.display="block";
   e.textContent="ERROR: "+msg;
 }
 window.addEventListener("error",function(ev){
+  if(__nmsThreeMissing) return; // already showing the real explanation below -- don't overwrite it with the cryptic "THREE is not defined" this same failure inevitably throws a moment later
   showErr((ev.message||"unknown")+"\n"+(ev.filename||"")+":"+(ev.lineno||""));
 });
+/* 2026-08-31: the whole app depends on the Three.js CDN script tag just
+   above actually loading -- a script-load failure fires only on the
+   script element itself, not as a global window "error" event, so a
+   blocked/unreachable CDN (corporate firewall, an over-aggressive
+   ad-blocker, a regional outage) previously fell through to whatever
+   later line first touched `THREE`, surfacing as a cryptic "THREE is
+   not defined" via the handler above rather than something a non-technical
+   visitor could act on. Checking for it explicitly, right after the tag
+   had a chance to run, means a real network/blocking problem gets a plain
+   explanation instead of a raw JS error -- the __nmsThreeMissing flag stops
+   the inevitable follow-up ReferenceError (from the first line below that
+   touches THREE) from silently overwriting this friendlier message. */
+if(typeof THREE==="undefined"){
+  __nmsThreeMissing=true;
+  showErr("Couldn't load a required file (three.js) from cdnjs.cloudflare.com.\n"+
+    "This usually means an ad-blocker or firewall is blocking that address, or your connection dropped mid-load.\n"+
+    "Try disabling any ad/script blocker for this site, then reload the page.");
+}
 
 /* ============ constants ============ */
 var SIZE_XZ=0x1000, SIZE_Y=0x100;
