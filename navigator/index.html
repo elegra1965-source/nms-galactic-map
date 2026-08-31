@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="format-detection" content="telephone=no">
   <title>Galactic Navigator</title>
   <meta name="description" content="Plot a real hyperdrive-aware multi-hop route across the NMS Galactic Map's procedural galaxy, by elegra1965.">
   <meta property="og:type" content="website">
@@ -15,6 +16,23 @@
   <meta name="twitter:title" content="Galactic Navigator — NMS Galactic Map">
   <meta name="twitter:description" content="Plot a real hyperdrive-aware multi-hop route across the NMS Galactic Map's procedural galaxy, by elegra1965.">
   <meta name="twitter:image" content="https://nms-galaxy-map.netlify.app/screenshots/12-galactic-navigator.jpg">
+  <link rel="canonical" href="https://nms-galaxy-map.netlify.app/navigator/index.html">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Galactic Navigator",
+    "url": "https://nms-galaxy-map.netlify.app/navigator/index.html",
+    "description": "Plot a real hyperdrive-aware multi-hop route across the NMS Galactic Map's procedural galaxy, by elegra1965.",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "Any (web browser)",
+    "browserRequirements": "Requires JavaScript",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "isAccessibleForFree": true,
+    "author": { "@type": "Person", "name": "elegra1965" },
+    "isPartOf": { "@type": "WebSite", "name": "NMS Galactic Map", "url": "https://nms-galaxy-map.netlify.app/" }
+  }
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
@@ -470,6 +488,19 @@ body.no-fx .orb{display:none}
 </style>
 </head>
 <body>
+<noscript>
+  <div style="position:fixed;inset:0;z-index:9999;background:#070b11;color:#cfe0f0;
+    font-family:Rajdhani,system-ui,sans-serif;display:flex;align-items:center;
+    justify-content:center;text-align:center;padding:24px">
+    <div style="max-width:420px">
+      <h1 style="font-family:Orbitron,sans-serif;color:#00e5ff;font-size:18px;
+        letter-spacing:.08em;margin:0 0 12px">GALACTIC NAVIGATOR</h1>
+      <p style="margin:0;line-height:1.5">This tool plots and displays your route
+      interactively and requires JavaScript to run. Please enable JavaScript in
+      your browser settings and reload the page.</p>
+    </div>
+  </div>
+</noscript>
 <script>
 /* Synchronous placeholder promise, created before the nms-core module
    script below even begins loading -- same pattern as the live map's
