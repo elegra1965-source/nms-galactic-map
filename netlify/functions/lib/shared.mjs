@@ -84,7 +84,7 @@ export function parseCompositeKey(key){
    See HANDOVER.md for the full reasoning. */
 export const FLAG_FIELDS = [
   "name","race","region","starClass","stars","suffix","giant",
-  "economy","conflict","blackHole","atlas","phantom","notes"
+  "economy","conflict","blackHole","atlas","phantom","notes","screenshot"
 ];
 export function isValidFlagField(field){
   if(FLAG_FIELDS.indexOf(field) >= 0) return true;
@@ -168,6 +168,73 @@ export async function githubPutFile(token, data, sha, commitMessage){
   });
   if(!res.ok){
     throw new Error("GitHub write failed: "+res.status+" "+(await res.text()));
+  }
+  return res.json();
+}
+
+/* Screenshot storage: unlike overrides.json's own JSON blob (see
+   githubGetFile/githubPutFile above), a system's optional photo is never
+   embedded inline in that file -- every visitor's page load fetches the
+   WHOLE systems dict in one GET (see system-edit.mjs's handleGet), and
+   overrides.json already had one real outage from outgrowing the GitHub
+   Contents API's 1MB inline-read ceiling from TEXT alone (2026-08-23, see
+   githubGetFile()'s own comment) -- embedding photos in there too would
+   make that far worse. A photo lives as its own committed file instead,
+   and only its resulting raw.githubusercontent.com URL (a short string,
+   same cost as any other text field) is ever written into a system
+   record. Added for the Edit System / Surveyor notes screenshot feature,
+   2026-09-01 (Tony: "on the edit system... a screenshot users can add a
+   picture").
+
+   Each upload gets its OWN filename (timestamp + a few random base36
+   chars, never just the system's own key) rather than one fixed path per
+   system that a re-upload would overwrite -- this matters for the
+   flag/dispute consensus system in system-edit.mjs: a screenshot currently
+   under review must NOT visibly change for every visitor the moment a new
+   (possibly losing) vote comes in, same guarantee every other flaggable
+   field already gets there (see voteAndMaybeResolve()'s own comment). If
+   uploads shared one fixed path, overwriting it on submission would leak
+   the new photo to everyone immediately, whether or not that vote actually
+   wins -- unique-per-upload filenames mean only whichever URL string
+   actually gets written into sysRec.data.screenshot (by a direct edit or a
+   WINNING consensus vote, exactly like every other field) is ever shown; a
+   losing vote's uploaded file just sits unreferenced, unused. Old
+   superseded photos (replaced by a later edit, or removed entirely) are
+   never deleted -- same "it's all still in the git history if it's ever
+   wanted" ethos this project already applies to overrides.json itself, and
+   cheap at the scale a personal fan project sees. */
+export const SCREENSHOT_DIR = "user-screenshots";
+export function screenshotUrlPrefix(){
+  return "https://raw.githubusercontent.com/"+GITHUB_OWNER+"/"+GITHUB_REPO+"/"+GITHUB_BRANCH+"/"+SCREENSHOT_DIR+"/";
+}
+export function screenshotPathFor(editKey){
+  // ':' isn't a safe path/URL character on every platform -- swap it for
+  // '-' in the filename only, the systems-dict key itself (galaxy:ADDRESS)
+  // is untouched everywhere else.
+  var stamp = Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,8);
+  return SCREENSHOT_DIR+"/"+String(editKey).replace(":","-")+"-"+stamp+".jpg";
+}
+/* Commits one binary file (a screenshot's already-base64 bytes, no
+   JSON.stringify wrapping around them -- that's what makes this different
+   from githubPutFile above, which always writes overrides.json as JSON).
+   base64Content is the RAW base64 payload, already stripped of its
+   "data:image/jpeg;base64," prefix by the caller. Always creates a NEW
+   file (see screenshotPathFor()'s own comment for why filenames never
+   collide), so unlike githubPutFile this never needs an existing sha. */
+export async function githubPutBinaryFile(token, path, base64Content, commitMessage){
+  var url = "https://api.github.com/repos/"+GITHUB_OWNER+"/"+GITHUB_REPO+"/contents/"+path;
+  var res = await fetch(url, {
+    method: "PUT",
+    headers: {
+      "Authorization": "Bearer "+token,
+      "Accept": "application/vnd.github+json",
+      "Content-Type": "application/json",
+      "User-Agent": "nms-galactic-map-function"
+    },
+    body: JSON.stringify({ message: commitMessage, content: base64Content, branch: GITHUB_BRANCH })
+  });
+  if(!res.ok){
+    throw new Error("GitHub screenshot write failed: "+res.status+" "+(await res.text()));
   }
   return res.json();
 }
