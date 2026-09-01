@@ -1569,23 +1569,32 @@ window.MOCK_JOURNEYS = [
     ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
     ctx.fill();
   }
-  /* ---- rare background events: shooting stars, a warping-in/out
-     freighter, and the odd anomaly (2026-08-31, Tony: "nothing is really
-     noticeable... maybe comets, shooting stars... odd freighter warping in
-     and out, even the odd anomalies") -- layered into the SAME canvas and
-     SAME throttled ~11fps loop the twinkle stars already use, rather than
-     a second animation loop, so this doesn't cost anything close to what
-     it might look like. Each is a handful of extra ctx.arc/lineTo calls on
-     at most one active object per kind at a time -- nothing here uses
-     filter/drop-shadow (the exact thing that turned out to cause real
-     frame-drop jank on the live map's own toolbar animation earlier this
-     session), so the cost is roughly proportional to "a few more dots,"
-     not to how dramatic it looks. Narrower/mobile viewports get the same
+  /* ---- rare background events: shooting stars, a drifting nebula
+     cloud, and the odd anomaly (2026-08-31, Tony: "nothing is really
+     noticeable... maybe comets, shooting stars... even the odd
+     anomalies") -- layered into the SAME canvas and SAME throttled
+     ~11fps loop the twinkle stars already use, rather than a second
+     animation loop, so this doesn't cost anything close to what it
+     might look like. Nothing here uses filter/drop-shadow (the exact
+     thing that turned out to cause real frame-drop jank on the live
+     map's own toolbar animation earlier this session) -- comet/anomaly
+     are a handful of extra ctx.arc/lineTo calls, and even the nebula
+     (the most expensive of the three) is just a handful of radial
+     gradients per frame. Narrower/mobile viewports get the same
      effects, just spawned less often -- less visual competition with the
      route/manifest panels on a small screen, and fewer spawns over time
      means less total draw work on weaker hardware, without needing to
      strip the feature down or duplicate a simpler version of it. All of
-     it is skipped outright under reduced-motion, same as the twinkle. */
+     it is skipped outright under reduced-motion, same as the twinkle.
+
+     2026-09-01, Tony: the freighter effect (rebalanced and reworked
+     twice this session -- see HANDOVER.md) was removed after real
+     in-game reference screenshots made clear the procedural hull just
+     didn't read as a No Man's Sky ship ("look like submarines... no
+     character"). In its place: the game's own background nebulae --
+     soft drifting gas clouds with a brighter core, per Tony's reference
+     screenshots (warm orange/red haze around a brighter blue-white
+     core) -- see spawnNebula/drawNebula below. */
   function spawnComet(cssW, cssH) {
     // 2026-08-31, Tony: "shooting stars too fast" -- crossing time was
     // 500-850ms, closer to a lightning bolt than something you can watch;
@@ -1604,84 +1613,6 @@ window.MOCK_JOURNEYS = [
       vy: speed * 0.28,
       len: len,
       born: 0, life: 0, maxLife: (cssW + len * 2) / speed
-    };
-  }
-  // 2026-08-31, Tony: "freighters can hardly see, look just like lights way
-  // too small, need random sizes so looks far away and closer" -- plus his
-  // reference screenshot of real NMS freighters: one large, detailed hull
-  // close up, several small dark silhouettes scattered further back. A
-  // plain dot/ellipse (the original version) can't read as "a ship" at any
-  // size, so this draws an actual small hull shape (see drawFreighterHull
-  // below) instead, scaled per-instance across a wide range so the depth
-  // cue is the size itself, same as the reference image.
-  //
-  // 2026-09-01, Tony: still "always seem just too small too far away...
-  // blink and you'd miss it." First pass rebalanced size/brightness (kept
-  // below, confirmed working) and tried a flyby variant plus a shorter
-  // spawn gap. Follow-up feedback, after a real in-game screenshot and a
-  // warp-arrival clip: rebalance is good, keep it; drop the flyby entirely
-  // ("not keen on flyby"); when a group spawns, the real game shows them
-  // clustered together in a loose formation, not scattered independently
-  // (his reference: two freighters near each other, same heading); and the
-  // real sequence is warp flash -> ship appears already fully formed -> it
-  // glides to its resting spot quickly, not a slow fade-in-place. Rewrote
-  // around that: every ship in a spawned group now shares one anchor point
-  // and heading (opts.anchorX/Y/baseRot) and takes a numbered slot along
-  // that heading (opts.slot) so a group reads as a line-formation, not a
-  // scatter. Each ship's actual arrival point is a short hop from its
-  // slot, and drawFreighter below pops the hull in near-full-opacity fast,
-  // then glides it from that arrival point into its slot on an eased
-  // "settle" phase -- see there for the phase machine. opts.delayMs
-  // staggers a multi-ship group's pop-ins slightly so three ships don't
-  // all flash on the exact same frame.
-  function spawnFreighter(cssW, cssH, opts) {
-    opts = opts || {};
-    // Weighted toward small/distant, occasionally a larger/closer one --
-    // real depth variety instead of every ship reading the same size.
-    var roll = Math.random();
-    var scale = roll < 0.55 ? 0.35 + Math.random() * 0.35   // far
-              : roll < 0.8 ? 0.7 + Math.random() * 0.55     // mid
-              : 1.25 + Math.random() * 0.95;                 // close
-    // the lead ship of a group is never left at the far tier -- a group
-    // should always contain at least one ship you can actually make out
-    if (opts.guaranteeVisible && scale < 0.7) scale = 0.7 + Math.random() * 0.85;
-
-    // Resting slot: near the group's shared anchor, spaced out along its
-    // heading so a multi-ship group reads as a loose line-formation like
-    // the reference screenshot, not independent ships scattered around.
-    var baseRot = opts.baseRot || 0, slot = opts.slot || 0;
-    var spacing = 55 + scale * 35;
-    var restX = opts.anchorX + Math.cos(baseRot) * spacing * slot + (Math.random() - 0.5) * 18;
-    var restY = opts.anchorY + Math.sin(baseRot) * spacing * slot * 0.5 + (Math.random() - 0.5) * 14;
-    // clamp clear of the floating Route/Manifest panels (306px/cssW-356px
-    // on desktop) -- a formation can't be scattered wide enough by chance
-    // to dodge them the way independent ships used to
-    restX = Math.max(340, Math.min(cssW - 380, restX));
-
-    // Arrival point: a short hop from the resting slot in a random
-    // direction -- what makes the glide-into-formation actually visible,
-    // instead of the ship just appearing already parked.
-    var arriveAng = Math.random() * Math.PI * 2, arriveDist = 45 + Math.random() * 55;
-    var startX = restX + Math.cos(arriveAng) * arriveDist;
-    var startY = restY + Math.sin(arriveAng) * arriveDist * 0.6;
-
-    var delayMs = opts.delayMs || 0;
-    return {
-      kind: "freighter",
-      x: startX, y: startY,
-      restX: restX, restY: restY,
-      scale: scale,
-      rot: baseRot + (Math.random() - 0.5) * 0.08, // small jitter -- a formation faces roughly one way
-      // tiny idle drift once settled, just enough that a held freighter
-      // doesn't read as a frozen sticker
-      driftX: (Math.random() - 0.5) * 0.003 * scale,
-      driftY: (Math.random() - 0.5) * 0.0015 * scale,
-      delayMs: delayMs,
-      phase: delayMs > 0 ? "delay" : "in", t: 0,
-      inMs: 380 + Math.random() * 220,
-      settleMs: 550 + Math.random() * 350,
-      holdMs: 5000 + Math.random() * 4500,
-      outMs: 550 + Math.random() * 250
     };
   }
   function spawnAnomaly(cssW, cssH) {
@@ -1706,90 +1637,82 @@ window.MOCK_JOURNEYS = [
     ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.arc(e.x, e.y, 1.5, 0, Math.PI * 2); ctx.fill();
     return e.life < e.maxLife;
   }
-  // A small procedural hull silhouette -- long low body, a raised
-  // bridge/island block, two thin masts -- drawn in local units (roughly
-  // 48 wide) so it scales/rotates as one shape via ctx transforms. Dark
-  // silhouette fill + a thin cool rim-light along the top edge, same
-  // language as the reference screenshot's own backlit freighters. Cheap:
-  // one filled polygon, one small filled trapezoid, two stroked lines,
-  // one stroke for the rim light -- a handful of draw calls regardless of
-  // how large the ship is drawn.
-  function drawFreighterHull(ctx, alpha) {
-    ctx.globalAlpha = alpha;
-    ctx.fillStyle = "rgba(6,10,17,0.92)";
-    ctx.beginPath();
-    ctx.moveTo(-24, -1.5); ctx.lineTo(-17, -3); ctx.lineTo(13, -3);
-    ctx.lineTo(21, -1.2); ctx.lineTo(21, 1.4); ctx.lineTo(-17, 2.8);
-    ctx.lineTo(-24, 1.2); ctx.closePath();
-    ctx.fill();
-    ctx.beginPath(); // bridge/island block
-    ctx.moveTo(0, -3); ctx.lineTo(8, -3); ctx.lineTo(7, -7); ctx.lineTo(2, -7);
-    ctx.closePath();
-    ctx.fill();
-    ctx.strokeStyle = "rgba(207,224,255," + (alpha * 0.55) + ")";
-    ctx.lineWidth = 0.5;
-    ctx.beginPath(); ctx.moveTo(3, -7); ctx.lineTo(3, -11); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(6, -7); ctx.lineTo(6, -12); ctx.stroke();
-    ctx.globalAlpha = alpha * 0.7;
-    ctx.beginPath();
-    ctx.moveTo(-17, -3); ctx.lineTo(13, -3); ctx.lineTo(21, -1.2);
-    ctx.stroke();
+  // A soft drifting gas cloud, not a single flat glow -- 5-7 overlapping
+  // radial-gradient blobs scattered around a shared center (randomised
+  // once at spawn, then just re-positioned each frame with a slow sine
+  // drift) so the silhouette reads as cloud/smoke structure, plus one
+  // brighter core blob on top for the hot center in Tony's reference
+  // screenshots. Two close warm-hue variants (outer haze + core) so
+  // repeat spawns aren't identical. Slow lifecycle on purpose -- this is
+  // meant to feel atmospheric next to the comet's quick streak and the
+  // anomaly's short-lived flicker, not compete with them for attention.
+  function spawnNebula(cssW, cssH) {
+    var cx = cssW * (0.15 + Math.random() * 0.7);
+    cx = Math.max(340, Math.min(cssW - 380, cx)); // clear of the floating route/manifest panels
+    var cy = cssH * (0.12 + Math.random() * 0.55);
+    var scale = 0.75 + Math.random() * 0.9;
+    var pal = Math.random() < 0.5
+      ? { outer: "#ff6a3a", mid: "#e8452f", core: "#eaf6ff" }
+      : { outer: "#ff8a3a", mid: "#d63a4a", core: "#cfe8ff" };
+    var blobCount = 5 + Math.floor(Math.random() * 3);
+    var blobs = [];
+    for (var i = 0; i < blobCount; i++) {
+      var ang = Math.random() * Math.PI * 2, dist = 10 + Math.random() * 46;
+      blobs.push({
+        ox: Math.cos(ang) * dist, oy: Math.sin(ang) * dist * 0.7,
+        r: 28 + Math.random() * 34, a: 0.35 + Math.random() * 0.35,
+        driftPhase: Math.random() * Math.PI * 2, driftAmt: 2 + Math.random() * 4
+      });
+    }
+    return {
+      kind: "nebula", x: cx, y: cy, scale: scale, pal: pal, blobs: blobs, t: 0,
+      inMs: 3800 + Math.random() * 1600,
+      holdMs: 11000 + Math.random() * 6000,
+      outMs: 5200 + Math.random() * 2600
+    };
   }
-  function drawFreighter(ctx, e, dt, cssW) {
+  function drawNebula(ctx, e, dt) {
     e.t += dt;
-    if (e.phase === "delay") {
-      // still waiting its turn in a staggered group -- not drawn yet
-      if (e.t >= e.delayMs) { e.phase = "in"; e.t = 0; }
-      return true;
-    }
-    var hullAlpha, flashAlpha, flashStretch;
-    if (e.phase === "in") {
-      // pops in near-full-opacity at the arrival point, fast -- a
-      // materialisation with the warp flash, not a slow fade
-      var p = Math.min(1, e.t / e.inMs);
-      hullAlpha = Math.min(1, p * 1.4) * (0.62 + e.scale * 0.12);
-      flashAlpha = 1 - p; flashStretch = 1 + (1 - p) * 8;
-      if (p >= 1) {
-        e.phase = "settle"; e.t = 0;
-        e.settleFromX = e.x; e.settleFromY = e.y;
-      }
-    } else if (e.phase === "settle") {
-      // quick eased glide from the arrival point into its formation slot
-      // -- "moves to a spot quickly", matching the real in-game sequence
-      var s = Math.min(1, e.t / e.settleMs);
-      var eased = 1 - Math.pow(1 - s, 3); // ease-out: fast start, settles in
-      e.x = e.settleFromX + (e.restX - e.settleFromX) * eased;
-      e.y = e.settleFromY + (e.restY - e.settleFromY) * eased;
-      hullAlpha = 0.62 + e.scale * 0.12;
-      flashAlpha = 0; flashStretch = 1;
-      if (s >= 1) { e.phase = "hold"; e.t = 0; e.x = e.restX; e.y = e.restY; }
-    } else if (e.phase === "hold") {
-      e.x += e.driftX * dt; e.y += e.driftY * dt;
-      hullAlpha = 0.62 + Math.min(0.3, e.scale * 0.12);
-      flashAlpha = 0; flashStretch = 1;
-      if (e.t >= e.holdMs) { e.phase = "out"; e.t = 0; }
+    var alpha, growth;
+    if (e.t < e.inMs) {
+      var p = e.t / e.inMs;
+      alpha = p; growth = 0.85 + p * 0.15;
+    } else if (e.t < e.inMs + e.holdMs) {
+      alpha = 1; growth = 1;
+    } else if (e.t < e.inMs + e.holdMs + e.outMs) {
+      var q = (e.t - e.inMs - e.holdMs) / e.outMs;
+      alpha = 1 - q; growth = 1 + q * 0.7; // spreads thinner as it dissipates, like smoke
     } else {
-      e.x += e.driftX * dt; e.y += e.driftY * dt;
-      var q = Math.min(1, e.t / e.outMs);
-      hullAlpha = (1 - q) * (0.62 + e.scale * 0.12);
-      flashAlpha = q; flashStretch = 1 + q * 8;
-      if (q >= 1) return false;
+      return false;
     }
-    if (flashAlpha > 0.02) {
-      var glow = ctx.createRadialGradient(e.x, e.y, 0, e.x, e.y, 14 * e.scale * flashStretch * 0.5);
-      glow.addColorStop(0, "rgba(207,224,255," + flashAlpha + ")");
-      glow.addColorStop(1, "rgba(207,224,255,0)");
-      ctx.globalAlpha = 1; ctx.fillStyle = glow;
-      ctx.beginPath(); ctx.arc(e.x, e.y, 14 * e.scale * flashStretch * 0.5, 0, Math.PI * 2); ctx.fill();
+    var s = e.scale * growth;
+    // Gentle breathing on the core + haze density -- the galaxy backdrop
+    // behind this canvas already paints its own static nebula-coloured
+    // regions, so a puff needs a bit of life to read as a distinct event
+    // sitting on top of it rather than blending into that art.
+    var corePulse = 0.85 + 0.15 * Math.sin(e.t / 900);
+    var hazePulse = 0.9 + 0.1 * Math.sin(e.t / 2600);
+    ctx.globalAlpha = 1;
+    for (var i = 0; i < e.blobs.length; i++) {
+      var b = e.blobs[i];
+      var drift = Math.sin(e.t / 3200 + b.driftPhase) * b.driftAmt;
+      var bx = e.x + (b.ox + drift) * s, by = e.y + (b.oy + drift * 0.6) * s, r = b.r * s;
+      var g = ctx.createRadialGradient(bx, by, 0, bx, by, r);
+      g.addColorStop(0, hexA(e.pal.mid, b.a * alpha * 0.8 * hazePulse));
+      g.addColorStop(0.55, hexA(e.pal.outer, b.a * alpha * 0.4 * hazePulse));
+      g.addColorStop(1, hexA(e.pal.outer, 0));
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(bx, by, r, 0, Math.PI * 2); ctx.fill();
     }
-    if (hullAlpha > 0.02) {
-      ctx.save();
-      ctx.translate(e.x, e.y);
-      ctx.rotate(e.rot);
-      ctx.scale(e.scale, e.scale);
-      drawFreighterHull(ctx, hullAlpha);
-      ctx.restore();
-    }
+    var coreR = 10 * s;
+    var core = ctx.createRadialGradient(e.x, e.y, 0, e.x, e.y, coreR * 3.2);
+    core.addColorStop(0, hexA(e.pal.core, alpha * 0.85 * corePulse));
+    core.addColorStop(0.35, hexA(e.pal.core, alpha * 0.35 * corePulse));
+    core.addColorStop(1, hexA(e.pal.core, 0));
+    ctx.fillStyle = core;
+    ctx.beginPath(); ctx.arc(e.x, e.y, coreR * 3.2, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = hexA(e.pal.core, alpha * 0.9 * corePulse);
+    ctx.beginPath(); ctx.arc(e.x, e.y, coreR * 0.55, 0, Math.PI * 2); ctx.fill();
     return true;
   }
   function drawAnomaly(ctx, e, dt) {
@@ -1818,7 +1741,7 @@ window.MOCK_JOURNEYS = [
     var stars = [];
     var lastDraw = 0, lastT = 0;
     var effects = [];
-    var nextCometAt = 0, nextFreighterAt = 0, nextAnomalyAt = 0;
+    var nextCometAt = 0, nextAnomalyAt = 0, nextNebulaAt = 0;
     function isNarrow() { return window.innerWidth <= 850; }
     function scheduleNext(minMs, maxMs, mobileMultiplier) {
       var m = isNarrow() ? mobileMultiplier : 1;
@@ -1848,45 +1771,30 @@ window.MOCK_JOURNEYS = [
         drawTwinkleStar(ctx, s, alpha);
       }
       if (animate) {
-        // Spawn: comets/anomalies stay one-at-a-time; freighters spawn as a
-        // small group (1-3 ships) sharing one anchor point and heading, so
-        // it reads as a loose formation like Tony's reference screenshot
-        // (two freighters near each other, same heading) rather than
-        // independent ships scattered around the sky. All on randomised
-        // timers so nothing falls into a noticeable rhythm. Mobile spawns
-        // 1.6-2x less often (less visual competition with the panels on a
-        // small screen, less total draw work over time).
+        // Spawn: comets/anomalies stay one-at-a-time, on randomised timers
+        // so nothing falls into a noticeable rhythm. Mobile spawns 1.6-2x
+        // less often (less visual competition with the panels on a small
+        // screen, less total draw work over time).
         var hasComet = effects.some(function (e) { return e.kind === "comet"; });
-        var freighterCount = effects.reduce(function (n, e) { return n + (e.kind === "freighter" ? 1 : 0); }, 0);
         var hasAnomaly = effects.some(function (e) { return e.kind === "anomaly"; });
         if (!hasComet && t > nextCometAt) {
           effects.push(spawnComet(cssW, cssH));
           nextCometAt = t + scheduleNext(9000, 19000, 1.7);
         }
-        if (freighterCount === 0 && t > nextFreighterAt) {
-          var groupSize = isNarrow() ? 1 + (Math.random() < 0.4 ? 1 : 0) : 1 + Math.floor(Math.random() * 3);
-          var anchorX = cssW * (0.3 + Math.random() * 0.4);
-          var anchorY = cssH * (0.1 + Math.random() * 0.32);
-          var baseRot = (Math.random() - 0.5) * 0.5;
-          for (var g = 0; g < groupSize; g++) {
-            effects.push(spawnFreighter(cssW, cssH, {
-              guaranteeVisible: g === 0,
-              anchorX: anchorX, anchorY: anchorY, baseRot: baseRot,
-              slot: g - (groupSize - 1) / 2,
-              delayMs: g === 0 ? 0 : 150 + Math.random() * 350
-            }));
-          }
-          nextFreighterAt = t + scheduleNext(22000, 42000, 1.6);
-        }
         if (!hasAnomaly && t > nextAnomalyAt) {
           effects.push(spawnAnomaly(cssW, cssH));
           nextAnomalyAt = t + scheduleNext(42000, 85000, 1.6);
         }
+        var hasNebula = effects.some(function (e) { return e.kind === "nebula"; });
+        if (!hasNebula && t > nextNebulaAt) {
+          effects.push(spawnNebula(cssW, cssH));
+          nextNebulaAt = t + scheduleNext(55000, 100000, 1.6);
+        }
         for (var j = effects.length - 1; j >= 0; j--) {
           var e = effects[j], alive;
           if (e.kind === "comet") alive = drawComet(ctx, e, dt);
-          else if (e.kind === "freighter") alive = drawFreighter(ctx, e, dt, cssW);
-          else alive = drawAnomaly(ctx, e, dt);
+          else if (e.kind === "anomaly") alive = drawAnomaly(ctx, e, dt);
+          else alive = drawNebula(ctx, e, dt);
           if (!alive) effects.splice(j, 1);
         }
       } else if (effects.length) {
