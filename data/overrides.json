@@ -34839,22 +34839,26 @@
             "moon": false,
             "orbits": 0,
             "biome": "Nuclear",
-            "descriptor": "",
+            "descriptor": "Gamma Dust",
             "water": true,
             "ring": false,
             "resources": [
               "Copper",
               "Silver"
             ],
-            "flora": [],
-            "fauna": [],
+            "flora": [
+              "Frequent"
+            ],
+            "fauna": [
+              "Numerous"
+            ],
             "minerals": [
               "Gamma Root",
               "Uranium"
             ],
             "salvage": [],
             "fossils": [],
-            "sentinel": "Aggressive",
+            "sentinel": "Enforcing",
             "autophage": false,
             "base": false,
             "baseName": ""
@@ -34864,15 +34868,19 @@
             "moon": false,
             "orbits": 0,
             "biome": "Icebound",
-            "descriptor": "",
+            "descriptor": "Winrty",
             "water": false,
             "ring": false,
             "resources": [
               "Copper",
               "Silver"
             ],
-            "flora": [],
-            "fauna": [],
+            "flora": [
+              "Scarce"
+            ],
+            "fauna": [
+              "Copious"
+            ],
             "minerals": [
               "Frost Crystals",
               "Dioxite"
@@ -34881,7 +34889,7 @@
             "fossils": [
               "Ancient Bones"
             ],
-            "sentinel": "Aggressive",
+            "sentinel": "Low Security",
             "autophage": false,
             "base": false,
             "baseName": ""
@@ -34891,21 +34899,25 @@
             "moon": true,
             "orbits": 2,
             "biome": "Empty",
-            "descriptor": "",
+            "descriptor": "Absent",
             "water": false,
             "ring": false,
             "resources": [
               "Copper",
               "Salt"
             ],
-            "flora": [],
-            "fauna": [],
+            "flora": [
+              "Lacking"
+            ],
+            "fauna": [
+              "Nonexistent"
+            ],
             "minerals": [],
             "salvage": [
               "Rusted Metal"
             ],
             "fossils": [],
-            "sentinel": "Attentive",
+            "sentinel": "Intermittent",
             "autophage": false,
             "base": false,
             "baseName": ""
@@ -34915,28 +34927,32 @@
             "moon": false,
             "orbits": 0,
             "biome": "Tectonic",
-            "descriptor": "",
+            "descriptor": "Magna Geysers",
             "water": false,
             "ring": false,
             "resources": [
               "Basalt",
               "Copper"
             ],
-            "flora": [],
-            "fauna": [],
+            "flora": [
+              "Uncommon"
+            ],
+            "fauna": [
+              "Rich"
+            ],
             "minerals": [
               "Magnetised Ferrite"
             ],
             "salvage": [],
             "fossils": [],
-            "sentinel": "Attentive",
+            "sentinel": "Infrequent",
             "autophage": false,
             "base": false,
             "baseName": ""
           }
         ]
       },
-      "editedAt": "2026-09-01T13:43:06.760Z",
+      "editedAt": "2026-09-01T17:19:05.216Z",
       "editedByIp": "5.133.46.24",
       "history": [
         {
@@ -34958,6 +34974,10 @@
         {
           "at": "2026-09-01T13:43:06.760Z",
           "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-09-01T17:19:05.216Z",
+          "text": "edited by a traveller"
         }
       ]
     }
@@ -34965,11 +34985,7 @@
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1788267434067,
-      1788267544421,
-      1788267982083,
-      1788268412703,
-      1788270186760
+      1788283145216
     ]
   },
   "flagLog": {}
