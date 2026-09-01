@@ -34826,7 +34826,7 @@
         "ruins": false,
         "outlaw": false,
         "phantom": "",
-        "notes": "",
+        "notes": "Lots of various space Anomolies when boosting between Arhun XII and Ibai 73/C5 they keep popping up when boosing back and forth",
         "colliding": false,
         "collidingA": 0,
         "collidingB": 0,
@@ -34952,7 +34952,7 @@
           }
         ]
       },
-      "editedAt": "2026-09-01T17:19:05.216Z",
+      "editedAt": "2026-09-01T17:26:23.723Z",
       "editedByIp": "5.133.46.24",
       "history": [
         {
@@ -34978,6 +34978,10 @@
         {
           "at": "2026-09-01T17:19:05.216Z",
           "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-09-01T17:26:23.723Z",
+          "text": "edited by a traveller"
         }
       ]
     }
@@ -34985,7 +34989,8 @@
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1788283145216
+      1788283145216,
+      1788283583723
     ]
   },
   "flagLog": {}
