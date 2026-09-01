@@ -62,6 +62,11 @@ h1{font-family:'Orbitron',sans-serif;font-weight:700;font-size:clamp(22px,5vw,34
 .code{font-family:'Orbitron',monospace;font-size:11px;letter-spacing:.1em;
   color:var(--text-faint);word-break:break-all;max-width:420px}
 
+.addr-block{display:flex;flex-direction:column;align-items:center;gap:8px}
+.glyph-strip{display:flex;gap:4px;justify-content:center;flex-wrap:wrap;max-width:420px}
+.glyph-strip img{width:22px;height:22px;opacity:.85;
+  filter:drop-shadow(0 0 4px rgba(0,229,255,.25))}
+
 .actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:4px}
 .btn{font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:.12em;
   text-transform:uppercase;text-decoration:none;color:var(--text);
@@ -89,11 +94,15 @@ h1{font-family:'Orbitron',sans-serif;font-weight:700;font-size:clamp(22px,5vw,34
     <div class="core"></div>
   </div>
 
-  <h1>Jump failed — no system at this address</h1>
-  <p class="sub">The portal address in your last jump doesn't resolve to a
+  <h1 id="h1">Jump failed — no system at this address</h1>
+  <p class="sub" id="sub">The portal address below doesn't resolve to a
     charted location. Either it was mistyped, or whatever you followed here
     points somewhere that <b>never generated</b>.</p>
-  <p class="code" id="path"></p>
+
+  <div class="addr-block" id="addrBlock" hidden>
+    <p class="code" id="path"></p>
+    <div class="glyph-strip" id="glyphStrip"></div>
+  </div>
 
   <div class="actions">
     <a class="btn primary" href="/">Return to Galactic Map</a>
@@ -104,9 +113,44 @@ h1{font-family:'Orbitron',sans-serif;font-weight:700;font-size:clamp(22px,5vw,34
 <div class="foot">NMS GALACTIC MAP — BUILT BY ELEGRA1965</div>
 
 <script>
+/* Real share links on this site (Copy Link, the Navigator hand-off, saved
+   routes) all carry the portal address in the QUERY STRING -- ?addr=, as
+   part of ?route=, etc. -- never in the path. So a genuinely broken link
+   that still has real address data will have it in location.search, not
+   location.pathname. When we can recover a real 12-hex-char address this
+   way, show it alongside its glyph strip (both audiences covered, no new
+   dependency -- these are the same flat glyph PNGs the main map's own
+   keypad already uses). When we can't, don't imply we know it was ever a
+   portal address at all -- swap to a plain "not on the map" message
+   instead of guessing. Deliberately NOT decoding a system name here: a
+   bare address has no reliable galaxy attached, so a name would just be
+   an unlabelled guess, which cuts against how this whole project discloses
+   its own procedural guesses (see the About modal's "Procedural data"
+   note) rather than presenting them as fact. */
 (function(){
-  var p = location.pathname.replace(/^\//,'') || '(no path given)';
-  document.getElementById('path').textContent = p;
+  function cleanHex(s){ return (s||'').trim().toUpperCase().replace(/[^0-9A-F]/g,''); }
+
+  var addr = null;
+  try{
+    var q = new URLSearchParams(location.search);
+    var c = cleanHex(q.get('addr'));
+    if(c.length === 12) addr = c;
+  }catch(e){}
+
+  if(addr){
+    document.getElementById('path').textContent = addr;
+    var strip = document.getElementById('glyphStrip');
+    for(var i=0;i<addr.length;i++){
+      var img = document.createElement('img');
+      img.src = 'glyphs/glyph-mask-' + addr[i] + '.png';
+      img.alt = addr[i];
+      strip.appendChild(img);
+    }
+    document.getElementById('addrBlock').hidden = false;
+  } else {
+    document.getElementById('h1').textContent = "Jump failed — this location isn't on the map";
+    document.getElementById('sub').innerHTML = 'The link you followed doesn\'t point to a charted destination. It may be outdated, mistyped, or from somewhere that no longer exists.';
+  }
 })();
 
 (function(){

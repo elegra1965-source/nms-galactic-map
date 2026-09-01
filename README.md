@@ -252,9 +252,14 @@ line it's sitting on.
 one that was cut off mid-share, and you don't land on a generic browser
 error -- the map's own hyperdrive-fault screen picks it up instead, in the
 same visual language as the rest of the site, with a way back to the map or
-to Search.
+to Search. Every real share link on this site (Copy Link, saved routes, the
+Navigator hand-off) carries its portal address in the URL's query string,
+so when a broken link still has one, the page recovers it and shows the hex
+code alongside its glyph strip -- covering both players who read addresses
+as hex and players who read them as glyphs. When there's no address to
+recover, it says so plainly instead of guessing.
 
-![Custom 404 page: a Hyperdrive Fault screen reading "Jump failed -- no system at this address", with the failed path shown as system/1CF0EE90BFFA](screenshots/16-404-jump-failed.jpg)
+![Custom 404 page: a Hyperdrive Fault screen reading "Jump failed -- no system at this address", showing the recovered hex address 1CF0EE90BFFA next to its 12-glyph strip](screenshots/16-404-jump-failed.jpg)
 
 <details id="the-address-decoded">
 <summary><strong>The address, decoded</strong></summary>
