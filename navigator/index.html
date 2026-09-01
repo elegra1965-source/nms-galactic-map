@@ -1613,30 +1613,27 @@ window.MOCK_JOURNEYS = [
   // plain dot/ellipse (the original version) can't read as "a ship" at any
   // size, so this draws an actual small hull shape (see drawFreighterHull
   // below) instead, scaled per-instance across a wide range so the depth
-  // cue is the size itself, same as the reference image. One trigger now
-  // spawns a small group (1-3 ships) together rather than a single ship
-  // alone, so it can occasionally read as "a few freighters warped in",
-  // matching what Tony actually asked for and the reference image's own
-  // scattered fleet -- capped concurrently (see the draw() spawn logic)
-  // so a burst can't run away into a crowd.
+  // cue is the size itself, same as the reference image.
   //
-  // 2026-09-01, Tony: even with the above, ships "always seem just too
-  // small too far away... blink and you'd miss it." Three changes: (1) the
-  // weighting still favours the far tier for depth variety, but the FIRST
-  // ship of every spawned group is now forced to mid-or-closer (opts.
-  // guaranteeVisible) so a group is never *only* distant lights -- there's
-  // always at least one ship worth actually looking at. (2) the warp-in/out
-  // flash (inMs/outMs) is stretched from ~500-760ms to ~900-1400ms so the
-  // moment itself has time to register before settling into the hold --
-  // the hold itself was already 5-9.5s, it was the flash that read as a
-  // blink. (3) opts.allowFlyby lets an eligible (mid/closer) ship cruise
-  // across part of the screen instead of holding in place -- see the
-  // isFlyby branch below and the matching off-screen-exit check in
-  // drawFreighter. Not literally how the game behaves (freighters only
-  // warp in while you're in space; flybys are an atmosphere/planet thing)
-  // but this whole layer is already cosmetic license, not simulation, and
-  // Tony asked for it as an option to try -- easy to dial back to 0% if it
-  // reads as wrong once live.
+  // 2026-09-01, Tony: still "always seem just too small too far away...
+  // blink and you'd miss it." First pass rebalanced size/brightness (kept
+  // below, confirmed working) and tried a flyby variant plus a shorter
+  // spawn gap. Follow-up feedback, after a real in-game screenshot and a
+  // warp-arrival clip: rebalance is good, keep it; drop the flyby entirely
+  // ("not keen on flyby"); when a group spawns, the real game shows them
+  // clustered together in a loose formation, not scattered independently
+  // (his reference: two freighters near each other, same heading); and the
+  // real sequence is warp flash -> ship appears already fully formed -> it
+  // glides to its resting spot quickly, not a slow fade-in-place. Rewrote
+  // around that: every ship in a spawned group now shares one anchor point
+  // and heading (opts.anchorX/Y/baseRot) and takes a numbered slot along
+  // that heading (opts.slot) so a group reads as a line-formation, not a
+  // scatter. Each ship's actual arrival point is a short hop from its
+  // slot, and drawFreighter below pops the hull in near-full-opacity fast,
+  // then glides it from that arrival point into its slot on an eased
+  // "settle" phase -- see there for the phase machine. opts.delayMs
+  // staggers a multi-ship group's pop-ins slightly so three ships don't
+  // all flash on the exact same frame.
   function spawnFreighter(cssW, cssH, opts) {
     opts = opts || {};
     // Weighted toward small/distant, occasionally a larger/closer one --
@@ -1649,36 +1646,42 @@ window.MOCK_JOURNEYS = [
     // should always contain at least one ship you can actually make out
     if (opts.guaranteeVisible && scale < 0.7) scale = 0.7 + Math.random() * 0.85;
 
-    var inMs = 900 + Math.random() * 500, outMs = 900 + Math.random() * 500;
-    var isFlyby = !!opts.allowFlyby && scale >= 0.7 && Math.random() < 0.35;
+    // Resting slot: near the group's shared anchor, spaced out along its
+    // heading so a multi-ship group reads as a loose line-formation like
+    // the reference screenshot, not independent ships scattered around.
+    var baseRot = opts.baseRot || 0, slot = opts.slot || 0;
+    var spacing = 55 + scale * 35;
+    var restX = opts.anchorX + Math.cos(baseRot) * spacing * slot + (Math.random() - 0.5) * 18;
+    var restY = opts.anchorY + Math.sin(baseRot) * spacing * slot * 0.5 + (Math.random() - 0.5) * 14;
+    // clamp clear of the floating Route/Manifest panels (306px/cssW-356px
+    // on desktop) -- a formation can't be scattered wide enough by chance
+    // to dodge them the way independent ships used to
+    restX = Math.max(340, Math.min(cssW - 380, restX));
 
-    var driftX, driftY, holdMs;
-    if (isFlyby) {
-      var dir = Math.random() < 0.5 ? 1 : -1;
-      holdMs = 7000 + Math.random() * 5000;
-      // aim to cross roughly 30-55% of the screen width over the hold --
-      // a slow cruise, not a comet-speed pass
-      var travel = cssW * (0.3 + Math.random() * 0.25) * dir;
-      driftX = travel / holdMs;
-      driftY = (Math.random() - 0.5) * 0.02 * scale;
-    } else {
-      holdMs = 5000 + Math.random() * 4500;
-      // slower/closer ships drift very slightly more -- barely perceptible,
-      // just enough that a held freighter doesn't read as a frozen sticker
-      driftX = (Math.random() - 0.5) * 0.003 * scale;
-      driftY = (Math.random() - 0.5) * 0.0015 * scale;
-    }
+    // Arrival point: a short hop from the resting slot in a random
+    // direction -- what makes the glide-into-formation actually visible,
+    // instead of the ship just appearing already parked.
+    var arriveAng = Math.random() * Math.PI * 2, arriveDist = 45 + Math.random() * 55;
+    var startX = restX + Math.cos(arriveAng) * arriveDist;
+    var startY = restY + Math.sin(arriveAng) * arriveDist * 0.6;
+
+    var delayMs = opts.delayMs || 0;
     return {
       kind: "freighter",
-      x: cssW * (0.08 + Math.random() * 0.84),
-      y: cssH * (0.08 + Math.random() * 0.4), // upper band, clear of the route line
+      x: startX, y: startY,
+      restX: restX, restY: restY,
       scale: scale,
-      rot: (Math.random() - 0.5) * 0.22,
-      driftX: driftX,
-      driftY: driftY,
-      isFlyby: isFlyby,
-      phase: "in", t: 0,
-      inMs: inMs, holdMs: holdMs, outMs: outMs
+      rot: baseRot + (Math.random() - 0.5) * 0.08, // small jitter -- a formation faces roughly one way
+      // tiny idle drift once settled, just enough that a held freighter
+      // doesn't read as a frozen sticker
+      driftX: (Math.random() - 0.5) * 0.003 * scale,
+      driftY: (Math.random() - 0.5) * 0.0015 * scale,
+      delayMs: delayMs,
+      phase: delayMs > 0 ? "delay" : "in", t: 0,
+      inMs: 380 + Math.random() * 220,
+      settleMs: 550 + Math.random() * 350,
+      holdMs: 5000 + Math.random() * 4500,
+      outMs: 550 + Math.random() * 250
     };
   }
   function spawnAnomaly(cssW, cssH) {
@@ -1734,22 +1737,39 @@ window.MOCK_JOURNEYS = [
   }
   function drawFreighter(ctx, e, dt, cssW) {
     e.t += dt;
-    e.x += e.driftX * dt; e.y += e.driftY * dt;
-    // a flyby that's drifted past the edge is already unseen -- drop it
-    // rather than running its (invisible) out-fade off-screen
-    if (e.isFlyby && e.phase !== "in" && cssW &&
-        (e.x < -60 * e.scale || e.x > cssW + 60 * e.scale)) return false;
+    if (e.phase === "delay") {
+      // still waiting its turn in a staggered group -- not drawn yet
+      if (e.t >= e.delayMs) { e.phase = "in"; e.t = 0; }
+      return true;
+    }
     var hullAlpha, flashAlpha, flashStretch;
     if (e.phase === "in") {
+      // pops in near-full-opacity at the arrival point, fast -- a
+      // materialisation with the warp flash, not a slow fade
       var p = Math.min(1, e.t / e.inMs);
-      hullAlpha = p * (0.62 + e.scale * 0.12);
+      hullAlpha = Math.min(1, p * 1.4) * (0.62 + e.scale * 0.12);
       flashAlpha = 1 - p; flashStretch = 1 + (1 - p) * 8;
-      if (p >= 1) { e.phase = "hold"; e.t = 0; }
+      if (p >= 1) {
+        e.phase = "settle"; e.t = 0;
+        e.settleFromX = e.x; e.settleFromY = e.y;
+      }
+    } else if (e.phase === "settle") {
+      // quick eased glide from the arrival point into its formation slot
+      // -- "moves to a spot quickly", matching the real in-game sequence
+      var s = Math.min(1, e.t / e.settleMs);
+      var eased = 1 - Math.pow(1 - s, 3); // ease-out: fast start, settles in
+      e.x = e.settleFromX + (e.restX - e.settleFromX) * eased;
+      e.y = e.settleFromY + (e.restY - e.settleFromY) * eased;
+      hullAlpha = 0.62 + e.scale * 0.12;
+      flashAlpha = 0; flashStretch = 1;
+      if (s >= 1) { e.phase = "hold"; e.t = 0; e.x = e.restX; e.y = e.restY; }
     } else if (e.phase === "hold") {
+      e.x += e.driftX * dt; e.y += e.driftY * dt;
       hullAlpha = 0.62 + Math.min(0.3, e.scale * 0.12);
       flashAlpha = 0; flashStretch = 1;
       if (e.t >= e.holdMs) { e.phase = "out"; e.t = 0; }
     } else {
+      e.x += e.driftX * dt; e.y += e.driftY * dt;
       var q = Math.min(1, e.t / e.outMs);
       hullAlpha = (1 - q) * (0.62 + e.scale * 0.12);
       flashAlpha = q; flashStretch = 1 + q * 8;
@@ -1829,13 +1849,13 @@ window.MOCK_JOURNEYS = [
       }
       if (animate) {
         // Spawn: comets/anomalies stay one-at-a-time; freighters spawn as a
-        // small group (1-3 ships, capped at 4 concurrent total so a burst
-        // can't run away) since Tony asked for it to read as "freighters"
-        // occasionally warping in together, matching his reference image's
-        // own small scattered fleet rather than a single ship alone. All on
-        // randomised timers so nothing falls into a noticeable rhythm.
-        // Mobile spawns 1.6-2x less often (less visual competition with
-        // the panels on a small screen, less total draw work over time).
+        // small group (1-3 ships) sharing one anchor point and heading, so
+        // it reads as a loose formation like Tony's reference screenshot
+        // (two freighters near each other, same heading) rather than
+        // independent ships scattered around the sky. All on randomised
+        // timers so nothing falls into a noticeable rhythm. Mobile spawns
+        // 1.6-2x less often (less visual competition with the panels on a
+        // small screen, less total draw work over time).
         var hasComet = effects.some(function (e) { return e.kind === "comet"; });
         var freighterCount = effects.reduce(function (n, e) { return n + (e.kind === "freighter" ? 1 : 0); }, 0);
         var hasAnomaly = effects.some(function (e) { return e.kind === "anomaly"; });
@@ -1845,8 +1865,16 @@ window.MOCK_JOURNEYS = [
         }
         if (freighterCount === 0 && t > nextFreighterAt) {
           var groupSize = isNarrow() ? 1 + (Math.random() < 0.4 ? 1 : 0) : 1 + Math.floor(Math.random() * 3);
+          var anchorX = cssW * (0.3 + Math.random() * 0.4);
+          var anchorY = cssH * (0.1 + Math.random() * 0.32);
+          var baseRot = (Math.random() - 0.5) * 0.5;
           for (var g = 0; g < groupSize; g++) {
-            effects.push(spawnFreighter(cssW, cssH, { guaranteeVisible: g === 0, allowFlyby: true }));
+            effects.push(spawnFreighter(cssW, cssH, {
+              guaranteeVisible: g === 0,
+              anchorX: anchorX, anchorY: anchorY, baseRot: baseRot,
+              slot: g - (groupSize - 1) / 2,
+              delayMs: g === 0 ? 0 : 150 + Math.random() * 350
+            }));
           }
           nextFreighterAt = t + scheduleNext(22000, 42000, 1.6);
         }
