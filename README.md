@@ -192,9 +192,20 @@ with room to type your own value if what you're seeing in-game isn't listed.
 Resources and Minerals were renamed **Common resources** / **Uncommon
 resources** to match the wiki's own rarity split, and the same
 dropdown-plus-your-own-value treatment now covers Salvageable tech and
-Fossils & curiosities too.
+Fossils & curiosities too. An optional **screenshot** (added 2026-09-01, resized
+and compressed automatically) sits alongside the public notes field --
+visible to every visitor, same as everything else here -- and your own
+private Surveyor notes can carry a screenshot too, saved only to your own
+device.
 
 ![Edit system modal](screenshots/05-edit-system-modal.jpg)
+
+Once saved, both show up right in the system info panel for every visitor
+-- **Community notes** and **Screenshot** as two clearly separate,
+titled sections, so it's obvious which is which even when only one of them
+has been filled in.
+
+![System info panel showing Community notes text and a submitted screenshot as two separate titled sections](screenshots/17-public-screenshot-notes.jpg)
 
 **Import from my save file.** Inside Edit system, an optional button reads a
 real Steam/GOG `.hg` save file entirely in your own browser -- nothing is
