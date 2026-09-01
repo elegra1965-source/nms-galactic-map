@@ -559,7 +559,7 @@ window.nmsCoreReady = new Promise(function (res) { window.__nmsCoreResolve = res
       <div class="right">
         <span class="status on" id="dataStatus">&#9679; SAMPLE DATA LOADED</span>
         <button id="warpFxToggle" class="ambienceToggle on" type="button" title="Toggle the warp-jump animation on I AM HERE -- on by default, same as the live map. Turn off if it gets repetitive on a long route.">&#9889; WARP FX</button>
-        <button id="ambienceToggle" class="ambienceToggle" type="button" title="Toggle a low ambient hum -- synthesized, off by default, only starts when you turn it on.">&#9835; AMBIENCE</button>
+        <button id="ambienceToggle" class="ambienceToggle on" type="button" title="Toggle the ambient space music -- on by default, turn off if you'd rather have it quiet.">&#9835; AMBIENCE ON</button>
       </div>
     </header>
 
@@ -1331,77 +1331,37 @@ window.MOCK_JOURNEYS = [
     failTimer = setTimeout(finish, 4000);
   }
 
-  // Real Web Audio synthesis, not an audio file -- used only by the ambient
-  // hum toggle below (the warp clip itself is muted, same as preview.html's
-  // #warp-vid). Wrapped in try/catch since Web Audio can be unavailable or
-  // blocked; silently doing nothing is a fine fallback.
-  var _sfxCtx = null;
-  function sfxContext() {
-    try {
-      if (!_sfxCtx) _sfxCtx = new (window.AudioContext || window.webkitAudioContext)();
-      if (_sfxCtx.state === "suspended") _sfxCtx.resume();
-      return _sfxCtx;
-    } catch (e) { return null; }
-  }
-
-  // ---- ambient hum (task: atmosphere layer) -- three sine tones (a root,
-  // a fifth above it, and a quiet overtone an octave above that) with a
-  // very slow LFO on the gain, synthesized rather than a looping audio
-  // file. Off by default: browsers block audio until a real user gesture
-  // anyway, and starting sound on load without asking is bad manners
-  // regardless -- #ambienceToggle is that gesture.
-  // 2026-08-31, Tony: "when switched on there is no sound" -- the synthesis
-  // itself wasn't broken (no dropped .connect()/.start() calls, context
-  // resume happens inside the click handler so autoplay policies don't
-  // block it), but the original 55Hz/82.41Hz pair sat right at or below
-  // where a lot of phone and laptop speakers simply stop reproducing
-  // anything audible -- so it was very plausibly always "playing," just
-  // inaudible on the exact hardware most visitors have, not a code bug.
-  // Moved both tones up an octave (110Hz/164.81Hz -- same fifth interval,
-  // still reads as a low hum) and added a quiet third tone an octave above
-  // that (220Hz, through its own smaller gain so it stays subordinate) as
-  // a safety net for speakers that still can't reproduce 110Hz well.
-  // Raised the peak gain slightly (0.045 -> 0.06) to compensate for the
-  // higher, less naturally "felt" frequencies. This is a best-effort fix
-  // aimed at typical hardware, not a verified one -- there's no way to
-  // actually hear audio output from this sandbox, so it's worth Tony
-  // re-testing with the volume up before calling it fixed.
-  var _humNodes = null;
+  // ---- ambient track (task: atmosphere layer) --------------------------
+  // 2026-08-31, Tony: raising the synthesized hum's frequencies/gain still
+  // wasn't audible even at max volume -- rather than keep guessing at a
+  // second synthesis fix blind (this sandbox has no way to actually hear
+  // output), Tony supplied a real royalty-free ambient track and asked for
+  // that instead. Swapped the whole synthesis approach for a plain looping
+  // <audio> element: a real mixed/mastered track is far more likely to
+  // actually be audible on real hardware than sine waves guessed from a
+  // sandbox with no speakers, and it's a normal, simple thing for a
+  // browser to play loud and clear.
+  // 2026-08-31, continued, Tony: "mp3 on by default with option to turn
+  // off" -- this now DOES fetch on every page load (see the init call
+  // below), not only when a visitor opts in, since it needs to be playing
+  // by default. That's a real ~1.3MB of extra network weight for every
+  // visitor now, not just the ones who go looking for the Ambience button
+  // -- an accepted trade-off for "on by default," but worth knowing if
+  // page weight ever becomes a complaint of its own.
+  var _ambientAudio = null;
   function startHum() {
-    var ctx = sfxContext();
-    if (!ctx) return;
-    try {
-      var now = ctx.currentTime;
-      var osc1 = ctx.createOscillator(); osc1.type = "sine"; osc1.frequency.value = 110;
-      var osc2 = ctx.createOscillator(); osc2.type = "sine"; osc2.frequency.value = 164.81;
-      var osc3 = ctx.createOscillator(); osc3.type = "sine"; osc3.frequency.value = 220;
-      var osc3Gain = ctx.createGain(); osc3Gain.gain.value = 0.4; // subordinate to the main pair
-      var lfo = ctx.createOscillator(); lfo.type = "sine"; lfo.frequency.value = 0.07;
-      var lfoGain = ctx.createGain(); lfoGain.gain.value = 0.012;
-      var master = ctx.createGain();
-      master.gain.setValueAtTime(0.0001, now);
-      master.gain.exponentialRampToValueAtTime(0.06, now + 1.6);
-      lfo.connect(lfoGain); lfoGain.connect(master.gain);
-      osc3.connect(osc3Gain); osc3Gain.connect(master);
-      osc1.connect(master); osc2.connect(master); master.connect(ctx.destination);
-      osc1.start(); osc2.start(); osc3.start(); lfo.start();
-      _humNodes = { osc1: osc1, osc2: osc2, osc3: osc3, lfo: lfo, master: master };
-    } catch (e) {}
+    if (!_ambientAudio) {
+      _ambientAudio = new Audio("assets/audio/ambient-space.mp3");
+      _ambientAudio.loop = true;
+      _ambientAudio.volume = 0.35; // background level -- meant to be felt, not to compete with warp-jump SFX
+      _ambientAudio.preload = "auto";
+    }
+    var p = _ambientAudio.play();
+    if (p && p.catch) p.catch(function () {}); // autoplay/policy rejection -- fails silently, same as the old try/catch convention
   }
   function stopHum() {
-    if (!_humNodes || !_sfxCtx) return;
-    try {
-      var now = _sfxCtx.currentTime;
-      var m = _humNodes.master;
-      m.gain.cancelScheduledValues(now);
-      m.gain.setValueAtTime(Math.max(m.gain.value, 0.0001), now);
-      m.gain.exponentialRampToValueAtTime(0.0001, now + 0.4);
-      var nodes = _humNodes;
-      setTimeout(function () {
-        try { nodes.osc1.stop(); nodes.osc2.stop(); nodes.osc3.stop(); nodes.lfo.stop(); } catch (e) {}
-      }, 500);
-    } catch (e) {}
-    _humNodes = null;
+    if (!_ambientAudio) return;
+    _ambientAudio.pause();
   }
 
   /* ---- real galaxy art (2026-08-29) -- ported from preview.html's
@@ -1627,27 +1587,58 @@ window.MOCK_JOURNEYS = [
      strip the feature down or duplicate a simpler version of it. All of
      it is skipped outright under reduced-motion, same as the twinkle. */
   function spawnComet(cssW, cssH) {
+    // 2026-08-31, Tony: "shooting stars too fast" -- crossing time was
+    // 500-850ms, closer to a lightning bolt than something you can watch;
+    // slowed to a real 2.2-3.6s traverse, same visual (dot + fading trail),
+    // just given time to actually be seen and enjoyed.
     var fromLeft = Math.random() < 0.5;
     var y0 = Math.random() * cssH * 0.6;
-    var len = 70 + Math.random() * 90;
-    var speed = (cssW + len) / (500 + Math.random() * 350); // px per ms, crosses in ~0.5-0.9s
+    var len = 90 + Math.random() * 100;
+    var crossMs = 2200 + Math.random() * 1400;
+    var speed = (cssW + len) / crossMs; // px per ms
     return {
       kind: "comet",
       x: fromLeft ? -len : cssW + len,
       y: y0,
       vx: (fromLeft ? 1 : -1) * speed,
-      vy: speed * 0.35,
+      vy: speed * 0.28,
       len: len,
       born: 0, life: 0, maxLife: (cssW + len * 2) / speed
     };
   }
+  // 2026-08-31, Tony: "freighters can hardly see, look just like lights way
+  // too small, need random sizes so looks far away and closer" -- plus his
+  // reference screenshot of real NMS freighters: one large, detailed hull
+  // close up, several small dark silhouettes scattered further back. A
+  // plain dot/ellipse (the original version) can't read as "a ship" at any
+  // size, so this draws an actual small hull shape (see drawFreighterHull
+  // below) instead, scaled per-instance across a wide range so the depth
+  // cue is the size itself, same as the reference image. One trigger now
+  // spawns a small group (1-3 ships) together rather than a single ship
+  // alone, so it can occasionally read as "a few freighters warped in",
+  // matching what Tony actually asked for and the reference image's own
+  // scattered fleet -- capped concurrently (see the draw() spawn logic)
+  // so a burst can't run away into a crowd.
   function spawnFreighter(cssW, cssH) {
+    // Weighted toward small/distant, occasionally a larger/closer one --
+    // real depth variety instead of every ship reading the same size.
+    var roll = Math.random();
+    var scale = roll < 0.6 ? 0.35 + Math.random() * 0.35   // far, most common
+              : roll < 0.9 ? 0.7 + Math.random() * 0.55    // mid
+              : 1.25 + Math.random() * 0.95;                // close, rare
+    var inMs = 500 + Math.random() * 260, outMs = 500 + Math.random() * 260;
     return {
       kind: "freighter",
-      x: cssW * (0.15 + Math.random() * 0.7),
-      y: cssH * (0.1 + Math.random() * 0.35), // upper band, well clear of the route line
+      x: cssW * (0.08 + Math.random() * 0.84),
+      y: cssH * (0.08 + Math.random() * 0.4), // upper band, clear of the route line
+      scale: scale,
+      rot: (Math.random() - 0.5) * 0.22,
+      // slower/closer ships drift very slightly more -- barely perceptible,
+      // just enough that a held freighter doesn't read as a frozen sticker
+      driftX: (Math.random() - 0.5) * 0.003 * scale,
+      driftY: (Math.random() - 0.5) * 0.0015 * scale,
       phase: "in", t: 0,
-      inMs: 320, holdMs: 3400 + Math.random() * 2600, outMs: 320
+      inMs: inMs, holdMs: 5000 + Math.random() * 4500, outMs: outMs
     };
   }
   function spawnAnomaly(cssW, cssH) {
@@ -1672,32 +1663,68 @@ window.MOCK_JOURNEYS = [
     ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.arc(e.x, e.y, 1.5, 0, Math.PI * 2); ctx.fill();
     return e.life < e.maxLife;
   }
+  // A small procedural hull silhouette -- long low body, a raised
+  // bridge/island block, two thin masts -- drawn in local units (roughly
+  // 48 wide) so it scales/rotates as one shape via ctx transforms. Dark
+  // silhouette fill + a thin cool rim-light along the top edge, same
+  // language as the reference screenshot's own backlit freighters. Cheap:
+  // one filled polygon, one small filled trapezoid, two stroked lines,
+  // one stroke for the rim light -- a handful of draw calls regardless of
+  // how large the ship is drawn.
+  function drawFreighterHull(ctx, alpha) {
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = "rgba(6,10,17,0.92)";
+    ctx.beginPath();
+    ctx.moveTo(-24, -1.5); ctx.lineTo(-17, -3); ctx.lineTo(13, -3);
+    ctx.lineTo(21, -1.2); ctx.lineTo(21, 1.4); ctx.lineTo(-17, 2.8);
+    ctx.lineTo(-24, 1.2); ctx.closePath();
+    ctx.fill();
+    ctx.beginPath(); // bridge/island block
+    ctx.moveTo(0, -3); ctx.lineTo(8, -3); ctx.lineTo(7, -7); ctx.lineTo(2, -7);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = "rgba(207,224,255," + (alpha * 0.55) + ")";
+    ctx.lineWidth = 0.5;
+    ctx.beginPath(); ctx.moveTo(3, -7); ctx.lineTo(3, -11); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(6, -7); ctx.lineTo(6, -12); ctx.stroke();
+    ctx.globalAlpha = alpha * 0.7;
+    ctx.beginPath();
+    ctx.moveTo(-17, -3); ctx.lineTo(13, -3); ctx.lineTo(21, -1.2);
+    ctx.stroke();
+  }
   function drawFreighter(ctx, e, dt) {
     e.t += dt;
-    var alpha, stretch;
+    e.x += e.driftX * dt; e.y += e.driftY * dt;
+    var hullAlpha, flashAlpha, flashStretch;
     if (e.phase === "in") {
       var p = Math.min(1, e.t / e.inMs);
-      alpha = p; stretch = 1 + (1 - p) * 7; // starts as a bright smeared flash, settles to a point
+      hullAlpha = p * (0.55 + e.scale * 0.12);
+      flashAlpha = 1 - p; flashStretch = 1 + (1 - p) * 8;
       if (p >= 1) { e.phase = "hold"; e.t = 0; }
     } else if (e.phase === "hold") {
-      alpha = 0.55; stretch = 1;
+      hullAlpha = 0.55 + Math.min(0.35, e.scale * 0.12);
+      flashAlpha = 0; flashStretch = 1;
       if (e.t >= e.holdMs) { e.phase = "out"; e.t = 0; }
     } else {
       var q = Math.min(1, e.t / e.outMs);
-      alpha = 1 - q; stretch = 1 + q * 7;
+      hullAlpha = (1 - q) * (0.55 + e.scale * 0.12);
+      flashAlpha = q; flashStretch = 1 + q * 8;
       if (q >= 1) return false;
     }
-    ctx.globalAlpha = alpha;
-    ctx.fillStyle = "#cfe0ff";
-    ctx.beginPath();
-    ctx.ellipse(e.x, e.y, 2.2 * stretch, 1.1, 0, 0, Math.PI * 2);
-    ctx.fill();
-    if (alpha > 0.4) {
-      var glow = ctx.createRadialGradient(e.x, e.y, 0, e.x, e.y, 10 * stretch * 0.4);
-      glow.addColorStop(0, "rgba(207,224,255," + (alpha * 0.5) + ")");
+    if (flashAlpha > 0.02) {
+      var glow = ctx.createRadialGradient(e.x, e.y, 0, e.x, e.y, 14 * e.scale * flashStretch * 0.5);
+      glow.addColorStop(0, "rgba(207,224,255," + flashAlpha + ")");
       glow.addColorStop(1, "rgba(207,224,255,0)");
-      ctx.fillStyle = glow;
-      ctx.beginPath(); ctx.arc(e.x, e.y, 10 * stretch * 0.4, 0, Math.PI * 2); ctx.fill();
+      ctx.globalAlpha = 1; ctx.fillStyle = glow;
+      ctx.beginPath(); ctx.arc(e.x, e.y, 14 * e.scale * flashStretch * 0.5, 0, Math.PI * 2); ctx.fill();
+    }
+    if (hullAlpha > 0.02) {
+      ctx.save();
+      ctx.translate(e.x, e.y);
+      ctx.rotate(e.rot);
+      ctx.scale(e.scale, e.scale);
+      drawFreighterHull(ctx, hullAlpha);
+      ctx.restore();
     }
     return true;
   }
@@ -1757,19 +1784,24 @@ window.MOCK_JOURNEYS = [
         drawTwinkleStar(ctx, s, alpha);
       }
       if (animate) {
-        // Spawn: at most one of each kind active at a time, on a randomised
-        // timer so they never fall into a noticeable rhythm. Mobile spawns
-        // 1.6-2x less often (less visual competition with the panels on a
-        // small screen, and less total draw work over a long session).
+        // Spawn: comets/anomalies stay one-at-a-time; freighters spawn as a
+        // small group (1-3 ships, capped at 4 concurrent total so a burst
+        // can't run away) since Tony asked for it to read as "freighters"
+        // occasionally warping in together, matching his reference image's
+        // own small scattered fleet rather than a single ship alone. All on
+        // randomised timers so nothing falls into a noticeable rhythm.
+        // Mobile spawns 1.6-2x less often (less visual competition with
+        // the panels on a small screen, less total draw work over time).
         var hasComet = effects.some(function (e) { return e.kind === "comet"; });
-        var hasFreighter = effects.some(function (e) { return e.kind === "freighter"; });
+        var freighterCount = effects.reduce(function (n, e) { return n + (e.kind === "freighter" ? 1 : 0); }, 0);
         var hasAnomaly = effects.some(function (e) { return e.kind === "anomaly"; });
         if (!hasComet && t > nextCometAt) {
           effects.push(spawnComet(cssW, cssH));
           nextCometAt = t + scheduleNext(9000, 19000, 1.7);
         }
-        if (!hasFreighter && t > nextFreighterAt) {
-          effects.push(spawnFreighter(cssW, cssH));
+        if (freighterCount === 0 && t > nextFreighterAt) {
+          var groupSize = isNarrow() ? 1 + (Math.random() < 0.4 ? 1 : 0) : 1 + Math.floor(Math.random() * 3);
+          for (var g = 0; g < groupSize; g++) effects.push(spawnFreighter(cssW, cssH));
           nextFreighterAt = t + scheduleNext(32000, 62000, 1.6);
         }
         if (!hasAnomaly && t > nextAnomalyAt) {
@@ -2802,13 +2834,43 @@ window.MOCK_JOURNEYS = [
     location.href = "../" + mapReturnQuery(here, currentGalaxyNum());
   };
 
-  var ambienceOn = false;
+  // 2026-08-31, Tony: "mp3 on by default with option to turn off" -- the
+  // button and its label already start in the "on" state (see the markup
+  // above), and the code below tries to actually start playback the moment
+  // the page loads. Real browsers won't let audio play before the visitor
+  // has interacted with the page AT ALL though (Chrome/Safari/Firefox all
+  // block it), so the immediate attempt will silently fail on a true first
+  // visit -- the second half of this (the capture-phase listener) is the
+  // standard workaround: it starts the track on the very first click/tap/
+  // key anywhere on the page if it hasn't already started, so a visitor
+  // gets ambience the moment they do ANYTHING (pick a journey, open a
+  // panel, whatever), not only if they specifically find and click this
+  // button. The button stays a real toggle throughout -- if the visitor
+  // turns it off, this first-interaction listener has already done its
+  // job and won't turn it back on.
+  var ambienceOn = true;
+  function setAmbienceLabel(on) {
+    var btn = $("ambienceToggle");
+    btn.classList.toggle("on", on);
+    btn.innerHTML = on ? "&#9835; AMBIENCE ON" : "&#9835; AMBIENCE";
+  }
   $("ambienceToggle").onclick = function () {
     ambienceOn = !ambienceOn;
-    this.classList.toggle("on", ambienceOn);
-    this.innerHTML = ambienceOn ? "&#9835; AMBIENCE ON" : "&#9835; AMBIENCE";
+    setAmbienceLabel(ambienceOn);
     if (ambienceOn) startHum(); else stopHum();
   };
+  startHum(); // real browsers block this before any interaction -- see fallback below
+  (function () {
+    function tryAutostart() {
+      document.removeEventListener("click", tryAutostart, true);
+      document.removeEventListener("touchstart", tryAutostart, true);
+      document.removeEventListener("keydown", tryAutostart, true);
+      if (ambienceOn) startHum(); // no-op if it's already playing; picks up where autoplay was blocked
+    }
+    document.addEventListener("click", tryAutostart, true);
+    document.addEventListener("touchstart", tryAutostart, true);
+    document.addEventListener("keydown", tryAutostart, true);
+  })();
 
   // Warp-jump animation toggle -- mirrors the live map's own "Warp
   // animation" checkbox (localStorage 'nms-galmap-warp'): on by default,
