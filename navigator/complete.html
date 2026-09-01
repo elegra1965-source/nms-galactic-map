@@ -707,9 +707,37 @@ body.no-fx .orb{display:none}
   });
   document.addEventListener("keydown", function(e){ if (e.key === "Escape") closeModal(); });
 
+  // Fix (2026-09-01): SAVE IMAGE / SHARE were coming out washed-out/grey
+  // instead of matching the vivid preview shown in the modal (Tony: "still
+  // whitewashed" -- confirmed happens on both Save and Share, so it's the
+  // shared capture step, not either button). Root cause, confirmed via a
+  // headless render comparing the live preview against html2canvas's own
+  // output pixel-for-pixel: html2canvas renders by cloning the whole
+  // document into a hidden iframe, and a FRESH clone of an element restarts
+  // any CSS animation bound to it from 0% -- it doesn't inherit the "already
+  // finished" state the real, on-screen element is sitting in. Two elements
+  // here have exactly that: .polaroidFrame's "pop" reveal (fades/scales in
+  // from transparent) and .shutterFlash's white camera-flash pulse. html2canvas
+  // grabs its frame a few hundred ms into building that clone, i.e. partway
+  // through both animations replaying from scratch -- so the captured image
+  // is effectively the real photo blended with a part-opacity white flash
+  // and a part-faded polaroid, which is exactly what reads as "whitewashed."
+  // Fix: freeze all animations/transitions in the document for the instant
+  // html2canvas is cloning it (a plain injected stylesheet, removed again as
+  // soon as the capture resolves), so the clone renders every element at its
+  // real, already-settled final state instead of replaying from 0%.
   function captureSnapshot(cb) {
     if (typeof html2canvas === "undefined") { toast("Snapshot renderer failed to load (offline?)."); return; }
-    html2canvas(document.getElementById("snapPreview"), { backgroundColor: "#070b11", scale: 2 }).then(cb);
+    var freeze = document.createElement("style");
+    freeze.textContent = "*{animation:none!important;transition:none!important}";
+    document.head.appendChild(freeze);
+    html2canvas(document.getElementById("snapPreview"), { backgroundColor: "#070b11", scale: 2 }).then(function (canvas) {
+      freeze.remove();
+      cb(canvas);
+    }, function (err) {
+      freeze.remove();
+      toast("Could not generate the snapshot image.");
+    });
   }
 
   document.getElementById("saveImage").onclick = function () {
