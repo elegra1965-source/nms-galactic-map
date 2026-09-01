@@ -1190,6 +1190,18 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 #tourBox{position:fixed;max-width:280px;padding:14px;pointer-events:auto;z-index:9001}
 #tourBox .modalBtns{margin-top:12px}
 #tourBox #tourBack{visibility:hidden}
+/* Screenshot lightbox (2026-09-01) -- one shared overlay for both the
+   Edit System modal's own preview and the public info panel's community
+   screenshot, opened via openScreenshotLightbox(). z-index sits above
+   #adminPanel (500) and every ordinary panel/modal so it can be triggered
+   from any of them; well below the first-run tour overlay (9000+), which
+   is a separate transient onboarding layer, not something a screenshot
+   click needs to out-rank. */
+.lightboxOverlay{position:fixed;inset:0;z-index:600;background:rgba(2,4,7,.88);
+  display:flex;align-items:center;justify-content:center;flex-direction:column;
+  gap:14px;padding:24px;cursor:zoom-out}
+.lightboxOverlay img{max-width:min(92vw,1100px);max-height:80vh;border-radius:var(--r-sm);
+  box-shadow:0 20px 60px rgba(0,0,0,.6);cursor:default}
 </style>
 </head>
 <body>
@@ -1510,6 +1522,18 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   <div id="pubNoteBox" style="display:none">
     <div class="lb" style="font-size:9px;letter-spacing:.12em;color:var(--text-faint);text-transform:uppercase;margin:8px 0 3px">Community notes</div>
     <div id="pubNote" style="font-size:12px;color:var(--text-dim);white-space:pre-wrap"></div>
+    <!-- 2026-09-01, Tony: "on the edit system instead of surveyor notes...
+         a screenshot users can add a picture" -- an optional public photo,
+         submitted the same way as the text notes above it, shown here as a
+         clickable thumbnail (see openScreenshotLightbox()). Its own
+         flagged/disputed/edited border comes from setFsClass(...,"screenshot",s)
+         in updatePanel(), independent of pubNoteBox's own "notes" border,
+         since a visitor can dispute the photo without disputing the text
+         or vice versa. -->
+    <div id="pubScreenshotWrap" style="display:none;margin-top:6px">
+      <img id="pubScreenshot" alt="Community-submitted screenshot of this system" title="Click to enlarge"
+        style="max-width:100%;max-height:140px;border-radius:var(--r-sm);border:1px solid var(--border-soft);cursor:zoom-in;display:block">
+    </div>
     <div id="pEditorLine" style="font-size:10.5px;color:var(--text-faint);margin-top:5px;display:none"></div>
   </div>
   <div class="seqbox">
@@ -1520,9 +1544,35 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     <div id="pCoords">X: — | Y: — | Z: —</div>
   </div>
   <textarea id="pNote" placeholder="Surveyor notes..."></textarea>
+  <!-- 2026-09-01, Tony: same screenshot idea as Edit system's public notes
+       (see pubScreenshotWrap above), but private -- attached to your own
+       local Surveyor log, same personal/local-only mechanism as the rest
+       of `store` (never sent anywhere, see store.noteImgs). Saves the
+       moment a photo is picked/removed, unlike the text note above which
+       waits for "Save log" -- there's no separate draft state for a file
+       picker to hold, same instant-save pattern Bookmark/Waypoint already
+       use elsewhere in this panel. -->
+  <div id="pNoteImgPreviewWrap" style="display:none;margin:6px 0">
+    <img id="pNoteImgPreview" alt="Your private screenshot for this system" title="Click to enlarge"
+      style="max-width:100%;max-height:140px;border-radius:var(--r-sm);border:1px solid var(--border-soft);cursor:zoom-in;display:block">
+  </div>
+  <input type="file" id="pNoteImgFile" accept="image/*" style="display:none">
+  <div class="prow">
+    <button class="btn" id="pNoteImgBtn" type="button" title="Attach a screenshot to your private surveyor log for this system -- saved only to this device, never shared.">Add screenshot</button>
+    <button class="btn" id="pNoteImgRemoveBtn" type="button" style="display:none" title="Remove your private screenshot for this system.">Remove screenshot</button>
+  </div>
   <div class="prow">
     <button class="btn" id="bSave" title="Save your surveyor notes for this system to this device.">Save log</button>
   </div>
+</div>
+
+<!-- 2026-09-01: shared enlarge-on-click overlay for both the public
+     (pubScreenshot) and private (pNoteImgPreview) screenshot thumbnails,
+     plus the Edit System modal's own preview (edScreenshotPreview). See
+     openScreenshotLightbox(). -->
+<div id="screenshotLightbox" class="lightboxOverlay" style="display:none" role="dialog" aria-label="Screenshot, enlarged">
+  <img id="screenshotLightboxImg" alt="Screenshot, enlarged">
+  <button class="btn" id="screenshotLightboxClose" type="button">Close</button>
 </div>
 
 <div id="keys" class="box">
@@ -1734,6 +1784,22 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     </div>
     <div class="mfld"><div class="lb">Public notes <span style="color:var(--text-faint)">(visible to everyone, not your private surveyor log)</span></div>
       <textarea id="edNotes" maxlength="800" placeholder="Anything else worth knowing about this system..."></textarea>
+    </div>
+    <!-- 2026-09-01, Tony: "instead of surveyor notes... a screenshot users
+         can add a picture" -- optional, alongside the text notes above
+         rather than replacing them (Tony's own call once asked). Staged
+         client-side (compressImageToJpeg()) same as everywhere else this
+         modal stages a value -- nothing uploads until Save, same as every
+         other field here. -->
+    <div class="mfld"><div class="lb">Screenshot <span style="color:var(--text-faint)">(optional, visible to everyone)</span></div>
+      <input type="file" id="edScreenshotFile" accept="image/*" style="display:none">
+      <div id="edScreenshotPreviewWrap" style="display:none;margin-bottom:6px">
+        <img id="edScreenshotPreview" alt="Screenshot preview" title="Click to enlarge"
+          style="max-width:100%;max-height:160px;border-radius:var(--r-sm);border:1px solid var(--border-soft);cursor:zoom-in;display:block">
+      </div>
+      <button class="btn" id="edScreenshotBtn" type="button" style="padding:4px 10px;font-size:11px" title="Pick an in-game screenshot to attach to this system, visible to every visitor. Resized and compressed automatically."><span id="edScreenshotBtnTxt">Add screenshot</span></button>
+      <button class="btn" id="edScreenshotRemoveBtn" type="button" style="padding:4px 10px;font-size:11px;display:none" title="Remove this system's screenshot.">Remove screenshot</button>
+      <div id="edScreenshotHint" style="font-size:10.5px;color:var(--text-faint);margin-top:4px"></div>
     </div>
     <div class="mfld" style="display:flex;gap:8px">
       <div style="flex:1"><div class="lb">Your name <span style="color:var(--text-faint)">(optional)</span></div><input type="text" id="edEditorName" maxlength="30" placeholder="Shown as who documented this system"></div>
@@ -3051,7 +3117,7 @@ var OVERRIDES={systems:{}};
    there's no way to share a JS module between the client bundle and the
    Netlify Functions here). "bodies.N" (N=0..5) is the 13th category,
    generated dynamically per system rather than listed here. */
-var FLAG_CATEGORIES=["name","race","region","starClass","stars","suffix","giant","economy","conflict","blackHole","atlas","phantom","notes"];
+var FLAG_CATEGORIES=["name","race","region","starClass","stars","suffix","giant","economy","conflict","blackHole","atlas","phantom","notes","screenshot"];
 function applyOverride(s){
   // Real per-galaxy addressing (2026-08-22): the shared systems dict is
   // keyed "galaxy:ADDRESS" now, not just ADDRESS (see TODO.md's "Real
@@ -3125,6 +3191,7 @@ function applyOverride(s){
   if(d.collidingA!==undefined) s.collidingA=d.collidingA|0;
   if(d.collidingB!==undefined) s.collidingB=d.collidingB|0;
   s.publicNotes=d.notes||"";
+  s.publicScreenshot=d.screenshot||"";
   s.editorName=d.editorName||"";
   s.editorFriendCode=d.editorFriendCode||"";
   if(d.bodies && d.bodies.length){
@@ -3293,18 +3360,18 @@ var TRAVELLER_K="nms-galmap-traveller"; // remembers "your name"/"friend code" l
    it's its own thing with an id of its own. Same personal, local-only
    mechanism otherwise, and rides along in Export/Import exactly like the
    rest of store (see saveRoutesMerge() near bImport's handler). */
-var store={notes:{},marks:{},waypoints:{},visited:{},routes:[]};
+var store={notes:{},noteImgs:{},marks:{},waypoints:{},visited:{},routes:[]};
 function skey(s){ return s.galaxy+":"+s.address; }
 function loadStore(){
   try{
     var raw=localStorage.getItem(STORE_K);
     if(raw){
       var o=JSON.parse(raw);
-      store.notes=o.notes||{}; store.marks=o.marks||{};
+      store.notes=o.notes||{}; store.noteImgs=o.noteImgs||{}; store.marks=o.marks||{};
       store.waypoints=o.waypoints||{}; store.visited=o.visited||{};
       store.routes=Array.isArray(o.routes)?o.routes:[];
     }
-  }catch(err){ store={notes:{},marks:{},waypoints:{},visited:{},routes:[]}; }
+  }catch(err){ store={notes:{},noteImgs:{},marks:{},waypoints:{},visited:{},routes:[]}; }
 }
 function saveStore(){
   try{ localStorage.setItem(STORE_K,JSON.stringify(store)); }
@@ -5621,6 +5688,7 @@ function fsCategoryValue(s,category){
     case "atlas": return !!s.atlas;
     case "phantom": return s.phantom||"";
     case "notes": return s.publicNotes||"";
+    case "screenshot": return s.publicScreenshot||"";
     default: return undefined;
   }
 }
@@ -5777,8 +5845,12 @@ function updatePanel(s){
   else pEditorLine.style.display="none";
   if(s.publicNotes){ document.getElementById("pubNote").style.display=""; document.getElementById("pubNote").textContent=s.publicNotes; }
   else document.getElementById("pubNote").style.display="none";
-  pnb.style.display=(s.publicNotes||editorTxt)?"":"none";
+  var pubShotWrap=document.getElementById("pubScreenshotWrap"), pubShotImg=document.getElementById("pubScreenshot");
+  if(s.publicScreenshot){ pubShotImg.src=s.publicScreenshot; pubShotWrap.style.display="block"; }
+  else { pubShotImg.src=""; pubShotWrap.style.display="none"; }
+  pnb.style.display=(s.publicNotes||editorTxt||s.publicScreenshot)?"":"none";
   setFsClass("pubNoteBox","notes",s);
+  setFsClass("pubScreenshotWrap","screenshot",s);
 
   var bl="";
   for(i=0;i<s.bodies.length;i++){
@@ -5832,6 +5904,7 @@ function updatePanel(s){
   document.getElementById("pAddr").textContent=s.address;
   document.getElementById("pCoords").textContent="X: "+s.vx+" | Y: "+s.vy+" | Z: "+s.vz;
   document.getElementById("pNote").value=store.notes[skey(s)]||"";
+  renderPNoteImg();
   document.getElementById("bMark").classList.toggle("on",!!store.marks[skey(s)]);
   var cb=document.getElementById("bCourse");
   cb.classList.toggle("off",here);
@@ -7157,6 +7230,7 @@ document.getElementById("fFile").addEventListener("change",function(e){
     try{
       var o=JSON.parse(rd.result);
       store.notes=Object.assign(store.notes,o.notes||{});
+      store.noteImgs=Object.assign(store.noteImgs,o.noteImgs||{});
       store.marks=Object.assign(store.marks,o.marks||{});
       store.waypoints=Object.assign(store.waypoints,o.waypoints||{});
       store.visited=Object.assign(store.visited,o.visited||{});
@@ -8173,6 +8247,147 @@ function relTime(iso){
   var years=Math.floor(months/12);
   return years+" year"+(years===1?"":"s")+" ago";
 }
+/* ============================================================
+   Screenshots (2026-09-01, Tony: "on the edit system instead of surveyor
+   notes... a screenshot users can add a picture" -- added to BOTH the
+   public Edit System modal and the private Surveyor notes log, alongside
+   their existing text fields, not replacing either). Shared pieces:
+   compressImageToJpeg() (used by both uploaders) and the lightbox overlay
+   (used by both preview thumbnails plus the public one on the info panel).
+   The public half's server round trip lives in netlify/functions/
+   system-edit.mjs's resolveScreenshotUpload() and lib/shared.mjs's
+   screenshot helpers -- see those for why every upload gets its own
+   filename rather than one fixed path per system.
+   ============================================================ */
+
+/* Reads an image file, draws it to a canvas, and re-encodes as JPEG at
+   shrinking size/quality steps until the result fits maxBytes -- a real
+   in-game screenshot straight off a phone or a capture tool easily runs
+   2-8MB, and neither the shared data store (overrides.json already had one
+   real outage from outgrowing the GitHub Contents API's 1MB inline-read
+   ceiling from TEXT alone, see lib/shared.mjs's githubGetFile() comment)
+   nor a visitor's own localStorage quota (Surveyor notes' private copy)
+   can afford that raw. Always outputs image/jpeg regardless of the source
+   format -- keeps both sides of this feature down to exactly one mime type
+   to validate/store, and JPEG compresses a real screenshot far smaller
+   than PNG would for the same visual quality. Resolves a
+   data:image/jpeg;base64,... string, or rejects with a short user-facing
+   message. Deliberately a fixed ladder of (dimension, quality) steps
+   rather than a search for an exact byte target -- five canvas draws, worst
+   case, always converges for a real photo, and "close enough under budget"
+   is all either caller actually needs. */
+function compressImageToJpeg(file,maxDim,maxBytes){
+  return new Promise(function(resolve,reject){
+    var url=URL.createObjectURL(file);
+    var img=new Image();
+    img.onload=function(){
+      URL.revokeObjectURL(url);
+      var w=img.naturalWidth,h=img.naturalHeight;
+      if(!w||!h){ reject(new Error("Couldn't read that image")); return; }
+      var STEPS=[[maxDim,0.82],[maxDim,0.62],[Math.round(maxDim*0.75),0.58],
+        [Math.round(maxDim*0.55),0.52],[Math.round(maxDim*0.4),0.48]];
+      var maxChars=maxBytes*4/3; // base64's fixed ~4/3 size overhead -- fine as a proxy, no need to decode just to measure
+      var last=null;
+      for(var i=0;i<STEPS.length;i++){
+        var dim=STEPS[i][0], q=STEPS[i][1];
+        var scale=Math.min(1,dim/Math.max(w,h));
+        var cw=Math.max(1,Math.round(w*scale)), ch=Math.max(1,Math.round(h*scale));
+        var canvas=document.createElement("canvas");
+        canvas.width=cw; canvas.height=ch;
+        canvas.getContext("2d").drawImage(img,0,0,cw,ch);
+        var dataUrl=canvas.toDataURL("image/jpeg",q);
+        last=dataUrl;
+        if(dataUrl.length<=maxChars){ resolve(dataUrl); return; }
+      }
+      if(last && last.length<=maxChars*1.5){ resolve(last); return; } // smallest step still a bit over -- close enough, better than failing outright
+      reject(new Error("That image is too large to attach, even compressed"));
+    };
+    img.onerror=function(){ URL.revokeObjectURL(url); reject(new Error("Couldn't read that image")); };
+    img.src=url;
+  });
+}
+function openScreenshotLightbox(src){
+  if(!src) return;
+  document.getElementById("screenshotLightboxImg").src=src;
+  document.getElementById("screenshotLightbox").style.display="flex";
+}
+function closeScreenshotLightbox(){ document.getElementById("screenshotLightbox").style.display="none"; }
+document.getElementById("screenshotLightboxClose").addEventListener("click",closeScreenshotLightbox);
+document.getElementById("screenshotLightbox").addEventListener("click",function(e){ if(e.target===this) closeScreenshotLightbox(); });
+document.addEventListener("keydown",function(e){
+  if(e.key==="Escape" && document.getElementById("screenshotLightbox").style.display!=="none") closeScreenshotLightbox();
+});
+document.getElementById("pubScreenshot").addEventListener("click",function(){ openScreenshotLightbox(this.src); });
+
+/* Edit System modal screenshot state -- kept as two separate values rather
+   than one shared "current value" string so the modal can always tell the
+   difference between "this is the same photo already saved here"
+   (edScreenshotBaseline, a stored https URL or "") and "this browser just
+   picked/removed a new one this session" (edScreenshotNew: null=untouched,
+   ""=removed, or a fresh data:image/jpeg;base64,... string). Reset fresh
+   every time openEditModal() opens (see its own setEdScreenshotState()
+   call); the value actually sent on Save is edScreenshotCurrentValue(),
+   read once in edSubmit's own payload assembly. */
+var edScreenshotBaseline="", edScreenshotNew=null;
+function setEdScreenshotState(url){
+  edScreenshotBaseline=url||""; edScreenshotNew=null;
+  renderEdScreenshotPreview();
+}
+function edScreenshotCurrentValue(){
+  return edScreenshotNew===null ? edScreenshotBaseline : edScreenshotNew;
+}
+function renderEdScreenshotPreview(){
+  var v=edScreenshotCurrentValue();
+  var wrap=document.getElementById("edScreenshotPreviewWrap");
+  var img=document.getElementById("edScreenshotPreview");
+  var removeBtn=document.getElementById("edScreenshotRemoveBtn");
+  var addBtnTxt=document.getElementById("edScreenshotBtnTxt");
+  if(v){ img.src=v; wrap.style.display="block"; removeBtn.style.display="inline-block"; addBtnTxt.textContent="Replace screenshot"; }
+  else { img.src=""; wrap.style.display="none"; removeBtn.style.display="none"; addBtnTxt.textContent="Add screenshot"; }
+}
+document.getElementById("edScreenshotBtn").addEventListener("click",function(){ document.getElementById("edScreenshotFile").click(); });
+document.getElementById("edScreenshotPreview").addEventListener("click",function(){ openScreenshotLightbox(this.src); });
+document.getElementById("edScreenshotRemoveBtn").addEventListener("click",function(){ edScreenshotNew=""; renderEdScreenshotPreview(); });
+document.getElementById("edScreenshotFile").addEventListener("change",function(e){
+  var f=e.target.files[0]; e.target.value="";
+  if(!f) return;
+  if(!/^image\//.test(f.type)){ toast("Please choose an image file"); return; }
+  var hint=document.getElementById("edScreenshotHint");
+  hint.textContent="Compressing...";
+  compressImageToJpeg(f,1100,260000).then(function(dataUrl){
+    hint.textContent="";
+    edScreenshotNew=dataUrl; renderEdScreenshotPreview();
+  }).catch(function(err){
+    hint.textContent="";
+    toast(err&&err.message?err.message:"Couldn't read that image");
+  });
+});
+
+/* Private Surveyor notes screenshot -- see store.noteImgs (loadStore()'s
+   own comment). renderPNoteImg() is called from updatePanel() right
+   alongside pNote's own value population, same choke point. */
+function renderPNoteImg(){
+  var v=selected?(store.noteImgs[skey(selected)]||""):"";
+  var wrap=document.getElementById("pNoteImgPreviewWrap"), img=document.getElementById("pNoteImgPreview"),
+    rm=document.getElementById("pNoteImgRemoveBtn");
+  if(v){ img.src=v; wrap.style.display="block"; rm.style.display="inline-block"; }
+  else { img.src=""; wrap.style.display="none"; rm.style.display="none"; }
+}
+document.getElementById("pNoteImgPreview").addEventListener("click",function(){ openScreenshotLightbox(this.src); });
+document.getElementById("pNoteImgBtn").addEventListener("click",function(){ document.getElementById("pNoteImgFile").click(); });
+document.getElementById("pNoteImgRemoveBtn").addEventListener("click",function(){
+  if(!selected) return;
+  delete store.noteImgs[skey(selected)]; saveStore(); renderPNoteImg(); toast("Screenshot removed");
+});
+document.getElementById("pNoteImgFile").addEventListener("change",function(e){
+  var f=e.target.files[0]; e.target.value="";
+  if(!f || !selected) return;
+  if(!/^image\//.test(f.type)){ toast("Please choose an image file"); return; }
+  compressImageToJpeg(f,640,90000).then(function(dataUrl){
+    store.noteImgs[skey(selected)]=dataUrl; saveStore(); renderPNoteImg(); toast("Screenshot attached to your log");
+  }).catch(function(err){ toast(err&&err.message?err.message:"Couldn't read that image"); });
+});
+
 function openEditModal(){
   if(!selected) return;
   var s=selected;
@@ -8214,6 +8429,7 @@ function openEditModal(){
   document.getElementById("edOutlaw").checked=!!s.outlaw;
   document.getElementById("edColliding").checked=!!s.colliding;
   document.getElementById("edNotes").value=s.publicNotes||"";
+  setEdScreenshotState(s.publicScreenshot||"");
   var myId=loadTravellerId();
   document.getElementById("edEditorName").value=myId.name;
   document.getElementById("edEditorCode").value=myId.code;
@@ -8440,13 +8656,15 @@ document.getElementById("edAddBody").addEventListener("click",function(){
 document.getElementById("edGiant").addEventListener("change",renderBodyEditList);
 document.getElementById("bEdit").addEventListener("click",function(){ if(selected) openEditModal(); });
 /* Human-readable labels for the "Flag this field" picker -- must list the
-   exact same 12 categories as FLAG_CATEGORIES above (kept in sync by hand
-   with FLAG_FIELDS in netlify/functions/_shared.mjs, same caveat). */
+   exact same 14 categories as FLAG_CATEGORIES above (kept in sync by hand
+   with FLAG_FIELDS in netlify/functions/lib/shared.mjs, same caveat).
+   screenshot added 2026-09-01 alongside the rest of that feature. */
 var FLAG_LABELS={
   name:"System name", race:"Race", region:"Region name", starClass:"Star class",
   stars:"Star colour(s)", suffix:"Water / Dissonant suffix", giant:"Gas giant",
   economy:"Economy (name, sell/buy %, strength)", conflict:"Conflict level",
-  blackHole:"Black hole", atlas:"Atlas Interface", phantom:"Phantom / Shadow Star", notes:"Notes"
+  blackHole:"Black hole", atlas:"Atlas Interface", phantom:"Phantom / Shadow Star", notes:"Notes",
+  screenshot:"Screenshot"
 };
 function renderFlagFieldList(s){
   var html="",i;
@@ -9447,6 +9665,7 @@ document.getElementById("edSubmit").addEventListener("click",function(){
     atlas:document.getElementById("edAtlas").checked,
     phantom:document.getElementById("edPhantom").value,
     notes:mergedNotes,
+    screenshot:edScreenshotCurrentValue(),
     editorName:edEditorName,
     editorFriendCode:edEditorCode,
     genVersion:GEN_VERSION,
