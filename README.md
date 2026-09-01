@@ -248,6 +248,14 @@ line it's sitting on.
 
 ![Course plotted card dragged clear of the jump line](screenshots/09-draggable-panels.jpg)
 
+**Jump failed (custom 404).** Follow a stale link, a mistyped address, or
+one that was cut off mid-share, and you don't land on a generic browser
+error -- the map's own hyperdrive-fault screen picks it up instead, in the
+same visual language as the rest of the site, with a way back to the map or
+to Search.
+
+![Custom 404 page: a Hyperdrive Fault screen reading "Jump failed -- no system at this address", with the failed path shown as system/1CF0EE90BFFA](screenshots/16-404-jump-failed.jpg)
+
 <details id="the-address-decoded">
 <summary><strong>The address, decoded</strong></summary>
 
