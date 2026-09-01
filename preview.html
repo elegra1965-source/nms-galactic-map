@@ -2460,6 +2460,29 @@ function bodyByIndex(s,idx){
   for(var i=0;i<s.bodies.length;i++) if(s.bodies[i].index===idx) return s.bodies[i];
   return null;
 }
+/* Walks a moon's real parent chain (b.parent) up to the first non-moon
+   body, so buildSystemView() can attach a moon to the actual planet it
+   orbits rather than whichever body happens to sit next to it in the
+   array. generateSystem() can (rarely) chain a moon's parent to another
+   moon rather than a planet when several consecutive body slots all roll
+   as moons -- this walks past that safely. applyOverride() never produces
+   that chain (a traveller's Orbits pick, and its own fallback, are always
+   validated to point at a real planet or 0), so this only ever matters for
+   purely-procedural systems, but it's used for both so buildSystemView()
+   has one single, always-correct way to find a moon's real anchor.
+   Cycle-guarded purely as a defensive backstop against malformed/legacy
+   data -- a real generated or saved system can't actually produce a
+   parent cycle. Returns the owning planet's .index, or null if it can't
+   be resolved (caller falls back to the last-built planet). */
+function findOwningPlanetIndex(s,b){
+  var seen={}, cur=b, guard=0;
+  while(cur && cur.moon){
+    if(guard++>8 || seen[cur.index]) return null;
+    seen[cur.index]=true;
+    cur=bodyByIndex(s,cur.parent);
+  }
+  return cur ? cur.index : null;
+}
 
 var BIOMES={
   "Lush":       {base:"#1d5f31",land:["#2f8f45","#3fa855","#256b30","#6f9438"],sea:"#12406e",cap:"#dce9f4",water:true, atmo:0x6fd8ff, res:["Paraffinium","Star Bulb","Nitrogen"]},
@@ -2511,11 +2534,55 @@ var BIOME_KEYS=Object.keys(BIOMES);
    matching guard for the degraded-fallback path. */
 var GEN_BIOME_KEYS=BIOME_KEYS.filter(function(k){ return k!=="Water World"; });
 /* Safe palette lookup for any biome VALUE, including a custom/unrecognised
-   traveller-typed name -- BIOMES has no texture/colour data for arbitrary
-   text, so this falls back to Barren's palette (a neutral, fully-featured
-   entry) rather than crashing. The literal string in b.biome/biome is still
-   shown everywhere it's displayed as text -- this only affects rendering. */
-function biomePal(k){ return BIOMES[k]||BIOMES.Barren; }
+   traveller-typed name (allowed since 2026-08-26 -- the Biome combo lets a
+   traveller type real in-game wording that isn't one of this site's own 12
+   named biomes). Every unrecognised value used to fall back to the exact
+   same fixed Barren palette -- harmless for a single custom entry, but a
+   real bug once a system has MULTIPLE differently-typed custom biomes:
+   Tony's own Nogsangh system (2026-09-01) had "Nuclear"/"Icebound"/
+   "Empty"/"Tectonic" across its 4 bodies -- none are recognised keys, so
+   all 4 collapsed onto the identical Barren look, "all the planets have
+   changed colour/texture to the same [picture]". Fixed by hashing the
+   literal string into a hue instead of one hardcoded fallback, so two
+   DIFFERENT custom names always render as two DIFFERENT colours (and the
+   same custom name always renders the same way, every reload) -- this is
+   not a claim about what colour that real in-game classification actually
+   is, there's no way to know that for arbitrary typed text, just a
+   guarantee that distinct biome text never paints identically. The literal
+   string in b.biome/biome is still shown everywhere it's displayed as
+   text -- this only affects rendering. */
+function _biomeStrHash(str){
+  var h=0;
+  for(var i=0;i<str.length;i++) h=((h<<5)-h+str.charCodeAt(i))|0;
+  return h>>>0;
+}
+function _hslToHex(h,s,l){
+  s/=100; l/=100;
+  var c=(1-Math.abs(2*l-1))*s, x=c*(1-Math.abs((h/60)%2-1)), m=l-c/2, r=0,g=0,b=0;
+  if(h<60){r=c;g=x;b=0;} else if(h<120){r=x;g=c;b=0;} else if(h<180){r=0;g=c;b=x;}
+  else if(h<240){r=0;g=x;b=c;} else if(h<300){r=x;g=0;b=c;} else {r=c;g=0;b=x;}
+  r=Math.round((r+m)*255); g=Math.round((g+m)*255); b=Math.round((b+m)*255);
+  return (r<<16)|(g<<8)|b;
+}
+var _customBiomePalCache={};
+function biomePal(k){
+  if(BIOMES[k]) return BIOMES[k];
+  var key=String(k||"");
+  if(!key) return BIOMES.Barren;
+  if(_customBiomePalCache[key]) return _customBiomePalCache[key];
+  var hue=_biomeStrHash(key)%360;
+  var pal={
+    base:"hsl("+hue+",42%,32%)",
+    land:["hsl("+hue+",48%,44%)","hsl("+hue+",42%,22%)","hsl("+hue+",55%,52%)","hsl("+hue+",38%,16%)"],
+    sea:"hsl("+((hue+200)%360)+",38%,26%)",
+    cap:"hsl("+hue+",30%,80%)",
+    water:true,
+    atmo:_hslToHex(hue,60,62),
+    res:null
+  };
+  _customBiomePalCache[key]=pal;
+  return pal;
+}
 /* Sourced (nomanssky.fandom.com/wiki/Resource, wiki/Biome, /wiki/System_colours): Lush/Barren/Scorched/
    Frozen/Toxic/Radioactive have fixed [local element, agricultural, atmospheric] resources; Dead has only
    a local element, no agri/atmo. Exotic/Mega Exotic/Marsh/Volcanic are documented as inconsistent/
@@ -3098,7 +3165,17 @@ function applyOverride(s){
         water:!!b.water,
         ring:(!isMoon&&!!b.ring)?(RING_STYLE_BY_BIOME[biome]||"tan"):false,
         ringOverridden:true, // this whole body came from a traveller's Edit system submission (d.bodies), ring checkbox included -- a real answer either way, not a procedural roll
-        size:o?o.size:(isMoon?0.42:0.85),
+        // Reuse the procedural body's own size ONLY when this slot's
+        // moon/planet role still matches what procedural generation
+        // originally rolled for it (o.moon===isMoon) -- otherwise a
+        // traveller correcting a body FROM planet TO moon (or vice versa --
+        // Tony's real Nogsangh report 2026-09-01: "Udre II"/"Ibai 73/C5"
+        // swapped) kept the OLD role's size, so the newly-flagged moon
+        // rendered bigger than the planet it's supposed to orbit ("looks
+        // like a planet orbiting a moon"). When the role genuinely
+        // changed, fall back to the same flat per-role default already
+        // used for a brand-new body added at this slot.
+        size:(o&&o.moon===isMoon)?o.size:(isMoon?0.42:0.85),
         tilt:o?o.tilt:((i%2?1:-1)*(0.1+0.05*i)),
         spin:o?o.spin:0.3,
         resUni:(b.resources&&b.resources.length)?b.resources.slice(0,6):(o?o.resUni:[]),
@@ -5344,97 +5421,125 @@ function buildSystemView(s){
   var featureR=lastOrbitR+12;
   if(s.blackHole) systemGroup.add(buildFeature(s,"bh",new THREE.Vector3(featureR*0.82,featureR*0.18,-featureR*0.55)));
   if(s.atlas) systemGroup.add(buildFeature(s,"atlas",new THREE.Vector3(-featureR*0.85,-featureR*0.15,featureR*0.5)));
-  var planetIdx=0, moonIdx=0, moonAnchor=null, moonAnchorSize=0;
+  /* Two-pass build (2026-09-01, Tony's Nogsangh report): every planet is
+     built first (pass 1, unchanged geometry/material logic from before),
+     recording each one's own moonAnchor/size/running-moon-count keyed by
+     its real body .index in planetAnchors{}. Moons are then attached in a
+     SEPARATE second pass, each one resolved to its actual owning planet
+     via findOwningPlanetIndex(s,b) (which reads b.parent -- the traveller's
+     real Orbits pick, or generateSystem()'s own procedural parent chain --
+     see that function's own header). The old single-pass version attached
+     a moon to whichever planet happened to be built immediately before it
+     in array order, with no reference to b.parent at all -- it happened to
+     look right for Nogsangh purely because the two swapped bodies (Udre
+     II/Ibai 73/C5) were array-adjacent, not because the logic was actually
+     using their real relationship; any system where a corrected/edited
+     moon isn't immediately preceded by its real parent in the array would
+     have rendered it orbiting the wrong planet. Falls back to the
+     last-built planet (the old behaviour) only if a moon's real parent
+     can't be resolved at all -- shouldn't happen for a saved/edited system
+     (applyOverride() always points b.parent at a genuine planet or 0),
+     kept as a safety net for malformed/legacy data. */
+  var planetIdx=0;
+  var planetAnchors={}; // keyed by body.index -- {moonAnchor,moonAnchorSize,moonIdx}
+  var lastPlanetAnchorKey=null;
   var planetEntries=[]; // for resolvePlanetCollisions(), populated below
+  var moonBodies=[]; // deferred to pass 2, once every planet anchor exists
   for(var bi=0; bi<s.bodies.length; bi++){
     var b=s.bodies[bi];
+    if(b.moon){ moonBodies.push(b); continue; }
     var pal=biomePal(b.biome);
-    if(!b.moon){
-      var pivot=new THREE.Object3D(); systemGroup.add(pivot);
-      var orbitR=8+planetIdx*3.7;
-      var mesh=new THREE.Mesh(new THREE.SphereGeometry(b.size,32,24),
-        new THREE.MeshLambertMaterial({map:makePlanetTexture(b)}));
-      mesh.position.set(orbitR,0,0);
-      mesh.rotation.z=b.tilt;
-      mesh.userData={body:b,sys:s};
-      pivot.add(mesh);
-      if(pal.atmo){
-        var atmo=new THREE.Mesh(new THREE.SphereGeometry(b.size*1.14,24,18),
-          new THREE.MeshBasicMaterial({color:pal.atmo,transparent:true,opacity:0.14,
-            blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.BackSide}));
-        atmo.position.copy(mesh.position);
-        pivot.add(atmo);
-      }
-      pivot.rotation.x=(planetIdx%2?0.13:-0.08);
-      pivot.rotation.y=planetIdx*1.1;
-      var ring=new THREE.Mesh(new THREE.RingGeometry(orbitR-0.03,orbitR+0.03,110),
-        new THREE.MeshBasicMaterial({color:0x00e5ff,transparent:true,opacity:0.12,
-          side:THREE.DoubleSide,depthWrite:false}));
-      ring.rotation.x=Math.PI/2; pivot.add(ring);
-      if(b.ring){
-        // A real Saturn-style planetary ring, distinct from the thin cyan
-        // orbit-path ring above -- lives as a CHILD of the planet mesh so it
-        // automatically inherits mesh.rotation.z (the planet's own axial
-        // tilt) and sits correctly in its equatorial plane with zero extra
-        // tilt math needed here. Width kept to ~0.3x the planet's own radius
-        // (was 0.95x, read as a chunky solid disc rather than a ring on
-        // Tony's actual screen) -- a tighter band plus a small gap off the
-        // planet's surface reads as a proper ring at real render size.
-        // "split" is the one style that's a genuinely different SHAPE, not
-        // just a different texture -- two separate thin bands with a real
-        // gap between them (Cassini-division look), matching the mockup
-        // Tony picked rather than faking a gap in the texture alone.
-        if(b.ring==="split"){
-          var pRingIn=new THREE.Mesh(new THREE.RingGeometry(b.size*1.4,b.size*1.5,64),
-            new THREE.MeshBasicMaterial({map:makeRingTexture(b),transparent:true,
-              side:THREE.DoubleSide,depthWrite:false}));
-          pRingIn.rotation.x=Math.PI/2; mesh.add(pRingIn);
-          var pRingOut=new THREE.Mesh(new THREE.RingGeometry(b.size*1.58,b.size*1.7,64),
-            new THREE.MeshBasicMaterial({map:makeRingTexture(b),transparent:true,
-              side:THREE.DoubleSide,depthWrite:false}));
-          pRingOut.rotation.x=Math.PI/2; mesh.add(pRingOut);
-        } else {
-          var pRing=new THREE.Mesh(new THREE.RingGeometry(b.size*1.4,b.size*1.7,64),
-            new THREE.MeshBasicMaterial({map:makeRingTexture(b),transparent:true,
-              side:THREE.DoubleSide,depthWrite:false}));
-          pRing.rotation.x=Math.PI/2; mesh.add(pRing);
-        }
-      }
-      pivots.push({p:pivot,sp:0.10/(1+planetIdx*0.55),mesh:mesh,spin:b.spin});
-      bodyMeshes.push(mesh);
-      moonAnchor=new THREE.Object3D();
-      moonAnchor.position.set(orbitR,0,0);
-      pivot.add(moonAnchor);
-      moonAnchorSize=b.size;
-      moonIdx=0;
-      planetEntries.push({pivot:pivot,mesh:mesh,size:b.size,moonAnchor:moonAnchor,index:b.index,atmo:atmo});
-      planetIdx++;
-    } else if(moonAnchor){
-      var mR=moonAnchorSize+b.size*1.9+moonIdx*1.5+1.4;
-      var mPivot=new THREE.Object3D(); moonAnchor.add(mPivot);
-      var mMesh=new THREE.Mesh(new THREE.SphereGeometry(b.size,24,18),
-        new THREE.MeshLambertMaterial({map:makePlanetTexture(b)}));
-      mMesh.position.set(mR,0,0);
-      mMesh.rotation.z=b.tilt;
-      mMesh.userData={body:b,sys:s};
-      mPivot.add(mMesh);
-      if(pal.atmo){
-        var mAtmo=new THREE.Mesh(new THREE.SphereGeometry(b.size*1.14,24,18),
-          new THREE.MeshBasicMaterial({color:pal.atmo,transparent:true,opacity:0.14,
-            blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.BackSide}));
-        mAtmo.position.copy(mMesh.position);
-        mPivot.add(mAtmo);
-      }
-      mPivot.rotation.x=(moonIdx%2?0.22:-0.16);
-      mPivot.rotation.y=moonIdx*2.1;
-      var mRing=new THREE.Mesh(new THREE.RingGeometry(mR-0.02,mR+0.02,64),
-        new THREE.MeshBasicMaterial({color:0x00e5ff,transparent:true,opacity:0.10,
-          side:THREE.DoubleSide,depthWrite:false}));
-      mRing.rotation.x=Math.PI/2; mPivot.add(mRing);
-      pivots.push({p:mPivot,sp:0.34/(1+moonIdx*0.4),mesh:mMesh,spin:b.spin});
-      bodyMeshes.push(mMesh);
-      moonIdx++;
+    var pivot=new THREE.Object3D(); systemGroup.add(pivot);
+    var orbitR=8+planetIdx*3.7;
+    var mesh=new THREE.Mesh(new THREE.SphereGeometry(b.size,32,24),
+      new THREE.MeshLambertMaterial({map:makePlanetTexture(b)}));
+    mesh.position.set(orbitR,0,0);
+    mesh.rotation.z=b.tilt;
+    mesh.userData={body:b,sys:s};
+    pivot.add(mesh);
+    if(pal.atmo){
+      var atmo=new THREE.Mesh(new THREE.SphereGeometry(b.size*1.14,24,18),
+        new THREE.MeshBasicMaterial({color:pal.atmo,transparent:true,opacity:0.14,
+          blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.BackSide}));
+      atmo.position.copy(mesh.position);
+      pivot.add(atmo);
     }
+    pivot.rotation.x=(planetIdx%2?0.13:-0.08);
+    pivot.rotation.y=planetIdx*1.1;
+    var ring=new THREE.Mesh(new THREE.RingGeometry(orbitR-0.03,orbitR+0.03,110),
+      new THREE.MeshBasicMaterial({color:0x00e5ff,transparent:true,opacity:0.12,
+        side:THREE.DoubleSide,depthWrite:false}));
+    ring.rotation.x=Math.PI/2; pivot.add(ring);
+    if(b.ring){
+      // A real Saturn-style planetary ring, distinct from the thin cyan
+      // orbit-path ring above -- lives as a CHILD of the planet mesh so it
+      // automatically inherits mesh.rotation.z (the planet's own axial
+      // tilt) and sits correctly in its equatorial plane with zero extra
+      // tilt math needed here. Width kept to ~0.3x the planet's own radius
+      // (was 0.95x, read as a chunky solid disc rather than a ring on
+      // Tony's actual screen) -- a tighter band plus a small gap off the
+      // planet's surface reads as a proper ring at real render size.
+      // "split" is the one style that's a genuinely different SHAPE, not
+      // just a different texture -- two separate thin bands with a real
+      // gap between them (Cassini-division look), matching the mockup
+      // Tony picked rather than faking a gap in the texture alone.
+      if(b.ring==="split"){
+        var pRingIn=new THREE.Mesh(new THREE.RingGeometry(b.size*1.4,b.size*1.5,64),
+          new THREE.MeshBasicMaterial({map:makeRingTexture(b),transparent:true,
+            side:THREE.DoubleSide,depthWrite:false}));
+        pRingIn.rotation.x=Math.PI/2; mesh.add(pRingIn);
+        var pRingOut=new THREE.Mesh(new THREE.RingGeometry(b.size*1.58,b.size*1.7,64),
+          new THREE.MeshBasicMaterial({map:makeRingTexture(b),transparent:true,
+            side:THREE.DoubleSide,depthWrite:false}));
+        pRingOut.rotation.x=Math.PI/2; mesh.add(pRingOut);
+      } else {
+        var pRing=new THREE.Mesh(new THREE.RingGeometry(b.size*1.4,b.size*1.7,64),
+          new THREE.MeshBasicMaterial({map:makeRingTexture(b),transparent:true,
+            side:THREE.DoubleSide,depthWrite:false}));
+        pRing.rotation.x=Math.PI/2; mesh.add(pRing);
+      }
+    }
+    pivots.push({p:pivot,sp:0.10/(1+planetIdx*0.55),mesh:mesh,spin:b.spin});
+    bodyMeshes.push(mesh);
+    var pMoonAnchor=new THREE.Object3D();
+    pMoonAnchor.position.set(orbitR,0,0);
+    pivot.add(pMoonAnchor);
+    planetAnchors[b.index]={moonAnchor:pMoonAnchor,moonAnchorSize:b.size,moonIdx:0};
+    lastPlanetAnchorKey=b.index;
+    planetEntries.push({pivot:pivot,mesh:mesh,size:b.size,moonAnchor:pMoonAnchor,index:b.index,atmo:atmo});
+    planetIdx++;
+  }
+  for(var mi=0; mi<moonBodies.length; mi++){
+    var mb=moonBodies[mi];
+    var mPal=biomePal(mb.biome);
+    var ownerKey=findOwningPlanetIndex(s,mb);
+    var anchorEntry=(ownerKey!==null && planetAnchors[ownerKey])?planetAnchors[ownerKey]:planetAnchors[lastPlanetAnchorKey];
+    if(!anchorEntry) continue; // no planet at all in this system -- nothing to attach to
+    var moonAnchor=anchorEntry.moonAnchor, moonAnchorSize=anchorEntry.moonAnchorSize, moonIdx=anchorEntry.moonIdx;
+    var mR=moonAnchorSize+mb.size*1.9+moonIdx*1.5+1.4;
+    var mPivot=new THREE.Object3D(); moonAnchor.add(mPivot);
+    var mMesh=new THREE.Mesh(new THREE.SphereGeometry(mb.size,24,18),
+      new THREE.MeshLambertMaterial({map:makePlanetTexture(mb)}));
+    mMesh.position.set(mR,0,0);
+    mMesh.rotation.z=mb.tilt;
+    mMesh.userData={body:mb,sys:s};
+    mPivot.add(mMesh);
+    if(mPal.atmo){
+      var mAtmo=new THREE.Mesh(new THREE.SphereGeometry(mb.size*1.14,24,18),
+        new THREE.MeshBasicMaterial({color:mPal.atmo,transparent:true,opacity:0.14,
+          blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.BackSide}));
+      mAtmo.position.copy(mMesh.position);
+      mPivot.add(mAtmo);
+    }
+    mPivot.rotation.x=(moonIdx%2?0.22:-0.16);
+    mPivot.rotation.y=moonIdx*2.1;
+    var mRing=new THREE.Mesh(new THREE.RingGeometry(mR-0.02,mR+0.02,64),
+      new THREE.MeshBasicMaterial({color:0x00e5ff,transparent:true,opacity:0.10,
+        side:THREE.DoubleSide,depthWrite:false}));
+    mRing.rotation.x=Math.PI/2; mPivot.add(mRing);
+    pivots.push({p:mPivot,sp:0.34/(1+moonIdx*0.4),mesh:mMesh,spin:mb.spin});
+    bodyMeshes.push(mMesh);
+    anchorEntry.moonIdx++;
   }
   if(s.colliding) resolvePlanetCollisions(planetEntries,s.collidingA,s.collidingB);
 }
