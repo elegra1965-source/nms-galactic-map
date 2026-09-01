@@ -1619,26 +1619,66 @@ window.MOCK_JOURNEYS = [
   // matching what Tony actually asked for and the reference image's own
   // scattered fleet -- capped concurrently (see the draw() spawn logic)
   // so a burst can't run away into a crowd.
-  function spawnFreighter(cssW, cssH) {
+  //
+  // 2026-09-01, Tony: even with the above, ships "always seem just too
+  // small too far away... blink and you'd miss it." Three changes: (1) the
+  // weighting still favours the far tier for depth variety, but the FIRST
+  // ship of every spawned group is now forced to mid-or-closer (opts.
+  // guaranteeVisible) so a group is never *only* distant lights -- there's
+  // always at least one ship worth actually looking at. (2) the warp-in/out
+  // flash (inMs/outMs) is stretched from ~500-760ms to ~900-1400ms so the
+  // moment itself has time to register before settling into the hold --
+  // the hold itself was already 5-9.5s, it was the flash that read as a
+  // blink. (3) opts.allowFlyby lets an eligible (mid/closer) ship cruise
+  // across part of the screen instead of holding in place -- see the
+  // isFlyby branch below and the matching off-screen-exit check in
+  // drawFreighter. Not literally how the game behaves (freighters only
+  // warp in while you're in space; flybys are an atmosphere/planet thing)
+  // but this whole layer is already cosmetic license, not simulation, and
+  // Tony asked for it as an option to try -- easy to dial back to 0% if it
+  // reads as wrong once live.
+  function spawnFreighter(cssW, cssH, opts) {
+    opts = opts || {};
     // Weighted toward small/distant, occasionally a larger/closer one --
     // real depth variety instead of every ship reading the same size.
     var roll = Math.random();
-    var scale = roll < 0.6 ? 0.35 + Math.random() * 0.35   // far, most common
-              : roll < 0.9 ? 0.7 + Math.random() * 0.55    // mid
-              : 1.25 + Math.random() * 0.95;                // close, rare
-    var inMs = 500 + Math.random() * 260, outMs = 500 + Math.random() * 260;
+    var scale = roll < 0.55 ? 0.35 + Math.random() * 0.35   // far
+              : roll < 0.8 ? 0.7 + Math.random() * 0.55     // mid
+              : 1.25 + Math.random() * 0.95;                 // close
+    // the lead ship of a group is never left at the far tier -- a group
+    // should always contain at least one ship you can actually make out
+    if (opts.guaranteeVisible && scale < 0.7) scale = 0.7 + Math.random() * 0.85;
+
+    var inMs = 900 + Math.random() * 500, outMs = 900 + Math.random() * 500;
+    var isFlyby = !!opts.allowFlyby && scale >= 0.7 && Math.random() < 0.35;
+
+    var driftX, driftY, holdMs;
+    if (isFlyby) {
+      var dir = Math.random() < 0.5 ? 1 : -1;
+      holdMs = 7000 + Math.random() * 5000;
+      // aim to cross roughly 30-55% of the screen width over the hold --
+      // a slow cruise, not a comet-speed pass
+      var travel = cssW * (0.3 + Math.random() * 0.25) * dir;
+      driftX = travel / holdMs;
+      driftY = (Math.random() - 0.5) * 0.02 * scale;
+    } else {
+      holdMs = 5000 + Math.random() * 4500;
+      // slower/closer ships drift very slightly more -- barely perceptible,
+      // just enough that a held freighter doesn't read as a frozen sticker
+      driftX = (Math.random() - 0.5) * 0.003 * scale;
+      driftY = (Math.random() - 0.5) * 0.0015 * scale;
+    }
     return {
       kind: "freighter",
       x: cssW * (0.08 + Math.random() * 0.84),
       y: cssH * (0.08 + Math.random() * 0.4), // upper band, clear of the route line
       scale: scale,
       rot: (Math.random() - 0.5) * 0.22,
-      // slower/closer ships drift very slightly more -- barely perceptible,
-      // just enough that a held freighter doesn't read as a frozen sticker
-      driftX: (Math.random() - 0.5) * 0.003 * scale,
-      driftY: (Math.random() - 0.5) * 0.0015 * scale,
+      driftX: driftX,
+      driftY: driftY,
+      isFlyby: isFlyby,
       phase: "in", t: 0,
-      inMs: inMs, holdMs: 5000 + Math.random() * 4500, outMs: outMs
+      inMs: inMs, holdMs: holdMs, outMs: outMs
     };
   }
   function spawnAnomaly(cssW, cssH) {
@@ -1692,22 +1732,26 @@ window.MOCK_JOURNEYS = [
     ctx.moveTo(-17, -3); ctx.lineTo(13, -3); ctx.lineTo(21, -1.2);
     ctx.stroke();
   }
-  function drawFreighter(ctx, e, dt) {
+  function drawFreighter(ctx, e, dt, cssW) {
     e.t += dt;
     e.x += e.driftX * dt; e.y += e.driftY * dt;
+    // a flyby that's drifted past the edge is already unseen -- drop it
+    // rather than running its (invisible) out-fade off-screen
+    if (e.isFlyby && e.phase !== "in" && cssW &&
+        (e.x < -60 * e.scale || e.x > cssW + 60 * e.scale)) return false;
     var hullAlpha, flashAlpha, flashStretch;
     if (e.phase === "in") {
       var p = Math.min(1, e.t / e.inMs);
-      hullAlpha = p * (0.55 + e.scale * 0.12);
+      hullAlpha = p * (0.62 + e.scale * 0.12);
       flashAlpha = 1 - p; flashStretch = 1 + (1 - p) * 8;
       if (p >= 1) { e.phase = "hold"; e.t = 0; }
     } else if (e.phase === "hold") {
-      hullAlpha = 0.55 + Math.min(0.35, e.scale * 0.12);
+      hullAlpha = 0.62 + Math.min(0.3, e.scale * 0.12);
       flashAlpha = 0; flashStretch = 1;
       if (e.t >= e.holdMs) { e.phase = "out"; e.t = 0; }
     } else {
       var q = Math.min(1, e.t / e.outMs);
-      hullAlpha = (1 - q) * (0.55 + e.scale * 0.12);
+      hullAlpha = (1 - q) * (0.62 + e.scale * 0.12);
       flashAlpha = q; flashStretch = 1 + q * 8;
       if (q >= 1) return false;
     }
@@ -1801,8 +1845,10 @@ window.MOCK_JOURNEYS = [
         }
         if (freighterCount === 0 && t > nextFreighterAt) {
           var groupSize = isNarrow() ? 1 + (Math.random() < 0.4 ? 1 : 0) : 1 + Math.floor(Math.random() * 3);
-          for (var g = 0; g < groupSize; g++) effects.push(spawnFreighter(cssW, cssH));
-          nextFreighterAt = t + scheduleNext(32000, 62000, 1.6);
+          for (var g = 0; g < groupSize; g++) {
+            effects.push(spawnFreighter(cssW, cssH, { guaranteeVisible: g === 0, allowFlyby: true }));
+          }
+          nextFreighterAt = t + scheduleNext(22000, 42000, 1.6);
         }
         if (!hasAnomaly && t > nextAnomalyAt) {
           effects.push(spawnAnomaly(cssW, cssH));
@@ -1811,7 +1857,7 @@ window.MOCK_JOURNEYS = [
         for (var j = effects.length - 1; j >= 0; j--) {
           var e = effects[j], alive;
           if (e.kind === "comet") alive = drawComet(ctx, e, dt);
-          else if (e.kind === "freighter") alive = drawFreighter(ctx, e, dt);
+          else if (e.kind === "freighter") alive = drawFreighter(ctx, e, dt, cssW);
           else alive = drawAnomaly(ctx, e, dt);
           if (!alive) effects.splice(j, 1);
         }
