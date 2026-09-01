@@ -92,7 +92,18 @@ header button:hover{border-color:var(--cyan);color:var(--cyan)}
 .status.on:first-letter{color:var(--matrix)}
 
 main{min-height:calc(100vh - 60px - 26px);display:grid;grid-template-columns:290px 1fr 340px}
-.panel{background:rgba(8,12,19,.92);border-right:1px solid var(--border-soft);display:flex;flex-direction:column;overflow:hidden}
+/* 2026-08-31, Tony: "can we make the route and manifest see through so can
+   see the background" -- the galaxy backdrop (galArtCanvas/galArtTwinkle)
+   spans the full view underneath these panels already (they're positioned
+   on top of it, not beside it -- see the desktop layout rule below), so
+   lowering the opacity here is enough on its own to reveal it; the blur
+   keeps text readable over whatever nebula colour happens to sit behind a
+   given panel instead of contrast varying panel to panel. Same treatment
+   already used on this page's own header/toolbar-style surfaces (see
+   `header` and the old `.toolbar` rule this file used to have), so this
+   isn't a new visual language, just extending an existing one to the
+   panels themselves. */
+.panel{background:rgba(8,12,19,.62);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-right:1px solid var(--border-soft);display:flex;flex-direction:column;overflow:hidden}
 .panel:last-child{border-right:0;border-left:1px solid var(--border-soft)}
 
 /* ---- panel head (drag handle + collapse) — shared by mobile and desktop ---- */
@@ -154,14 +165,9 @@ details.pickerFold .journeyPicker{padding:0 9px 9px;margin-bottom:0}
 .warning b{letter-spacing:.1em;color:var(--gold);font-family:'Orbitron',sans-serif;font-size:9px}
 .warning p{line-height:1.5;margin:6px 0 0}
 
-/* ---- galaxy / toolbar ---- */
+/* ---- galaxy backdrop ---- */
 .galaxy{position:relative;overflow:hidden}
-.toolbar{position:absolute;top:16px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:2px;background:rgba(4,10,20,.72);border:1px solid var(--border-soft);border-radius:var(--r);padding:3px;z-index:3;backdrop-filter:blur(4px)}
-.toolbar button{background:none;border:0;color:var(--text-faint);font-size:9px;letter-spacing:.08em;font-family:'Orbitron',sans-serif;font-weight:700;padding:7px 11px;border-radius:6px}
-.toolbar button.active{background:var(--panel-2);color:var(--cyan)}
-.toolbar .zoomGroup{display:flex;gap:2px}
-.toolbar .zoomGroup button{width:26px;padding:7px 0;text-align:center}
-.galaxy-view{position:absolute;inset:0;transition:transform var(--motion-dur) var(--motion-ease)}
+.galaxy-view{position:absolute;inset:0}
 /* Real galaxy art (2026-08-29): a canvas rendering of the same seeded,
    type-coloured galaxy the live Galactic Map draws for its rotating mini
    icon (see drawRealGalaxyArt() in the script below, ported from
@@ -439,9 +445,7 @@ body.xyzRevealed #coordsXYZ{display:inline}
   .hamburger{display:inline-flex}
   main{display:block;position:relative;min-height:calc(100vh - 54px - 26px)}
   .galaxy{height:100%;min-height:340px}
-  .toolbar{top:10px}
-  .toolbar button{padding:6px 8px;font-size:8px}
-  .panel{position:absolute;z-index:4;left:0;right:0;bottom:44px;max-height:60vh;border:1px solid var(--border)!important;background:rgba(6,10,17,.97);display:none;border-radius:var(--r) var(--r) 0 0}
+  .panel{position:absolute;z-index:4;left:0;right:0;bottom:44px;max-height:60vh;border:1px solid var(--border)!important;background:rgba(6,10,17,.78);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:none;border-radius:var(--r) var(--r) 0 0}
   .panel.mobile-open{display:flex;flex-direction:column}
   /* mobile: the bottom-sheet tab bar is the only show/hide control -- the desktop drag/collapse
      header button is hidden here so a leftover desktop-set "collapsed" state can never strand
@@ -616,12 +620,6 @@ window.nmsCoreReady = new Promise(function (res) { window.__nmsCoreResolve = res
       </aside>
 
       <section id="galaxy" class="galaxy">
-        <div class="toolbar">
-          <div class="zoomGroup">
-            <button id="zoomOut">&minus;</button>
-            <button id="zoomIn">+</button>
-          </div>
-        </div>
         <div class="galaxy-view" id="galaxyView">
           <canvas class="galArtCanvas" id="galArtCanvas"></canvas>
           <canvas class="galArtTwinkle" id="galArtTwinkle"></canvas>
@@ -1346,28 +1344,48 @@ window.MOCK_JOURNEYS = [
     } catch (e) { return null; }
   }
 
-  // ---- ambient hum (task: atmosphere layer) -- two low sine tones a fifth
-  // apart with a very slow LFO on the gain, synthesized rather than a looping
-  // audio file. Off by default: browsers block audio until a real user
-  // gesture anyway, and starting sound on load without asking is bad manners
-  // regardless -- #ambienceToggle is that gesture. ----
+  // ---- ambient hum (task: atmosphere layer) -- three sine tones (a root,
+  // a fifth above it, and a quiet overtone an octave above that) with a
+  // very slow LFO on the gain, synthesized rather than a looping audio
+  // file. Off by default: browsers block audio until a real user gesture
+  // anyway, and starting sound on load without asking is bad manners
+  // regardless -- #ambienceToggle is that gesture.
+  // 2026-08-31, Tony: "when switched on there is no sound" -- the synthesis
+  // itself wasn't broken (no dropped .connect()/.start() calls, context
+  // resume happens inside the click handler so autoplay policies don't
+  // block it), but the original 55Hz/82.41Hz pair sat right at or below
+  // where a lot of phone and laptop speakers simply stop reproducing
+  // anything audible -- so it was very plausibly always "playing," just
+  // inaudible on the exact hardware most visitors have, not a code bug.
+  // Moved both tones up an octave (110Hz/164.81Hz -- same fifth interval,
+  // still reads as a low hum) and added a quiet third tone an octave above
+  // that (220Hz, through its own smaller gain so it stays subordinate) as
+  // a safety net for speakers that still can't reproduce 110Hz well.
+  // Raised the peak gain slightly (0.045 -> 0.06) to compensate for the
+  // higher, less naturally "felt" frequencies. This is a best-effort fix
+  // aimed at typical hardware, not a verified one -- there's no way to
+  // actually hear audio output from this sandbox, so it's worth Tony
+  // re-testing with the volume up before calling it fixed.
   var _humNodes = null;
   function startHum() {
     var ctx = sfxContext();
     if (!ctx) return;
     try {
       var now = ctx.currentTime;
-      var osc1 = ctx.createOscillator(); osc1.type = "sine"; osc1.frequency.value = 55;
-      var osc2 = ctx.createOscillator(); osc2.type = "sine"; osc2.frequency.value = 82.41;
+      var osc1 = ctx.createOscillator(); osc1.type = "sine"; osc1.frequency.value = 110;
+      var osc2 = ctx.createOscillator(); osc2.type = "sine"; osc2.frequency.value = 164.81;
+      var osc3 = ctx.createOscillator(); osc3.type = "sine"; osc3.frequency.value = 220;
+      var osc3Gain = ctx.createGain(); osc3Gain.gain.value = 0.4; // subordinate to the main pair
       var lfo = ctx.createOscillator(); lfo.type = "sine"; lfo.frequency.value = 0.07;
       var lfoGain = ctx.createGain(); lfoGain.gain.value = 0.012;
       var master = ctx.createGain();
       master.gain.setValueAtTime(0.0001, now);
-      master.gain.exponentialRampToValueAtTime(0.045, now + 1.6);
+      master.gain.exponentialRampToValueAtTime(0.06, now + 1.6);
       lfo.connect(lfoGain); lfoGain.connect(master.gain);
+      osc3.connect(osc3Gain); osc3Gain.connect(master);
       osc1.connect(master); osc2.connect(master); master.connect(ctx.destination);
-      osc1.start(); osc2.start(); lfo.start();
-      _humNodes = { osc1: osc1, osc2: osc2, lfo: lfo, master: master };
+      osc1.start(); osc2.start(); osc3.start(); lfo.start();
+      _humNodes = { osc1: osc1, osc2: osc2, osc3: osc3, lfo: lfo, master: master };
     } catch (e) {}
   }
   function stopHum() {
@@ -1380,7 +1398,7 @@ window.MOCK_JOURNEYS = [
       m.gain.exponentialRampToValueAtTime(0.0001, now + 0.4);
       var nodes = _humNodes;
       setTimeout(function () {
-        try { nodes.osc1.stop(); nodes.osc2.stop(); nodes.lfo.stop(); } catch (e) {}
+        try { nodes.osc1.stop(); nodes.osc2.stop(); nodes.osc3.stop(); nodes.lfo.stop(); } catch (e) {}
       }, 500);
     } catch (e) {}
     _humNodes = null;
@@ -1504,7 +1522,7 @@ window.MOCK_JOURNEYS = [
   }
   function makeTwinkleStars(cssW, cssH) {
     var area = Math.max(1, cssW * cssH);
-    var n = Math.min(220, Math.max(40, Math.round(area / 1800)));
+    var n = Math.min(280, Math.max(40, Math.round(area / 1500)));
     var stars = [];
     for (var i = 0; i < n; i++) {
       // Depth tiers give the field real near/far variety instead of every
@@ -1591,12 +1609,130 @@ window.MOCK_JOURNEYS = [
     ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
     ctx.fill();
   }
+  /* ---- rare background events: shooting stars, a warping-in/out
+     freighter, and the odd anomaly (2026-08-31, Tony: "nothing is really
+     noticeable... maybe comets, shooting stars... odd freighter warping in
+     and out, even the odd anomalies") -- layered into the SAME canvas and
+     SAME throttled ~11fps loop the twinkle stars already use, rather than
+     a second animation loop, so this doesn't cost anything close to what
+     it might look like. Each is a handful of extra ctx.arc/lineTo calls on
+     at most one active object per kind at a time -- nothing here uses
+     filter/drop-shadow (the exact thing that turned out to cause real
+     frame-drop jank on the live map's own toolbar animation earlier this
+     session), so the cost is roughly proportional to "a few more dots,"
+     not to how dramatic it looks. Narrower/mobile viewports get the same
+     effects, just spawned less often -- less visual competition with the
+     route/manifest panels on a small screen, and fewer spawns over time
+     means less total draw work on weaker hardware, without needing to
+     strip the feature down or duplicate a simpler version of it. All of
+     it is skipped outright under reduced-motion, same as the twinkle. */
+  function spawnComet(cssW, cssH) {
+    var fromLeft = Math.random() < 0.5;
+    var y0 = Math.random() * cssH * 0.6;
+    var len = 70 + Math.random() * 90;
+    var speed = (cssW + len) / (500 + Math.random() * 350); // px per ms, crosses in ~0.5-0.9s
+    return {
+      kind: "comet",
+      x: fromLeft ? -len : cssW + len,
+      y: y0,
+      vx: (fromLeft ? 1 : -1) * speed,
+      vy: speed * 0.35,
+      len: len,
+      born: 0, life: 0, maxLife: (cssW + len * 2) / speed
+    };
+  }
+  function spawnFreighter(cssW, cssH) {
+    return {
+      kind: "freighter",
+      x: cssW * (0.15 + Math.random() * 0.7),
+      y: cssH * (0.1 + Math.random() * 0.35), // upper band, well clear of the route line
+      phase: "in", t: 0,
+      inMs: 320, holdMs: 3400 + Math.random() * 2600, outMs: 320
+    };
+  }
+  function spawnAnomaly(cssW, cssH) {
+    return {
+      kind: "anomaly",
+      x: cssW * (0.1 + Math.random() * 0.8),
+      y: cssH * (0.15 + Math.random() * 0.6),
+      col: Math.random() < 0.5 ? "#ff0055" : "#f0a500",
+      t: 0, inMs: 900, holdMs: 4000 + Math.random() * 3500, outMs: 1100
+    };
+  }
+  function drawComet(ctx, e, dt) {
+    e.x += e.vx * dt; e.y += e.vy * dt; e.life += dt;
+    var mag = Math.sqrt(e.vx * e.vx + e.vy * e.vy) || 1;
+    var tailX = e.x - (e.vx / mag) * e.len, tailY = e.y - (e.vy / mag) * e.len;
+    var g = ctx.createLinearGradient(e.x, e.y, tailX, tailY);
+    g.addColorStop(0, "rgba(255,255,255,0.95)");
+    g.addColorStop(0.4, "rgba(207,224,255,0.5)");
+    g.addColorStop(1, "rgba(207,224,255,0)");
+    ctx.strokeStyle = g; ctx.lineWidth = 1.4; ctx.globalAlpha = 1;
+    ctx.beginPath(); ctx.moveTo(e.x, e.y); ctx.lineTo(tailX, tailY); ctx.stroke();
+    ctx.fillStyle = "#fff"; ctx.beginPath(); ctx.arc(e.x, e.y, 1.5, 0, Math.PI * 2); ctx.fill();
+    return e.life < e.maxLife;
+  }
+  function drawFreighter(ctx, e, dt) {
+    e.t += dt;
+    var alpha, stretch;
+    if (e.phase === "in") {
+      var p = Math.min(1, e.t / e.inMs);
+      alpha = p; stretch = 1 + (1 - p) * 7; // starts as a bright smeared flash, settles to a point
+      if (p >= 1) { e.phase = "hold"; e.t = 0; }
+    } else if (e.phase === "hold") {
+      alpha = 0.55; stretch = 1;
+      if (e.t >= e.holdMs) { e.phase = "out"; e.t = 0; }
+    } else {
+      var q = Math.min(1, e.t / e.outMs);
+      alpha = 1 - q; stretch = 1 + q * 7;
+      if (q >= 1) return false;
+    }
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = "#cfe0ff";
+    ctx.beginPath();
+    ctx.ellipse(e.x, e.y, 2.2 * stretch, 1.1, 0, 0, Math.PI * 2);
+    ctx.fill();
+    if (alpha > 0.4) {
+      var glow = ctx.createRadialGradient(e.x, e.y, 0, e.x, e.y, 10 * stretch * 0.4);
+      glow.addColorStop(0, "rgba(207,224,255," + (alpha * 0.5) + ")");
+      glow.addColorStop(1, "rgba(207,224,255,0)");
+      ctx.fillStyle = glow;
+      ctx.beginPath(); ctx.arc(e.x, e.y, 10 * stretch * 0.4, 0, Math.PI * 2); ctx.fill();
+    }
+    return true;
+  }
+  function drawAnomaly(ctx, e, dt) {
+    e.t += dt;
+    var alpha;
+    if (e.t < e.inMs) alpha = e.t / e.inMs;
+    else if (e.t < e.inMs + e.holdMs) alpha = 1;
+    else if (e.t < e.inMs + e.holdMs + e.outMs) alpha = 1 - (e.t - e.inMs - e.holdMs) / e.outMs;
+    else return false;
+    var pulse = 0.75 + 0.25 * Math.sin(e.t / 260);
+    var r = 3.2 * pulse;
+    var glow = ctx.createRadialGradient(e.x, e.y, 0, e.x, e.y, r * 5);
+    glow.addColorStop(0, hexA(e.col, alpha * 0.55));
+    glow.addColorStop(1, hexA(e.col, 0));
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = glow;
+    ctx.beginPath(); ctx.arc(e.x, e.y, r * 5, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = hexA(e.col, alpha * 0.9);
+    ctx.beginPath(); ctx.arc(e.x, e.y, r, 0, Math.PI * 2); ctx.fill();
+    return true;
+  }
   function initTwinkleStars(canvas) {
     if (!canvas || canvas._twinkleInit) return;
     canvas._twinkleInit = true;
     var ctx = canvas.getContext("2d");
     var stars = [];
-    var lastDraw = 0;
+    var lastDraw = 0, lastT = 0;
+    var effects = [];
+    var nextCometAt = 0, nextFreighterAt = 0, nextAnomalyAt = 0;
+    function isNarrow() { return window.innerWidth <= 850; }
+    function scheduleNext(minMs, maxMs, mobileMultiplier) {
+      var m = isNarrow() ? mobileMultiplier : 1;
+      return (minMs + Math.random() * (maxMs - minMs)) * m;
+    }
     function sized() {
       var dpr = Math.min(window.devicePixelRatio || 1, 2);
       var cssW = canvas.clientWidth || 1, cssH = canvas.clientHeight || 1;
@@ -1607,6 +1743,8 @@ window.MOCK_JOURNEYS = [
     }
     function draw(t) {
       var cssW = canvas.clientWidth || 1, cssH = canvas.clientHeight || 1;
+      var dt = lastT ? Math.min(200, t - lastT) : 0; // clamp so a backgrounded tab can't "catch up" with a huge jump
+      lastT = t;
       ctx.clearRect(0, 0, cssW, cssH);
       var animate = !reducedMotion();
       for (var i = 0; i < stars.length; i++) {
@@ -1617,6 +1755,36 @@ window.MOCK_JOURNEYS = [
           alpha = s.base * (0.4 + 0.6 * wave);
         }
         drawTwinkleStar(ctx, s, alpha);
+      }
+      if (animate) {
+        // Spawn: at most one of each kind active at a time, on a randomised
+        // timer so they never fall into a noticeable rhythm. Mobile spawns
+        // 1.6-2x less often (less visual competition with the panels on a
+        // small screen, and less total draw work over a long session).
+        var hasComet = effects.some(function (e) { return e.kind === "comet"; });
+        var hasFreighter = effects.some(function (e) { return e.kind === "freighter"; });
+        var hasAnomaly = effects.some(function (e) { return e.kind === "anomaly"; });
+        if (!hasComet && t > nextCometAt) {
+          effects.push(spawnComet(cssW, cssH));
+          nextCometAt = t + scheduleNext(9000, 19000, 1.7);
+        }
+        if (!hasFreighter && t > nextFreighterAt) {
+          effects.push(spawnFreighter(cssW, cssH));
+          nextFreighterAt = t + scheduleNext(32000, 62000, 1.6);
+        }
+        if (!hasAnomaly && t > nextAnomalyAt) {
+          effects.push(spawnAnomaly(cssW, cssH));
+          nextAnomalyAt = t + scheduleNext(42000, 85000, 1.6);
+        }
+        for (var j = effects.length - 1; j >= 0; j--) {
+          var e = effects[j], alive;
+          if (e.kind === "comet") alive = drawComet(ctx, e, dt);
+          else if (e.kind === "freighter") alive = drawFreighter(ctx, e, dt);
+          else alive = drawAnomaly(ctx, e, dt);
+          if (!alive) effects.splice(j, 1);
+        }
+      } else if (effects.length) {
+        effects.length = 0; // reduced-motion flips on mid-session: drop anything in flight rather than freeze it half-drawn
       }
       ctx.globalAlpha = 1;
     }
@@ -2082,7 +2250,6 @@ window.MOCK_JOURNEYS = [
     return 1;
   }
 
-  var zoomLevel = 1;
 
   /* Builds the same curved, dashed diagonal route strip as the Journey
      Snapshot's buildRoute() (complete.html) -- one real point per jump in
@@ -2675,21 +2842,16 @@ window.MOCK_JOURNEYS = [
     showToast("Journey restarted.");
   };
 
-  // ---- toolbar: zoom -----------------------------------------------------
   // 2026-08-30 (Tony: "remove the free camera"): this used to be a
   // follow-route/free-camera toggle pair, where free camera let you
   // drag-to-pan the same 2D view (galArtCanvas/galArtTwinkle/routeSvg all
   // live inside #galaxyView, so panning that one element moved them
   // together -- there's no 3D scene here to orbit). Removed outright, not
-  // just hidden: the view now simply always sits in its default position,
-  // and zoom is the only thing left to control.
-  var viewEl = $("galaxyView");
-  function applyView() {
-    viewEl.style.transform = "scale(" + zoomLevel + ")";
-  }
-  function applyZoom() { applyView(); }
-  $("zoomIn").onclick = function () { zoomLevel = Math.min(2, zoomLevel + 0.2); applyZoom(); };
-  $("zoomOut").onclick = function () { zoomLevel = Math.max(0.6, zoomLevel - 0.2); applyZoom(); };
+  // just hidden. 2026-08-31 (Tony: "don't think we need the plus and minus
+  // for zooming"): the toolbar's zoom buttons -- the only other thing this
+  // view ever let you control -- are gone the same way. The view now simply
+  // always sits in its default, unscaled position with nothing left to
+  // adjust; the galaxy backdrop is generated to fill the space on its own.
 
   // ---- hyperdrive drive type + range (2026-08-29) -----------------------
   function setWarpDisplay() {
