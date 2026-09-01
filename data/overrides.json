@@ -35207,7 +35207,7 @@
         "conflict": "Peaceful",
         "blackHole": false,
         "atlas": false,
-        "ruins": false,
+        "ruins": true,
         "outlaw": false,
         "phantom": "",
         "notes": "Vy'keen( Abandoned ), economy data unknown, conflict unknown | Base \"Relic World\" on Relic World",
@@ -35399,11 +35399,15 @@
           }
         ]
       },
-      "editedAt": "2026-09-01T21:52:06.111Z",
+      "editedAt": "2026-09-01T21:54:54.437Z",
       "editedByIp": "5.133.46.24",
       "history": [
         {
           "at": "2026-09-01T21:52:06.111Z",
+          "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-09-01T21:54:54.437Z",
           "text": "edited by a traveller"
         }
       ]
@@ -35412,7 +35416,8 @@
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1788299526111
+      1788299526111,
+      1788299694437
     ]
   },
   "flagLog": {}
