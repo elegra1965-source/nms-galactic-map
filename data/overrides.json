@@ -9772,7 +9772,7 @@
         "colliding": false,
         "collidingA": 0,
         "collidingB": 0,
-        "editorName": "elegra1965",
+        "editorName": "t672b774",
         "editorFriendCode": "MGD8-C6PP-XKFGT",
         "bodies": [
           {
@@ -9782,7 +9782,7 @@
             "biome": "Radioactive",
             "descriptor": "Radioactive storms",
             "water": true,
-            "ring": "tan",
+            "ring": "gold",
             "resources": [
               "Salt",
               "Gamma Roots"
@@ -9790,6 +9790,7 @@
             "flora": [
               "Fair"
             ],
+            "fauna": [],
             "minerals": [
               "Uranium",
               "Activated Copper"
@@ -9798,8 +9799,10 @@
               "Salvageable scrap"
             ],
             "fossils": [],
-            "sentinel": "None",
-            "autophage": false
+            "sentinel": "Spread Thin",
+            "autophage": false,
+            "base": false,
+            "baseName": ""
           },
           {
             "name": "Ayne",
@@ -9815,6 +9818,7 @@
             "flora": [
               "Full"
             ],
+            "fauna": [],
             "minerals": [
               "Silver",
               "Dioxide",
@@ -9822,8 +9826,10 @@
             ],
             "salvage": [],
             "fossils": [],
-            "sentinel": "None",
-            "autophage": false
+            "sentinel": "Ever-present",
+            "autophage": false,
+            "base": false,
+            "baseName": ""
           },
           {
             "name": "Anmar XIII",
@@ -9840,6 +9846,7 @@
             "flora": [
               "Absent"
             ],
+            "fauna": [],
             "minerals": [
               "Salt",
               "Rusted Metal",
@@ -9847,8 +9854,10 @@
             ],
             "salvage": [],
             "fossils": [],
-            "sentinel": "None",
-            "autophage": false
+            "sentinel": "Observant",
+            "autophage": false,
+            "base": false,
+            "baseName": ""
           },
           {
             "name": "Tanh",
@@ -9864,6 +9873,7 @@
             "flora": [
               "Full"
             ],
+            "fauna": [],
             "minerals": [
               "Cobolt",
               "Copper",
@@ -9872,7 +9882,9 @@
             "salvage": [],
             "fossils": [],
             "sentinel": "Low",
-            "autophage": false
+            "autophage": false,
+            "base": false,
+            "baseName": ""
           },
           {
             "name": "Sayab 94/B2",
@@ -9888,6 +9900,7 @@
             "flora": [
               "Ample"
             ],
+            "fauna": [],
             "minerals": [
               "Salt",
               "Dioxide",
@@ -9897,8 +9910,10 @@
               "Salvageable Scrap"
             ],
             "fossils": [],
-            "sentinel": "None",
-            "autophage": false
+            "sentinel": "Answer To None",
+            "autophage": false,
+            "base": false,
+            "baseName": ""
           },
           {
             "name": "Fave",
@@ -9914,6 +9929,7 @@
             "flora": [
               "Copious"
             ],
+            "fauna": [],
             "minerals": [
               "Magnatised Ferrite",
               "Phosphorus",
@@ -9921,13 +9937,17 @@
             ],
             "salvage": [],
             "fossils": [],
-            "sentinel": "None",
-            "autophage": false
+            "sentinel": "Dissonant",
+            "autophage": false,
+            "base": false,
+            "baseName": ""
           }
-        ]
+        ],
+        "screenshot": "https://raw.githubusercontent.com/elegra1965-source/nms-galactic-map/main/user-screenshots/0-1058E1434753-mtj0kzeo-o5cil3.jpg",
+        "genVersion": "1.3.0"
       },
-      "editedAt": "2026-08-22T00:00:00.000Z",
-      "editedByIp": "merge-1058E1434753-into-0058E1434753",
+      "editedAt": "2026-09-01T18:42:13.741Z",
+      "editedByIp": "5.133.46.24",
       "flaggedFields": [],
       "disputedFields": [],
       "history": [
@@ -10006,6 +10026,10 @@
         {
           "at": "2026-08-22T00:00:00.000Z",
           "text": "Merged 1 duplicate record(s) with a wrong leading address digit (pre-existing bug from an earlier session's base-import/save-import work) into this canonical address"
+        },
+        {
+          "at": "2026-09-01T18:42:13.741Z",
+          "text": "edited by a traveller"
         }
       ],
       "galaxy": 0
@@ -35165,7 +35189,8 @@
   "ipLog": {
     "5.133.46.24": [
       1788287703987,
-      1788288100397
+      1788288100397,
+      1788288133741
     ]
   },
   "flagLog": {}
