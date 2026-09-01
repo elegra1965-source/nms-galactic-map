@@ -34890,9 +34890,9 @@
             "name": "Udre II",
             "moon": true,
             "orbits": 2,
-            "biome": "Lush",
+            "biome": "Empty",
             "descriptor": "",
-            "water": true,
+            "water": false,
             "ring": false,
             "resources": [
               "Copper",
@@ -34936,7 +34936,7 @@
           }
         ]
       },
-      "editedAt": "2026-09-01T13:13:32.703Z",
+      "editedAt": "2026-09-01T13:43:06.760Z",
       "editedByIp": "5.133.46.24",
       "history": [
         {
@@ -34954,6 +34954,10 @@
         {
           "at": "2026-09-01T13:13:32.703Z",
           "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-09-01T13:43:06.760Z",
+          "text": "edited by a traveller"
         }
       ]
     }
@@ -34964,7 +34968,8 @@
       1788267434067,
       1788267544421,
       1788267982083,
-      1788268412703
+      1788268412703,
+      1788270186760
     ]
   },
   "flagLog": {}
