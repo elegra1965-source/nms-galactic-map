@@ -1758,14 +1758,15 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 
   <!-- Populated live by populateDatalists() from values the user has actually
        saved before (localStorage-only, see loadKnownTerms()/rememberKnownTerms()) --
-       gives the free-text body fields real browser-native suggestions as you type,
-       without ever sending anything extra to the server. -->
-  <datalist id="dlResources"></datalist>
-  <datalist id="dlFlora"></datalist>
-  <datalist id="dlFauna"></datalist>
-  <datalist id="dlMinerals"></datalist>
-  <datalist id="dlSalvage"></datalist>
-  <datalist id="dlFossils"></datalist>
+       gives the Descriptor field real browser-native suggestions as you type.
+       The 6 comma-separated fields (Resources/Flora/Fauna/Minerals/Salvageable
+       tech/Fossils) used to use a plain datalist element here too, but that
+       matches the WHOLE field value as one string -- once a first item+comma
+       was typed, nothing typed after that could ever match a single-word
+       option again, so the suggestion list just stopped appearing after the
+       1st item (Tony, 2026-09-01). Replaced with a proper per-segment combo,
+       see buildCommaCombo() -- also fixed those fields' suggestions coming
+       out in wiki-category order instead of alphabetical. -->
   <datalist id="dlDescriptor"></datalist>
 
   <div class="box modal" id="reportModal" style="max-width:340px;display:none">
@@ -3355,8 +3356,12 @@ function rememberKnownTerms(payload){
 var CANON_TERMS_BY_FIELD={resources:RESOURCES_CANON,minerals:MINERALS_CANON,
   salvage:SALVAGE_CANON,fossils:FOSSILS_CANON};
 function populateDatalists(){
-  var map={resources:"dlResources",flora:"dlFlora",fauna:"dlFauna",minerals:"dlMinerals",
-    salvage:"dlSalvage",fossils:"dlFossils",descriptor:"dlDescriptor"};
+  // Only Descriptor still uses a plain <datalist> -- it's a single free-text
+  // phrase, not a comma-separated list, so the native-datalist "matches the
+  // whole field value" behaviour that broke Resources/Flora/Fauna/Minerals/
+  // Salvageable tech/Fossils (see buildCommaCombo()'s comment) never applied
+  // here, and a datalist is simpler than a custom combo for one value.
+  var map={descriptor:"dlDescriptor"};
   Object.keys(map).forEach(function(k){
     var dl=document.getElementById(map[k]); if(!dl) return;
     // Real wiki-sourced items first (if this field has any), then whatever
@@ -3367,6 +3372,9 @@ function populateDatalists(){
     var seen={}, arr=[];
     canon.forEach(function(v){ var lo=v.toLowerCase(); if(!seen[lo]){ seen[lo]=1; arr.push(v); } });
     learned.forEach(function(v){ var lo=v.toLowerCase(); if(!seen[lo]){ seen[lo]=1; arr.push(v); } });
+    // Alphabetized (Tony, 2026-09-01) -- was canon-order-then-most-recent,
+    // same ordering bug this whole round of fixes addresses everywhere else.
+    arr=sortAlphaCI(arr);
     var html="";
     for(var i=0;i<arr.length;i++) html+='<option value="'+escAttr(arr[i])+'">';
     dl.innerHTML=html;
@@ -7748,18 +7756,117 @@ function flushAllCombos(){
   var els=document.querySelectorAll(".icomboInput");
   for(var ci=0;ci<els.length;ci++){ if(els[ci]._icomboCommit) els[ci]._icomboCommit(); }
 }
+/* Case-insensitive alphabetical sort, returning a NEW array -- used to fix
+   a real ordering bug Tony flagged (2026-09-01): every dropdown/combo list
+   in Edit system was showing items in whatever order the underlying data
+   table happened to define them (wiki category order, generation-tier
+   order, etc), not alphabetical, making a specific item slow to find by
+   eye. Never mutates the array passed in, since several of these (BIOME_KEYS,
+   ECON, CONFLICT, SENTINEL_WORDS...) are shared, order-sensitive tables
+   read elsewhere in the file for actual generation logic -- only the
+   COMBO'S OWN DISPLAY COPY gets reordered, never the source data. */
+function sortAlphaCI(arr){
+  return arr.slice().sort(function(a,b){
+    var x=String(a).toLowerCase(), y=String(b).toLowerCase();
+    return x<y?-1:(x>y?1:0);
+  });
+}
+/* Comma-list free-text combo (Resources/Flora/Fauna/Minerals/Salvageable
+   tech/Fossils) -- like buildIconCombo() above, but for a field that can
+   hold MULTIPLE comma-separated items with no fixed word list to validate
+   against (typing anything is always a valid save, canon/learned terms are
+   suggestions only). Fixes two real bugs Tony reported (2026-09-01): (1)
+   suggestions came out in wiki-category/most-recent order rather than
+   alphabetical -- fixed via sortAlphaCI() above; (2) a native <datalist>
+   (this field's old mechanism) matches the WHOLE input value as one
+   string, so once a first item + comma was typed, nothing typed after
+   that could ever match a single-word suggestion again -- the dropdown
+   just stopped appearing for every item after the 1st, defeating the
+   point of a suggestion list. This filters against only the text after
+   the LAST comma, and inserts a picked suggestion back into just that
+   segment (leaving every earlier item untouched) -- so suggestions work
+   identically for the 1st, 2nd, 3rd... item typed into the field. Reuses
+   the same .icombo/.icomboList/.icomboOpt CSS as buildIconCombo. */
+function buildCommaCombo(inputId,listId,canonArr,knownKey){
+  var inp=document.getElementById(inputId), list=document.getElementById(listId);
+  if(!inp||!list) return;
+  function allItems(){
+    var learned=knownTerms[knownKey]||[], seen={}, arr=[];
+    canonArr.concat(learned).forEach(function(v){
+      var lo=v.toLowerCase();
+      if(!seen[lo]){ seen[lo]=1; arr.push(v); }
+    });
+    return sortAlphaCI(arr);
+  }
+  function segments(){ return inp.value.split(","); }
+  function lastSeg(){
+    var parts=segments();
+    return parts[parts.length-1].replace(/^\s+/,"");
+  }
+  function priorItems(){
+    var parts=segments();
+    return parts.slice(0,-1).map(function(p){ return p.trim(); }).filter(Boolean);
+  }
+  function render(){
+    var q=lastSeg().toLowerCase(), used={}, html="", shown=0, k, it, lo;
+    priorItems().forEach(function(p){ used[p.toLowerCase()]=1; });
+    var items=allItems();
+    for(k=0;k<items.length && shown<60;k++){
+      it=items[k]; lo=it.toLowerCase();
+      if(used[lo]) continue;
+      if(q && lo.indexOf(q)<0) continue;
+      html+='<div class="icomboOpt" data-val="'+escAttr(it)+'"><span>'+escAttr(it)+'</span></div>';
+      shown++;
+    }
+    if(!shown) html='<div class="icomboEmpty">No match -- type your own, it\u2019ll still save</div>';
+    list.innerHTML=html;
+  }
+  function pick(val){
+    var newVal=priorItems().concat([val]).join(", ")+", ";
+    var maxLen=+inp.getAttribute("maxlength")||0;
+    if(maxLen && newVal.length>maxLen) newVal=newVal.slice(0,maxLen);
+    inp.value=newVal;
+    render();
+    list.classList.add("show");
+    // Delegated on #bodyEditList (see its "input" listener) -- this is what
+    // actually writes the picked value into editBodies[i] and re-runs
+    // checkItemLenWarn(), same as if the traveller had typed it by hand.
+    inp.dispatchEvent(new Event("input",{bubbles:true}));
+  }
+  inp.addEventListener("focus",function(){ render(); list.classList.add("show"); });
+  inp.addEventListener("input",function(){ render(); list.classList.add("show"); });
+  inp.addEventListener("keydown",function(e){
+    if(e.key==="Escape"){ list.classList.remove("show"); }
+    else if(e.key==="Enter"){
+      var first=list.querySelector(".icomboOpt");
+      if(first){ pick(first.getAttribute("data-val")); e.preventDefault(); }
+    }
+  });
+  list.addEventListener("mousedown",function(e){
+    var row=e.target.closest?e.target.closest(".icomboOpt"):null;
+    if(!row) return;
+    e.preventDefault(); // .icomboOpt is a plain div (not natively focusable)
+                         // so this never actually moves focus off inp -- kept
+                         // for robustness, matching buildIconCombo's intent.
+    pick(row.getAttribute("data-val"));
+  });
+  inp.addEventListener("blur",function(){
+    setTimeout(function(){ list.classList.remove("show"); },120);
+  });
+}
 function buildEconConflictSelects(){
   buildIconCombo("edEcon","edEconList",
-    ECON.map(function(g){ return {label:g[0],items:g[1],iconHtml:econIcon(g[0])}; }),
+    ECON.map(function(g){ return {label:g[0],items:sortAlphaCI(g[1]),iconHtml:econIcon(g[0])}; }),
     "— uncharted / none —");
   buildIconCombo("edEconStr","edEconStrList",
-    ECON_S.map(function(arr,i){ return {label:ECON_TIER_LB[i]||("Tier "+i),items:arr,iconHtml:ecoStars(i)}; }));
+    ECON_S.map(function(arr,i){ return {label:ECON_TIER_LB[i]||("Tier "+i),items:sortAlphaCI(arr),iconHtml:ecoStars(i)}; }));
   /* Tony noticed (2026-08-17) the info panel's Conflict row shows a real
      tier-number badge (1/2/3, via conBadge()) but the new dropdown list only
      had the crossed-swords icon with no number -- adding the exact same
-     .conBadge markup used in the panel so the list reads the same way. */
+     .conBadge markup used in the panel so the list reads the same way.
+     Items within each tier alphabetized 2026-09-01 (see sortAlphaCI). */
   buildIconCombo("edConflict","edConflictList",
-    CONFLICT.map(function(arr,i){ return {label:CONFLICT_TIER_LB[i]||("Tier "+i),items:arr,
+    CONFLICT.map(function(arr,i){ return {label:CONFLICT_TIER_LB[i]||("Tier "+i),items:sortAlphaCI(arr),
       iconHtml:svg(IC_CONFLICT,CONFLICT_COL[i])+'<span class="conBadge"><b>'+(i+1)+'</b></span>'}; }));
 }
 buildEconConflictSelects();
@@ -7771,11 +7878,19 @@ buildEconConflictSelects();
 // static field. One tiny single-item "group" per biome so each gets its own
 // colour-matched icon rather than sharing one icon across a whole tier.
 function biomeComboGroups(){
-  return BIOME_KEYS.map(function(k){ return {label:null,items:[k],iconHtml:svg(IC_BIOME,BIOMES[k].base)}; });
+  // Alphabetized for display (Tony, 2026-09-01) -- BIOME_KEYS itself keeps
+  // its original insertion order since it's read elsewhere for real
+  // generation logic; only this combo's own copy is reordered.
+  return sortAlphaCI(BIOME_KEYS).map(function(k){ return {label:null,items:[k],iconHtml:svg(IC_BIOME,BIOMES[k].base)}; });
 }
 function sentinelComboGroups(){
+  // "None" deliberately stays first (it's the common/default choice, same
+  // as blankLabel sitting first in buildIconCombo's own item list) --
+  // everything within each real tier is alphabetized (Tony, 2026-09-01);
+  // tier order itself (Calm->Extreme) is left alone since that's a
+  // meaningful severity progression, not an arbitrary listing.
   var g=[{label:null,items:["None"],iconHtml:svg(IC_SENTINEL,"#5a6a76")}];
-  for(var i=0;i<SENTINEL_WORDS.length;i++) g.push({label:SENTINEL_TIER_LB[i],items:SENTINEL_WORDS[i],iconHtml:svg(IC_SENTINEL,SENTINEL_TIER_COL[i])});
+  for(var i=0;i<SENTINEL_WORDS.length;i++) g.push({label:SENTINEL_TIER_LB[i],items:sortAlphaCI(SENTINEL_WORDS[i]),iconHtml:svg(IC_SENTINEL,SENTINEL_TIER_COL[i])});
   return g;
 }
 var editStars=[];
@@ -7899,17 +8014,17 @@ function renderBodyEditList(){
       }
       html+='<div class="brow2">'+
           '<div class="mfld" style="margin-bottom:0"><div class="lb">Sentinel</div><div class="icombo"><input type="text" class="bfSentinel icomboInput" data-i="'+i+'" id="bfSentinel-'+i+'" autocomplete="off" value="'+escAttr(b.sentinel||"None")+'"><div class="icomboList" id="bfSentinelList-'+i+'"></div></div></div>'+
-          '<div class="mfld" style="margin-bottom:0"><div class="lb">Fossils &amp; curiosities</div><input type="text" class="bfFossils" data-i="'+i+'" maxlength="80" spellcheck="true" list="dlFossils" value="'+escAttr(b.fossils)+'"></div>'+
+          '<div class="mfld" style="margin-bottom:0"><div class="lb">Fossils &amp; curiosities</div><div class="icombo"><input type="text" class="bfFossils" data-i="'+i+'" id="bfFossils-'+i+'" maxlength="80" spellcheck="true" autocomplete="off" value="'+escAttr(b.fossils)+'"><div class="icomboList" id="bfFossilsList-'+i+'"></div></div></div>'+
         '</div>'+
-        '<div class="mfld" style="margin-bottom:0"><div class="lb">Common resources (comma separated)</div><input type="text" class="bfRes" data-i="'+i+'" maxlength="120" spellcheck="true" list="dlResources" value="'+escAttr(b.resources)+'"></div>'+
+        '<div class="mfld" style="margin-bottom:0"><div class="lb">Common resources (comma separated)</div><div class="icombo"><input type="text" class="bfRes" data-i="'+i+'" id="bfRes-'+i+'" maxlength="120" spellcheck="true" autocomplete="off" value="'+escAttr(b.resources)+'"><div class="icomboList" id="bfResList-'+i+'"></div></div></div>'+
         '<div class="fldHint">Separate multiple items with commas -- each individual item can be up to 24 characters.</div>'+
         '<div class="brow2">'+
-          '<div class="mfld" style="margin-bottom:0"><div class="lb">Flora</div><input type="text" class="bfFlora" data-i="'+i+'" maxlength="80" spellcheck="true" list="dlFlora" value="'+escAttr(b.flora)+'"></div>'+
-          '<div class="mfld" style="margin-bottom:0"><div class="lb">Fauna</div><input type="text" class="bfFauna" data-i="'+i+'" maxlength="80" spellcheck="true" list="dlFauna" value="'+escAttr(b.fauna)+'"></div>'+
+          '<div class="mfld" style="margin-bottom:0"><div class="lb">Flora</div><div class="icombo"><input type="text" class="bfFlora" data-i="'+i+'" id="bfFlora-'+i+'" maxlength="80" spellcheck="true" autocomplete="off" value="'+escAttr(b.flora)+'"><div class="icomboList" id="bfFloraList-'+i+'"></div></div></div>'+
+          '<div class="mfld" style="margin-bottom:0"><div class="lb">Fauna</div><div class="icombo"><input type="text" class="bfFauna" data-i="'+i+'" id="bfFauna-'+i+'" maxlength="80" spellcheck="true" autocomplete="off" value="'+escAttr(b.fauna)+'"><div class="icomboList" id="bfFaunaList-'+i+'"></div></div></div>'+
         '</div>'+
         '<div class="brow2">'+
-          '<div class="mfld" style="margin-bottom:0"><div class="lb">Uncommon resources</div><input type="text" class="bfMinerals" data-i="'+i+'" maxlength="80" spellcheck="true" list="dlMinerals" value="'+escAttr(b.minerals)+'"></div>'+
-          '<div class="mfld" style="margin-bottom:0"><div class="lb">Salvageable tech</div><input type="text" class="bfSalvage" data-i="'+i+'" maxlength="80" spellcheck="true" list="dlSalvage" value="'+escAttr(b.salvage)+'"></div>'+
+          '<div class="mfld" style="margin-bottom:0"><div class="lb">Uncommon resources</div><div class="icombo"><input type="text" class="bfMinerals" data-i="'+i+'" id="bfMinerals-'+i+'" maxlength="80" spellcheck="true" autocomplete="off" value="'+escAttr(b.minerals)+'"><div class="icomboList" id="bfMineralsList-'+i+'"></div></div></div>'+
+          '<div class="mfld" style="margin-bottom:0"><div class="lb">Salvageable tech</div><div class="icombo"><input type="text" class="bfSalvage" data-i="'+i+'" id="bfSalvage-'+i+'" maxlength="80" spellcheck="true" autocomplete="off" value="'+escAttr(b.salvage)+'"><div class="icomboList" id="bfSalvageList-'+i+'"></div></div></div>'+
         '</div>';
     }
     html+='</div>';
@@ -7924,6 +8039,14 @@ function renderBodyEditList(){
     if(!editBodies[i].open) continue;
     buildIconCombo("bfBiome-"+i,"bfBiomeList-"+i,biomeComboGroups(),null,true);
     buildIconCombo("bfSentinel-"+i,"bfSentinelList-"+i,sentinelComboGroups());
+    // Comma-list suggestion combos (2026-09-01) -- see buildCommaCombo()'s
+    // own comment for why these replaced a plain <datalist>.
+    buildCommaCombo("bfRes-"+i,"bfResList-"+i,RESOURCES_CANON,"resources");
+    buildCommaCombo("bfFlora-"+i,"bfFloraList-"+i,[],"flora");
+    buildCommaCombo("bfFauna-"+i,"bfFaunaList-"+i,[],"fauna");
+    buildCommaCombo("bfMinerals-"+i,"bfMineralsList-"+i,MINERALS_CANON,"minerals");
+    buildCommaCombo("bfSalvage-"+i,"bfSalvageList-"+i,SALVAGE_CANON,"salvage");
+    buildCommaCombo("bfFossils-"+i,"bfFossilsList-"+i,FOSSILS_CANON,"fossils");
   }
   renderCollidingSelectors();
 }
