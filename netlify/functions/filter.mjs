@@ -125,6 +125,35 @@ function filterPercent(raw, fieldName){
   return {ok:true, cleaned:parseFloat(s).toFixed(1)};
 }
 
+// Screenshot (2026-09-01, Tony: "on the edit system instead of surveyor
+// notes... a screenshot users can add a picture"): a system's optional
+// photo, submitted as a compressed JPEG data URL (preview.html always
+// re-encodes to JPEG client-side before this ever reaches here -- see
+// compressImageToJpeg()) OR, on a re-save where the traveller didn't touch
+// it, the URL this same field already resolved to on an earlier submission
+// (the Edit System modal always resubmits a system's full current state,
+// same as every other field -- see edSubmit's own comment in preview.html;
+// system-edit.mjs recognises that shape and skips re-uploading it, see its
+// own resolveScreenshotUpload() comment). This file deliberately has no
+// dependencies (see the header comment above), so this only checks SHAPE
+// and size -- it never validates the actual GitHub URL prefix, that
+// recognition happens in system-edit.mjs, which already imports
+// lib/shared.mjs for it.
+var MAX_SCREENSHOT_DATAURL_CHARS = 360000; // ~260KB decoded once base64's ~4/3 overhead is accounted for -- see compressImageToJpeg()'s own budget in preview.html
+function filterScreenshot(raw){
+  var s = String(raw==null?"":raw).trim();
+  if(!s) return {ok:true, cleaned:""};
+  if(/^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(s)){
+    if(s.length > MAX_SCREENSHOT_DATAURL_CHARS) return {ok:false, cleaned:"", reason:"Screenshot is too large -- try picking it again, it should compress automatically"};
+    return {ok:true, cleaned:s};
+  }
+  // Anything else claiming to be "leave the existing one as it is": only a
+  // plain, short https URL is plausible as an already-stored screenshot
+  // link -- never anything else (no javascript:, no arbitrary long string).
+  if(/^https:\/\/\S+$/.test(s) && s.length <= 300) return {ok:true, cleaned:s};
+  return {ok:false, cleaned:"", reason:"Screenshot must be a photo you just added, or left exactly as it was"};
+}
+
 /* Validate an entire system-edit payload. Returns {ok, cleaned, errors[]}. */
 export function filterSystemEdit(payload){
   var errors = [];
@@ -219,6 +248,9 @@ export function filterSystemEdit(payload){
 
   var notesR = filterText(payload.notes, {maxLen:800, allowNewlines:true, fieldName:"Notes"});
   if(!notesR.ok) errors.push(notesR.reason); else out.notes = notesR.cleaned;
+
+  var screenshotR = filterScreenshot(payload.screenshot);
+  if(!screenshotR.ok) errors.push(screenshotR.reason); else out.screenshot = screenshotR.cleaned;
 
   // Optional attribution -- "who documented this system" -- added per Tony's
   // ask (2026-08-16) for a way to show which traveller submitted a system's

@@ -14,9 +14,12 @@
                per-entry galaxy instead, see filterBulkImport() in filter.mjs.)
      "edit"   payload = {name, race, region, stars:[colourKey,...] (max 3), starClass, water, dissonant,
                          giant, ruins, outlaw, phantom, econName, sell, buy, econDesc, conflict, blackHole, atlas, notes,
-                         editorName, editorFriendCode, genVersion, colliding, collidingA, collidingB,
+                         screenshot, editorName, editorFriendCode, genVersion, colliding, collidingA, collidingB,
                          bodies:[{name, moon, orbits, biome, descriptor, water, ring, resources,
                                   flora, fauna, minerals, salvage, fossils, sentinel, autophage, base, baseName}, ...]}
+                         (screenshot added 2026-09-01 -- an optional public photo, see
+                         resolveScreenshotUpload() and lib/shared.mjs's screenshot helpers for the
+                         full "why one file per upload, not per system" reasoning.)
                          (base added 2026-08-17 -- "Has base" per-body marker, same manual-only
                          pattern as autophage. baseName added 2026-08-21 -- the base's own name,
                          30-char cap same as a body's own `name`; deliberately its own field, NEVER
@@ -143,7 +146,8 @@ import { filterSystemEdit, filterReport, filterBulkImport } from "./filter.mjs";
 import {
   json, isValidAddress, githubGetFile, githubPutFile, pruneLog,
   editorHash, getGetCache, setGetCache, invalidateGetCache,
-  isValidFlagField, isValidGalaxy, compositeKey, parseCompositeKey
+  isValidFlagField, isValidGalaxy, compositeKey, parseCompositeKey,
+  githubPutBinaryFile, screenshotPathFor, screenshotUrlPrefix
 } from "./lib/shared.mjs";
 
 const MAX_EDITS_PER_IP_PER_HOUR = 8;
@@ -189,6 +193,11 @@ function getCategoryValue(out, category){
     // itself, fixed alongside since it's the identical one-line pattern.
     case "phantom": return out.phantom || "";
     case "notes": return out.notes;
+    // Screenshot (2026-09-01): a plain string, same treatment as notes --
+    // by the time this runs, filtered.cleaned.screenshot has already been
+    // resolved to a final hosted URL (or "") by resolveScreenshotUpload()
+    // below, never a raw data: URL.
+    case "screenshot": return out.screenshot||"";
     // Colliding planets (2026-08-17): bundled the same way "suffix" bundles
     // water+dissonant above -- colliding/collidingA/collidingB are one
     // traveller pick (display-only pairing), so they go through consensus
@@ -230,6 +239,7 @@ function applyCategoryValue(data, category, value){
     case "outlaw": data.outlaw=!!value; return;
     case "phantom": data.phantom=value; return;
     case "notes": data.notes=value; return;
+    case "screenshot": data.screenshot=value; return;
     case "colliding":
       data.colliding=!!value.colliding; data.collidingA=value.collidingA||0; data.collidingB=value.collidingB||0;
       return;
@@ -249,6 +259,38 @@ function pushHistory(sysRec, line, now){
    counts DISTINCT editorHash values in the winning group, not raw vote
    count -- one editor re-submitting the same form five times must never
    look like 5 people agreeing. */
+/* Turns whatever filterSystemEdit() validated for `screenshot` into the
+   value that actually gets stored on the system record. Three shapes can
+   arrive here (see filter.mjs's filterScreenshot() for what's already been
+   validated by this point):
+     ""                            -> no screenshot, or the traveller removed
+                                       it -- stored as-is, no GitHub I/O.
+     "data:image/jpeg;base64,..."  -> a genuinely NEW photo -- gets committed
+                                       to its own file (lib/shared.mjs's
+                                       screenshot helpers), and only the
+                                       resulting URL is ever returned/stored.
+     any other "https://..."       -> an already-hosted screenshot URL the
+                                       traveller didn't touch this submission
+                                       (the Edit System modal always
+                                       resubmits a system's full current
+                                       state, same as every other field) --
+                                       left exactly as it is, no new commit.
+   Only the middle case does any GitHub I/O -- called BEFORE the
+   flag/dispute consensus loop below runs, so a currently-flagged/disputed
+   screenshot's new candidate photo is uploaded (so it HAS a URL to vote
+   with) but never touches sysRec.data.screenshot unless that vote actually
+   wins, exactly the same guarantee every other TOP_CATS field already gets
+   -- see screenshotPathFor()'s own comment in lib/shared.mjs for why each
+   upload gets a unique filename rather than overwriting one fixed path,
+   which is what makes that guarantee possible here at all. */
+async function resolveScreenshotUpload(token, editKey, rawValue){
+  if(!rawValue || rawValue.indexOf("data:image/jpeg;base64,") !== 0) return rawValue || "";
+  var base64 = rawValue.slice("data:image/jpeg;base64,".length);
+  var path = screenshotPathFor(editKey);
+  await githubPutBinaryFile(token, path, base64, "Add screenshot for "+editKey+" via site");
+  return screenshotUrlPrefix()+path.split("/").pop();
+}
+
 function voteAndMaybeResolve(sysRec, category, value, edHash, now){
   if(!sysRec.fieldVotes) sysRec.fieldVotes={};
   var votes = sysRec.fieldVotes[category] || [];
@@ -624,6 +666,13 @@ export default async (req, context) => {
   var commitMessage;
   var editKey = compositeKey(galaxy, address);
   if(action === "edit"){
+    if(typeof filtered.cleaned.screenshot === "string" && filtered.cleaned.screenshot.indexOf("data:image/jpeg;base64,") === 0){
+      try {
+        filtered.cleaned.screenshot = await resolveScreenshotUpload(token, editKey, filtered.cleaned.screenshot);
+      } catch(e){
+        return json(502, {ok:false, error:"Could not save screenshot: "+e.message});
+      }
+    }
     var edHash = await editorHash(ip);
     var sysRec = current.data.systems[editKey];
     if(!sysRec) sysRec = current.data.systems[editKey] = { galaxy:galaxy, flaggedFields:[], disputedFields:[] };
@@ -647,7 +696,7 @@ export default async (req, context) => {
     // or more categories from flaggedFields/disputedFields.
     var stillUnderReview = sysRec.flaggedFields.concat(sysRec.disputedFields);
 
-    var TOP_CATS = ["name","race","region","starClass","stars","suffix","giant","economy","conflict","blackHole","atlas","ruins","outlaw","phantom","notes","colliding"];
+    var TOP_CATS = ["name","race","region","starClass","stars","suffix","giant","economy","conflict","blackHole","atlas","ruins","outlaw","phantom","notes","colliding","screenshot"];
     for(var ti=0; ti<TOP_CATS.length; ti++){
       if(stillUnderReview.indexOf(TOP_CATS[ti])>=0) continue;
       applyCategoryValue(sysRec.data, TOP_CATS[ti], getCategoryValue(filtered.cleaned, TOP_CATS[ti]));
