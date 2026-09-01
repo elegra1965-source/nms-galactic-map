@@ -34838,49 +34838,39 @@
             "name": "Rinuscu",
             "moon": false,
             "orbits": 0,
-            "biome": "Nuclear",
+            "biome": "Toxic",
             "descriptor": "",
             "water": true,
             "ring": false,
             "resources": [
-              "Copper",
-              "Silver"
+              "Salt"
             ],
             "flora": [],
             "fauna": [],
-            "minerals": [
-              "Gamma Root",
-              "Uranium"
-            ],
+            "minerals": [],
             "salvage": [],
             "fossils": [],
-            "sentinel": "High Security",
+            "sentinel": "Aggressive",
             "autophage": false,
             "base": false,
             "baseName": ""
           },
           {
-            "name": "Ibai 73/C5",
-            "moon": false,
-            "orbits": 0,
-            "biome": "Icebound",
+            "name": "Buquerqu Corrupted",
+            "moon": true,
+            "orbits": 1,
+            "biome": "Toxic",
             "descriptor": "",
             "water": false,
-            "ring": "tan",
+            "ring": false,
             "resources": [
-              "Copper",
-              "silver"
+              "Gold"
             ],
             "flora": [],
             "fauna": [],
-            "minerals": [
-              "Frost Crystals",
-              "Dioxite"
-            ],
+            "minerals": [],
             "salvage": [],
-            "fossils": [
-              "Ancient Bones"
-            ],
+            "fossils": [],
             "sentinel": "Aggressive",
             "autophage": false,
             "base": false,
@@ -34888,22 +34878,19 @@
           },
           {
             "name": "Udre II",
-            "moon": true,
-            "orbits": 2,
-            "biome": "Empty",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Lush",
             "descriptor": "",
-            "water": false,
-            "ring": false,
+            "water": true,
+            "ring": "tan",
             "resources": [
-              "Copper",
-              "Salt"
+              "Sodium"
             ],
             "flora": [],
             "fauna": [],
             "minerals": [],
-            "salvage": [
-              "Rusted Metal"
-            ],
+            "salvage": [],
             "fossils": [],
             "sentinel": "Attentive",
             "autophage": false,
@@ -34914,19 +34901,16 @@
             "name": "Arhun XII",
             "moon": false,
             "orbits": 0,
-            "biome": "Tectonic",
+            "biome": "Volcanic",
             "descriptor": "",
             "water": false,
             "ring": false,
             "resources": [
-              "Basalt",
-              "Copper"
+              "Sodium"
             ],
             "flora": [],
             "fauna": [],
-            "minerals": [
-              "Magnetised Ferrite"
-            ],
+            "minerals": [],
             "salvage": [],
             "fossils": [],
             "sentinel": "Attentive",
@@ -34936,11 +34920,15 @@
           }
         ]
       },
-      "editedAt": "2026-09-01T12:57:14.067Z",
+      "editedAt": "2026-09-01T12:59:04.421Z",
       "editedByIp": "5.133.46.24",
       "history": [
         {
           "at": "2026-09-01T12:57:14.067Z",
+          "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-09-01T12:59:04.421Z",
           "text": "edited by a traveller"
         }
       ]
@@ -34949,7 +34937,8 @@
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1788267434067
+      1788267434067,
+      1788267544421
     ]
   },
   "flagLog": {}
