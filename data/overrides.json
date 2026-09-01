@@ -35183,14 +35183,236 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:141CFF968224": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Poroza VIII",
+        "race": "Uninhabited",
+        "region": "Isienek Anomaly",
+        "starClass": "X1",
+        "stars": [
+          "yellow",
+          "blue"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": true,
+        "econName": "Experimental",
+        "sell": "72.3",
+        "buy": "-16.7",
+        "econDesc": "Unsuccessful",
+        "conflict": "Peaceful",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "phantom": "",
+        "notes": "Vy'keen( Abandoned ), economy data unknown, conflict unknown | Base \"Relic World\" on Relic World",
+        "colliding": false,
+        "collidingA": 0,
+        "collidingB": 0,
+        "screenshot": "",
+        "editorName": "t672b774",
+        "editorFriendCode": "MGD8-C6PP-XKFGT",
+        "genVersion": "1.3.0",
+        "bodies": [
+          {
+            "name": "Opekava VI",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Toxic",
+            "descriptor": "Eternal Cyclones",
+            "water": false,
+            "ring": false,
+            "resources": [
+              "Silver"
+            ],
+            "flora": [
+              "Sporadic"
+            ],
+            "fauna": [
+              "Devoid"
+            ],
+            "minerals": [
+              "Magnatised Ferrite",
+              "Crystallised Helium",
+              "Activated Quartzite"
+            ],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Intermittent",
+            "autophage": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "Dajj XVIII",
+            "moon": true,
+            "orbits": 1,
+            "biome": "Lush",
+            "descriptor": "Noxious Gas Storms",
+            "water": false,
+            "ring": false,
+            "resources": [
+              "Gold"
+            ],
+            "flora": [
+              "High"
+            ],
+            "fauna": [
+              "Full"
+            ],
+            "minerals": [
+              "Fungal Mould",
+              "Ammonia",
+              "Quartzite"
+            ],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Forsaken",
+            "autophage": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "Juktashf XVII",
+            "moon": true,
+            "orbits": 1,
+            "biome": "Mega Exotic",
+            "descriptor": "High Verable Temperatures",
+            "water": false,
+            "ring": false,
+            "resources": [
+              "Sodium"
+            ],
+            "flora": [
+              "Full"
+            ],
+            "fauna": [
+              "Copious"
+            ],
+            "minerals": [
+              "quartzite",
+              "Pyrite"
+            ],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Intermittent",
+            "autophage": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "Tine XIV",
+            "moon": true,
+            "orbits": 1,
+            "biome": "Lush",
+            "descriptor": "Poison Cyclones",
+            "water": false,
+            "ring": false,
+            "resources": [
+              "Salt"
+            ],
+            "flora": [
+              "Generous"
+            ],
+            "fauna": [
+              "Frequent"
+            ],
+            "minerals": [
+              "Quartzite",
+              "Ammonia"
+            ],
+            "salvage": [],
+            "fossils": [
+              "Ancient Bones"
+            ],
+            "sentinel": "Isolated",
+            "autophage": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "Relic World",
+            "moon": true,
+            "orbits": 1,
+            "biome": "Mega Exotic",
+            "descriptor": "Dangerously Hot Fog",
+            "water": false,
+            "ring": false,
+            "resources": [
+              "Sodium"
+            ],
+            "flora": [
+              "Copious"
+            ],
+            "fauna": [
+              "Rare"
+            ],
+            "minerals": [
+              "Star Bulb",
+              "Paraffinium",
+              "Quartzite"
+            ],
+            "salvage": [],
+            "fossils": [
+              "Ancient Bones"
+            ],
+            "sentinel": "Ever-present",
+            "autophage": false,
+            "base": true,
+            "baseName": "Relic World"
+          },
+          {
+            "name": "Monteighle Embok",
+            "moon": true,
+            "orbits": 1,
+            "biome": "Barren",
+            "descriptor": "Frequent Blizzards",
+            "water": false,
+            "ring": false,
+            "resources": [
+              "Salt"
+            ],
+            "flora": [
+              "Absent"
+            ],
+            "fauna": [
+              "Generous"
+            ],
+            "minerals": [
+              "Frost Crystal",
+              "Dioxide",
+              "Quartzite"
+            ],
+            "salvage": [],
+            "fossils": [
+              "Ancient Bones"
+            ],
+            "sentinel": "Unwavering",
+            "autophage": false,
+            "base": false,
+            "baseName": ""
+          }
+        ]
+      },
+      "editedAt": "2026-09-01T21:52:06.111Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-01T21:52:06.111Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1788287703987,
-      1788288100397,
-      1788288133741
+      1788299526111
     ]
   },
   "flagLog": {}
