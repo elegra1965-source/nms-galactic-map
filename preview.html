@@ -1531,6 +1531,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
          since a visitor can dispute the photo without disputing the text
          or vice versa. -->
     <div id="pubScreenshotWrap" style="display:none;margin-top:6px">
+      <div class="lb" style="font-size:9px;letter-spacing:.12em;color:var(--text-faint);text-transform:uppercase;margin:0 0 3px">Screenshot</div>
       <img id="pubScreenshot" alt="Community-submitted screenshot of this system" title="Click to enlarge"
         style="max-width:100%;max-height:140px;border-radius:var(--r-sm);border:1px solid var(--border-soft);cursor:zoom-in;display:block">
     </div>
@@ -1797,8 +1798,10 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
         <img id="edScreenshotPreview" alt="Screenshot preview" title="Click to enlarge"
           style="max-width:100%;max-height:160px;border-radius:var(--r-sm);border:1px solid var(--border-soft);cursor:zoom-in;display:block">
       </div>
-      <button class="btn" id="edScreenshotBtn" type="button" style="padding:4px 10px;font-size:11px" title="Pick an in-game screenshot to attach to this system, visible to every visitor. Resized and compressed automatically."><span id="edScreenshotBtnTxt">Add screenshot</span></button>
-      <button class="btn" id="edScreenshotRemoveBtn" type="button" style="padding:4px 10px;font-size:11px;display:none" title="Remove this system's screenshot.">Remove screenshot</button>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn" id="edScreenshotBtn" type="button" style="flex:1;padding:4px 10px;font-size:11px;text-align:center" title="Pick an in-game screenshot to attach to this system, visible to every visitor. Resized and compressed automatically."><span id="edScreenshotBtnTxt">Add screenshot</span></button>
+        <button class="btn" id="edScreenshotRemoveBtn" type="button" style="flex:1;padding:4px 10px;font-size:11px;text-align:center;display:none" title="Remove this system's screenshot.">Remove screenshot</button>
+      </div>
       <div id="edScreenshotHint" style="font-size:10.5px;color:var(--text-faint);margin-top:4px"></div>
     </div>
     <div class="mfld" style="display:flex;gap:8px">
@@ -1923,6 +1926,10 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     <div class="mfld">
       <div class="lb">Community-submitted data</div>
       <div style="font-size:12px;color:var(--text-dim);line-height:1.55">Anything entered via <b>Edit system</b> is trusted as typed -- it isn't checked against Hello Games' own in-game discovery records, which are known to desync between players. Two travellers can occasionally submit different names for the same system in good faith. If something looks wrong, use <b>Report</b> and elegra1965 will sort it out from the save history. Biome and resource fields work the same way -- both now offer a fuller, wiki-researched dropdown (Biome added <b>Water World</b> and corrected a couple of naming gaps, 2026-08-26) with room to type your own value if what you see in-game isn't listed. Resources and Minerals were also renamed <b>Common resources</b> / <b>Uncommon resources</b> to match the wiki's own rarity split, and the same dropdown-plus-your-own-value treatment now covers Salvageable tech and Fossils &amp; curiosities too.</div>
+    </div>
+    <div class="mfld">
+      <div class="lb">Screenshots (added 2026-09-01)</div>
+      <div style="font-size:12px;color:var(--text-dim);line-height:1.55">Edit system can now carry an optional <b>photo</b> alongside the public notes field -- visible to every visitor, same as everything else typed in there, and covered by the same flag/dispute system if someone thinks it's wrong or inappropriate. Pick one from your device and it's resized/compressed automatically before upload, no need to shrink it yourself first. Separately, your own private <b>Surveyor notes</b> (see the system info panel) can carry a photo too -- that one never leaves your device, saved locally the same way the note text already is. Both are entirely optional and only ever replace what was there if you choose a new one.</div>
     </div>
     <div class="mfld">
       <div class="lb">Import from my save file</div>
