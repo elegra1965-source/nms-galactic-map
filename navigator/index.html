@@ -1679,13 +1679,28 @@ window.MOCK_JOURNEYS = [
       c.width = w; c.height = h;
       var cx = c.getContext("2d");
       cx.drawImage(raw, 0, 0, w, h);
-      var g = cx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, Math.max(w, h) * 0.52);
+      // Tony caught (2026-09-02) that a plain circular gradient sized off
+      // the image's LONGER side leaves the shorter side barely faded at
+      // all -- e.g. on a wide photo the top/bottom edges sat at ~85%
+      // opacity right up to the actual border, reading as a hard cut (and
+      // showing up diagonally once the per-spawn rotation jitter tilted
+      // it). Fix: scale the context to the image's own half-width/
+      // half-height BEFORE drawing the gradient, so a plain unit-radius
+      // circle in that transformed space becomes an ELLIPSE that exactly
+      // touches all 4 real edges at once, whatever the aspect ratio --
+      // guaranteeing every edge (not just the longer axis) fades to fully
+      // transparent by the time it reaches the image's real border.
+      cx.save();
+      cx.translate(w / 2, h / 2);
+      cx.scale(w / 2, h / 2);
+      var g = cx.createRadialGradient(0, 0, 0, 0, 0, 1);
       g.addColorStop(0, "rgba(0,0,0,1)");
       g.addColorStop(0.55, "rgba(0,0,0,1)");
       g.addColorStop(1, "rgba(0,0,0,0)");
       cx.globalCompositeOperation = "destination-in";
       cx.fillStyle = g;
-      cx.fillRect(0, 0, w, h);
+      cx.fillRect(-1, -1, 2, 2);
+      cx.restore();
       entry.canvas = c; entry.w = w; entry.h = h; entry.ready = true;
     };
     raw.src = src;
