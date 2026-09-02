@@ -1650,8 +1650,47 @@ window.MOCK_JOURNEYS = [
   // purpose -- this is meant to feel atmospheric next to the comet's
   // quick streak and the anomaly's short-lived flicker, not compete with
   // them for attention.
-  var nebulaImg = new Image();
-  nebulaImg.src = "assets/fx/nebula-puff-01.webp";
+  // 2026-09-02, Tony added 3 more real nebula photos alongside the
+  // original in-game screenshot above, so this doesn't sit on one single
+  // repeated image any more. Unlike that first one -- manually cropped and
+  // luma-keyed to a transparent WebP ahead of time -- the new ones are
+  // ordinary opaque photos (hard rectangular edges, their own baked-in
+  // starfield). Rather than needing every future drop-in image pre-edited
+  // in Photoshop, each source gets a soft elliptical alpha fade baked on
+  // ONCE at load time: drawn to an offscreen canvas, then a radial-gradient
+  // mask multiplied in via "destination-in" so the rim fades to fully
+  // transparent. The original image (already transparent at its own edges)
+  // just gets faded a touch further in from its own rim too -- harmless,
+  // since alpha there was already near zero. A random one of these is
+  // picked per spawn (see spawnNebula below) instead of always the same
+  // image.
+  var NEBULA_SOURCES = [
+    "assets/fx/nebula-puff-01.webp",
+    "assets/fx/nebula-02.webp",
+    "assets/fx/nebula-03.jpg",
+    "assets/fx/nebula-04.webp"
+  ];
+  var nebulaImgs = NEBULA_SOURCES.map(function(src) {
+    var raw = new Image();
+    var entry = { ready: false, canvas: null, w: 0, h: 0 };
+    raw.onload = function() {
+      var w = raw.naturalWidth, h = raw.naturalHeight;
+      var c = document.createElement("canvas");
+      c.width = w; c.height = h;
+      var cx = c.getContext("2d");
+      cx.drawImage(raw, 0, 0, w, h);
+      var g = cx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, Math.max(w, h) * 0.52);
+      g.addColorStop(0, "rgba(0,0,0,1)");
+      g.addColorStop(0.55, "rgba(0,0,0,1)");
+      g.addColorStop(1, "rgba(0,0,0,0)");
+      cx.globalCompositeOperation = "destination-in";
+      cx.fillStyle = g;
+      cx.fillRect(0, 0, w, h);
+      entry.canvas = c; entry.w = w; entry.h = h; entry.ready = true;
+    };
+    raw.src = src;
+    return entry;
+  });
   function spawnNebula(cssW, cssH) {
     var cx = cssW * (0.15 + Math.random() * 0.7);
     cx = Math.max(340, Math.min(cssW - 380, cx)); // clear of the floating route/manifest panels
@@ -1668,6 +1707,7 @@ window.MOCK_JOURNEYS = [
               : cssW * (0.27 + Math.random() * 0.17);                 // close
     return {
       kind: "nebula", x: cx, y: cy, drawW: drawW,
+      imgIdx: Math.floor(Math.random() * nebulaImgs.length),
       flip: Math.random() < 0.5,
       rot: (Math.random() - 0.5) * 0.12,
       t: 0,
@@ -1678,7 +1718,8 @@ window.MOCK_JOURNEYS = [
   }
   function drawNebula(ctx, e, dt) {
     e.t += dt;
-    if (!nebulaImg.complete || !nebulaImg.naturalWidth) return true; // still loading -- wait rather than pop in
+    var img = nebulaImgs[e.imgIdx];
+    if (!img || !img.ready) return true; // still loading/processing -- wait rather than pop in
     var alpha, growth;
     if (e.t < e.inMs) {
       var p = e.t / e.inMs;
@@ -1691,13 +1732,13 @@ window.MOCK_JOURNEYS = [
     } else {
       return false;
     }
-    var w = e.drawW * growth, h = w * (nebulaImg.naturalHeight / nebulaImg.naturalWidth);
+    var w = e.drawW * growth, h = w * (img.h / img.w);
     ctx.save();
     ctx.globalAlpha = alpha;
     ctx.translate(e.x, e.y);
     ctx.rotate(e.rot);
     if (e.flip) ctx.scale(-1, 1);
-    ctx.drawImage(nebulaImg, -w / 2, -h / 2, w, h);
+    ctx.drawImage(img.canvas, -w / 2, -h / 2, w, h);
     ctx.restore();
     ctx.globalAlpha = 1;
     return true;
