@@ -147,7 +147,8 @@ import {
   json, isValidAddress, githubGetFile, githubPutFile, pruneLog,
   editorHash, getGetCache, setGetCache, invalidateGetCache,
   isValidFlagField, isValidGalaxy, compositeKey, parseCompositeKey,
-  githubPutBinaryFile, screenshotPathFor, screenshotUrlPrefix
+  githubPutBinaryFile, screenshotPathFor, screenshotUrlPrefix,
+  addCommunityTerms
 } from "./lib/shared.mjs";
 
 const MAX_EDITS_PER_IP_PER_HOUR = 8;
@@ -370,7 +371,7 @@ async function handleGet(req, token){
     };
   }
 
-  var out = { ok:true, systems: publicSystems };
+  var out = { ok:true, systems: publicSystems, communityTerms: current.data.communityTerms || {} };
 
   if(isAdmin){
     out.reports = current.data.reports;
@@ -732,6 +733,23 @@ export default async (req, context) => {
       }
     }
     sysRec.data.bodies = newBodies;
+
+    // Feed every distinct free-text value in this submission into the
+    // shared community-terms vocabulary (2026-09-02) -- see
+    // lib/shared.mjs's addCommunityTerms() for the full "why". Reads off
+    // newBodies (the array just committed above), not filtered.cleaned.bodies
+    // directly, so a body index still under flag/dispute review is learned
+    // from its real pre-edit value, never from a submission that didn't win.
+    newBodies.forEach(function(b){
+      if(!b) return;
+      addCommunityTerms(current.data, "resources", b.resources||[]);
+      addCommunityTerms(current.data, "flora", b.flora||[]);
+      addCommunityTerms(current.data, "fauna", b.fauna||[]);
+      addCommunityTerms(current.data, "minerals", b.minerals||[]);
+      addCommunityTerms(current.data, "salvage", b.salvage||[]);
+      addCommunityTerms(current.data, "fossils", b.fossils||[]);
+      if(b.descriptor) addCommunityTerms(current.data, "descriptor", [b.descriptor]);
+    });
 
     sysRec.editedAt = new Date(now).toISOString();
     sysRec.editedByIp = ip;
