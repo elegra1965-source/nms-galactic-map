@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>NMS Galactic Map — Preview v4</title>
+<title>NMS Galactic Map</title>
 <meta name="description" content="NMS Galactic Map — a fan-made 3D No Man's Sky galaxy map and portal address decoder, by elegra1965.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="NMS Galactic Map">
@@ -1925,7 +1925,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     </div>
     <div class="mfld">
       <div class="lb">Community-submitted data</div>
-      <div style="font-size:12px;color:var(--text-dim);line-height:1.55">Anything entered via <b>Edit system</b> is trusted as typed -- it isn't checked against Hello Games' own in-game discovery records, which are known to desync between players. Two travellers can occasionally submit different names for the same system in good faith. If something looks wrong, use <b>Report</b> and elegra1965 will sort it out from the save history. Biome and resource fields work the same way -- both now offer a fuller, wiki-researched dropdown (Biome added <b>Water World</b> and corrected a couple of naming gaps, 2026-08-26) with room to type your own value if what you see in-game isn't listed. Resources and Minerals were also renamed <b>Common resources</b> / <b>Uncommon resources</b> to match the wiki's own rarity split, and the same dropdown-plus-your-own-value treatment now covers Salvageable tech and Fossils &amp; curiosities too.</div>
+      <div style="font-size:12px;color:var(--text-dim);line-height:1.55">Anything entered via <b>Edit system</b> is trusted as typed -- it isn't checked against Hello Games' own in-game discovery records, which are known to desync between players. Two travellers can occasionally submit different names for the same system in good faith. If something looks wrong, use <b>Report</b> and elegra1965 will sort it out from the save history. Biome and resource fields work the same way -- both now offer a fuller, wiki-researched dropdown (Biome added <b>Water World</b> and corrected a couple of naming gaps, 2026-08-26) with room to type your own value if what you see in-game isn't listed. Resources and Minerals were also renamed <b>Common resources</b> / <b>Uncommon resources</b> to match the wiki's own rarity split, and the same dropdown-plus-your-own-value treatment now covers Salvageable tech and Fossils &amp; curiosities too. Typing a value that isn't on the list yet (2026-09-02) doesn't just get remembered for you -- it's added to the shared suggestion list every traveller sees, so the next person to spot the same item gets it as a dropdown option instead of having to type it themselves.</div>
     </div>
     <div class="mfld">
       <div class="lb">Screenshots</div>
@@ -3118,7 +3118,7 @@ function generateSystem(vx,vy,vz,idx,noOverride){
 var FUNC_URL="/.netlify/functions/system-edit";
 var FLAG_URL="/.netlify/functions/flag-dispute";
 var FEEDBACK_URL="/.netlify/functions/feedback";
-var OVERRIDES={systems:{}};
+var OVERRIDES={systems:{},communityTerms:{}};
 /* The 12 whole-row flag categories a visitor can flag/dispute (see
    FLAG_FIELDS in netlify/functions/_shared.mjs -- kept in sync by hand,
    there's no way to share a JS module between the client bundle and the
@@ -3302,6 +3302,13 @@ function loadOverrides(){
   }).then(function(data){
     if(!data || !data.ok) return;
     OVERRIDES.systems=data.systems||{};
+    // Community-submitted dropdown vocabulary (2026-09-02) -- see
+    // system-edit.mjs's handleGet()/addCommunityTerms() for what this is.
+    // Repopulating the Descriptor datalist and re-rendering is enough:
+    // buildCommaCombo()'s own allItems() reads OVERRIDES.communityTerms
+    // fresh on every open, so nothing else needs to be told this arrived.
+    OVERRIDES.communityTerms=data.communityTerms||{};
+    populateDatalists();
     if(Object.keys(OVERRIDES.systems).length) refreshAfterOverrides();
   }).catch(function(){
     /* Shared edits are a nice-to-have layer -- if the Function isn't set up yet
@@ -3428,7 +3435,17 @@ function saveLastPosition(galaxy,address){
    success path), fed into a <datalist> per field so the browser's own
    native suggestion dropdown shows terms this traveller has typed before
    as they start typing again. Local-only, same as notes/marks/waypoints --
-   never sent to the server, never shared between visitors. */
+   never sent to the server, never shared between visitors.
+
+   Added 2026-09-02: a SEPARATE, shared vocabulary layer now sits alongside
+   this one -- OVERRIDES.communityTerms, fetched from the server on every
+   page load (see loadOverrides()) and grown by every successful edit ANY
+   traveller makes (see addCommunityTerms() in lib/shared.mjs). Tony had
+   typed "Quartzite" himself and asked why it only ever became a suggestion
+   in his own browser, not everyone else's too -- this is that fix. Both
+   layers feed the same suggestion list (see buildCommaCombo()'s allItems()
+   and populateDatalists() below): canon list, then community terms, then
+   this browser's own locally-learned terms, deduped case-insensitively. */
 /* Real item names sourced 2026-08-26 from nomanssky.fandom.com/wiki/Resource
    (Common/Uncommon rarity tiers), /wiki/Curiosity and /wiki/Salvaged_Frigate_Module
    -- seeded into the matching field's datalist below (see populateDatalists())
@@ -3446,7 +3463,13 @@ var MINERALS_CANON=["Condensed Carbon","Pure Ferrite","Magnetised Ferrite","Sodi
   "Ionised Cobalt","Chlorine","Paraffinium","Pyrite","Ammonia","Uranium","Dioxite","Phosphorus",
   "Tainted Metal","Mordite","Gold","Activated Cadmium","Activated Emeril","Activated Indium",
   "Fungal Mould","Frost Crystal","Gamma Root","Cactus Flesh","Solanium","Star Bulb","Marrow Bulb",
-  "Kelp Sac","Faecium","Runaway Mould","Living Slime","Viscous Fluids"];
+  "Kelp Sac","Faecium","Runaway Mould","Living Slime","Viscous Fluids",
+  // Added 2026-09-02 (Tony hit these typing manually -- purple-star items
+  // missing from the original wiki pass): Quartzite/Activated Quartzite are
+  // this file's own STELLAR_EL for purple stars (see that table above), and
+  // Crystallised Helium is a real gas-giant-only uncommon resource -- all 3
+  // confirmed against nomanssky.fandom.com's own pages for each item.
+  "Quartzite","Activated Quartzite","Crystallised Helium"];
 var SALVAGE_CANON=["Salvaged Technology","Salvaged Frigate Module","Recovered Sentinel Components",
   "Rogue Technology Echo","Anomalous Data Unit","Anomalous Homing Device","Advanced Research Module",
   "Biomechanical Construct","Bionic Ark","Capital Ship Wiring Platform","Encrypted Navigation Data",
@@ -3520,8 +3543,10 @@ function populateDatalists(){
     // case-insensitive so "star bulb" typed once doesn't sit right next to
     // the canonical "Star Bulb".
     var canon=CANON_TERMS_BY_FIELD[k]||[], learned=knownTerms[k]||[];
+    var community=(OVERRIDES.communityTerms&&OVERRIDES.communityTerms[k])||[];
     var seen={}, arr=[];
     canon.forEach(function(v){ var lo=v.toLowerCase(); if(!seen[lo]){ seen[lo]=1; arr.push(v); } });
+    community.forEach(function(v){ var lo=v.toLowerCase(); if(!seen[lo]){ seen[lo]=1; arr.push(v); } });
     learned.forEach(function(v){ var lo=v.toLowerCase(); if(!seen[lo]){ seen[lo]=1; arr.push(v); } });
     // Alphabetized (Tony, 2026-09-01) -- was canon-order-then-most-recent,
     // same ordering bug this whole round of fixes addresses everywhere else.
@@ -7977,8 +8002,10 @@ function buildCommaCombo(inputId,listId,canonArr,knownKey){
   var inp=document.getElementById(inputId), list=document.getElementById(listId);
   if(!inp||!list) return;
   function allItems(){
-    var learned=knownTerms[knownKey]||[], seen={}, arr=[];
-    canonArr.concat(learned).forEach(function(v){
+    var learned=knownTerms[knownKey]||[];
+    var community=(OVERRIDES.communityTerms&&OVERRIDES.communityTerms[knownKey])||[];
+    var seen={}, arr=[];
+    canonArr.concat(community).concat(learned).forEach(function(v){
       var lo=v.toLowerCase();
       if(!seen[lo]){ seen[lo]=1; arr.push(v); }
     });
