@@ -103,7 +103,7 @@ export async function githubGetFile(token){
   });
   if(res.status === 404){
     // file doesn't exist yet -- start fresh
-    return { sha: null, data: { systems:{}, reports:[], ipLog:{}, flagLog:{} } };
+    return { sha: null, data: { systems:{}, reports:[], ipLog:{}, flagLog:{}, communityTerms:{} } };
   }
   if(!res.ok){
     throw new Error("GitHub read failed: "+res.status+" "+(await res.text()));
@@ -144,6 +144,7 @@ export async function githubGetFile(token){
   if(!data.reports) data.reports = [];
   if(!data.ipLog) data.ipLog = {};
   if(!data.flagLog) data.flagLog = {};
+  if(!data.communityTerms) data.communityTerms = {};
   return { sha: body.sha, data: data };
 }
 
@@ -283,3 +284,47 @@ var _getCache = { data: null, fetchedAt: 0 };
 export function getGetCache(){ return _getCache; }
 export function setGetCache(data, now){ _getCache = { data: data, fetchedAt: now }; }
 export function invalidateGetCache(){ _getCache = { data: null, fetchedAt: 0 }; }
+
+/* Community-submitted vocabulary for the "type your own value" free-text
+   fields (resources/flora/fauna/minerals/salvage/fossils/descriptor) --
+   shared across every visitor's suggestion dropdown, unlike preview.html's
+   own per-traveller localStorage "known terms" list (KNOWN_TERMS_K, added
+   2026-08-17 -- that one never leaves the submitting browser). Added
+   2026-09-02: Tony had to manually type "Quartzite" (a real purple-star
+   item missing from the hardcoded MINERALS_CANON list) and asked why his
+   own typed value doesn't also become a suggestion for every OTHER
+   traveller's dropdown, not just his own browser remembering it for him.
+
+   Every successful "edit" submission's body-level free-text fields get
+   folded in here (see system-edit.mjs's edit handler, right after
+   sysRec.data.bodies is finalised) and the public GET response returns the
+   whole thing (see handleGet) so preview.html's buildCommaCombo()/
+   populateDatalists() can merge it in as a third suggestion source
+   alongside the hardcoded canon list and the browser's own learned terms --
+   no server-side canon list is kept here; it's purely "every distinct
+   value any traveller has ever submitted for this field", deduped.
+
+   Deliberately additive-only (a submission only ever grows this, never
+   edits/removes an existing entry -- same "documentation only grows" ethos
+   as the rest of this store) and capped per field so a determined spammer
+   can't grow overrides.json forever; a duplicate (matched case-
+   insensitively) is silently skipped rather than treated as an error, since
+   resubmitting an already-known term isn't a mistake. */
+export const COMMUNITY_TERM_FIELDS = ["resources","flora","fauna","minerals","salvage","fossils","descriptor"];
+var MAX_COMMUNITY_TERMS_PER_FIELD = 500;
+export function addCommunityTerms(data, field, values){
+  if(COMMUNITY_TERM_FIELDS.indexOf(field) < 0) return;
+  if(!data.communityTerms) data.communityTerms = {};
+  var list = data.communityTerms[field] || (data.communityTerms[field] = []);
+  var seen = {};
+  list.forEach(function(v){ seen[String(v).toLowerCase()] = 1; });
+  (values||[]).forEach(function(v){
+    v = String(v||"").trim();
+    if(!v) return;
+    var lo = v.toLowerCase();
+    if(seen[lo]) return;
+    seen[lo] = 1;
+    list.push(v);
+  });
+  if(list.length > MAX_COMMUNITY_TERMS_PER_FIELD) list.length = MAX_COMMUNITY_TERMS_PER_FIELD;
+}
