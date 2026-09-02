@@ -5821,14 +5821,23 @@ function updatePanel(s){
   document.getElementById("pCore").textContent=commas(s.coreLY)+" LY from galaxy centre";
   document.getElementById("icRace").innerHTML=raceIcon(s.race);
   document.getElementById("icEco").innerHTML=econIcon(s.econType);
-  document.getElementById("icCon").innerHTML=svg(IC_CONFLICT,CONFLICT_COL[s.conTier]);
   document.getElementById("pRace").innerHTML=escAttr(s.race)+(s.abandoned?' <span style="color:var(--gold)">(Abandoned)</span>':"");
   document.getElementById("pEco").textContent=s.uncharted?"—":s.econName;
   document.getElementById("pEcoSub").textContent=s.uncharted?"Uncharted system":
     (s.econName+" // Sell: "+s.sell+"% Buy: "+s.buy+"% // "+s.econDesc);
   document.getElementById("pEcoStars").innerHTML=s.uncharted?"":ecoStars(s.econTier);
-  document.getElementById("pCon").textContent=s.conflict;
-  document.getElementById("pConBadge").innerHTML=conBadge(s);
+  // "Not Available" (2026-09-02): hides the whole Conflict row, matching
+  // Tony's own in-game screenshot of an abandoned system that showed no
+  // Conflict line at all (also wiki-confirmed for abandoned systems
+  // generally) -- same hide-the-row mechanism as Sentinel's "Not shown".
+  if(s.conflict==="Not Available"){
+    document.getElementById("pConRow").style.display="none";
+  }else{
+    document.getElementById("pConRow").style.display="";
+    document.getElementById("icCon").innerHTML=svg(IC_CONFLICT,CONFLICT_COL[s.conTier]);
+    document.getElementById("pCon").textContent=s.conflict;
+    document.getElementById("pConBadge").innerHTML=conBadge(s);
+  }
   setFsClass("pRaceRow","race",s);
   setFsClass("pEcoRow","economy",s);
   setFsClass("pConRow","conflict",s);
@@ -6381,7 +6390,7 @@ function showHoverPop(s,cx,cy){
       '<div class="hpRow">'+raceIcon(s.race)+'<span class="hpLbl">'+s.race+'</span></div>'+
       '<div class="hpRow">'+econIcon(s.econType)+'<span class="hpLbl">'+(s.uncharted?"Uncharted":s.econName)+'</span></div>'+
       (s.uncharted?'':'<div class="hpSub">Sell: '+s.sell+'% Buy: '+s.buy+'% // '+s.econDesc+'</div>')+
-      '<div class="hpRow">'+svg(IC_CONFLICT,CONFLICT_COL[s.conTier])+conBadge(s)+'<span class="hpLbl">'+s.conflict+'</span></div>'+
+      (s.conflict==="Not Available"?'':'<div class="hpRow">'+svg(IC_CONFLICT,CONFLICT_COL[s.conTier])+conBadge(s)+'<span class="hpLbl">'+s.conflict+'</span></div>')+
       '</div>';
   }
   pop.innerHTML=html;
@@ -8105,8 +8114,15 @@ function buildEconConflictSelects(){
      .conBadge markup used in the panel so the list reads the same way.
      Items within each tier alphabetized 2026-09-01 (see sortAlphaCI). */
   buildIconCombo("edConflict","edConflictList",
-    CONFLICT.map(function(arr,i){ return {label:CONFLICT_TIER_LB[i]||("Tier "+i),items:sortAlphaCI(arr),
-      iconHtml:svg(IC_CONFLICT,CONFLICT_COL[i])+'<span class="conBadge"><b>'+(i+1)+'</b></span>'}; }));
+    // "Not Available" (2026-09-02, Tony's own in-game screenshot): an
+    // abandoned system showed no Conflict line at all -- confirmed against
+    // the wiki too (abandoned systems always show "no conflict rating,
+    // Not Available"). Hides the whole Conflict row in the info panel,
+    // same mechanism as Sentinel's "Not shown" -- see drawSystem() below.
+    [{label:null,items:["Not Available"],iconHtml:svg(IC_CONFLICT,"#5a6a76")}].concat(
+      CONFLICT.map(function(arr,i){ return {label:CONFLICT_TIER_LB[i]||("Tier "+i),items:sortAlphaCI(arr),
+        iconHtml:svg(IC_CONFLICT,CONFLICT_COL[i])+'<span class="conBadge"><b>'+(i+1)+'</b></span>'}; }))
+    );
 }
 buildEconConflictSelects();
 // Per-body Biome/Sentinel combos (added 2026-08-17, Tony: "biome and Sentinel
@@ -8224,12 +8240,6 @@ function renderBodyEditList(){
           '<label class="chk2"><input type="checkbox" class="bfWater" data-i="'+i+'"'+(b.water?" checked":"")+'> Water</label>'+
           '<label class="chk2"><input type="checkbox" class="bfAutophage" data-i="'+i+'"'+(b.autophage?" checked":"")+'> Autophage camp</label>'+
         '</div>';
-      if(!b.moon){
-        // Rings aren't a thing on moons in-game, so this only ever shows
-        // for a planet/Giant row -- matches the same moon-only-field pattern
-        // the Orbits dropdown below uses in reverse.
-        html+='<label class="chk2"><input type="checkbox" class="bfRing" data-i="'+i+'"'+(b.ring?" checked":"")+'> Has rings</label>';
-      }
       // "Has base" checkbox available on every body (planet or moon) --
       // unlike rings, a base can genuinely sit on a moon in-game. The name
       // field only appears once ticked (2026-08-21, Tony: "put name of base
@@ -8239,7 +8249,18 @@ function renderBodyEditList(){
       // matters). The typed name gets merged into this system's Notes at
       // Save time (see edSubmit's click handler), same "Base 'X' on Y"
       // phrasing the save-file bulk-import already uses for consistency.
-      html+='<label class="chk2"><input type="checkbox" class="bfBase" data-i="'+i+'"'+(b.base?" checked":"")+'> Has base</label>';
+      var baseChk='<label class="chk2"><input type="checkbox" class="bfBase" data-i="'+i+'"'+(b.base?" checked":"")+'> Has base</label>';
+      if(!b.moon){
+        // Rings aren't a thing on moons in-game, so this only ever shows
+        // for a planet/Giant row -- matches the same moon-only-field pattern
+        // the Orbits dropdown below uses in reverse. Paired with Has base on
+        // the same row (2026-09-02, Tony: "would tidy it up") since both are
+        // available together on a planet -- on a moon (no rings option) Has
+        // base still gets its own full-width row below.
+        html+='<div class="brow2"><label class="chk2"><input type="checkbox" class="bfRing" data-i="'+i+'"'+(b.ring?" checked":"")+'> Has rings</label>'+baseChk+'</div>';
+      }else{
+        html+=baseChk;
+      }
       if(b.base){
         html+='<div class="mfld" style="margin-bottom:0"><div class="lb">Base name</div><input type="text" class="bfBaseName" data-i="'+i+'" maxlength="30" placeholder="e.g. Elegraynor Portal" value="'+escAttr(b.baseName||"")+'"></div>';
       }
