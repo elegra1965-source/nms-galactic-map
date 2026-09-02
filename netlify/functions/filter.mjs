@@ -15,6 +15,67 @@ export const BAD_WORDS = [
   "rape","rapist","kike","chink","spic","tranny"
 ];
 
+// Server-side mirror of preview.html's RESOURCES_CANON/MINERALS_CANON/
+// SALVAGE_CANON/FOSSILS_CANON -- keep in sync. Added 2026-09-02 (Tony:
+// "auto correct whats known but flag back anything else") as the
+// authoritative half of the spelling safety net: the client already does
+// this same check and asks the traveller before it ever submits, but this
+// server-side copy runs unconditionally on EVERY save (bulk import
+// included, and anything hitting this endpoint directly) so a typo of a
+// real known item can never slip into the shared community-terms list no
+// matter how it got submitted -- it just silently corrects to the real
+// spelling. Flora/Fauna have no such list here either, same reasoning as
+// the client: those names are effectively endless and made up per-planet.
+const RESOURCES_CANON = ["Carbon","Oxygen","Di-hydrogen","Tritium","Ferrite Dust","Silicate Powder",
+  "Sodium","Cobalt","Salt","Copper","Chromatic Metal","Silver","Sulphurine","Radon","Nitrogen",
+  "Activated Copper","Residual Goop","Rusted Metal","Somnal Dust","Ancestral Memories","Liquid Sun"];
+const MINERALS_CANON = ["Condensed Carbon","Pure Ferrite","Magnetised Ferrite","Sodium Nitrate",
+  "Ionised Cobalt","Chlorine","Paraffinium","Pyrite","Ammonia","Uranium","Dioxite","Phosphorus",
+  "Tainted Metal","Mordite","Gold","Activated Cadmium","Activated Emeril","Activated Indium",
+  "Fungal Mould","Frost Crystal","Gamma Root","Cactus Flesh","Solanium","Star Bulb","Marrow Bulb",
+  "Kelp Sac","Faecium","Runaway Mould","Living Slime","Viscous Fluids",
+  "Quartzite","Activated Quartzite","Crystallised Helium"];
+const SALVAGE_CANON = ["Salvaged Technology","Salvaged Frigate Module","Recovered Sentinel Components",
+  "Rogue Technology Echo","Anomalous Data Unit","Anomalous Homing Device","Advanced Research Module",
+  "Biomechanical Construct","Bionic Ark","Capital Ship Wiring Platform","Encrypted Navigation Data",
+  "Cartographic Data","Loop Manifestation Technology","Starship Expansion Module",
+  "Contained Reality Glitch","Living Starship Organ","Access Card","Advanced Crafted Product"];
+const FOSSILS_CANON = ["Fossil Sample","Timeless Artifact","Soul Fragment","Energetic Fragment",
+  "Fragment of Life","Communion of Hirk","Cosmic Melody Instrument","Glassy Indeterminance",
+  "Incomplete Data Sequence","Medicinal Substance","Concentrated Deposit","Valuable Mineral Deposit",
+  "Valuable Ore","Aquatic Relic"];
+
+function levenshtein(a,b){
+  a = String(a).toLowerCase(); b = String(b).toLowerCase();
+  var m = a.length, n = b.length;
+  if(!m) return n; if(!n) return m;
+  var prev = new Array(n+1), cur = new Array(n+1), i, j;
+  for(j=0;j<=n;j++) prev[j]=j;
+  for(i=1;i<=m;i++){
+    cur[0]=i;
+    for(j=1;j<=n;j++) cur[j]=Math.min(prev[j]+1, cur[j-1]+1, prev[j-1]+(a.charAt(i-1)===b.charAt(j-1)?0:1));
+    var tmp=prev; prev=cur; cur=tmp;
+  }
+  return prev[n];
+}
+// Same tolerance curve as preview.html's copy -- short words need to be
+// almost exact, longer ones can absorb a couple more different characters.
+function autoCorrectAgainstCanon(value, canonArr){
+  var v = String(value||"").trim();
+  if(!v || !canonArr) return v;
+  var vLo = v.toLowerCase(), i;
+  for(i=0;i<canonArr.length;i++){ if(canonArr[i].toLowerCase()===vLo) return canonArr[i]; }
+  var best=null, bestDist=Infinity;
+  for(i=0;i<canonArr.length;i++){
+    var d=levenshtein(v, canonArr[i]);
+    if(d<bestDist){ bestDist=d; best=canonArr[i]; }
+  }
+  if(!best) return v;
+  var maxLen = Math.max(v.length, best.length);
+  var allowed = maxLen<=5 ? 1 : (maxLen<=10 ? 2 : 3);
+  return bestDist<=allowed ? best : v;
+}
+
 // Server-side mirror of preview.html's SENTINEL_WORDS -- keep in sync.
 // Expanded 2026-08-17 from 5 flat tier names to the real per-tier adjective
 // words (sourced from the NMS wiki's Sentinel page, itself extracted from
@@ -284,12 +345,12 @@ export function filterSystemEdit(payload){
   // Small helper for the 4 grouped resource fields (Flora/Minerals/
   // Salvageable tech/Fossils) -- same shape and limits as the existing
   // Resources list, just run once per group.
-  function resArr(list,fieldName){
+  function resArr(list,fieldName,canonArr){
     var out2 = [];
     var arr = Array.isArray(list) ? list : [];
     for(var k=0;k<Math.min(arr.length,6);k++){
       var r = filterText(arr[k], {maxLen:24, fieldName:fieldName});
-      if(r.ok && r.cleaned) out2.push(r.cleaned);
+      if(r.ok && r.cleaned) out2.push(canonArr ? autoCorrectAgainstCanon(r.cleaned, canonArr) : r.cleaned);
     }
     return out2;
   }
@@ -319,7 +380,7 @@ export function filterSystemEdit(payload){
     var res = Array.isArray(b.resources) ? b.resources : [];
     for(var j=0;j<Math.min(res.length,6);j++){
       var resR = filterText(res[j], {maxLen:24, fieldName:"Resource"});
-      if(resR.ok && resR.cleaned) resOut.push(resR.cleaned);
+      if(resR.ok && resR.cleaned) resOut.push(autoCorrectAgainstCanon(resR.cleaned, RESOURCES_CANON));
     }
     var isMoon = !!b.moon;
     if(isMoon) moonCount++; else planetCount++;
@@ -353,9 +414,9 @@ export function filterSystemEdit(payload){
       resources: resOut,
       flora: resArr(b.flora,"Flora"),
       fauna: resArr(b.fauna,"Fauna"),
-      minerals: resArr(b.minerals,"Mineral"),
-      salvage: resArr(b.salvage,"Salvageable tech"),
-      fossils: resArr(b.fossils,"Fossil/curiosity"),
+      minerals: resArr(b.minerals,"Mineral",MINERALS_CANON),
+      salvage: resArr(b.salvage,"Salvageable tech",SALVAGE_CANON),
+      fossils: resArr(b.fossils,"Fossil/curiosity",FOSSILS_CANON),
       sentinel: SENTINEL_LEVELS.indexOf(sentinelIn)>=0 ? sentinelIn : "None",
       autophage: !!b.autophage,
       // "Has base" (2026-08-17, Tony): plain boolean, same manual-only
