@@ -35190,7 +35190,7 @@
       "disputedFields": [],
       "data": {
         "name": "Poroza VIII",
-        "race": "Uninhabited",
+        "race": "Vy'keen",
         "region": "Isienek Anomaly",
         "starClass": "X1",
         "stars": [
@@ -35200,11 +35200,11 @@
         "water": false,
         "dissonant": false,
         "giant": true,
-        "econName": "Experimental",
+        "econName": "Data Unavailable",
         "sell": "72.3",
         "buy": "-16.7",
         "econDesc": "Unsuccessful",
-        "conflict": "Peaceful",
+        "conflict": "Not Available",
         "blackHole": false,
         "atlas": false,
         "ruins": true,
@@ -35397,9 +35397,10 @@
             "base": false,
             "baseName": ""
           }
-        ]
+        ],
+        "abandoned": true
       },
-      "editedAt": "2026-09-01T21:54:54.437Z",
+      "editedAt": "2026-09-02T13:20:49.202Z",
       "editedByIp": "5.133.46.24",
       "history": [
         {
@@ -35409,6 +35410,10 @@
         {
           "at": "2026-09-01T21:54:54.437Z",
           "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-09-02T13:20:49.202Z",
+          "text": "edited by a traveller"
         }
       ]
     }
@@ -35416,9 +35421,57 @@
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1788299526111,
-      1788299694437
+      1788355249202
     ]
   },
-  "flagLog": {}
+  "flagLog": {},
+  "communityTerms": {
+    "resources": [
+      "Silver",
+      "Gold",
+      "Sodium",
+      "Salt"
+    ],
+    "flora": [
+      "Sporadic",
+      "High",
+      "Full",
+      "Generous",
+      "Copious",
+      "Absent"
+    ],
+    "fauna": [
+      "Devoid",
+      "Full",
+      "Copious",
+      "Frequent",
+      "Rare",
+      "Generous"
+    ],
+    "minerals": [
+      "Magnatised Ferrite",
+      "Crystallised Helium",
+      "Activated Quartzite",
+      "Fungal Mould",
+      "Ammonia",
+      "Quartzite",
+      "Pyrite",
+      "Star Bulb",
+      "Paraffinium",
+      "Frost Crystal",
+      "Dioxide"
+    ],
+    "salvage": [],
+    "fossils": [
+      "Ancient Bones"
+    ],
+    "descriptor": [
+      "Eternal Cyclones",
+      "Noxious Gas Storms",
+      "High Verable Temperatures",
+      "Poison Cyclones",
+      "Dangerously Hot Fog",
+      "Frequent Blizzards"
+    ]
+  }
 }
