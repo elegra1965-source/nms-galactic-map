@@ -27,7 +27,10 @@ const SENTINEL_WORDS = [
   ["Aggressive","Frenzied","High Security","Hostile Patrols","Threatening","Hateful","Zealous","Malicious","Inescapable"],
   ["Corrupted","Forsaken","Rebellious","Answer To None","Sharded from the Atlas","Dissonant","De-Harmonised"]
 ];
-const SENTINEL_LEVELS = ["None"].concat(SENTINEL_WORDS[0],SENTINEL_WORDS[1],SENTINEL_WORDS[2],SENTINEL_WORDS[3]);
+// "Not shown" added 2026-09-02 -- mirrors preview.html's SENTINEL_ALL_WORDS
+// (a real, distinct, savable value: hides the whole Sentinel row client-
+// side, since a real in-game panel can show no Sentinel line at all).
+const SENTINEL_LEVELS = ["None","Not shown"].concat(SENTINEL_WORDS[0],SENTINEL_WORDS[1],SENTINEL_WORDS[2],SENTINEL_WORDS[3]);
 
 // Server-side mirror of preview.html's RING_STYLE_BY_BIOME -- keep in sync.
 // The client only ever sends a boolean "does this body have a ring", never
@@ -231,6 +234,14 @@ export function filterSystemEdit(payload){
   // blackHole/atlas above -- not derived from the conflict word itself,
   // since a traveller should be able to set them independently.
   out.outlaw = !!payload.outlaw;
+
+  // Abandoned (2026-09-02, Tony -- own in-game screenshot showed Race
+  // reading "Vy'keen (Abandoned)": a real race AND abandoned status shown
+  // together). The generator only ever set this procedurally and it was
+  // never savable through Edit system before now -- same manual-only
+  // pattern as outlaw/ruins/giant/blackHole/atlas above, independent of
+  // the race value itself so a traveller can correct either one on its own.
+  out.abandoned = !!payload.abandoned;
 
   // Phantom Star / Shadow Star -- an obscure, wiki-documented NMS oddity
   // (nomanssky.fandom.com/wiki/Phantom_Star, researched in

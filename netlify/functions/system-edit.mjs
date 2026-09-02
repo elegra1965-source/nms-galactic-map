@@ -13,7 +13,7 @@
                "edit"/"report"/"resolve-flag"; "bulk-import" carries its own
                per-entry galaxy instead, see filterBulkImport() in filter.mjs.)
      "edit"   payload = {name, race, region, stars:[colourKey,...] (max 3), starClass, water, dissonant,
-                         giant, ruins, outlaw, phantom, econName, sell, buy, econDesc, conflict, blackHole, atlas, notes,
+                         giant, ruins, outlaw, abandoned, phantom, econName, sell, buy, econDesc, conflict, blackHole, atlas, notes,
                          screenshot, editorName, editorFriendCode, genVersion, colliding, collidingA, collidingB,
                          bodies:[{name, moon, orbits, biome, descriptor, water, ring, resources,
                                   flora, fauna, minerals, salvage, fossils, sentinel, autophage, base, baseName}, ...]}
@@ -185,6 +185,10 @@ function getCategoryValue(out, category){
     // Outlaw (2026-08-17): plain boolean, same pattern as ruins/giant/
     // blackHole/atlas above.
     case "outlaw": return !!out.outlaw;
+    // Abandoned (2026-09-02): plain boolean, same pattern as outlaw/
+    // ruins/giant/blackHole/atlas above -- independent of race so either
+    // can be corrected on its own.
+    case "abandoned": return !!out.abandoned;
     // Phantom / Shadow Star -- was validated by filterSystemEdit() and shown
     // in the Edit system modal since it was added, but never actually wired
     // into TOP_CATS/getCategoryValue/applyCategoryValue below, so a
@@ -238,6 +242,7 @@ function applyCategoryValue(data, category, value){
     case "atlas": data.atlas=!!value; return;
     case "ruins": data.ruins=!!value; return;
     case "outlaw": data.outlaw=!!value; return;
+    case "abandoned": data.abandoned=!!value; return;
     case "phantom": data.phantom=value; return;
     case "notes": data.notes=value; return;
     case "screenshot": data.screenshot=value; return;
@@ -504,7 +509,7 @@ async function handleBulkImport(req, token, body, ip, now){
           name: entry.systemName || "", race:"", region:"", starClass:"", stars:[],
           water:false, dissonant:false, giant:false,
           econName:"", sell:"", buy:"", econDesc:"", conflict:"",
-          blackHole:false, atlas:false, ruins:false, outlaw:false, phantom:"",
+          blackHole:false, atlas:false, ruins:false, outlaw:false, abandoned:false, phantom:"",
           notes: noteLine, colliding:false, collidingA:0, collidingB:0,
           editorName: filtered.cleaned.editorName, editorFriendCode: filtered.cleaned.editorFriendCode,
           genVersion: filtered.cleaned.genVersion || "",
@@ -697,7 +702,7 @@ export default async (req, context) => {
     // or more categories from flaggedFields/disputedFields.
     var stillUnderReview = sysRec.flaggedFields.concat(sysRec.disputedFields);
 
-    var TOP_CATS = ["name","race","region","starClass","stars","suffix","giant","economy","conflict","blackHole","atlas","ruins","outlaw","phantom","notes","colliding","screenshot"];
+    var TOP_CATS = ["name","race","region","starClass","stars","suffix","giant","economy","conflict","blackHole","atlas","ruins","outlaw","abandoned","phantom","notes","colliding","screenshot"];
     for(var ti=0; ti<TOP_CATS.length; ti++){
       if(stillUnderReview.indexOf(TOP_CATS[ti])>=0) continue;
       applyCategoryValue(sysRec.data, TOP_CATS[ti], getCategoryValue(filtered.cleaned, TOP_CATS[ti]));
