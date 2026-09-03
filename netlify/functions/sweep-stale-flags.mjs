@@ -62,7 +62,7 @@ export default async (req) => {
   try { await githubPutFile(token, current.data, current.sha, "Sweep: auto-resolve "+cleared.length+" stale flag(s)"); }
   catch(e){ return new Response("Sweep found "+cleared.length+" stale flag(s) but failed to save: "+e.message, {status:200}); }
 
-  invalidateGetCache();
+  await invalidateGetCache();
   return new Response("Auto-resolved "+cleared.length+" stale flag(s): "+cleared.join(", "), {status:200});
 };
 

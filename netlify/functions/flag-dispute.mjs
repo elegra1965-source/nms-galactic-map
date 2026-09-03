@@ -146,7 +146,7 @@ export default async (req, context) => {
   try { await githubPutFile(token, current.data, current.sha, "Flag "+fields.join(",")+" on "+flagKey); }
   catch(e){ return json(502, {ok:false, error:"Could not save to shared data store: "+e.message}); }
 
-  invalidateGetCache();
+  await invalidateGetCache();
 
   return json(200, {ok:true, address: address, fields: fields, issueCreated: !!issueUrl});
 };

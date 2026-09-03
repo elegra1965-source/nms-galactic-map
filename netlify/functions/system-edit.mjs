@@ -153,7 +153,7 @@ import {
 
 const MAX_EDITS_PER_IP_PER_HOUR = 8;
 const MAX_REPORTS_PER_IP_PER_HOUR = 15;
-const GET_CACHE_TTL_MS = 30 * 1000;
+const GET_CACHE_TTL_MS = 60 * 1000; // bumped from 30s now that the cache is shared via Netlify Blobs (2026-09-03) -- a launch-day traffic wave shares one GitHub read across ALL concurrent visitors, not just ones hitting the same warm container
 const MAX_VOTES_PER_FIELD = 20;   // oldest dropped once a field's vote ledger passes this
 const MAX_HISTORY_PER_SYSTEM = 30; // oldest dropped once a system's audit log passes this
 const MAX_BULK_IMPORTS_PER_IP_PER_DAY = 1; // save-file import is a much heavier write than a normal edit -- one per IP per day is plenty for a real visitor, and blocks abuse
@@ -339,8 +339,8 @@ async function handleGet(req, token){
   var isAdmin = !!(adminToken && suppliedAdminToken && suppliedAdminToken === adminToken);
 
   var now = Date.now();
-  var cacheHeaders = { "Cache-Control": "public, max-age=30, s-maxage=30" };
-  var cache = getGetCache();
+  var cacheHeaders = { "Cache-Control": "public, max-age=60, s-maxage=60" };
+  var cache = await getGetCache();
 
   if(!isAdmin && cache.data && (now - cache.fetchedAt) < GET_CACHE_TTL_MS){
     return json(200, cache.data, cacheHeaders);
@@ -410,7 +410,7 @@ async function handleGet(req, token){
     return json(200, out); // admin view: always live, never cached/served-from-cache
   }
 
-  setGetCache(out, now);
+  await setGetCache(out, now);
   return json(200, out, cacheHeaders);
 }
 
@@ -557,7 +557,7 @@ async function handleBulkImport(req, token, body, ip, now){
     return json(502, {ok:false, error:"Could not save to shared data store: "+e.message});
   }
 
-  invalidateGetCache();
+  await invalidateGetCache();
   return json(200, {ok:true, added:added, merged:merged, planetsSet:planetsSet, systemNamesSet:systemNamesSet, total:filtered.cleaned.entries.length});
 }
 
@@ -610,7 +610,7 @@ async function handleResolveFlag(req, token, body){
   try { await githubPutFile(token, current.data, current.sha, "Resolve flag "+field+" on "+resolveKey); }
   catch(e){ return json(502, {ok:false, error:"Could not save to shared data store: "+e.message}); }
 
-  invalidateGetCache();
+  await invalidateGetCache();
   return json(200, {ok:true});
 }
 
@@ -782,7 +782,7 @@ export default async (req, context) => {
     return json(502, {ok:false, error:"Could not save to shared data store: "+e.message});
   }
 
-  invalidateGetCache();
+  await invalidateGetCache();
 
   return json(200, {ok:true, address: address, action: action});
 };
