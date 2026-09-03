@@ -320,47 +320,27 @@ of that with an actual ported decompilation of the game's own logic.
 
 This repo is the whole client — one HTML file, no build step, no framework:
 
-```
-preview.html                      the entire app: markup + CSS + JS + Three.js r128 (cdnjs), inline
-atlas-pois.json                   Galactic Atlas overlay data -- ~50 real points of interest
-                                  from galacticatlas.nomanssky.com, hand-entered (name,
-                                  address, url); fetched by preview.html's Atlas toggle
-netlify.toml                      serves preview.html at "/", points Netlify at netlify/functions
-netlify/functions/
-  system-edit.mjs                 edit/report intake: rate-limits by IP, reads-merges-commits
-                                  data/overrides.json via the GitHub Contents API; flagged/
-                                  disputed fields go through consensus voting instead of a
-                                  direct overwrite (see "Edit tracking & disputes" below)
-  flag-dispute.mjs                "Data looks wrong" submissions from the Report modal —
-                                  marks a field disputed, best-effort opens a GitHub Issue
-  sweep-stale-flags.mjs           scheduled function, auto-clears any flag >7 days old with
-                                  no consensus reached; never touches a confirmed dispute
-  lib/shared.mjs                  shared GitHub Contents API read/write + GET cache used by
-                                  the three functions above
-  filter.mjs                      the authoritative content filter (profanity, HTML/URL
-                                  stripping, per-field length + allowlist) — mirrored client-
-                                  side in preview.html for instant feedback, but this copy is
-                                  the one that actually decides
-nms-core/                         real decompiled game logic (star type, planet count, black
-                                  hole/Atlas placement, system/region/planet names, economy/
-                                  conflict/race/ring odds) — see "Real game data" below and
-                                  nms-core/README.md for the full module docs
-nms-core/save-import/             client-side-only reader for real .hg save files (name + real
-                                  base list) — see nms-core/save-import/README.md
-nms-tools/                        nms-lookup.js, a single-call wrapper around nms-core for
-                                  other NMS developers who don't want to learn its internals;
-                                  check-atlas-updates.mjs, a manual (not scheduled) check for
-                                  whether atlas-pois.json above has drifted from the live site
-glyphs/                           the 16 real portal glyph PNGs (keypad)
-icons-web/, Icons/                race/economy iconography, cropped from real screenshots
-favicon/, manifest.json, sw.js    PWA install + offline support
-navigator/                        the Galactic Navigator -- index.html, complete.html,
-                                  map-mock.html; opened from preview.html's PLAN JOURNEY button
-                                  with the real plotted route; see "What it can do" above
-SPEC.md                           the original address maths and game-data model, wiki-sourced
-SHARED-EDITS-SETUP.md             one-time GitHub token + Netlify env var setup
-HANDOVER.md                       full build history, session by session
-```
+| Path | What it does |
+|---|---|
+| `preview.html` | the entire app: markup + CSS + JS + Three.js r128 (cdnjs), inline |
+| `atlas-pois.json` | Galactic Atlas overlay data — ~50 real points of interest from galacticatlas.nomanssky.com, hand-entered (name, address, url); fetched by preview.html's Atlas toggle |
+| `netlify.toml` | serves preview.html at "/", points Netlify at netlify/functions |
+| `netlify/functions/` |  |
+| &nbsp;&nbsp;`system-edit.mjs` | edit/report intake: rate-limits by IP, reads-merges-commits data/overrides.json via the GitHub Contents API; flagged/disputed fields go through consensus voting instead of a direct overwrite (see "Edit tracking & disputes" below) |
+| &nbsp;&nbsp;`flag-dispute.mjs` | "Data looks wrong" submissions from the Report modal — marks a field disputed, best-effort opens a GitHub Issue |
+| &nbsp;&nbsp;`sweep-stale-flags.mjs` | scheduled function, auto-clears any flag >7 days old with no consensus reached; never touches a confirmed dispute |
+| &nbsp;&nbsp;`lib/shared.mjs` | shared GitHub Contents API read/write + GET cache used by the three functions above |
+| &nbsp;&nbsp;`filter.mjs` | the authoritative content filter (profanity, HTML/URL stripping, per-field length + allowlist) — mirrored client-side in preview.html for instant feedback, but this copy is the one that actually decides |
+| `nms-core/` | real decompiled game logic (star type, planet count, black hole/Atlas placement, system/region/planet names, economy/conflict/race/ring odds) — see "What real No Man's Sky data does this use?" below and nms-core/README.md for the full module docs |
+| `nms-core/save-import/` | client-side-only reader for real .hg save files (name + real base list) — see nms-core/save-import/README.md |
+| `nms-tools/` | nms-lookup.js, a single-call wrapper around nms-core for other NMS developers who don't want to learn its internals; check-atlas-updates.mjs, a manual (not scheduled) check for whether atlas-pois.json above has drifted from the live site |
+| `glyphs/` | the 16 real portal glyph PNGs (keypad) |
+| `icons-web/`, `Icons/` | race/economy iconography, cropped from real screenshots |
+| `favicon/`, `manifest.json`, `sw.js` | PWA install + offline support |
+| `navigator/` | the Galactic Navigator — index.html, complete.html, map-mock.html; opened from preview.html's PLAN JOURNEY button with the real plotted route; see "What can this map do?" above |
+| `SPEC.md` | the original address maths and game-data model, wiki-sourced |
+| `SHARED-EDITS-SETUP.md` | one-time GitHub token + Netlify env var setup |
+| `HANDOVER.md` | full build history, session by session |
 
 What's **not** in here: `data/overrides.json`, the file that actually holds
 every community-submitted system edit. It isn't missing by accident — it's
