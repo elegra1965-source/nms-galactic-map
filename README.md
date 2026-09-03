@@ -28,18 +28,18 @@ portal address  ->  12 hex glyphs  ->  signed 3D voxel coordinate
 
 **Contents**
 
-- [What it can do](#what-it-can-do)
-- [The address, decoded](#the-address-decoded)
-- [What's in here, and what's not](#whats-in-here-and-whats-not)
-- [Real game data (nms-core)](#real-game-data-nms-core)
-- [Importing your own save](#importing-your-own-save-optional-client-side-only)
-- [Shared community edits](#shared-community-edits-and-how-a-submission-actually-gets-in)
-- [Running it locally](#running-it-locally)
-- [Verifying the generator yourself](#verifying-the-generator-yourself)
-- [Accessibility](#accessibility)
+- [What can this map do?](#what-can-this-map-do)
+- [How does a portal address become a 3D location?](#the-address-decoded)
+- [Is the system data real, or procedurally generated?](#whats-in-here-and-whats-not)
+- [What real No Man's Sky data does this use?](#real-game-data-nms-core)
+- [Can I import my own save file, and is it uploaded anywhere?](#importing-your-own-save-optional-client-side-only)
+- [How do shared community edits get submitted and accepted?](#shared-community-edits-and-how-a-submission-actually-gets-in)
+- [How do I run this locally?](#running-it-locally)
+- [How can I verify the generator's accuracy myself?](#verifying-the-generator-yourself)
+- [Is it accessible?](#is-it-accessible)
 - [Credits](#credits)
 
-## What it can do
+## What can this map do?
 
 Screenshots from the live site, in the order you'd actually hit them. The
 site itself also has a live version of this same walkthrough -- hit **Tour**
@@ -273,7 +273,7 @@ recover, it says so plainly instead of guessing.
 ![Custom 404 page: a Hyperdrive Fault screen reading "Jump failed -- no system at this address", showing the recovered hex address 1CF0EE90BFFA next to its 12-glyph strip](screenshots/16-404-jump-failed.jpg)
 
 <details id="the-address-decoded">
-<summary><strong>The address, decoded</strong></summary>
+<summary><strong>How does a portal address become a 3D location?</strong></summary>
 
 ```
 [P][SSS][YY][ZZZ][XXX]     12 hex glyphs
@@ -316,7 +316,7 @@ of that with an actual ported decompilation of the game's own logic.
 </details>
 
 <details id="whats-in-here-and-whats-not">
-<summary><strong>What's in here, and what's not</strong></summary>
+<summary><strong>Is the system data real, or procedurally generated?</strong></summary>
 
 This repo is the whole client — one HTML file, no build step, no framework:
 
@@ -377,7 +377,7 @@ data with whatever was on disk at clone time.
 </details>
 
 <details id="real-game-data-nms-core">
-<summary><strong>Real game data (nms-core)</strong></summary>
+<summary><strong>What real No Man's Sky data does this use?</strong></summary>
 
 The procedural layer described above started as a from-scratch reverse
 engineering (see `SPEC.md`). `nms-core/` replaced the star-type, planet-count,
@@ -407,7 +407,7 @@ who wants game-accurate system data in their own project without learning
 </details>
 
 <details id="importing-your-own-save-optional-client-side-only">
-<summary><strong>Importing your own save (optional, client-side only)</strong></summary>
+<summary><strong>Can I import my own save file, and is it uploaded anywhere?</strong></summary>
 
 `nms-core/save-import/` is a separate concern from the procedural layer
 above — it doesn't generate anything, it *reads* a real Steam/GOG `.hg`
@@ -425,7 +425,7 @@ the technical writeup.
 </details>
 
 <details id="shared-community-edits-and-how-a-submission-actually-gets-in">
-<summary><strong>Shared community edits, and how a submission actually gets in</strong></summary>
+<summary><strong>How do shared community edits get submitted and accepted?</strong></summary>
 
 The procedural layer is complete on its own — every system has plausible
 data the moment you jump to it. But it's still a guess. **Edit system** lets
@@ -477,7 +477,7 @@ UI) can confirm, dismiss, or directly fix a disputed field.
 </details>
 
 <details id="running-it-locally">
-<summary><strong>Running it locally</strong></summary>
+<summary><strong>How do I run this locally?</strong></summary>
 
 No build step, no dependencies:
 
@@ -506,7 +506,7 @@ auto-deploying on push to `main`.
 </details>
 
 <details id="verifying-the-generator-yourself">
-<summary><strong>Verifying the generator yourself</strong></summary>
+<summary><strong>How can I verify the generator's accuracy myself?</strong></summary>
 
 Determinism is the whole basis of the procedural layer, and it's directly
 checkable — no black box:
@@ -527,7 +527,7 @@ system/region name, planet count, economy/conflict/race) should match.
 
 </details>
 
-## Accessibility
+## Is it accessible?
 
 Font size (4 presets), a High Contrast toggle, and colour-blindness support
 for protanopia/deuteranopia/tritanopia — built as real Daltonization
