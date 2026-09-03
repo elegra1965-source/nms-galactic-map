@@ -5,11 +5,13 @@
    Pulled out during the edit-tracking/dispute build (see
    EDIT-TRACKING-AND-DISPUTES.md) so all three functions read/write
    the exact same GitHub repo constants, the exact same shape of
-   data/overrides.json, and share ONE in-memory GET cache object --
-   a flag or an admin resolve-flag action changes the public GET
-   payload just as much as a normal edit does, so it has to invalidate
-   the same cache system-edit.mjs's own GET handler reads from.
+   data/overrides.json, and share ONE GET cache -- a flag or an admin
+   resolve-flag action changes the public GET payload just as much as
+   a normal edit does, so it has to invalidate the same cache
+   system-edit.mjs's own GET handler reads from.
    ============================================================ */
+
+import { getStore } from "@netlify/blobs";
 
 export const GITHUB_OWNER  = "elegra1965-source";
 export const GITHUB_REPO   = "nms-galactic-map";
@@ -273,17 +275,44 @@ export async function editorHash(ip){
   return "u_"+hex.slice(0,16);
 }
 
-/* Shared 30s GET-response cache (see the header comment in system-edit.mjs
-   for why this exists). Exported as get/set/invalidate functions rather
-   than a raw mutable object so flag-dispute.mjs and sweep-stale-flags.mjs
-   can invalidate it after their own writes without needing to know its
-   internal shape -- any of the three functions changing overrides.json
-   must call invalidateGetCache() so the next visitor's page load doesn't
-   serve a stale pre-write copy for up to 30s. */
-var _getCache = { data: null, fetchedAt: 0 };
-export function getGetCache(){ return _getCache; }
-export function setGetCache(data, now){ _getCache = { data: data, fetchedAt: now }; }
-export function invalidateGetCache(){ _getCache = { data: null, fetchedAt: 0 }; }
+/* Shared GET-response cache (see the header comment in system-edit.mjs for
+   why this exists). Originally a plain in-memory object, which only ever
+   helped repeat requests hitting the SAME warm Netlify Function container
+   -- under a real traffic spike (e.g. this going public/viral) Netlify
+   spins up many concurrent containers, each starting with an empty cache,
+   so a burst of new visitors landing in the same few seconds could still
+   fire a burst of concurrent live GitHub Contents-API reads. Moved onto
+   Netlify Blobs (2026-09-03, pre-launch traffic-safety pass) so ALL
+   concurrent invocations -- across every container -- share the exact
+   same cached copy instead of each rolling its own. No extra Netlify
+   config needed: getStore() auto-detects the site/token from the
+   function's own runtime context.
+   Exported as get/set/invalidate functions (now async) rather than a raw
+   object so flag-dispute.mjs and sweep-stale-flags.mjs can invalidate it
+   after their own writes without needing to know its internal shape --
+   any of the three functions changing overrides.json must call (and
+   await) invalidateGetCache() so the next visitor's page load doesn't
+   serve a stale pre-write copy. */
+var CACHE_STORE_NAME = "nms-galmap-cache";
+var CACHE_KEY = "get-response-cache";
+export async function getGetCache(){
+  try {
+    var val = await getStore(CACHE_STORE_NAME).get(CACHE_KEY, { type: "json" });
+    return val || { data: null, fetchedAt: 0 };
+  } catch(e){
+    // Blobs unreachable/misconfigured: behave as a cache miss rather than
+    // failing the whole request -- githubGetFile() below still works.
+    return { data: null, fetchedAt: 0 };
+  }
+}
+export async function setGetCache(data, now){
+  try { await getStore(CACHE_STORE_NAME).setJSON(CACHE_KEY, { data: data, fetchedAt: now }); }
+  catch(e){ /* non-fatal: next request just misses cache and reads GitHub live */ }
+}
+export async function invalidateGetCache(){
+  try { await getStore(CACHE_STORE_NAME).delete(CACHE_KEY); }
+  catch(e){ /* non-fatal */ }
+}
 
 /* Community-submitted vocabulary for the "type your own value" free-text
    fields (resources/flora/fauna/minerals/salvage/fossils/descriptor) --
