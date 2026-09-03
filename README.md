@@ -30,7 +30,7 @@ portal address  ->  12 hex glyphs  ->  signed 3D voxel coordinate
 
 - [What can this map do?](#what-can-this-map-do)
 - [How does a portal address become a 3D location?](#the-address-decoded)
-- [Is the system data real, or procedurally generated?](#whats-in-here-and-whats-not)
+- [What files make up this repo, and what's deliberately not in here?](#whats-in-here-and-whats-not)
 - [What real No Man's Sky data does this use?](#real-game-data-nms-core)
 - [Can I import my own save file, and is it uploaded anywhere?](#importing-your-own-save-optional-client-side-only)
 - [How do shared community edits get submitted and accepted?](#shared-community-edits-and-how-a-submission-actually-gets-in)
@@ -316,7 +316,7 @@ of that with an actual ported decompilation of the game's own logic.
 </details>
 
 <details id="whats-in-here-and-whats-not">
-<summary><strong>Is the system data real, or procedurally generated?</strong></summary>
+<summary><strong>What files make up this repo, and what's deliberately not in here?</strong></summary>
 
 This repo is the whole client — one HTML file, no build step, no framework:
 
