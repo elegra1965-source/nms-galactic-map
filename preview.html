@@ -666,7 +666,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   width:min(560px,calc(100vw - 20px));padding:10px 12px;display:none}
 #keys.show{display:block}
 /* Searchable galaxy picker docked next to the keypad's own title (2026-08-22,
-   real per-galaxy addressing -- see TODO.md). Reuses the same native
+   real per-galaxy addressing). Reuses the same native
    <datalist> autocomplete pattern this file already relies on elsewhere
    (populateDatalists()) rather than a custom dropdown widget. */
 .kheadrow{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
@@ -1768,7 +1768,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     <button class="btn" id="edRetry" type="button" style="display:none;margin:-4px 0 10px">Retry save</button>
     <div class="iconWrap" id="editIconWrap"><img id="editIconImg" src="" alt=""><span class="driftBeam"></span></div>
     <div id="editSpin"><span id="editSpinTxt">Atlas is working on it...</span></div>
-    <!-- Galaxy (2026-08-22, real per-galaxy addressing -- see TODO.md): a
+    <!-- Galaxy (2026-08-22, real per-galaxy addressing): a
          portal address alone doesn't say which of the 257 galaxies it's in,
          so the editor confirms/picks it here at save time. Pre-filled from
          the system currently on screen (see openEditModal()) but always
@@ -2385,7 +2385,7 @@ function starTypeForIdx(vx,vy,vz,idx){
    diff "records saved under the old GEN_VERSION" against a fresh regen
    under the new one and flag mismatches through the existing dispute
    system, instead of either guessing blind or manually re-checking ~260+
-   records by hand. See TODO.md. */
+   records by hand. */
 var GEN_VERSION="1.3.0"; // bumped 2026-08-24: planet/moon biome selection
   // now uses nms-core/economy.js's pickBiome() -- a real wiki-sourced
   // weighted table by star colour x galaxy type x Prime-vs-Normal slot --
@@ -2408,7 +2408,7 @@ var GEN_VERSION="1.3.0"; // bumped 2026-08-24: planet/moon biome selection
   // NOT confirmed against decompiled data or the wiki, see the dedup
   // pass's own comment in generateSystem() for the caveat). 1.1.0 covered
   // economy/wealth/conflict/race wiring to nms-core/system.js and the
-  // sell%/buy% refit -- see nms-core/economy.js's header and TODO.md.
+  // sell%/buy% refit -- see nms-core/economy.js's header.
 var ODDS={yellow:{out:.25,unc:0,aba:0},red:{out:.50,unc:.95,aba:0},
   green:{out:.15,unc:.40,aba:.10},blue:{out:.15,unc:.40,aba:.10},purple:{out:.05,unc:.20,aba:.35}};
 /* chance a purple system is also a Giant-planet system -- placeholder,
@@ -2968,7 +2968,7 @@ function generateSystem(vx,vy,vz,idx,noOverride){
      gas_giant/planet counts) carries systemAttributes()'s own
      economy_type/wealth/conflict_level/dominant_race/uncharted/abandoned/
      pirate, ~99% validated against 1000 ground-truth systems (see
-     nms-core/system.js's header, TODO.md). window.NMSEconomy.
+     nms-core/system.js's header). window.NMSEconomy.
      rollSystemFlavorFromAttrs() takes those as given and only rolls the
      flavour-text word within each type/tier plus sell%/buy% (the one piece
      systemAttributes() doesn't model -- see economy.js's own rollSellBuy()
@@ -3224,15 +3224,13 @@ var OVERRIDES={systems:{},communityTerms:{}};
 var FLAG_CATEGORIES=["name","race","region","starClass","stars","suffix","giant","economy","conflict","blackHole","atlas","phantom","notes","screenshot"];
 function applyOverride(s){
   // Real per-galaxy addressing (2026-08-22): the shared systems dict is
-  // keyed "galaxy:ADDRESS" now, not just ADDRESS (see TODO.md's "Real
-  // per-galaxy addressing" entry and lib/shared.mjs's compositeKey()
-  // comment) -- skey() is the exact same helper store.marks/waypoints/
+  // keyed "galaxy:ADDRESS" now, not just ADDRESS (see lib/shared.mjs's
+  // compositeKey() comment) -- skey() is the exact same helper store.marks/waypoints/
   // visited already use for this, reused here rather than duplicated.
   var ov=OVERRIDES.systems && OVERRIDES.systems[skey(s)];
   // Backward-compat fallback for data/overrides.json records that predate
   // the 2026-08-22 composite-key migration -- see the long comment above
-  // applyOverride() and TODO.md's "Real per-galaxy addressing" entry for
-  // the full why. Only applies in Euclid (galaxy 0), matching the
+  // applyOverride() for the full why. Only applies in Euclid (galaxy 0), matching the
   // migration's own default, and only when no real composite-keyed record
   // already exists for this address (a fresh post-migration or newly-
   // edited record always wins).
@@ -4079,7 +4077,7 @@ function voxelToGalaxy(x,y,z){ return new THREE.Vector3((x/2048)*GAL_R,(y/128)*G
 /* Galactic Atlas overlay (2026-08-29): Hello Games' own community POI map
    for the Euclid galaxy -- https://galacticatlas.nomanssky.com/ -- pulled
    in as clickable diamond markers. Addresses hand-entered once into
-   atlas-pois.json (no live scraping -- see TODO.md); each one decodes with
+   atlas-pois.json (no live scraping); each one decodes with
    this project's own parseAddress()/voxelToGalaxy(), exactly like typing
    it into the Jump box. Diamonds are children of galaxyGroup (same parent
    as "marker" above), so they orbit with the galaxy's own rotation exactly
@@ -9595,7 +9593,7 @@ applyA11y();
    synchronous, no other code runs in between, safe.
    "Documented" (community-edited OVERRIDES.systems) entries closed that
    last gap on 2026-08-22: the shared store is now keyed "galaxy:ADDRESS"
-   (see TODO.md's "Real per-galaxy addressing" entry and lib/shared.mjs's
+   (see lib/shared.mjs's
    compositeKey() comment), so every record already carries its own real
    galaxy in its key, parsed the exact same way addFromStore() below
    already parses store.marks/waypoints/visited's own "galaxy:address"
@@ -9620,7 +9618,7 @@ function buildSearchIndex(){
     }
     idx.push({name:sys.name,address:addr,hint:hint,galaxy:g});
     // Real (non-procedural) planet/moon names + base names, added 2026-08-21
-    // per Tony's TODO.md ask -- most travellers remember what they named a
+    // per Tony's ask -- most travellers remember what they named a
     // PLANET or a base, not the system it's in. b.nameOverridden is the same
     // flag applyOverride() sets the moment a real submitted body name lands
     // (see upgradeBodyNames()'s own comment) -- it's only ever true for a
@@ -10408,7 +10406,7 @@ document.getElementById("siImportBases").addEventListener("click",function(){
   // has to go out in a single request or the second call would just be
   // rejected as "one import per day already used."
   //
-  // Real per-galaxy addressing (2026-08-22, see TODO.md): every entry needs
+  // Real per-galaxy addressing (2026-08-22): every entry needs
   // a real galaxy now, not just an address. extractSaveSummary() already
   // resolved each base's real galaxy where possible (b.galaxy, via
   // TeleportEndpoints name-matching -- see extract-summary.js's header
