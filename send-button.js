@@ -46,7 +46,8 @@ template.innerHTML = `
 
 :host{
   --nms-cyan:#4fe3ff;
-  --nms-orange:#ffb020;
+  --nms-idle-border:rgba(0,229,255,.16);
+  --nms-idle-text:#cfe0f0;
   display:inline-block;
 }
 button{
@@ -59,9 +60,9 @@ button{
   gap:.7em;
   padding:.85em 1.3em;
   background:transparent;
-  border:1px solid var(--nms-orange);
+  border:1px solid var(--nms-idle-border);
   border-radius:2px;
-  color:var(--nms-orange);
+  color:var(--nms-idle-text);
   font:inherit;
   font-family:'Consolas','Menlo','Courier New',monospace;
   font-size:.8rem;
@@ -71,7 +72,8 @@ button{
   transition:box-shadow .3s ease, color .3s ease, border-color .3s ease, opacity .2s ease;
 }
 button:hover:not(:disabled){
-  box-shadow:0 0 14px rgba(255,176,32,.35);
+  border-color:var(--nms-cyan);
+  box-shadow:0 0 14px rgba(79,227,255,.25);
 }
 button:disabled{ cursor:default; opacity:.7; }
 :host(.is-sending) button,
