@@ -10605,6 +10605,13 @@ function submitFeedbackPayload(payload){
   retryBtn.style.display="none";
   spin.style.display="flex"; btn.disabled=true;
   btn.playSending();
+  var sendStartedAt=Date.now(); // send-button.js's own playSending() holds at "Feedback sent"
+    // for exactly SEND_ANIM_MS internally before it's fully settled -- on success below
+    // we wait out whatever's left of that window (rather than closing the instant the
+    // network responds, which on a fast connection was cutting the ship-flies-off
+    // animation short) plus SEND_HOLD_MS so there's always a moment to actually read
+    // "Feedback sent" before the modal closes, regardless of how fast the request was.
+  var SEND_ANIM_MS=4000, SEND_HOLD_MS=700;
   var stopWait=startAtlasWait(spinTxt, iconWrap, iconImg);
   fetch(FEEDBACK_URL,{method:"POST",headers:{"Content-Type":"application/json"},
     body:JSON.stringify(payload)
@@ -10620,9 +10627,13 @@ function submitFeedbackPayload(payload){
       return;
     }
     hideStatusIcon(iconWrap);
-    btn.reset();
-    closeModal();
-    toast(res.body.issueUrl?"Feedback sent -- thank you":"Feedback sent -- thanks");
+    var elapsed=Date.now()-sendStartedAt;
+    var wait=Math.max(0,SEND_ANIM_MS-elapsed)+SEND_HOLD_MS;
+    setTimeout(function(){
+      btn.reset();
+      closeModal();
+      toast(res.body.issueUrl?"Feedback sent -- thank you":"Feedback sent -- thanks");
+    },wait);
   }).catch(function(){
     stopWait(); spin.style.display="none"; btn.disabled=false;
     showStatusIcon(iconWrap,iconImg,"grave");
