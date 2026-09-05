@@ -799,6 +799,25 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   padding:5px 4px;margin:-5px -4px -5px -4px;border-radius:6px;cursor:pointer}
 #disclaimerModal .mfld>.lb::before{content:'\25B8';color:var(--cyan);font-size:8px;transition:transform .15s ease;flex:none}
 #disclaimerModal .mfld>.lb.open::before{transform:rotate(90deg)}
+/* Read-aloud additions (Tony, 2026-09-05): hidden entirely unless the
+   toggle below is switched on -- panel looks exactly as it always has
+   until then. See the JS comment near openDisclaimer() for the full
+   design reasoning (why Web Speech API, why no native pause/resume). */
+#discReadToggleRow{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin:-4px 0 10px}
+#discReadToggleLabel{font-size:9px;letter-spacing:.1em;color:var(--text-faint);text-transform:uppercase}
+#discReadToggle{width:30px;height:16px;border-radius:8px;background:rgba(120,140,150,.2);border:1px solid rgba(120,140,150,.35);position:relative;cursor:pointer;padding:0;flex:none}
+#discReadToggle .thumb{width:12px;height:12px;border-radius:50%;background:#5b7480;position:absolute;top:1px;left:1px;transition:left .15s ease,background .15s ease}
+#discReadToggle[aria-checked="true"]{background:rgba(111,216,255,.25);border-color:var(--cyan)}
+#discReadToggle[aria-checked="true"] .thumb{left:15px;background:var(--cyan)}
+#discReadBar{display:none;align-items:center;gap:10px;margin:-2px 0 12px;font-size:10px;color:var(--text-faint);flex-wrap:wrap}
+#disclaimerModal.read-mode #discReadBar{display:flex}
+#discReadBar button{background:transparent;border:1px solid var(--cyan);color:var(--cyan);font-size:10px;padding:3px 8px;border-radius:4px;cursor:pointer;font-family:inherit}
+#discReadBar button:disabled{opacity:.35;cursor:default}
+#disclaimerModal .mfld>.lb .rd-ic{display:none;margin-left:auto;font-size:11px;opacity:.4;flex:none}
+#disclaimerModal.read-mode .mfld>.lb .rd-ic{display:inline-block}
+#disclaimerModal .mfld>.lb.reading{color:var(--white)}
+#disclaimerModal .mfld>.lb .rd-ic.pulse{opacity:1;color:var(--cyan);animation:rdPulse 1.1s ease-in-out infinite;display:inline-block}
+@keyframes rdPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.85)}}
 .mfld input[type=text],.mfld input[type=number]{width:100%;text-transform:none;font-family:'Rajdhani',sans-serif;
   letter-spacing:.02em;color:var(--text);font-size:12px}
 .mfld textarea{margin-top:0}
@@ -1931,7 +1950,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
         <option>Other</option>
       </select>
     </div>
-    <div class="mfld"><div class="lb">What happened, or what you'd like</div>
+    <div class="mfld"><div class="lb">What happened? What would you like adding, etc.?</div>
       <textarea id="fbMessage" maxlength="800" placeholder="Be as specific as you can"></textarea>
     </div>
     <div class="mfld"><div class="lb">Steps to reproduce (if it's a bug, optional)</div>
@@ -1948,7 +1967,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     <div class="iconWrap" id="feedbackIconWrap"><img id="feedbackIconImg" src="" alt=""><span class="driftBeam"></span></div>
     <div id="feedbackSpin"><span id="feedbackSpinTxt">Atlas is working on it...</span></div>
     <div class="modalBtns">
-      <button class="btn primary" id="fbSubmit">Send feedback</button>
+      <send-button id="fbSubmit" class="btn primary" sent-label="Feedback sent">Send feedback</send-button>
       <button class="btn" id="fbCancel">Cancel</button>
     </div>
   </div>
@@ -1972,11 +1991,21 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   <div class="box modal" id="disclaimerModal" style="max-width:380px;display:none">
     <h3>Before you explore</h3>
     <div class="msub" style="margin-bottom:12px">A few quick things:</div>
+    <div id="discReadToggleRow">
+      <span id="discReadToggleLabel">Read aloud</span>
+      <button type="button" id="discReadToggle" role="switch" aria-checked="false" aria-label="Toggle read-aloud controls for this page"><span class="thumb"></span></button>
+    </div>
+    <div id="discReadBar" role="status" aria-live="polite">
+      <button type="button" id="discReadPlay">&#9654; Read all</button>
+      <button type="button" id="discReadPause" disabled>Pause</button>
+      <button type="button" id="discReadStop" disabled>Stop</button>
+      <span id="discReadStatus">ready</span>
+    </div>
     <div class="mfld">
       <div class="lb">Fan-made project</div>
       <div style="font-size:12px;color:var(--text-dim);line-height:1.55">This is an unofficial, fan-made tool. It is not affiliated with, endorsed by, or sponsored by Hello Games.</div>
     </div>
-    <div class="mfld">
+    <div class="mfld" data-narrate="Procedural data. Star systems here are generated the same way the game generates them, straight from a portal address, not scraped from anyone's save. Star type, names, planet count, race, economy, and conflict level are reverse-engineered and right most of the time, but they're an approximation, not a perfect decompile, so occasional mismatches are expected rather than a bug. Individual planet names, whether a planet has rings, and sentinel activity per planet are all plausible guesses this project invented rather than decoded from the game, though the underlying odds behind rings and sentinel activity are based on real decompiled data. Anything tagged Procedural is a guess rather than a confirmed value. Importing a save only ever pulls in real base names; everything else still needs typing in by hand via Edit system, and a system only reflects real in-game data once a traveller has done that.">
       <div class="lb">Procedural data</div>
       <div style="font-size:12px;color:var(--text-dim);line-height:1.55">Star systems are generated procedurally from their portal address, the same way the game does -- they are not scraped from anyone's real save. Star type, system/region names, total planet+moon count, and (as of 2026-08-23) <b>race, economy type/tier, and conflict level</b> are all reverse-engineered from the game's own logic and right most of the time, but they're a corpus-verified <b>approximation</b>, not a perfect decompile -- occasional mismatches (e.g. a system that generates as 5 bodies but is really 3 in your save, or a race that doesn't match) are a known, expected gap (roughly 1 in 100, per the 1000-system real corpus this was validated against), not a bug to report. The exact sell%/buy% numbers shown are the one part of that economy panel still this project's own invented figure, not derived from the address -- the real game only exposes economy <i>strength</i> (low/medium/high), not an exact percentage, to reverse-engineer against. <b>Individual planet names are not</b> accurate at all -- the real game's planet-naming logic has never been fully reverse-engineered (confirmed against the game's own decompiled data and a real save file), so what you see is a plausible guess, not your actual save data. As of 2026-08-18 that guess leans on the planet's own biome (and Sentinel activity, once known) to pick a more fitting-sounding name -- still a guess, just a less randomly-mismatched one. <b>Which planets have rings is still a guess too</b> -- No Man's Sky's real ring-placement logic has never been reverse-engineered, so unlike race/economy/conflict above, it's this project's own invented flavour, built to read naturally next to the real in-game panel. The underlying ring odds are real decompiled game data though (the flat 30% chance, pulled from GCSOLARGENERATIONGLOBALS.GLOBAL.MBIN) -- so the overall statistical feel matches the game, but any single planet's actual ring can't match your save any more than its name can. <b>Sentinel activity per planet is the same kind of invented guess</b> (added 2026-08-23) -- No Man's Sky has never exposed this per system in a way that's been reverse-engineered either, so it's this project's own weighting, leaning toward calmer readings in low-conflict systems and more aggressive ones in high-conflict systems, tagged "(procedural)" next to the value the same way rings are, until a traveller confirms the real in-game reading via Edit system. On the rare system where a portal address isn't available to compute the real values from, race/economy/conflict fall back to an invented guess too, same as rings -- a dashed "Procedural" tag next to the field is how you can tell. Importing your save file only ever pulls in real <b>base names</b> (a save doesn't expose anything else about a system) -- everything else, including fixing a wrong planet count, still needs typing in by hand via <b>Edit system</b>. A system only reflects real in-game data once a traveller has entered it that way, marked "Community edited".</div>
     </div>
@@ -2020,7 +2049,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
       <div class="lb">Saving and sharing a route</div>
       <div style="font-size:12px;color:var(--text-dim);line-height:1.55">Once a course is plotted, the Course plotted card has two more buttons below Jump to / Clear. <b>Save Route</b> stores that exact route -- start, end, every waypoint -- into <b>My Routes</b> (the &#9776; Routes button in the toolbar) so it's there on this device even after closing the tab; expeditions rarely get planned start-to-finish in one sitting. <b>Copy Link</b> hands the same route out as a URL instead, for pasting to yourself on another device or sending to someone else -- opening it loads (and saves) the route automatically, or you can paste one into the box at the top of My Routes without needing the link to open on its own. Saved routes travel with Export/Import logs the same way bookmarks and waypoints do.</div>
     </div>
-    <div class="mfld">
+    <div class="mfld" data-narrate="Search by name, also how to get back to everywhere you've been. Search finds a system, planet, moon, or base by name, but only among things that already have a real name attached: anything documented by the community, plus your own bookmarks, waypoints, and visited history, across every galaxy. Leave the search box empty and it instead lists everywhere you've bookmarked, waypointed, visited, or personally edited, sorted alphabetically, so you can jump straight back. This is the one search that works regardless of where you currently are. The rest of the galaxy has no name to search until someone documents it, since turning a portal address into a name only works one way, so there's no way to look up a name that hasn't already been entered here, even from a friend's save or a screenshot. If you have the actual portal address instead, typing it in and hitting Jump always works.">
       <div class="lb">Search by name -- also how to get back to everywhere you've been</div>
       <div style="font-size:12px;color:var(--text-dim);line-height:1.55">The <b>Search</b> button finds a system, planet, moon or base by name and jumps straight there -- but only among things that already have a real name attached: anything community-documented via Edit system, plus your own bookmarks, waypoints, and visited history (searched across every galaxy, not just the one you're viewing). A planet/moon/base result scrolls and highlights the matching row in the info panel once you land on the system, so you're not left hunting for it in the body list. <b>Leave the search box empty</b> and it instead lists everywhere you've bookmarked, waypointed, or visited, plus any system <i>you</i> personally have edited or bulk-imported from your save (added 2026-08-27, tagged "Documented (you)") -- sorted alphabetically, click one to jump straight back, no address or portal glyphs to remember. This is the one place that works regardless of where you currently are; <b>Local view's Filters panel is different</b> -- it only ever narrows down whatever's already rendered nearby (colour, race, economy, black holes, Atlas interfaces, outlaw/phantom/shadow systems, waypointed, reachable-by-drive), so there's no "Visited" or "Edited by traveller" filter option there any more -- a system on the other side of the galaxy was never going to appear just because a filter box was ticked, so Search above is the actual way back to it. The rest of the galaxy has no name to search until someone actually names it -- and that's a hard limit, not just a small index waiting to be filled in: turning a portal address into a name is a one-way calculation (like a hash), so there's no formula to run backwards from a name to find its address, only checking addresses one at a time to see what they generate. With roughly 18 quintillion possible systems, precomputing and indexing every name in advance isn't practically possible, so a name from somewhere else -- a friend's save, a database, a screenshot -- generally won't be searchable here unless that exact system has also been documented, bookmarked, waypointed or visited on this site. If you have the actual portal address instead of just a name, typing or pasting it into the address box and hitting <b>Jump</b> always works, since generating a system forward from its address is the one direction this map can always compute. And since names aren't tied to a specific galaxy in the shared data store, the same documented address can look identical no matter which of the 257 galaxies you're browsing.</div>
     </div>
@@ -2028,7 +2057,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
       <div class="lb">Boxes in your way?</div>
       <div style="font-size:12px;color:var(--text-dim);line-height:1.55">Filters, the system info panel, Course plotted, the glyph keypad, Search, Edit system, and Accessibility can all be dragged by their header to wherever suits your screen -- handy on smaller or rotated phones where they can otherwise overlap.</div>
     </div>
-    <div class="mfld">
+    <div class="mfld" data-narrate="Links to elegra1965's other No Man's Sky projects: NMS Command Network, the Atlas AI assistant interface, the NMS Theme Pack, the Weather App, the Alphabet Translator, and an Atlas Obsidian theme pending review.">
       <div class="lb">More by elegra1965</div>
       <div style="display:flex;flex-direction:column;gap:5px;font-size:12px">
         <a href="https://nomansskyhub.app" target="_blank" rel="noreferrer" style="color:var(--cyan);text-decoration:none">&#9670; NMS Command Network (hub)</a>
@@ -2048,7 +2077,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
       <div style="font-size:12px;color:var(--text-dim);line-height:1.55;margin-bottom:6px">Opens a GitHub Issue elegra1965 can see -- no account or email needed.</div>
       <button class="btn" id="discFeedback" style="width:100%;text-align:center">Send feedback</button>
     </div>
-    <div class="mfld">
+    <div class="mfld" data-narrate="Buttons to share this map on X, on Reddit, or copy a link.">
       <div class="lb">Share this map</div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
         <button class="btn" onclick="return shareTo('x')" style="flex:1;text-align:center">Share on X</button>
@@ -9024,33 +9053,232 @@ function openDisclaimer(){
   remeasureDisclaimerScroll();
 }
 document.getElementById("bAbout").addEventListener("click",openDisclaimer);
-/* About accordion (Tony, 2026-08-22): the modal's ~14 .mfld sections were all
-   open at once, making it a long scroll. Collapse every section to just its
-   label; clicking a label opens its body and closes whichever other section
-   was open. Runs once at load -- the modal's DOM exists whether or not it's
-   currently displayed, no need to redo this each time it's opened. */
+/* About accordion + read-aloud (Tony, 2026-09-05): the open/close mechanics
+   below are the same exclusive-accordion behaviour from 2026-08-22 -- click
+   a header, it opens and every other section closes. Two things added on
+   top:
+   1) Real keyboard/ARIA support -- there was no keyboard path into this
+      before (mouse/touch only). Each header is promoted from a plain div
+      into an actual <h4> (so screen readers announce it as a heading, not
+      silent text) with role=button/aria-expanded/aria-controls, and
+      Enter/Space now activates it same as a click.
+   2) An opt-in "read aloud" toggle using the browser's own speech
+      synthesis (Web Speech API) -- off by default, panel looks exactly as
+      it always has until switched on. Deliberately NOT pre-recorded
+      narration (this copy changes often; re-recording every time isn't
+      viable) and deliberately NOT relying on speechSynthesis.pause()/
+      resume() (silently broken on a lot of mobile browsers, confirmed on
+      Chrome-for-Android in testing while Samsung Internet worked fine) --
+      pause instead cancels the current sentence and replays it on resume,
+      using only speak()/cancel(), the two calls that work everywhere.
+      Narration text is read straight from each section's own visible copy
+      by default, so it can never drift out of sync when this copy is
+      edited -- data-narrate on the two link/button-only sections (More by
+      elegra1965, Share this map -- nothing else there to read) overrides
+      that with a short hand-written line instead. A "read all" run also
+      auto-expands each section as it starts reading it, same as a person
+      clicking through manually would; clicking a different header while
+      it's running jumps narration straight to that section instead of
+      fighting the click. */
 (function(){
-  var sections=document.querySelectorAll('#disclaimerModal .mfld');
+  var modal=document.getElementById('disclaimerModal');
+  var sections=modal.querySelectorAll('.mfld');
+  var collapsible=[];
+  var narratable=[];
+
   for(var i=0;i<sections.length;i++){
-    var lb=sections[i].querySelector('.lb');
-    var body=sections[i].querySelector(':scope > div:last-child');
-    if(!lb||!body||body===lb) continue;
-    lb.style.cursor="pointer";
-    lb.style.userSelect="none";
-    body.style.display="none";
-    (function(body){
-      lb.addEventListener("click",function(){
-        var opening=body.style.display==="none";
-        var bodies=document.querySelectorAll('#disclaimerModal .mfld > div:last-child');
-        for(var j=0;j<bodies.length;j++) bodies[j].style.display="none";
-        var labels=document.querySelectorAll('#disclaimerModal .mfld > .lb');
-        for(var k=0;k<labels.length;k++) labels[k].classList.remove("open");
-        body.style.display=opening?"":"none";
-        if(opening) lb.classList.add("open");
-        remeasureDisclaimerScroll();
-      });
-    })(body);
+    var section=sections[i];
+    var oldLb=section.querySelector('.lb');
+    if(!oldLb) continue;
+
+    var lb=document.createElement('h4');
+    lb.className=oldLb.className;
+    while(oldLb.firstChild) lb.appendChild(oldLb.firstChild);
+    oldLb.parentNode.replaceChild(lb,oldLb);
+
+    var icon=document.createElement('span');
+    icon.className='rd-ic';
+    icon.setAttribute('aria-hidden','true');
+    icon.innerHTML='&#128266;';
+    lb.appendChild(icon);
+
+    var divs=section.querySelectorAll(':scope > div');
+    var narrateBody=divs.length?divs[0]:null;
+
+    var collapseItem=null;
+    var collapseBody=section.querySelector(':scope > div:last-child');
+    if(collapseBody && collapseBody!==lb){
+      var id='discBody-'+i;
+      collapseBody.id=id;
+      collapseBody.style.display='none';
+      lb.style.cursor='pointer';
+      lb.style.userSelect='none';
+      lb.setAttribute('role','button');
+      lb.setAttribute('tabindex','0');
+      lb.setAttribute('aria-expanded','false');
+      lb.setAttribute('aria-controls',id);
+      collapseItem={lb:lb,body:collapseBody};
+      collapsible.push(collapseItem);
+    }
+
+    if(narrateBody){
+      narratable.push({lb:lb,icon:icon,section:section,body:narrateBody,collapse:collapseItem});
+    }
   }
+
+  function closeAll(){
+    for(var j=0;j<collapsible.length;j++){
+      collapsible[j].body.style.display='none';
+      collapsible[j].lb.classList.remove('open');
+      collapsible[j].lb.setAttribute('aria-expanded','false');
+    }
+  }
+
+  function openItem(item){
+    closeAll();
+    item.body.style.display='';
+    item.lb.classList.add('open');
+    item.lb.setAttribute('aria-expanded','true');
+    remeasureDisclaimerScroll();
+  }
+
+  for(var k=0;k<collapsible.length;k++){
+    (function(item){
+      function activate(){
+        var wasOpen=item.body.style.display!=='none';
+        if(wasOpen) closeAll(); else openItem(item);
+        remeasureDisclaimerScroll();
+        if(readMode){
+          if(wasOpen){ Narrate.stop(); }
+          else{
+            var match=null;
+            for(var m=0;m<narratable.length;m++){ if(narratable[m].lb===item.lb){ match=narratable[m]; break; } }
+            if(match) Narrate.playOne(match);
+          }
+        }
+      }
+      item.lb.addEventListener('click',activate);
+      item.lb.addEventListener('keydown',function(e){
+        if(e.key==='Enter'||e.key===' '||e.key==='Spacebar'){ e.preventDefault(); activate(); }
+      });
+    })(collapsible[k]);
+  }
+
+  var readMode=false;
+  var toggleBtn=document.getElementById('discReadToggle');
+  toggleBtn.addEventListener('click',function(){
+    readMode=!readMode;
+    toggleBtn.setAttribute('aria-checked',String(readMode));
+    modal.classList.toggle('read-mode',readMode);
+    if(!readMode) Narrate.stop();
+  });
+
+  var Narrate=(function(){
+    var readBar=document.getElementById('discReadBar');
+    if(!('speechSynthesis' in window)){
+      readBar.innerHTML='<span style="font-size:10px;color:var(--text-faint)">read-aloud isn\'t supported in this browser</span>';
+      return {playOne:function(){},playAll:function(){},stop:function(){}};
+    }
+    var playBtn=document.getElementById('discReadPlay');
+    var pauseBtn=document.getElementById('discReadPause');
+    var stopBtn=document.getElementById('discReadStop');
+    var status=document.getElementById('discReadStatus');
+    var CLOSING_LINE='That was the contents of the About page.';
+    var queue=[],pos=0,playing=false,paused=false,wantsClosing=false,replayCurrent=null,voicesReady=null,gen=0;
+
+    function textFor(entry){
+      if(entry.section.hasAttribute('data-narrate')) return entry.section.getAttribute('data-narrate');
+      return (entry.body.textContent||'').replace(/\s+/g,' ').trim();
+    }
+    function splitSentences(t){
+      return (t.match(/[^.!?]+[.!?]+(\s|$)/g)||[t]).map(function(s){return s.trim();}).filter(Boolean);
+    }
+    function ensureVoices(){
+      if(voicesReady) return voicesReady;
+      voicesReady=new Promise(function(resolve){
+        var existing=window.speechSynthesis.getVoices();
+        if(existing.length){ resolve(existing); return; }
+        var settled=false;
+        window.speechSynthesis.onvoiceschanged=function(){
+          if(settled) return;
+          var v=window.speechSynthesis.getVoices();
+          if(v.length){ settled=true; resolve(v); }
+        };
+        setTimeout(function(){ if(!settled){ settled=true; resolve(window.speechSynthesis.getVoices()); } },1200);
+      });
+      return voicesReady;
+    }
+    function setControls(active){ playBtn.disabled=active; pauseBtn.disabled=!active; stopBtn.disabled=!active; }
+    function setStatus(t){ status.textContent=t; }
+    function clearActive(){
+      for(var n=0;n<narratable.length;n++){ narratable[n].lb.classList.remove('reading'); narratable[n].icon.classList.remove('pulse'); }
+    }
+    function highlight(entry){
+      clearActive();
+      if(!entry) return;
+      entry.lb.classList.add('reading');
+      entry.icon.classList.add('pulse');
+      if(entry.collapse) openItem(entry.collapse);
+    }
+    function speak(text,entry,onDone,myGen){
+      highlight(entry);
+      setStatus(entry?'reading':'finishing');
+      var u=new SpeechSynthesisUtterance(text);
+      u.onend=function(){ if(myGen!==gen||!playing||paused) return; onDone(); };
+      u.onerror=function(){ if(myGen!==gen) return; if(playing&&!paused) finish(true); };
+      replayCurrent=function(){ if(myGen===gen) speak(text,entry,onDone,myGen); };
+      window.speechSynthesis.cancel();
+      setTimeout(function(){ window.speechSynthesis.speak(u); },40);
+    }
+    function advance(myGen){
+      if(myGen!==gen) return;
+      if(pos<queue.length){
+        var q=queue[pos];
+        speak(q.text,q.entry,function(){ pos++; advance(myGen); },myGen);
+        return;
+      }
+      if(wantsClosing){ wantsClosing=false; speak(CLOSING_LINE,null,function(){ finish(false); },myGen); return; }
+      finish(false);
+    }
+    function buildQueue(list){
+      var q=[];
+      for(var x=0;x<list.length;x++){
+        var sentences=splitSentences(textFor(list[x]));
+        for(var s=0;s<sentences.length;s++) q.push({entry:list[x],text:sentences[s]});
+      }
+      return q;
+    }
+    function play(list,closing){
+      gen++; var myGen=gen;
+      ensureVoices().then(function(voices){
+        if(myGen!==gen) return;
+        if(!voices.length){ setStatus('no voice found on this device'); return; }
+        queue=buildQueue(list); pos=0; playing=true; paused=false; wantsClosing=closing;
+        setControls(true); pauseBtn.textContent='Pause';
+        advance(myGen);
+      });
+    }
+    function finish(errored){
+      gen++;
+      playing=false; paused=false; pos=0; queue=[]; wantsClosing=false; replayCurrent=null;
+      clearActive();
+      window.speechSynthesis.cancel();
+      setControls(false); pauseBtn.textContent='Pause';
+      setStatus(errored?'playback error -- try again':'ready');
+    }
+    playBtn.addEventListener('click',function(){ play(narratable,true); });
+    pauseBtn.addEventListener('click',function(){
+      if(!playing) return;
+      if(!paused){ paused=true; window.speechSynthesis.cancel(); pauseBtn.textContent='Resume'; setStatus('paused'); }
+      else{ paused=false; pauseBtn.textContent='Pause'; if(replayCurrent) replayCurrent(); }
+    });
+    stopBtn.addEventListener('click',function(){ finish(false); });
+    return {
+      playOne:function(entry){ play([entry],false); },
+      playAll:function(){ play(narratable,true); },
+      stop:function(){ finish(false); }
+    };
+  })();
 })();
 document.getElementById("discOk").addEventListener("click",function(){
   try{ localStorage.setItem(DISCLAIMER_KEY,"1"); }catch(e){}
@@ -10358,6 +10586,7 @@ function openFeedbackModal(){
   document.getElementById("feedbackErr").classList.remove("scanning");
   document.getElementById("fbRetry").style.display="none";
   hideStatusIcon(document.getElementById("feedbackIconWrap"));
+  document.getElementById("fbSubmit").reset();
   lastFeedbackAttempt=null;
   var fm=document.getElementById("feedbackModal");
   document.getElementById("modalWrap").classList.add("show");
@@ -10377,6 +10606,7 @@ function submitFeedbackPayload(payload){
   lastFeedbackAttempt=payload;
   retryBtn.style.display="none";
   spin.style.display="flex"; btn.disabled=true;
+  btn.playSending();
   var stopWait=startAtlasWait(spinTxt, iconWrap, iconImg);
   fetch(FEEDBACK_URL,{method:"POST",headers:{"Content-Type":"application/json"},
     body:JSON.stringify(payload)
@@ -10388,9 +10618,11 @@ function submitFeedbackPayload(payload){
       showStatusIcon(iconWrap,iconImg,d.icon);
       setErrText(errEl,d.message); errEl.style.display="block"; errEl.scrollIntoView({block:"nearest"});
       retryBtn.style.display=d.retryable?"inline-block":"none";
+      btn.playReturn();
       return;
     }
     hideStatusIcon(iconWrap);
+    btn.reset();
     closeModal();
     toast(res.body.issueUrl?"Feedback sent -- thank you":"Feedback sent -- thanks");
   }).catch(function(){
@@ -10399,6 +10631,7 @@ function submitFeedbackPayload(payload){
     setErrText(errEl,"Couldn't reach the server -- check your connection. Your feedback was NOT sent.");
     errEl.style.display="block"; errEl.scrollIntoView({block:"nearest"});
     retryBtn.style.display="inline-block";
+    btn.playReturn();
   });
 }
 document.getElementById("fbRetry").addEventListener("click",function(){
@@ -11140,5 +11373,6 @@ if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){
   });
 })();
 </script>
+<script type="module" src="send-button.js"></script>
 </body>
 </html>
