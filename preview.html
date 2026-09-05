@@ -10611,7 +10611,11 @@ function submitFeedbackPayload(payload){
     // network responds, which on a fast connection was cutting the ship-flies-off
     // animation short) plus SEND_HOLD_MS so there's always a moment to actually read
     // "Feedback sent" before the modal closes, regardless of how fast the request was.
-  var SEND_ANIM_MS=4000, SEND_HOLD_MS=700;
+  var SEND_ANIM_MS=4000, SEND_HOLD_MS=700, RETURN_ANIM_MS=600;
+    // RETURN_ANIM_MS covers playReturn()'s own warp-in: a 140ms delay before
+    // the ship's is-exiting class clears, then the .38s warp-flash-in burst
+    // -- closeModal() below waits this long so the warp-in is actually seen
+    // instead of the modal vanishing out from under it.
   var stopWait=startAtlasWait(spinTxt, iconWrap, iconImg);
   fetch(FEEDBACK_URL,{method:"POST",headers:{"Content-Type":"application/json"},
     body:JSON.stringify(payload)
@@ -10630,9 +10634,11 @@ function submitFeedbackPayload(payload){
     var elapsed=Date.now()-sendStartedAt;
     var wait=Math.max(0,SEND_ANIM_MS-elapsed)+SEND_HOLD_MS;
     setTimeout(function(){
-      btn.reset();
-      closeModal();
-      toast(res.body.issueUrl?"Feedback sent -- thank you":"Feedback sent -- thanks");
+      btn.playReturn();
+      setTimeout(function(){
+        closeModal();
+        toast(res.body.issueUrl?"Feedback sent -- thank you":"Feedback sent -- thanks");
+      },RETURN_ANIM_MS);
     },wait);
   }).catch(function(){
     stopWait(); spin.style.display="none"; btn.disabled=false;
