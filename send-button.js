@@ -75,6 +75,19 @@ button:hover:not(:disabled){
   border-color:var(--nms-cyan);
   box-shadow:0 0 14px rgba(79,227,255,.25);
 }
+/* The site's own buttons all set outline:none and rely on hover/active
+   border colour instead of the browser's default focus ring -- matching
+   that here rather than leaving the browser's default outline, which
+   renders in whatever accent colour the OS/browser picks (showed up
+   looking orange-ish on Windows, unrelated to the border colour above).
+   :focus-visible still gets a real ring for keyboard users. */
+button:focus{
+  outline:none;
+}
+button:focus-visible{
+  outline:2px solid var(--nms-cyan);
+  outline-offset:2px;
+}
 button:disabled{ cursor:default; opacity:.7; }
 :host(.is-sending) button,
 :host(.is-sent) button{
