@@ -2693,16 +2693,73 @@ var BIOMES={
      water world via Edit system, but the random generator will never pick
      it on its own until that research happens. res left null (undocumented)
      rather than guessed, same convention as Exotic/Marsh/Volcanic above. */
-  "Water World":{base:"#1f5a7a",land:["#2a6f8f","#154258","#3a8aab","#0f3245"],sea:"#0e3a52",cap:"#eaf6ff",water:true, atmo:0x7fd4ff, res:null}
+  "Water World":{base:"#1f5a7a",land:["#2a6f8f","#154258","#3a8aab","#0f3245"],sea:"#0e3a52",cap:"#eaf6ff",water:true, atmo:0x7fd4ff, res:null},
+  /* Added 2026-09-06 (Tony, biome-corpus research pass) -- a real, separate
+     top-level biome per the wiki's own current Category:Biomes listing
+     (nomanssky.fandom.com/wiki/Category:Biomes), confirmed added in the
+     "Worlds Part 2" content update (Feb 2025). This is NOT the same thing
+     as this site's existing purple-system "Gas giant" special case
+     (edGiant checkbox -- one giant planet + up to 5 moons, a system-layout
+     mechanic): the wiki confirms Gas Giant is now also a normal per-planet
+     biome any system can roll, independent of that older mechanic. Manual-
+     select only for now, same as Water World above -- no real generation
+     weight has been researched for it yet, so GEN_BIOME_KEYS below
+     excludes it too. Palette is this project's own placeholder (a banded
+     amber/orange gas-giant look), not sourced from a real in-game screenshot
+     -- worth revisiting once a confirmed real one is available. res left
+     null (undocumented). */
+  "Gas Giant":  {base:"#b8863a",land:["#d4a24f","#8f6224","#e8c070","#6b4a1a"],sea:null,water:false, atmo:0xe0b060,glow:"#f0c878", res:null},
+  /* Added 2026-09-06 (Tony, same research pass) -- also listed on the
+     wiki's Category:Biomes page (Biome - The Reliquary), but flagged here
+     as LOWER CONFIDENCE than Gas Giant above: the wiki's own Reliquary page
+     is a stub, and a related page (Biome Subtype - Relic World) describes
+     what sounds like the same thing as a SUBTYPE layered onto an existing
+     biome (Worlds Part 2 again) rather than a standalone top-level biome in
+     its own right -- the wiki is not internally consistent on which of the
+     two it actually is. Included as a manual-select option per Tony's own
+     call so it's available if a traveller confirms one in-game, but this
+     is the one entry in this table most likely to need correcting (either
+     removed in favour of treating it as a subtype tag, or merged into
+     whatever its true parent biome turns out to be) once real confirmation
+     comes in. Palette is a placeholder (weathered stone/ruin tones), not
+     sourced from a screenshot. res left null (undocumented). */
+  "The Reliquary": {base:"#8a7a5a",land:["#a5936c","#6b5d42","#c2ad82","#4f4530"],sea:null,water:false, atmo:0xcbb98a, res:null}
 };
 var BIOME_KEYS=Object.keys(BIOMES);
-/* Generation-only subset of BIOME_KEYS -- excludes "Water World" (manual-
-   select only, see its comment above) so the old flat-uniform fallback pick
-   below (used only if window.NMSEconomy/economy.js fails to load) can never
-   randomly produce it. The weighted pick in economy.js's own BIOME_ORDER
-   already excludes it by simply never having been given it -- this is the
-   matching guard for the degraded-fallback path. */
-var GEN_BIOME_KEYS=BIOME_KEYS.filter(function(k){ return k!=="Water World"; });
+/* Generation-only subset of BIOME_KEYS -- excludes "Water World", "Gas
+   Giant" and "The Reliquary" (all manual-select only, see their comments
+   above) so the old flat-uniform fallback pick below (used only if
+   window.NMSEconomy/economy.js fails to load) can never randomly produce
+   them. The weighted pick in economy.js's own BIOME_ORDER already excludes
+   them by simply never having been given them -- this is the matching
+   guard for the degraded-fallback path. */
+var GEN_BIOME_KEYS=BIOME_KEYS.filter(function(k){ return k!=="Water World" && k!=="Gas Giant" && k!=="The Reliquary"; });
+/* Real in-game "planet type" flavour-text sub-names -- NOT separate biomes,
+   just alternate on-screen wording NMS layers onto one of the categories
+   above (confirmed against the wiki's own per-biome pages, 2026-09-06
+   research pass; e.g. nomanssky.fandom.com/wiki/Biome_-_Dead lists Dead,
+   Empty, Desolate, Lifeless, Forsaken, Life-Incompatible, Low Atmosphere,
+   Airless, Abandoned and Terraforming Catastrophe as prefixes the SAME Dead
+   biome can generate with -- a traveller reporting "Airless" saw a Dead
+   planet, not a 13th category). Purely a display/lookup convenience for
+   Edit System's Biome combo below (biomeComboGroups()) so a traveller can
+   search/select using the exact wording they actually saw in-game --
+   selecting any of these still stores its PARENT key as the real value,
+   so classification, colouring, and the biome-corpus comparison against
+   economy.js's pickBiome() all keep working against the 12 real category
+   keys only, never against a sub-name string. "Lava" and "Tectonic" are
+   included at LOWER CONFIDENCE (mapped to Volcanic on thematic grounds --
+   Volcanic's own wiki page didn't have its sub-name list confirmed in this
+   pass) -- worth double-checking against nomanssky.fandom.com/wiki/Biome_-_Volcanic
+   directly if a traveller reports one and this mapping turns out wrong. */
+var BIOME_SUBNAMES={
+  "Dead": ["Empty","Desolate","Lifeless","Forsaken","Life-Incompatible","Low Atmosphere","Airless","Abandoned","Terraforming Catastrophe"],
+  "Exotic": ["Weird"],
+  "Frozen": ["Icebound"],
+  "Barren": ["Arid"],
+  "Radioactive": ["Nuclear"],
+  "Volcanic": ["Lava","Tectonic"] // lower confidence -- see comment above
+};
 /* Safe palette lookup for any biome VALUE, including a custom/unrecognised
    traveller-typed name (allowed since 2026-08-26 -- the Biome combo lets a
    traveller type real in-game wording that isn't one of this site's own 12
@@ -8120,7 +8177,17 @@ function buildIconCombo(inputId,listId,groups,blankLabel,allowCustom){
   for(i=0;i<groups.length;i++){
     var g=groups[i];
     for(j=0;j<g.items.length;j++){
-      items.push({label:g.items[j],display:g.items[j],groupLabel:g.label,iconHtml:g.iconHtml});
+      // Item can be a plain string (existing Economy/Conflict/Sentinel
+      // combos -- label and display are the same, exactly as before) or an
+      // {v,d} object (added 2026-09-06 for the Biome combo's sub-name
+      // support below): v is what actually gets stored/submitted, d is
+      // what's shown/searched in the list. Lets a traveller find and pick
+      // "Airless" while the field still saves "Dead" -- see
+      // biomeComboGroups() and BIOME_SUBNAMES above for why.
+      var raw=g.items[j];
+      var val=(raw&&typeof raw==="object")?raw.v:raw;
+      var disp=(raw&&typeof raw==="object")?raw.d:raw;
+      items.push({label:val,display:disp,groupLabel:g.label,iconHtml:g.iconHtml});
     }
   }
   var lastCommitted=inp.value||"";
@@ -8347,11 +8414,23 @@ buildEconConflictSelects();
 // row is its own DOM instance with a unique index-suffixed id, not a single
 // static field. One tiny single-item "group" per biome so each gets its own
 // colour-matched icon rather than sharing one icon across a whole tier.
+// UPDATED 2026-09-06 (biome-corpus research pass): each group now also
+// carries every real in-game sub-name BIOME_SUBNAMES knows for that biome
+// (e.g. "Airless" under Dead), so a traveller can search/select using the
+// exact wording they saw on screen. Every item in a group -- the canonical
+// name itself plus every sub-name -- shares that group's {v:k} value, so
+// picking any of them stores and submits the same canonical key; the
+// input box settling on the canonical name after a sub-name is picked is
+// intentional (matches what's actually saved), not a bug.
 function biomeComboGroups(){
   // Alphabetized for display (Tony, 2026-09-01) -- BIOME_KEYS itself keeps
   // its original insertion order since it's read elsewhere for real
   // generation logic; only this combo's own copy is reordered.
-  return sortAlphaCI(BIOME_KEYS).map(function(k){ return {label:null,items:[k],iconHtml:svg(IC_BIOME,BIOMES[k].base)}; });
+  return sortAlphaCI(BIOME_KEYS).map(function(k){
+    var subs=BIOME_SUBNAMES[k]||[];
+    var items=[{v:k,d:k}].concat(subs.map(function(s){ return {v:k,d:s}; }));
+    return {label:k,items:items,iconHtml:svg(IC_BIOME,BIOMES[k].base)};
+  });
 }
 function sentinelComboGroups(){
   // "None" deliberately stays first (it's the common/default choice, same
