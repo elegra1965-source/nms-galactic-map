@@ -2219,9 +2219,9 @@ window.nmsCoreReady=new Promise(function(res){ window.__nmsCoreResolve=res; });
    call site below falls back to the original (less accurate but
    always-available) generation it used before this swap. See
    DEPLOYMENT_BRIEF.md for the full integration story. */
-import * as NMSCore from './nms-core/index.js';
-import { loadLetterMap } from './nms-core/loadLetterMap.js';
-import * as NMSEconomy from './nms-core/economy.js';
+import * as NMSCore from './nms-core/index.js?v=20260906';
+import { loadLetterMap } from './nms-core/loadLetterMap.js?v=20260906';
+import * as NMSEconomy from './nms-core/economy.js?v=20260906';
 window.NMSCore = NMSCore;
 /* Standalone, shareable economy/conflict/race/outlaw/ring module -- see
    nms-core/economy.js's own header for the full sourcing story. Unlike
@@ -10611,11 +10611,12 @@ function submitFeedbackPayload(payload){
     // network responds, which on a fast connection was cutting the ship-flies-off
     // animation short) plus SEND_HOLD_MS so there's always a moment to actually read
     // "Feedback sent" before the modal closes, regardless of how fast the request was.
-  var SEND_ANIM_MS=4000, SEND_HOLD_MS=700, RETURN_ANIM_MS=600;
-    // RETURN_ANIM_MS covers playReturn()'s own warp-in: a 140ms delay before
-    // the ship's is-exiting class clears, then the .38s warp-flash-in burst
-    // -- closeModal() below waits this long so the warp-in is actually seen
-    // instead of the modal vanishing out from under it.
+  var SEND_ANIM_MS=4000, SEND_HOLD_MS=700, RETURN_ANIM_MS=1100;
+    // RETURN_ANIM_MS covers playReturn()'s own warp-in (a 140ms delay then a
+    // .38s flash-and-fade -- ~520ms total) plus a hold on top, same idea as
+    // SEND_HOLD_MS above: the warp-in itself is a quick flash by design, so
+    // without an explicit hold the modal closed the instant it finished and
+    // it read as a blink-and-you-miss-it flicker rather than something seen.
   var stopWait=startAtlasWait(spinTxt, iconWrap, iconImg);
   fetch(FEEDBACK_URL,{method:"POST",headers:{"Content-Type":"application/json"},
     body:JSON.stringify(payload)
