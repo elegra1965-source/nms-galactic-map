@@ -2,8 +2,8 @@
 // voxelAttributes() replaces the "black hole = index 079, Atlas = 07A"
 // assumption with the real distance-from-galaxy-centre model.
 
-import { PRNG } from './prng.js';
-import { generateName } from './generator.js';
+import { PRNG } from './prng.js?v=20260906';
+import { generateName } from './generator.js?v=20260906';
 
 const MASK64 = 0xFFFFFFFFFFFFFFFFn;
 const CONST_A = 0x64DD81482CBD31D7n;

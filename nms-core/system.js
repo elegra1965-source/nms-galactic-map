@@ -27,11 +27,11 @@
 // tracked in TODO.md and deliberately NOT done in this file -- that's a
 // separate, reviewable change.
 
-import { PRNG, MULTIPLIER } from './prng.js';
-import { indexPrimedPRNG } from './iprng.js';
-import { voxelAttributes } from './region.js';
-import { generateName } from './generator.js';
-import { toRoman } from './roman.js';
+import { PRNG, MULTIPLIER } from './prng.js?v=20260906';
+import { indexPrimedPRNG } from './iprng.js?v=20260906';
+import { voxelAttributes } from './region.js?v=20260906';
+import { generateName } from './generator.js?v=20260906';
+import { toRoman } from './roman.js?v=20260906';
 
 const MASK64 = 0xFFFFFFFFFFFFFFFFn;
 const CONST_A = 0x64DD81482CBD31D7n;

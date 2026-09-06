@@ -8,7 +8,7 @@
 // the `name.slice(0, 64)` cap) that are kept for output fidelity with the
 // original rather than "cleaned up."
 
-import { ALPHASETS } from './alphasets.js';
+import { ALPHASETS } from './alphasets.js?v=20260906';
 
 const TINY_DOUBLE = 2.3283064370807974e-10; // 1 / 2^32
 const VOWELS = 'aeiou';

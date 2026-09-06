@@ -1,10 +1,10 @@
 // Ported from hadsh/nms_namegen (fork of stuart/nms_namegen), MIT licensed.
 // https://github.com/hadsh/nms_namegen
 
-import { PRNG, MULTIPLIER } from './prng.js';
-import { generateName } from './generator.js';
-import { toRoman } from './roman.js';
-import { planetSeeds } from './system.js';
+import { PRNG, MULTIPLIER } from './prng.js?v=20260906';
+import { generateName } from './generator.js?v=20260906';
+import { toRoman } from './roman.js?v=20260906';
+import { planetSeeds } from './system.js?v=20260906';
 
 const TINY_DOUBLE = 2.3283064370807974e-10;
 
