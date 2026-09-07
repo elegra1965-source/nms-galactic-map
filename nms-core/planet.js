@@ -136,29 +136,16 @@ function planetName(planetSeedOrCode, galaxy, letterMap, opts) {
   }
 
   const rng = new PRNG(seed);
-  // Biome-flavoured adornment pool -- see the block above planetName()
-  // for why this is a deliberately disclosed stylistic guess, not a
-  // real algorithm. Falls back to the exact original 10-entry
-  // ADORNMENTS pool (untouched) whenever opts/biome isn't supplied, so
-  // every existing caller keeps producing byte-identical names to
-  // before this change.
-  //
-  // 2026-09-07 (Tony): sentinel activity is its own invented-per-body
-  // guess (rollSentinelGuess(), never decoded from the game -- see the
-  // comment above SENTINEL_TIER_WEIGHTS_BY_CONTIER) and is already
-  // shown on its own line in the info panel. Feeding it into the name
-  // itself double-counts that guess AND stomps the biome pool, so a
-  // planet could read e.g. "Waynett Sentinel" instead of "Waynett
-  // Prime"/"Waynett Verdance" even though nothing about the *name*
-  // logic was wrong -- it was correctly doing what it was told to do.
-  // Sentinel activity no longer feeds the adornment pool at all; only
-  // biome does. SENTINEL_HOSTILE_ADORNMENTS/SENTINEL_HOSTILE_SET are
-  // kept (still exported) rather than deleted, in case this is ever
-  // wanted back as an opt-in display flourish elsewhere.
+  // 2026-09-07 (Tony): confirmed the biome pool below is a "sub name"
+  // concept (e.g. a Radioactive planet's flavour word like "Dissident"),
+  // never the actual planet name's %ADORNMENT% slot -- BIOME_ADORNMENTS
+  // and SENTINEL_HOSTILE_ADORNMENTS (see above) are now BOTH disabled
+  // here. planetName() always draws from the classic 10-entry ADORNMENTS
+  // array ("Prime", "Major", etc.), exactly as the original disassembly
+  // did, regardless of opts.biome/opts.sentinel. Both pools are kept
+  // (still exported) for a real, separate sub-name feature elsewhere,
+  // rather than deleted.
   var adornmentPool = ADORNMENTS;
-  if (opts && opts.biome && BIOME_ADORNMENTS[opts.biome]) {
-    adornmentPool = BIOME_ADORNMENTS[opts.biome];
-  }
   const adornmentWord = adornmentPool === ADORNMENTS
     ? ADORNMENTS[Number(((rng.seed & 0xFFFFFFFFn) * 10n) >> 0x20n)]
     : pickAdornment(rng, adornmentPool);
