@@ -45,11 +45,12 @@ const BIOME_ADORNMENTS = {
   Volcanic:      ['Cinder', 'Ember', 'Magma', 'Ashfall', 'Pyroclast', 'Caldera', 'Flow', 'Vent'],
 };
 
-// Only used when the caller supplies a HIGH sentinel-activity word (the
-// aggressive/corrupted tiers from preview.html's SENTINEL_WORDS) -- takes
-// priority over the biome pool above, since "a hostile Sentinel presence"
-// is a stronger, rarer signal than base biome. Never used for None/low/
-// mid tiers (see SENTINEL_HOSTILE_SET below).
+// NOT currently wired into planetName() (see 2026-09-07 note in that
+// function) -- sentinel activity is its own invented per-body guess,
+// already shown on its own info-panel line, and feeding a HIGH-tier
+// word in here used to stomp the biome pool and produce names like
+// "Waynett Sentinel" instead of "Waynett Prime". Kept/exported in case
+// this is wanted back later as an explicit opt-in elsewhere.
 const SENTINEL_HOSTILE_ADORNMENTS = [
   'Sentinel', 'Corrupted', 'Purge', 'Vigil', 'Enforced', 'Interdicted', 'Quarantine',
 ];
@@ -135,16 +136,27 @@ function planetName(planetSeedOrCode, galaxy, letterMap, opts) {
   }
 
   const rng = new PRNG(seed);
-  // Biome/sentinel-flavoured adornment pool -- see the block above
-  // planetName() for why this is a deliberately disclosed stylistic
-  // guess, not a real algorithm. Falls back to the exact original
-  // 10-entry ADORNMENTS pool (untouched) whenever opts/biome isn't
-  // supplied, so every existing caller keeps producing byte-identical
-  // names to before this change.
+  // Biome-flavoured adornment pool -- see the block above planetName()
+  // for why this is a deliberately disclosed stylistic guess, not a
+  // real algorithm. Falls back to the exact original 10-entry
+  // ADORNMENTS pool (untouched) whenever opts/biome isn't supplied, so
+  // every existing caller keeps producing byte-identical names to
+  // before this change.
+  //
+  // 2026-09-07 (Tony): sentinel activity is its own invented-per-body
+  // guess (rollSentinelGuess(), never decoded from the game -- see the
+  // comment above SENTINEL_TIER_WEIGHTS_BY_CONTIER) and is already
+  // shown on its own line in the info panel. Feeding it into the name
+  // itself double-counts that guess AND stomps the biome pool, so a
+  // planet could read e.g. "Waynett Sentinel" instead of "Waynett
+  // Prime"/"Waynett Verdance" even though nothing about the *name*
+  // logic was wrong -- it was correctly doing what it was told to do.
+  // Sentinel activity no longer feeds the adornment pool at all; only
+  // biome does. SENTINEL_HOSTILE_ADORNMENTS/SENTINEL_HOSTILE_SET are
+  // kept (still exported) rather than deleted, in case this is ever
+  // wanted back as an opt-in display flourish elsewhere.
   var adornmentPool = ADORNMENTS;
-  if (opts && opts.sentinel && SENTINEL_HOSTILE_SET.has(opts.sentinel)) {
-    adornmentPool = SENTINEL_HOSTILE_ADORNMENTS;
-  } else if (opts && opts.biome && BIOME_ADORNMENTS[opts.biome]) {
+  if (opts && opts.biome && BIOME_ADORNMENTS[opts.biome]) {
     adornmentPool = BIOME_ADORNMENTS[opts.biome];
   }
   const adornmentWord = adornmentPool === ADORNMENTS
