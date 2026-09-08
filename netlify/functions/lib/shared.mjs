@@ -344,7 +344,10 @@ export async function invalidateGetCache(){
 // traveller submission exists, same treatment as every free-text field
 // here -- a typed value not on the canonical list becomes a future
 // suggestion for every OTHER traveller too, not just saved and forgotten.
-export const COMMUNITY_TERM_FIELDS = ["resources","flora","fauna","minerals","salvage","fossils","descriptor","biome"];
+// "subtype" added 2026-09-08 -- Sub type, split out of Biome (see
+// system-edit.mjs's own comment on why): same treatment, a traveller's
+// typed sub-name becomes a future suggestion for every other traveller.
+export const COMMUNITY_TERM_FIELDS = ["resources","flora","fauna","minerals","salvage","fossils","descriptor","biome","subtype"];
 var MAX_COMMUNITY_TERMS_PER_FIELD = 500;
 export function addCommunityTerms(data, field, values){
   if(COMMUNITY_TERM_FIELDS.indexOf(field) < 0) return;
