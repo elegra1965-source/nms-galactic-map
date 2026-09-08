@@ -8784,39 +8784,26 @@ function renderBodyEditList(){
           // name stays `descriptor`, nothing saved needs migrating.
           '<div class="mfld" style="margin-bottom:0"><div class="lb">Conditions</div><div class="icombo"><input type="text" class="bfConditions icomboInput" maxlength="50" data-i="'+i+'" id="bfConditions-'+i+'" autocomplete="off" placeholder="e.g. Bountiful" value="'+escAttr(b.descriptor)+'"><div class="icomboList" id="bfConditionsList-'+i+'"></div></div></div>'+
         '</div>'+
+        // Reordered 2026-09-09 (Tony: "has rings, water, has base then below
+        // them autophage camp, ruins, reliquary -- reduces the height and
+        // better grouping") -- was 3 separate 2-item rows (Water+Autophage,
+        // Reliquary+Ruins, Rings+Base), now 2 rows of up to 3. Has rings
+        // only ever shows for a planet/Giant row (moons never have rings in-
+        // game, same reasoning as before), so a moon's first row is just
+        // Water + Has base.
         '<div class="brow2">'+
+          (!b.moon?'<label class="chk2"><input type="checkbox" class="bfRing" data-i="'+i+'"'+(b.ring?" checked":"")+'> Has rings</label>':"")+
           '<label class="chk2"><input type="checkbox" class="bfWater" data-i="'+i+'"'+(b.water?" checked":"")+'> Water</label>'+
-          '<label class="chk2"><input type="checkbox" class="bfAutophage" data-i="'+i+'"'+(b.autophage?" checked":"")+'> Autophage camp</label>'+
+          '<label class="chk2"><input type="checkbox" class="bfBase" data-i="'+i+'"'+(b.base?" checked":"")+'> Has base</label>'+
         '</div>'+
-        // Reliquary / Ruins (2026-09-08) -- TWO separate checkboxes (Tony:
-        // "should be 2 separate tick boxes not together"), replacing what
-        // was briefly one combined "Reliquary ruins" checkbox. Both replace
-        // "The Reliquary" as a selectable biome -- see applyOverride()'s
-        // own comment for the why -- and are independent per-body flags,
-        // same manual-only pattern as Autophage camp above.
-        '<div class="brow2"><label class="chk2"><input type="checkbox" class="bfReliquary" data-i="'+i+'"'+(b.reliquary?" checked":"")+'> Reliquary</label>'+
-          '<label class="chk2"><input type="checkbox" class="bfRuins" data-i="'+i+'"'+(b.ruins?" checked":"")+'> Ruins</label></div>';
-      // "Has base" checkbox available on every body (planet or moon) --
-      // unlike rings, a base can genuinely sit on a moon in-game. The name
-      // field only appears once ticked (2026-08-21, Tony: "put name of base
-      // in notes" -- a bare boolean tag was never enough to say WHICH base,
-      // and a base name is never a system/star name -- see the save-import
-      // bulk-import bug fixed the same day for why that distinction
-      // matters). The typed name gets merged into this system's Notes at
-      // Save time (see edSubmit's click handler), same "Base 'X' on Y"
-      // phrasing the save-file bulk-import already uses for consistency.
-      var baseChk='<label class="chk2"><input type="checkbox" class="bfBase" data-i="'+i+'"'+(b.base?" checked":"")+'> Has base</label>';
-      if(!b.moon){
-        // Rings aren't a thing on moons in-game, so this only ever shows
-        // for a planet/Giant row -- matches the same moon-only-field pattern
-        // the Orbits dropdown below uses in reverse. Paired with Has base on
-        // the same row (2026-09-02, Tony: "would tidy it up") since both are
-        // available together on a planet -- on a moon (no rings option) Has
-        // base still gets its own full-width row below.
-        html+='<div class="brow2"><label class="chk2"><input type="checkbox" class="bfRing" data-i="'+i+'"'+(b.ring?" checked":"")+'> Has rings</label>'+baseChk+'</div>';
-      }else{
-        html+=baseChk;
-      }
+        '<div class="brow2">'+
+          '<label class="chk2"><input type="checkbox" class="bfAutophage" data-i="'+i+'"'+(b.autophage?" checked":"")+'> Autophage camp</label>'+
+          '<label class="chk2"><input type="checkbox" class="bfRuins" data-i="'+i+'"'+(b.ruins?" checked":"")+'> Ruins</label>'+
+          // Reliquary replaces "The Reliquary" as a selectable biome (see
+          // applyOverride()'s own comment for the why) -- independent
+          // per-body flag, same manual-only pattern as Autophage camp.
+          '<label class="chk2"><input type="checkbox" class="bfReliquary" data-i="'+i+'"'+(b.reliquary?" checked":"")+'> Reliquary</label>'+
+        '</div>';
       if(b.base){
         html+='<div class="mfld" style="margin-bottom:0"><div class="lb">Base name</div><input type="text" class="bfBaseName" data-i="'+i+'" maxlength="30" placeholder="e.g. Elegraynor Portal" value="'+escAttr(b.baseName||"")+'"></div>';
       }
