@@ -185,14 +185,25 @@ name" below) -- that's the actual way back to it.
 system lets you overwrite that with what you actually see in-game -- stars,
 race, economy, conflict, per-planet biomes and rings -- and the result is
 visible to every visitor, not just saved locally. Every edit is a real git
-commit, so nothing is ever silently lost. Biome and resource fields (added
-2026-08-26) offer a fuller, wiki-researched dropdown -- Biome now includes
-**Water World** and fixes a couple of naming gaps (e.g. Airless/Icebound) --
-with room to type your own value if what you're seeing in-game isn't listed.
-Resources and Minerals were renamed **Common resources** / **Uncommon
-resources** to match the wiki's own rarity split, and the same
-dropdown-plus-your-own-value treatment now covers Salvageable tech and
-Fossils & curiosities too. An optional **screenshot** (added 2026-09-01, resized
+commit, so nothing is ever silently lost. **Biome now starts blank, showing
+"Unknown" until you confirm it (added 2026-09-08)** -- nobody has
+reverse-engineered the game's real biome roll, so unlike race/economy/
+conflict this project never shows a guessed biome as if it were fact. Biome
+is now split into three fields: **Biome** (the canonical category), **Sub
+type** (the real on-screen wording you actually saw, e.g. "Isotopic" for a
+Radioactive planet -- filtered live to whichever Biome is picked, wiki-
+researched per biome), and **Conditions** (renamed from "Descriptor" --
+real weather-phrase suggestions, also filtered by Biome). All three accept
+your own typed value if what you saw isn't listed, and a genuinely new
+value becomes a suggestion for every future visitor too, not just saved and
+forgotten. **"The Reliquary" is no longer a selectable Biome** -- research
+found it's actually a prefix/suffix tag the real game layers onto an
+existing biome ("Abandoned Desert", "Dusty Relic"), not a 13th category of
+its own -- replaced by two independent per-planet checkboxes, **Reliquary**
+and **Ruins**. Resources and Minerals were renamed **Common resources** /
+**Uncommon resources** to match the wiki's own rarity split, and the same
+dropdown-plus-your-own-value treatment covers Salvageable tech and Fossils
+& curiosities too. An optional **screenshot** (added 2026-09-01, resized
 and compressed automatically) sits alongside the public notes field --
 visible to every visitor, same as everything else here -- and your own
 private Surveyor notes can carry a screenshot too, saved only to your own
@@ -240,7 +251,12 @@ to remember its address or portal glyphs.
 **Honest about its limits.** The About modal spells out exactly what's
 generated accurately (star type, system/region names, planet count) versus
 an unverified guess (individual planet names, and why) -- rather than
-presenting a guess as fact.
+presenting a guess as fact. **Biome goes a step further than that** (added
+2026-09-08): unlike planet names, race, economy, or conflict -- all of which
+show a plausible generated value, tagged as a guess where relevant -- nobody
+has reverse-engineered the game's real biome roll at all, so this project
+doesn't display a guess for Biome/Sub type/Conditions at all. They read
+"Unknown" until a traveller reports the real answer via Edit system.
 
 ![About modal](screenshots/07-about-modal.jpg)
 
@@ -377,7 +393,7 @@ against a real corpus, planet names weren't (this is surfaced to players
 directly, see the About modal and the hint under every system's planet
 list).
 
-**Updated 2026-08-23** against a newer release of the same upstream library, which fixed three real bugs in this project's own port (an off-by-one on the safe-start-planet draw, a missing signed-coordinate fold in black-hole/Atlas placement that affected roughly half of all voxels, and a desynced RNG stream on purple/gas-giant systems) and added a genuinely new capability: `nms-core/system.js` now derives real economy type, wealth, conflict level, and dominant race directly from the game's own generator — the actual reverse-engineered algorithm, not `economy.js`'s statistically-approximated word pools — validated against 1000 real, wiki-documented systems to 98–99% accuracy per field. This isn't wired into the live site's economy/race/conflict display yet (still `economy.js`, via a separate RNG stream — see `TODO.md`), but the star-type/planet-count/black-hole/Atlas-placement fixes are live for every visitor.
+**Updated 2026-08-23** against a newer release of the same upstream library, which fixed three real bugs in this project's own port (an off-by-one on the safe-start-planet draw, a missing signed-coordinate fold in black-hole/Atlas placement that affected roughly half of all voxels, and a desynced RNG stream on purple/gas-giant systems) and added a genuinely new capability: `nms-core/system.js` now derives real economy type, wealth, conflict level, and dominant race directly from the game's own generator — the actual reverse-engineered algorithm, not `economy.js`'s statistically-approximated word pools — validated against 1000 real, wiki-documented systems to 98–99% accuracy per field. This isn't wired into the live site's economy/race/conflict display yet — still `economy.js`, via a separate RNG stream — but the star-type/planet-count/black-hole/Atlas-placement fixes are live for every visitor.
 
 `nms-tools/nms-lookup.js` wraps the whole module behind one call —
 `await init('./nms-core')` then `getSystem(address, galaxy)` — for anyone
@@ -516,6 +532,13 @@ error-redistribution pipeline), not the more common simulation matrices that
 just show a sighted person what colour blindness looks like. The distinction
 matters: correction actually helps a colour-blind player tell the map's own
 colour-coding apart, which is the point.
+
+The About modal also has an opt-in **Read aloud** toggle (added 2026-09-05,
+off by default so the panel looks unchanged until switched on) using the
+browser's own text-to-speech — a play/pause/stop bar plus a small speaker
+icon per section, reading each section's own visible copy live so it can't
+drift out of sync when that copy is edited, or reading straight through all
+of them in order.
 
 ## Credits
 
