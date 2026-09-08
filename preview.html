@@ -3434,6 +3434,7 @@ function applyOverride(s){
         nameOverridden:!!(b.name&&b.name.trim()),
         biome:biome,
         biomeOverridden:biomeOverridden,
+        subtype:(b.subtype||"").trim(),
         descriptor:b.descriptor||"",
         terrain:o?o.terrain:"Pangean",
         water:!!b.water,
@@ -3491,6 +3492,15 @@ function applyOverride(s){
         // shipped concept (Knowledge Stones + memoir device) and conflating
         // the two would misrepresent both.
         reliquary:!!b.reliquary,
+        // Ruins (2026-09-08, split from Reliquary per Tony: "Reliquary and
+        // ruins should be 2 separate tick boxes not together") -- same
+        // per-body/manual-only pattern, deliberately independent so a
+        // traveller can flag either observation without the other. Note
+        // this reuses the field name "ruins" already used by the SYSTEM-
+        // level flag (payload.ruins/s.ruins, Ancient Ruins POI) -- same
+        // precedent as "water" already existing at both system AND per-
+        // body level in this same payload shape, so no actual collision.
+        ruins:!!b.ruins,
         // "Has base" (2026-08-17, Tony): personal-marker-style field, same
         // manual-only pattern as autophage/rings -- no procedural rule
         // exists (or could exist) for where a TRAVELLER'S OWN base sits.
@@ -3697,7 +3707,10 @@ var KNOWN_TERMS_K="nms-galmap-known-terms";
 // here: a traveller's own typed value (not on the canonical list) should
 // become a future suggestion, not just a saved-but-forgotten string. See
 // biomeCommunityExtras()/rememberKnownTerms() below.
-var KNOWN_TERMS_FIELDS=["resources","flora","fauna","minerals","salvage","fossils","descriptor","biome"];
+// "subtype" added 2026-09-08 -- the new per-body Sub type field (see
+// subtypeComboGroups() above), same reasoning as biome: a traveller's own
+// typed sub-name not on the researched list becomes a future suggestion.
+var KNOWN_TERMS_FIELDS=["resources","flora","fauna","minerals","salvage","fossils","descriptor","biome","subtype"];
 var knownTerms={};
 function loadKnownTerms(){
   knownTerms={};
@@ -3741,6 +3754,7 @@ function rememberKnownTerms(payload){
     rememberTerms(knownTerms.fossils,b.fossils||[]);
     if(b.descriptor) rememberTerms(knownTerms.descriptor,[b.descriptor]);
     if(b.biome) rememberTerms(knownTerms.biome,[b.biome]);
+    if(b.subtype) rememberTerms(knownTerms.subtype,[b.subtype]);
   });
   saveKnownTerms();
   populateDatalists();
@@ -3874,12 +3888,16 @@ function showTermConfirmModal(flagged,onConfirm){
   noBtn.addEventListener("click",onNo);
 }
 function populateDatalists(){
-  // Only Descriptor still uses a plain <datalist> -- it's a single free-text
-  // phrase, not a comma-separated list, so the native-datalist "matches the
-  // whole field value" behaviour that broke Resources/Flora/Fauna/Minerals/
-  // Salvageable tech/Fossils (see buildCommaCombo()'s comment) never applied
-  // here, and a datalist is simpler than a custom combo for one value.
-  var map={descriptor:"dlDescriptor"};
+  // Descriptor (now "Conditions" in the UI) switched from a plain
+  // <datalist> to a grouped icombo, biome-filtered via
+  // conditionsComboGroups() (2026-09-08) -- see CONDITIONS_CANON's own
+  // comment. Nothing else ever used this native-datalist mechanism, so the
+  // map is now empty; left as a no-op rather than deleted outright since
+  // this function is still called from several places below (loadOverrides,
+  // rememberKnownTerms, initial load) and an empty map keeps all of those
+  // call sites harmless without hunting down and removing each one. The
+  // orphaned #dlDescriptor <datalist> element itself is simply unused now.
+  var map={};
   Object.keys(map).forEach(function(k){
     var dl=document.getElementById(map[k]); if(!dl) return;
     // Real wiki-sourced items first (if this field has any), then whatever
@@ -6271,7 +6289,7 @@ function updatePanel(s){
         // economy/conflict, until a traveller submits the real answer via
         // Edit system (b.ringOverridden) -- shown inline rather than as a
         // separate tag, this row is already a single compact line.
-        '<span class="bb">'+(b.biomeOverridden?b.biome:"Unknown")+(b.water?" &middot; water":"")+(b.ring?" &middot; rings"+(b.ringOverridden?"":" (procedural)"):"")+(b.reliquary?" &middot; reliquary":"")+'</span></div>';
+        '<span class="bb">'+(b.biomeOverridden?(b.biome+(b.subtype?" ("+b.subtype+")":"")):"Unknown")+(b.water?" &middot; water":"")+(b.ring?" &middot; rings"+(b.ringOverridden?"":" (procedural)"):"")+(b.reliquary?" &middot; reliquary":"")+(b.ruins?" &middot; ruins":"")+'</span></div>';
   }
   document.getElementById("pBodies").innerHTML=bl;
   // 2026-08-30, honest-review fix: this blanket "names are a guess" line
@@ -6318,14 +6336,18 @@ function showBody(b,s){
   // name/region/planet-count (the real ported algorithm) this must never
   // read as fact. b.biome itself is untouched and still backs colour/ring-
   // style rendering elsewhere on this same panel.
-  document.getElementById("bBiome").textContent=(b.biomeOverridden?b.biome:"Unknown")+(b.descriptor?" ("+b.descriptor+")":"");
+  // 2026-09-08: Sub type shown alongside Biome (e.g. "Radioactive
+  // (Nuclear)") when a traveller has reported one -- Conditions/descriptor
+  // still appends after, same as before.
+  document.getElementById("bBiome").textContent=(b.biomeOverridden?(b.biome+(b.subtype?" ("+b.subtype+")":"")):"Unknown")+(b.descriptor?" \u2014 "+b.descriptor:"");
   document.getElementById("bTerr").textContent=b.terrain+(b.water?" · has water":" · no water");
   var t=[["",b.moon?"Moon":(s.giant?"Giant":"Planet")]];
   if(!biomePal(b.biome).atmo) t.push(["","No atmosphere"]);
   // Gated on biomeOverridden (2026-09-08) -- "Anomalous" is a direct claim
   // about which biome this is, same reasoning as the Biome line above.
   if(b.biomeOverridden&&(b.biome==="Exotic"||b.biome==="Mega Exotic")) t.push(["bh","Anomalous"]);
-  if(b.reliquary) t.push(["hot","Reliquary ruins"]);
+  if(b.reliquary) t.push(["hot","Reliquary"]);
+  if(b.ruins) t.push(["hot","Ruins"]);
   if(b.water) t.push(["hot","Water"]);
   // Same invented-flavour distinction as the panel body list -- a ring
   // nobody's confirmed via Edit system reads as a muted "guess" tag rather
@@ -8556,6 +8578,99 @@ function biomeComboGroups(){
   }
   return groups;
 }
+// Sub type combo (2026-09-08, Tony: "BIOME 'radioactive' / SUB TYPE 'nuclear'
+// / CONDITIONS 'frequent radioactive storms'") -- splits what used to be a
+// display-only search alias (picking "Isotopic" under Biome only ever saved
+// "Radioactive", the specific wording was thrown away) into its OWN saved
+// field. Reuses BIOME_SUBNAMES/MEGA_EXOTIC_SUBNAMES as the canon source --
+// same research, now the literal savable value instead of just a lookup
+// alias -- filtered to whichever Biome is CURRENTLY selected for this body,
+// plus free-type-and-it-saves (allowCustom) and a shared "Other reported"
+// community-extras group, same pattern as Biome itself.
+function subtypeCommunityExtras(usedLower){
+  var learned=(typeof knownTerms!=="undefined"&&knownTerms.subtype)||[];
+  var community=(typeof OVERRIDES!=="undefined"&&OVERRIDES.communityTerms&&OVERRIDES.communityTerms.subtype)||[];
+  var seen={}, out=[];
+  community.concat(learned).forEach(function(v){
+    var lo=String(v).toLowerCase();
+    if(usedLower[lo]||seen[lo]) return;
+    seen[lo]=1; out.push(v);
+  });
+  return sortAlphaCI(out);
+}
+function subtypeComboGroups(biomeKey){
+  var subs=(biomeKey==="Mega Exotic")?megaExoticSubs():(BIOME_SUBNAMES[biomeKey]||[]);
+  var usedLower={};
+  subs.forEach(function(s){ usedLower[s.toLowerCase()]=1; });
+  var groups=subs.length?[{label:null,items:subs.map(function(s){ return {v:s,d:s}; }),iconHtml:svg(IC_BIOME,(BIOMES[biomeKey]||BIOMES.Barren).base)}]:[];
+  var extras=subtypeCommunityExtras(usedLower);
+  if(extras.length) groups.push({label:"Other reported",items:extras.map(function(s){ return {v:s,d:s}; }),iconHtml:svg(IC_BIOME,"#8892a6")});
+  return groups;
+}
+// Conditions combo (renamed from "Descriptor" in the UI, 2026-09-08 --
+// Tony: "Descriptor name probably needs changing as people might not know
+// what descriptor is") -- real weather-phrase word lists, sourced from the
+// SAME per-biome wiki pages as BIOME_SUBNAMES (each biome's own "Weather[]"
+// table -- Clear/Normal/Extreme columns flattened into one list; column
+// tier isn't tracked separately since a traveller is reporting what they
+// actually saw, not picking a severity). Dead and Gas Giant have no real
+// list (Dead: wiki states "storms never occur"; Gas Giant: no discrete
+// named phrases found, only prose) -- left empty, community/free-text only.
+// Mega Exotic's 3 colour-locked weather sets are flattened into one union
+// here rather than filtered by star colour like its biome sub-names are --
+// a real refinement if it turns out to matter, not done in this pass.
+// Internal field name stays `descriptor` (see applyOverride()/payload
+// builder) -- only the UI label and its suggestion source changed, so
+// nothing already saved needs migrating.
+var CONDITIONS_CANON={
+  "Lush": ["Temperate","Light Showers","Mild Rain","Refreshing Breeze","Humid","Pleasant","Balmy","Mellow","Beautiful","Blissful","Boiling Puddles","Sweltering Damp","Superheated Drizzle","Dangerously Hot Fog","Choking Humidity","Mostly Calm","Occasional Scalding Cloudbursts","Usually Mild","Blistering Damp","Lethal Humidity Outbreaks","Boiling Superstorms","Intense Heatbursts","Superheated Rain","Boiling Monsoons","Broiling Humidity","Painfully Hot Rain","Torrential Heat","Blistering Floods","Scalding Rainstorms","Torrid Deluges","Bilious Storms","Echoes of Acid","Deadly Pressure Variations","Harsh Toxic Wind","Corrupted Blood","Inescapable Toxins","Clouds of Haunted Green","Invisible Jade Winds","Infinite Toxic Mist","Poison Cyclones"],
+  "Toxic": ["Acid Rain","Caustic Moisture","Choking Clouds","Corrosive Damp","Poison Rain","Poisonous Gas","Stinging Atmosphere","Stinging Puddles","Toxic Clouds","Toxic Damp","Acidic Dust Pockets","Alkaline Cloudbursts","Atmospheric Corruption","Caustic Winds","Corrosive Sleet Storms","Dangerously Toxic Rain","Infrequent Toxic Drizzle","Lethal Atmosphere","Occasional Acid Storms","Passing Toxic Fronts","Poison Flurries","Acidic Deluges","Bone-Stripping Acid Storms","Caustic Floods","Corrosive Cyclones","Corrosive Rainstorms","Corrosive Storms","Frequent Toxic Floods","Noxious Gas Storms","Pouring Toxic Rain","Torrential Acid","Toxic Monsoons","Toxic Outbreaks","Toxic Superstorms"],
+  "Scorched": ["Parched","Overly Warm","Sunny","Dehydrated","Unending Sunlight","Direct Sunlight","Heated Atmosphere","Sweltering","Dangerously Hot","Burning Air","Infrequent Heat Storms","Rare Firestorms","Superheated Gas Pockets","Wandering Hot Spots","Atmospheric Heat Instabilities","Occasional Ash Storms","Incendiary Dust","Self-Igniting Storms","Extreme Heat","Burning Gas Clouds","Intense Heat","Superheated Air","Scalding Heat","Inferno Winds","Firestorms","Combustible Dust"],
+  "Frozen": ["Crisp","Freezing","Frost","Icy","Permafrost","Powder Snow","Snowy","Wintry","Drifting Snowstorms","Frozen Clouds","Harsh, Icy Winds","Icy Blasts","Ice Storms","Infrequent Blizzards","Migratory Blizzards","Occasional Snowfall","Outbreaks of Frozen Rain","Wandering Frosts","Deep Freeze","Frequent Blizzards","Hazardous Whiteouts","Howling Blizzards","Icy Tempests","Intense Cold","Raging Snowstorms","Roaring Ice Storms","Supercooled Storms"],
+  "Barren": ["Baked","Clear","Dry Gusts","Icy Nights","Moistureless","Sterile","Unclouded Skies","Withered","Blasted Atmosphere","Ceaseless Drought","Dust-Choked Winds","Freezing Night Winds","Highly Variable Temperatures","Infrequent Dust Storms","Intermittent Wind Blasting","Occasional Sandstorms","Parched Sands","Sporadic Grit Storms","Billowing Dust Storms","Choking Sandstorms","Dead Wastes","Extreme Wind Blasting","Hazardous Temperature Extremes","Howling Gales","Lung-Burning Night Wind","Planetwide Desiccation","Sand Blizzards"],
+  "Radioactive": ["Contaminated Puddles","Gamma Dust","Irradiated Winds","Nuclidic Atmosphere","Radioactive Damp","Radioactive Humidity","Unstable Atmosphere","Volatile Winds","Volatile Windstorms","Energetic Storms","Irradiated Downpours","Irradiated Storms","Occasional Radiation Outbursts","Particulate Winds","Radioactive Dust Storms","Reactive Rain","Unstable Fog","Planet-Wide Radiation Storms","Contaminated Squalls","Enormous Nuclear Storms","Extreme Atmospheric Decay","Extreme Radioactivity","Extreme Thermonuclear Fog","Frequent Particle Eruptions","Gamma Cyclones","Irradiated Thunderstorms","Roaring Nuclear Wind"],
+  "Irradiated": ["Contaminated Puddles","Gamma Dust","Irradiated Winds","Nuclidic Atmosphere","Radioactive Damp","Radioactive Humidity","Unstable Atmosphere","Volatile Winds","Volatile Windstorms","Energetic Storms","Irradiated Downpours","Irradiated Storms","Occasional Radiation Outbursts","Particulate Winds","Radioactive Dust Storms","Reactive Rain","Unstable Fog","Planet-Wide Radiation Storms","Contaminated Squalls","Enormous Nuclear Storms","Extreme Atmospheric Decay","Extreme Radioactivity","Extreme Thermonuclear Fog","Frequent Particle Eruptions","Gamma Cyclones","Irradiated Thunderstorms","Roaring Nuclear Wind"],
+  "Marsh": ["Gentle Mist","Humid","Tropical Winds","Warm Fog","Temperate Murk","Mild Damp","Warm Dewdrops","Tepid Damp","Sweaty Drizzle","Muggy Haze","Tropical Storms","Occasional Boiling Fog","Superheated Mists","Painful Mist","Infrequent Torrents","Oppressive","Soggy Danger","Sticky Heat","Clammy Menace","Hazardous Moisture","Death Fog","Sultry Disaster","Cataclysmic Monsoons","Mists of Annihilation","All-Consuming Fog","Liquid Hell","Storms of Desolation","Melting Deluges","Boiling Catastrophe","Damp Misery"],
+  "Volcanic": ["Sulphurous Haze","Ash Wisps","Drifting Smog","Cinderfalls","Ash Plumes","Choking Ash","Burning Mists","Sulfur Fumes","Enveloping Ash","Ashen Winds","Smothering Ash","Heated Gas Pockets","Occasional Firestorms","Incendiary Winds","Unpredictable Conflagrations","Drifting Firestorms","Pillars of Flame","Magma Geysers","Plumes of Fire","Molten Rain","Tectonic Storms","Frequent Firestorms","Walls of Flame","Clouds of Fire","Ashen Destruction","Magma Rain","Basalt Hail","Explosive Gas Eruptions","Lethal Ash Storms","Sulphurous Inferno","Colossal Firestorms","Obsidian Doom"],
+  "Exotic": ["Invisible Mist","Internal Rain","Lost Clouds","Crimson Heat","Winds of Glass","Thirsty Clouds","Obsidian Heat","Memories of Frost","Haunted Frost","Indetectable Burning","Anomalous"],
+  "Mega Exotic": ["Burning Crimson","Scarlet Rain","Fevered Clouds","Carmine Winds","Red Mist","Flaming Hail","Vermillion Storms","Rain of Atlas","Angered Clouds","Blood Rain","Bilious Storms","Deadly Pressure Variations","Harsh Toxic Wind","Corrupted Blood","Infinite Toxic Mist","Echoes of Acid","Poison Cyclones","Inescapable Toxins","Clouds of Haunted Green","Invisible Jade Winds","Frozen Mists","Electric Rain","Azure Storms","Extreme Low Pressure","All-Consuming Cold","Winds from Beyond","Unfathomable Storms","Unimaginable Blue","Ultramarine Wind","Inverted Superstorms"],
+  "Water World": ["Coastal Storm"]
+};
+function conditionsCommunityExtras(usedLower){
+  var learned=(typeof knownTerms!=="undefined"&&knownTerms.descriptor)||[];
+  var community=(typeof OVERRIDES!=="undefined"&&OVERRIDES.communityTerms&&OVERRIDES.communityTerms.descriptor)||[];
+  var seen={}, out=[];
+  community.concat(learned).forEach(function(v){
+    var lo=String(v).toLowerCase();
+    if(usedLower[lo]||seen[lo]) return;
+    seen[lo]=1; out.push(v);
+  });
+  return sortAlphaCI(out);
+}
+function conditionsComboGroups(biomeKey){
+  var canon=CONDITIONS_CANON[biomeKey]||[];
+  var usedLower={};
+  canon.forEach(function(s){ usedLower[s.toLowerCase()]=1; });
+  var groups=canon.length?[{label:null,items:sortAlphaCI(canon).map(function(s){ return {v:s,d:s}; }),iconHtml:svg(IC_BIOME,(BIOMES[biomeKey]||BIOMES.Barren).base)}]:[];
+  var extras=conditionsCommunityExtras(usedLower);
+  if(extras.length) groups.push({label:"Previously reported",items:extras.map(function(s){ return {v:s,d:s}; }),iconHtml:svg(IC_BIOME,"#8892a6")});
+  return groups;
+}
+// Rebuilds ONE body row's Sub type + Conditions suggestion lists against
+// whatever Biome is CURRENTLY typed for it (2026-09-08) -- called once at
+// row-open (renderBodyEditList()) and again every time that row's Biome
+// field commits a new value (see the delegated "change" handler below), so
+// switching Biome live re-filters both without needing the row re-opened.
+// blankLabel is "Unknown" for both (not null/empty) -- matching Biome's own
+// "staying blank is a valid, keepable state" fix: buildIconCombo's own
+// commitNow() only accepts a blank field on blur when blankLabel is truthy,
+// so an empty string here would have silently snapped back to whatever was
+// last saved instead of actually clearing.
+function rebuildBiomeDependentCombos(i){
+  var biomeVal=(editBodies[i]&&editBodies[i].biome)||"";
+  buildIconCombo("bfSubtype-"+i,"bfSubtypeList-"+i,subtypeComboGroups(biomeVal),"Unknown",true);
+  buildIconCombo("bfConditions-"+i,"bfConditionsList-"+i,conditionsComboGroups(biomeVal),"Unknown",true);
+}
 function sentinelComboGroups(){
   // "None" deliberately stays first (it's the common/default choice, same
   // as blankLabel sitting first in buildIconCombo's own item list) --
@@ -8647,21 +8762,40 @@ function renderBodyEditList(){
         '</div>'+
         '<div class="brow2">'+
           '<div class="mfld" style="margin-bottom:0"><div class="lb">Biome</div><div class="icombo"><input type="text" class="bfBiome icomboInput" maxlength="30" data-i="'+i+'" id="bfBiome-'+i+'" autocomplete="off" value="'+escAttr(b.biome)+'"><div class="icomboList" id="bfBiomeList-'+i+'"></div></div></div>'+
+          // Sub type (2026-09-08, split out of Biome's own search-alias list
+          // -- "BIOME 'Radioactive' / SUB TYPE 'Nuclear'" per Tony) -- its
+          // own saved field, filtered to whichever Biome is CURRENTLY typed
+          // above; see rebuildBiomeDependentCombos() for how it re-filters
+          // live as the Biome field changes.
+          '<div class="mfld" style="margin-bottom:0"><div class="lb">Sub type</div><div class="icombo"><input type="text" class="bfSubtype icomboInput" maxlength="30" data-i="'+i+'" id="bfSubtype-'+i+'" autocomplete="off" placeholder="e.g. Nuclear" value="'+escAttr(b.subtype||"")+'"><div class="icomboList" id="bfSubtypeList-'+i+'"></div></div></div>'+
+        '</div>'+
+        '<div class="brow2">'+
           /* maxlength was 20 -- too short for real in-game hazard/weather
              phrases (Tony hit this typing "Planet-wide Radioactive Storm",
              30 chars, and got cut off mid-word at "Radiatio"). Bumped to 50,
              comfortably covers the longest real phrases seen (e.g. "Extreme
              Sentinel Activity", "Planet-wide Radioactive Storm"). */
-          '<div class="mfld" style="margin-bottom:0"><div class="lb">Descriptor</div><input type="text" class="bfDesc" data-i="'+i+'" maxlength="50" spellcheck="true" list="dlDescriptor" placeholder="e.g. Bountiful" value="'+escAttr(b.descriptor)+'"></div>'+
+          // Renamed "Descriptor"->"Conditions" in the UI (2026-09-08, Tony:
+          // "people might not know what descriptor is") and switched from a
+          // plain <datalist> to the same grouped icombo every other canon
+          // field uses, now filtered to the current Biome via
+          // conditionsComboGroups() -- see CONDITIONS_CANON's own comment
+          // for the real weather-phrase research behind it. Internal field
+          // name stays `descriptor`, nothing saved needs migrating.
+          '<div class="mfld" style="margin-bottom:0"><div class="lb">Conditions</div><div class="icombo"><input type="text" class="bfConditions icomboInput" maxlength="50" data-i="'+i+'" id="bfConditions-'+i+'" autocomplete="off" placeholder="e.g. Bountiful" value="'+escAttr(b.descriptor)+'"><div class="icomboList" id="bfConditionsList-'+i+'"></div></div></div>'+
         '</div>'+
         '<div class="brow2">'+
           '<label class="chk2"><input type="checkbox" class="bfWater" data-i="'+i+'"'+(b.water?" checked":"")+'> Water</label>'+
           '<label class="chk2"><input type="checkbox" class="bfAutophage" data-i="'+i+'"'+(b.autophage?" checked":"")+'> Autophage camp</label>'+
         '</div>'+
-        // Reliquary ruins (2026-09-08) -- replaces "The Reliquary" as a
-        // selectable biome, same manual-only checkbox pattern as Autophage
-        // camp right above; see applyOverride()'s own comment for the why.
-        '<div class="brow2"><label class="chk2"><input type="checkbox" class="bfReliquary" data-i="'+i+'"'+(b.reliquary?" checked":"")+'> Reliquary ruins</label></div>';
+        // Reliquary / Ruins (2026-09-08) -- TWO separate checkboxes (Tony:
+        // "should be 2 separate tick boxes not together"), replacing what
+        // was briefly one combined "Reliquary ruins" checkbox. Both replace
+        // "The Reliquary" as a selectable biome -- see applyOverride()'s
+        // own comment for the why -- and are independent per-body flags,
+        // same manual-only pattern as Autophage camp above.
+        '<div class="brow2"><label class="chk2"><input type="checkbox" class="bfReliquary" data-i="'+i+'"'+(b.reliquary?" checked":"")+'> Reliquary</label>'+
+          '<label class="chk2"><input type="checkbox" class="bfRuins" data-i="'+i+'"'+(b.ruins?" checked":"")+'> Ruins</label></div>';
       // "Has base" checkbox available on every body (planet or moon) --
       // unlike rings, a base can genuinely sit on a moon in-game. The name
       // field only appears once ticked (2026-08-21, Tony: "put name of base
@@ -8726,6 +8860,12 @@ function renderBodyEditList(){
     // needing SOME biome picked. See editBodies' own default biome:"" below.
     buildIconCombo("bfBiome-"+i,"bfBiomeList-"+i,biomeComboGroups(),"Unknown",true);
     buildIconCombo("bfSentinel-"+i,"bfSentinelList-"+i,sentinelComboGroups());
+    // Sub type/Conditions (2026-09-08) -- both filtered to this body's
+    // CURRENT Biome value; rebuildBiomeDependentCombos() re-runs these same
+    // two calls whenever the Biome field itself changes (see the delegated
+    // "change" handler below), so switching Biome live re-filters both
+    // without needing the row to be closed and reopened.
+    rebuildBiomeDependentCombos(i);
     // Comma-list suggestion combos (2026-09-01) -- see buildCommaCombo()'s
     // own comment for why these replaced a plain <datalist>.
     buildCommaCombo("bfRes-"+i,"bfResList-"+i,RESOURCES_CANON,"resources");
@@ -8949,9 +9089,14 @@ function openEditModal(){
       name:b.name,
       moon:!!b.moon,
       // 2026-09-08 (Tony/goodguyfree): starts blank/"Unknown" rather than
-      // pre-filled with a guessed biome key -- see biomeOverridden's own
-      // comment in applyOverride() for the full reasoning.
-      biome:(b.biome&&String(b.biome).trim())?b.biome:"",
+      // pre-filled with a guessed biome key. FIXED same day -- b.biome is
+      // NEVER actually blank here (it always carries the procedural guess
+      // for rendering, see biomeOverridden's own comment in applyOverride())
+      // so checking b.biome's truthiness alone always pre-filled the guess
+      // anyway. Must gate on b.biomeOverridden instead -- only a real past
+      // traveller submission should pre-fill this field.
+      biome:b.biomeOverridden?b.biome:"",
+      subtype:b.subtype||"",
       descriptor:b.descriptor||"",
       water:!!b.water,
       ring:!!b.ring,
@@ -8964,6 +9109,7 @@ function openEditModal(){
       sentinel:(SENTINEL_ALL_WORDS.indexOf(b.sentinel)>=0)?b.sentinel:"None",
       autophage:!!b.autophage,
       reliquary:!!b.reliquary,
+      ruins:!!b.ruins,
       base:!!b.base,
       baseName:b.baseName||"",
       parentPos:b.moon?b.parent:0,
@@ -9119,7 +9265,9 @@ document.getElementById("bodyEditList").addEventListener("input",function(e){
   var iAttr=e.target.getAttribute("data-i"); if(iAttr===null) return; var i=+iAttr;
   if(e.target.classList.contains("bfName")) editBodies[i].name=e.target.value;
   else if(e.target.classList.contains("bfRes")) editBodies[i].resources=e.target.value;
-  else if(e.target.classList.contains("bfDesc")) editBodies[i].descriptor=e.target.value;
+  // bfDesc's old "input"-event capture removed (2026-09-08) -- Conditions
+  // is now an icombo (bfConditions), committed on "change" like Biome/
+  // Sentinel, not on every keystroke -- see the "change" listener below.
   else if(e.target.classList.contains("bfFlora")) editBodies[i].flora=e.target.value;
   else if(e.target.classList.contains("bfFauna")) editBodies[i].fauna=e.target.value;
   else if(e.target.classList.contains("bfMinerals")) editBodies[i].minerals=e.target.value;
@@ -9136,9 +9284,18 @@ document.getElementById("bodyEditList").addEventListener("change",function(e){
   }
   else if(e.target.classList.contains("bfWater")) editBodies[i].water=e.target.checked;
   else if(e.target.classList.contains("bfRing")) editBodies[i].ring=e.target.checked;
-  else if(e.target.classList.contains("bfBiome")) editBodies[i].biome=e.target.value;
+  else if(e.target.classList.contains("bfBiome")){
+    editBodies[i].biome=e.target.value;
+    // 2026-09-08: Sub type/Conditions must re-filter to the NEW biome the
+    // moment this commits -- otherwise they'd keep showing suggestions for
+    // whatever biome was selected when the row was opened.
+    rebuildBiomeDependentCombos(i);
+  }
+  else if(e.target.classList.contains("bfSubtype")) editBodies[i].subtype=e.target.value;
+  else if(e.target.classList.contains("bfConditions")) editBodies[i].descriptor=e.target.value;
   else if(e.target.classList.contains("bfAutophage")) editBodies[i].autophage=e.target.checked;
   else if(e.target.classList.contains("bfReliquary")) editBodies[i].reliquary=e.target.checked;
+  else if(e.target.classList.contains("bfRuins")) editBodies[i].ruins=e.target.checked;
   else if(e.target.classList.contains("bfBase")){
     editBodies[i].base=e.target.checked;
     renderBodyEditList(); // base-name field only appears once ticked -- must show/hide immediately
@@ -9162,8 +9319,8 @@ document.getElementById("bodyEditList").addEventListener("click",function(e){
 document.getElementById("edAddBody").addEventListener("click",function(){
   if(editBodies.length>=6){ toast("6 is the limit -- No Man's Sky systems can have at most 6 planets and moons combined."); return; }
   for(var j=0;j<editBodies.length;j++) editBodies[j].open=false;
-  editBodies.push({uid:bodyUidSeq++,name:"New body",moon:false,biome:"",descriptor:"",water:false,
-    resources:"",flora:"",fauna:"",minerals:"",salvage:"",fossils:"",sentinel:"None",autophage:false,reliquary:false,base:false,baseName:"",orbits:"",open:true});
+  editBodies.push({uid:bodyUidSeq++,name:"New body",moon:false,biome:"",subtype:"",descriptor:"",water:false,
+    resources:"",flora:"",fauna:"",minerals:"",salvage:"",fossils:"",sentinel:"None",autophage:false,reliquary:false,ruins:false,base:false,baseName:"",orbits:"",open:true});
   renderBodyEditList();
   var rows=document.querySelectorAll("#bodyEditList .bodyEdit");
   var last=rows[rows.length-1];
@@ -10403,7 +10560,7 @@ document.getElementById("edSubmit").addEventListener("click",function(){
       return {
         name:b.name.trim(), moon:b.moon,
         orbits:(b.moon && b.orbits && uidToPos[b.orbits])?uidToPos[b.orbits]:0,
-        biome:b.biome, descriptor:(b.descriptor||"").trim(), water:b.water, ring:!b.moon&&!!b.ring,
+        biome:b.biome, subtype:(b.subtype||"").trim(), descriptor:(b.descriptor||"").trim(), water:b.water, ring:!b.moon&&!!b.ring,
         resources:b.resources.split(",").map(function(x){ return x.trim(); }).filter(Boolean),
         flora:(b.flora||"").split(",").map(function(x){ return x.trim(); }).filter(Boolean),
         fauna:(b.fauna||"").split(",").map(function(x){ return x.trim(); }).filter(Boolean),
@@ -10413,6 +10570,7 @@ document.getElementById("edSubmit").addEventListener("click",function(){
         sentinel:b.sentinel||"None",
         autophage:!!b.autophage,
         reliquary:!!b.reliquary,
+        ruins:!!b.ruins,
         base:!!b.base,
         baseName:(b.baseName||"").trim()
       };
