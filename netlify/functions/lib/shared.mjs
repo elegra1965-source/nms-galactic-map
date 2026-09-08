@@ -339,7 +339,12 @@ export async function invalidateGetCache(){
    can't grow overrides.json forever; a duplicate (matched case-
    insensitively) is silently skipped rather than treated as an error, since
    resubmitting an already-known term isn't a mistake. */
-export const COMMUNITY_TERM_FIELDS = ["resources","flora","fauna","minerals","salvage","fossils","descriptor"];
+// "biome" added 2026-09-08 (Tony/goodguyfree): nobody's reverse-engineered
+// the real biome roll, so preview.html now shows "Unknown" until a real
+// traveller submission exists, same treatment as every free-text field
+// here -- a typed value not on the canonical list becomes a future
+// suggestion for every OTHER traveller too, not just saved and forgotten.
+export const COMMUNITY_TERM_FIELDS = ["resources","flora","fauna","minerals","salvage","fossils","descriptor","biome"];
 var MAX_COMMUNITY_TERMS_PER_FIELD = 500;
 export function addCommunityTerms(data, field, values){
   if(COMMUNITY_TERM_FIELDS.indexOf(field) < 0) return;
