@@ -189,9 +189,10 @@ commit, so nothing is ever silently lost. **Biome now starts blank, showing
 "Unknown" until you confirm it (added 2026-09-08)** -- nobody has
 reverse-engineered the game's real biome roll, so unlike race/economy/
 conflict this project never shows a guessed biome as if it were fact. Biome
-is now split into three fields: **Biome** (the canonical category), **Sub
-type** (the real on-screen wording you actually saw, e.g. "Isotopic" for a
-Radioactive planet -- filtered live to whichever Biome is picked, wiki-
+is now split into three fields: **Biome** (the canonical category),
+**Category type** (the real on-screen wording you actually saw, e.g.
+"Isotopic" for a Radioactive planet -- filtered live to whichever Biome is
+picked, wiki-
 researched per biome), and **Conditions** (renamed from "Descriptor" --
 real weather-phrase suggestions, also filtered by Biome). All three accept
 your own typed value if what you saw isn't listed, and a genuinely new
@@ -255,7 +256,7 @@ presenting a guess as fact. **Biome goes a step further than that** (added
 2026-09-08): unlike planet names, race, economy, or conflict -- all of which
 show a plausible generated value, tagged as a guess where relevant -- nobody
 has reverse-engineered the game's real biome roll at all, so this project
-doesn't display a guess for Biome/Sub type/Conditions at all. They read
+doesn't display a guess for Biome/Category type/Conditions at all. They read
 "Unknown" until a traveller reports the real answer via Edit system.
 
 ![About modal](screenshots/07-about-modal.jpg)
