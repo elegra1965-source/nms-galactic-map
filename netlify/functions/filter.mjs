@@ -376,6 +376,14 @@ export function filterSystemEdit(payload){
     // truncate what the client now happily accepts.
     var descR = filterText(b.descriptor, {maxLen:50, fieldName:"Descriptor"});
     if(!descR.ok){ errors.push(descR.reason); continue; }
+    // Sub type (2026-09-08, split out of Biome -- see preview.html's own
+    // subtypeComboGroups() comment for the why): the real on-screen wording
+    // a traveller saw ("Isotopic") kept SEPARATE from the canonical biome
+    // key ("Radioactive") it maps to, instead of being thrown away the way
+    // it used to be when it was just a search alias. Same 30-char cap as
+    // Biome itself.
+    var subtypeR = filterText(b.subtype||"", {maxLen:30, fieldName:"Sub type"});
+    if(!subtypeR.ok){ errors.push(subtypeR.reason); continue; }
     var resOut = [];
     var res = Array.isArray(b.resources) ? b.resources : [];
     for(var j=0;j<Math.min(res.length,6);j++){
@@ -403,6 +411,7 @@ export function filterSystemEdit(payload){
       // order, same as every save made before this field existed.
       orbits: Math.max(0, Math.min(6, parseInt(b.orbits,10)||0)),
       biome: biomeR.cleaned,
+      subtype: subtypeR.cleaned,
       descriptor: descR.cleaned,
       water: !!b.water,
       // Rings aren't a thing on moons in-game -- enforced server-side too,
@@ -424,6 +433,12 @@ export function filterSystemEdit(payload){
       // on why), same manual-only boolean pattern as autophage/base --
       // no procedural rule for which planet has one.
       reliquary: !!b.reliquary,
+      // Ruins (2026-09-08, split from Reliquary per Tony: "should be 2
+      // separate tick boxes") -- same manual-only boolean pattern,
+      // independent of reliquary. Reuses the field name "ruins" already
+      // used by the system-level flag (out.ruins above) -- same precedent
+      // as "water" already existing at both system and per-body level.
+      ruins: !!b.ruins,
       // "Has base" (2026-08-17, Tony): plain boolean, same manual-only
       // pattern as autophage above -- no procedural rule for a traveller's
       // own base placement.

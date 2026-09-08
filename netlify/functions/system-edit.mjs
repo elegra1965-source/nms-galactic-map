@@ -15,17 +15,27 @@
      "edit"   payload = {name, race, region, stars:[colourKey,...] (max 3), starClass, water, dissonant,
                          giant, ruins, outlaw, abandoned, phantom, econName, sell, buy, econDesc, conflict, blackHole, atlas, notes,
                          screenshot, editorName, editorFriendCode, genVersion, colliding, collidingA, collidingB,
-                         bodies:[{name, moon, orbits, biome, descriptor, water, ring, resources,
+                         bodies:[{name, moon, orbits, biome, subtype, descriptor, water, ring, resources,
                                   flora, fauna, minerals, salvage, fossils, sentinel, autophage,
-                                  reliquary, base, baseName}, ...]}
-                         (reliquary added 2026-09-08 -- per-body "has Reliquary ruins" marker,
-                         same manual-only pattern as autophage. Replaces "The Reliquary" as a
+                                  reliquary, ruins, base, baseName}, ...]}
+                         (subtype added 2026-09-08 -- Sub type, split out of Biome per Tony ("BIOME
+                         'radioactive' / SUB TYPE 'nuclear' / CONDITIONS 'frequent radioactive
+                         storms'"): the real on-screen wording a traveller saw ("Isotopic"), kept
+                         separate from the canonical `biome` key it maps to instead of being
+                         thrown away the way it used to be when it was only a search alias.
+                         `descriptor` is unchanged internally -- only its UI label ("Conditions")
+                         and suggestion source changed, see preview.html's CONDITIONS_CANON.)
+                         (reliquary/ruins added 2026-09-08 -- TWO separate per-body "has
+                         Reliquary"/"has ruins" markers, same manual-only pattern as autophage,
+                         deliberately split into 2 checkboxes per Tony ("should be 2 separate
+                         tick boxes not together"). Together they replace "The Reliquary" as a
                          selectable biome client-side -- research found it's actually a
                          prefix/suffix TAG the real game layers onto an existing biome
                          ("Abandoned Desert", "Dusty Relic"), not a 13th category of its own.
-                         Deliberately its own field, NOT the existing system-level `ruins` flag
-                         below -- that's a different, already-shipped concept (Ancient Ruins
-                         surface POI: Knowledge Stones + memoir device).)
+                         Per-body `ruins` reuses the field name already used by the system-level
+                         `ruins` flag below (Ancient Ruins surface POI: Knowledge Stones + memoir
+                         device) -- same precedent as `water` already existing at both system
+                         and per-body level in this same payload shape, not an actual collision.)
                          (screenshot added 2026-09-01 -- an optional public photo, see
                          resolveScreenshotUpload() and lib/shared.mjs's screenshot helpers for the
                          full "why one file per upload, not per system" reasoning.)
@@ -459,9 +469,9 @@ async function handleGet(req, token){
    dense array replacing the procedural one wholesale, not a sparse patch. */
 function blankBody(){
   return {
-    name:"", moon:false, orbits:0, biome:"", descriptor:"", water:false, ring:false,
+    name:"", moon:false, orbits:0, biome:"", subtype:"", descriptor:"", water:false, ring:false,
     resources:[], flora:[], fauna:[], minerals:[], salvage:[], fossils:[],
-    sentinel:"None", autophage:false, reliquary:false, base:false, baseName:""
+    sentinel:"None", autophage:false, reliquary:false, ruins:false, base:false, baseName:""
   };
 }
 function applyPlanetNamesToBodies(existingBodies, bodyCount, planetNames){
@@ -769,6 +779,10 @@ export default async (req, context) => {
       // surfaces it as an "Other reported" suggestion for every OTHER
       // traveller, not just saved and forgotten in this one record.
       if(b.biome) addCommunityTerms(current.data, "biome", [b.biome]);
+      // 2026-09-08 (Sub type split from Biome): same reasoning -- a
+      // traveller's real on-screen sub-name feeds the shared vocabulary so
+      // subtypeComboGroups() can surface it for every OTHER traveller too.
+      if(b.subtype) addCommunityTerms(current.data, "subtype", [b.subtype]);
     });
 
     sysRec.editedAt = new Date(now).toISOString();
