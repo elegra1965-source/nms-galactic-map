@@ -419,6 +419,11 @@ export function filterSystemEdit(payload){
       fossils: resArr(b.fossils,"Fossil/curiosity",FOSSILS_CANON),
       sentinel: SENTINEL_LEVELS.indexOf(sentinelIn)>=0 ? sentinelIn : "None",
       autophage: !!b.autophage,
+      // Reliquary ruins (2026-09-08) -- replaces "The Reliquary" as a
+      // selectable biome value client-side (see preview.html's own comment
+      // on why), same manual-only boolean pattern as autophage/base --
+      // no procedural rule for which planet has one.
+      reliquary: !!b.reliquary,
       // "Has base" (2026-08-17, Tony): plain boolean, same manual-only
       // pattern as autophage above -- no procedural rule for a traveller's
       // own base placement.

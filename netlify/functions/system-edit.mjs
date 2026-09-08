@@ -16,7 +16,16 @@
                          giant, ruins, outlaw, abandoned, phantom, econName, sell, buy, econDesc, conflict, blackHole, atlas, notes,
                          screenshot, editorName, editorFriendCode, genVersion, colliding, collidingA, collidingB,
                          bodies:[{name, moon, orbits, biome, descriptor, water, ring, resources,
-                                  flora, fauna, minerals, salvage, fossils, sentinel, autophage, base, baseName}, ...]}
+                                  flora, fauna, minerals, salvage, fossils, sentinel, autophage,
+                                  reliquary, base, baseName}, ...]}
+                         (reliquary added 2026-09-08 -- per-body "has Reliquary ruins" marker,
+                         same manual-only pattern as autophage. Replaces "The Reliquary" as a
+                         selectable biome client-side -- research found it's actually a
+                         prefix/suffix TAG the real game layers onto an existing biome
+                         ("Abandoned Desert", "Dusty Relic"), not a 13th category of its own.
+                         Deliberately its own field, NOT the existing system-level `ruins` flag
+                         below -- that's a different, already-shipped concept (Ancient Ruins
+                         surface POI: Knowledge Stones + memoir device).)
                          (screenshot added 2026-09-01 -- an optional public photo, see
                          resolveScreenshotUpload() and lib/shared.mjs's screenshot helpers for the
                          full "why one file per upload, not per system" reasoning.)
@@ -452,7 +461,7 @@ function blankBody(){
   return {
     name:"", moon:false, orbits:0, biome:"", descriptor:"", water:false, ring:false,
     resources:[], flora:[], fauna:[], minerals:[], salvage:[], fossils:[],
-    sentinel:"None", autophage:false, base:false, baseName:""
+    sentinel:"None", autophage:false, reliquary:false, base:false, baseName:""
   };
 }
 function applyPlanetNamesToBodies(existingBodies, bodyCount, planetNames){
@@ -754,6 +763,12 @@ export default async (req, context) => {
       addCommunityTerms(current.data, "salvage", b.salvage||[]);
       addCommunityTerms(current.data, "fossils", b.fossils||[]);
       if(b.descriptor) addCommunityTerms(current.data, "descriptor", [b.descriptor]);
+      // 2026-09-08 (Tony/goodguyfree, biome-unknown fix): feed a submitted
+      // biome value into the shared vocabulary same as every other free-
+      // text field above -- preview.html's biomeCommunityExtras() then
+      // surfaces it as an "Other reported" suggestion for every OTHER
+      // traveller, not just saved and forgotten in this one record.
+      if(b.biome) addCommunityTerms(current.data, "biome", [b.biome]);
     });
 
     sysRec.editedAt = new Date(now).toISOString();
