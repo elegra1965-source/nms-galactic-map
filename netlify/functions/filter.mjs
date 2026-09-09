@@ -534,7 +534,10 @@ export function filterSystemEdit(payload){
   // in-game icon glyphs from Tony's own reference photos, added as
   // traveller-selectable options rather than guessed-at "official"
   // categories (no text label was visible in the photos this time).
-  var SIGNAL_ICONS = ["mineral","flora","frozen","tech","outpost","creature","hazard","cargo"];
+  // atlasstation added later the same day -- Hello Games' own real Atlas
+  // Station icon (Tony confirmed it directly), not a fan reading of an
+  // ambiguous photo like creature/hazard/cargo were.
+  var SIGNAL_ICONS = ["mineral","flora","frozen","tech","outpost","creature","hazard","cargo","atlasstation"];
   for(var sgI=0; sgI<Math.min(signals.length,6); sgI++){
     var sg = signals[sgI] || {};
     var sgNameR = filterText(sg.name, {maxLen:40, fieldName:"Signal marker name"});
