@@ -15,7 +15,7 @@
      "edit"   payload = {name, race, region, stars:[colourKey,...] (max 3), starClass, water, dissonant,
                          giant, ruins, outlaw, abandoned, phantom, econName, sell, buy, econDesc, conflict, blackHole, atlas, notes,
                          screenshot, editorName, editorFriendCode, genVersion, colliding, collidingA, collidingB,
-                         hasStation, stationName,
+                         hasStation, stationName, stationPhoto,
                          bodies:[{name, moon, orbits, biome, subtype, descriptor, water, ring, resources,
                                   flora, fauna, minerals, salvage, fossils, sentinel, autophage,
                                   reliquary, ruins, base, baseName}, ...]}
@@ -78,7 +78,14 @@
                          kind of real-game-content change genVersion above was built to anticipate,
                          but genVersion itself is untouched by this: it tracks when the PROCEDURAL
                          GENERATOR's own output goes stale, and station directorship is manual-only
-                         data with no generateSystem() involvement at all.)
+                         data with no generateSystem() involvement at all. stationPhoto added
+                         the same day as a same-session follow-up, once Tony asked about letting a
+                         visitor upload a real photo of their station -- a DEDICATED upload
+                         (Tony's own explicit pick over reusing the general `screenshot` field
+                         above), resolved through the exact same resolveScreenshotUpload()/
+                         filterScreenshot() machinery, just called a second time with its own
+                         editKey suffix so it always lands in its own uniquely-named file, never
+                         colliding with a system's separate general screenshot upload.)
      "report" payload = {reason}
      "bulk-import" payload = {entries:[{address, names:[...], planetNames:[{index,name}...],
                     systemName}...], editorName, editorFriendCode, genVersion}
@@ -241,7 +248,12 @@ function getCategoryValue(out, category){
     // bundles water+dissonant and "colliding" bundles its 3 fields -- one
     // traveller pick (has a station + what they named it), goes through
     // consensus together rather than as 2 independently-flaggable fields.
-    case "station": return { hasStation: !!out.hasStation, stationName: out.stationName||"" };
+    // stationPhoto added same-session (2026-09-09): by the time this runs,
+    // filtered.cleaned.stationPhoto has already been resolved to a final
+    // hosted URL (or "") by its own resolveScreenshotUpload() call below --
+    // same treatment as the general `screenshot` category above, just its
+    // own dedicated field/upload/file.
+    case "station": return { hasStation: !!out.hasStation, stationName: out.stationName||"", stationPhoto: out.stationPhoto||"" };
     default: return undefined;
   }
 }
@@ -284,7 +296,7 @@ function applyCategoryValue(data, category, value){
       data.colliding=!!value.colliding; data.collidingA=value.collidingA||0; data.collidingB=value.collidingB||0;
       return;
     case "station":
-      data.hasStation=!!value.hasStation; data.stationName=value.stationName||"";
+      data.hasStation=!!value.hasStation; data.stationName=value.stationName||""; data.stationPhoto=value.stationPhoto||"";
       return;
   }
 }
@@ -714,6 +726,20 @@ export default async (req, context) => {
         filtered.cleaned.screenshot = await resolveScreenshotUpload(token, editKey, filtered.cleaned.screenshot);
       } catch(e){
         return json(502, {ok:false, error:"Could not save screenshot: "+e.message});
+      }
+    }
+    // Station photo (2026-09-09): same resolveScreenshotUpload() call as the
+    // general screenshot just above, with its own "-station" editKey suffix
+    // purely for a readable filename in GitHub's history -- uniqueness
+    // itself is already guaranteed by screenshotPathFor()'s own timestamp+
+    // random suffix regardless of what editKey it's given, so this can
+    // never collide with the general screenshot's own upload for the same
+    // system, even if both are replaced in the very same submission.
+    if(typeof filtered.cleaned.stationPhoto === "string" && filtered.cleaned.stationPhoto.indexOf("data:image/jpeg;base64,") === 0){
+      try {
+        filtered.cleaned.stationPhoto = await resolveScreenshotUpload(token, editKey+"-station", filtered.cleaned.stationPhoto);
+      } catch(e){
+        return json(502, {ok:false, error:"Could not save station photo: "+e.message});
       }
     }
     var edHash = await editorHash(ip);

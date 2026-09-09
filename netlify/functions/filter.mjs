@@ -204,18 +204,23 @@ function filterPercent(raw, fieldName){
 // recognition happens in system-edit.mjs, which already imports
 // lib/shared.mjs for it.
 var MAX_SCREENSHOT_DATAURL_CHARS = 360000; // ~260KB decoded once base64's ~4/3 overhead is accounted for -- see compressImageToJpeg()'s own budget in preview.html
-function filterScreenshot(raw){
+function filterScreenshot(raw, fieldName){
+  // fieldName (2026-09-09): optional, defaults to "Screenshot" -- lets this
+  // same validator be reused for the new Station photo field below with a
+  // correctly-worded rejection message ("Station photo is too large...")
+  // instead of a generic one that would misname what's actually wrong.
+  var fn = fieldName || "Screenshot";
   var s = String(raw==null?"":raw).trim();
   if(!s) return {ok:true, cleaned:""};
   if(/^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(s)){
-    if(s.length > MAX_SCREENSHOT_DATAURL_CHARS) return {ok:false, cleaned:"", reason:"Screenshot is too large -- try picking it again, it should compress automatically"};
+    if(s.length > MAX_SCREENSHOT_DATAURL_CHARS) return {ok:false, cleaned:"", reason:fn+" is too large -- try picking it again, it should compress automatically"};
     return {ok:true, cleaned:s};
   }
   // Anything else claiming to be "leave the existing one as it is": only a
   // plain, short https URL is plausible as an already-stored screenshot
   // link -- never anything else (no javascript:, no arbitrary long string).
   if(/^https:\/\/\S+$/.test(s) && s.length <= 300) return {ok:true, cleaned:s};
-  return {ok:false, cleaned:"", reason:"Screenshot must be a photo you just added, or left exactly as it was"};
+  return {ok:false, cleaned:"", reason:fn+" must be a photo you just added, or left exactly as it was"};
 }
 
 /* Validate an entire system-edit payload. Returns {ok, cleaned, errors[]}. */
@@ -316,6 +321,20 @@ export function filterSystemEdit(payload){
   out.hasStation = !!payload.hasStation;
   var stationNameR = filterText(payload.stationName, {maxLen:30, fieldName:"Station name"});
   if(!stationNameR.ok) errors.push(stationNameR.reason); else out.stationName = stationNameR.cleaned;
+  // Station photo (2026-09-09, Tony: "user being able to upload a picture
+  // of their space station... like atlas station is"). A DEDICATED upload,
+  // deliberately separate from the general system Screenshot field further
+  // below -- Tony's own explicit pick when asked ("New dedicated field
+  // (recommended)") so a station photo and a general system screenshot can
+  // each be added/removed/flagged/disputed independently of one another.
+  // Reuses filterScreenshot() as-is (same 3 accepted shapes: a fresh
+  // data:image/jpeg;base64,... upload from compressImageToJpeg(), an
+  // already-hosted https:// URL the traveller didn't touch this
+  // submission, or "" to remove it) -- just with a field-specific name so
+  // a rejection reads "Station photo is too large..." rather than the
+  // generic "Screenshot is too large...".
+  var stationPhotoR = filterScreenshot(payload.stationPhoto, "Station photo");
+  if(!stationPhotoR.ok) errors.push(stationPhotoR.reason); else out.stationPhoto = stationPhotoR.cleaned;
 
   // Phantom Star / Shadow Star -- an obscure, wiki-documented NMS oddity
   // (nomanssky.fandom.com/wiki/Phantom_Star, researched in
