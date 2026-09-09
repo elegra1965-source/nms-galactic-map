@@ -304,6 +304,19 @@ export function filterSystemEdit(payload){
   // the race value itself so a traveller can correct either one on its own.
   out.abandoned = !!payload.abandoned;
 
+  // Space Station Directorship (2026-09-09, NMS "Cosmos" 10th-anniversary
+  // update / Update 7.0): players can now become director of a system's
+  // space station and personalise it (nomanssky.com/cosmos-update). This is
+  // the "foundation" pass Tony asked for -- manual-only, same pattern as
+  // outlaw/ruins/giant/blackHole/atlas above, since no procedural rule could
+  // ever derive who a real player chose to make a station director. System-
+  // level (not per-body), since a station isn't tied to a specific planet or
+  // moon the way a base is. stationName reuses the same 30-char cap as
+  // editorName/baseName above.
+  out.hasStation = !!payload.hasStation;
+  var stationNameR = filterText(payload.stationName, {maxLen:30, fieldName:"Station name"});
+  if(!stationNameR.ok) errors.push(stationNameR.reason); else out.stationName = stationNameR.cleaned;
+
   // Phantom Star / Shadow Star -- an obscure, wiki-documented NMS oddity
   // (nomanssky.fandom.com/wiki/Phantom_Star, researched in
   // Galactic-Map-Session-Notes.md): most regions contain thousands of

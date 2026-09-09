@@ -15,6 +15,7 @@
      "edit"   payload = {name, race, region, stars:[colourKey,...] (max 3), starClass, water, dissonant,
                          giant, ruins, outlaw, abandoned, phantom, econName, sell, buy, econDesc, conflict, blackHole, atlas, notes,
                          screenshot, editorName, editorFriendCode, genVersion, colliding, collidingA, collidingB,
+                         hasStation, stationName,
                          bodies:[{name, moon, orbits, biome, subtype, descriptor, water, ring, resources,
                                   flora, fauna, minerals, salvage, fossils, sentinel, autophage,
                                   reliquary, ruins, base, baseName}, ...]}
@@ -68,7 +69,16 @@
                          2026-08-17 -- display-only "these two planets visually overlap" flag, built
                          client-side in a separate session but never actually added to this
                          allowlist until now -- see filter.mjs's own comment on that same field for
-                         why it's a manual pick, not derived data.)
+                         why it's a manual pick, not derived data. hasStation/stationName added
+                         2026-09-09 -- Space Station Directorship, from the real "Cosmos" 10th-
+                         anniversary update (Update 7.0), released the same day. Foundation pass
+                         per Tony's own framing ("lay the foundation down and update as we go
+                         along") -- system-level manual boolean + a 30-char name, same pattern as
+                         every other special-feature flag in this payload. This is exactly the
+                         kind of real-game-content change genVersion above was built to anticipate,
+                         but genVersion itself is untouched by this: it tracks when the PROCEDURAL
+                         GENERATOR's own output goes stale, and station directorship is manual-only
+                         data with no generateSystem() involvement at all.)
      "report" payload = {reason}
      "bulk-import" payload = {entries:[{address, names:[...], planetNames:[{index,name}...],
                     systemName}...], editorName, editorFriendCode, genVersion}
@@ -227,6 +237,11 @@ function getCategoryValue(out, category){
     // traveller pick (display-only pairing), so they go through consensus
     // together, not as 3 independently-flaggable fields.
     case "colliding": return { colliding: !!out.colliding, collidingA: out.collidingA||0, collidingB: out.collidingB||0 };
+    // Space Station Directorship (2026-09-09): bundled the same way "suffix"
+    // bundles water+dissonant and "colliding" bundles its 3 fields -- one
+    // traveller pick (has a station + what they named it), goes through
+    // consensus together rather than as 2 independently-flaggable fields.
+    case "station": return { hasStation: !!out.hasStation, stationName: out.stationName||"" };
     default: return undefined;
   }
 }
@@ -267,6 +282,9 @@ function applyCategoryValue(data, category, value){
     case "screenshot": data.screenshot=value; return;
     case "colliding":
       data.colliding=!!value.colliding; data.collidingA=value.collidingA||0; data.collidingB=value.collidingB||0;
+      return;
+    case "station":
+      data.hasStation=!!value.hasStation; data.stationName=value.stationName||"";
       return;
   }
 }
@@ -721,7 +739,7 @@ export default async (req, context) => {
     // or more categories from flaggedFields/disputedFields.
     var stillUnderReview = sysRec.flaggedFields.concat(sysRec.disputedFields);
 
-    var TOP_CATS = ["name","race","region","starClass","stars","suffix","giant","economy","conflict","blackHole","atlas","ruins","outlaw","abandoned","phantom","notes","colliding","screenshot"];
+    var TOP_CATS = ["name","race","region","starClass","stars","suffix","giant","economy","conflict","blackHole","atlas","ruins","outlaw","abandoned","phantom","notes","colliding","screenshot","station"];
     for(var ti=0; ti<TOP_CATS.length; ti++){
       if(stillUnderReview.indexOf(TOP_CATS[ti])>=0) continue;
       applyCategoryValue(sysRec.data, TOP_CATS[ti], getCategoryValue(filtered.cleaned, TOP_CATS[ti]));
