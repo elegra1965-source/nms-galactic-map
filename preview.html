@@ -735,6 +735,25 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
    down just here rather than shrinking it everywhere it's reused. */
 .hoverpop .conBadge b{font-size:8px;padding:0 4px;border-radius:6px}
 .hoverpop .conBadge{gap:3px}
+.resreport{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:37;
+  width:280px;font-family:'Orbitron',sans-serif;
+  background:rgba(6,12,20,0.94);border:1px solid var(--border);border-radius:var(--r-sm);
+  overflow:hidden;box-shadow:0 8px 28px rgba(0,0,0,0.5)}
+.resreport .rrHead{background:rgba(107,255,168,0.14);border-bottom:1px solid rgba(107,255,168,0.35);
+  padding:9px 30px 9px 12px;position:relative}
+.resreport .rrName{color:var(--fs-edited);font-size:12px;letter-spacing:.05em;font-weight:600}
+.resreport .rrCat{color:rgba(207,224,240,0.75);font-size:9px;letter-spacing:.04em;margin-top:2px;font-family:'Rajdhani',sans-serif}
+.resreport .rrClose{position:absolute;right:6px;top:6px;width:20px;height:20px;border:none;
+  background:transparent;color:var(--text-dim);font-size:16px;line-height:1;cursor:pointer;border-radius:4px}
+.resreport .rrClose:hover{color:var(--white);background:rgba(255,255,255,0.08)}
+.resreport .rrBody{padding:10px 12px;font-family:'Rajdhani',sans-serif;font-size:11px;color:var(--text)}
+.resreport .rrRow{margin-bottom:6px;line-height:1.4}
+.resreport .rrRow:last-child{margin-bottom:0}
+.resreport .rrLbl{color:var(--cyan);letter-spacing:.03em;margin-right:4px}
+.resreport .rrMarker{display:block;width:100%;background:rgba(0,229,255,0.08);border:none;
+  border-top:1px solid var(--border);color:var(--cyan);font-family:'Orbitron',sans-serif;
+  font-size:10px;letter-spacing:.1em;padding:9px;cursor:pointer;transition:background .15s}
+.resreport .rrMarker:hover{background:rgba(0,229,255,0.16)}
 #toast{position:fixed;left:50%;top:calc(var(--top-h,60px) + 8px);transform:translateX(-50%);z-index:40;
   font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:.12em;color:var(--gold);
   background:rgba(11,17,25,.95);border:1px solid var(--gold);border-radius:var(--r-sm);
@@ -1317,6 +1336,18 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 <div id="labels"></div>
 <div id="atlasBadges"></div>
 <div id="hoverPop" class="hoverpop" style="display:none"></div>
+<div id="resReport" class="resreport" style="display:none">
+  <div class="rrHead">
+    <div class="rrName" id="rrName"></div>
+    <div class="rrCat" id="rrCat"></div>
+    <button class="rrClose" id="rrClose" title="Close" aria-label="Close">×</button>
+  </div>
+  <div class="rrBody">
+    <div class="rrRow"><span class="rrLbl">Signal Type:</span> <span id="rrSignal"></span></div>
+    <div class="rrRow rrRoute"><span class="rrLbl">Route recommendation:</span> <span id="rrRoute"></span></div>
+  </div>
+  <button class="rrMarker" id="rrMarker">⊗ SET MARKER</button>
+</div>
 <div id="toast"></div>
 <div id="galInfo"></div>
 <div id="galHud"><canvas id="galIcon" width="168" height="168"></canvas><div class="galHudTxt"><div id="galHudName">Galactic Core</div><div id="galHudDist">&mdash;</div></div></div>
@@ -2902,6 +2933,67 @@ function biomePal(k){
    Stellar element is set by the star's colour, confirmed per colour (purple = Quartzite). */
 var UNIVERSAL_EL=["Cobalt","Silver","Gold","Magnetised Ferrite","Salt","Sodium"];
 var STELLAR_EL={yellow:"Copper",red:"Cadmium",green:"Emeril",blue:"Indium",purple:"Quartzite"};
+/* ============ Cosmos-era floating resource/signal icons (2026-09-09) ============
+   Tony sent real screenshots of the "Cosmos" 10th-anniversary system view: small
+   diamond-shaped icons float near bodies, each clickable into a "Starmap Analysis
+   Report" card (name/category, Signal Type, Route recommendation flavour text, a
+   Set Marker action). Built as small per-PLANET billboards only (not moons, and
+   NOT invented standalone POIs like the reference's asteroid belts/comet
+   fragments -- this site has no data at all for those, and this project's own
+   standing rule is to never invent what isn't sourced, same reasoning as the
+   biome "Unknown until a real submission exists" gating elsewhere).
+   Everything shown here as fact (the resource NAME) comes from data this site
+   already treats as real/sourced: bd.res (the wiki-sourced per-biome resource
+   list showBody() already displays), resUni (the procedural universal-element
+   roll, always present), and the system's own stellar element. The one
+   deliberately INVENTED part is the "Route recommendation" flavour line --
+   there is no way to source a unique per-object description procedurally, so
+   this is openly decorative atmosphere text picked from the small bank below,
+   never treated as fact anywhere else in the UI. Both picks are seeded off the
+   body's own .seed (mulberry32, same determinism pattern used everywhere else
+   in this file) so a given system's icons look the same on every reload,
+   consistent with the rest of the map. */
+var RES_ICON_CAT={
+  mineral:{icon:IC_MINERAL,color:"#5ad7ff",label:"Mineral Deposit"},
+  flora:{icon:IC_FLORA,color:"#7cffa0",label:"Flora Growth"},
+  frozen:{icon:null,color:"#bfe6ff",label:"Frozen Signal"},
+  tech:{icon:IC_SALVAGE,color:"#ff8a4a",label:"Tech Anomaly"}
+};
+var RES_ICON_BIOME_CAT={
+  "Lush":"flora","Toxic":"flora","Marsh":"flora","Water World":"flora",
+  "Frozen":"frozen",
+  "Barren":"mineral","Dead":"mineral","Scorched":"mineral","Volcanic":"mineral","Gas Giant":"mineral",
+  "Radioactive":"tech","Irradiated":"tech","Exotic":"tech","Mega Exotic":"tech","The Reliquary":"tech"
+};
+var RES_ICON_ROUTES={
+  mineral:["Dense mineral deposit detected. Mining opportunities nearby.",
+           "Rich vein of surface deposits. Extraction site viable.",
+           "Ore-bearing formation detected. Refinery drop recommended."],
+  flora:["Organic compounds detected. Flora harvesting opportunities.",
+         "Biological signal strong. Sampling site viable.",
+         "Active growth detected. Farming outpost potential."],
+  frozen:["Sub-zero signal detected. Extraction gear recommended.",
+          "Frozen deposit located. Thermal protection advised.",
+          "Ice-bound formation detected. Harvest opportunities present."],
+  tech:["Anomalous signal detected. Approach with scanner ready.",
+        "Unstable readings nearby. Proceed with caution.",
+        "Salvageable technology detected. Recovery opportunity flagged."]
+};
+function resIconCategory(biome){ return RES_ICON_BIOME_CAT[biome]||"mineral"; }
+function resIconResourceName(b,s){
+  var bd=biomePal(b.biome), rlist=[];
+  if(bd.res) rlist=rlist.concat(bd.res);
+  var stel=STELLAR_EL[s.starTypes[0]]; if(stel) rlist.push(stel);
+  if(b.resUni) rlist=rlist.concat(b.resUni);
+  if(!rlist.length) rlist=["Unknown deposit"];
+  var pick=mulberry32(b.seed^0x52c17)();
+  return rlist[Math.floor(pick*rlist.length)];
+}
+function resIconRouteText(cat,seed){
+  var bank=RES_ICON_ROUTES[cat]||RES_ICON_ROUTES.mineral;
+  var pick=mulberry32(seed^0x7a11f)();
+  return bank[Math.floor(pick*bank.length)];
+}
 var TERRAIN=["Pangean","Continental","Riverland","Wetlands","Swamp","Archipelago","Island Chains","Oceanic","Reef"];
 var SYL_A=["Ok","Ux","Ya","Ze","Hu","Ig","Ba","Vy","Ne","Qo","Ri","Ta","El","Mu","Su","Ka"];
 var SYL_B=["ra","lo","ni","tak","ves","mor","dun","phi","gal","ren","sup","yak","del","onu","cor","wex"];
@@ -5811,7 +5903,7 @@ function renderRoutesList(){
 }
 
 /* ============ system view ============ */
-var bodyMeshes=[], pivots=[], starMeshes=[], coronas=[], featureMeshes=[];
+var bodyMeshes=[], pivots=[], starMeshes=[], coronas=[], featureMeshes=[], resourceMeshes=[];
 function buildStar(s,i,pos){
   var col=s.starColors[i%s.starColors.length];
   var rad=2.0;
@@ -5960,6 +6052,71 @@ function buildStationCard(s,pos){
   img.src=s.stationPhoto;
   return spr;
 }
+/* Builds ONE floating diamond signal icon for a planet (see the RES_ICON_*
+   header comment above for the data-honesty reasoning). Deliberately a CHILD
+   of the planet's own pivot (not systemGroup, unlike buildFeature/
+   buildStationCard) -- pivot.rotation.y is what animate() already spins to
+   produce the planet's orbit, so a sprite parented here just rides along
+   automatically, no separate per-frame position code needed. Sprites stay
+   camera-facing regardless of parent rotation (same THREE.Sprite billboarding
+   confirmed for buildFeature/buildStationCard earlier this session), so this
+   still reads as a stationary-facing tag while visibly orbiting with its
+   planet -- matching how the reference screenshots show these hugging their
+   object as the view moves. */
+function buildResourceIcon(s,b,pivot,localPos){
+  var cat=resIconCategory(b.biome);
+  var cfg=RES_ICON_CAT[cat];
+  var CS=64;
+  var canvas=document.createElement("canvas");
+  canvas.width=CS; canvas.height=CS;
+  var ctx=canvas.getContext("2d");
+  ctx.translate(CS/2,CS/2);
+  ctx.beginPath();
+  ctx.moveTo(0,-CS*0.42); ctx.lineTo(CS*0.34,0); ctx.lineTo(0,CS*0.42); ctx.lineTo(-CS*0.34,0); ctx.closePath();
+  ctx.fillStyle="rgba(6,12,20,0.55)";
+  ctx.fill();
+  ctx.lineWidth=2.4;
+  ctx.strokeStyle=cfg.color;
+  ctx.shadowColor=cfg.color; ctx.shadowBlur=8;
+  ctx.stroke();
+  ctx.shadowBlur=0;
+  ctx.strokeStyle=cfg.color; ctx.lineWidth=1.6;
+  ctx.lineCap="round"; ctx.lineJoin="round";
+  if(cat==="frozen"){
+    // No existing SVG icon in this app is a snowflake -- drawn by hand here
+    // rather than reusing an unrelated glyph, six spokes each with a small
+    // "V" barb near the tip (matches the pale-blue frozen/snowflake icon
+    // Tony described from the reference screenshots).
+    ctx.save(); ctx.scale(0.62,0.62);
+    for(var a=0;a<6;a++){
+      ctx.save(); ctx.rotate(a*Math.PI/3);
+      ctx.beginPath(); ctx.moveTo(0,-11); ctx.lineTo(0,11); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0,-7); ctx.lineTo(-3.2,-9.6); ctx.moveTo(0,-7); ctx.lineTo(3.2,-9.6); ctx.stroke();
+      ctx.restore();
+    }
+    ctx.restore();
+  } else {
+    var m=/d="([^"]+)"/.exec(cfg.icon);
+    if(m){
+      var p=new Path2D(m[1]);
+      ctx.save(); ctx.scale(1.5,1.5); ctx.translate(-12,-12); ctx.stroke(p); ctx.restore();
+    }
+  }
+  var tex=new THREE.CanvasTexture(canvas);
+  tex.minFilter=THREE.LinearFilter;
+  var mat=new THREE.SpriteMaterial({map:tex,transparent:true,depthWrite:false});
+  var spr=new THREE.Sprite(mat);
+  var h=0.85+b.size*0.55;
+  spr.scale.set(h,h,1);
+  spr.position.copy(localPos);
+  spr.userData={resourceIcon:true,sys:s,body:b,category:cat,
+    name:b.name,catLabel:cfg.label,
+    signalType:resIconResourceName(b,s),
+    route:resIconRouteText(cat,b.seed)};
+  pivot.add(spr);
+  resourceMeshes.push(spr);
+  return spr;
+}
 /* Display-only fix for the "Colliding planets present" edit flag. Which two
    planets collide is ALWAYS a traveller pick (s.collidingA/s.collidingB,
    1-based body.index, set via the two dropdowns in Edit system) -- this
@@ -6035,7 +6192,8 @@ function buildSystemView(s){
       if(o.material){ if(o.material.map&&o.material.map!==CORONA&&o.material.map!==BH_TEX&&o.material.map!==ATLAS_TEX) o.material.map.dispose(); o.material.dispose(); }
     });
   }
-  bodyMeshes=[]; pivots=[]; starMeshes=[]; coronas=[]; featureMeshes=[];
+  bodyMeshes=[]; pivots=[]; starMeshes=[]; coronas=[]; featureMeshes=[]; resourceMeshes=[];
+  hideResourceReport();
   var si;
   for(si=0; si<s.stars; si++){
     var off=new THREE.Vector3(si*3.6-(s.stars-1)*1.8,0,0);
@@ -6132,6 +6290,7 @@ function buildSystemView(s){
         pRing.rotation.x=Math.PI/2; mesh.add(pRing);
       }
     }
+    buildResourceIcon(s,b,pivot,new THREE.Vector3(orbitR+b.size*2.1,b.size*1.5,b.size*1.0));
     pivots.push({p:pivot,sp:0.10/(1+planetIdx*0.55),mesh:mesh,spin:b.spin});
     bodyMeshes.push(mesh);
     var pMoonAnchor=new THREE.Object3D();
@@ -6840,11 +6999,17 @@ function tryPick(cx,cy){
       if(focusSystem&&pickedSys.address!==focusSystem.address) setCourse(pickedSys,true);
     }
   } else if(mode==="system"){
-    var bh=ray.intersectObjects(bodyMeshes.concat(starMeshes).concat(featureMeshes));
+    var bh=ray.intersectObjects(bodyMeshes.concat(starMeshes).concat(featureMeshes).concat(resourceMeshes));
     if(bh.length){
       var ud=bh[0].object.userData;
-      if(ud.star||ud.feature) updatePanel(ud.sys);
-      else showBody(ud.body,ud.sys);
+      if(ud.resourceIcon){ showResourceReport(ud); }
+      else {
+        hideResourceReport();
+        if(ud.star||ud.feature) updatePanel(ud.sys);
+        else showBody(ud.body,ud.sys);
+      }
+    } else {
+      hideResourceReport();
     }
   } else if(mode==="galaxy"){
     /* 2026-08-27, Tony: click the "you are here" marker to jump straight
@@ -6868,6 +7033,37 @@ function tryPick(cx,cy){
     }
   }
 }
+
+/* ============ Starmap Analysis Report popup (2026-09-09) ============
+   Click target for the resource/signal diamond icons built by
+   buildResourceIcon() above -- see tryPick()'s new resourceMeshes branch.
+   A single fixed bottom-dock card rather than one pinned to the icon's
+   own screen position (which would need a per-frame 3D-to-2D projection
+   while open, same as the hover popup does for Local view) -- kept
+   simple for this first pass; flagged to Tony as an easy follow-up if he
+   wants it pinned to the icon instead. */
+function showResourceReport(ud){
+  document.getElementById("rrName").textContent=ud.name.toUpperCase();
+  document.getElementById("rrCat").textContent=ud.catLabel;
+  document.getElementById("rrSignal").textContent=ud.signalType+".";
+  document.getElementById("rrRoute").textContent=ud.route;
+  var card=document.getElementById("resReport");
+  card.style.display="";
+  card._ud=ud;
+}
+function hideResourceReport(){
+  document.getElementById("resReport").style.display="none";
+}
+document.getElementById("rrClose").addEventListener("click",hideResourceReport);
+// Decorative-only, matching this card's own "Route recommendation" flavour
+// text (see the RES_ICON_* header comment) -- not wired to any persisted
+// waypoint/bookmark system, just a toast acknowledging the action, same
+// spirit as the rest of this card being atmosphere rather than a real
+// gameplay mechanic.
+document.getElementById("rrMarker").addEventListener("click",function(){
+  var ud=document.getElementById("resReport")._ud;
+  toast(ud?("Marker set \u2014 "+ud.name.toUpperCase()):"Marker set");
+});
 
 /* ============ hover popup + course preview (Session 38) ============
    Two independent hover behaviours, both mouse-only (matchMedia hover:hover
@@ -9148,6 +9344,7 @@ document.getElementById("screenshotLightboxClose").addEventListener("click",clos
 document.getElementById("screenshotLightbox").addEventListener("click",function(e){ if(e.target===this) closeScreenshotLightbox(); });
 document.addEventListener("keydown",function(e){
   if(e.key==="Escape" && document.getElementById("screenshotLightbox").style.display!=="none") closeScreenshotLightbox();
+if(e.key==="Escape") hideResourceReport();
 });
 document.getElementById("pubScreenshot").addEventListener("click",function(){ openScreenshotLightbox(this.src); });
 document.getElementById("pubStationPhoto").addEventListener("click",function(){ openScreenshotLightbox(this.src); });
