@@ -6053,6 +6053,7 @@ function buildSystemView(s){
   var featureR=lastOrbitR+12;
   if(s.blackHole) systemGroup.add(buildFeature(s,"bh",new THREE.Vector3(featureR*0.82,featureR*0.18,-featureR*0.55)));
   if(s.atlas) systemGroup.add(buildFeature(s,"atlas",new THREE.Vector3(-featureR*0.85,-featureR*0.15,featureR*0.5)));
+  if(s.hasStation && s.stationPhoto) systemGroup.add(buildStationCard(s,new THREE.Vector3(featureR*0.06,featureR*0.92,featureR*0.32)));
   /* Two-pass build (2026-09-01, Tony's Nogsangh report): every planet is
      built first (pass 1, unchanged geometry/material logic from before),
      recording each one's own moonAnchor/size/running-moon-count keyed by
