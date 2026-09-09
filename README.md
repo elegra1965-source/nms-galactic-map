@@ -197,18 +197,22 @@ researched per biome), and **Conditions** (renamed from "Descriptor" --
 real weather-phrase suggestions, also filtered by Biome). All three accept
 your own typed value if what you saw isn't listed, and a genuinely new
 value becomes a suggestion for every future visitor too, not just saved and
-forgotten. **"The Reliquary" is no longer a selectable Biome** -- research
-found it's actually a prefix/suffix tag the real game layers onto an
-existing biome ("Abandoned Desert", "Dusty Relic"), not a 13th category of
-its own -- replaced by two independent per-planet checkboxes, **Reliquary**
-and **Ruins**. Resources and Minerals were renamed **Common resources** /
-**Uncommon resources** to match the wiki's own rarity split, and the same
-dropdown-plus-your-own-value treatment covers Salvageable tech and Fossils
-& curiosities too. An optional **screenshot** (added 2026-09-01, resized
-and compressed automatically) sits alongside the public notes field --
-visible to every visitor, same as everything else here -- and your own
-private Surveyor notes can carry a screenshot too, saved only to your own
-device.
+forgotten. **Whether a planet has rings or water joined that same strict
+treatment (2026-09-09)** -- neither has ever been reverse-engineered either,
+so like Biome, both simply don't appear at all in the info panel until a
+traveller ticks the real answer via Edit system, rather than showing a
+guessed checkbox state as fact. **"The Reliquary" is no longer a selectable
+Biome** -- research found it's actually a prefix/suffix tag the real game
+layers onto an existing biome ("Abandoned Desert", "Dusty Relic"), not a
+13th category of its own -- replaced by two independent per-planet
+checkboxes, **Reliquary** and **Ruins**. Resources and Minerals were
+renamed **Common resources** / **Uncommon resources** to match the wiki's
+own rarity split, and the same dropdown-plus-your-own-value treatment
+covers Salvageable tech and Fossils & curiosities too. An optional
+**screenshot** (added 2026-09-01, resized and compressed automatically)
+sits alongside the public notes field -- visible to every visitor, same as
+everything else here -- and your own private Surveyor notes can carry a
+screenshot too, saved only to your own device.
 
 ![Edit system modal](screenshots/05-edit-system-modal.jpg)
 
@@ -252,12 +256,13 @@ to remember its address or portal glyphs.
 **Honest about its limits.** The About modal spells out exactly what's
 generated accurately (star type, system/region names, planet count) versus
 an unverified guess (individual planet names, and why) -- rather than
-presenting a guess as fact. **Biome goes a step further than that** (added
-2026-09-08): unlike planet names, race, economy, or conflict -- all of which
-show a plausible generated value, tagged as a guess where relevant -- nobody
-has reverse-engineered the game's real biome roll at all, so this project
-doesn't display a guess for Biome/Category type/Conditions at all. They read
-"Unknown" until a traveller reports the real answer via Edit system.
+presenting a guess as fact. **Biome, Category type, Conditions, rings, and
+water go a step further than that** (added 2026-09-08, extended 2026-09-09):
+unlike planet names and Sentinel activity -- which show a plausible
+generated value, tagged as a guess -- nobody has reverse-engineered any of
+these five, so this project doesn't display a guess for them at all. They
+simply don't appear until a traveller reports the real answer via Edit
+system.
 
 ![About modal](screenshots/07-about-modal.jpg)
 

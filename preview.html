@@ -595,10 +595,15 @@ html.hc-on .btn{border-width:2px}
    see generateSystem()'s flavorIsReal / s.raceReal/econReal/conflictReal.
    This class/tag now only actually fires for those three in the rare
    fallback case (no portal address, or a component failed to load) -- see
-   updatePanel()'s raceIsGuess/econIsGuess/conIsGuess. Rings are the one
-   field here still genuinely, unconditionally invented -- nms_namegen
-   never modelled planet rings at all, nothing to port -- so .guessVal/
-   .tag.guess keeps firing for every ring exactly as before. */
+   updatePanel()'s raceIsGuess/econIsGuess/conIsGuess. Rings used to be the
+   one field here still genuinely, unconditionally invented (nms_namegen
+   never modelled planet rings at all) and got the dashed .tag.guess
+   treatment for it -- but 2026-09-09 (Tony: rings/water should get the
+   same treatment biome already has) moved rings (and water, alongside it)
+   to the stricter Biome pattern instead: simply omitted from display
+   entirely until a traveller confirms via Edit system (b.bodyOverridden),
+   rather than shown with a dashed "guess" tag. .guessVal/.tag.guess now
+   only ever fire for race/economy/conflict's rare fallback case above. */
 .guessVal{opacity:.55}
 .tag.guess{border-color:var(--text-faint);color:var(--text-faint);border-style:dashed}
 .tag.fs-disputed{border-color:var(--fs-disputed);color:var(--fs-disputed);box-shadow:none;padding-left:7px}
@@ -2005,9 +2010,9 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
       <div class="lb">Fan-made project</div>
       <div style="font-size:12px;color:var(--text-dim);line-height:1.55">This is an unofficial, fan-made tool. It is not affiliated with, endorsed by, or sponsored by Hello Games.</div>
     </div>
-    <div class="mfld" data-narrate="Procedural data. Star systems here are generated the same way the game generates them, straight from a portal address, not scraped from anyone's save. Star type, names, planet count, race, economy, and conflict level are reverse-engineered and right most of the time, but they're an approximation, not a perfect decompile, so occasional mismatches are expected rather than a bug. Individual planet names, whether a planet has rings, and sentinel activity per planet are all plausible guesses this project invented rather than decoded from the game, though the underlying odds behind rings and sentinel activity are based on real decompiled data. Biome is handled differently again: nobody has reverse-engineered the game's real biome roll, so this project doesn't even show a guess for it -- it displays Unknown, along with its category type and current conditions, until a traveller confirms the real reading via Edit system. Anything tagged Procedural is a guess rather than a confirmed value. Importing a save only ever pulls in real base names; everything else still needs typing in by hand via Edit system, and a system only reflects real in-game data once a traveller has done that.">
+    <div class="mfld" data-narrate="Procedural data. Star systems here are generated the same way the game generates them, straight from a portal address, not scraped from anyone's save. Star type, names, planet count, race, economy, and conflict level are reverse-engineered and right most of the time, but they're an approximation, not a perfect decompile, so occasional mismatches are expected rather than a bug. Individual planet names are a plausible guess this project invented rather than decoded from the game. Sentinel activity per planet is the same kind of invented guess, tagged Procedural next to the value until a traveller confirms it. Whether a planet has rings, water, and its biome, category type, and conditions are handled more strictly: nobody has reverse-engineered any of these, so this project doesn't even show a guess for them -- they simply don't appear at all until a traveller confirms the real reading via Edit system. Anything tagged Procedural is a guess rather than a confirmed value. Importing a save only ever pulls in real base names; everything else still needs typing in by hand via Edit system, and a system only reflects real in-game data once a traveller has done that.">
       <div class="lb">Procedural data</div>
-      <div style="font-size:12px;color:var(--text-dim);line-height:1.55">Star systems are generated procedurally from their portal address, the same way the game does -- they are not scraped from anyone's real save. Star type, system/region names, total planet+moon count, and (as of 2026-08-23) <b>race, economy type/tier, and conflict level</b> are all reverse-engineered from the game's own logic and right most of the time, but they're a corpus-verified <b>approximation</b>, not a perfect decompile -- occasional mismatches (e.g. a system that generates as 5 bodies but is really 3 in your save, or a race that doesn't match) are a known, expected gap (roughly 1 in 100, per the 1000-system real corpus this was validated against), not a bug to report. The exact sell%/buy% numbers shown are the one part of that economy panel still this project's own invented figure, not derived from the address -- the real game only exposes economy <i>strength</i> (low/medium/high), not an exact percentage, to reverse-engineer against. <b>Individual planet names are not</b> accurate at all -- the real game's planet-naming logic has never been fully reverse-engineered (confirmed against the game's own decompiled data and a real save file), so what you see is a plausible guess, not your actual save data. As of 2026-08-18 that guess leans on the planet's own biome (and Sentinel activity, once known) to pick a more fitting-sounding name -- still a guess, just a less randomly-mismatched one. <b>Which planets have rings is still a guess too</b> -- No Man's Sky's real ring-placement logic has never been reverse-engineered, so unlike race/economy/conflict above, it's this project's own invented flavour, built to read naturally next to the real in-game panel. The underlying ring odds are real decompiled game data though (the flat 30% chance, pulled from GCSOLARGENERATIONGLOBALS.GLOBAL.MBIN) -- so the overall statistical feel matches the game, but any single planet's actual ring can't match your save any more than its name can. <b>Sentinel activity per planet is the same kind of invented guess</b> (added 2026-08-23) -- No Man's Sky has never exposed this per system in a way that's been reverse-engineered either, so it's this project's own weighting, leaning toward calmer readings in low-conflict systems and more aggressive ones in high-conflict systems, tagged "(procedural)" next to the value the same way rings are, until a traveller confirms the real in-game reading via Edit system. <b>Biome is handled differently again</b> (2026-09-08) -- nobody has reverse-engineered No Man's Sky's real biome roll at all, so unlike rings and Sentinel above, this project doesn't even display a guess for it: every planet's Biome, Category type, and Conditions fields show "Unknown" until a traveller reports the real reading via Edit system, at which point that traveller's answer is shown as-is, not a procedural approximation. On the rare system where a portal address isn't available to compute the real values from, race/economy/conflict fall back to an invented guess too, same as rings -- a dashed "Procedural" tag next to the field is how you can tell. Importing your save file only ever pulls in real <b>base names</b> (a save doesn't expose anything else about a system) -- everything else, including fixing a wrong planet count, still needs typing in by hand via <b>Edit system</b>. A system only reflects real in-game data once a traveller has entered it that way, marked "Community edited".</div>
+      <div style="font-size:12px;color:var(--text-dim);line-height:1.55">Star systems are generated procedurally from their portal address, the same way the game does -- they are not scraped from anyone's real save. Star type, system/region names, total planet+moon count, and (as of 2026-08-23) <b>race, economy type/tier, and conflict level</b> are all reverse-engineered from the game's own logic and right most of the time, but they're a corpus-verified <b>approximation</b>, not a perfect decompile -- occasional mismatches (e.g. a system that generates as 5 bodies but is really 3 in your save, or a race that doesn't match) are a known, expected gap (roughly 1 in 100, per the 1000-system real corpus this was validated against), not a bug to report. The exact sell%/buy% numbers shown are the one part of that economy panel still this project's own invented figure, not derived from the address -- the real game only exposes economy <i>strength</i> (low/medium/high), not an exact percentage, to reverse-engineer against. <b>Individual planet names are not</b> accurate at all -- the real game's planet-naming logic has never been fully reverse-engineered (confirmed against the game's own decompiled data and a real save file), so what you see is a plausible guess, not your actual save data. As of 2026-08-18 that guess leans on the planet's own biome (and Sentinel activity, once known) to pick a more fitting-sounding name -- still a guess, just a less randomly-mismatched one. <b>Which planets have rings (and whether a planet has water) is a guess too</b> -- No Man's Sky's real ring-placement logic has never been reverse-engineered, so unlike race/economy/conflict above, it's this project's own invented flavour, built to read naturally next to the real in-game panel. The underlying ring odds are real decompiled game data though (the flat 30% chance, pulled from GCSOLARGENERATIONGLOBALS.GLOBAL.MBIN) -- so the overall statistical feel matches the game, but any single planet's actual ring (or water) can't match your save any more than its name can. As of 2026-09-09 rings and water get the same strict treatment as Biome below rather than a tagged guess: simply not shown at all until a traveller confirms the real answer via Edit system. <b>Sentinel activity per planet is the same kind of invented guess</b> (added 2026-08-23) -- No Man's Sky has never exposed this per system in a way that's been reverse-engineered either, so it's this project's own weighting, leaning toward calmer readings in low-conflict systems and more aggressive ones in high-conflict systems, tagged "(procedural)" next to the value until a traveller confirms the real in-game reading via Edit system -- the one field left shown this tagged-guess way rather than hidden outright. <b>Biome is handled differently again</b> (2026-09-08) -- nobody has reverse-engineered No Man's Sky's real biome roll at all, so like rings and water above, this project doesn't even display a guess for it: every planet's Biome, Category type, and Conditions fields show "Unknown" until a traveller reports the real reading via Edit system, at which point that traveller's answer is shown as-is, not a procedural approximation. On the rare system where a portal address isn't available to compute the real values from, race/economy/conflict fall back to an invented guess too, same as rings -- a dashed "Procedural" tag next to the field is how you can tell. Importing your save file only ever pulls in real <b>base names</b> (a save doesn't expose anything else about a system) -- everything else, including fixing a wrong planet count, still needs typing in by hand via <b>Edit system</b>. A system only reflects real in-game data once a traveller has entered it that way, marked "Community edited".</div>
     </div>
     <div class="mfld">
       <div class="lb">Star class letters (e.g. "G7p")</div>
@@ -3256,7 +3261,16 @@ function generateSystem(vx,vy,vz,idx,noOverride){
       biome:biome, biomeOverridden:false, // procedural roll, never a traveller submission (2026-09-08, Tony/goodguyfree: nobody's reverse-engineered the real biome roll, so this never displays as fact -- see the .bb/bBiome render sites, which show "Unknown" instead of this value until a real submission exists) -- the value itself is KEPT and still drives colour/ring-style rendering, only the TEXT claim is gated
       terrain:hasWater?pickOne(br,TERRAIN.slice(1)):"Pangean", water:hasWater,
       ring:ringStyle,
-      ringOverridden:false, // procedural roll (rollRing()), never a traveller submission -- see the "guess" tag on the panel body list
+      // Renamed from ringOverridden (2026-09-09, Tony: "has water and rings
+      // until again user input" should work the same as biome) -- this
+      // flag now covers BOTH water and rings, not just rings: neither has
+      // ever been reverse-engineered any more than biome has, they're both
+      // procedural guesses from the same rollRing()/hasWater roll, so both
+      // get the same treatment biome already has -- simply not shown as
+      // fact until a traveller's real Edit system submission exists for
+      // this whole body. See applyOverride() below for where this flips
+      // true, and the .bb/tags render sites for where it gates display.
+      bodyOverridden:false, // procedural roll, never a traveller submission
       size:isMoon?(0.34+br()*0.22):(0.68+br()*0.62),
       tilt:(br()-0.5)*0.7, spin:0.15+br()*0.5,
       resUni:resUni,
@@ -3439,7 +3453,7 @@ function applyOverride(s){
         terrain:o?o.terrain:"Pangean",
         water:!!b.water,
         ring:(!isMoon&&!!b.ring)?(RING_STYLE_BY_BIOME[biome]||"tan"):false,
-        ringOverridden:true, // this whole body came from a traveller's Edit system submission (d.bodies), ring checkbox included -- a real answer either way, not a procedural roll
+        bodyOverridden:true, // this whole body came from a traveller's Edit system submission (d.bodies) -- water/ring checkboxes included, a real answer either way, not a procedural roll
         // Reuse the procedural body's own size ONLY when this slot's
         // moon/planet role still matches what procedural generation
         // originally rolled for it (o.moon===isMoon) -- otherwise a
@@ -6285,11 +6299,15 @@ function updatePanel(s){
     var bMark=(bStat==="flagged"||bStat==="disputed")?(" fs-"+bStat):"";
     bl+='<div class="brow'+(b.moon?" isMoon":"")+bMark+'" data-b="'+i+'"'+moonTip+'><span class="bdot" style="background:'+biomePal(b.biome).base+'"></span>'+
         '<span class="bn">'+(b.moon?"&#8627; ":"")+b.name+'</span>'+
-        // Ring is an invented per-planet roll (rollRing()), same as race/
-        // economy/conflict, until a traveller submits the real answer via
-        // Edit system (b.ringOverridden) -- shown inline rather than as a
-        // separate tag, this row is already a single compact line.
-        '<span class="bb">'+(b.biomeOverridden?(b.biome+(b.subtype?" ("+b.subtype+")":"")):"Unknown")+(b.water?" &middot; water":"")+(b.ring?" &middot; rings"+(b.ringOverridden?"":" (procedural)"):"")+(b.reliquary?" &middot; reliquary":"")+(b.ruins?" &middot; ruins":"")+'</span></div>';
+        // Water and rings are invented per-planet rolls (hasWater/
+        // rollRing()), same as race/economy/conflict, until a traveller
+        // submits the real answer via Edit system (b.bodyOverridden) --
+        // both simply omitted from this line rather than shown as fact,
+        // same strict treatment biome already gets (2026-09-09, Tony:
+        // "should also include if has water and rings until again user
+        // input") -- dropped the old "(procedural)" tag on rings, since
+        // that was a softer half-measure biome never got either.
+        '<span class="bb">'+(b.biomeOverridden?(b.biome+(b.subtype?" ("+b.subtype+")":"")):"Unknown")+(b.bodyOverridden&&b.water?" &middot; water":"")+(b.bodyOverridden&&b.ring?" &middot; rings":"")+(b.reliquary?" &middot; reliquary":"")+(b.ruins?" &middot; ruins":"")+'</span></div>';
   }
   document.getElementById("pBodies").innerHTML=bl;
   // 2026-08-30, honest-review fix: this blanket "names are a guess" line
@@ -6348,17 +6366,16 @@ function showBody(b,s){
   if(b.biomeOverridden&&(b.biome==="Exotic"||b.biome==="Mega Exotic")) t.push(["bh","Anomalous"]);
   if(b.reliquary) t.push(["hot","Reliquary"]);
   if(b.ruins) t.push(["hot","Ruins"]);
-  if(b.water) t.push(["hot","Water"]);
-  // Same invented-flavour distinction as the panel body list -- a ring
-  // nobody's confirmed via Edit system reads as a muted "guess" tag rather
-  // than a confident gold "hot" one. 2026-08-23: dropped the ring style
-  // name (Golden/Icy/Dusty/Ash/Split) from both this tag and the panel
-  // body list above -- per Tony/GoodGuysFree, just "rings" if present is
-  // all that's needed here (the style name is still shown/used for the
-  // actual ring's visual colour on the 3D body itself, just not spelled
-  // out in text) -- and it was also what pushed the .bb truncation fix
-  // right before this to its limit on a long biome+water+ring line.
-  if(b.ring) t.push([b.ringOverridden?"hot":"guess","Rings"+(b.ringOverridden?"":" (procedural)")]);
+  if(b.bodyOverridden&&b.water) t.push(["hot","Water"]);
+  // Same strict treatment as the panel body list and Biome -- a ring
+  // nobody's confirmed via Edit system isn't shown at all, not even
+  // tagged as a guess (2026-09-09, dropped the old "(procedural)" tag).
+  // 2026-08-23: dropped the ring style name (Golden/Icy/Dusty/Ash/Split)
+  // from both this tag and the panel body list above -- per Tony/
+  // GoodGuysFree, just "rings" if present is all that's needed here (the
+  // style name is still shown/used for the actual ring's visual colour on
+  // the 3D body itself, just not spelled out in text).
+  if(b.bodyOverridden&&b.ring) t.push(["hot","Rings"]);
   if(b.autophage) t.push(["hot","Autophage camp"]);
   if(b.base) t.push(["hot",b.baseName?('Base: "'+b.baseName+'"'):"Has base"]);
   var html="",i;
@@ -8792,9 +8809,12 @@ function renderBodyEditList(){
         // game, same reasoning as before), so a moon's first row is just
         // Water + Has base.
         '<div class="brow2">'+
-          (!b.moon?'<label class="chk2"><input type="checkbox" class="bfRing" data-i="'+i+'"'+(b.ring?" checked":"")+'> Has rings</label>':"")+
+          // Labels changed "Has rings"/"Has base" -> "Rings"/"Base"
+          // (2026-09-09, Tony: consistency with the row below -- "Autophage
+          // camp, Ruins, Reliquary" doesn't use "Has X" phrasing either).
+          (!b.moon?'<label class="chk2"><input type="checkbox" class="bfRing" data-i="'+i+'"'+(b.ring?" checked":"")+'> Rings</label>':"")+
           '<label class="chk2"><input type="checkbox" class="bfWater" data-i="'+i+'"'+(b.water?" checked":"")+'> Water</label>'+
-          '<label class="chk2"><input type="checkbox" class="bfBase" data-i="'+i+'"'+(b.base?" checked":"")+'> Has base</label>'+
+          '<label class="chk2"><input type="checkbox" class="bfBase" data-i="'+i+'"'+(b.base?" checked":"")+'> Base</label>'+
         '</div>'+
         '<div class="brow2">'+
           '<label class="chk2"><input type="checkbox" class="bfAutophage" data-i="'+i+'"'+(b.autophage?" checked":"")+'> Autophage camp</label>'+
