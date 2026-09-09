@@ -507,6 +507,54 @@ export function filterSystemEdit(payload){
   out.collidingA = Math.max(0, Math.min(out.bodies.length, parseInt(payload.collidingA,10)||0));
   out.collidingB = Math.max(0, Math.min(out.bodies.length, parseInt(payload.collidingB,10)||0));
 
+  // Resource / signal markers (2026-09-09, Cosmos update -- click-to-inspect
+  // diamond icons on the 3D system view). One marker is drawn automatically
+  // per planet/moon already (no data of its own, purely derived from the
+  // body it sits on) -- these are the EXTRA traveller-submitted ones added
+  // via the "+ Add" button in Edit system, for real standalone points of
+  // interest the generator has no equivalent for at all (asteroid belts,
+  // comet fragments, wreck fields, and the like), same reasoning as
+  // baseName/stationName above: nothing procedural could ever invent this,
+  // it's only ever a traveller's own observation. Every text field here is
+  // free-typed to match what a traveller actually saw in-game, so unlike
+  // resArr()'s canon-corrected lists above there's no autocorrect list to
+  // run against. `planet` is an OPTIONAL link (same 1-based-position-into-
+  // THIS-bodies-array shape as a moon's `orbits` or colliding's A/B above,
+  // clamped the same way) -- 0 means "not linked to any body", which the
+  // client renders as a free-floating marker instead of one riding along
+  // with a planet's orbit. Capped at 6 per system, same cap as bodies
+  // itself, so a system's marker count can't run away. Icon "outpost" added
+  // same day (Tony's own "Barnyano Outpost Beta" screenshot, a real 5th
+  // icon category) -- deliberately kept manual-only, never wired into any
+  // procedural per-planet path, see preview.html's RES_ICON_CAT comment.
+  out.signals = [];
+  var signals = Array.isArray(payload.signals) ? payload.signals : [];
+  if(signals.length > 6) errors.push("A system can have at most 6 resource/signal markers");
+  // creature/hazard/cargo added 2026-09-09, same session -- 3 more real
+  // in-game icon glyphs from Tony's own reference photos, added as
+  // traveller-selectable options rather than guessed-at "official"
+  // categories (no text label was visible in the photos this time).
+  var SIGNAL_ICONS = ["mineral","flora","frozen","tech","outpost","creature","hazard","cargo"];
+  for(var sgI=0; sgI<Math.min(signals.length,6); sgI++){
+    var sg = signals[sgI] || {};
+    var sgNameR = filterText(sg.name, {maxLen:40, fieldName:"Signal marker name"});
+    if(!sgNameR.ok){ errors.push(sgNameR.reason); continue; }
+    var sgCatR = filterText(sg.category, {maxLen:40, fieldName:"Signal marker category"});
+    if(!sgCatR.ok){ errors.push(sgCatR.reason); continue; }
+    var sgTypeR = filterText(sg.signalType, {maxLen:80, fieldName:"Signal type"});
+    if(!sgTypeR.ok){ errors.push(sgTypeR.reason); continue; }
+    var sgRouteR = filterText(sg.route, {maxLen:140, fieldName:"Route recommendation"});
+    if(!sgRouteR.ok){ errors.push(sgRouteR.reason); continue; }
+    out.signals.push({
+      name: sgNameR.cleaned,
+      category: sgCatR.cleaned,
+      icon: SIGNAL_ICONS.indexOf(sg.icon)>=0 ? sg.icon : "mineral",
+      signalType: sgTypeR.cleaned,
+      route: sgRouteR.cleaned,
+      planet: Math.max(0, Math.min(out.bodies.length, parseInt(sg.planet,10)||0))
+    });
+  }
+
   return {ok: errors.length===0, cleaned: out, errors: errors};
 }
 

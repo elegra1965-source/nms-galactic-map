@@ -16,6 +16,7 @@
                          giant, ruins, outlaw, abandoned, phantom, econName, sell, buy, econDesc, conflict, blackHole, atlas, notes,
                          screenshot, editorName, editorFriendCode, genVersion, colliding, collidingA, collidingB,
                          hasStation, stationName, stationPhoto,
+                         signals:[{name, category, icon, signalType, route, planet}, ...] (max 6),
                          bodies:[{name, moon, orbits, biome, subtype, descriptor, water, ring, resources,
                                   flora, fauna, minerals, salvage, fossils, sentinel, autophage,
                                   reliquary, ruins, base, baseName}, ...]}
@@ -86,6 +87,26 @@
                          filterScreenshot() machinery, just called a second time with its own
                          editKey suffix so it always lands in its own uniquely-named file, never
                          colliding with a system's separate general screenshot upload.)
+                         signals added 2026-09-09 -- the "Cosmos" system-view click-to-inspect
+                         diamond icons (resource/signal markers). One is drawn automatically per
+                         planet/moon already, straight off `bodies`, with no data of its own -- this
+                         array is only the EXTRA ones a traveller adds by hand for real standalone
+                         points of interest the generator has no equivalent for at all (asteroid
+                         belts, comet fragments, wreck fields). Per Tony's own pick ("Full custom
+                         card"), every field is free-typed to match what the traveller actually saw
+                         in-game rather than picked from a fixed list, same reasoning as
+                         baseName/stationName above. `planet` is an OPTIONAL 1-based link into THIS
+                         SAME submitted `bodies` array (identical shape/clamping to a moon's `orbits`
+                         or colliding's collidingA/collidingB above) -- 0 means "not linked to any
+                         body", rendered client-side as a free-floating marker instead of one that
+                         rides along with a planet's orbit. Capped at 6 per system, same cap as
+                         `bodies` itself. Bundled as one consensus-voted TOP_CATS unit (see
+                         getCategoryValue's comment below) rather than 6 independently-flaggable
+                         rows, same precedent as "colliding" and "station" above -- deliberately NOT
+                         added to FLAG_FIELDS/FLAG_CATEGORIES in lib/shared.mjs/preview.html. A 5th
+                         icon value, "outpost", added same day (Tony's own "Barnyano Outpost Beta"
+                         screenshot) -- deliberately manual-only, never wired into any procedural
+                         per-planet path.)
      "report" payload = {reason}
      "bulk-import" payload = {entries:[{address, names:[...], planetNames:[{index,name}...],
                     systemName}...], editorName, editorFriendCode, genVersion}
@@ -254,6 +275,11 @@ function getCategoryValue(out, category){
     // same treatment as the general `screenshot` category above, just its
     // own dedicated field/upload/file.
     case "station": return { hasStation: !!out.hasStation, stationName: out.stationName||"", stationPhoto: out.stationPhoto||"" };
+    // Resource / signal markers (2026-09-09): bundled the same way "colliding"
+    // and "station" bundle their own fields above -- the whole array is one
+    // consensus-voted unit, not 6 independently-flaggable rows. See the
+    // payload-shape doc comment at the top of this file for the full "why".
+    case "signals": return Array.isArray(out.signals) ? out.signals : [];
     default: return undefined;
   }
 }
@@ -298,6 +324,7 @@ function applyCategoryValue(data, category, value){
     case "station":
       data.hasStation=!!value.hasStation; data.stationName=value.stationName||""; data.stationPhoto=value.stationPhoto||"";
       return;
+    case "signals": data.signals=Array.isArray(value)?value:[]; return;
   }
 }
 
@@ -765,7 +792,7 @@ export default async (req, context) => {
     // or more categories from flaggedFields/disputedFields.
     var stillUnderReview = sysRec.flaggedFields.concat(sysRec.disputedFields);
 
-    var TOP_CATS = ["name","race","region","starClass","stars","suffix","giant","economy","conflict","blackHole","atlas","ruins","outlaw","abandoned","phantom","notes","colliding","screenshot","station"];
+    var TOP_CATS = ["name","race","region","starClass","stars","suffix","giant","economy","conflict","blackHole","atlas","ruins","outlaw","abandoned","phantom","notes","colliding","screenshot","station","signals"];
     for(var ti=0; ti<TOP_CATS.length; ti++){
       if(stillUnderReview.indexOf(TOP_CATS[ti])>=0) continue;
       applyCategoryValue(sysRec.data, TOP_CATS[ti], getCategoryValue(filtered.cleaned, TOP_CATS[ti]));
