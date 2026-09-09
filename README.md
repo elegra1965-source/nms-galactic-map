@@ -212,7 +212,13 @@ covers Salvageable tech and Fossils & curiosities too. An optional
 **screenshot** (added 2026-09-01, resized and compressed automatically)
 sits alongside the public notes field -- visible to every visitor, same as
 everything else here -- and your own private Surveyor notes can carry a
-screenshot too, saved only to your own device.
+screenshot too, saved only to your own device. **Space station directorship
+(added 2026-09-09, for the real "Cosmos" 10th-anniversary update)** -- a
+manual-only checkbox plus an optional station name, same pattern as Black
+hole/Ruins/Outlaw above, since who a real player made director of their
+station isn't something a procedural generator could ever derive. This is a
+foundation pass: only whether a station exists and its name are tracked for
+now.
 
 ![Edit system modal](screenshots/05-edit-system-modal.jpg)
 
