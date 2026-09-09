@@ -220,6 +220,25 @@ station isn't something a procedural generator could ever derive. This is a
 foundation pass: only whether a station exists and its name are tracked for
 now.
 
+**Signal markers (added 2026-09-09).** Edit system can also record the
+floating diamond-shaped signals you see near objects in-game -- what your
+own "Starmap Analysis Report" popup actually told you was there. Like
+station directorship above, these are entirely manual: an earlier version
+guessed one automatically for every planet from its biome, but a real
+screenshot showed every world getting a fabricated icon with nothing ever
+actually submitted, so that guessing was removed outright -- a marker now
+only ever appears once a traveller adds one. Nine icon types are
+selectable (Mineral Deposit, Flora Growth, Frozen Signal, Tech Anomaly,
+Deep-space Outpost, Cosmic Whale, Hazard / Danger, Minor Wreckage, Atlas
+Station), picked from a small custom dropdown that shows each option's
+real icon image next to its name rather than plain text. Six of the nine
+now use real in-game icon images (isolated from reference photos and
+background-removed); the remaining three (Flora Growth, Tech Anomaly,
+Hazard / Danger) still use a hand-drawn placeholder glyph until a real
+image is available. Each marker also carries a free-text name, category,
+signal type, and route note -- type what your own report actually said,
+same as everything else in this section.
+
 ![Edit system modal](screenshots/05-edit-system-modal.jpg)
 
 Once saved, both show up right in the system info panel for every visitor

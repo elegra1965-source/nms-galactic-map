@@ -907,6 +907,30 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 .bodyEdit .bx:hover{color:#ff8080}
 .bodyEdit .brow2{display:flex;gap:6px;margin-bottom:6px}
 .bodyEdit .brow2>div{flex:1}
+/* Icon-type picker for signal markers (2026-09-09, Tony: "add the icons in
+   front of names" -- a native <select><option> can't reliably show an image
+   next to its text across browsers, so this is a small custom dropdown
+   sitting on top of a hidden real <select class="sgIcon"> that still carries
+   the actual value/change-event wiring (see renderSignalEditList()) -- same
+   hidden-select-plus-visible-custom-control pattern already used for the
+   hyperdrive drive/range pills above, just a dropdown list instead of a pill
+   row since 8 options is too many to fit as pills in this narrow column. */
+.iconPick{position:relative}
+.iconPickBtn{display:flex;align-items:center;gap:6px;width:100%;background:#04070c;
+  border:1px solid var(--border-soft);border-radius:var(--r-sm);color:var(--text);
+  font-family:'Rajdhani',sans-serif;font-size:12px;padding:5px 8px;cursor:pointer;text-align:left}
+.iconPickBtn:hover{border-color:var(--cyan)}
+.iconPickLbl{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.iconPickCaret{color:var(--text-faint);font-size:10px;flex:none}
+.iconPickImg{width:18px;height:18px;flex:none;display:block}
+.iconPickList{display:none;position:absolute;top:calc(100% + 3px);left:0;right:0;z-index:20;
+  background:#04070c;border:1px solid var(--border-soft);border-radius:var(--r-sm);
+  max-height:220px;overflow-y:auto;box-shadow:0 6px 18px rgba(0,0,0,.5)}
+.iconPick.open .iconPickList{display:block}
+.iconPickOpt{display:flex;align-items:center;gap:6px;padding:5px 8px;cursor:pointer;
+  font-size:12px;color:var(--text)}
+.iconPickOpt:hover{background:rgba(255,255,255,.06)}
+.iconPickOpt.on{background:rgba(111,216,255,.12);color:var(--cyan)}
 .chk2{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-dim);cursor:pointer;
   white-space:nowrap;padding-top:16px}
 .chk2 input{accent-color:#00e5ff;width:13px;height:13px}
@@ -2110,6 +2134,10 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
       <div style="font-size:12px;color:var(--text-dim);line-height:1.55">Added 2026-09-09 for the real "Cosmos" 10th-anniversary update (Update 7.0), which lets you become director of a system's space station and personalise it. Like Ancient Ruins/Outlaw above, this isn't tied to any procedural rule -- it's <b>manual-only</b>, so use <b>Edit system</b> to mark a system as having a station and, if you like, give it a name. This is a foundation pass: only whether a station exists and its name are tracked for now, not any further station detail.</div>
     </div>
     <div class="mfld">
+      <div class="lb">Signal markers</div>
+      <div style="font-size:12px;color:var(--text-dim);line-height:1.55">Added 2026-09-09. The floating diamond-shaped signals you see near objects in-game -- what your own "Starmap Analysis Report" popup actually said was there -- are entirely <b>manual</b>, same spirit as station directorship above: an earlier version guessed one for every single planet from its biome, but a real screenshot showed every world getting a fabricated icon with nothing ever actually submitted, so that guessing was removed outright -- a marker now only ever appears once a traveller adds one via <b>Edit system</b>. Nine icon types are selectable (Mineral Deposit, Flora Growth, Frozen Signal, Tech Anomaly, Deep-space Outpost, Cosmic Whale, Hazard / Danger, Minor Wreckage, Atlas Station), picked from a small dropdown that shows each option's actual icon image next to its name rather than plain text. Six of the nine (Mineral Deposit, Frozen Signal, Deep-space Outpost, Cosmic Whale, Minor Wreckage, Atlas Station) now use real in-game icon images; the rest (Flora Growth, Tech Anomaly, Hazard / Danger) still use a hand-drawn placeholder glyph until a real image is available for them too. Each marker also carries a free-text name, category, signal type, and route note -- type what your own report actually said, same "type what you saw" pattern as everything else in Edit system.</div>
+    </div>
+    <div class="mfld">
       <div class="lb">Import from my save file</div>
       <div style="font-size:12px;color:var(--text-dim);line-height:1.55">In <b>Edit system</b>, "Import from my save file" reads a real .hg save entirely in your own browser -- the file itself is never uploaded anywhere. It can find your in-game name (to auto-fill "Your name" above) and any real bases you've built, which you can then choose to bulk-import to the shared map in one go. Discovery records don't store player-given planet names at all (checked directly against a real save), only base names do, so that's the one thing this can genuinely pull in for you -- everything else still needs typing in by hand, same as always. Friend codes aren't in a save file either (that's an account/platform thing, not game data). One import per device per day, same spirit as the normal edit rate limit but scaled for a much bigger write.</div>
     </div>
@@ -2986,9 +3014,36 @@ var RES_ICON_CAT={
   // like closer variants of categories already covered (a more detailed
   // mineral crystal, a slightly different frozen teal) so weren't added as
   // separate options.
-  creature:{icon:null,color:"#e08cd9",label:"Creature / Lifeform"},
+  creature:{icon:null,color:"#e08cd9",label:"Cosmic Whale"},
   hazard:{icon:null,color:"#ff5a4a",label:"Hazard / Danger"},
-  cargo:{icon:null,color:"#eef2f5",label:"Cargo / Wreckage"}
+  cargo:{icon:null,color:"#eef2f5",label:"Minor Wreckage"},
+  // Atlas Station (2026-09-09, same session as the real-icon-image swap
+  // just below) -- Hello Games' own real icon for this landmark (Tony:
+  // "thats hello games new icon for atlas station"), not a fan reading of
+  // an ambiguous screenshot the way creature/hazard/cargo were. Never wired
+  // into RES_ICON_BIOME_CAT, same "not procedural" reasoning as outpost.
+  atlasstation:{icon:null,color:"#ff7a3d",label:"Atlas Station"}
+};
+/* Real icon images (2026-09-09, Tony: "just got grok to isolate icons" --
+   he ran his own reference photos through Grok to get clean isolated
+   versions, one per category, dropped in New Map/). Only these 6 categories
+   have a real image; flora/tech/hazard don't yet and keep their existing
+   canvas-drawn glyph (see buildManualSignalIcon() below). Each source image
+   came back as a flat JPEG with the "transparent" background baked in as a
+   visible checkerboard/white pattern rather than a real alpha channel --
+   background was removed here (flood-filled from the image border on a
+   near-neutral-AND-bright test, so it can't accidentally eat into the dark
+   diamond or a saturated glyph colour) and re-exported as real transparent
+   PNGs at icons-web/signal-<cat>.png, matching this file's existing
+   icons-web/feature-*.png convention. Loaded once each into REAL_ICON_TEX
+   right after TEX_LOADER is defined further down. */
+var REAL_ICON_URL={
+  mineral:"icons-web/signal-mineral.png",
+  frozen:"icons-web/signal-frozen.png",
+  outpost:"icons-web/signal-outpost.png",
+  creature:"icons-web/signal-creature.png",
+  cargo:"icons-web/signal-cargo.png",
+  atlasstation:"icons-web/signal-atlasstation.png"
 };
 var RES_ICON_BIOME_CAT={
   "Lush":"flora","Toxic":"flora","Marsh":"flora","Water World":"flora",
@@ -4229,6 +4284,19 @@ var CORONA=makeCorona();
 var TEX_LOADER=new THREE.TextureLoader();
 var BH_TEX=TEX_LOADER.load("icons-web/feature-blackhole.png");
 var ATLAS_TEX=TEX_LOADER.load("icons-web/feature-atlas.png");
+/* Real signal-marker icon images (2026-09-09, Tony: "just got grok to
+   isolate icons"). Same load-once-reuse pattern as BH_TEX/ATLAS_TEX just
+   above -- REAL_ICON_URL (defined next to RES_ICON_CAT) is the source of
+   truth for which categories have a real image at all; this just loads each
+   one through the one shared TEX_LOADER, once, and caches the resulting
+   Texture for every sprite of that category to share. mineral/frozen/
+   outpost/creature/cargo all replace their earlier hand-drawn canvas glyph
+   with the real thing here; flora/tech/hazard have no real image yet and
+   keep the existing canvas-drawn path in buildManualSignalIcon() below.
+   atlasstation is new -- Hello Games' own real Atlas Station icon, not a
+   relabelled version of anything already built. */
+var REAL_ICON_TEX={};
+for(var _ricK in REAL_ICON_URL){ REAL_ICON_TEX[_ricK]=TEX_LOADER.load(REAL_ICON_URL[_ricK]); }
 
 function makeCloud(seed){
   var cv=document.createElement("canvas"); cv.width=160; cv.height=160;
@@ -6230,63 +6298,49 @@ function buildResourceIcon(s,b,pivot,localPos){
    exactly like an automatic icon) or null for a free-floating marker
    (added straight to systemGroup at a world-space position instead). */
 function buildManualSignalIcon(s,sig,parent,pos){
-  var cat=(["mineral","flora","frozen","tech","outpost","creature","hazard","cargo"].indexOf(sig.icon)>=0)?sig.icon:"mineral";
+  var cat=(["mineral","flora","frozen","tech","outpost","creature","hazard","cargo","atlasstation"].indexOf(sig.icon)>=0)?sig.icon:"mineral";
   var cfg=RES_ICON_CAT[cat];
-  var CS=64;
-  var canvas=document.createElement("canvas");
-  canvas.width=CS; canvas.height=CS;
-  var ctx=canvas.getContext("2d");
-  ctx.translate(CS/2,CS/2);
-  ctx.beginPath();
-  ctx.moveTo(0,-CS*0.42); ctx.lineTo(CS*0.34,0); ctx.lineTo(0,CS*0.42); ctx.lineTo(-CS*0.34,0); ctx.closePath();
-  ctx.fillStyle="rgba(6,12,20,0.55)";
-  ctx.fill();
-  ctx.lineWidth=2.4;
-  ctx.strokeStyle=cfg.color;
-  ctx.shadowColor=cfg.color; ctx.shadowBlur=8;
-  ctx.stroke();
-  ctx.shadowBlur=0;
-  ctx.strokeStyle=cfg.color; ctx.lineWidth=1.6;
-  ctx.lineCap="round"; ctx.lineJoin="round";
-  if(cat==="frozen"){
-    ctx.save(); ctx.scale(0.62,0.62);
-    for(var a=0;a<6;a++){
-      ctx.save(); ctx.rotate(a*Math.PI/3);
-      ctx.beginPath(); ctx.moveTo(0,-11); ctx.lineTo(0,11); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(0,-7); ctx.lineTo(-3.2,-9.6); ctx.moveTo(0,-7); ctx.lineTo(3.2,-9.6); ctx.stroke();
-      ctx.restore();
-    }
-    ctx.restore();
-  } else if(cat==="outpost"){
-    // Small abstract station glyph -- a central module, two solar-panel
-    // struts each side, and a mast+dish -- hand-drawn the same way frozen's
-    // snowflake is above, since no existing SVG icon in this app resembles
-    // a station/outpost. Never reached via the automatic per-planet path
-    // (RES_ICON_BIOME_CAT has no outpost mapping), only via a traveller's
-    // own manually-submitted marker -- see RES_ICON_CAT's comment on why.
-    ctx.save(); ctx.scale(0.62,0.62);
-    ctx.strokeRect(-3,-7,6,14);
-    ctx.beginPath();
-    ctx.moveTo(-3,-3); ctx.lineTo(-11,-5);
-    ctx.moveTo(-3,3); ctx.lineTo(-11,5);
-    ctx.moveTo(3,-3); ctx.lineTo(11,-5);
-    ctx.moveTo(3,3); ctx.lineTo(11,5);
-    ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(0,-7); ctx.lineTo(0,-11); ctx.stroke();
-    ctx.beginPath(); ctx.arc(0,-11,1.4,0,Math.PI*2); ctx.stroke();
-    ctx.restore();
-  } else if(cat==="creature"||cat==="hazard"||cat==="cargo"){
-    drawExtraIconGlyph(ctx,cat);
+  var mat;
+  if(REAL_ICON_TEX[cat]){
+    // Real icon image (2026-09-09) -- mineral/frozen/outpost/creature/cargo/
+    // atlasstation all now use the actual isolated icon Tony provided
+    // instead of a hand-drawn canvas glyph; see REAL_ICON_URL's comment
+    // above for where these came from. The image already has its own
+    // diamond backdrop baked in, so there's no separate backdrop-drawing
+    // step here the way the canvas path below still needs one.
+    mat=new THREE.SpriteMaterial({map:REAL_ICON_TEX[cat],transparent:true,depthWrite:false});
   } else {
-    var m=/d="([^"]+)"/.exec(cfg.icon);
-    if(m){
-      var p=new Path2D(m[1]);
-      ctx.save(); ctx.scale(1.5,1.5); ctx.translate(-12,-12); ctx.stroke(p); ctx.restore();
+    // No real image yet for this category (flora/tech/hazard) -- same
+    // hand-drawn canvas backdrop+glyph as before.
+    var CS=64;
+    var canvas=document.createElement("canvas");
+    canvas.width=CS; canvas.height=CS;
+    var ctx=canvas.getContext("2d");
+    ctx.translate(CS/2,CS/2);
+    ctx.beginPath();
+    ctx.moveTo(0,-CS*0.42); ctx.lineTo(CS*0.34,0); ctx.lineTo(0,CS*0.42); ctx.lineTo(-CS*0.34,0); ctx.closePath();
+    ctx.fillStyle="rgba(6,12,20,0.55)";
+    ctx.fill();
+    ctx.lineWidth=2.4;
+    ctx.strokeStyle=cfg.color;
+    ctx.shadowColor=cfg.color; ctx.shadowBlur=8;
+    ctx.stroke();
+    ctx.shadowBlur=0;
+    ctx.strokeStyle=cfg.color; ctx.lineWidth=1.6;
+    ctx.lineCap="round"; ctx.lineJoin="round";
+    if(cat==="hazard"){
+      drawExtraIconGlyph(ctx,cat);
+    } else {
+      var m=/d="([^"]+)"/.exec(cfg.icon);
+      if(m){
+        var p=new Path2D(m[1]);
+        ctx.save(); ctx.scale(1.5,1.5); ctx.translate(-12,-12); ctx.stroke(p); ctx.restore();
+      }
     }
+    var tex=new THREE.CanvasTexture(canvas);
+    tex.minFilter=THREE.LinearFilter;
+    mat=new THREE.SpriteMaterial({map:tex,transparent:true,depthWrite:false});
   }
-  var tex=new THREE.CanvasTexture(canvas);
-  tex.minFilter=THREE.LinearFilter;
-  var mat=new THREE.SpriteMaterial({map:tex,transparent:true,depthWrite:false});
   var spr=new THREE.Sprite(mat);
   spr.scale.set(1.3,1.3,1);
   spr.position.copy(pos);
@@ -6479,7 +6533,22 @@ function buildSystemView(s){
         pRing.rotation.x=Math.PI/2; mesh.add(pRing);
       }
     }
-    buildResourceIcon(s,b,pivot,new THREE.Vector3(orbitR+b.size*2.1,b.size*1.5,b.size*1.0));
+    // buildResourceIcon() call removed 2026-09-09 (Tony, same day as the
+    // outpost/creature/hazard/cargo icon work): he saw a diamond icon next
+    // to every single planet/moon in a real system screenshot and pointed
+    // out these appear automatically, with no real submitted data behind
+    // them -- resIconCategory() derives purely from biome (itself
+    // "Unknown" for any unconfirmed planet per the Sept 8 decision) and
+    // falls back to "mineral" for anything unmapped, so every body got an
+    // icon whether or not a traveller had actually reported one. That's
+    // exactly the "generated ... not user input" problem Tony flagged for
+    // outpost specifically earlier this session, just not yet applied here
+    // -- now applied everywhere: only buildManualSignalIcon()'s
+    // traveller-submitted signals (the Edit system "Resource / signal
+    // markers" list) ever render a diamond. buildResourceIcon() itself is
+    // left defined but unused rather than deleted, same as the existing
+    // dead-code branches inside it -- lower risk than removing a
+    // function outright, and an easy revert if ever wanted back.
     pivots.push({p:pivot,sp:0.10/(1+planetIdx*0.55),mesh:mesh,spin:b.spin});
     bodyMeshes.push(mesh);
     var pMoonAnchor=new THREE.Object3D();
@@ -9786,7 +9855,7 @@ function openEditModal(){
     return {
       uid:signalUidSeq++,
       name:g.name||"", category:g.category||"",
-      icon:(["mineral","flora","frozen","tech","outpost","creature","hazard","cargo"].indexOf(g.icon)>=0)?g.icon:"mineral",
+      icon:(["mineral","flora","frozen","tech","outpost","creature","hazard","cargo","atlasstation"].indexOf(g.icon)>=0)?g.icon:"mineral",
       signalType:g.signalType||"", route:g.route||"",
       planetPos:g.planet||0, open:false
     };
@@ -10003,6 +10072,52 @@ document.getElementById("edGiant").addEventListener("change",renderBodyEditList)
 // render function rather than folded into editBodies -- a signal marker
 // isn't a body, and giving it a fake body-shaped row would make both
 // this list and the save payload harder to reason about for no benefit.
+var ICON_SWATCH_CATS=["mineral","flora","frozen","tech","outpost","creature","hazard","cargo","atlasstation"];
+var iconSwatchCache={};
+/* Small preview image for the icon-type picker below (2026-09-09, Tony:
+   "add the icons in front of names" in the Icon type dropdown). For the 6
+   categories with a real image (REAL_ICON_URL) this just returns that same
+   URL directly -- the picker always shows exactly what actually gets placed
+   in the scene, no separate rendering needed. For the rest (flora/tech/
+   hazard, no real image yet) this is the same 64px canvas-drawing code as
+   buildManualSignalIcon()'s own fallback path (diamond backdrop +
+   per-category glyph), exported as a data: URL <img> instead of a
+   THREE.CanvasTexture. Cached per category either way since none of this
+   changes at runtime -- resolved once on first use, then reused for every
+   signal row and every re-render. */
+function iconSwatchDataURL(cat){
+  if(REAL_ICON_URL[cat]) return REAL_ICON_URL[cat];
+  if(iconSwatchCache[cat]) return iconSwatchCache[cat];
+  var cfg=RES_ICON_CAT[cat];
+  var CS=64;
+  var canvas=document.createElement("canvas");
+  canvas.width=CS; canvas.height=CS;
+  var ctx=canvas.getContext("2d");
+  ctx.translate(CS/2,CS/2);
+  ctx.beginPath();
+  ctx.moveTo(0,-CS*0.42); ctx.lineTo(CS*0.34,0); ctx.lineTo(0,CS*0.42); ctx.lineTo(-CS*0.34,0); ctx.closePath();
+  ctx.fillStyle="rgba(6,12,20,0.55)";
+  ctx.fill();
+  ctx.lineWidth=2.4;
+  ctx.strokeStyle=cfg.color;
+  ctx.shadowColor=cfg.color; ctx.shadowBlur=8;
+  ctx.stroke();
+  ctx.shadowBlur=0;
+  ctx.strokeStyle=cfg.color; ctx.lineWidth=1.6;
+  ctx.lineCap="round"; ctx.lineJoin="round";
+  if(cat==="hazard"){
+    drawExtraIconGlyph(ctx,cat);
+  } else {
+    var m=/d="([^"]+)"/.exec(cfg.icon);
+    if(m){
+      var p=new Path2D(m[1]);
+      ctx.save(); ctx.scale(1.5,1.5); ctx.translate(-12,-12); ctx.stroke(p); ctx.restore();
+    }
+  }
+  var url=canvas.toDataURL("image/png");
+  iconSwatchCache[cat]=url;
+  return url;
+}
 function renderSignalEditList(){
   var el=document.getElementById("signalEditList"), html="", i;
   for(i=0;i<editSignals.length;i++){
@@ -10017,16 +10132,38 @@ function renderSignalEditList(){
     if(g.open){
       html+='<div class="brow2">'+
           '<div class="mfld" style="margin-bottom:0"><div class="lb">Name</div><input type="text" class="sgName" data-si="'+i+'" maxlength="40" placeholder="e.g. The Afaye Cluster" value="'+escAttr(g.name)+'"></div>'+
-          '<div class="mfld" style="margin-bottom:0"><div class="lb">Icon type</div><select class="sgIcon" data-si="'+i+'">'+
-            '<option value="mineral"'+(g.icon==="mineral"?" selected":"")+'>Mineral</option>'+
-            '<option value="flora"'+(g.icon==="flora"?" selected":"")+'>Flora</option>'+
-            '<option value="frozen"'+(g.icon==="frozen"?" selected":"")+'>Frozen</option>'+
-            '<option value="tech"'+(g.icon==="tech"?" selected":"")+'>Tech</option>'+
-            '<option value="outpost"'+(g.icon==="outpost"?" selected":"")+'>Outpost / Construction</option>'+
-            '<option value="creature"'+(g.icon==="creature"?" selected":"")+'>Creature / Lifeform</option>'+
-            '<option value="hazard"'+(g.icon==="hazard"?" selected":"")+'>Hazard / Danger</option>'+
-            '<option value="cargo"'+(g.icon==="cargo"?" selected":"")+'>Cargo / Wreckage</option>'+
-          '</select></div>'+
+          '<div class="mfld" style="margin-bottom:0"><div class="lb">Icon type</div>'+
+            '<div class="iconPick" data-si="'+i+'">'+
+              '<button type="button" class="iconPickBtn" data-si="'+i+'">'+
+                '<img class="iconPickImg" src="'+iconSwatchDataURL(g.icon)+'" alt="">'+
+                '<span class="iconPickLbl">'+RES_ICON_CAT[g.icon].label+'</span>'+
+                '<span class="iconPickCaret">&#9662;</span>'+
+              '</button>'+
+              '<div class="iconPickList">'+
+                (function(){
+                  var oh="";
+                  for(var oi=0;oi<ICON_SWATCH_CATS.length;oi++){
+                    var ocat=ICON_SWATCH_CATS[oi];
+                    oh+='<div class="iconPickOpt'+(ocat===g.icon?" on":"")+'" data-si="'+i+'" data-icon="'+ocat+'">'+
+                      '<img class="iconPickImg" src="'+iconSwatchDataURL(ocat)+'" alt="">'+
+                      '<span>'+RES_ICON_CAT[ocat].label+'</span></div>';
+                  }
+                  return oh;
+                })()+
+              '</div>'+
+            '</div>'+
+            '<select class="sgIcon" data-si="'+i+'" style="display:none">'+
+              '<option value="mineral"'+(g.icon==="mineral"?" selected":"")+'>Mineral</option>'+
+              '<option value="flora"'+(g.icon==="flora"?" selected":"")+'>Flora</option>'+
+              '<option value="frozen"'+(g.icon==="frozen"?" selected":"")+'>Frozen</option>'+
+              '<option value="tech"'+(g.icon==="tech"?" selected":"")+'>Tech</option>'+
+              '<option value="outpost"'+(g.icon==="outpost"?" selected":"")+'>Outpost / Construction</option>'+
+              '<option value="creature"'+(g.icon==="creature"?" selected":"")+'>Cosmic Whale</option>'+
+              '<option value="hazard"'+(g.icon==="hazard"?" selected":"")+'>Hazard / Danger</option>'+
+              '<option value="cargo"'+(g.icon==="cargo"?" selected":"")+'>Minor Wreckage</option>'+
+              '<option value="atlasstation"'+(g.icon==="atlasstation"?" selected":"")+'>Atlas Station</option>'+
+            '</select>'+
+          '</div>'+
         '</div>'+
         '<div class="mfld" style="margin-bottom:0"><div class="lb">Category label</div><input type="text" class="sgCat" data-si="'+i+'" maxlength="40" placeholder="e.g. Asteroid Belt" value="'+escAttr(g.category)+'"></div>'+
         '<div class="mfld" style="margin-bottom:0"><div class="lb">Signal type</div><input type="text" class="sgType" data-si="'+i+'" maxlength="80" placeholder="e.g. Extraterrestrial ice." value="'+escAttr(g.signalType)+'"></div>'+
@@ -10055,6 +10192,28 @@ document.getElementById("signalEditList").addEventListener("change",function(e){
   else if(e.target.classList.contains("sgPlanet")) editSignals[i].planetUid=e.target.value;
 });
 document.getElementById("signalEditList").addEventListener("click",function(e){
+  // Icon-type picker (2026-09-09) -- checked first and returns early so
+  // clicks inside it never fall through to the header open/close toggle
+  // below (a picker button/option can sit inside an open row, but it's not
+  // the row's .bhead).
+  var pickOpt=e.target.closest?e.target.closest(".iconPickOpt"):null;
+  if(pickOpt){
+    var oi=+pickOpt.getAttribute("data-si"), ocat=pickOpt.getAttribute("data-icon");
+    var sel=document.querySelector('.sgIcon[data-si="'+oi+'"]');
+    if(sel){ sel.value=ocat; sel.dispatchEvent(new Event("change",{bubbles:true})); }
+    var wrap=pickOpt.closest(".iconPick");
+    if(wrap) wrap.classList.remove("open");
+    renderSignalEditList();
+    return;
+  }
+  var pickBtn=e.target.closest?e.target.closest(".iconPickBtn"):null;
+  if(pickBtn){
+    var pWrap=pickBtn.closest(".iconPick");
+    var wasOpenPick=pWrap&&pWrap.classList.contains("open");
+    document.querySelectorAll("#signalEditList .iconPick.open").forEach(function(o){ o.classList.remove("open"); });
+    if(pWrap&&!wasOpenPick) pWrap.classList.add("open");
+    return;
+  }
   var rm=e.target.getAttribute("data-sigremove");
   if(rm!==null){ editSignals.splice(+rm,1); renderSignalEditList(); return; }
   var row=e.target.closest?e.target.closest(".bodyEdit"):null;
@@ -10066,6 +10225,18 @@ document.getElementById("signalEditList").addEventListener("click",function(e){
     editSignals[idx].open=!wasOpen;
     renderSignalEditList();
   }
+});
+// Click anywhere outside an open icon-type picker closes it -- the picker's
+// own button/option clicks are handled (and stopped from reaching here via
+// normal bubbling into this same listener) by the delegated handler above,
+// which only ever ADDS/toggles "open" or removes it itself on a pick; this
+// listener's job is purely the "clicked elsewhere entirely" case.
+document.addEventListener("click",function(e){
+  var openPicks=document.querySelectorAll("#signalEditList .iconPick.open");
+  if(!openPicks.length) return;
+  openPicks.forEach(function(p){
+    if(!p.contains(e.target)) p.classList.remove("open");
+  });
 });
 document.getElementById("edAddSignal").addEventListener("click",function(){
   if(editSignals.length>=6){ toast("6 is the limit for resource/signal markers per system."); return; }
@@ -11331,7 +11502,7 @@ document.getElementById("edSubmit").addEventListener("click",function(){
       return {
         name:(g.name||"").trim(),
         category:(g.category||"").trim(),
-        icon:(["mineral","flora","frozen","tech","outpost","creature","hazard","cargo"].indexOf(g.icon)>=0)?g.icon:"mineral",
+        icon:(["mineral","flora","frozen","tech","outpost","creature","hazard","cargo","atlasstation"].indexOf(g.icon)>=0)?g.icon:"mineral",
         signalType:(g.signalType||"").trim(),
         route:(g.route||"").trim(),
         planet:(g.planetUid && uidToPos[g.planetUid])?uidToPos[g.planetUid]:0
