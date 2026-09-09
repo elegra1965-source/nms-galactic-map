@@ -1404,6 +1404,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
       <label class="chk" title="Real in-game term (Purple systems only) -- was labelled &quot;Giant planet&quot;, renamed to match the wiki. Always 1 huge planet with 5 moons, no other planets."><input type="checkbox" id="fGiant">Gas giant</label>
       <label class="chk"><input type="checkbox" id="fBH">Black holes</label>
       <label class="chk"><input type="checkbox" id="fAtl">Atlas interfaces</label>
+      <label class="chk" title="Systems where a traveller has documented a Space Station Directorship (added for the real Cosmos/Update 7.0 10th-anniversary update, 2026-09-09)."><input type="checkbox" id="fStation">Space stations</label>
       <label class="chk" title="Phantom stars are a rare NMS oddity: system indices that exist in the portal address space but don't appear on the real in-game Galactic Map. Normally only reachable via a save/portal-index edit -- entering the map from inside one snaps your position to the nearest real star instead. Tick to show ONLY phantom star systems."><input type="checkbox" id="fPhantom">Phantom stars</label>
       <label class="chk" title="Shadow stars are a distinct, related anomaly: the first invalid system index just past the portal network's valid range. Unlike ordinary phantoms, a shadow star CAN be reached by a normal hyperjump. Tick to show ONLY shadow star systems."><input type="checkbox" id="fShadow">Shadow stars</label>
       <label class="chk" title="Systems you've saved as a travel goal, whether or not your current drive can reach them yet -- see the Waypoint button on a system's panel."><input type="checkbox" id="fWaypoint">Waypoints</label>
@@ -1830,6 +1831,10 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     <div class="mfld"><div class="lb">Special features</div>
       <label class="chk"><input type="checkbox" id="edBH"> Black hole present</label>
       <label class="chk"><input type="checkbox" id="edAtlas"> Atlas station present</label>
+      <label class="chk" title="Added 2026-09-09 for the real &quot;Cosmos&quot; 10th-anniversary update (Update 7.0): players can now become director of a system's space station and personalise it. Manual-only, same as the other special features here -- only you can know this from actually seeing it in-game. This is a foundation pass, more station detail may be added later."><input type="checkbox" id="edStation"> Space station directorship</label>
+      <div id="edStationNameWrap" style="display:none;margin:4px 0 8px 19px">
+        <div class="mfld" style="margin-bottom:0"><div class="lb">Station name</div><input type="text" id="edStationName" maxlength="30" placeholder="e.g. The Wandering Star" autocomplete="off"></div>
+      </div>
       <label class="chk"><input type="checkbox" id="edGiant"> Gas giant (purple systems only -- limits to 1 planet + up to 5 moons; renamed from "Giant planet" to match the real in-game term)</label>
       <label class="chk" title="Ancient Ruins are a real surface point of interest (Knowledge Stones + a memoir device, sometimes a buried Artifact Ruin) -- not tied to any procedural rule this project could find, so this is manual-only, same as black hole/Atlas."><input type="checkbox" id="edRuins"> Ruins present</label>
       <label class="chk" title="Tony caught (2026-08-17): choosing the &quot;Pirate Controlled&quot; conflict word alone doesn't flag a system as Outlaw -- that's a separate flag (drives the skull icon on the Conflict badge and the Outlaw tag), procedural-only until now, same manual-only pattern as the others here."><input type="checkbox" id="edOutlaw"> Outlaw system present</label>
@@ -3401,6 +3406,8 @@ function applyOverride(s){
   if(d.colliding!==undefined) s.colliding=!!d.colliding;
   if(d.collidingA!==undefined) s.collidingA=d.collidingA|0;
   if(d.collidingB!==undefined) s.collidingB=d.collidingB|0;
+  if(d.hasStation!==undefined) s.hasStation=!!d.hasStation;
+  if(d.stationName!==undefined) s.stationName=d.stationName||"";
   s.publicNotes=d.notes||"";
   s.publicScreenshot=d.screenshot||"";
   s.editorName=d.editorName||"";
@@ -4643,6 +4650,7 @@ function passFilter(s){
   if(eco&&s.econType!==eco) return false;
   if(document.getElementById("fBH").checked&&!s.blackHole) return false;
   if(document.getElementById("fAtl").checked&&!s.atlas) return false;
+  if(document.getElementById("fStation").checked&&!s.hasStation) return false;
   if(document.getElementById("fPhantom").checked&&s.phantom!=="phantom") return false;
   if(document.getElementById("fShadow").checked&&s.phantom!=="shadow") return false;
   if(document.getElementById("fOut").checked&&!s.outlaw) return false;
@@ -6236,6 +6244,7 @@ function updatePanel(s){
   if(s.ruins) tags.push(["ruin","Ruins"]);
   if(s.blackHole) tags.push(["bh","Black hole","blackHole"]);
   if(s.atlas) tags.push(["hot","Atlas interface","atlas"]);
+  if(s.hasStation) tags.push(["hot",s.stationName?("Station: "+s.stationName):"Space station","station"]);
   if(!canReachColor(s.type)) tags.push(["noreach",driveNeededMsg(s.type)]);
   if(s.phantom==="phantom") tags.push(["ghost","Phantom Star","phantom",
     "An unreachable NMS oddity: most regions contain thousands of \"phantom\" system indices that never appear on the real in-game map or Galactic Map. Normally only reached via a save/portal-index edit -- opening the map while inside one snaps your position to the nearest normal star instead."]);
@@ -7385,7 +7394,7 @@ bindSlider("sSz","vSz",function(){
   var sel=document.getElementById("fEco"),i;
   for(i=0;i<ECON.length;i++){ var o=document.createElement("option"); o.textContent=ECON[i][0]; sel.appendChild(o); }
 })();
-["fCol","fRace","fEco","fBH","fAtl","fOut","fGiant","fWaypoint","fReachOnly","fPhantom","fShadow"].forEach(function(id){
+["fCol","fRace","fEco","fBH","fAtl","fStation","fOut","fGiant","fWaypoint","fReachOnly","fPhantom","fShadow"].forEach(function(id){
   document.getElementById(id).addEventListener("change",applyFilter);
 });
 /* spec item 9 -- warp animation toggle */
@@ -7420,6 +7429,7 @@ document.getElementById("bReset").addEventListener("click",function(){
   document.getElementById("fCol").value=""; document.getElementById("fRace").value="";
   document.getElementById("fEco").value="";
   document.getElementById("fBH").checked=false; document.getElementById("fAtl").checked=false;
+  document.getElementById("fStation").checked=false;
   document.getElementById("fOut").checked=false; document.getElementById("fGiant").checked=false;
   document.getElementById("fWaypoint").checked=false;
   document.getElementById("fReachOnly").checked=false;
@@ -8750,6 +8760,9 @@ function renderCollidingSelectors(){
   document.getElementById("edCollidingB").innerHTML=opts(collidingBUid);
 }
 document.getElementById("edColliding").addEventListener("change",renderCollidingSelectors);
+document.getElementById("edStation").addEventListener("change",function(){
+  document.getElementById("edStationNameWrap").style.display=this.checked?"block":"none";
+});
 document.getElementById("edCollidingA").addEventListener("change",function(e){ collidingAUid=e.target.value; });
 document.getElementById("edCollidingB").addEventListener("change",function(e){ collidingBUid=e.target.value; });
 // Each row starts collapsed (just a name summary) so a system with several
@@ -9084,6 +9097,9 @@ function openEditModal(){
   document.getElementById("edOutlaw").checked=!!s.outlaw;
   document.getElementById("edAbandoned").checked=!!s.abandoned;
   document.getElementById("edColliding").checked=!!s.colliding;
+  document.getElementById("edStation").checked=!!s.hasStation;
+  document.getElementById("edStationName").value=s.stationName||"";
+  document.getElementById("edStationNameWrap").style.display=s.hasStation?"block":"none";
   document.getElementById("edNotes").value=s.publicNotes||"";
   setEdScreenshotState(s.publicScreenshot||"");
   var myId=loadTravellerId();
@@ -10549,6 +10565,8 @@ document.getElementById("edSubmit").addEventListener("click",function(){
     colliding:document.getElementById("edColliding").checked,
     collidingA:(document.getElementById("edColliding").checked&&uidToPos[collidingAUid])?uidToPos[collidingAUid]:0,
     collidingB:(document.getElementById("edColliding").checked&&uidToPos[collidingBUid])?uidToPos[collidingBUid]:0,
+    hasStation:document.getElementById("edStation").checked,
+    stationName:document.getElementById("edStation").checked?document.getElementById("edStationName").value.trim():"",
     econName:document.getElementById("edEcon").value.trim(),
     sell:document.getElementById("edSell").value.trim(),
     buy:document.getElementById("edBuy").value.trim(),
