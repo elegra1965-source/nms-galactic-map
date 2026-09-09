@@ -1958,6 +1958,14 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
       </div>
       <div id="bodyEditList"></div>
     </div>
+    <div class="mfld">
+      <div class="lb" style="display:flex;justify-content:space-between;align-items:center">
+        <span>Resource / signal markers (Cosmos-era, max 6)</span>
+        <button class="btn" id="edAddSignal" type="button" style="padding:3px 8px">+ Add</button>
+      </div>
+      <div class="fldHint" style="margin-top:-4px;margin-bottom:6px">The floating diamond-shaped signals you see near objects in-game -- type what your own \u201cStarmap Analysis Report\u201d popup actually said, and optionally pick which planet/moon it floats near (or leave it as a free-floating marker).</div>
+      <div id="signalEditList"></div>
+    </div>
     <div class="modalBtns">
       <button class="btn primary" id="edSubmit">Save</button>
       <button class="btn" id="edCancel">Cancel</button>
@@ -2957,7 +2965,30 @@ var RES_ICON_CAT={
   mineral:{icon:IC_MINERAL,color:"#5ad7ff",label:"Mineral Deposit"},
   flora:{icon:IC_FLORA,color:"#7cffa0",label:"Flora Growth"},
   frozen:{icon:null,color:"#bfe6ff",label:"Frozen Signal"},
-  tech:{icon:IC_SALVAGE,color:"#ff8a4a",label:"Tech Anomaly"}
+  tech:{icon:IC_SALVAGE,color:"#ff8a4a",label:"Tech Anomaly"},
+  // Outpost/construction (2026-09-09, Tony's own "Barnyano Outpost Beta"
+  // screenshot): deliberately NEVER wired into RES_ICON_BIOME_CAT above --
+  // Tony's explicit ask was "dont want icon generated ... has to be user
+  // input not procedural", so this category only ever reaches the scene
+  // through buildManualSignalIcon()'s traveller-submitted markers, never
+  // through the automatic per-planet buildResourceIcon() path. No existing
+  // SVG icon in this app resembles a station/outpost either, so -- same as
+  // frozen above -- icon stays null and the glyph is hand-drawn.
+  outpost:{icon:null,color:"#c7cdd6",label:"Deep-space Outpost"},
+  // 3 more added 2026-09-09, same session -- Tony sent 7 close-up photos of
+  // real in-game icons with no accompanying text labels this time (unlike
+  // the Barnyano Outpost screenshot, which had a full popup). Rather than
+  // guess at "official" category names for each, Tony's own call: let the
+  // traveller pick whichever glyph looks right for what they saw and type
+  // the real specifics themselves in the free-text fields -- same as every
+  // other manual marker. These 3 are the ones with a clearly distinct
+  // shape/colour from the 5 already built; a couple of the 7 photos looked
+  // like closer variants of categories already covered (a more detailed
+  // mineral crystal, a slightly different frozen teal) so weren't added as
+  // separate options.
+  creature:{icon:null,color:"#e08cd9",label:"Creature / Lifeform"},
+  hazard:{icon:null,color:"#ff5a4a",label:"Hazard / Danger"},
+  cargo:{icon:null,color:"#eef2f5",label:"Cargo / Wreckage"}
 };
 var RES_ICON_BIOME_CAT={
   "Lush":"flora","Toxic":"flora","Marsh":"flora","Water World":"flora",
@@ -3332,7 +3363,7 @@ function generateSystem(vx,vy,vz,idx,noOverride){
      computed once here (not per-body -- it can't change within one system)
      via the same function already used for the nebula palette/badge. */
   var gxType=galaxyType(GALAXY).k;
-  s.bodies=[]; s.planets=0; s.moons=0;
+  s.bodies=[]; s.planets=0; s.moons=0; s.signals=[];
   for(var pi=0; pi<total; pi++){
     var br=mulberry32(gseed(vx,vy,vz,(idx<<4)^(pi+7)));
     var isMoon = s.giant ? (pi>0)
@@ -3540,6 +3571,13 @@ function applyOverride(s){
   if(d.hasStation!==undefined) s.hasStation=!!d.hasStation;
   if(d.stationName!==undefined) s.stationName=d.stationName||"";
   if(d.stationPhoto!==undefined) s.stationPhoto=d.stationPhoto||"";
+  // Traveller-submitted resource/signal markers (2026-09-09, Cosmos-era
+  // follow-up -- Tony: "maybe can choose which planet when adding icon").
+  // Purely traveller data with no procedural counterpart to merge against
+  // (unlike bodies[], which blends real submissions with procedural
+  // rendering-only fields) -- so this is a plain overwrite, same treatment
+  // as stationName/stationPhoto just above.
+  s.signals=(d.signals&&d.signals.length)?d.signals:[];
   s.publicNotes=d.notes||"";
   s.publicScreenshot=d.screenshot||"";
   s.editorName=d.editorName||"";
@@ -6063,6 +6101,44 @@ function buildStationCard(s,pos){
    still reads as a stationary-facing tag while visibly orbiting with its
    planet -- matching how the reference screenshots show these hugging their
    object as the view moves. */
+/* Shared by buildResourceIcon()/buildManualSignalIcon() for the 3 icon
+   types added 2026-09-09 (creature/hazard/cargo) -- unlike frozen/outpost
+   above, these are a genuine shared helper rather than a duplicated block:
+   they were never speculatively drawn ahead of a real reference (both
+   frozen and outpost were each hand-drawn once, verified, then copied), so
+   there's no "already-verified working code" being reshaped here, just new
+   code with no reason to type twice. ctx is assumed already translated to
+   the icon centre and scaled/stroke-styled by the caller, same contract as
+   the frozen/outpost branches. */
+function drawExtraIconGlyph(ctx,cat){
+  ctx.save(); ctx.scale(0.62,0.62);
+  if(cat==="creature"){
+    // Small abstract creature silhouette -- rounded body, two curved
+    // ear/antenna shapes, two short legs -- matching the general read of
+    // Tony's own reference photos (a bipedal figure with curled antennae in
+    // one, a small four-legged silhouette in another) without claiming to
+    // reproduce either exactly.
+    ctx.beginPath(); ctx.ellipse(0,2,7,9,0,0,Math.PI*2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-3,-6); ctx.quadraticCurveTo(-8,-14,-2,-16); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(3,-6); ctx.quadraticCurveTo(8,-14,2,-16); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-4,10); ctx.lineTo(-5,14); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(4,10); ctx.lineTo(5,14); ctx.stroke();
+  } else if(cat==="hazard"){
+    // Thick ring, dark diamond backdrop shows through the centre --
+    // matches the red ringed/donut look in Tony's reference photo without
+    // needing a separate fill colour.
+    ctx.lineWidth=5;
+    ctx.beginPath(); ctx.arc(0,0,8,0,Math.PI*2); ctx.stroke();
+  } else if(cat==="cargo"){
+    // Barrel/crate outline -- a rect body, two horizontal band lines, and a
+    // small diamond badge in the middle -- matching Tony's reference photo
+    // of a pale canister with a diamond mark on it.
+    ctx.strokeRect(-6,-10,12,20);
+    ctx.beginPath(); ctx.moveTo(-6,-3); ctx.lineTo(6,-3); ctx.moveTo(-6,4); ctx.lineTo(6,4); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0,-4); ctx.lineTo(4,0); ctx.lineTo(0,4); ctx.lineTo(-4,0); ctx.closePath(); ctx.stroke();
+  }
+  ctx.restore();
+}
 function buildResourceIcon(s,b,pivot,localPos){
   var cat=resIconCategory(b.biome);
   var cfg=RES_ICON_CAT[cat];
@@ -6095,6 +6171,28 @@ function buildResourceIcon(s,b,pivot,localPos){
       ctx.restore();
     }
     ctx.restore();
+  } else if(cat==="outpost"){
+    // Dead code here -- resIconCategory()/RES_ICON_BIOME_CAT can never
+    // return "outpost" (see RES_ICON_CAT's comment), so this automatic
+    // per-planet path never reaches it. Kept structurally identical to
+    // buildManualSignalIcon()'s own copy of this branch below anyway, same
+    // near-duplicate-rather-than-shared-refactor reasoning as the rest of
+    // this function.
+    ctx.save(); ctx.scale(0.62,0.62);
+    ctx.strokeRect(-3,-7,6,14);
+    ctx.beginPath();
+    ctx.moveTo(-3,-3); ctx.lineTo(-11,-5);
+    ctx.moveTo(-3,3); ctx.lineTo(-11,5);
+    ctx.moveTo(3,-3); ctx.lineTo(11,-5);
+    ctx.moveTo(3,3); ctx.lineTo(11,5);
+    ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0,-7); ctx.lineTo(0,-11); ctx.stroke();
+    ctx.beginPath(); ctx.arc(0,-11,1.4,0,Math.PI*2); ctx.stroke();
+    ctx.restore();
+  } else if(cat==="creature"||cat==="hazard"||cat==="cargo"){
+    // Dead code here too, same reason as the outpost branch above -- kept
+    // structurally identical to buildManualSignalIcon()'s own copy below.
+    drawExtraIconGlyph(ctx,cat);
   } else {
     var m=/d="([^"]+)"/.exec(cfg.icon);
     if(m){
@@ -6114,6 +6212,90 @@ function buildResourceIcon(s,b,pivot,localPos){
     signalType:resIconResourceName(b,s),
     route:resIconRouteText(cat,b.seed)};
   pivot.add(spr);
+  resourceMeshes.push(spr);
+  return spr;
+}
+/* Traveller-submitted counterpart to buildResourceIcon() above (2026-09-09
+   follow-up -- Tony: "3 icons on system map but they are not necessarily
+   linked to planets... maybe can choose which planet when adding icon").
+   Deliberately a near-duplicate of buildResourceIcon()'s canvas-drawing
+   code rather than a shared refactor -- lower risk than reshaping already-
+   verified working code right after it shipped. The real difference is the
+   TEXT: buildResourceIcon() picks a real resource name from this site's own
+   sourced data and an openly-decorative flavour line; every field here is
+   whatever the traveller actually typed (their own real "Starmap Analysis
+   Report" observation), so this never falls back to a procedural pick --
+   only to a plain "unreported" placeholder if a field was left blank.
+   `parent` is either the specific body's own pivot (rides along in orbit
+   exactly like an automatic icon) or null for a free-floating marker
+   (added straight to systemGroup at a world-space position instead). */
+function buildManualSignalIcon(s,sig,parent,pos){
+  var cat=(["mineral","flora","frozen","tech","outpost","creature","hazard","cargo"].indexOf(sig.icon)>=0)?sig.icon:"mineral";
+  var cfg=RES_ICON_CAT[cat];
+  var CS=64;
+  var canvas=document.createElement("canvas");
+  canvas.width=CS; canvas.height=CS;
+  var ctx=canvas.getContext("2d");
+  ctx.translate(CS/2,CS/2);
+  ctx.beginPath();
+  ctx.moveTo(0,-CS*0.42); ctx.lineTo(CS*0.34,0); ctx.lineTo(0,CS*0.42); ctx.lineTo(-CS*0.34,0); ctx.closePath();
+  ctx.fillStyle="rgba(6,12,20,0.55)";
+  ctx.fill();
+  ctx.lineWidth=2.4;
+  ctx.strokeStyle=cfg.color;
+  ctx.shadowColor=cfg.color; ctx.shadowBlur=8;
+  ctx.stroke();
+  ctx.shadowBlur=0;
+  ctx.strokeStyle=cfg.color; ctx.lineWidth=1.6;
+  ctx.lineCap="round"; ctx.lineJoin="round";
+  if(cat==="frozen"){
+    ctx.save(); ctx.scale(0.62,0.62);
+    for(var a=0;a<6;a++){
+      ctx.save(); ctx.rotate(a*Math.PI/3);
+      ctx.beginPath(); ctx.moveTo(0,-11); ctx.lineTo(0,11); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0,-7); ctx.lineTo(-3.2,-9.6); ctx.moveTo(0,-7); ctx.lineTo(3.2,-9.6); ctx.stroke();
+      ctx.restore();
+    }
+    ctx.restore();
+  } else if(cat==="outpost"){
+    // Small abstract station glyph -- a central module, two solar-panel
+    // struts each side, and a mast+dish -- hand-drawn the same way frozen's
+    // snowflake is above, since no existing SVG icon in this app resembles
+    // a station/outpost. Never reached via the automatic per-planet path
+    // (RES_ICON_BIOME_CAT has no outpost mapping), only via a traveller's
+    // own manually-submitted marker -- see RES_ICON_CAT's comment on why.
+    ctx.save(); ctx.scale(0.62,0.62);
+    ctx.strokeRect(-3,-7,6,14);
+    ctx.beginPath();
+    ctx.moveTo(-3,-3); ctx.lineTo(-11,-5);
+    ctx.moveTo(-3,3); ctx.lineTo(-11,5);
+    ctx.moveTo(3,-3); ctx.lineTo(11,-5);
+    ctx.moveTo(3,3); ctx.lineTo(11,5);
+    ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0,-7); ctx.lineTo(0,-11); ctx.stroke();
+    ctx.beginPath(); ctx.arc(0,-11,1.4,0,Math.PI*2); ctx.stroke();
+    ctx.restore();
+  } else if(cat==="creature"||cat==="hazard"||cat==="cargo"){
+    drawExtraIconGlyph(ctx,cat);
+  } else {
+    var m=/d="([^"]+)"/.exec(cfg.icon);
+    if(m){
+      var p=new Path2D(m[1]);
+      ctx.save(); ctx.scale(1.5,1.5); ctx.translate(-12,-12); ctx.stroke(p); ctx.restore();
+    }
+  }
+  var tex=new THREE.CanvasTexture(canvas);
+  tex.minFilter=THREE.LinearFilter;
+  var mat=new THREE.SpriteMaterial({map:tex,transparent:true,depthWrite:false});
+  var spr=new THREE.Sprite(mat);
+  spr.scale.set(1.3,1.3,1);
+  spr.position.copy(pos);
+  spr.userData={resourceIcon:true,sys:s,manual:true,category:cat,
+    name:(sig.name&&sig.name.trim())?sig.name:"Unnamed signal",
+    catLabel:(sig.category&&sig.category.trim())?sig.category:"Signal",
+    signalType:(sig.signalType&&sig.signalType.trim())?sig.signalType:"Unreported",
+    route:(sig.route&&sig.route.trim())?sig.route:"No further details reported."};
+  if(parent) parent.add(spr); else systemGroup.add(spr);
   resourceMeshes.push(spr);
   return spr;
 }
@@ -6236,6 +6418,12 @@ function buildSystemView(s){
   var lastPlanetAnchorKey=null;
   var planetEntries=[]; // for resolvePlanetCollisions(), populated below
   var moonBodies=[]; // deferred to pass 2, once every planet anchor exists
+  // 1-based array-position lookups, populated below in both the planet and
+  // moon passes -- used only by the manual-signal-marker pass further down
+  // to place a traveller-linked marker near the exact body they picked
+  // (payload.signals[].planet is a 1-based position into s.bodies, same
+  // shape as a moon's own "orbits" field / the colliding-pair fields).
+  var bodyPivots={}, bodyLocalPos={}, bodySize={};
   for(var bi=0; bi<s.bodies.length; bi++){
     var b=s.bodies[bi];
     if(b.moon){ moonBodies.push(b); continue; }
@@ -6245,6 +6433,7 @@ function buildSystemView(s){
     var mesh=new THREE.Mesh(new THREE.SphereGeometry(b.size,32,24),
       new THREE.MeshLambertMaterial({map:makePlanetTexture(b)}));
     mesh.position.set(orbitR,0,0);
+    bodyPivots[bi+1]=pivot; bodyLocalPos[bi+1]=mesh.position.clone(); bodySize[bi+1]=b.size;
     mesh.rotation.z=b.tilt;
     mesh.userData={body:b,sys:s};
     pivot.add(mesh);
@@ -6313,6 +6502,8 @@ function buildSystemView(s){
     var mMesh=new THREE.Mesh(new THREE.SphereGeometry(mb.size,24,18),
       new THREE.MeshLambertMaterial({map:makePlanetTexture(mb)}));
     mMesh.position.set(mR,0,0);
+    var mbPos=s.bodies.indexOf(mb)+1;
+    bodyPivots[mbPos]=mPivot; bodyLocalPos[mbPos]=mMesh.position.clone(); bodySize[mbPos]=mb.size;
     mMesh.rotation.z=mb.tilt;
     mMesh.userData={body:mb,sys:s};
     mPivot.add(mMesh);
@@ -6332,6 +6523,31 @@ function buildSystemView(s){
     pivots.push({p:mPivot,sp:0.34/(1+moonIdx*0.4),mesh:mMesh,spin:mb.spin});
     bodyMeshes.push(mMesh);
     anchorEntry.moonIdx++;
+  }
+  // Traveller-added resource/signal markers (2026-09-09) -- built AFTER
+  // every real body's pivot/position/size is known (both passes above),
+  // since a linked marker needs its target body's own pivot to parent
+  // onto. A marker with no planet chosen (or one pointing at a slot that
+  // no longer exists -- e.g. the traveller removed that body afterwards)
+  // free-floats instead, fanned out around a small ring near the feature
+  // area so multiple free ones don't stack on top of each other.
+  if(s.signals && s.signals.length){
+    var freeIdx=0;
+    for(var sgi=0; sgi<s.signals.length; sgi++){
+      var sig=s.signals[sgi];
+      var linkPos=sig.planet|0;
+      if(linkPos>=1 && bodyPivots[linkPos]){
+        var basePos=bodyLocalPos[linkPos], bsz=bodySize[linkPos];
+        var localPos=new THREE.Vector3(basePos.x+bsz*2.4,basePos.y+bsz*1.7,basePos.z+bsz*1.1);
+        buildManualSignalIcon(s,sig,bodyPivots[linkPos],localPos);
+      } else {
+        var fAng=freeIdx*(Math.PI*2/6)+0.4;
+        var fR=featureR*0.45;
+        var worldPos=new THREE.Vector3(Math.cos(fAng)*fR,featureR*0.15*(freeIdx%2?1:-1),Math.sin(fAng)*fR);
+        buildManualSignalIcon(s,sig,null,worldPos);
+        freeIdx++;
+      }
+    }
   }
   if(s.colliding) resolvePlanetCollisions(planetEntries,s.collidingA,s.collidingB);
 }
@@ -6424,6 +6640,10 @@ function fsCategoryValue(s,category){
     // that at the same time it gives the new photo section something to
     // diff against.
     case "station": return JSON.stringify({h:!!s.hasStation,n:s.stationName||"",p:s.stationPhoto||""});
+    // Resource/signal markers (2026-09-09): the whole array diffed as one
+    // unit, same "colliding"/"station" bundling precedent -- not split
+    // per-marker since there's no per-marker flag/dispute UI for it.
+    case "signals": return JSON.stringify(s.signals||[]);
     default: return undefined;
   }
 }
@@ -6564,6 +6784,7 @@ function updatePanel(s){
   if(s.blackHole) tags.push(["bh","Black hole","blackHole"]);
   if(s.atlas) tags.push(["hot","Atlas interface","atlas"]);
   if(s.hasStation) tags.push(["hot",s.stationName?("Station: "+s.stationName):"Space station","station"]);
+  if(s.signals&&s.signals.length) tags.push(["hot",s.signals.length+(s.signals.length===1?" signal marker":" signal markers"),"signals"]);
   if(!canReachColor(s.type)) tags.push(["noreach",driveNeededMsg(s.type)]);
   if(s.phantom==="phantom") tags.push(["ghost","Phantom Star","phantom",
     "An unreachable NMS oddity: most regions contain thousands of \"phantom\" system indices that never appear on the real in-game map or Galactic Map. Normally only reached via a save/portal-index edit -- opening the map while inside one snaps your position to the nearest normal star instead."]);
@@ -9092,7 +9313,9 @@ function renderStarEditList(){
   el.innerHTML=html;
 }
 var editBodies=[];
-var bodyUidSeq=1; // stable per-row id, survives add/remove reordering during a single edit session
+var bodyUidSeq=1;
+var editSignals=[];
+var signalUidSeq=1; // stable per-row id, survives add/remove reordering during a single edit session
 /* uids (not positions -- same reasoning as bfOrbits above) of the two
    traveller-picked colliding planets, kept in module scope so a selection
    survives re-renders triggered by adding/removing/reordering bodies. Only
@@ -9559,6 +9782,21 @@ function openEditModal(){
   collidingAUid=(s.collidingA>=1 && editBodies[s.collidingA-1])?editBodies[s.collidingA-1].uid:"";
   collidingBUid=(s.collidingB>=1 && editBodies[s.collidingB-1])?editBodies[s.collidingB-1].uid:"";
   renderBodyEditList();
+  editSignals=(s.signals||[]).map(function(g){
+    return {
+      uid:signalUidSeq++,
+      name:g.name||"", category:g.category||"",
+      icon:(["mineral","flora","frozen","tech","outpost","creature","hazard","cargo"].indexOf(g.icon)>=0)?g.icon:"mineral",
+      signalType:g.signalType||"", route:g.route||"",
+      planetPos:g.planet||0, open:false
+    };
+  });
+  for(var sgk=0; sgk<editSignals.length; sgk++){
+    var spp=editSignals[sgk].planetPos;
+    editSignals[sgk].planetUid=(spp>=1 && editBodies[spp-1])?editBodies[spp-1].uid:"";
+    delete editSignals[sgk].planetPos;
+  }
+  renderSignalEditList();
   document.getElementById("editModal").classList.remove("min");
   document.getElementById("bEditMin").innerHTML="&#9662;";
   document.getElementById("editErr").style.display="none";
@@ -9757,6 +9995,87 @@ document.getElementById("edAddBody").addEventListener("click",function(){
   if(last) last.scrollIntoView({block:"nearest",behavior:"smooth"});
 });
 document.getElementById("edGiant").addEventListener("change",renderBodyEditList);
+// Repeatable resource/signal-marker rows -- deliberately the SAME
+// accordion pattern (and the same .bodyEdit/.bhead/.brow2/.mfld/.lb CSS,
+// no new rules needed) as the planets/moons editor just above, since it's
+// structurally the same thing: an array of traveller-editable rows with
+// add/remove and a collapsed one-line summary. Kept as its OWN array/
+// render function rather than folded into editBodies -- a signal marker
+// isn't a body, and giving it a fake body-shaped row would make both
+// this list and the save payload harder to reason about for no benefit.
+function renderSignalEditList(){
+  var el=document.getElementById("signalEditList"), html="", i;
+  for(i=0;i<editSignals.length;i++){
+    var g=editSignals[i];
+    var summary=escAttr(g.name||"(unnamed signal)");
+    html+='<div class="bodyEdit'+(g.open?" open":"")+'" data-si="'+i+'">'+
+      '<div class="bhead">'+
+        '<span class="bhLabel">Signal #'+(i+1)+' &mdash; '+summary+'</span>'+
+        '<span class="bhBtns"><span class="bchev">'+(g.open?"&#9662;":"&#9656;")+'</span>'+
+          '<span class="bx" data-sigremove="'+i+'" title="Remove">&times;</span></span>'+
+      '</div>';
+    if(g.open){
+      html+='<div class="brow2">'+
+          '<div class="mfld" style="margin-bottom:0"><div class="lb">Name</div><input type="text" class="sgName" data-si="'+i+'" maxlength="40" placeholder="e.g. The Afaye Cluster" value="'+escAttr(g.name)+'"></div>'+
+          '<div class="mfld" style="margin-bottom:0"><div class="lb">Icon type</div><select class="sgIcon" data-si="'+i+'">'+
+            '<option value="mineral"'+(g.icon==="mineral"?" selected":"")+'>Mineral</option>'+
+            '<option value="flora"'+(g.icon==="flora"?" selected":"")+'>Flora</option>'+
+            '<option value="frozen"'+(g.icon==="frozen"?" selected":"")+'>Frozen</option>'+
+            '<option value="tech"'+(g.icon==="tech"?" selected":"")+'>Tech</option>'+
+            '<option value="outpost"'+(g.icon==="outpost"?" selected":"")+'>Outpost / Construction</option>'+
+            '<option value="creature"'+(g.icon==="creature"?" selected":"")+'>Creature / Lifeform</option>'+
+            '<option value="hazard"'+(g.icon==="hazard"?" selected":"")+'>Hazard / Danger</option>'+
+            '<option value="cargo"'+(g.icon==="cargo"?" selected":"")+'>Cargo / Wreckage</option>'+
+          '</select></div>'+
+        '</div>'+
+        '<div class="mfld" style="margin-bottom:0"><div class="lb">Category label</div><input type="text" class="sgCat" data-si="'+i+'" maxlength="40" placeholder="e.g. Asteroid Belt" value="'+escAttr(g.category)+'"></div>'+
+        '<div class="mfld" style="margin-bottom:0"><div class="lb">Signal type</div><input type="text" class="sgType" data-si="'+i+'" maxlength="80" placeholder="e.g. Extraterrestrial ice." value="'+escAttr(g.signalType)+'"></div>'+
+        '<div class="mfld" style="margin-bottom:0"><div class="lb">Route recommendation</div><input type="text" class="sgRoute" data-si="'+i+'" maxlength="140" placeholder="e.g. Rich vein of comet fragments. Harvest opportunities detected." value="'+escAttr(g.route)+'"></div>'+
+        '<div class="mfld" style="margin-bottom:0"><div class="lb">Near which planet/moon</div><select class="sgPlanet" data-si="'+i+'"><option value="">Not linked (floating)</option>';
+      for(var pj=0;pj<editBodies.length;pj++){
+        html+='<option value="'+editBodies[pj].uid+'"'+(String(g.planetUid)===String(editBodies[pj].uid)?" selected":"")+
+          '>'+(editBodies[pj].moon?"Moon":"Planet")+' #'+(pj+1)+' \u2014 '+escAttr(editBodies[pj].name||"(unnamed)")+'</option>';
+      }
+      html+='</select></div>';
+    }
+    html+='</div>';
+  }
+  el.innerHTML=html;
+}
+document.getElementById("signalEditList").addEventListener("input",function(e){
+  var iAttr=e.target.getAttribute("data-si"); if(iAttr===null) return; var i=+iAttr;
+  if(e.target.classList.contains("sgName")) editSignals[i].name=e.target.value;
+  else if(e.target.classList.contains("sgCat")) editSignals[i].category=e.target.value;
+  else if(e.target.classList.contains("sgType")) editSignals[i].signalType=e.target.value;
+  else if(e.target.classList.contains("sgRoute")) editSignals[i].route=e.target.value;
+});
+document.getElementById("signalEditList").addEventListener("change",function(e){
+  var iAttr=e.target.getAttribute("data-si"); if(iAttr===null) return; var i=+iAttr;
+  if(e.target.classList.contains("sgIcon")) editSignals[i].icon=e.target.value;
+  else if(e.target.classList.contains("sgPlanet")) editSignals[i].planetUid=e.target.value;
+});
+document.getElementById("signalEditList").addEventListener("click",function(e){
+  var rm=e.target.getAttribute("data-sigremove");
+  if(rm!==null){ editSignals.splice(+rm,1); renderSignalEditList(); return; }
+  var row=e.target.closest?e.target.closest(".bodyEdit"):null;
+  var headHit=e.target.closest?e.target.closest(".bhead"):null;
+  if(row && headHit){
+    var idx=+row.getAttribute("data-si");
+    var wasOpen=editSignals[idx].open;
+    for(var j=0;j<editSignals.length;j++) editSignals[j].open=false;
+    editSignals[idx].open=!wasOpen;
+    renderSignalEditList();
+  }
+});
+document.getElementById("edAddSignal").addEventListener("click",function(){
+  if(editSignals.length>=6){ toast("6 is the limit for resource/signal markers per system."); return; }
+  for(var j=0;j<editSignals.length;j++) editSignals[j].open=false;
+  editSignals.push({uid:signalUidSeq++,name:"",category:"",icon:"mineral",signalType:"",route:"",planetUid:"",open:true});
+  renderSignalEditList();
+  var rows=document.querySelectorAll("#signalEditList .bodyEdit");
+  var last=rows[rows.length-1];
+  if(last) last.scrollIntoView({block:"nearest",behavior:"smooth"});
+});
 document.getElementById("bEdit").addEventListener("click",function(){ if(selected) openEditModal(); });
 /* Human-readable labels for the "Flag this field" picker -- must list the
    exact same 14 categories as FLAG_CATEGORIES above (kept in sync by hand
@@ -11006,6 +11325,16 @@ document.getElementById("edSubmit").addEventListener("click",function(){
         ruins:!!b.ruins,
         base:!!b.base,
         baseName:(b.baseName||"").trim()
+      };
+    }),
+    signals:editSignals.map(function(g){
+      return {
+        name:(g.name||"").trim(),
+        category:(g.category||"").trim(),
+        icon:(["mineral","flora","frozen","tech","outpost","creature","hazard","cargo"].indexOf(g.icon)>=0)?g.icon:"mineral",
+        signalType:(g.signalType||"").trim(),
+        route:(g.route||"").trim(),
+        planet:(g.planetUid && uidToPos[g.planetUid])?uidToPos[g.planetUid]:0
       };
     })
   };
