@@ -79,7 +79,19 @@ header .right{display:flex;align-items:center;gap:10px}
 .ambienceToggle{background:none;border:1px solid var(--border-soft);color:var(--text-faint);padding:5px 9px;border-radius:5px;font-size:9px;font-family:'Orbitron',sans-serif;letter-spacing:.05em;transition:border-color var(--motion-dur) var(--motion-ease),color var(--motion-dur) var(--motion-ease)}
 .ambienceToggle:hover{border-color:var(--cyan);color:var(--cyan)}
 .ambienceToggle.on{border-color:var(--gold);color:var(--gold)}
-@media(max-width:850px){.ambienceToggle{display:none}}
+/* 2026-09-09, Tony: found on mobile there was NO way to reach these two
+   buttons at all -- the old rule below was a flat `display:none` under
+   850px, which is every phone, with nothing built to replace it. Ambient
+   music and warp-jump SFX loop the whole time this page is open, so having
+   no way to turn either off on mobile isn't just a missing convenience,
+   it's actively tedious on a long route. Fix: instead of hiding the whole
+   button, collapse it to icon-only (hide just the .ambToggleLabel text
+   span below) -- keeps the header's fixed 60px single-row height and
+   layout completely untouched, while keeping both buttons tappable. */
+@media(max-width:850px){
+  .ambienceToggle{padding:5px 7px}
+  .ambienceToggle .ambToggleLabel{display:none}
+}
 header button{background:var(--panel);color:var(--text);border:1px solid var(--border);padding:8px 12px;border-radius:var(--r);font-family:'Rajdhani',sans-serif;font-weight:600;letter-spacing:.03em}
 header button:hover{border-color:var(--cyan);color:var(--cyan)}
 .hamburger{display:none;width:36px;height:36px;padding:0!important;align-items:center;justify-content:center}
@@ -558,8 +570,8 @@ window.nmsCoreReady = new Promise(function (res) { window.__nmsCoreResolve = res
       <div class="title">GALACTIC NAVIGATOR</div>
       <div class="right">
         <span class="status on" id="dataStatus">&#9679; SAMPLE DATA LOADED</span>
-        <button id="warpFxToggle" class="ambienceToggle on" type="button" title="Toggle the warp-jump animation on I AM HERE -- on by default, same as the live map. Turn off if it gets repetitive on a long route.">&#9889; WARP FX</button>
-        <button id="ambienceToggle" class="ambienceToggle on" type="button" title="Toggle the ambient space music -- on by default, turn off if you'd rather have it quiet.">&#9835; AMBIENCE ON</button>
+        <button id="warpFxToggle" class="ambienceToggle on" type="button" title="Toggle the warp-jump animation on I AM HERE -- on by default, same as the live map. Turn off if it gets repetitive on a long route.">&#9889;<span class="ambToggleLabel"> WARP FX</span></button>
+        <button id="ambienceToggle" class="ambienceToggle on" type="button" title="Toggle the ambient space music -- on by default, turn off if you'd rather have it quiet.">&#9835;<span class="ambToggleLabel"> AMBIENCE ON</span></button>
       </div>
     </header>
 
@@ -2877,7 +2889,11 @@ window.MOCK_JOURNEYS = [
   function setAmbienceLabel(on) {
     var btn = $("ambienceToggle");
     btn.classList.toggle("on", on);
-    btn.innerHTML = on ? "&#9835; AMBIENCE ON" : "&#9835; AMBIENCE";
+    // Preserves the icon/.ambToggleLabel split the mobile icon-only CSS
+    // above depends on -- innerHTML previously overwrote it back to plain
+    // text on every toggle, which would have silently broken the mobile
+    // fix (2026-09-09) the next time this ran.
+    btn.innerHTML = on ? "&#9835;<span class=\"ambToggleLabel\"> AMBIENCE ON</span>" : "&#9835;<span class=\"ambToggleLabel\"> AMBIENCE</span>";
   }
   $("ambienceToggle").onclick = function () {
     ambienceOn = !ambienceOn;
@@ -2912,7 +2928,8 @@ window.MOCK_JOURNEYS = [
     var b = $("warpFxToggle");
     if (!b) return;
     b.classList.toggle("on", warpFxOn);
-    b.innerHTML = warpFxOn ? "&#9889; WARP FX" : "&#9889; WARP FX OFF";
+    // Same preserve-the-span reasoning as setAmbienceLabel() above.
+    b.innerHTML = warpFxOn ? "&#9889;<span class=\"ambToggleLabel\"> WARP FX</span>" : "&#9889;<span class=\"ambToggleLabel\"> WARP FX OFF</span>";
   }
   $("warpFxToggle").onclick = function () {
     warpFxOn = !warpFxOn;
