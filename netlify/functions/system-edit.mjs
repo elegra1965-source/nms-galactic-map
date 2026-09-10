@@ -15,7 +15,7 @@
      "edit"   payload = {name, race, region, stars:[colourKey,...] (max 3), starClass, water, dissonant,
                          giant, ruins, outlaw, abandoned, phantom, econName, sell, buy, econDesc, conflict, blackHole, atlas, notes,
                          screenshot, editorName, editorFriendCode, genVersion, colliding, collidingA, collidingB,
-                         hasStation, stationName, stationPhoto,
+                         hasStation, stationName, allianceName, stationPhoto,
                          signals:[{name, category, icon, signalType, route, planet}, ...] (max 6),
                          bodies:[{name, moon, orbits, biome, subtype, descriptor, water, ring, resources,
                                   flora, fauna, minerals, salvage, fossils, sentinel, autophage,
@@ -87,6 +87,17 @@
                          filterScreenshot() machinery, just called a second time with its own
                          editKey suffix so it always lands in its own uniquely-named file, never
                          colliding with a system's separate general screenshot upload.)
+                         allianceName added 2026-09-10 -- checked against the real Cosmos patch
+                         notes before adding this: founding an alliance is its own separate,
+                         OPTIONAL action a station director may take ("directors may found their
+                         own alliance and seek like minded travellers to join their collective"),
+                         not a requirement of simply naming/personalising a station, and not
+                         scoped to one system/region the way stationName is (an alliance can span
+                         every system its founder directs; other travellers can join up to 3).
+                         Kept as a plain optional 30-char string here regardless, same "foundation
+                         pass, more detail later" framing as station itself -- bundled into the
+                         same "station" consensus category rather than given its own, since it's
+                         still one traveller's station-directorship pick.)
                          signals added 2026-09-09 -- the "Cosmos" system-view click-to-inspect
                          diamond icons (resource/signal markers). One is drawn automatically per
                          planet/moon already, straight off `bodies`, with no data of its own -- this
@@ -274,7 +285,7 @@ function getCategoryValue(out, category){
     // hosted URL (or "") by its own resolveScreenshotUpload() call below --
     // same treatment as the general `screenshot` category above, just its
     // own dedicated field/upload/file.
-    case "station": return { hasStation: !!out.hasStation, stationName: out.stationName||"", stationPhoto: out.stationPhoto||"" };
+    case "station": return { hasStation: !!out.hasStation, stationName: out.stationName||"", allianceName: out.allianceName||"", stationPhoto: out.stationPhoto||"" };
     // Resource / signal markers (2026-09-09): bundled the same way "colliding"
     // and "station" bundle their own fields above -- the whole array is one
     // consensus-voted unit, not 6 independently-flaggable rows. See the
@@ -322,7 +333,7 @@ function applyCategoryValue(data, category, value){
       data.colliding=!!value.colliding; data.collidingA=value.collidingA||0; data.collidingB=value.collidingB||0;
       return;
     case "station":
-      data.hasStation=!!value.hasStation; data.stationName=value.stationName||""; data.stationPhoto=value.stationPhoto||"";
+      data.hasStation=!!value.hasStation; data.stationName=value.stationName||""; data.allianceName=value.allianceName||""; data.stationPhoto=value.stationPhoto||"";
       return;
     case "signals": data.signals=Array.isArray(value)?value:[]; return;
   }

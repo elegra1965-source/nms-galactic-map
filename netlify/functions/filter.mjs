@@ -321,6 +321,14 @@ export function filterSystemEdit(payload){
   out.hasStation = !!payload.hasStation;
   var stationNameR = filterText(payload.stationName, {maxLen:30, fieldName:"Station name"});
   if(!stationNameR.ok) errors.push(stationNameR.reason); else out.stationName = stationNameR.cleaned;
+  // Alliance name (2026-09-10): checked against the real Cosmos patch notes before
+  // adding this. Founding an alliance is a SEPARATE, OPTIONAL action a station
+  // director may take -- not a requirement of naming/personalising a station --
+  // so this is optional here too, same 30-char cap and same always-optional
+  // treatment as stationName (filterText already passes an empty string through
+  // as ok:true, no separate "required" branch needed).
+  var allianceNameR = filterText(payload.allianceName, {maxLen:30, fieldName:"Alliance name"});
+  if(!allianceNameR.ok) errors.push(allianceNameR.reason); else out.allianceName = allianceNameR.cleaned;
   // Station photo (2026-09-09, Tony: "user being able to upload a picture
   // of their space station... like atlas station is"). A DEDICATED upload,
   // deliberately separate from the general system Screenshot field further
