@@ -1982,6 +1982,36 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
              from any owned station. So this stays optional here, same treatment as
              stationName, not gated behind it. -->
         <div class="mfld" style="margin-bottom:6px"><div class="lb">Alliance name <span style="color:var(--text-faint)">(optional -- only if this director founded one)</span></div><input type="text" id="edAllianceName" maxlength="30" placeholder="e.g. The Wandering Star Compact" autocomplete="off"></div>
+        <!-- Alliance badge (2026-09-10, Tony's own follow-up once Alliance
+             name was live: "logic dictates they should be searchable... their
+             system/systems should show" -- which is also what made Alliance
+             name itself searchable across every system that carries it, see
+             buildSearchIndex() in the Search section below). The same real
+             mechanic (one alliance, many systems, ONE banner per the Cosmos
+             patch notes' "design a name and banner to propagate across the
+             universe") means a badge can't be scoped to just this system's
+             own record the way Station photo above is -- it has to be ONE
+             shared image keyed by the alliance NAME itself. Reuses
+             compressImageToJpeg()'s exact pipeline, but the staged state
+             (edAllianceBadgeNew below) is deliberately NOT a baseline/new
+             pair like edStationPhoto*/edScreenshot* -- untouched always
+             sends "", never an already-hosted URL, so a director who never
+             touches this field can't accidentally resubmit (and thus
+             re-vote for) a shared badge they didn't choose. The existing
+             shared badge for whatever alliance name is currently typed, if
+             any, is looked up read-only from ALLIANCES (populated by
+             loadOverrides() from system-edit.mjs's handleGet()) purely for
+             reference -- see renderEdAllianceBadge(). -->
+        <div class="mfld" style="margin-bottom:6px">
+          <div class="lb">Alliance badge <span style="color:var(--text-faint)">(optional, visible to everyone)</span></div>
+          <input type="file" id="edAllianceBadgeFile" accept="image/*" style="display:none">
+          <div id="edAllianceBadgePreviewWrap" style="display:none;margin-bottom:6px">
+            <img id="edAllianceBadgePreview" alt="Alliance badge preview" title="Click to enlarge"
+              style="max-width:100%;max-height:120px;border-radius:var(--r-sm);border:1px solid var(--border-soft);cursor:zoom-in;display:block">
+          </div>
+          <button class="btn" id="edAllianceBadgeBtn" type="button" style="padding:4px 10px;font-size:11px;text-align:center;width:100%" title="Pick a badge/emblem image for this alliance -- shared across every system documented under this same alliance name. Resized and compressed automatically."><span id="edAllianceBadgeBtnTxt">Add alliance badge</span></button>
+          <div id="edAllianceBadgeHint" style="font-size:10.5px;color:var(--text-faint);margin-top:4px"></div>
+        </div>
         <!-- 2026-09-09, same-session follow-up: Tony asked about letting a
              visitor upload a real photo of their station, "like atlas
              station is", visible to every visitor. A DEDICATED upload
@@ -3630,6 +3660,27 @@ var FUNC_URL="/.netlify/functions/system-edit";
 var FLAG_URL="/.netlify/functions/flag-dispute";
 var FEEDBACK_URL="/.netlify/functions/feedback";
 var OVERRIDES={systems:{},communityTerms:{}};
+/* Alliance badges (2026-09-10) -- name-keyed, not system-keyed, so this is
+   deliberately its own top-level registry rather than living inside
+   OVERRIDES: a single alliance's entry here can apply to many different
+   systems' records at once. Populated by loadOverrides() from the same GET
+   response's `alliances` field (see system-edit.mjs's handleGet()), keyed
+   exactly the way normalizeAllianceKey() keys it server-side (lib/shared.mjs)
+   -- allianceKey() below is the client-side copy of that same trim+lowercase
+   rule, kept in sync by hand same as FLAG_CATEGORIES already is. */
+var ALLIANCES={};
+function allianceKey(name){ return String(name||"").trim().toLowerCase(); }
+/* Small inline badge icon for the info panel's "(Alliance: X)" tag pill
+   (see updatePanel()'s tags array) -- returns "" (nothing) when this
+   alliance has no shared badge on file yet. Tag pill content is already
+   built as an HTML string elsewhere (see the tags.push html join further
+   down), so an <img> here renders exactly like the rest of that pill,
+   same reasoning that let conBadge() already do this for the Conflict row. */
+function allianceBadgeTagHtml(name){
+  var a=ALLIANCES[allianceKey(name)];
+  if(!a||!a.badgeUrl) return "";
+  return ' <img src="'+a.badgeUrl+'" alt="" style="width:13px;height:13px;object-fit:cover;border-radius:3px;vertical-align:-2px;border:1px solid rgba(255,255,255,.25)">';
+}
 /* The 12 whole-row flag categories a visitor can flag/dispute (see
    FLAG_FIELDS in netlify/functions/_shared.mjs -- kept in sync by hand,
    there's no way to share a JS module between the client bundle and the
@@ -3862,6 +3913,13 @@ function loadOverrides(){
     // buildCommaCombo()'s own allItems() reads OVERRIDES.communityTerms
     // fresh on every open, so nothing else needs to be told this arrived.
     OVERRIDES.communityTerms=data.communityTerms||{};
+    // Alliance badges (2026-09-10) -- see the ALLIANCES var comment above.
+    // No populate/refresh call needed the way communityTerms needs
+    // populateDatalists(): this only ever gets READ, on demand, by
+    // renderEdAllianceBadge() (Edit system modal) and allianceBadgeTagHtml()
+    // (info panel tag) -- both already re-render from live state whenever
+    // they're called, so nothing needs to be proactively pushed out here.
+    ALLIANCES=data.alliances||{};
     populateDatalists();
     if(Object.keys(OVERRIDES.systems).length) refreshAfterOverrides();
   }).catch(function(){
@@ -6937,7 +6995,7 @@ function updatePanel(s){
   if(s.ruins) tags.push(["ruin","Ruins"]);
   if(s.blackHole) tags.push(["bh","Black hole","blackHole"]);
   if(s.atlas) tags.push(["hot","Atlas interface","atlas"]);
-  if(s.hasStation) tags.push(["hot",(s.stationName?("Station: "+s.stationName):"Space station")+(s.allianceName?(" (Alliance: "+s.allianceName+")"):""),"station"]);
+  if(s.hasStation) tags.push(["hot",(s.stationName?("Station: "+s.stationName):"Space station")+(s.allianceName?(" (Alliance: "+s.allianceName+")"+allianceBadgeTagHtml(s.allianceName)):""),"station"]);
   if(s.signals&&s.signals.length) tags.push(["hot",s.signals.length+(s.signals.length===1?" signal marker":" signal markers"),"signals"]);
   if(!canReachColor(s.type)) tags.push(["noreach",driveNeededMsg(s.type)]);
   if(s.phantom==="phantom") tags.push(["ghost","Phantom Star","phantom",
@@ -9814,6 +9872,68 @@ document.getElementById("edStationPhotoFile").addEventListener("change",function
   });
 });
 
+/* Alliance badge (2026-09-10) -- see the HTML comment above
+   edAllianceBadgeFile for why this is deliberately NOT a baseline/new pair
+   like edStationPhoto* / edScreenshot* above. edAllianceBadgeNew is either
+   null (untouched this session -- edAllianceBadgeCurrentValue() then sends
+   "", never an already-hosted URL) or a fresh data:image/jpeg;base64,...
+   string this browser just picked. There's no "remove" affordance here on
+   purpose -- this is a SHARED resource keyed by alliance name, not this
+   system's own, so silently blanking it on every other system's behalf
+   isn't offered; picking a NEW image is the only action available, and
+   system-edit.mjs's upsertAllianceBadge() requires a second traveller's
+   matching upload before it actually replaces an alliance that already has
+   one (same anti-vandalism principle the flag/dispute consensus system
+   already applies to every other shared field). */
+var edAllianceBadgeNew=null;
+function edAllianceBadgeCurrentValue(){ return edAllianceBadgeNew||""; }
+function edAllianceLookup(){
+  var key=allianceKey(document.getElementById("edAllianceName").value);
+  return key?(ALLIANCES[key]||null):null;
+}
+function renderEdAllianceBadge(){
+  var wrap=document.getElementById("edAllianceBadgePreviewWrap");
+  var img=document.getElementById("edAllianceBadgePreview");
+  var btnTxt=document.getElementById("edAllianceBadgeBtnTxt");
+  var hint=document.getElementById("edAllianceBadgeHint");
+  if(edAllianceBadgeNew){
+    img.src=edAllianceBadgeNew; wrap.style.display="block";
+    btnTxt.textContent="Replace alliance badge";
+    hint.textContent="New badge -- not shared until you Save. If this alliance already has one, a second traveller's matching upload is needed to confirm the change.";
+    return;
+  }
+  var existing=edAllianceLookup();
+  if(existing && existing.badgeUrl){
+    img.src=existing.badgeUrl; wrap.style.display="block";
+    btnTxt.textContent="Replace alliance badge";
+    hint.textContent="This alliance's current shared badge. Uploading a new one needs a second traveller's matching upload to confirm the change.";
+  } else {
+    img.src=""; wrap.style.display="none";
+    btnTxt.textContent="Add alliance badge";
+    hint.textContent="";
+  }
+}
+document.getElementById("edAllianceBadgeBtn").addEventListener("click",function(){ document.getElementById("edAllianceBadgeFile").click(); });
+document.getElementById("edAllianceBadgePreview").addEventListener("click",function(){ openScreenshotLightbox(this.src); });
+document.getElementById("edAllianceBadgeFile").addEventListener("change",function(e){
+  var f=e.target.files[0]; e.target.value="";
+  if(!f) return;
+  if(!/^image\//.test(f.type)){ toast("Please choose an image file"); return; }
+  var hint=document.getElementById("edAllianceBadgeHint");
+  hint.textContent="Compressing...";
+  compressImageToJpeg(f,640,180000).then(function(dataUrl){
+    edAllianceBadgeNew=dataUrl; renderEdAllianceBadge();
+  }).catch(function(err){
+    hint.textContent="";
+    toast(err&&err.message?err.message:"Couldn't read that image");
+  });
+});
+// Retyping the alliance name re-looks-up whatever THAT name's existing
+// badge is (if any) -- purely informational, doesn't touch edAllianceBadgeNew,
+// so a already-staged new upload stays staged even if the name is tweaked
+// afterwards.
+document.getElementById("edAllianceName").addEventListener("input",function(){ renderEdAllianceBadge(); });
+
 /* Private Surveyor notes screenshot -- see store.noteImgs (loadStore()'s
    own comment). renderPNoteImg() is called from updatePanel() right
    alongside pNote's own value population, same choke point. */
@@ -9992,6 +10112,7 @@ function openEditModal(){
   document.getElementById("edAllianceName").value=s.allianceName||"";
   document.getElementById("edStationNameWrap").style.display=s.hasStation?"block":"none";
   setEdStationPhotoState(s.stationPhoto||"");
+  edAllianceBadgeNew=null; renderEdAllianceBadge();
   document.getElementById("edNotes").value=s.publicNotes||"";
   setEdScreenshotState(s.publicScreenshot||"");
   var myId=loadTravellerId();
@@ -11678,6 +11799,7 @@ document.getElementById("edSubmit").addEventListener("click",function(){
     hasStation:document.getElementById("edStation").checked,
     stationName:document.getElementById("edStation").checked?document.getElementById("edStationName").value.trim():"",
     allianceName:document.getElementById("edStation").checked?document.getElementById("edAllianceName").value.trim():"",
+    allianceBadge:document.getElementById("edStation").checked?edAllianceBadgeCurrentValue():"",
     stationPhoto:document.getElementById("edStation").checked?edStationPhotoCurrentValue():"",
     econName:document.getElementById("edEcon").value.trim(),
     sell:document.getElementById("edSell").value.trim(),
