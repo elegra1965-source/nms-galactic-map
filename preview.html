@@ -1828,6 +1828,62 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 </defs></svg>
 
 <div id="modalWrap">
+  <!-- 2026-09-10: "Adaptive console" for Edit system, approved by Tony after
+       reviewing a side-by-side preview of 4 layout options plus this hybrid
+       recommendation. Scoped entirely to its own class names (edConsole/
+       edSec/edSwitch/...) so nothing here collides with the rest of the
+       site's stylesheet. Every existing field below keeps its existing id
+       and behaviour untouched -- this only adds a navigation layer on top;
+       see groupEditSections()/edInitConsole() near openEditModal() for how
+       the existing field divs get moved (not rebuilt) into the 6 section
+       containers, and how a brand-new system (nothing saved yet) gets the
+       Back/Next wizard while an already-documented one gets the flip-switch
+       tiles instead. -->
+  <style>
+  .edConsole{margin-bottom:10px}
+  .edConsoleState{display:inline-flex;gap:4px;padding:3px;border:1px solid var(--border-soft);
+    border-radius:8px;background:var(--panel);margin-bottom:10px}
+  .edConsoleState button{font-family:'Orbitron',sans-serif;font-size:8.5px;letter-spacing:.07em;
+    text-transform:uppercase;padding:7px 10px;border-radius:6px;border:none;background:transparent;
+    color:var(--text-faint);cursor:pointer}
+  .edConsoleState button.on{background:rgba(0,229,255,.1);color:var(--cyan)}
+  .edScanbar{display:flex;align-items:center;gap:5px;margin-bottom:6px}
+  .edScanbar i{flex:1;height:3px;border-radius:2px;background:var(--border-soft)}
+  .edScanbar i.done{background:var(--cyan-dim)}
+  .edScanbar i.now{background:var(--cyan);box-shadow:0 0 8px rgba(0,229,255,.6)}
+  .edScanlabel{font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:.12em;color:var(--text-faint);
+    text-transform:uppercase;margin-bottom:10px}
+  .edScanlabel b{color:var(--cyan)}
+  .edSwitchRow{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;perspective:600px}
+  .edSwitch{width:58px;height:54px;cursor:pointer;position:relative}
+  .edSwInner{position:relative;width:100%;height:100%;transform-style:preserve-3d;
+    transition:transform .45s cubic-bezier(.2,.7,.3,1.2)}
+  .edSwitch.active .edSwInner{transform:rotateY(180deg)}
+  .edSwFace{position:absolute;inset:0;backface-visibility:hidden;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:3px;
+    clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px);
+    border:1px solid var(--border-soft);background:rgba(255,255,255,.02)}
+  .edSwFront img{width:20px;height:20px;object-fit:contain;opacity:.9}
+  .edSwFront span{font-family:'Orbitron',sans-serif;font-size:6.6px;letter-spacing:.04em;
+    text-transform:uppercase;color:var(--text-faint);text-align:center;line-height:1.15;padding:0 2px}
+  .edSwBack{transform:rotateY(180deg);border-color:var(--cyan);background:rgba(0,229,255,.1);
+    color:var(--cyan);font-size:17px}
+  .edSwitch:not(.active):hover .edSwFront{border-color:var(--cyan-dim)}
+  @media (hover:hover){
+    .edSwitch:not(.active):hover .edSwFront{animation:edSwitchPulse 1.1s ease-in-out infinite}
+  }
+  @keyframes edSwitchPulse{
+    0%,100%{box-shadow:0 0 0 0 rgba(0,229,255,0)}
+    14%{box-shadow:0 0 0 3px rgba(0,229,255,.35)}
+    28%{box-shadow:0 0 0 0 rgba(0,229,255,0)}
+    42%{box-shadow:0 0 0 3px rgba(0,229,255,.35)}
+    60%,100%{box-shadow:0 0 0 0 rgba(0,229,255,0)}
+  }
+  .edWizNav{display:flex;gap:6px;margin:4px 0 14px}
+  .edWizNav .btn{flex:1}
+  .edSec{animation:edSecIn .25s ease}
+  @keyframes edSecIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+  </style>
   <div class="box modal" id="editModal">
     <div class="edhead" id="edHead">
       <div>
@@ -1842,6 +1898,21 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     <button class="btn" id="edRetry" type="button" style="display:none;margin:-4px 0 10px">Retry save</button>
     <div class="iconWrap" id="editIconWrap"><img id="editIconImg" src="" alt=""><span class="driftBeam"></span></div>
     <div id="editSpin"><span id="editSpinTxt">Atlas is working on it...</span></div>
+    <div class="edConsole" id="edConsole">
+      <div class="edConsoleState" id="edConsoleState">
+        <button type="button" class="on" data-mode="wizard">New system</button>
+        <button type="button" data-mode="tabs">Already documented</button>
+      </div>
+      <div class="edScanbar" id="edScanbar"></div>
+      <div class="edScanlabel" id="edScanlabel"></div>
+      <div class="edSwitchRow" id="edSwitchRow"></div>
+    </div>
+    <div class="edSec" id="edSecIdent" style="display:none"></div>
+    <div class="edSec" id="edSecEcon" style="display:none"></div>
+    <div class="edSec" id="edSecBodies" style="display:none"></div>
+    <div class="edSec" id="edSecFeatures" style="display:none"></div>
+    <div class="edSec" id="edSecLog" style="display:none"></div>
+    <div class="edSec" id="edSecAttr" style="display:none"></div>
     <!-- Galaxy (2026-08-22, real per-galaxy addressing): a
          portal address alone doesn't say which of the 257 galaxies it's in,
          so the editor confirms/picks it here at save time. Pre-filled from
@@ -1999,6 +2070,10 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
       <div class="fldHint" style="margin-top:-4px;margin-bottom:6px">The floating diamond-shaped signals you see near objects in-game -- type what your own \u201cStarmap Analysis Report\u201d popup actually said, and optionally pick which planet/moon it floats near (or leave it as a free-floating marker).</div>
       <div id="signalEditList"></div>
     </div>
+    <div class="edWizNav" id="edWizNav" style="display:none">
+      <button class="btn" id="edWizBack" type="button">&#9664; Back</button>
+      <button class="btn" id="edWizNext" type="button">Next &#9654;</button>
+    </div>
     <div class="modalBtns">
       <button class="btn primary" id="edSubmit">Save</button>
       <button class="btn" id="edCancel">Cancel</button>
@@ -2140,7 +2215,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     </div>
     <div class="mfld">
       <div class="lb">Space station directorship</div>
-      <div style="font-size:12px;color:var(--text-dim);line-height:1.55">Added 2026-09-09 for the real "Cosmos" 10th-anniversary update (Update 7.0), which lets you become director of a system's space station and personalise it. Like Ancient Ruins/Outlaw above, this isn't tied to any procedural rule -- it's <b>manual-only</b>, so use <b>Edit system</b> to mark a system as having a station and, if you like, give it a name. This is a foundation pass: only whether a station exists and its name are tracked for now, not any further station detail.</div>
+      <div style="font-size:12px;color:var(--text-dim);line-height:1.55">Added 2026-09-09 for the real "Cosmos" 10th-anniversary update (Update 7.0), which lets you become director of a system's space station and personalise it. Like Ancient Ruins/Outlaw above, this isn't tied to any procedural rule -- it's <b>manual-only</b>, so use <b>Edit system</b> to mark a system as having a station and, if you like, give it a name and an optional <b>photo</b>. A director may also (2026-09-10) optionally have founded an <b>alliance</b> -- checked against the real patch notes first: founding one is its own separate, optional action, not tied to any single station or region, so it's tracked the same optional way as the station name itself. This is still a foundation pass: existence, name, photo, and alliance name are tracked, not any deeper director-specific detail.</div>
     </div>
     <div class="mfld">
       <div class="lb">Signal markers</div>
@@ -9764,9 +9839,116 @@ document.getElementById("pNoteImgFile").addEventListener("change",function(e){
   }).catch(function(err){ toast(err&&err.message?err.message:"Couldn't read that image"); });
 });
 
+/* ---- Adaptive console for Edit system (2026-09-10) ----
+   groupEditSections() runs once, the FIRST time the modal opens: it moves
+   (not clones/rebuilds) each field's existing .mfld wrapper into one of the
+   6 section containers added above, found via document.getElementById(...)
+   .closest(".mfld") on one stable field id per group -- every input keeps
+   its own id and every existing event listener on it (icombo widgets, the
+   star/body/signal list renderers, photo upload staging) stays attached,
+   since appendChild moves a node rather than recreating it. After this
+   runs once, every later modal open just shows/hides the 6 containers --
+   nothing is ever re-grouped or duplicated. */
+var edGrouped=false;
+function groupEditSections(){
+  if(edGrouped) return;
+  edGrouped=true;
+  function put(containerId, anchorIds){
+    var c=document.getElementById(containerId);
+    anchorIds.forEach(function(id){
+      var el=document.getElementById(id);
+      var fld=el&&el.closest(".mfld");
+      if(fld) c.appendChild(fld);
+    });
+  }
+  put("edSecIdent",   ["edGalaxy","edName","edRegion","edStarClass","edRace"]);
+  put("edSecEcon",    ["edEcon","edSell","edEconStr","edConflict"]);
+  put("edSecBodies",  ["edAddStar","edAddBody","edAddSignal"]);
+  put("edSecFeatures",["edBH","edPhantom"]);
+  put("edSecLog",     ["edNotes","edScreenshotFile"]);
+  put("edSecAttr",    ["edEditorName","edEditorCodeVisible","edOpenSaveImport"]);
+}
+var EDSEC_ORDER=["ident","econ","bodies","features","log","attr"];
+var EDSEC_META={
+  ident:    {title:"Identification",       icon:"icons-web/edtab-identification.png"},
+  econ:     {title:"Economy & Conflict",   icon:"icons-web/edtab-economy.png"},
+  bodies:   {title:"Stellar Bodies",       icon:"icons-web/edtab-bodies.png"},
+  features: {title:"Special Features",     icon:"icons-web/edtab-features.png"},
+  log:      {title:"Surveyor Log",         icon:"icons-web/edtab-log.png"},
+  attr:     {title:"Attribution",          icon:"icons-web/edtab-attribution.png"}
+};
+function edSecEl(key){ return document.getElementById("edSec"+key.charAt(0).toUpperCase()+key.slice(1)); }
+var edMode="wizard", edWizStep=0, edActiveKey="ident";
+function edBuildSwitchRow(){
+  var row=document.getElementById("edSwitchRow");
+  if(row.children.length) return;
+  EDSEC_ORDER.forEach(function(key){
+    var sw=document.createElement("div");
+    sw.className="edSwitch"; sw.dataset.key=key;
+    sw.innerHTML=
+      '<div class="edSwInner">'+
+        '<div class="edSwFace edSwFront"><img src="'+EDSEC_META[key].icon+'" alt=""><span>'+EDSEC_META[key].title+'</span></div>'+
+        '<div class="edSwFace edSwBack">&#10003;</div>'+
+      '</div>';
+    sw.addEventListener("click",function(){ edGoTo(key); });
+    row.appendChild(sw);
+  });
+}
+function edBuildScanbar(){
+  var bar=document.getElementById("edScanbar");
+  if(bar.children.length) return;
+  EDSEC_ORDER.forEach(function(){ bar.appendChild(document.createElement("i")); });
+}
+function edGoTo(key){
+  edActiveKey=key;
+  EDSEC_ORDER.forEach(function(k){ edSecEl(k).style.display=(k===key)?"":"none"; });
+  var sws=document.querySelectorAll("#edSwitchRow .edSwitch");
+  for(var i=0;i<sws.length;i++) sws[i].classList.toggle("active", sws[i].dataset.key===key);
+  if(edMode==="wizard"){ edWizStep=EDSEC_ORDER.indexOf(key); edUpdateWizNav(); }
+}
+function edUpdateWizNav(){
+  var kids=document.getElementById("edScanbar").children;
+  for(var i=0;i<kids.length;i++) kids[i].className = i<edWizStep?"done":(i===edWizStep?"now":"");
+  document.getElementById("edScanlabel").innerHTML =
+    "Compiling survey log &mdash; step "+(edWizStep+1)+" of "+EDSEC_ORDER.length+": <b>"+EDSEC_META[EDSEC_ORDER[edWizStep]].title+"</b>";
+  var last=edWizStep===EDSEC_ORDER.length-1;
+  document.getElementById("edWizBack").style.visibility = edWizStep===0?"hidden":"visible";
+  document.getElementById("edWizNext").style.display = last?"none":"";
+  var btnsRow=document.querySelector("#editModal .modalBtns");
+  if(btnsRow) btnsRow.style.display = last?"flex":"none";
+}
+function edSetMode(mode){
+  edMode=mode;
+  var stateBtns=document.querySelectorAll("#edConsoleState button");
+  for(var i=0;i<stateBtns.length;i++) stateBtns[i].classList.toggle("on", stateBtns[i].dataset.mode===mode);
+  document.getElementById("edSwitchRow").style.display = mode==="tabs"?"flex":"none";
+  document.getElementById("edScanbar").style.display = mode==="wizard"?"flex":"none";
+  document.getElementById("edScanlabel").style.display = mode==="wizard"?"block":"none";
+  document.getElementById("edWizNav").style.display = mode==="wizard"?"flex":"none";
+  var btnsRow=document.querySelector("#editModal .modalBtns");
+  if(mode==="tabs" && btnsRow) btnsRow.style.display="flex";
+  edWizStep=0;
+  edGoTo(mode==="wizard"?EDSEC_ORDER[0]:edActiveKey);
+}
+function edInitConsole(isDocumented){
+  edBuildSwitchRow();
+  edBuildScanbar();
+  edActiveKey="ident";
+  edSetMode(isDocumented?"tabs":"wizard");
+}
+document.querySelectorAll("#edConsoleState button").forEach(function(b){
+  b.addEventListener("click",function(){ edSetMode(b.dataset.mode); });
+});
+document.getElementById("edWizBack").addEventListener("click",function(){
+  if(edWizStep>0) edGoTo(EDSEC_ORDER[edWizStep-1]);
+});
+document.getElementById("edWizNext").addEventListener("click",function(){
+  if(edWizStep<EDSEC_ORDER.length-1) edGoTo(EDSEC_ORDER[edWizStep+1]);
+});
 function openEditModal(){
   if(!selected) return;
   var s=selected;
+  groupEditSections();
   // Shows what's already saved for this address BEFORE the form below
   // pre-fills over it with the same values, so a visitor about to overwrite
   // real community data (not just a procedural placeholder) sees that
@@ -9883,6 +10065,13 @@ function openEditModal(){
   document.getElementById("edRetry").style.display="none";
   hideStatusIcon(document.getElementById("editIconWrap"));
   lastEditAttempt=null;
+  // s.override is the site's own existing "real community data already saved
+  // here" flag (see the notice built at the top of this function) -- reused
+  // as-is to decide which console mode to open in: a placeholder/unsaved
+  // system starts in the wizard, an already-documented one starts on the
+  // flip-switch tiles. Either can still be switched manually via the two
+  // buttons at the top of the form.
+  edInitConsole(!!s.override);
   closeAllModalBoxes();
   document.getElementById("editModal").style.display="";
   document.getElementById("modalWrap").classList.add("show");
@@ -10921,6 +11110,19 @@ function buildSearchIndex(){
       GALAXY=prevGal;
     }
     idx.push({name:sys.name,address:addr,hint:hint,galaxy:g});
+    // Alliance name, added 2026-09-10 per Tony's ask -- a director may
+    // optionally found an alliance (see disclaimerModal's "Space station
+    // directorship" section) that isn't scoped to any single system, so
+    // the SAME alliance name can legitimately appear on several of that
+    // director's systems. Indexing it as its own entry (same pattern as
+    // the planet/base names just below) means searching the alliance name
+    // naturally surfaces every system that carries it -- no grouping logic
+    // needed, buildSearchIndex()/renderMatches() already return and render
+    // multiple matches for one query. hint carries the owning system's own
+    // name too (not just the bare word "Alliance"), since several results
+    // will share the exact same title (the alliance name itself) and a
+    // traveller needs a fast way to tell them apart beyond the address.
+    if(sys.allianceName) idx.push({name:sys.allianceName,address:addr,hint:"Alliance ("+sys.name+")",galaxy:g});
     // Real (non-procedural) planet/moon names + base names, added 2026-08-21
     // per Tony's ask -- most travellers remember what they named a
     // PLANET or a base, not the system it's in. b.nameOverridden is the same
