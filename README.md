@@ -214,11 +214,15 @@ sits alongside the public notes field -- visible to every visitor, same as
 everything else here -- and your own private Surveyor notes can carry a
 screenshot too, saved only to your own device. **Space station directorship
 (added 2026-09-09, for the real "Cosmos" 10th-anniversary update)** -- a
-manual-only checkbox plus an optional station name, same pattern as Black
-hole/Ruins/Outlaw above, since who a real player made director of their
-station isn't something a procedural generator could ever derive. This is a
-foundation pass: only whether a station exists and its name are tracked for
-now.
+manual-only checkbox plus an optional station name and photo, same pattern
+as Black hole/Ruins/Outlaw above, since who a real player made director of
+their station isn't something a procedural generator could ever derive. A
+director can also optionally have founded an **alliance (added 2026-09-10)**
+-- checked against the real patch notes first: founding one is its own
+separate, optional action a director may take, not scoped to any single
+station or region, so it's tracked the same optional way as the station name
+itself. This is still a foundation pass: existence, name, photo, and
+alliance name are tracked, not any deeper director-specific detail.
 
 **Signal markers (added 2026-09-09).** Edit system can also record the
 floating diamond-shaped signals you see near objects in-game -- what your
