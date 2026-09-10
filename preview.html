@@ -1902,6 +1902,15 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
       <label class="chk" title="Added 2026-09-09 for the real &quot;Cosmos&quot; 10th-anniversary update (Update 7.0): players can now become director of a system's space station and personalise it. Manual-only, same as the other special features here -- only you can know this from actually seeing it in-game. This is a foundation pass, more station detail may be added later."><input type="checkbox" id="edStation"> Space station directorship</label>
       <div id="edStationNameWrap" style="display:none;margin:4px 0 8px 19px">
         <div class="mfld" style="margin-bottom:6px"><div class="lb">Station name</div><input type="text" id="edStationName" maxlength="30" placeholder="e.g. The Wandering Star" autocomplete="off"></div>
+        <!-- 2026-09-10: checked against the real Cosmos (Update 7.0) patch notes before
+             adding this -- founding an alliance is its OWN separate, OPTIONAL action a
+             station director may take ("directors MAY found their own alliance..."), not
+             a requirement of simply naming/personalising a station. It's also not scoped
+             to one station/region the way stationName is: an alliance can span every
+             system its founder directs, and other travellers can join up to 3 alliances
+             from any owned station. So this stays optional here, same treatment as
+             stationName, not gated behind it. -->
+        <div class="mfld" style="margin-bottom:6px"><div class="lb">Alliance name <span style="color:var(--text-faint)">(optional -- only if this director founded one)</span></div><input type="text" id="edAllianceName" maxlength="30" placeholder="e.g. The Wandering Star Compact" autocomplete="off"></div>
         <!-- 2026-09-09, same-session follow-up: Tony asked about letting a
              visitor upload a real photo of their station, "like atlas
              station is", visible to every visitor. A DEDICATED upload
@@ -3625,6 +3634,7 @@ function applyOverride(s){
   if(d.collidingB!==undefined) s.collidingB=d.collidingB|0;
   if(d.hasStation!==undefined) s.hasStation=!!d.hasStation;
   if(d.stationName!==undefined) s.stationName=d.stationName||"";
+  if(d.allianceName!==undefined) s.allianceName=d.allianceName||"";
   if(d.stationPhoto!==undefined) s.stationPhoto=d.stationPhoto||"";
   // Traveller-submitted resource/signal markers (2026-09-09, Cosmos-era
   // follow-up -- Tony: "maybe can choose which planet when adding icon").
@@ -6128,7 +6138,7 @@ function buildStationCard(s,pos){
   spr.scale.set(w,h,1);
   spr.position.copy(pos);
   spr.userData={feature:true,stationCard:true,
-    name:s.stationName?("Station: "+s.stationName):"Space station",sys:s};
+    name:(s.stationName?("Station: "+s.stationName):"Space station")+(s.allianceName?(" (Alliance: "+s.allianceName+")"):""),sys:s};
   featureMeshes.push(spr);
   var img=new Image();
   img.crossOrigin="anonymous";
@@ -6708,7 +6718,7 @@ function fsCategoryValue(s,category){
     // never actually show edited/flagged/disputed colouring -- this fixes
     // that at the same time it gives the new photo section something to
     // diff against.
-    case "station": return JSON.stringify({h:!!s.hasStation,n:s.stationName||"",p:s.stationPhoto||""});
+    case "station": return JSON.stringify({h:!!s.hasStation,n:s.stationName||"",a:s.allianceName||"",p:s.stationPhoto||""});
     // Resource/signal markers (2026-09-09): the whole array diffed as one
     // unit, same "colliding"/"station" bundling precedent -- not split
     // per-marker since there's no per-marker flag/dispute UI for it.
@@ -6852,7 +6862,7 @@ function updatePanel(s){
   if(s.ruins) tags.push(["ruin","Ruins"]);
   if(s.blackHole) tags.push(["bh","Black hole","blackHole"]);
   if(s.atlas) tags.push(["hot","Atlas interface","atlas"]);
-  if(s.hasStation) tags.push(["hot",s.stationName?("Station: "+s.stationName):"Space station","station"]);
+  if(s.hasStation) tags.push(["hot",(s.stationName?("Station: "+s.stationName):"Space station")+(s.allianceName?(" (Alliance: "+s.allianceName+")"):""),"station"]);
   if(s.signals&&s.signals.length) tags.push(["hot",s.signals.length+(s.signals.length===1?" signal marker":" signal markers"),"signals"]);
   if(!canReachColor(s.type)) tags.push(["noreach",driveNeededMsg(s.type)]);
   if(s.phantom==="phantom") tags.push(["ghost","Phantom Star","phantom",
@@ -9797,6 +9807,7 @@ function openEditModal(){
   document.getElementById("edColliding").checked=!!s.colliding;
   document.getElementById("edStation").checked=!!s.hasStation;
   document.getElementById("edStationName").value=s.stationName||"";
+  document.getElementById("edAllianceName").value=s.allianceName||"";
   document.getElementById("edStationNameWrap").style.display=s.hasStation?"block":"none";
   setEdStationPhotoState(s.stationPhoto||"");
   document.getElementById("edNotes").value=s.publicNotes||"";
@@ -11464,6 +11475,7 @@ document.getElementById("edSubmit").addEventListener("click",function(){
     collidingB:(document.getElementById("edColliding").checked&&uidToPos[collidingBUid])?uidToPos[collidingBUid]:0,
     hasStation:document.getElementById("edStation").checked,
     stationName:document.getElementById("edStation").checked?document.getElementById("edStationName").value.trim():"",
+    allianceName:document.getElementById("edStation").checked?document.getElementById("edAllianceName").value.trim():"",
     stationPhoto:document.getElementById("edStation").checked?edStationPhotoCurrentValue():"",
     econName:document.getElementById("edEcon").value.trim(),
     sell:document.getElementById("edSell").value.trim(),
