@@ -98,6 +98,16 @@
                          pass, more detail later" framing as station itself -- bundled into the
                          same "station" consensus category rather than given its own, since it's
                          still one traveller's station-directorship pick.)
+                         allianceBadge added same day, same-session follow-up once Tony noticed the
+                         Edit system form had nowhere to actually attach one: unlike stationPhoto
+                         above, this is NOT part of the "station" TOP_CATS category and is never
+                         written onto sysRec.data at all -- it's resolved (see the "edit" handler
+                         below) and then upserted into the top-level data.alliances dict, keyed by
+                         allianceName via normalizeAllianceKey() (lib/shared.mjs), since one alliance
+                         spans every system its founder directs and needs ONE shared badge, not a
+                         separate photo per system. See upsertAllianceBadge()'s own header comment
+                         for the full design (why it's name-keyed, and its lightweight 2-editor
+                         consensus once an alliance already has a badge).)
                          signals added 2026-09-09 -- the "Cosmos" system-view click-to-inspect
                          diamond icons (resource/signal markers). One is drawn automatically per
                          planet/moon already, straight off `bodies`, with no data of its own -- this
@@ -216,7 +226,7 @@ import {
   editorHash, getGetCache, setGetCache, invalidateGetCache,
   isValidFlagField, isValidGalaxy, compositeKey, parseCompositeKey,
   githubPutBinaryFile, screenshotPathFor, screenshotUrlPrefix,
-  addCommunityTerms
+  addCommunityTerms, normalizeAllianceKey
 } from "./lib/shared.mjs";
 
 const MAX_EDITS_PER_IP_PER_HOUR = 8;
@@ -414,6 +424,68 @@ function voteAndMaybeResolve(sysRec, category, value, edHash, now){
   return false;
 }
 
+/* Alliance badges (2026-09-10) -- a genuinely different shape of "shared"
+   than anything else in this file. Every other TOP_CATS field above is
+   scoped to ONE system record (compositeKey galaxy:ADDRESS), so even
+   getting it wrong only ever affects that one system's visitors. An
+   alliance badge is keyed by the alliance NAME instead (data.alliances,
+   see normalizeAllianceKey() in lib/shared.mjs) precisely because it's
+   NOT scoped that way in the real game -- the same reasoning that made
+   Alliance name itself span every system its founder directs, and that
+   made it worth indexing for search (buildSearchIndex() in preview.html).
+   That also means literally any visitor typing the right alliance name
+   could silently overwrite an alliance's shared badge for every OTHER
+   system carrying it, which no per-system field risks -- Tony's own pick,
+   when asked, was the "matches the real game" shared-profile design over
+   a quick per-system clone of Station photo, on the understanding it
+   needed its own moderation.
+
+   Kept deliberately lightweight rather than a whole new voting UI: a
+   brand-new alliance name (no existing data.alliances entry) sets its
+   badge immediately from a single submission -- there's nothing yet to
+   protect, and this is exactly how founding an alliance's name/station
+   already works (first submission just becomes the value, same as every
+   other unflagged field in this file). Once an alliance HAS a badge,
+   changing it reuses the exact 2-distinct-editor consensus principle
+   voteAndMaybeResolve() already applies to flagged/disputed system
+   fields (own vote ledger, deduped by editorHash, oldest dropped past
+   MAX_VOTES_PER_FIELD) rather than accepting the very next submission --
+   this is the "its own moderation rules" the shared-profile design was
+   flagged as needing. Never called at all when allianceBadge is "" (see
+   filter.mjs's own comment on why "" from the client means "not touching
+   this", not "remove") -- an existing shared badge is never blanked just
+   because one submitter's own form didn't carry a new one. */
+function upsertAllianceBadge(data, allianceName, badgeUrl, edHash, now, editorName){
+  var key = normalizeAllianceKey(allianceName);
+  if(!key || !badgeUrl) return;
+  if(!data.alliances) data.alliances = {};
+  var rec = data.alliances[key];
+  if(!rec){
+    data.alliances[key] = { name: allianceName, badgeUrl: badgeUrl, updatedAt: now, editorName: editorName||"", fieldVotes: [] };
+    return;
+  }
+  rec.name = allianceName; // keep the display spelling fresh to whichever traveller most recently typed this same key
+  if(rec.badgeUrl === badgeUrl) return; // resubmitting the badge that's already canonical -- nothing to vote on
+  var votes = rec.fieldVotes || [];
+  votes.push({ value: badgeUrl, editorHash: edHash, ts: now });
+  if(votes.length > MAX_VOTES_PER_FIELD) votes = votes.slice(-MAX_VOTES_PER_FIELD);
+  var groups = {}; // badgeUrl -> Set(editorHash)
+  for(var i=0;i<votes.length;i++){
+    var v = votes[i].value;
+    if(!groups[v]) groups[v] = new Set();
+    groups[v].add(votes[i].editorHash);
+  }
+  var winner=null, winnerCount=0;
+  for(var v2 in groups){ if(groups[v2].size>winnerCount){ winner=v2; winnerCount=groups[v2].size; } }
+  if(winner && winnerCount>=2){
+    rec.badgeUrl = winner;
+    rec.updatedAt = now;
+    rec.fieldVotes = [];
+  } else {
+    rec.fieldVotes = votes;
+  }
+}
+
 async function handleGet(req, token){
   // Tony-only view: append ?token=<ADMIN_TOKEN> (set as a Netlify env var,
   // separate from GITHUB_TOKEN) to also see the flagged/reports queue, so he
@@ -463,7 +535,20 @@ async function handleGet(req, token){
     };
   }
 
-  var out = { ok:true, systems: publicSystems, communityTerms: current.data.communityTerms || {} };
+  // Alliance badges (2026-09-10): public, name-keyed, no per-editor detail
+  // (fieldVotes/editorHash) leaked -- same "just enough to render, nothing
+  // about who submitted what" treatment communityTerms already gets above.
+  // preview.html's loadOverrides() reads this into ALLIANCES so the Edit
+  // system modal can show an alliance's existing shared badge (see
+  // renderEdAllianceBadge()) and the info panel can show it next to any
+  // system's own "(Alliance: X)" tag (see updatePanel()'s allianceBadgeTagHtml()).
+  var publicAlliances = {};
+  for(var allKey in (current.data.alliances||{})){
+    var allRec = current.data.alliances[allKey];
+    publicAlliances[allKey] = { name: allRec.name, badgeUrl: allRec.badgeUrl||"", updatedAt: allRec.updatedAt||null };
+  }
+
+  var out = { ok:true, systems: publicSystems, communityTerms: current.data.communityTerms || {}, alliances: publicAlliances };
 
   if(isAdmin){
     out.reports = current.data.reports;
@@ -780,7 +865,23 @@ export default async (req, context) => {
         return json(502, {ok:false, error:"Could not save station photo: "+e.message});
       }
     }
+    // Alliance badge (2026-09-10): same upload resolution as stationPhoto
+    // just above -- a fresh data: URL becomes a hosted URL. What happens
+    // to that URL afterwards is different, though: it's not written onto
+    // THIS system's own record at all, it's upserted into the shared,
+    // name-keyed data.alliances dict below (see upsertAllianceBadge()'s
+    // own header comment for the full "why").
+    if(typeof filtered.cleaned.allianceBadge === "string" && filtered.cleaned.allianceBadge.indexOf("data:image/jpeg;base64,") === 0){
+      try {
+        filtered.cleaned.allianceBadge = await resolveScreenshotUpload(token, editKey+"-alliance", filtered.cleaned.allianceBadge);
+      } catch(e){
+        return json(502, {ok:false, error:"Could not save alliance badge: "+e.message});
+      }
+    }
     var edHash = await editorHash(ip);
+    if(filtered.cleaned.allianceName && filtered.cleaned.allianceBadge){
+      upsertAllianceBadge(current.data, filtered.cleaned.allianceName, filtered.cleaned.allianceBadge, edHash, now, filtered.cleaned.editorName||"");
+    }
     var sysRec = current.data.systems[editKey];
     if(!sysRec) sysRec = current.data.systems[editKey] = { galaxy:galaxy, flaggedFields:[], disputedFields:[] };
     if(sysRec.galaxy===undefined) sysRec.galaxy = galaxy; // backfill for a pre-existing record saved before this field existed

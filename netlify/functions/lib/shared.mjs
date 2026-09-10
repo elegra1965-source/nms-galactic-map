@@ -55,6 +55,18 @@ export function isValidGalaxy(g){
 export function compositeKey(galaxy, address){
   return String(galaxy)+":"+String(address).toUpperCase();
 }
+/* Alliance badges (2026-09-10) key data.alliances by the alliance NAME
+   itself, not a system address -- see system-edit.mjs's upsertAllianceBadge()
+   header comment for the full "why" (one alliance can span every system its
+   founder directs, same real-game mechanic Alliance name's own search
+   indexing already relies on). Normalised the same simple way preview.html's
+   own search already lowercases/trims names for matching -- trim+lowercase
+   is enough to treat "The Wandering Star Compact" and "the wandering star
+   compact" as the same alliance without needing a canonical registry of
+   alliance names anywhere. */
+export function normalizeAllianceKey(name){
+  return String(name||"").trim().toLowerCase();
+}
 /* Splits a composite key back into {galaxy, address} -- used by the admin
    GET view (which needs to show Tony which galaxy a flagged/disputed
    system is actually in) and by anything iterating current.data.systems by
@@ -105,7 +117,7 @@ export async function githubGetFile(token){
   });
   if(res.status === 404){
     // file doesn't exist yet -- start fresh
-    return { sha: null, data: { systems:{}, reports:[], ipLog:{}, flagLog:{}, communityTerms:{} } };
+    return { sha: null, data: { systems:{}, reports:[], ipLog:{}, flagLog:{}, communityTerms:{}, alliances:{} } };
   }
   if(!res.ok){
     throw new Error("GitHub read failed: "+res.status+" "+(await res.text()));
@@ -147,6 +159,9 @@ export async function githubGetFile(token){
   if(!data.ipLog) data.ipLog = {};
   if(!data.flagLog) data.flagLog = {};
   if(!data.communityTerms) data.communityTerms = {};
+  // alliances (2026-09-10): name-keyed shared badges, see normalizeAllianceKey()
+  // above and system-edit.mjs's upsertAllianceBadge() for the full shape.
+  if(!data.alliances) data.alliances = {};
   return { sha: body.sha, data: data };
 }
 

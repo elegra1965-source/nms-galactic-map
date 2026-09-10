@@ -344,6 +344,25 @@ export function filterSystemEdit(payload){
   var stationPhotoR = filterScreenshot(payload.stationPhoto, "Station photo");
   if(!stationPhotoR.ok) errors.push(stationPhotoR.reason); else out.stationPhoto = stationPhotoR.cleaned;
 
+  // Alliance badge (2026-09-10, Tony's own follow-up once Alliance name
+  // shipped: "logic dictates they should be searchable... their systems
+  // should show", which made every system sharing an alliance name findable
+  // in one search -- the same real-game mechanic (one alliance, many
+  // systems, ONE banner per the Cosmos patch notes) means a badge can't be
+  // scoped to this one system's record the way Station photo is just above.
+  // Still validated here, as part of a normal system-edit submission -- same
+  // 3 filterScreenshot() shapes (fresh upload / untouched hosted URL / "")
+  // -- but system-edit.mjs stores the RESULT keyed by alliance name in its
+  // own data.alliances dict, not on this system's own record. Unlike
+  // stationPhoto, "" here is never sent by the client to mean "remove" (see
+  // preview.html's edAllianceBadgeCurrentValue() comment) -- it only ever
+  // means "this submission isn't touching the shared badge", so
+  // upsertAllianceBadge() leaves any existing alliance badge alone rather
+  // than blanking it just because one director's own submission didn't
+  // include a new one.
+  var allianceBadgeR = filterScreenshot(payload.allianceBadge, "Alliance badge");
+  if(!allianceBadgeR.ok) errors.push(allianceBadgeR.reason); else out.allianceBadge = allianceBadgeR.cleaned;
+
   // Phantom Star / Shadow Star -- an obscure, wiki-documented NMS oddity
   // (nomanssky.fandom.com/wiki/Phantom_Star, researched in
   // Galactic-Map-Session-Notes.md): most regions contain thousands of
