@@ -1861,8 +1861,15 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   .edScanlabel{font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:.12em;color:var(--text-faint);
     text-transform:uppercase;margin-bottom:10px}
   .edScanlabel b{color:var(--cyan)}
-  .edSwitchRow{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;perspective:600px}
-  .edSwitch{width:58px;height:54px;cursor:pointer;position:relative}
+  /* 2026-09-11, Tony's ask (screenshot showed 5 tabs then Attribution
+     alone on its own row): switched from flex-wrap, which packs tiles
+     left-to-right and wraps whatever doesn't fit, to a fixed 3-column
+     grid -- always exactly 2 even rows of 3 for all 6 EDSEC_ORDER tabs,
+     regardless of the modal's actual width, and each tile grows to fill
+     its column (bigger tiles on a wider modal) instead of staying a fixed
+     58px. */
+  .edSwitchRow{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px;perspective:600px}
+  .edSwitch{width:100%;height:54px;cursor:pointer;position:relative}
   .edSwInner{position:relative;width:100%;height:100%;transform-style:preserve-3d;
     transition:transform .45s cubic-bezier(.2,.7,.3,1.2)}
   .edSwitch.active .edSwInner{transform:rotateY(180deg)}
