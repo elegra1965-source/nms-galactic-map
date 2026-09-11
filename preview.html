@@ -497,6 +497,13 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border:none;border-ra
 .routeActBtn:hover{border-color:var(--cyan);color:var(--cyan)}
 .routeActBtn.danger:hover{border-color:#ff5a4a;color:#ff5a4a}
 .searchEmpty{color:var(--text-faint);font-size:10px;line-height:1.5;padding:4px 0}
+/* 2026-09-11: header block above an alliance's grouped results (see
+   renderMatches) -- Orbitron/cyan/uppercase to match the site's other
+   small section labels (e.g. .edScanlabel) rather than inventing a new
+   look for it. */
+.searchAllianceHead{font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--cyan);padding:6px 4px 3px;border-top:1px solid var(--border-soft)}
+.searchAllianceHead:first-child{border-top:none;padding-top:0}
 .pillrow{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:9px}
 .pill{font-family:'Orbitron',sans-serif;font-size:8.5px;letter-spacing:.06em;
   padding:5px 7px;border-radius:var(--r-sm);border:1px solid var(--border);
@@ -1866,8 +1873,13 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   .edSwFront img{width:20px;height:20px;object-fit:contain;opacity:.9}
   .edSwFront span{font-family:'Orbitron',sans-serif;font-size:6.6px;letter-spacing:.04em;
     text-transform:uppercase;color:var(--text-faint);text-align:center;line-height:1.15;padding:0 2px}
-  .edSwBack{transform:rotateY(180deg);border-color:var(--cyan);background:rgba(0,229,255,.1);
-    color:var(--cyan);font-size:17px}
+  .edSwBack{transform:rotateY(180deg);border-color:var(--cyan);background:rgba(0,229,255,.1)}
+  /* 2026-09-11, Tony's ask: swap the plain text checkmark for the site's
+     real Atlas icon (same status-atlas.png/pulse motion already used for
+     "normal save, in flight" elsewhere) so the "you're on this tab" face
+     matches the rest of the site's real game imagery instead of a generic
+     glyph. Reuses the existing iconPulse keyframe rather than a new one. */
+  .edSwBack img{width:22px;height:22px;object-fit:contain;animation:iconPulse 1.6s ease-in-out infinite}
   .edSwitch:not(.active):hover .edSwFront{border-color:var(--cyan-dim)}
   @media (hover:hover){
     .edSwitch:not(.active):hover .edSwFront{animation:edSwitchPulse 1.1s ease-in-out infinite}
@@ -10008,7 +10020,7 @@ function edBuildSwitchRow(){
     sw.innerHTML=
       '<div class="edSwInner">'+
         '<div class="edSwFace edSwFront"><img src="'+EDSEC_META[key].icon+'" alt=""><span>'+EDSEC_META[key].title+'</span></div>'+
-        '<div class="edSwFace edSwBack">&#10003;</div>'+
+        '<div class="edSwFace edSwBack"><img src="icons-web/status-atlas.png" alt=""></div>'+
       '</div>';
     sw.addEventListener("click",function(){ edGoTo(key); });
     row.appendChild(sw);
@@ -11350,15 +11362,43 @@ function runSearch(query){
   for(i=0;i<idx.length;i++){
     if(idx[i].name.toLowerCase().indexOf(q)===0) starts.push(idx[i]);
   }
-  renderMatches(starts.slice(0,20),
+  /* 2026-09-11, Tony's ask: pull Alliance-tagged matches into their own
+     group instead of leaving them flat in the same list as any other
+     same-prefix hit (e.g. a system literally named "Ember" sitting next
+     to an alliance called "Embercore" would otherwise be indistinguishable
+     at a glance). Grouped by the alliance's own real name (idx.name for
+     these rows -- hint carries the OWNING system, not the alliance), since
+     a broad-enough prefix can technically match more than one distinct
+     alliance at once. Kept inside this same popup rather than a separate
+     floating window -- see WINDOW-STANDARDS.md. */
+  var allianceOrder=[], allianceGroups={}, rest=[];
+  for(i=0;i<starts.length;i++){
+    var m=starts[i];
+    if(m.hint && m.hint.indexOf("Alliance (")===0){
+      if(!allianceGroups[m.name]){ allianceGroups[m.name]=[]; allianceOrder.push(m.name); }
+      allianceGroups[m.name].push(m);
+    } else {
+      rest.push(m);
+    }
+  }
+  renderMatches({allianceOrder:allianceOrder,allianceGroups:allianceGroups,rest:rest},
     "No match found -- only names you or the community have actually documented, bookmarked, waypointed or visited are searchable, not every procedural system. Your own bookmarks/waypoints/visited history are already searched across every galaxy, not just the one you're currently viewing.");
 }
+/* 2026-09-11: now accepts either the plain flat array runSearch's empty-
+   query browse mode has always passed, OR the {allianceOrder,
+   allianceGroups, rest} shape runSearch's real query path now builds --
+   detected by Array.isArray so browse mode needed no changes at all. */
 function renderMatches(matches,emptyMsg){
   var box=document.getElementById("searchResults");
-  if(!matches.length){ box.innerHTML='<div class="searchEmpty">'+emptyMsg+'</div>'; return; }
-  var html="",i;
-  for(i=0;i<matches.length;i++){
-    var m=matches[i];
+  var grouped=!Array.isArray(matches);
+  var allianceOrder=grouped?matches.allianceOrder:[];
+  var allianceGroups=grouped?matches.allianceGroups:{};
+  var rest=grouped?matches.rest:matches;
+  var total=rest.length,g;
+  for(g=0;g<allianceOrder.length;g++) total+=allianceGroups[allianceOrder[g]].length;
+  if(!total){ box.innerHTML='<div class="searchEmpty">'+emptyMsg+'</div>'; return; }
+  var CAP=20, used=0, html="";
+  function rowHtml(m){
     /* 2026-08-30, honest-review fix: this used to only print the galaxy
        name for a CROSS-galaxy result, on the theory that "no tag" plainly
        enough meant "same as what you're currently browsing". Real usage
@@ -11374,10 +11414,17 @@ function renderMatches(matches,emptyMsg){
     var galNote=' &middot; <span'+(m.galaxy!==GALAXY?' style="color:var(--gold)"':'')+'>'+
       (GALAXIES[m.galaxy]||("Galaxy #"+(m.galaxy+1)))+'</span>';
     var bodyAttr=(m.bodyIdx!=null)?(' data-body="'+m.bodyIdx+'"'):"";
-    html+='<div class="searchRes" data-addr="'+m.address+'" data-galaxy="'+m.galaxy+'"'+bodyAttr+'>'+
+    return '<div class="searchRes" data-addr="'+m.address+'" data-galaxy="'+m.galaxy+'"'+bodyAttr+'>'+
       '<div class="searchResName">'+m.name+'</div>'+
       '<div class="searchResMeta">'+m.address+' &middot; '+m.hint+galNote+'</div></div>';
   }
+  for(g=0;g<allianceOrder.length && used<CAP;g++){
+    var allianceName=allianceOrder[g], group=allianceGroups[allianceName], j;
+    html+='<div class="searchAllianceHead">Alliance: '+allianceName+' &middot; '+
+      group.length+' system'+(group.length===1?"":"s")+'</div>';
+    for(j=0;j<group.length && used<CAP;j++){ html+=rowHtml(group[j]); used++; }
+  }
+  for(var i=0;i<rest.length && used<CAP;i++){ html+=rowHtml(rest[i]); used++; }
   box.innerHTML=html;
 }
 (function(){
