@@ -804,6 +804,14 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   align-items:flex-start;justify-content:center;overflow-y:auto;overflow-x:hidden;padding:50px 12px}
 #modalWrap.show{display:flex}
 .modal{width:100%;max-width:420px;padding:16px 16px 14px;margin-bottom:40px;max-height:calc(100vh - 100px);overflow-y:auto;overflow-x:hidden}
+/* 2026-09-11, Tony's ask (Save/Cancel still sitting right at the bottom
+   edge after tightening the Star class/Race gap): editModal's content --
+   6 flip tabs plus up to 6 real fields per section -- regularly runs
+   longer than most of this shared .modal class's other users, so it gets
+   its own taller allowance here (ID beats class, so this overrides the
+   two properties above for #editModal only; every other modal keeps the
+   original 100px/40px budget untouched). */
+#editModal{max-height:calc(100vh - 60px);margin-bottom:20px}
 /* hyperdriveModal, feedbackModal: .modal's blanket overflow-y:auto showed
    an always-on scrollbar here even on viewports where the content
    comfortably fits -- same 1px scrollHeight-vs-clientHeight rounding quirk
