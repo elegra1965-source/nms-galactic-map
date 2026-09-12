@@ -534,7 +534,20 @@ html.hc-on .btn{border-width:2px}
   display:none;max-height:calc(100vh - 70px);overflow-y:auto;overflow-x:hidden}
 #panel.show{display:block}
 .phead{display:flex;gap:10px;align-items:flex-start;margin-bottom:8px}
-#pName{cursor:grab}
+/* #pName is now the ONLY drag handle for #panel (see makeDraggable() call
+   below) instead of the whole .phead row -- but the shared drag-handle rule
+   at "#fHead,.phead,.chead,..." further up only ever had .phead itself in
+   its list, so #pName inherited none of it: no touch-action:none (lets a
+   touch's default scroll/zoom gesture steal the pointer before the drag
+   handler sees it) and, worse, no user-select:none. That second one is the
+   real bug -- #keysHead hit this exact same failure mode 2026-08-23 for the
+   exact same reason (a bare text handle with no padding/icon around it to
+   usually absorb the mousedown first): without it, grabbing the name starts
+   the BROWSER'S OWN click-and-drag-to-select-text instead of this file's
+   pointer-based drag, so the box never moves and the stuck selection state
+   can eat the very next click too -- easily read as "neither drag nor
+   minimize do anything". Same fix #keysHead already uses. */
+#pName{cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 .stars{display:flex;gap:4px;flex:none;padding-top:2px}
 .starsw{width:20px;height:20px;border-radius:50%}
 #panel h2{font-family:'Orbitron',sans-serif;font-size:13px;font-weight:600;color:var(--white);line-height:1.25}
@@ -11772,12 +11785,22 @@ function runFindScan(mode){
     if(b.tag==="history"&&a.tag!=="history") return 1;
     return a.dist-b.dist;
   });
-  renderFindMatches(results.slice(0,20),radius,capped,thinned);
+  renderFindMatches(results.slice(0,20),radius,capped,thinned,mode,q);
 }
 window.__findResultsByAddr=null;
-function renderFindMatches(results,radius,capped,thinned){
+function renderFindMatches(results,radius,capped,thinned,mode,q){
   var box=document.getElementById("findScanResults");
   var notes="";
+  // A non-empty name query only ever matches systems whose real name
+  // contains that exact text -- names are effectively unique per address,
+  // so this is almost always going to be the one system you already typed.
+  // Spell that out right here, with a one-click way to actually browse
+  // nearby instead, rather than leaving "why is nothing else showing up"
+  // to be re-discovered by trial and error.
+  if(mode==="name" && q){
+    notes+='<div class="searchEmpty">Only matching &quot;'+escAttr(q)+'&quot; -- '+
+      '<span class="findClearLink" style="color:var(--cyan);cursor:pointer;text-decoration:underline">clear the name and browse everything nearby instead</span></div>';
+  }
   if(capped) notes+='<div class="searchEmpty">Radius capped to '+commas(radius)+' LY for performance.</div>';
   if(thinned) notes+='<div class="searchEmpty">Large radius -- sampled at reduced density to stay responsive. An ordinary system might not turn up; narrow the radius (or add a black hole/Atlas requirement, always checked exactly) for a denser scan.</div>';
   if(!results.length){
@@ -11856,6 +11879,12 @@ function planJourneyTo(sys){
   });
   document.getElementById("bFdScan").addEventListener("click",function(){ runFindScan(findMode); });
   document.getElementById("findScanResults").addEventListener("click",function(e){
+    if(e.target.closest&&e.target.closest(".findClearLink")){
+      document.getElementById("inSearch").value="";
+      runFindScan("name");
+      runSearch(""); // keep the by-name history list above in sync too
+      return;
+    }
     var row=e.target.closest?e.target.closest(".findCard"):null;
     if(!row) return;
     var addr=row.getAttribute("data-addr");
