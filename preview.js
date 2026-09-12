@@ -10825,11 +10825,18 @@ if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){
   if(!btn) return;
   var TIERS=[
     ['galSel','galTypeFilter'],
-    ['sepA','mGal','mLoc','inAddr','bAddrReset'],
-    ['sepB','bKeys','bRand','bSearch','bJump'],
+    ['sepA'],
+    ['sepB','bKeys','bRand','bSearch','bJump','bWarpToggle','bRoutes'],
     ['sepC','bFiltToggle','bLbl','bGrid','bAtlas'],
     ['sepD','cOrb','cFly'],
     ['sepE','bInstall','bTour','bAbout','bAccess']
+    // 2026-09-12: #mGal/#mLoc/#inAddr/#bAddrReset deliberately absent from
+    // every tier below -- same "not listed = never touched by this
+    // cascade, always visible" mechanism #bWarpToggle/#bRoutes used to
+    // rely on, now used for the group Tony actually wants left showing
+    // when controls are hidden (Galaxy/Local/the hex address box/Clear --
+    // confirmed via his own screenshots that all 4 already share one row
+    // with room to spare, so dropping everything else can't squeeze it).
   ].map(function(ids){
     return ids.map(function(id){ return document.getElementById(id); }).filter(Boolean);
   });
