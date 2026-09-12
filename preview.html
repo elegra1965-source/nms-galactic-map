@@ -11902,17 +11902,22 @@ function renderFindMatches(results,radius,capped,thinned,mode,q){
   }
   tabName.addEventListener("click",function(){ showFindTab("name"); });
   tabTrait.addEventListener("click",function(){ showFindTab("trait"); });
-  // Default the shared scan radius to the currently-selected Hyperdrive's
-  // range the first time this popup is opened -- still freely editable
-  // (Tony's own "Free radius" answer), just a sane starting point instead
-  // of an arbitrary constant.
-  var radiusDefaulted=false;
-  document.getElementById("bSearch").addEventListener("click",function(){
-    if(radiusDefaulted) return;
+  // Keeps the shared scan radius live-synced to the currently-selected
+  // Hyperdrive's jump range -- both the first time this popup is opened AND
+  // every time that range changes afterwards in Filters (Tony: "scan radius
+  // should match user jump distance, user should not need to
+  // put/change...") -- until the traveller types their own value into the
+  // radius box, at which point it's clearly a deliberate choice and syncing
+  // stops so it isn't silently overwritten later.
+  var radiusUserEdited=false;
+  function syncRadiusToHyper(){
+    if(radiusUserEdited) return;
     var hv=parseInt(document.getElementById("fHyper").value,10);
     if(hv) document.getElementById("fdRadius").value=hv;
-    radiusDefaulted=true;
-  });
+  }
+  document.getElementById("bSearch").addEventListener("click",syncRadiusToHyper);
+  document.getElementById("fHyper").addEventListener("change",syncRadiusToHyper);
+  document.getElementById("fdRadius").addEventListener("input",function(){ radiusUserEdited=true; });
   document.getElementById("bFdScan").addEventListener("click",function(){ runFindScan(findMode); });
   document.getElementById("findScanResults").addEventListener("click",function(e){
     if(e.target.closest&&e.target.closest(".findClearLink")){
