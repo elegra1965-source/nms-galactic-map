@@ -508,10 +508,6 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border:none;border-ra
 .findCard .meta{font-size:10.5px;color:var(--text-dim);margin-top:2px}
 .findCard .dist{font-size:11.5px;color:var(--gold);text-align:right;white-space:nowrap}
 .findCard .dist small{display:block;font-size:9px;color:var(--text-faint);font-weight:normal}
-.findCard .plan{display:none;margin-top:7px;padding-top:7px;border-top:1px solid var(--border-soft)}
-.findCard.active .plan{display:block}
-.findPlanLink{font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:.04em;text-transform:uppercase;color:var(--cyan);cursor:pointer}
-.findPlanLink:hover{color:var(--gold)}
 /* 2026-09-11: header block above an alliance's grouped results (see
    renderMatches) -- Orbitron/cyan/uppercase to match the site's other
    small section labels (e.g. .edScanlabel) rather than inventing a new
@@ -11669,6 +11665,14 @@ function renderMatches(matches,emptyMsg){
    second on ordinary hardware -- verified by the call-count math in
    verify_find_scan.js's harness, not just asserted here. */
 var FIND_SCAN_BUDGET=8000, FIND_MAX_HALFWIDTH=8;
+function sysNameMatches(s,q){
+  if(s.name.toLowerCase().indexOf(q)>=0) return true;
+  if(s.bodies) for(var _bi=0;_bi<s.bodies.length;_bi++){
+    var _bn=s.bodies[_bi].name;
+    if(_bn && _bn.toLowerCase().indexOf(q)>=0) return true;
+  }
+  return false;
+}
 function findMatchesTraits(s,tr){
   if(tr.col&&s.type!==tr.col) return false;
   if(tr.race&&s.race!==tr.race) return false;
@@ -11717,7 +11721,7 @@ function runFindScan(mode){
   function tryMatch(s,forceInclude,tag){
     var key=s.galaxy+":"+s.address;
     if(seen[key]) return;
-    var isMatch = mode==="name" ? (s.name.toLowerCase().indexOf(q)>=0) : findMatchesTraits(s,tr);
+    var isMatch = mode==="name" ? sysNameMatches(s,q) : findMatchesTraits(s,tr);
     if(!isMatch) return;
     var dist=wpDist(s,focusSystem)*VOX_LY;
     if(!forceInclude && dist>radius) return;
@@ -11733,6 +11737,16 @@ function runFindScan(mode){
     var parts=mk.split(","), mvx=parseInt(parts[0],10), mvy=parseInt(parts[1],10), mvz=parseInt(parts[2],10);
     var list=_marked[mk];
     for(var mi=0;mi<list.length;mi++) tryMatch(genAt(mvx,mvy,mvz,list[mi]),true,"history");
+  }
+
+  // 1b) allSystems is the exact array generateSlice() just built for Local
+  // view's own starfield -- same systems, same generated names, already
+  // sitting in memory. Reusing it directly (rather than an independent
+  // re-sample) guarantees perfect parity with what's on screen right now.
+  var localR=parseInt(document.getElementById("sR").value,10);
+  if(isNaN(localR)) localR=2;
+  if(window.allSystems && allSystems.length){
+    for(var ali=0;ali<allSystems.length;ali++) tryMatch(allSystems[ali],false,"local");
   }
 
   // 2) every real black hole / Atlas station in radius -- exact, not sampled.
@@ -11757,10 +11771,19 @@ function runFindScan(mode){
   // 3) random sample, same seed/density the map itself already uses when
   // this region is actually rendered, budget-capped so a big radius stays
   // responsive (thinned rather than refused -- see the toast below).
+  // Budget the sample pass over the OUTER shell only (regions already
+  // covered by the allSystems reuse above are skipped below) -- both because
+  // re-sampling them would just be redundant work, and so the regions that
+  // actually need this pass (beyond Local view's own reach) get a fair share
+  // of the budget instead of it being diluted across regions that didn't
+  // need it.
+  var innerSpan=Math.min(2*localR+1,2*halfwidth+1);
+  var outerRegionsN=Math.max(1,Math.pow(2*halfwidth+1,3)-Math.pow(innerSpan,3));
   var wantPer=parseInt(document.getElementById("sPer").value,10)||22;
-  var per=Math.max(2,Math.min(wantPer,Math.floor(FIND_SCAN_BUDGET/Math.max(1,regionsN))));
+  var per=Math.max(2,Math.min(wantPer,Math.floor(FIND_SCAN_BUDGET/outerRegionsN)));
   var thinned=per<wantPer;
   for(dx=-halfwidth;dx<=halfwidth;dx++) for(dy=-halfwidth;dy<=halfwidth;dy++) for(dz=-halfwidth;dz<=halfwidth;dz++){
+    if(Math.abs(dx)<=localR && Math.abs(dy)<=localR && Math.abs(dz)<=localR) continue; // already covered above
     var vx2=focus.x+dx, vy2=focus.y+dy, vz2=focus.z+dz;
     var count=regionCount(vx2,vy2,vz2);
     var vr=mulberry32(gseed(vx2,vy2,vz2,0xF00D));
@@ -11780,14 +11803,23 @@ function runFindScan(mode){
     }
   }
 
+  var isTargeted=(mode==="name"&&q) || (mode==="trait"&&(tr.col||tr.race||tr.eco||tr.bh||tr.atl||tr.out||tr.giant));
   results.sort(function(a,b){
-    if(a.tag==="history"&&b.tag!=="history") return -1;
-    if(b.tag==="history"&&a.tag!=="history") return 1;
+    if(isTargeted){
+      if(a.tag==="history"&&b.tag!=="history") return -1;
+      if(b.tag==="history"&&a.tag!=="history") return 1;
+    }
     return a.dist-b.dist;
   });
   renderFindMatches(results.slice(0,20),radius,capped,thinned,mode,q);
 }
 window.__findResultsByAddr=null;
+function remeasureSearchPop(){
+  var pop=document.getElementById("searchPop");
+  if(!pop) return;
+  pop.classList.remove("scroll");
+  if(pop.scrollHeight>pop.clientHeight+3) pop.classList.add("scroll");
+}
 function renderFindMatches(results,radius,capped,thinned,mode,q){
   var box=document.getElementById("findScanResults");
   var notes="";
@@ -11807,6 +11839,7 @@ function renderFindMatches(results,radius,capped,thinned,mode,q){
     box.innerHTML=notes+'<div class="searchEmpty">No matches within '+commas(Math.round(radius))+
       ' LY. Everywhere you\'ve bookmarked, waypointed, visited or documented is always checked too, regardless of distance.</div>';
     window.__findResultsByAddr=null;
+    remeasureSearchPop();
     return;
   }
   var byAddr={}, html=notes, i;
@@ -11823,35 +11856,11 @@ function renderFindMatches(results,radius,capped,thinned,mode,q){
       '<div class="top"><div><div class="name">'+s.name+'</div>'+
       '<div class="meta">'+metaBits.join(" &middot; ")+'</div></div>'+
       '<div class="dist">'+distLabel+'<small'+(reach?"":' style="color:#ff6a5a"')+'>'+subLabel+'</small></div></div>'+
-      '<div class="plan"><span class="findPlanLink">Plan journey to '+s.name+' &rarr;</span></div>'+
       '</div>';
   }
   box.innerHTML=html;
   window.__findResultsByAddr=byAddr;
-}
-/* Clicking a card's own "Plan journey" link previews the system (same as
-   clicking the card itself) and then hands off to the REAL, already-existing
-   #bPlanJourney button -- but setCourse()'s route is computed ASYNCHRONOUSLY
-   (a Worker, see setCourse()'s own comment), so clicking #bPlanJourney in the
-   very same tick this fires could still be holding the PREVIOUS course's
-   waypoints. Polling for courseWaypoints to actually end at this system
-   before clicking (instead of a fixed delay, which would either be too
-   short for a slow fallback route or needlessly long for a fast one) is
-   what keeps this safe -- worst case (route still computing after 4s) it
-   says so instead of silently handing off stale/wrong data. */
-function planJourneyTo(sys){
-  previewSystem(sys);
-  var deadline=Date.now()+4000;
-  (function tryClick(){
-    var cw=courseWaypoints;
-    if(courseTarget && courseTarget.address===sys.address &&
-       cw && cw.length && cw[cw.length-1].address===sys.address){
-      document.getElementById("bPlanJourney").click();
-      return;
-    }
-    if(Date.now()<deadline) setTimeout(tryClick,120);
-    else toast("Still plotting the route -- try PLAN JOURNEY again in a moment");
-  })();
+  remeasureSearchPop();
 }
 (function(){
   var tabName=document.getElementById("fdTabName"), tabTrait=document.getElementById("fdTabTrait");
@@ -11863,6 +11872,7 @@ function planJourneyTo(sys){
     tabTrait.classList.toggle("on",m==="trait");
     bodyName.style.display=(m==="name")?"":"none";
     bodyTrait.style.display=(m==="trait")?"":"none";
+    remeasureSearchPop();
   }
   tabName.addEventListener("click",function(){ showFindTab("name"); });
   tabTrait.addEventListener("click",function(){ showFindTab("trait"); });
@@ -11890,17 +11900,17 @@ function planJourneyTo(sys){
     var addr=row.getAttribute("data-addr");
     var sys=window.__findResultsByAddr&&window.__findResultsByAddr[addr];
     if(!sys) return;
-    var wasPlanClick=!!(e.target.closest&&e.target.closest(".findPlanLink"));
-    var siblings=row.parentNode.querySelectorAll(".findCard");
-    for(var i=0;i<siblings.length;i++) siblings[i].classList.remove("active");
-    row.classList.add("active");
     // previewSystem() (factored out of tryPick(), see its own comment above
     // that function) opens the full info panel and silently plots a course
     // -- exactly like clicking this same star on the map already does --
-    // without moving you. Clicking the card's own "Plan journey" link goes
-    // one step further and hands off to the real PLAN JOURNEY button once
-    // that route is actually ready -- see planJourneyTo()'s own comment.
-    if(wasPlanClick) planJourneyTo(sys); else previewSystem(sys);
+    // without moving you. It used to be possible to instead jump straight to
+    // the real PLAN JOURNEY button from here, but that button navigates the
+    // whole page away to the Navigator -- doing that from a Find card meant
+    // one click silently threw away whatever else you had open (Tony: "if
+    // have search open and when i clicked plot course...it closed search").
+    // Every card click just previews now; use the info panel's own PLAN
+    // JOURNEY button once you've actually decided.
+    previewSystem(sys);
   });
 })();
 /* #routesPop open/close/position -- same pattern as #searchPop just above,
