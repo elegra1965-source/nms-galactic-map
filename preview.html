@@ -243,6 +243,42 @@ canvas#c{display:block;position:fixed;inset:0;touch-action:none}
    never read as grouped even though the dividers were always there. Bumped
    to a visible cyan line with a little breathing room on each side. */
 .sep{width:2px;height:22px;background:rgba(0,229,255,.35);align-self:center;margin:0 4px}
+@property --bevAng{syntax:'<angle>';inherits:false;initial-value:0deg}
+.btn.beveled{
+  position:relative;
+  clip-path:polygon(7px 0,100% 0,100% calc(100% - 7px),calc(100% - 7px) 100%,0 100%,0 7px);
+  border:1.5px solid transparent;
+  background:
+    linear-gradient(rgba(13,19,28,.92),rgba(13,19,28,.92)) padding-box,
+    conic-gradient(from var(--bevAng),transparent 0deg,rgba(0,229,255,.18) 16deg,var(--cyan) 26deg,
+      transparent 68deg,transparent 360deg) border-box;
+  text-shadow:0 0 5px rgba(0,229,255,.3);
+  animation:bevTrace 6s linear infinite;
+}
+.btn.beveled:hover{border-color:transparent;
+  background:
+    linear-gradient(rgba(19,27,39,.92),rgba(19,27,39,.92)) padding-box,
+    conic-gradient(from var(--bevAng),transparent 0deg,rgba(0,229,255,.18) 16deg,var(--cyan) 26deg,
+      transparent 68deg,transparent 360deg) border-box;
+}
+.btn.beveled.on,.btn.beveled.primary{
+  color:var(--gold);text-shadow:0 0 7px rgba(240,165,0,.55);
+  background:
+    linear-gradient(rgba(240,165,0,.10),rgba(240,165,0,.10)) padding-box,
+    conic-gradient(from var(--bevAng),transparent 0deg,rgba(240,165,0,.20) 16deg,var(--gold) 26deg,
+      transparent 68deg,transparent 360deg) border-box;
+}
+@keyframes bevTrace{to{--bevAng:360deg}}
+@media (prefers-reduced-motion:reduce){
+  .btn.beveled{animation:none;
+    background:
+      linear-gradient(rgba(13,19,28,.92),rgba(13,19,28,.92)) padding-box,
+      linear-gradient(90deg,var(--cyan),var(--border)) border-box;}
+  .btn.beveled.on,.btn.beveled.primary{
+    background:
+      linear-gradient(rgba(240,165,0,.10),rgba(240,165,0,.10)) padding-box,
+      linear-gradient(90deg,var(--gold),var(--border)) border-box;}
+}
 input[type=text]{font-family:'Orbitron',monospace;font-size:11px;letter-spacing:.12em;
   background:#04070c;border:1px solid var(--border);color:var(--cyan);
   padding:6px 8px;border-radius:var(--r-sm);width:140px;text-transform:uppercase;outline:none}
@@ -1440,38 +1476,38 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     <option value="Lush">Lush</option>
   </select>
   <div class="sep" id="sepA"></div>
-  <button class="btn on" id="mGal" title="Whole-galaxy view. Decorative starfield plus your focus marker, bookmarks and course target.">Galaxy</button>
-  <button class="btn" id="mLoc" title="The real star systems around your current voxel. This is where clicking, filters and labels work.">Local</button>
+  <button class="btn beveled on" id="mGal" style="animation-delay:0s" title="Whole-galaxy view. Decorative starfield plus your focus marker, bookmarks and course target.">Galaxy</button>
+  <button class="btn beveled" id="mLoc" style="animation-delay:-.5s" title="The real star systems around your current voxel. This is where clicking, filters and labels work.">Local</button>
   <div class="sep" id="sepB"></div>
   <div id="addrGrp">
     <div class="addr-lb">Portal address (hex)</div>
     <div class="addr-row">
       <input type="text" id="inAddr" value="" placeholder="HEX ADDRESS" maxlength="12" spellcheck="false" enterkeyhint="go" title="Type or paste a 12-character hex portal address, or use the Glyphs keypad to enter it as the game's own symbols instead, then tap Jump.">
-      <button class="btn primary" id="bJump" title="Travel to the 12-glyph address in the box. Regenerates the local slice around it.">Jump</button>
-      <button class="btn" id="bAddrReset" title="Clear the address box.">Clear</button>
+      <button class="btn beveled primary" id="bJump" style="animation-delay:-3s" title="Travel to the 12-glyph address in the box. Regenerates the local slice around it.">Jump</button>
+      <button class="btn beveled" id="bAddrReset" style="animation-delay:-1s" title="Clear the address box.">Clear</button>
     </div>
   </div>
-  <button class="btn" id="bKeys" title="Open the 16-key portal glyph keypad. Tap glyphs to build an address; it stays in sync with the hex box.">Glyphs</button>
-  <button class="btn" id="bRand" title="Roll a random valid portal address and jump there.">Random</button>
-  <button class="btn" id="bSearch" title="Find a destination by name or traits.
+  <button class="btn beveled" id="bKeys" style="animation-delay:-1.5s" title="Open the 16-key portal glyph keypad. Tap glyphs to build an address; it stays in sync with the hex box.">Glyphs</button>
+  <button class="btn beveled" id="bRand" style="animation-delay:-2s" title="Roll a random valid portal address and jump there.">Random</button>
+  <button class="btn beveled" id="bSearch" style="animation-delay:-2.5s" title="Find a destination by name or traits.
 Bookmarked/visited/documented systems
 always show up. Scan also searches
 nearby procedural space within a radius.">Search</button>
-  <button class="btn" id="bWarpToggle" title="Play a warp-jump animation when entering system view. Same setting as Filters -> Warp animation, just easier to reach. Click to turn on/off.">&#9889; Warp FX</button>
-  <button class="btn" id="bRoutes" title="Save the route you've plotted so you can pick it back up later, share it with a link, or load one someone sent you.">&#9776; Routes</button>
+  <button class="btn beveled" id="bWarpToggle" style="animation-delay:-3.5s" title="Play a warp-jump animation when entering system view. Same setting as Filters -> Warp animation, just easier to reach. Click to turn on/off.">&#9889; Warp FX</button>
+  <button class="btn beveled" id="bRoutes" style="animation-delay:0s" title="Save the route you've plotted so you can pick it back up later, share it with a link, or load one someone sent you.">&#9776; Routes</button>
   <div class="sep" id="sepC"></div>
-  <button class="btn" id="bFiltToggle" title="Show or hide the system filters.">Filters</button>
-  <button class="btn on" id="bLbl" title="Show names on the nearest stars, or on planets and moons inside a system. Shortcut: H">Labels</button>
-  <button class="btn on" id="bGrid" title="Show the region grid in Local view. Each cube is one region, roughly 400 light years across. Shortcut: G">Grid</button>
-  <button class="btn" id="bAtlas" title="Show community points of interest from Hello Games' own Galactic Atlas (galacticatlas.nomanssky.com), Euclid galaxy only, as clickable diamond markers. Click one to open its real Atlas page in a new tab.">Atlas</button>
+  <button class="btn beveled" id="bFiltToggle" style="animation-delay:-.5s" title="Show or hide the system filters.">Filters</button>
+  <button class="btn beveled on" id="bLbl" style="animation-delay:-1s" title="Show names on the nearest stars, or on planets and moons inside a system. Shortcut: H">Labels</button>
+  <button class="btn beveled on" id="bGrid" style="animation-delay:-1.5s" title="Show the region grid in Local view. Each cube is one region, roughly 400 light years across. Shortcut: G">Grid</button>
+  <button class="btn beveled" id="bAtlas" style="animation-delay:-2s" title="Show community points of interest from Hello Games' own Galactic Atlas (galacticatlas.nomanssky.com), Euclid galaxy only, as clickable diamond markers. Click one to open its real Atlas page in a new tab.">Atlas</button>
   <div class="sep" id="sepD"></div>
-  <button class="btn on" id="cOrb" title="Orbit camera: drag to swing around the centre point, wheel or pinch to zoom in and out.">Orbit</button>
-  <button class="btn" id="cFly" title="Free flight: WASD or arrows to move, Shift to boost, Space/Q up, E down, drag to look. On touch, drag the left third as a thumbstick.">Camera</button>
+  <button class="btn beveled on" id="cOrb" style="animation-delay:-2.5s" title="Orbit camera: drag to swing around the centre point, wheel or pinch to zoom in and out.">Orbit</button>
+  <button class="btn beveled" id="cFly" style="animation-delay:-3s" title="Free flight: WASD or arrows to move, Shift to boost, Space/Q up, E down, drag to look. On touch, drag the left third as a thumbstick.">Camera</button>
   <div class="sep" id="sepE"></div>
-  <button class="btn" id="bInstall" title="Install this map as an app on your device." style="display:none">&#9672; Install app</button>
-  <button class="btn" id="bTour" title="A quick guided tour of what this map can do.">&#9673; Tour</button>
-  <button class="btn" id="bAbout" title="Fan-made disclaimer and a note on procedural vs. real system data.">&#9432; About</button>
-  <button class="btn" id="bAccess" title="Accessibility settings: font size, colour-blind filters, high contrast." aria-label="Accessibility settings" aria-haspopup="true" aria-expanded="false">&#9881;</button>
+  <button class="btn beveled" id="bInstall" title="Install this map as an app on your device." style="display:none;animation-delay:-3.5s">&#9672; Install app</button>
+  <button class="btn beveled" id="bTour" style="animation-delay:-4s" title="A quick guided tour of what this map can do.">&#9673; Tour</button>
+  <button class="btn beveled" id="bAbout" style="animation-delay:-4.5s" title="Fan-made disclaimer and a note on procedural vs. real system data.">&#9432; About</button>
+  <button class="btn beveled" id="bAccess" style="animation-delay:-5s" title="Accessibility settings: font size, colour-blind filters, high contrast." aria-label="Accessibility settings" aria-haspopup="true" aria-expanded="false">&#9881;</button>
   </div>
 </div>
 
