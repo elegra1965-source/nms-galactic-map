@@ -497,6 +497,21 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border:none;border-ra
 .routeActBtn:hover{border-color:var(--cyan);color:var(--cyan)}
 .routeActBtn.danger:hover{border-color:#ff5a4a;color:#ff5a4a}
 .searchEmpty{color:var(--text-faint);font-size:10px;line-height:1.5;padding:4px 0}
+/* Find scan result cards (2026-09-12) -- separate from .searchRes (the
+   plain by-name/documented rows just above) because these need a "Plan
+   journey" sub-row that only appears once a card is the active/just-clicked
+   one, which .searchRes has no room or hook for. */
+.findCard{border-radius:6px;border:1px solid var(--border-soft);margin-bottom:7px;padding:9px;cursor:pointer}
+.findCard:hover{border-color:var(--cyan-dim);background:var(--panel-2)}
+.findCard .top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.findCard .name{font-size:13px;color:var(--white)}
+.findCard .meta{font-size:10.5px;color:var(--text-dim);margin-top:2px}
+.findCard .dist{font-size:11.5px;color:var(--gold);text-align:right;white-space:nowrap}
+.findCard .dist small{display:block;font-size:9px;color:var(--text-faint);font-weight:normal}
+.findCard .plan{display:none;margin-top:7px;padding-top:7px;border-top:1px solid var(--border-soft)}
+.findCard.active .plan{display:block}
+.findPlanLink{font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:.04em;text-transform:uppercase;color:var(--cyan);cursor:pointer}
+.findPlanLink:hover{color:var(--gold)}
 /* 2026-09-11: header block above an alliance's grouped results (see
    renderMatches) -- Orbitron/cyan/uppercase to match the site's other
    small section labels (e.g. .edScanlabel) rather than inventing a new
@@ -519,6 +534,7 @@ html.hc-on .btn{border-width:2px}
   display:none;max-height:calc(100vh - 70px);overflow-y:auto;overflow-x:hidden}
 #panel.show{display:block}
 .phead{display:flex;gap:10px;align-items:flex-start;margin-bottom:8px}
+#pName{cursor:grab}
 .stars{display:flex;gap:4px;flex:none;padding-top:2px}
 .starsw{width:20px;height:20px;border-radius:50%}
 #panel h2{font-family:'Orbitron',sans-serif;font-size:13px;font-weight:600;color:var(--white);line-height:1.25}
@@ -1756,7 +1772,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
       <button class="btn" id="fdTabTrait" type="button" style="flex:1" title="Search by star colour, race, economy and other traits -- same fields as Filters.">By traits</button>
     </div>
     <div id="fdNameBody">
-      <input type="text" id="inSearch" placeholder="SYSTEM NAME" spellcheck="false">
+      <input type="text" id="inSearch" placeholder="SYSTEM NAME (leave blank to browse nearby)" spellcheck="false">
       <div id="searchResults"></div>
     </div>
     <div id="fdTraitBody" style="display:none">
@@ -1778,7 +1794,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
       <div style="display:flex;gap:6px">
         <input type="number" id="fdRadius" value="2200" min="1" step="100" style="flex:1">
         <button class="btn primary" id="bFdScan" type="button" style="white-space:nowrap"
-          title="Scans a random sample of systems in every region within this radius -- the same sampling the map itself already uses -- plus every real black hole/Atlas station in range (those are exact, never sampled) and everywhere you've bookmarked, waypointed, visited or documented, regardless of distance. A specific ordinary system is not guaranteed to turn up on a sampled scan; narrow the radius, or add a black hole/Atlas requirement, for an exact search.">Scan</button>
+          title="Scans a random sample of systems in every region within this radius -- the same sampling the map itself already uses -- plus every real black hole/Atlas station in range (those are exact, never sampled) and everywhere you've bookmarked, waypointed, visited or documented, regardless of distance. Leave the name blank (or every trait on Any) to just browse what's nearby, nearest first. A specific ordinary system is not guaranteed to turn up on a sampled scan; narrow the radius, or add a black hole/Atlas requirement, for an exact search.">Scan</button>
       </div>
     </div>
     <div id="findScanResults"></div>
@@ -8731,7 +8747,15 @@ function makeDraggable(boxEl,handleEl){
   },true);
 }
 makeDraggable(document.getElementById("filt"),document.getElementById("fHead"));
-makeDraggable(document.getElementById("panel"),document.querySelector("#panel .phead"));
+/* 2026-09-12, Tony: minimize (the small triangle button, top-right of this
+   header) and drag were too easy to mix up -- a click landing a pixel or two
+   off the button's own hit area hit the rest of the header instead, which
+   armed a drag. makeDraggable() already ignores clicks ON the button itself
+   (see its own pointerdown handler), so the fix is narrowing WHERE a drag
+   can start at all, not that exclusion -- only the system name text now
+   starts a drag; the star icon, region line and minimize button are safe to
+   click anywhere near without ever nudging the panel. */
+makeDraggable(document.getElementById("panel"),document.getElementById("pName"));
 makeDraggable(document.getElementById("course"),document.querySelector("#course .chead"));
 makeDraggable(document.getElementById("accessPop"),document.getElementById("a11yHead"));
 makeDraggable(document.getElementById("editModal"),document.getElementById("edHead"));
@@ -11647,7 +11671,8 @@ function runFindScan(mode){
   var q="", tr=null;
   if(mode==="name"){
     q=document.getElementById("inSearch").value.trim().toLowerCase();
-    if(!q){ toast("Type a name to scan for"); return; }
+    // Blank query -- browse nearby systems (sorted by distance) rather than
+    // refusing; see this block's own header comment.
   } else {
     tr={
       col:document.getElementById("fdCol").value,
@@ -11658,9 +11683,9 @@ function runFindScan(mode){
       out:document.getElementById("fdOut").checked,
       giant:document.getElementById("fdGiant").checked
     };
-    if(!tr.col&&!tr.race&&!tr.eco&&!tr.bh&&!tr.atl&&!tr.out&&!tr.giant){
-      toast("Pick at least one trait to scan for"); return;
-    }
+    // No trait ticked -- same "browse nearby" fallback as a blank name query
+    // above; findMatchesTraits({col:"",race:"",...}) already matches
+    // everything on its own, nothing else to change here.
   }
   var wantRadius=Math.max(1,parseFloat(document.getElementById("fdRadius").value)||2200);
   var wantHalf=Math.ceil(wantRadius/LY_PER_VOXEL)+1;
@@ -11769,16 +11794,41 @@ function renderFindMatches(results,radius,capped,thinned){
     var metaBits=[s.type,s.race];
     if(s.blackHole) metaBits.push("Black hole");
     if(s.atlas) metaBits.push("Atlas");
-    var distTxt=(r.tag==="history")?'<span style="color:var(--gold)">Your history</span>':
-      ('<span style="color:var(--gold)">'+commas(Math.round(r.dist))+' LY</span>');
-    html+='<div class="findRes" data-addr="'+s.address+'">'+
-      '<div class="searchResName">'+s.name+'</div>'+
-      '<div class="searchResMeta">'+metaBits.join(" &middot; ")+' &middot; '+distTxt+
-        (reach?"":' &middot; <span style="color:#ff6a5a">needs '+minDriveForColor(s.type).short+'</span>')+
-      '</div></div>';
+    var distLabel=(r.tag==="history")?"Your history":(commas(Math.round(r.dist))+" LY");
+    var subLabel=reach?"reachable":("needs "+minDriveForColor(s.type).short);
+    html+='<div class="findCard" data-addr="'+s.address+'">'+
+      '<div class="top"><div><div class="name">'+s.name+'</div>'+
+      '<div class="meta">'+metaBits.join(" &middot; ")+'</div></div>'+
+      '<div class="dist">'+distLabel+'<small'+(reach?"":' style="color:#ff6a5a"')+'>'+subLabel+'</small></div></div>'+
+      '<div class="plan"><span class="findPlanLink">Plan journey to '+s.name+' &rarr;</span></div>'+
+      '</div>';
   }
   box.innerHTML=html;
   window.__findResultsByAddr=byAddr;
+}
+/* Clicking a card's own "Plan journey" link previews the system (same as
+   clicking the card itself) and then hands off to the REAL, already-existing
+   #bPlanJourney button -- but setCourse()'s route is computed ASYNCHRONOUSLY
+   (a Worker, see setCourse()'s own comment), so clicking #bPlanJourney in the
+   very same tick this fires could still be holding the PREVIOUS course's
+   waypoints. Polling for courseWaypoints to actually end at this system
+   before clicking (instead of a fixed delay, which would either be too
+   short for a slow fallback route or needlessly long for a fast one) is
+   what keeps this safe -- worst case (route still computing after 4s) it
+   says so instead of silently handing off stale/wrong data. */
+function planJourneyTo(sys){
+  previewSystem(sys);
+  var deadline=Date.now()+4000;
+  (function tryClick(){
+    var cw=courseWaypoints;
+    if(courseTarget && courseTarget.address===sys.address &&
+       cw && cw.length && cw[cw.length-1].address===sys.address){
+      document.getElementById("bPlanJourney").click();
+      return;
+    }
+    if(Date.now()<deadline) setTimeout(tryClick,120);
+    else toast("Still plotting the route -- try PLAN JOURNEY again in a moment");
+  })();
 }
 (function(){
   var tabName=document.getElementById("fdTabName"), tabTrait=document.getElementById("fdTabTrait");
@@ -11806,16 +11856,22 @@ function renderFindMatches(results,radius,capped,thinned){
   });
   document.getElementById("bFdScan").addEventListener("click",function(){ runFindScan(findMode); });
   document.getElementById("findScanResults").addEventListener("click",function(e){
-    var row=e.target.closest?e.target.closest(".findRes"):null;
+    var row=e.target.closest?e.target.closest(".findCard"):null;
     if(!row) return;
     var addr=row.getAttribute("data-addr");
     var sys=window.__findResultsByAddr&&window.__findResultsByAddr[addr];
+    if(!sys) return;
+    var wasPlanClick=!!(e.target.closest&&e.target.closest(".findPlanLink"));
+    var siblings=row.parentNode.querySelectorAll(".findCard");
+    for(var i=0;i<siblings.length;i++) siblings[i].classList.remove("active");
+    row.classList.add("active");
     // previewSystem() (factored out of tryPick(), see its own comment above
     // that function) opens the full info panel and silently plots a course
     // -- exactly like clicking this same star on the map already does --
-    // without moving you. The existing Warp Manifest card's own PLAN
-    // JOURNEY button picks the route up from there; nothing new needed here.
-    if(sys) previewSystem(sys);
+    // without moving you. Clicking the card's own "Plan journey" link goes
+    // one step further and hands off to the real PLAN JOURNEY button once
+    // that route is actually ready -- see planJourneyTo()'s own comment.
+    if(wasPlanClick) planJourneyTo(sys); else previewSystem(sys);
   });
 })();
 /* #routesPop open/close/position -- same pattern as #searchPop just above,
