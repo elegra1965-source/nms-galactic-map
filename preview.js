@@ -5470,7 +5470,14 @@ function setMode(m){
     document.getElementById("panel").classList.remove("show");
     updateRings();
   }
-  if(m==="local"){ cam.dist=50; flyPos.set(0,10,44); maybeShowHyperNotice(); }
+  /* Local's starting tilt (2026-09-12, Tony: default framing left a big
+     empty band of sky at the top of the view -- he preferred a steeper,
+     more top-down angle that fills the frame edge-to-edge instead). Reset
+     phi here (not just dist) every time Local is entered -- boot restore,
+     the LOCAL button, or "Back to local" -- so it's always this angle
+     regardless of whatever rotation was left over from Galaxy/System or a
+     previous drag, rather than only fixing it on a truly fresh page load. */
+  if(m==="local"){ cam.dist=50; cam.phi=0.35; flyPos.set(0,10,44); maybeShowHyperNotice(); }
   if(m==="system"){ cam.dist=40; flyPos.set(0,12,38); }
   aimFly(cam.target);
   applyCam();
