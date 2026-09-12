@@ -5551,6 +5551,12 @@ function toggleFold(boxId,headId,label,minBtnId){
   if(minBtnId){
     var b=document.getElementById(minBtnId);
     if(b) b.innerHTML=isMin?"&#9656;":"&#9662;";
+    // 2026-09-12: minBtnId is only ever "bFiltMin" in practice (see comment
+    // above) so this can't touch Tweak/Telemetry/Search -- keeps the
+    // toolbar Filters button gold while its panel is open, same "on" =
+    // "currently showing" language Labels/Grid/Atlas/Orbit already use.
+    var ft=document.getElementById("bFiltToggle");
+    if(ft) ft.classList.toggle("on",!isMin);
   }
 }
 
@@ -8697,6 +8703,7 @@ applyA11y();
   function open(){
     clearTimeout(hideT);
     pop.classList.add("show");
+    btn.classList.add("on");
     if(!pop.style.left) positionUnderButton();
     btn.setAttribute("aria-expanded","true");
   }
@@ -8707,6 +8714,7 @@ applyA11y();
   }
   function close(){
     pop.classList.remove("show");
+    btn.classList.remove("on");
     btn.setAttribute("aria-expanded","false");
     pinned=false;
   }
@@ -9018,12 +9026,13 @@ function renderMatches(matches,emptyMsg){
   }
   function openSearch(){
     pop.classList.add("show");
+    btn.classList.add("on");
     if(!pop.dataset.userMoved) positionUnderSearchBtn();
     runSearch(inp.value);
     remeasureScroll();
     inp.focus();
   }
-  function closeSearch(){ pop.classList.remove("show"); }
+  function closeSearch(){ pop.classList.remove("show"); btn.classList.remove("on"); }
   document.getElementById("bSearchClose").addEventListener("click",function(e){
     e.stopPropagation();
     closeSearch();
@@ -9420,11 +9429,12 @@ function renderFindMatches(results,radius,capped,thinned,mode,q){
   }
   function openRoutes(){
     pop.classList.add("show");
+    btn.classList.add("on");
     positionUnderRoutesBtn();
     renderRoutesList();
     remeasureScroll();
   }
-  function closeRoutes(){ pop.classList.remove("show"); }
+  function closeRoutes(){ pop.classList.remove("show"); btn.classList.remove("on"); }
   window.closeRoutesPop=closeRoutes;
   btn.addEventListener("click",function(e){
     e.stopPropagation();
