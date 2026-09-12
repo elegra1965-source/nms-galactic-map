@@ -18,6 +18,12 @@ const CACHE = 'nms-galmap-v2';
 const CORE_FILES = [
   '/',
   '/preview.html',
+  // 2026-09-12: the app's main script used to be inline inside preview.html
+  // itself; split out to its own file today so the browser can cache it
+  // separately from the HTML (a small HTML tweak no longer means re-fetching
+  // and re-parsing the whole ~600KB script too). Listed here for the same
+  // reason preview.html itself is -- so the offline app shell has it too.
+  '/preview.js',
   '/manifest.json',
   '/favicon/icon-192.png',
   '/favicon/icon-512.png',

@@ -185,7 +185,13 @@ name" below) -- that's the actual way back to it.
 system lets you overwrite that with what you actually see in-game -- stars,
 race, economy, conflict, per-planet biomes and rings -- and the result is
 visible to every visitor, not just saved locally. Every edit is a real git
-commit, so nothing is ever silently lost. **Biome now starts blank, showing
+commit, so nothing is ever silently lost. **The form itself is an "Adaptive
+console" (added 2026-09-10)** -- a brand-new system opens a step-by-step
+wizard, one section at a time, in order; an already-documented system
+instead opens six flip-card tabs -- Identification, Economy & Conflict,
+Stellar Bodies, Special Features, Surveyor Log, Attribution -- you can jump
+between directly, since you're correcting existing data rather than
+filling it in from scratch. **Biome now starts blank, showing
 "Unknown" until you confirm it (added 2026-09-08)** -- nobody has
 reverse-engineered the game's real biome roll, so unlike race/economy/
 conflict this project never shows a guessed biome as if it were fact. Biome
@@ -266,21 +272,36 @@ game without knowing the hex first.
 
 ![Portal glyph keypad](screenshots/06-glyph-keypad.jpg)
 
-**Search by name.** No reverse index exists across the whole procedural
+**Search & Scan.** No reverse index exists across the whole procedural
 galaxy -- names are generated *from* the address, not the other way round --
-but the Search button finds anything this browser already knows a real name
-for: community-documented systems, plus your own bookmarks, waypoints, and
-visited history. Results are galaxy-aware -- each one is tagged with the real
-galaxy it belongs to, since the same address means something different in
-each of the 256 -- and picking one switches you to that galaxy automatically
-before jumping there. Leave the search box empty and it instead lists
-everywhere you've bookmarked, waypointed, or visited, plus any system you
-personally have edited or bulk-imported from your save (added 2026-08-27,
-tagged "Documented (you)" -- other travellers' edits stay out), sorted
+so the Search popup covers this two ways, split across a **By Name** and a
+**By Traits** tab (added 2026-09-12). By Name still starts with anything
+this browser already knows a real name for: community-documented systems,
+plus your own bookmarks, waypoints, and visited history. Results are
+galaxy-aware -- each one is tagged with the real galaxy it belongs to, since
+the same address means something different in each of the 256 -- and
+picking one switches you to that galaxy automatically before jumping there.
+Leave the search box empty and it instead lists everywhere you've
+bookmarked, waypointed, or visited, plus any system you personally have
+edited or bulk-imported from your save (added 2026-08-27, tagged
+"Documented (you)" -- other travellers' edits stay out), sorted
 alphabetically -- a way to get back to somewhere you've been without needing
 to remember its address or portal glyphs.
 
-![Search by name panel showing matching results](screenshots/13-search-panel.jpg)
+Either tab can also run a real **Scan** of nearby space, out to a radius
+that starts synced to your current Hyperdrive's jump range (Filters) and
+stays synced automatically until you type your own value into the radius
+box. A scan checks every system it can reach against your query or trait
+filters -- including individual planet and moon names, not just system
+names, with the result telling you exactly which name matched -- plus every
+real black hole and Atlas Interface in range for By Traits. With no name
+typed and no trait filter set, Scan instead just lists whatever's nearby,
+nearest first, for casually browsing the neighbourhood rather than looking
+for something specific. Clicking any result opens its info panel and
+silently plots a course to it without navigating away, so browsing results
+never costs you whatever route you already had plotted.
+
+![Search & Scan panel showing matching results](screenshots/13-search-panel.jpg)
 
 **Honest about its limits.** The About modal spells out exactly what's
 generated accurately (star type, system/region names, planet count) versus
@@ -369,11 +390,12 @@ of that with an actual ported decompilation of the game's own logic.
 <details id="whats-in-here-and-whats-not">
 <summary><strong>What files make up this repo, and what's deliberately not in here?</strong></summary>
 
-This repo is the whole client — one HTML file, no build step, no framework:
+This repo is the whole client — two files carry it (markup/CSS, and the app's own JS), no build step, no framework:
 
 | Path | What it does |
 |---|---|
-| `preview.html` | the entire app: markup + CSS + JS + Three.js r128 (cdnjs), inline |
+| `preview.html` | markup + CSS + the Three.js r128 `<script>` tag (cdnjs); loads `preview.js` for the app itself |
+| `preview.js` | the entire app's JS -- generation, all UI, Search/Find -- split out of preview.html 2026-09-12 so the browser can cache it separately from the markup |
 | `atlas-pois.json` | Galactic Atlas overlay data — ~50 real points of interest from galacticatlas.nomanssky.com, hand-entered (name, address, url); fetched by preview.html's Atlas toggle |
 | `netlify.toml` | serves preview.html at "/", points Netlify at netlify/functions |
 | `netlify/functions/` |  |
