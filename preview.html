@@ -1436,7 +1436,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   </div>
   <button class="btn" id="bKeys" title="Open the 16-key portal glyph keypad. Tap glyphs to build an address; it stays in sync with the hex box.">Glyphs</button>
   <button class="btn" id="bRand" title="Roll a random valid portal address and jump there.">Random</button>
-  <button class="btn" id="bSearch" title="Search for a system by name -- only ones you or the community have documented, bookmarked, waypointed or visited, not every procedural system.">Search</button>
+  <button class="btn" id="bSearch" title="Find a destination by name or traits. Your own bookmarked/waypointed/visited/documented systems always show up here regardless of distance; the Scan button additionally searches the wider procedural galaxy within a radius you set.">Search</button>
   <button class="btn" id="bWarpToggle" title="Play a warp-jump animation when entering system view. Same setting as Filters -> Warp animation, just easier to reach. Click to turn on/off.">&#9889; Warp FX</button>
   <button class="btn" id="bRoutes" title="Save the route you've plotted so you can pick it back up later, share it with a link, or load one someone sent you.">&#9776; Routes</button>
   <div class="sep" id="sepC"></div>
@@ -1742,8 +1742,46 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 <div class="box fold" id="searchPop" role="dialog" aria-label="Search by system name">
   <div class="kicker fhead" id="searchHead" style="margin-bottom:8px">&#9662; Search by name</div>
   <div class="fbody" id="searchBody">
-    <input type="text" id="inSearch" placeholder="SYSTEM NAME" spellcheck="false">
-    <div id="searchResults"></div>
+    <!-- Find: destination scan (2026-09-12) -- Tony's own framing was an
+         extension of Search ("otherwise struggle to find the system"), not a
+         second toolbar button, so both tabs live in this same popup. "By
+         name" keeps the existing #inSearch/#searchResults personal-history
+         search exactly as it was (untouched below); "By traits" is new. Both
+         share one freely-typed scan radius and a Scan button that searches
+         the wider procedural galaxy, not just your own bookmarked/waypointed/
+         visited/documented history -- see runFindScan() near the bottom of
+         this file for what a scan actually covers and its honest limits. -->
+    <div class="prow" style="margin-bottom:8px">
+      <button class="btn on" id="fdTabName" type="button" style="flex:1" title="Search by the system's real name.">By name</button>
+      <button class="btn" id="fdTabTrait" type="button" style="flex:1" title="Search by star colour, race, economy and other traits -- same fields as Filters.">By traits</button>
+    </div>
+    <div id="fdNameBody">
+      <input type="text" id="inSearch" placeholder="SYSTEM NAME" spellcheck="false">
+      <div id="searchResults"></div>
+    </div>
+    <div id="fdTraitBody" style="display:none">
+      <div class="fld"><div class="lb">Star colour</div>
+        <select id="fdCol"><option value="">Any</option><option>yellow</option><option>red</option>
+        <option>green</option><option>blue</option><option>purple</option></select></div>
+      <div class="fld"><div class="lb">Race</div>
+        <select id="fdRace"><option value="">Any</option><option>Gek</option><option>Vy'keen</option>
+        <option>Korvax</option><option>Uninhabited</option></select></div>
+      <div class="fld"><div class="lb">Economy</div>
+        <select id="fdEco"><option value="">Any</option></select></div>
+      <label class="chk"><input type="checkbox" id="fdOut">Outlaw</label>
+      <label class="chk"><input type="checkbox" id="fdGiant">Gas giant</label>
+      <label class="chk"><input type="checkbox" id="fdBH">Black holes</label>
+      <label class="chk"><input type="checkbox" id="fdAtl">Atlas interfaces</label>
+    </div>
+    <div class="fld" id="fdRadiusRow" style="margin-top:9px">
+      <div class="lb">Scan radius (LY)</div>
+      <div style="display:flex;gap:6px">
+        <input type="number" id="fdRadius" value="2200" min="1" step="100" style="flex:1">
+        <button class="btn primary" id="bFdScan" type="button" style="white-space:nowrap"
+          title="Scans a random sample of systems in every region within this radius -- the same sampling the map itself already uses -- plus every real black hole/Atlas station in range (those are exact, never sampled) and everywhere you've bookmarked, waypointed, visited or documented, regardless of distance. A specific ordinary system is not guaranteed to turn up on a sampled scan; narrow the radius, or add a black hole/Atlas requirement, for an exact search.">Scan</button>
+      </div>
+    </div>
+    <div id="findScanResults"></div>
   </div>
 </div>
 
@@ -7429,6 +7467,32 @@ canvas.addEventListener("wheel",function(e){
 },{passive:false});
 
 /* ============ picking ============ */
+/* previewSystem(sys) -- open a system's full info panel and silently plot a
+   course to it from wherever you currently are, WITHOUT moving you. This is
+   exactly what clicking any already-visible star in Local view has done
+   since 2026-08-17 (see the comment that used to live right here); factored
+   out 2026-09-12 so the new Find results (runFindScan()/renderFindMatches()
+   near the bottom of this file) can call the identical, already-verified
+   behaviour instead of a second copy that could quietly drift from it. */
+function previewSystem(sys){
+  updatePanel(sys);
+  /* Task 2: "if click on a star and they don't have correct drive, popup
+     saying need X to reach Y". Informational only -- still opens the panel
+     above so the map stays usable as a reference/planning tool, doesn't
+     block browsing. The actual travel actions (Enter system, Jump to a
+     plotted course) are the ones that hard-block -- see their own handlers
+     below. */
+  if(!canReachColor(sys.type)) toast(driveNeededMsg(sys.type));
+  /* Tony (2026-08-17): wanted clicking any star to immediately plot a fresh
+     course there, replacing whatever was plotted before, instead of the old
+     line sitting there until a separate "Set course" click. setCourse()
+     already clears+redraws drawCourse() at the start of its own flow, so
+     just calling it here on every click naturally replaces the previous
+     line rather than leaving it stuck on screen. Skipped only when the pick
+     IS your current location -- setCourse() already no-ops with a toast for
+     that case, no need to spam it on every click of your own star. */
+  if(focusSystem&&sys.address!==focusSystem.address) setCourse(sys,true);
+}
 var ray=new THREE.Raycaster(), ndc=new THREE.Vector2();
 function tryPick(cx,cy){
   var rect=canvas.getBoundingClientRect();
@@ -7438,25 +7502,7 @@ function tryPick(cx,cy){
   if(mode==="local"&&locInstMesh){
     var hits=ray.intersectObject(locInstMesh);
     if(hits.length&&hits[0].instanceId!==undefined&&shown[hits[0].instanceId]){
-      var pickedSys=shown[hits[0].instanceId];
-      updatePanel(pickedSys);
-      /* Task 2: "if click on a star and they don't have correct drive,
-         popup saying need X to reach Y". Informational only -- still opens
-         the panel above so the map stays usable as a reference/planning
-         tool, doesn't block browsing. The actual travel actions (Enter
-         system, Jump to a plotted course) are the ones that hard-block --
-         see their own handlers below. */
-      if(!canReachColor(pickedSys.type)) toast(driveNeededMsg(pickedSys.type));
-      /* Tony (2026-08-17): wanted clicking any star to immediately plot a
-         fresh course there, replacing whatever was plotted before, instead
-         of the old line sitting there until a separate "Set course" click.
-         setCourse() already clears+redraws drawCourse() at the start of its
-         own flow, so just calling it here on every click naturally replaces
-         the previous line rather than leaving it stuck on screen. Skipped
-         only when the pick IS your current location -- setCourse() already
-         no-ops with a toast for that case, no need to spam it on every
-         click of your own star. */
-      if(focusSystem&&pickedSys.address!==focusSystem.address) setCourse(pickedSys,true);
+      previewSystem(shown[hits[0].instanceId]);
     }
   } else if(mode==="system"){
     var bh=ray.intersectObjects(bodyMeshes.concat(starMeshes).concat(featureMeshes).concat(resourceMeshes));
@@ -8212,6 +8258,14 @@ bindSlider("sSz","vSz",function(){
 
 (function(){
   var sel=document.getElementById("fEco"),i;
+  for(i=0;i<ECON.length;i++){ var o=document.createElement("option"); o.textContent=ECON[i][0]; sel.appendChild(o); }
+})();
+/* Same population as #fEco just above, for the "By traits" tab of the new
+   Find popup (#searchPop) -- a separate select rather than sharing #fEco
+   itself, so scanning for a trait can never silently change what Filters is
+   currently narrowing Local view down to, or vice versa. */
+(function(){
+  var sel=document.getElementById("fdEco"),i;
   for(i=0;i<ECON.length;i++){ var o=document.createElement("option"); o.textContent=ECON[i][0]; sel.appendChild(o); }
 })();
 ["fCol","fRace","fEco","fBH","fAtl","fStation","fOut","fGiant","fWaypoint","fReachOnly","fPhantom","fShadow"].forEach(function(id){
@@ -11533,6 +11587,235 @@ function renderMatches(matches,emptyMsg){
         setTimeout(function(){ brow.classList.remove("searchHit"); },2400);
       }
     }
+  });
+})();
+/* ============ Find: destination scan (2026-09-12) ============
+   The gap this closes: Filters only narrows systems generateSlice() already
+   materialized for the CURRENT Local view, and (the by-name search just
+   above, untouched) only finds systems you or the community have already
+   documented/bookmarked/waypointed/visited -- neither can answer "is there a
+   system matching X somewhere I haven't looked yet", which was Tony's own
+   original real-world case: finding a yellow-star/black-hole/Korvax system
+   in-game first, then only being able to locate it here because it happened
+   to already be inside the currently-rendered slice.
+   Honest scope, not swept under the rug: a system's REAL name and its
+   ordinary traits (colour/race/economy/outlaw/gas giant) only exist at one
+   of 4096 possible indices per region, and generating all 4096 to check
+   every one, for every region in a multi-thousand-LY radius, is far too
+   slow to run synchronously on a click (this is exactly why generateSlice()
+   itself only ever materializes a random `per`-sized sample per region, not
+   all 4096 -- see its own comment). So this scan reuses that SAME sampling
+   approach (same #sPer density, same per-region seed 0xF00D) rather than
+   pretending to be exhaustive -- a specific ordinary system is not
+   guaranteed to turn up, exactly as one is not guaranteed to already be
+   rendered in Local view today, and the UI says so.
+   Two things ARE checked exactly, with zero sampling gap, however large the
+   radius: every region's real black hole/Atlas index (regionAnomalyIdx() is
+   O(1) per region, no 4096-index sweep needed), and every system already in
+   your OWN history (bookmarked/waypointed/visited/documented, current
+   galaxy -- markedRegionIdx() again, same source Local view itself always
+   force-includes) regardless of distance. Between the two, Tony's own
+   original worked example -- find a black-hole system by colour/race -- is
+   in fact always found, not just usually. */
+/* Both radii below are deliberately conservative: even the "exact, not
+   sampled" black-hole/Atlas pass costs one full generateSystem() call per
+   real anomaly (most regions have one of each -- see regionAnomalyIdx()'s
+   own comment), and generateSystem() is not cheap (full body/biome/ring
+   generation per system). At FIND_MAX_HALFWIDTH=8 that pass is bounded to
+   (2*8+1)^3=4,913 regions -- worst case (no colour filter to cheaply skip
+   with, see wantCol below) under ~10,000 full generations, comfortably
+   under this file's own existing "Heavy: N systems" threshold of 45,000 for
+   a passive render, which is the right bar for a single on-demand click to
+   clear too. FIND_SCAN_BUDGET separately bounds the random-sample pass the
+   same way generateSlice()'s own `per` already is. Together, a max-radius
+   scan (halfwidth capped, sample thinned) still finishes in well under a
+   second on ordinary hardware -- verified by the call-count math in
+   verify_find_scan.js's harness, not just asserted here. */
+var FIND_SCAN_BUDGET=8000, FIND_MAX_HALFWIDTH=8;
+function findMatchesTraits(s,tr){
+  if(tr.col&&s.type!==tr.col) return false;
+  if(tr.race&&s.race!==tr.race) return false;
+  if(tr.eco&&s.econType!==tr.eco) return false;
+  if(tr.bh&&!s.blackHole) return false;
+  if(tr.atl&&!s.atlas) return false;
+  if(tr.out&&!s.outlaw) return false;
+  if(tr.giant&&!s.giant) return false;
+  return true;
+}
+function runFindScan(mode){
+  if(!focusSystem){ toast("Jump somewhere first"); return; }
+  var q="", tr=null;
+  if(mode==="name"){
+    q=document.getElementById("inSearch").value.trim().toLowerCase();
+    if(!q){ toast("Type a name to scan for"); return; }
+  } else {
+    tr={
+      col:document.getElementById("fdCol").value,
+      race:document.getElementById("fdRace").value,
+      eco:document.getElementById("fdEco").value,
+      bh:document.getElementById("fdBH").checked,
+      atl:document.getElementById("fdAtl").checked,
+      out:document.getElementById("fdOut").checked,
+      giant:document.getElementById("fdGiant").checked
+    };
+    if(!tr.col&&!tr.race&&!tr.eco&&!tr.bh&&!tr.atl&&!tr.out&&!tr.giant){
+      toast("Pick at least one trait to scan for"); return;
+    }
+  }
+  var wantRadius=Math.max(1,parseFloat(document.getElementById("fdRadius").value)||2200);
+  var wantHalf=Math.ceil(wantRadius/LY_PER_VOXEL)+1;
+  var halfwidth=Math.min(FIND_MAX_HALFWIDTH,wantHalf);
+  var capped=wantHalf>FIND_MAX_HALFWIDTH;
+  var radius=capped?(FIND_MAX_HALFWIDTH*LY_PER_VOXEL):wantRadius;
+
+  var results=[], seen={};
+  function genAt(vx,vy,vz,idx){
+    var s=generateSystem(vx,vy,vz,idx);
+    var jr=mulberry32(gseed(vx,vy,vz,idx^0x9999));
+    var dx=vx-focus.x, dy=vy-focus.y, dz=vz-focus.z;
+    s.px=(dx+jr()-0.5)*VOX_U; s.py=(dy+jr()-0.5)*VOX_U; s.pz=(dz+jr()-0.5)*VOX_U;
+    return s;
+  }
+  function tryMatch(s,forceInclude,tag){
+    var key=s.galaxy+":"+s.address;
+    if(seen[key]) return;
+    var isMatch = mode==="name" ? (s.name.toLowerCase().indexOf(q)>=0) : findMatchesTraits(s,tr);
+    if(!isMatch) return;
+    var dist=wpDist(s,focusSystem)*VOX_LY;
+    if(!forceInclude && dist>radius) return;
+    seen[key]=true;
+    results.push({sys:s,dist:dist,tag:tag});
+  }
+
+  // 1) your own history (bookmarked/waypointed/visited/documented, current
+  // galaxy) -- always checked, regardless of distance, same as the by-name
+  // search's own empty-query browse already does.
+  var _marked=markedRegionIdx(), mk;
+  for(mk in _marked){
+    var parts=mk.split(","), mvx=parseInt(parts[0],10), mvy=parseInt(parts[1],10), mvz=parseInt(parts[2],10);
+    var list=_marked[mk];
+    for(var mi=0;mi<list.length;mi++) tryMatch(genAt(mvx,mvy,mvz,list[mi]),true,"history");
+  }
+
+  // 2) every real black hole / Atlas station in radius -- exact, not sampled.
+  // Same cheap starTypeForIdx() colour pre-check as the sample pass below
+  // when a colour is required (regionAnomalyIdx() itself is already O(1),
+  // it's the subsequent full generateSystem() per anomaly that's costly --
+  // see FIND_MAX_HALFWIDTH's own comment above) -- this is what keeps
+  // Tony's own original worked example (yellow + black hole + race) fast
+  // even at a large radius, not just correct.
+  var dx,dy,dz,regionsN=0;
+  var wantColAnomaly=(mode==="trait"&&tr.col)?tr.col:null;
+  for(dx=-halfwidth;dx<=halfwidth;dx++) for(dy=-halfwidth;dy<=halfwidth;dy++) for(dz=-halfwidth;dz<=halfwidth;dz++){
+    regionsN++;
+    var vx=focus.x+dx, vy=focus.y+dy, vz=focus.z+dz;
+    var an=regionAnomalyIdx(vx,vy,vz);
+    if(an.bh>=0 && (!wantColAnomaly || starTypeForIdx(vx,vy,vz,an.bh).k===wantColAnomaly))
+      tryMatch(genAt(vx,vy,vz,an.bh),false,"exact");
+    if(an.atlas>=0 && an.atlas!==an.bh && (!wantColAnomaly || starTypeForIdx(vx,vy,vz,an.atlas).k===wantColAnomaly))
+      tryMatch(genAt(vx,vy,vz,an.atlas),false,"exact");
+  }
+
+  // 3) random sample, same seed/density the map itself already uses when
+  // this region is actually rendered, budget-capped so a big radius stays
+  // responsive (thinned rather than refused -- see the toast below).
+  var wantPer=parseInt(document.getElementById("sPer").value,10)||22;
+  var per=Math.max(2,Math.min(wantPer,Math.floor(FIND_SCAN_BUDGET/Math.max(1,regionsN))));
+  var thinned=per<wantPer;
+  for(dx=-halfwidth;dx<=halfwidth;dx++) for(dy=-halfwidth;dy<=halfwidth;dy++) for(dz=-halfwidth;dz<=halfwidth;dz++){
+    var vx2=focus.x+dx, vy2=focus.y+dy, vz2=focus.z+dz;
+    var count=regionCount(vx2,vy2,vz2);
+    var vr=mulberry32(gseed(vx2,vy2,vz2,0xF00D));
+    // Cheap colour-only pre-check (starTypeForIdx(), see its own comment
+    // above -- verified byte-identical to generateSystem()'s own first
+    // draw) so a colour requirement doesn't spend the full-generation
+    // budget on misses -- lets the sample cover more of the region for
+    // exactly the trait Tony's own example leaned on hardest.
+    var wantCol=(mode==="trait"&&tr.col)?tr.col:null;
+    var tries=0, hits=0, maxTries=per*6;
+    while(hits<per && tries<maxTries){
+      tries++;
+      var pick=Math.floor(vr()*count);
+      if(wantCol && starTypeForIdx(vx2,vy2,vz2,pick).k!==wantCol) continue;
+      hits++;
+      tryMatch(genAt(vx2,vy2,vz2,pick),false,"sample");
+    }
+  }
+
+  results.sort(function(a,b){
+    if(a.tag==="history"&&b.tag!=="history") return -1;
+    if(b.tag==="history"&&a.tag!=="history") return 1;
+    return a.dist-b.dist;
+  });
+  renderFindMatches(results.slice(0,20),radius,capped,thinned);
+}
+window.__findResultsByAddr=null;
+function renderFindMatches(results,radius,capped,thinned){
+  var box=document.getElementById("findScanResults");
+  var notes="";
+  if(capped) notes+='<div class="searchEmpty">Radius capped to '+commas(radius)+' LY for performance.</div>';
+  if(thinned) notes+='<div class="searchEmpty">Large radius -- sampled at reduced density to stay responsive. An ordinary system might not turn up; narrow the radius (or add a black hole/Atlas requirement, always checked exactly) for a denser scan.</div>';
+  if(!results.length){
+    box.innerHTML=notes+'<div class="searchEmpty">No matches within '+commas(Math.round(radius))+
+      ' LY. Everywhere you\'ve bookmarked, waypointed, visited or documented is always checked too, regardless of distance.</div>';
+    window.__findResultsByAddr=null;
+    return;
+  }
+  var byAddr={}, html=notes, i;
+  for(i=0;i<results.length;i++){
+    var r=results[i], s=r.sys;
+    byAddr[s.address]=s;
+    var reach=canReachColor(s.type);
+    var metaBits=[s.type,s.race];
+    if(s.blackHole) metaBits.push("Black hole");
+    if(s.atlas) metaBits.push("Atlas");
+    var distTxt=(r.tag==="history")?'<span style="color:var(--gold)">Your history</span>':
+      ('<span style="color:var(--gold)">'+commas(Math.round(r.dist))+' LY</span>');
+    html+='<div class="findRes" data-addr="'+s.address+'">'+
+      '<div class="searchResName">'+s.name+'</div>'+
+      '<div class="searchResMeta">'+metaBits.join(" &middot; ")+' &middot; '+distTxt+
+        (reach?"":' &middot; <span style="color:#ff6a5a">needs '+minDriveForColor(s.type).short+'</span>')+
+      '</div></div>';
+  }
+  box.innerHTML=html;
+  window.__findResultsByAddr=byAddr;
+}
+(function(){
+  var tabName=document.getElementById("fdTabName"), tabTrait=document.getElementById("fdTabTrait");
+  var bodyName=document.getElementById("fdNameBody"), bodyTrait=document.getElementById("fdTraitBody");
+  var findMode="name";
+  function showFindTab(m){
+    findMode=m;
+    tabName.classList.toggle("on",m==="name");
+    tabTrait.classList.toggle("on",m==="trait");
+    bodyName.style.display=(m==="name")?"":"none";
+    bodyTrait.style.display=(m==="trait")?"":"none";
+  }
+  tabName.addEventListener("click",function(){ showFindTab("name"); });
+  tabTrait.addEventListener("click",function(){ showFindTab("trait"); });
+  // Default the shared scan radius to the currently-selected Hyperdrive's
+  // range the first time this popup is opened -- still freely editable
+  // (Tony's own "Free radius" answer), just a sane starting point instead
+  // of an arbitrary constant.
+  var radiusDefaulted=false;
+  document.getElementById("bSearch").addEventListener("click",function(){
+    if(radiusDefaulted) return;
+    var hv=parseInt(document.getElementById("fHyper").value,10);
+    if(hv) document.getElementById("fdRadius").value=hv;
+    radiusDefaulted=true;
+  });
+  document.getElementById("bFdScan").addEventListener("click",function(){ runFindScan(findMode); });
+  document.getElementById("findScanResults").addEventListener("click",function(e){
+    var row=e.target.closest?e.target.closest(".findRes"):null;
+    if(!row) return;
+    var addr=row.getAttribute("data-addr");
+    var sys=window.__findResultsByAddr&&window.__findResultsByAddr[addr];
+    // previewSystem() (factored out of tryPick(), see its own comment above
+    // that function) opens the full info panel and silently plots a course
+    // -- exactly like clicking this same star on the map already does --
+    // without moving you. The existing Warp Manifest card's own PLAN
+    // JOURNEY button picks the route up from there; nothing new needed here.
+    if(sys) previewSystem(sys);
   });
 })();
 /* #routesPop open/close/position -- same pattern as #searchPop just above,
