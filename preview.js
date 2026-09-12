@@ -5471,13 +5471,20 @@ function setMode(m){
     updateRings();
   }
   /* Local's starting tilt (2026-09-12, Tony: default framing left a big
-     empty band of sky at the top of the view -- he preferred a steeper,
-     more top-down angle that fills the frame edge-to-edge instead). Reset
-     phi here (not just dist) every time Local is entered -- boot restore,
-     the LOCAL button, or "Back to local" -- so it's always this angle
-     regardless of whatever rotation was left over from Galaxy/System or a
-     previous drag, rather than only fixing it on a truly fresh page load. */
-  if(m==="local"){ cam.dist=50; cam.phi=0.35; flyPos.set(0,10,44); maybeShowHyperNotice(); }
+     empty band of sky at the top of the view -- he found a rotated angle
+     he preferred instead and had Claude read the exact camera position
+     back off the Telemetry panel to reproduce it: camera ~(47.66, 0.24,
+     15.10) at dist~50 solves to phi~1.55 rad -- i.e. almost perfectly
+     level with the target/galactic-plane (Y~0) rather than the old 0.62
+     rad, which was tipped up enough to leave that empty band above the
+     stars. Reset phi here (not just dist) every time Local is entered --
+     boot restore, the LOCAL button, or "Back to local" -- so it's always
+     this angle regardless of whatever rotation was left over from Galaxy/
+     System or a previous drag, rather than only fixing it on a truly
+     fresh page load. theta (azimuth) is left alone -- unlike phi it has
+     no bearing on whether the view fills the frame, so there's no one
+     "correct" value for it. */
+  if(m==="local"){ cam.dist=50; cam.phi=1.55; flyPos.set(0,10,44); maybeShowHyperNotice(); }
   if(m==="system"){ cam.dist=40; flyPos.set(0,12,38); }
   aimFly(cam.target);
   applyCam();
