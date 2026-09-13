@@ -1693,7 +1693,22 @@ function rememberKnownTerms(payload){
   saveKnownTerms();
   populateDatalists();
 }
-var CANON_TERMS_BY_FIELD={resources:RESOURCES_CANON,minerals:MINERALS_CANON,
+// 2026-09-13 fix (Tony: a real 6-planet submission flagged Copper, Salt,
+// Silver, Cobalt (typo'd "Cobolt"), Activated Copper, Rusted Metal and
+// Magnetised Ferrite as "not on the known list", even spelled correctly --
+// because RESOURCES_CANON and MINERALS_CANON were each other's blind spot.
+// The real game doesn't pin a resource to one tier: the same element is the
+// per-planet Common pickup on one biome and the per-planet Uncommon pickup
+// on another (exactly what this submission reported first-hand -- Copper
+// as Uncommon on three different planets, Magnetised Ferrite as Common on
+// one). Common and Uncommon resources now share one combined canon pool for
+// matching/auto-correct, so a real item spelled correctly is recognised
+// either way instead of hitting the confirm dialog every time it shows up
+// on the "other" tier. Salvageable tech and Fossils & curiosities are left
+// untouched -- nothing in this submission (or any prior one) showed either
+// of those crossing into the other's list.
+var RESOURCE_TIER_CANON=RESOURCES_CANON.concat(MINERALS_CANON);
+var CANON_TERMS_BY_FIELD={resources:RESOURCE_TIER_CANON,minerals:RESOURCE_TIER_CANON,
   salvage:SALVAGE_CANON,fossils:FOSSILS_CANON};
 var CANON_FIELD_LABELS={resources:"Common resources",minerals:"Uncommon resources",
   salvage:"Salvageable tech",fossils:"Fossils & curiosities"};
