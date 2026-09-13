@@ -237,15 +237,17 @@ station directorship above, these are entirely manual: an earlier version
 guessed one automatically for every planet from its biome, but a real
 screenshot showed every world getting a fabricated icon with nothing ever
 actually submitted, so that guessing was removed outright -- a marker now
-only ever appears once a traveller adds one. Nine icon types are
+only ever appears once a traveller adds one. Ten icon types are
 selectable (Mineral Deposit, Flora Growth, Frozen Signal, Tech Anomaly,
 Deep-space Outpost, Cosmic Whale, Hazard / Danger, Minor Wreckage, Atlas
-Station), picked from a small custom dropdown that shows each option's
-real icon image next to its name rather than plain text. Six of the nine
-now use real in-game icon images (isolated from reference photos and
-background-removed); the remaining three (Flora Growth, Tech Anomaly,
-Hazard / Danger) still use a hand-drawn placeholder glyph until a real
-image is available. Each marker also carries a free-text name, category,
+Station, and Base / Structure -- added 2026-09-13, spotted in-game and
+sent in as a real reference photo), picked from a small custom dropdown
+that shows each option's real icon image next to its name rather than
+plain text. Seven of the ten now use real in-game icon images (isolated
+from reference photos and background-removed); the remaining three
+(Flora Growth, Tech Anomaly, Hazard / Danger) still use a hand-drawn
+placeholder glyph until a real image is available. Each marker also
+carries a free-text name, category,
 signal type, and route note -- type what your own report actually said,
 same as everything else in this section.
 

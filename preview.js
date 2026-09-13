@@ -9739,17 +9739,24 @@ function renderFindMatches(results,radius,capped,thinned,mode,q){
     var addr=row.getAttribute("data-addr");
     var sys=window.__findResultsByAddr&&window.__findResultsByAddr[addr];
     if(!sys) return;
-    // previewSystem() (factored out of tryPick(), see its own comment above
-    // that function) opens the full info panel and silently plots a course
-    // -- exactly like clicking this same star on the map already does --
-    // without moving you. It used to be possible to instead jump straight to
-    // the real PLAN JOURNEY button from here, but that button navigates the
-    // whole page away to the Navigator -- doing that from a Find card meant
-    // one click silently threw away whatever else you had open (Tony: "if
-    // have search open and when i clicked plot course...it closed search").
-    // Every card click just previews now; use the info panel's own PLAN
-    // JOURNEY button once you've actually decided.
-    previewSystem(sys);
+    // 2026-09-13 fix (Tony: after Scan, "whichever you click the system
+    // should change to the system you clicked"). This used to call
+    // previewSystem() (still used by tryPick() for an ordinary star click on
+    // the rendered field, see its own comment above that function), which
+    // opens the info panel and silently plots a course WITHOUT moving you --
+    // fine for a star already visible on screen, but a Scan result can sit
+    // anywhere in the galaxy, nowhere near what's currently rendered, so
+    // "preview only" left the 3D view/camera/system banner still showing
+    // wherever you scanned FROM, reading as a dead click. Now matches the By
+    // Name search result's own click handler just above: set the address,
+    // jumpTo() it for real, then close the popup the same way closeSearch()
+    // does (that function is local to the other IIFE above, out of scope
+    // here, so its two lines are just repeated rather than exported).
+    document.getElementById("inAddr").value=sys.address;
+    setKeypad(sys.address);
+    if(jumpTo(sys.address)) playWarpTransition("portal");
+    document.getElementById("searchPop").classList.remove("show");
+    document.getElementById("bSearch").classList.remove("on");
   });
 })();
 /* #routesPop open/close/position -- same pattern as #searchPop just above,
