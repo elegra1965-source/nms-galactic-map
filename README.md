@@ -253,6 +253,8 @@ same as everything else in this section.
 
 ![Edit system modal](screenshots/05-edit-system-modal.png)
 
+![Signal marker icon-type dropdown, showing each option's real icon image next to its name](screenshots/05b-signal-marker-icons.png)
+
 Once saved, both show up right in the system info panel for every visitor
 -- **Community notes** and **Screenshot** as two clearly separate,
 titled sections, so it's obvious which is which even when only one of them
