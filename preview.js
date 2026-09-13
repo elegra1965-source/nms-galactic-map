@@ -4452,6 +4452,8 @@ function updatePanel(s){
   document.getElementById("panel").classList.add("show");
   document.getElementById("pSys").style.display="";
   document.getElementById("pBody").style.display="none";
+  closePanelFold("pSeqHead","pSeqBody");
+  closePanelFold("pNoteHead","pNoteBody");
   document.getElementById("pStars").innerHTML=starSwatches(s);
   document.getElementById("pName").textContent=s.name;
   document.getElementById("pReg").textContent="REGION: "+s.region;
@@ -5993,6 +5995,35 @@ document.getElementById("bGoCourse").addEventListener("click",function(){
   }
   var a=courseTarget.address; setKeypad(a); jumpTo(a); playWarpTransition("ship");
 });
+/* 2026-09-13 fix: pSeqHead ("Portal sequence & coordinates") and pNoteHead
+   ("Surveyor log") were added (with role=button/tabindex=0/aria-expanded,
+   collapsed by default via style="display:none" on pSeqBody/pNoteBody) as
+   part of shortening the info panel, but togglePanelFold() -- named in that
+   same commit's own HTML comment -- was never actually written, so the
+   headers did nothing when clicked. Mirrors the ▸/▾ + display:none idiom
+   toggleFold() already uses for the floating Filters/Tweak/Telemetry boxes,
+   just scoped to a body element inside this one panel instead of a whole
+   box, and independent of each other (opening one doesn't close the other). */
+function togglePanelFold(headId,bodyId){
+  var head=document.getElementById(headId), body=document.getElementById(bodyId);
+  var wasOpen=body.style.display!=="none";
+  body.style.display=wasOpen?"none":"";
+  head.setAttribute("aria-expanded",String(!wasOpen));
+  head.textContent=(wasOpen?"▸ ":"▾ ")+head.textContent.slice(2);
+}
+function closePanelFold(headId,bodyId){
+  var head=document.getElementById(headId), body=document.getElementById(bodyId);
+  body.style.display="none";
+  head.setAttribute("aria-expanded","false");
+  head.textContent="▸ "+head.textContent.slice(2);
+}
+function panelFoldKey(e,headId,bodyId){
+  if(e.key==="Enter"||e.key===" "){ e.preventDefault(); togglePanelFold(headId,bodyId); }
+}
+document.getElementById("pSeqHead").addEventListener("click",function(){ togglePanelFold("pSeqHead","pSeqBody"); });
+document.getElementById("pNoteHead").addEventListener("click",function(){ togglePanelFold("pNoteHead","pNoteBody"); });
+document.getElementById("pSeqHead").addEventListener("keydown",function(e){ panelFoldKey(e,"pSeqHead","pSeqBody"); });
+document.getElementById("pNoteHead").addEventListener("keydown",function(e){ panelFoldKey(e,"pNoteHead","pNoteBody"); });
 document.getElementById("bSave").addEventListener("click",function(){
   if(!selected) return;
   var v=document.getElementById("pNote").value.trim();
