@@ -3680,7 +3680,16 @@ function renderRoutesList(){
 var bodyMeshes=[], pivots=[], starMeshes=[], coronas=[], featureMeshes=[], resourceMeshes=[];
 function buildStar(s,i,pos){
   var col=s.starColors[i%s.starColors.length];
-  var rad=2.0;
+  var rad=1.6;
+  /* Each additional star in a multi-star system additively blends its own
+     corona/glow on top of the first (2026-09-13, Tony: "if more than 1 star
+     would defiantly over powering") -- a binary would otherwise stack two
+     full-brightness coronas right next to each other and read far brighter
+     than either star alone. Companion stars (i>0) get a dimmed glow so the
+     total bloom stays in the same ballpark as a single star; the core disc
+     itself is left at full brightness since that's the actual star, not the
+     bloom around it. */
+  var glowMul=i===0?1:0.6;
   var grp=new THREE.Group();
   grp.position.copy(pos);
   var core=new THREE.Mesh(new THREE.SphereGeometry(rad,30,22),
@@ -3700,15 +3709,15 @@ function buildStar(s,i,pos){
      the plane and both glow shells; sh1/rad itself untouched (that's the
      star's actual visible disc size, not the bloom around it). */
   var sh1=new THREE.Mesh(new THREE.SphereGeometry(rad*1.35,24,18),
-    new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:0.22,
+    new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:0.22*glowMul,
       blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.BackSide}));
   var sh2=new THREE.Mesh(new THREE.SphereGeometry(rad*1.7,20,16),
-    new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:0.10,
+    new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:0.10*glowMul,
       blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.BackSide}));
   grp.add(sh1); grp.add(sh2);
   var cor=new THREE.Mesh(new THREE.PlaneGeometry(rad*7,rad*7),
     new THREE.MeshBasicMaterial({map:CORONA,color:col,transparent:true,
-      opacity:0.95,blending:THREE.AdditiveBlending,depthWrite:false,
+      opacity:0.95*glowMul,blending:THREE.AdditiveBlending,depthWrite:false,
       side:THREE.DoubleSide}));
   grp.add(cor); coronas.push(cor);
   return grp;
@@ -4240,7 +4249,7 @@ function buildSystemView(s){
      star visually isn't. */
   var si;
   for(si=0; si<s.stars; si++){
-    var off=new THREE.Vector3(featureR*0.78+si*3.2,featureR*0.55,-featureR*0.25-si*1.6);
+    var off=new THREE.Vector3(featureR*0.66+si*3.2,featureR*0.47,-featureR*0.21-si*1.6);
     systemGroup.add(buildStar(s,si,off));
   }
   starLight.color.setHex(s.starColors[0]);
@@ -10672,7 +10681,7 @@ function syncPanelOffset(){
   if(occludeW>w*0.22) occludeW=0;
   if(occludeW===_lastOccludeW) return;
   _lastOccludeW=occludeW;
-  if(occludeW>0) camera.setViewOffset(w+occludeW,h,0,0,w,h);
+  if(occludeW>0) camera.setViewOffset(w+occludeW,h,occludeW,0,w,h);
   else camera.clearViewOffset();
   camera.updateProjectionMatrix();
 }
