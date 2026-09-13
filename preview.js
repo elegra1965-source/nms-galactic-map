@@ -6505,6 +6505,12 @@ document.getElementById("pSeqHead").addEventListener("click",function(){ toggleP
 document.getElementById("pNoteHead").addEventListener("click",function(){ togglePanelFold("pNoteHead","pNoteBody"); });
 document.getElementById("pSeqHead").addEventListener("keydown",function(e){ panelFoldKey(e,"pSeqHead","pSeqBody"); });
 document.getElementById("pNoteHead").addEventListener("keydown",function(e){ panelFoldKey(e,"pNoteHead","pNoteBody"); });
+// 2026-09-13, Tony's follow-up on the same review: the Filters panel's
+// checkbox block gets the same collapsible treatment via the same
+// togglePanelFold()/panelFoldKey() helpers -- see the fTogHead/fTogBody
+// HTML comment for why only this block folds and not the whole panel.
+document.getElementById("fTogHead").addEventListener("click",function(){ togglePanelFold("fTogHead","fTogBody"); });
+document.getElementById("fTogHead").addEventListener("keydown",function(e){ panelFoldKey(e,"fTogHead","fTogBody"); });
 document.getElementById("bSave").addEventListener("click",function(){
   if(!selected) return;
   var v=document.getElementById("pNote").value.trim();

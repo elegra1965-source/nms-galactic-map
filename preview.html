@@ -1597,6 +1597,17 @@ nearby procedural space within a radius.">Search</button>
         <option>Korvax</option><option>Uninhabited</option></select></div>
       <div class="fld"><div class="lb">Economy</div>
         <select id="fEco"><option value="">Any</option></select></div>
+      <!-- 2026-09-13, Tony's own follow-up to the same review: this checkbox
+           block was the tallest single stretch in Filters, and with the panel
+           now internally scrolling (see #filt .fbody above) it's easy to miss
+           how many toggles are even in here. Collapsed by default using the
+           exact same panelFoldHead/togglePanelFold idiom the info panel's
+           Portal sequence/Surveyor log sections already use -- see those and
+           togglePanelFold() in preview.js -- just scoped to this box instead
+           of #panel. The three dropdowns above stay outside the fold since
+           they're the filters people reach for first. -->
+      <div class="lb panelFoldHead" id="fTogHead" role="button" tabindex="0" aria-expanded="false" aria-controls="fTogBody" style="margin-top:10px">&#9656; Display toggles</div>
+      <div id="fTogBody" style="display:none">
       <label class="chk"><input type="checkbox" id="fOut">Outlaw</label>
       <label class="chk" title="Real in-game term (Purple systems only) -- was labelled &quot;Giant planet&quot;, renamed to match the wiki. Always 1 huge planet with 5 moons, no other planets."><input type="checkbox" id="fGiant">Gas giant</label>
       <label class="chk"><input type="checkbox" id="fBH">Black holes</label>
@@ -1606,6 +1617,7 @@ nearby procedural space within a radius.">Search</button>
       <label class="chk" title="Shadow stars are a distinct, related anomaly: the first invalid system index just past the portal network's valid range. Unlike ordinary phantoms, a shadow star CAN be reached by a normal hyperjump. Tick to show ONLY shadow star systems."><input type="checkbox" id="fShadow">Shadow stars</label>
       <label class="chk" title="Systems you've saved as a travel goal, whether or not your current drive can reach them yet -- see the Waypoint button on a system's panel."><input type="checkbox" id="fWaypoint">Waypoints</label>
       <label class="chk" title="Hides stars your current Hyperdrive drive type can't reach by star colour (yellow/red/green/blue/purple). Nothing to do with phantom or shadow stars -- those are a different kind of &quot;unreachable&quot;, with their own filters below."><input type="checkbox" id="fReachOnly">Drive: reachable only</label>
+      </div>
       <div class="fld" style="margin-top:7px">
         <div class="lb">Hyperdrive</div>
         <button class="btn" type="button" id="bHyperOpen" style="width:100%;text-align:left;overflow:hidden;text-overflow:ellipsis"
