@@ -4088,6 +4088,97 @@ function resolvePlanetCollisions(planetEntries,idxA,idxB){
   if(b.atmo){ a.pivot.add(b.atmo); b.atmo.position.copy(newPos); }
   if(b.moonAnchor){ a.pivot.add(b.moonAnchor); b.moonAnchor.position.copy(newPos); }
 }
+/* ============ flattened system-view helpers (2026-09-13) ============
+   Added for the Cosmos-era system-view redesign: Tony's real in-game
+   reference screenshots ("THE TAGASHIW XVI SYSTEM" etc.) show every
+   planet sharing ONE flat orbital plane, not this site's older
+   individually-tilted-per-planet look -- see buildSystemView()'s planet
+   loop below, where pivot.rotation.x now always uses this single
+   constant instead of a per-planet stagger. Kept as a named constant
+   (not just a literal 0) so the whole disc's tilt can be tuned later in
+   one place if Tony ever wants it (independent of the camera's own
+   raked viewing angle, which is what setMode('system') controls). */
+var SYSTEM_TILT=0;
+/* Four ring treatments, cycling by planet index (0=innermost since
+   planetIdx counts outward from the star) -- matches the 4 distinct ring
+   styles visible in the real reference screenshot: solid -> red
+   segmented "scan band" -> solid white -> fine dashed (outermost of the
+   4, repeats again for a 5th/6th planet if a system has that many). */
+var ORBIT_RING_STYLES=[
+  {color:0x00e5ff,opacity:0.55,dash:null},
+  {color:0xff4646,opacity:0.65,dash:[34,7,12,7,55,7,18,7,70,7]},
+  {color:0xffffff,opacity:0.55,dash:null},
+  {color:0xd7ebf5,opacity:0.42,dash:[3,7]}
+];
+/* Long thin alternating-alpha strip for a dashed ring -- RingGeometry's
+   own UVs map u around the circumference and v radially (see the
+   existing makeRingTexture() comment above, already relied on for
+   planets' own Saturn-style rings), so a texture that varies along its
+   WIDTH and repeats via wrapS is exactly what draws dashes running
+   around the ring rather than across its band. */
+function orbitDashTexture(dash){
+  var TW=1024,TH=8,cv=document.createElement("canvas"); cv.width=TW; cv.height=TH;
+  var g=cv.getContext("2d");
+  var total=dash.reduce(function(a,b){return a+b;},0);
+  var scale=TW/total,x=0,on=true,i;
+  g.clearRect(0,0,TW,TH);
+  for(i=0;i<dash.length;i++){
+    var w=dash[i]*scale;
+    if(on){ g.fillStyle="#fff"; g.fillRect(x,0,w,TH); }
+    x+=w; on=!on;
+  }
+  var t=new THREE.CanvasTexture(cv); t.needsUpdate=true;
+  t.wrapS=THREE.RepeatWrapping; t.wrapT=THREE.ClampToEdgeWrapping;
+  return t;
+}
+/* Builds one styled orbit-path ring for a planet at orbitR, style chosen
+   by ORBIT_RING_STYLES[idx % 4]. Dash repeat count is scaled with orbitR
+   so dash SIZE stays roughly constant across rings of different radii
+   (a bigger ring needs proportionally more repeats of the same pattern),
+   not a fixed repeat count that would stretch on the outer rings. */
+function orbitRingMesh(orbitR,idx){
+  var style=ORBIT_RING_STYLES[idx%ORBIT_RING_STYLES.length];
+  var matOpts={color:style.color,transparent:true,opacity:style.opacity,
+    side:THREE.DoubleSide,depthWrite:false};
+  if(style.dash){
+    var tex=orbitDashTexture(style.dash);
+    tex.repeat.set(Math.max(1,orbitR*0.6),1);
+    matOpts.map=tex;
+  }
+  var ring=new THREE.Mesh(new THREE.RingGeometry(orbitR-0.05,orbitR+0.05,128),
+    new THREE.MeshBasicMaterial(matOpts));
+  ring.rotation.x=Math.PI/2;
+  return ring;
+}
+/* Default station icon (2026-09-13, expanded to all 5 processed refs).
+   The system centre now ALWAYS shows a station (matching the confirmed
+   mockup design), not just when a traveller has submitted a real photo.
+   DEFAULT_STATION_TEX holds all 5 of Tony's reference photos that have
+   had their backgrounds removed -- each entry carries its OWN aspect
+   ratio (a tall spire vs. a wide ring station are very different shapes,
+   so one shared aspect would squash most of them), picked STABLY per
+   system (mulberry32 off s.idx, same determinism pattern every other
+   seeded roll in this file already uses) so a system shows the same
+   default icon on every visit rather than a different one each time. */
+var DEFAULT_STATION_TEX=[
+  {tex:TEX_LOADER.load("icons-web/feature-station-default1.png"),aspect:160/316},
+  {tex:TEX_LOADER.load("icons-web/feature-station-default2.png"),aspect:332/332},
+  {tex:TEX_LOADER.load("icons-web/feature-station-default3.png"),aspect:640/607},
+  {tex:TEX_LOADER.load("icons-web/feature-station-default4.png"),aspect:640/364},
+  {tex:TEX_LOADER.load("icons-web/feature-station-default5.png"),aspect:438/482}
+];
+function buildDefaultStationIcon(s){
+  var pick=DEFAULT_STATION_TEX[Math.floor(mulberry32(s.idx^0x53544144)()*DEFAULT_STATION_TEX.length)];
+  var mat=new THREE.SpriteMaterial({map:pick.tex,transparent:true,depthWrite:false});
+  var spr=new THREE.Sprite(mat);
+  var h=5.0,w=h*pick.aspect;
+  spr.scale.set(w,h,1);
+  spr.position.set(0,0,0);
+  spr.userData={feature:true,stationCard:true,
+    name:"Space station"+(s.allianceName?(" (Alliance: "+s.allianceName+")"):"")};
+  featureMeshes.push(spr);
+  return spr;
+}
 function buildSystemView(s){
   while(systemGroup.children.length){
     var ch=systemGroup.children.pop();
@@ -4098,24 +4189,43 @@ function buildSystemView(s){
   }
   bodyMeshes=[]; pivots=[]; starMeshes=[]; coronas=[]; featureMeshes=[]; resourceMeshes=[];
   hideResourceReport();
+  /* place clear of the outermost planet's orbit ring -- lastOrbitR mirrors
+     the exact orbitR formula used below (8 + planetIdx*3.7) so this can't
+     drift back inside the rings as generated bodies change; +12 is a hard
+     clearance margin. Computed BEFORE the star loop now (2026-09-13,
+     flattened system-view redesign) because the star cluster is also
+     positioned off featureR -- see below. */
+  var lastOrbitR=8+Math.max(0,s.planets-1)*3.7;
+  var featureR=lastOrbitR+12;
+  /* Flattened system view (2026-09-13, Tony -- Cosmos-era reference
+     screenshots): the star used to sit at the scene's exact centre, with
+     every planet orbiting it directly. The reference instead keeps the
+     STATION at centre and pushes the star out to its own corner, so the
+     star (and, for a binary, its companion, offset a little further
+     along the same direction) now gets a fixed off-centre placement --
+     same "unit-length fraction of featureR" approach already used for
+     the black hole/Atlas billboards below, just its own direction so a
+     system with a black hole AND a station AND a star all stay visually
+     separated rather than stacking. starLight is deliberately left at
+     the origin (not moved with the star) so the flattened disc keeps
+     even, centred lighting rather than going dark on whichever side the
+     star visually isn't. */
   var si;
   for(si=0; si<s.stars; si++){
-    var off=new THREE.Vector3(si*3.6-(s.stars-1)*1.8,0,0);
+    var off=new THREE.Vector3(featureR*0.78+si*3.2,featureR*0.55,-featureR*0.25-si*1.6);
     systemGroup.add(buildStar(s,si,off));
   }
   starLight.color.setHex(s.starColors[0]);
   starLight.position.set(0,0,0);
-  /* place clear of the outermost planet's orbit ring -- lastOrbitR mirrors
-     the exact orbitR formula used below (8 + planetIdx*3.7) so this can't
-     drift back inside the rings as generated bodies change; +12 is a hard
-     clearance margin, and the Y component is kept small (0.15-0.18 of the
-     radius) so perspective doesn't fold the sprite back inside the ring
-     ellipse on screen the way a steeper vertical offset did before. */
-  var lastOrbitR=8+Math.max(0,s.planets-1)*3.7;
-  var featureR=lastOrbitR+12;
   if(s.blackHole) systemGroup.add(buildFeature(s,"bh",new THREE.Vector3(featureR*0.82,featureR*0.18,-featureR*0.55)));
   if(s.atlas) systemGroup.add(buildFeature(s,"atlas",new THREE.Vector3(-featureR*0.85,-featureR*0.15,featureR*0.5)));
-  if(s.hasStation && s.stationPhoto) systemGroup.add(buildStationCard(s,new THREE.Vector3(featureR*0.06,featureR*0.92,featureR*0.32)));
+  /* Station is now ALWAYS shown at the scene centre -- either the real
+     submitted photo (buildStationCard, unchanged) or, when no photo has
+     been submitted yet, a small default station icon, matching the
+     confirmed mockup design rather than showing an empty centre until a
+     traveller uploads one. */
+  if(s.hasStation && s.stationPhoto) systemGroup.add(buildStationCard(s,new THREE.Vector3(0,0,0)));
+  else systemGroup.add(buildDefaultStationIcon(s));
   /* Two-pass build (2026-09-01, Tony's Nogsangh report): every planet is
      built first (pass 1, unchanged geometry/material logic from before),
      recording each one's own moonAnchor/size/running-moon-count keyed by
@@ -4166,12 +4276,14 @@ function buildSystemView(s){
       atmo.position.copy(mesh.position);
       pivot.add(atmo);
     }
-    pivot.rotation.x=(planetIdx%2?0.13:-0.08);
+    /* Flattened system view (2026-09-13): every planet's orbit now shares
+       ONE plane (SYSTEM_TILT) instead of each getting its own individual
+       pivot.rotation.x stagger. rotation.y is left as a per-planet
+       starting phase (just which point of its ring it begins at) --
+       unrelated to the tilt fix, still varied per planet. */
+    pivot.rotation.x=SYSTEM_TILT;
     pivot.rotation.y=planetIdx*1.1;
-    var ring=new THREE.Mesh(new THREE.RingGeometry(orbitR-0.03,orbitR+0.03,110),
-      new THREE.MeshBasicMaterial({color:0x00e5ff,transparent:true,opacity:0.12,
-        side:THREE.DoubleSide,depthWrite:false}));
-    ring.rotation.x=Math.PI/2; pivot.add(ring);
+    pivot.add(orbitRingMesh(orbitR,planetIdx));
     if(b.ring){
       // A real Saturn-style planetary ring, distinct from the thin cyan
       // orbit-path ring above -- lives as a CHILD of the planet mesh so it
@@ -5071,6 +5183,25 @@ function handleHoverRay(e){
     return;
   }
   canvas.style.cursor="";
+  /* System-view hover cards (2026-09-13, Phase 2): System view has no
+     instanced mesh to raycast (Local's locInstMesh trick doesn't apply --
+     every star/feature/body here is its own real Object3D), so this
+     raycasts the same three arrays tryPick()'s system branch already
+     raycasts on click (bodyMeshes/starMeshes/featureMeshes -- resourceMeshes
+     deliberately left out, those already have their own click-only report
+     card). Same 70ms throttle as the other two branches. */
+  if(mode==="system"){
+    var nowSys=performance.now();
+    if(nowSys-_hoverRayT<70) return; _hoverRayT=nowSys;
+    var rectSys=canvas.getBoundingClientRect();
+    ndc.x=((e.clientX-rectSys.left)/rectSys.width)*2-1;
+    ndc.y=-((e.clientY-rectSys.top)/rectSys.height)*2+1;
+    ray.setFromCamera(ndc,camera);
+    var hitsSys=ray.intersectObjects(bodyMeshes.concat(starMeshes).concat(featureMeshes));
+    if(hitsSys.length) showSystemHoverPop(hitsSys[0].object.userData,e.clientX,e.clientY);
+    else hideHoverPop();
+    return;
+  }
   if(mode!=="local"||!locInstMesh) return;
   var now=performance.now();
   if(now-_hoverRayT<70) return; _hoverRayT=now;
@@ -5125,6 +5256,36 @@ function hideHoverPop(){
   if(!hoverPopVisible) return;
   document.getElementById("hoverPop").style.display="none";
   hoverPopVisible=false; hoverSys=null;
+}
+/* System-view hover cards (2026-09-13, Phase 2) -- reuses the exact same
+   #hoverPop element/CSS Local's showHoverPop() already uses (hpName/hpCls
+   classes), just fed different content per object type since System view's
+   userData shapes differ from Local's system-summary objects: a body carries
+   {body,sys}, a star/feature carries {star|feature,name,sys}. Deliberately
+   simpler than Local's full hover card (no zoom-gated "full" detail tier) --
+   clicking any of these already opens the real info panel/body card via
+   tryPick()'s system branch, so this is just a lightweight "what's this"
+   label, not a second copy of the full panel. */
+function showSystemHoverPop(ud,cx,cy){
+  var pop=document.getElementById("hoverPop"),html;
+  if(ud.body){
+    var b=ud.body,subParts=[];
+    if(b.biome) subParts.push(b.biome);
+    if(b.water) subParts.push("Water");
+    if(b.ring) subParts.push("Ring");
+    html='<div class="hpName">'+(b.moon?"↳ ":"")+b.name+'</div>'+
+      (subParts.length?'<div class="hpCls">'+subParts.join(" // ")+'</div>':'');
+  } else if(ud.star){
+    var spec=(ud.sys&&ud.sys.spectral)?ud.sys.spectral:"";
+    html='<div class="hpName">★ '+ud.name+'</div>'+
+      (spec?'<div class="hpCls">'+spec+'</div>':'');
+  } else {
+    html='<div class="hpName">'+ud.name+'</div>';
+  }
+  pop.innerHTML=html;
+  pop.style.left=cx+"px"; pop.style.top=cy+"px";
+  pop.style.display="block";
+  hoverPopVisible=true;
 }
 /* Corrected 2026-08-17 after Tony's live feedback: his original "only
    during Set course" answer was interpreted as "only once a panel is
@@ -5459,6 +5620,19 @@ function setMode(m){
   document.getElementById("mLoc").classList.toggle("on",m!=="galaxy");
   document.getElementById("bEnter").textContent=(m==="system")?"Back to local":"Enter system";
   document.getElementById("mstat").textContent=m.toUpperCase();
+  /* System-name banner (2026-09-13, Phase 2) -- System view had no
+     persistent "you are here" label at all; selected is always populated
+     with the current system by the time setMode("system") runs (every
+     caller does buildSystemView(selected) either just before or after
+     this, see buildSystemView's own call sites), so this is safe to read
+     unconditionally here rather than needing its own separate hook. */
+  var sysBanner=document.getElementById("sysBanner");
+  if(m==="system"&&selected){
+    sysBanner.textContent=selected.name;
+    sysBanner.style.display="block";
+  } else {
+    sysBanner.style.display="none";
+  }
   updateGalInfoBadge();
   hideLabels();
   document.getElementById("empty").style.display=(m==="local"&&shown.length===0)?"block":"none";
@@ -5489,7 +5663,12 @@ function setMode(m){
      no bearing on whether the view fills the frame, so there's no one
      "correct" value for it. */
   if(m==="local"){ cam.dist=50; cam.phi=1.55; flyPos.set(0,10,44); maybeShowHyperNotice(); }
-  if(m==="system"){ cam.dist=40; flyPos.set(0,12,38); }
+  /* 2026-09-13, flattened system-view redesign: explicit phi now set
+     (previously system mode inherited whatever phi Local last had, ~1.55
+     rad -- nearly edge-on -- which would show the new flat shared orbital
+     plane as barely more than a line). Raked down closer to Galaxy's own
+     angle instead so the flattened disc actually reads as a disc. */
+  if(m==="system"){ cam.dist=65; cam.phi=0.8; flyPos.set(0,34,50); }
   aimFly(cam.target);
   applyCam();
 }

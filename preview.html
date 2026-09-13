@@ -818,6 +818,16 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 .hoverpop .hpRow .icimg.tint{width:15px;height:15px}
 .hoverpop .hpLbl{color:var(--text);font-size:11px;letter-spacing:.03em}
 .hoverpop .hpSub{color:var(--text-dim);font-size:9px;letter-spacing:.02em;margin:1px 0 0 23px}
+/* System-name banner (2026-09-13, Phase 2) -- System view's own "you are
+   here" label, shown only while mode==="system" (see setMode()). Fixed
+   top-center, non-interactive (pointer-events:none) so it never blocks the
+   toolbar or canvas clicks underneath it even if it happens to overlap on
+   a narrow/mobile layout -- flagged to Tony as worth a live check there. */
+#sysBanner{display:none;position:fixed;top:60px;left:50%;transform:translateX(-50%);
+  z-index:32;pointer-events:none;font-family:'Orbitron',sans-serif;color:var(--gold);
+  font-size:13px;letter-spacing:.12em;text-transform:uppercase;
+  background:rgba(11,17,25,.72);border:1px solid var(--border);border-radius:var(--r-sm);
+  padding:5px 16px;text-shadow:0 1px 2px #000}
 /* Tony (2026-08-17): the conBadge() pill reused for the hover popup's
    Conflict row is sized for the full info panel/dropdown (10px text, 8px
    radius) -- too bulky next to this popup's smaller 16px icons, so scoped
@@ -1458,6 +1468,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 <div id="labels"></div>
 <div id="atlasBadges"></div>
 <div id="hoverPop" class="hoverpop" style="display:none"></div>
+<div id="sysBanner"></div>
 <div id="resReport" class="resreport" style="display:none">
   <div class="rrHead">
     <div class="rrName" id="rrName"></div>
