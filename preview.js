@@ -661,7 +661,13 @@ var RES_ICON_CAT={
   // "thats hello games new icon for atlas station"), not a fan reading of
   // an ambiguous screenshot the way creature/hazard/cargo were. Never wired
   // into RES_ICON_BIOME_CAT, same "not procedural" reasoning as outpost.
-  atlasstation:{icon:null,color:"#ff7a3d",label:"Atlas Station"}
+  atlasstation:{icon:null,color:"#ff7a3d",label:"Atlas Station"},
+  // Added 2026-09-13 from Tony's own in-game screenshot of a floating
+  // diamond icon he hadn't seen before ("not sure what it is possible
+  // base") -- the glyph is a building/horizon silhouette, closest real
+  // match to a base or other surface structure, but keeping the label
+  // honest about the uncertainty rather than asserting "Base" outright.
+  base:{icon:null,color:"#8fd0ff",label:"Base / Structure"}
 };
 /* Real icon images (2026-09-09, Tony: "just got grok to isolate icons" --
    he ran his own reference photos through Grok to get clean isolated
@@ -682,7 +688,8 @@ var REAL_ICON_URL={
   outpost:"icons-web/signal-outpost.png",
   creature:"icons-web/signal-creature.png",
   cargo:"icons-web/signal-cargo.png",
-  atlasstation:"icons-web/signal-atlasstation.png"
+  atlasstation:"icons-web/signal-atlasstation.png",
+  base:"icons-web/signal-base.png"
 };
 var RES_ICON_BIOME_CAT={
   "Lush":"flora","Toxic":"flora","Marsh":"flora","Water World":"flora",
@@ -1489,7 +1496,19 @@ function refreshAfterOverrides(){
       // floating star/planet labels and textures would otherwise keep
       // showing the pre-edit data until you left and re-entered. Rebuild the
       // system view in place so labels/textures pick up the save immediately.
-      if(mode==="system") buildSystemView(selected);
+      if(mode==="system"){
+        buildSystemView(selected);
+        // #sysBanner (the fixed top-centre "you are here" pill, see
+        // setMode()) is only ever written when system mode is first
+        // entered -- confirmed missing here 2026-09-13 (Tony: renamed a
+        // system while already inside it, the banner kept showing the old
+        // name even though the floating star label and the info panel both
+        // picked up the rename correctly). Same one-line fix setMode()
+        // itself uses, just re-run here too so an in-place edit doesn't
+        // leave this one label stuck on the pre-edit name.
+        var _sysBanner=document.getElementById("sysBanner");
+        if(_sysBanner) _sysBanner.textContent=selected.name;
+      }
     }
   }
 }
@@ -3983,7 +4002,7 @@ function buildResourceIcon(s,b,pivot,localPos){
    exactly like an automatic icon) or null for a free-floating marker
    (added straight to systemGroup at a world-space position instead). */
 function buildManualSignalIcon(s,sig,parent,pos){
-  var cat=(["mineral","flora","frozen","tech","outpost","creature","hazard","cargo","atlasstation"].indexOf(sig.icon)>=0)?sig.icon:"mineral";
+  var cat=(["mineral","flora","frozen","tech","outpost","creature","hazard","cargo","atlasstation","base"].indexOf(sig.icon)>=0)?sig.icon:"mineral";
   var cfg=RES_ICON_CAT[cat];
   var mat;
   if(REAL_ICON_TEX[cat]){
@@ -5323,7 +5342,16 @@ function showSystemHoverPop(ud,cx,cy){
     html='<div class="hpName">'+(b.moon?"↳ ":"")+b.name+'</div>'+
       '<div class="hpCls">'+biomeTxt+'</div>'+
       '<div class="hpSub">'+b.terrain+(b.water?" // Water":" // No water")+'</div>'+
-      (tags.length?'<div class="hpSub">'+tags.join(" // ")+'</div>':'');
+      (tags.length?'<div class="hpSub">'+tags.join(" // ")+'</div>':'')+
+      // Resources line (2026-09-13, Tony: compared a real in-game discovery
+      // popup showing its resource list against this card showing none) --
+      // b.resUni is the exact same combined list the info panel's own
+      // "Resources" row already shows (biome-typical + stellar element +
+      // any traveller-submitted Common resources, see updatePanel()), so
+      // this reuses it rather than inventing a second resource computation.
+      // Capped at 3 so the hover stays a quick glance, not a second panel;
+      // omitted entirely when nothing's known yet, same as the tags line.
+      (b.resUni&&b.resUni.length?'<div class="hpSub">'+b.resUni.slice(0,3).join(", ")+'</div>':'');
   } else if(ud.star){
     /* Enriched 2026-09-13 (Tony live feedback: "star not much information
        again") -- reuses the exact same race/economy/conflict block Local's
@@ -8269,7 +8297,7 @@ document.getElementById("edGiant").addEventListener("change",renderBodyEditList)
 // render function rather than folded into editBodies -- a signal marker
 // isn't a body, and giving it a fake body-shaped row would make both
 // this list and the save payload harder to reason about for no benefit.
-var ICON_SWATCH_CATS=["mineral","flora","frozen","tech","outpost","creature","hazard","cargo","atlasstation"];
+var ICON_SWATCH_CATS=["mineral","flora","frozen","tech","outpost","creature","hazard","cargo","atlasstation","base"];
 var iconSwatchCache={};
 /* Small preview image for the icon-type picker below (2026-09-09, Tony:
    "add the icons in front of names" in the Icon type dropdown). For the 6
@@ -8359,6 +8387,7 @@ function renderSignalEditList(){
               '<option value="hazard"'+(g.icon==="hazard"?" selected":"")+'>Hazard / Danger</option>'+
               '<option value="cargo"'+(g.icon==="cargo"?" selected":"")+'>Minor Wreckage</option>'+
               '<option value="atlasstation"'+(g.icon==="atlasstation"?" selected":"")+'>Atlas Station</option>'+
+              '<option value="base"'+(g.icon==="base"?" selected":"")+'>Base / Structure</option>'+
             '</select>'+
           '</div>'+
         '</div>'+
