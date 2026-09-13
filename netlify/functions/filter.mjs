@@ -521,18 +521,28 @@ export function filterSystemEdit(payload){
   // Edit form but a submitted choice was silently dropped before it ever
   // reached the shared data store -- same "allowlist is authoritative"
   // pattern every other field on this page already follows, just missed
-  // for this one. Display-only, like ring style: which two planets visually
+  // for this one. Display-only, like ring style: which planets visually
   // collide can ONLY be a traveller's own in-game observation, so this is a
-  // manual pick, not derived from anything else in the payload. collidingA/
-  // collidingB are 1-based positions into THIS SAME submitted bodies array
-  // (same shape as a moon's "orbits" field above) -- clamped to a real
-  // position or 0 ("not set"), never trusted blindly, but not hard-rejected
-  // either if the pair looks incomplete/equal, since that just means the
-  // display-only pairing quietly does nothing rather than blocking an
-  // otherwise-valid save over one optional cosmetic field. */
+  // manual pick, not derived from anything else in the payload.
+  // collidingSet (2026-09-13, goodguyfree found a real in-game system with 4
+  // planets colliding at once -- replaces the old fixed collidingA/
+  // collidingB pair with an arbitrary-length list) is an array of 1-based
+  // positions into THIS SAME submitted bodies array (same shape as a moon's
+  // "orbits" field above) -- each clamped to a real position, duplicates
+  // dropped, and since bodies.length itself is already capped at 6 above
+  // there's no separate length cap needed here. Not hard-rejected if the
+  // set looks incomplete/short, since that just means the display-only
+  // clustering quietly does nothing (see resolvePlanetCollisions() client-
+  // side) rather than blocking an otherwise-valid save over one optional
+  // cosmetic field. */
   out.colliding = !!payload.colliding;
-  out.collidingA = Math.max(0, Math.min(out.bodies.length, parseInt(payload.collidingA,10)||0));
-  out.collidingB = Math.max(0, Math.min(out.bodies.length, parseInt(payload.collidingB,10)||0));
+  var rawCollidingSet = Array.isArray(payload.collidingSet) ? payload.collidingSet : [];
+  var seenColliding = {};
+  out.collidingSet = [];
+  for(var cci=0; cci<rawCollidingSet.length; cci++){
+    var cpos = Math.max(0, Math.min(out.bodies.length, parseInt(rawCollidingSet[cci],10)||0));
+    if(cpos>0 && !seenColliding[cpos]){ seenColliding[cpos]=true; out.collidingSet.push(cpos); }
+  }
 
   // Resource / signal markers (2026-09-09, Cosmos update -- click-to-inspect
   // diamond icons on the 3D system view). One marker is drawn automatically

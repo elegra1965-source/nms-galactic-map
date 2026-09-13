@@ -399,6 +399,27 @@ html.debug-on #tweak{display:block}
 #tweak.sideR{left:100%;margin-left:8px}
 #tweak.sideL{right:100%;margin-right:8px}
 #filt{width:176px;padding:10px 12px;position:relative}
+/* Desktop counterpart to the mobile #filt .fbody max-height rule further down
+   (site review 2026-09-13: "Opening Filters in Local (galaxy) view renders
+   the panel directly on top of the top-left Galactic Core distance card").
+   Root cause: #leftcol is bottom:10px-anchored on desktop and Filters simply
+   grows upward with however many filter rows are showing -- on a short-ish
+   browser window (confirmed live at 1536x695) that growth reaches past
+   #galHud's own top:calc(var(--top-h,60px)+10px) position, and #leftcol gets
+   bumped to z-index:45 while Filters is open (see that rule's own comment)
+   specifically so Filters stays usable on top of everything -- which is
+   exactly what was clipping galHud's two text lines instead of just tucking
+   Filters beside them. The mobile media query below already solves this the
+   same way for its own (top-anchored) layout; this is that same fix for the
+   bottom-anchored desktop one -- cap .fbody and let it scroll internally
+   rather than letting the whole panel grow into galHud's space. Budget:
+   var(--top-h) + galHud's worst-case bottom edge (.withBadge pushes its
+   top down another 36px, so top-h+46+84px tall) + a visible gap (20px) +
+   #leftcol's own bottom offset (10px) + #filt's own header row/padding
+   above .fbody (~52px, measured live) -- verified live against the real
+   site at 1536x695 (a common short-window size) with both the normal and
+   .withBadge states before shipping this number. */
+#filt .fbody{max-height:calc(100vh - var(--top-h,60px) - 222px);overflow-y:auto;overflow-x:hidden}
 /* Filters header (2026-08-24): needs its own flex layout (unlike the
    shared .fhead class other fold-headers use unmodified) because it now
    holds a label span *and* a dedicated #bFiltMin button side by side --
@@ -510,7 +531,7 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border:none;border-ra
   transition:left .15s,top .15s}
 #annivBadge img{width:100%;height:100%;display:block;
   filter:drop-shadow(0 0 5px rgba(240,90,40,.4))}
-#top,#leftcol,#tel,#panel,#course,#modalWrap .modal,#galHud,#accessPop,#searchPop,#routesPop,#keys{
+#top,#leftcol,#tel,#panel,#course,#modalWrap .modal,#galHud,#accessPop,#searchPop,#routesPop,#favPop,#keys{
   zoom:var(--ui-zoom,1)}
 #accessPop{position:fixed;z-index:36;width:198px;padding:11px 13px;
   top:calc(var(--top-h,60px) + 8px);right:10px;display:none}
@@ -553,6 +574,14 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border:none;border-ra
 #routesPop.show{display:block}
 #routesPop.scroll{overflow-y:auto}
 #inRouteLink{box-sizing:border-box}
+/* #favPop: same popover box as #routesPop, same reasons (see its own HTML
+   comment) -- width matches #routesPop since favourite rows carry a Remove
+   button same as a route row's action row. */
+#favPop{position:fixed;z-index:36;width:300px;padding:11px 13px;
+  top:calc(var(--top-h,60px) + 8px);right:10px;display:none;
+  max-height:60vh;overflow-y:hidden;overflow-x:hidden}
+#favPop.show{display:block}
+#favPop.scroll{overflow-y:auto}
 .routeRes{cursor:default}
 .routeRowActions{display:flex;gap:5px;margin-top:5px;flex-wrap:wrap}
 .routeActBtn{background:transparent;border:1px solid var(--border-soft);color:var(--text-dim);
@@ -1536,6 +1565,7 @@ always show up. Scan also searches
 nearby procedural space within a radius.">Search</button>
   <button class="btn beveled" id="bWarpToggle" style="animation-delay:-3.5s" title="Play a warp-jump animation when entering system view. Same setting as Filters -> Warp animation, just easier to reach. Click to turn on/off.">&#9889; Warp FX</button>
   <button class="btn beveled" id="bRoutes" style="animation-delay:0s" title="Save the route you've plotted so you can pick it back up later, share it with a link, or load one someone sent you.">&#9776; Routes</button>
+  <button class="btn beveled" id="bFav" style="animation-delay:-.5s" title="Every system you've bookmarked (the Bookmark button on a system's info panel), in one always-reachable list -- click one to jump straight there.">&#9733; Favourites</button>
   <div class="sep" id="sepC"></div>
   <button class="btn beveled" id="bFiltToggle" style="animation-delay:-.5s" title="Show or hide the system filters.">Filters</button>
   <button class="btn beveled on" id="bLbl" style="animation-delay:-1s" title="Show names on the nearest stars, or on planets and moons inside a system. Shortcut: H">Labels</button>
@@ -1912,6 +1942,21 @@ nearby procedural space within a radius.">Search</button>
   </div>
 </div>
 
+<!-- 2026-09-13, Tony's own ask: a dedicated Favourites list rather than
+     folding bookmarks into Search's empty-query browse mode ("even No Man's
+     Sky itself has a Favourites tab") -- same store.marks data the Bookmark
+     button on a system's info panel already writes, just its own always-
+     reachable list. Same popover box/pattern as #routesPop just above,
+     reusing its .searchRes/.routeRowActions/.routeActBtn styling since this
+     is structurally the same "list of saved things, click to jump, remove
+     button per row" shape Routes already established -- no new CSS needed. -->
+<div class="box fold" id="favPop" role="dialog" aria-label="Favourites">
+  <div class="kicker fhead" id="favHead" style="margin-bottom:8px">&#9733; Favourites</div>
+  <div class="fbody" id="favBody">
+    <div id="favResults"></div>
+  </div>
+</div>
+
 <div class="box" id="accessPop" role="dialog" aria-label="Accessibility settings">
   <div class="kicker" id="a11yHead" style="margin-bottom:8px">&#9881; Accessibility</div>
   <div class="fld"><div class="lb">Font size</div>
@@ -2214,10 +2259,10 @@ nearby procedural space within a radius.">Search</button>
       <label class="chk"><input type="checkbox" id="edGiant"> Gas giant (purple systems only -- limits to 1 planet + up to 5 moons; renamed from "Giant planet" to match the real in-game term)</label>
       <label class="chk" title="Ancient Ruins are a real surface point of interest (Knowledge Stones + a memoir device, sometimes a buried Artifact Ruin) -- not tied to any procedural rule this project could find, so this is manual-only, same as black hole/Atlas."><input type="checkbox" id="edRuins"> Ruins present</label>
       <label class="chk" title="Tony caught (2026-08-17): choosing the &quot;Pirate Controlled&quot; conflict word alone doesn't flag a system as Outlaw -- that's a separate flag (drives the skull icon on the Conflict badge and the Outlaw tag), procedural-only until now, same manual-only pattern as the others here."><input type="checkbox" id="edOutlaw"> Outlaw system present</label>
-      <label class="chk" title="Tick if two of this system's planets visually overlap/collide in-game, like a close binary pair. Only YOU can know this from actually seeing it in-game -- pick which two planets below. Display-only -- pulls those two planets apart into a touching binary-style orbit so they no longer intersect, but each keeps its own separate name, biome, and resources. No planet is merged or removed."><input type="checkbox" id="edColliding"> Colliding planets present</label>
+      <label class="chk" title="Tick if two or more of this system's planets visually overlap/collide in-game -- a close binary pair, or a bigger cluster (some real systems have more than two touching). Only YOU can know this from actually seeing it in-game -- pick which planets below, and use + Add planet for a cluster bigger than two. Display-only -- pulls the picked planets into a touching cluster so they no longer intersect, but each keeps its own separate name, biome, and resources. No planet is merged or removed."><input type="checkbox" id="edColliding"> Colliding planets present</label>
       <div id="edCollidingPair" style="display:none;margin:4px 0 8px 19px">
-        <div class="mfld" style="margin-bottom:6px"><div class="lb">First planet</div><select id="edCollidingA"></select></div>
-        <div class="mfld" style="margin-bottom:0"><div class="lb">Second planet</div><select id="edCollidingB"></select></div>
+        <div id="collidingEditList"></div>
+        <button class="btn" id="edAddColliding" type="button" style="padding:3px 8px">+ Add planet</button>
       </div>
     </div>
     <div class="mfld"><div class="lb">Phantom / Shadow Star status</div>

@@ -14,7 +14,7 @@
                per-entry galaxy instead, see filterBulkImport() in filter.mjs.)
      "edit"   payload = {name, race, region, stars:[colourKey,...] (max 3), starClass, water, dissonant,
                          giant, ruins, outlaw, abandoned, phantom, econName, sell, buy, econDesc, conflict, blackHole, atlas, notes,
-                         screenshot, editorName, editorFriendCode, genVersion, colliding, collidingA, collidingB,
+                         screenshot, editorName, editorFriendCode, genVersion, colliding, collidingSet,
                          hasStation, stationName, allianceName, stationPhoto,
                          signals:[{name, category, icon, signalType, route, planet}, ...] (max 6),
                          bodies:[{name, moon, orbits, biome, subtype, descriptor, water, ring, resources,
@@ -70,7 +70,11 @@
                          2026-08-17 -- display-only "these two planets visually overlap" flag, built
                          client-side in a separate session but never actually added to this
                          allowlist until now -- see filter.mjs's own comment on that same field for
-                         why it's a manual pick, not derived data. hasStation/stationName added
+                         why it's a manual pick, not derived data. collidingA/collidingB replaced by
+                         collidingSet (an array of 1-based positions, any length 2+) on 2026-09-13
+                         once goodguyfree found a real in-game system with 4 planets colliding at
+                         once -- same manual-pick reasoning, just no longer limited to a fixed pair.
+                         hasStation/stationName added
                          2026-09-09 -- Space Station Directorship, from the real "Cosmos" 10th-
                          anniversary update (Update 7.0), released the same day. Foundation pass
                          per Tony's own framing ("lay the foundation down and update as we go
@@ -118,7 +122,7 @@
                          in-game rather than picked from a fixed list, same reasoning as
                          baseName/stationName above. `planet` is an OPTIONAL 1-based link into THIS
                          SAME submitted `bodies` array (identical shape/clamping to a moon's `orbits`
-                         or colliding's collidingA/collidingB above) -- 0 means "not linked to any
+                         or colliding's collidingSet entries above) -- 0 means "not linked to any
                          body", rendered client-side as a free-floating marker instead of one that
                          rides along with a planet's orbit. Capped at 6 per system, same cap as
                          `bodies` itself. Bundled as one consensus-voted TOP_CATS unit (see
@@ -281,11 +285,12 @@ function getCategoryValue(out, category){
     // resolved to a final hosted URL (or "") by resolveScreenshotUpload()
     // below, never a raw data: URL.
     case "screenshot": return out.screenshot||"";
-    // Colliding planets (2026-08-17): bundled the same way "suffix" bundles
-    // water+dissonant above -- colliding/collidingA/collidingB are one
-    // traveller pick (display-only pairing), so they go through consensus
-    // together, not as 3 independently-flaggable fields.
-    case "colliding": return { colliding: !!out.colliding, collidingA: out.collidingA||0, collidingB: out.collidingB||0 };
+    // Colliding planets (2026-08-17, extended to any cluster size 2026-09-13):
+    // bundled the same way "suffix" bundles water+dissonant above --
+    // colliding/collidingSet are one traveller pick (display-only
+    // clustering), so they go through consensus together, not as
+    // independently-flaggable fields.
+    case "colliding": return { colliding: !!out.colliding, collidingSet: (out.collidingSet||[]).slice().sort(function(a,b){ return a-b; }) };
     // Space Station Directorship (2026-09-09): bundled the same way "suffix"
     // bundles water+dissonant and "colliding" bundles its 3 fields -- one
     // traveller pick (has a station + what they named it), goes through
@@ -340,7 +345,7 @@ function applyCategoryValue(data, category, value){
     case "notes": data.notes=value; return;
     case "screenshot": data.screenshot=value; return;
     case "colliding":
-      data.colliding=!!value.colliding; data.collidingA=value.collidingA||0; data.collidingB=value.collidingB||0;
+      data.colliding=!!value.colliding; data.collidingSet=Array.isArray(value.collidingSet)?value.collidingSet:[];
       return;
     case "station":
       data.hasStation=!!value.hasStation; data.stationName=value.stationName||""; data.allianceName=value.allianceName||""; data.stationPhoto=value.stationPhoto||"";
@@ -682,7 +687,7 @@ async function handleBulkImport(req, token, body, ip, now){
           water:false, dissonant:false, giant:false,
           econName:"", sell:"", buy:"", econDesc:"", conflict:"",
           blackHole:false, atlas:false, ruins:false, outlaw:false, abandoned:false, phantom:"",
-          notes: noteLine, colliding:false, collidingA:0, collidingB:0,
+          notes: noteLine, colliding:false, collidingSet:[],
           editorName: filtered.cleaned.editorName, editorFriendCode: filtered.cleaned.editorFriendCode,
           genVersion: filtered.cleaned.genVersion || "",
           bodies: applyPlanetNamesToBodies([], entry.bodyCount, entry.planetNames)

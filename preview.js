@@ -1288,8 +1288,17 @@ function applyOverride(s){
   if(d.outlaw!==undefined) s.outlaw=!!d.outlaw;
   if(d.abandoned!==undefined) s.abandoned=!!d.abandoned;
   if(d.colliding!==undefined) s.colliding=!!d.colliding;
-  if(d.collidingA!==undefined) s.collidingA=d.collidingA|0;
-  if(d.collidingB!==undefined) s.collidingB=d.collidingB|0;
+  // collidingSet (2026-09-13, goodguyfree found a real 4-planet pileup in-
+  // game): replaces the old fixed collidingA/collidingB pair with an
+  // arbitrary-length list of 1-based body positions, so a cluster of any
+  // size can be documented, not just two. Older saved systems only ever
+  // wrote collidingA/collidingB -- synthesize the equivalent 2-entry set
+  // from those so pre-existing data keeps rendering exactly as before.
+  if(d.collidingSet!==undefined && Array.isArray(d.collidingSet)){
+    s.collidingSet=d.collidingSet.map(function(n){ return n|0; }).filter(function(n){ return n>0; });
+  } else if(d.collidingA!==undefined || d.collidingB!==undefined){
+    s.collidingSet=[d.collidingA|0, d.collidingB|0].filter(function(n){ return n>0; });
+  }
   if(d.hasStation!==undefined) s.hasStation=!!d.hasStation;
   if(d.stationName!==undefined) s.stationName=d.stationName||"";
   if(d.allianceName!==undefined) s.allianceName=d.allianceName||"";
@@ -3735,6 +3744,82 @@ function renderRoutesList(){
   });
   box.innerHTML=html;
 }
+/* Favourites (2026-09-13, Tony's own ask for a dedicated tab rather than
+   folding bookmarks into Search's empty-query browse mode) -- store.marks
+   IS already the favourites data (same thing the Bookmark button on a
+   system's info panel writes), this just gives it its own always-reachable
+   list instead of being interleaved with waypoints/visited/documented.
+   Decodes each saved "galaxy:address" key back into a real system via
+   generateSystem() to get its current name, same technique buildSearchIndex()
+   above already uses for the exact same store.marks/waypoints/visited keys. */
+function buildFavouritesIndex(){
+  var keys=Object.keys(store.marks), idx=[];
+  for(var k=0;k<keys.length;k++){
+    var parts=keys[k].split(":");
+    if(parts.length<2) continue;
+    var g=parseInt(parts[0],10);
+    if(isNaN(g)) continue;
+    var addr=parts[1];
+    var a=parseAddress(addr);
+    if(!a) continue;
+    var sys;
+    if(g===GALAXY){
+      sys=generateSystem(a.x,a.y,a.z,a.idx);
+    } else {
+      var prevGal=GALAXY;
+      GALAXY=g;
+      sys=generateSystem(a.x,a.y,a.z,a.idx);
+      GALAXY=prevGal;
+    }
+    idx.push({name:sys.name,address:addr,galaxy:g,key:keys[k]});
+  }
+  idx.sort(function(a,b){ return a.name.localeCompare(b.name); });
+  return idx;
+}
+function renderFavouritesList(){
+  var box=document.getElementById("favResults");
+  if(!box) return;
+  var favs=buildFavouritesIndex();
+  if(!favs.length){
+    box.innerHTML='<div class="searchEmpty">Nothing favourited yet -- open a system\'s info panel and tap Bookmark to add it here.</div>';
+    return;
+  }
+  var html="";
+  favs.forEach(function(f){
+    var glyphHtml="",gi;
+    for(gi=0;gi<f.address.length;gi++) glyphHtml+='<img alt="'+f.address[gi]+'" src="'+glyphSrc(f.address[gi])+'" style="height:10px;width:10px;vertical-align:-1px;margin-right:1px">';
+    html+='<div class="searchRes favRes" data-addr="'+f.address+'" data-galaxy="'+f.galaxy+'" data-key="'+escAttr(f.key)+'">'+
+      '<div class="searchResName">'+f.name+'</div>'+
+      '<div class="searchResMeta">'+glyphHtml+' '+f.address+' &middot; '+(GALAXIES[f.galaxy]||("Galaxy #"+(f.galaxy+1)))+'</div>'+
+      '<div class="routeRowActions"><button type="button" class="routeActBtn danger" data-act="unfav">Remove</button></div>'+
+    '</div>';
+  });
+  box.innerHTML=html;
+}
+document.getElementById("favResults").addEventListener("click",function(e){
+  var unfavBtn=e.target.closest?e.target.closest('.routeActBtn[data-act="unfav"]'):null;
+  if(unfavBtn){
+    var row=unfavBtn.closest(".favRes");
+    var key=row&&row.getAttribute("data-key");
+    if(key){ delete store.marks[key]; saveStore(); applyFilter(); buildGalaxyMarks(); renderFavouritesList(); toast("Removed from Favourites"); }
+    return;
+  }
+  var row2=e.target.closest?e.target.closest(".favRes"):null;
+  if(!row2) return;
+  var addr=row2.getAttribute("data-addr");
+  var galAttr=row2.getAttribute("data-galaxy");
+  var gal=galAttr!==null?parseInt(galAttr,10):GALAXY;
+  if(!isNaN(gal)&&gal!==GALAXY){
+    switchGalaxy(gal);
+    document.getElementById("galSel").value=String(gal);
+    syncGalaxyPickInput();
+    toast("Switched to "+GALAXIES[gal]+" -- that's where this favourite is",3200);
+  }
+  document.getElementById("inAddr").value=addr;
+  setKeypad(addr);
+  if(jumpTo(addr)) playWarpTransition("portal");
+  if(typeof closeFavPop==="function") closeFavPop();
+});
 
 /* ============ system view ============ */
 var bodyMeshes=[], pivots=[], starMeshes=[], coronas=[], featureMeshes=[], resourceMeshes=[];
@@ -4110,13 +4195,16 @@ function buildManualSignalIcon(s,sig,parent,pos){
   resourceMeshes.push(spr);
   return spr;
 }
-/* Display-only fix for the "Colliding planets present" edit flag. Which two
-   planets collide is ALWAYS a traveller pick (s.collidingA/s.collidingB,
-   1-based body.index, set via the two dropdowns in Edit system) -- this
-   deliberately does NOT auto-detect overlap from generated size/position,
-   since only someone who actually saw the collision in-game can know which
-   pair it is; a geometric guess can miss the real pair or flag one that
-   isn't actually colliding on screen.
+/* Display-only fix for the "Colliding planets present" edit flag. Which
+   planets collide is ALWAYS a traveller pick (s.collidingSet, an array of
+   1-based body.index values, set via the Edit system panel's colliding-
+   planet rows -- 2 fixed dropdowns until 2026-09-13, when goodguyfree found
+   a real in-game system with 4 planets colliding at once and it became an
+   add/remove list) -- this deliberately does NOT auto-detect overlap from
+   generated size/position, since only someone who actually saw the
+   collision in-game can know which planets it is; a geometric guess can
+   miss the real cluster or flag one that isn't actually colliding on
+   screen.
    Real bug found 2026-08-17 (Tony's screenshot vs. his Ibaraohu reference):
    the original version here only nudged each planet's mesh.position ONCE,
    right after the scene finished building -- but every planet still orbits
@@ -4140,42 +4228,71 @@ function buildManualSignalIcon(s,sig,parent,pos){
    resources -- nothing is merged or removed, purely how the two meshes are
    parented and positioned in the 3D scene. Runs after the full body loop
    below so every planetEntries size/mesh reference is already built. */
-function resolvePlanetCollisions(planetEntries,idxA,idxB){
-  if(!idxA||!idxB||idxA===idxB) return;
-  var a=null,b=null,i;
-  for(i=0;i<planetEntries.length;i++){
-    if(planetEntries[i].index===idxA) a=planetEntries[i];
-    if(planetEntries[i].index===idxB) b=planetEntries[i];
+/* Extended 2026-09-13 (goodguyfree found a real in-game system with 4
+   planets colliding, not just the 2-planet case this originally handled) --
+   idxList is now an arbitrary-length array of 1-based body positions
+   instead of a fixed idxA/idxB pair. Every planet after the first is
+   attached to the FIRST one's pivot (same reparenting technique as the
+   original 2-planet version, just repeated per planet), each at its own
+   direction around it so a bigger cluster fans out instead of stacking
+   multiple planets in the same spot. entries[0] (the pre-2026-09-13 "A")
+   still gets no rotation offset at all, so an unchanged 2-planet pick
+   renders pixel-identical to before this change. */
+function resolvePlanetCollisions(planetEntries,idxList){
+  var seen={}, idxs=[], k;
+  for(k=0;k<(idxList||[]).length;k++){
+    var v=idxList[k]|0;
+    if(v>0 && !seen[v]){ seen[v]=true; idxs.push(v); }
   }
-  if(!a||!b) return; // one or both picks no longer exist (e.g. body removed since last save)
+  if(idxs.length<2) return;
+  var entries=[], i, j;
+  for(i=0;i<idxs.length;i++){
+    for(j=0;j<planetEntries.length;j++){
+      if(planetEntries[j].index===idxs[i]){ entries.push(planetEntries[j]); break; }
+    }
+  }
+  if(entries.length<2) return; // fewer than 2 of the picks still exist (e.g. bodies removed since last save)
+  var a=entries[0];
+  // Golden-angle spacing (~137.5 degrees) around A: reused here purely
+  // because it's a cheap, well-known way to spread any number of points
+  // around a circle with none of them landing close together, however many
+  // planets are in the cluster -- not tied to anything astronomical.
+  var GOLDEN_ANGLE=2.399963229728653;
+  var baseDir=new THREE.Vector3(0.82,-0.22,0.53).normalize();
+  var yAxis=new THREE.Vector3(0,1,0);
+  for(i=1;i<entries.length;i++){
+    var b=entries[i];
+    // b no longer orbits independently -- drop its pivot (and the orbit-
+    // path ring + anything else still only attached to that pivot) from
+    // the scene, and drop its entry from pivots[] so animate() isn't still
+    // spinning a pivot nothing renders from any more.
+    systemGroup.remove(b.pivot);
+    for(j=pivots.length-1;j>=0;j--){ if(pivots[j].p===b.pivot) pivots.splice(j,1); }
+    // b's own orbital pivot is gone, but it should still spin gently on its
+    // own axis like every other planet -- give it a throwaway Object3D
+    // that's never added to the scene as a harmless stand-in "pivot" (its
+    // rotation.y ticks up doing nothing) purely so animate()'s existing
+    // per-pivots-entry loop keeps applying b's own axial spin without any
+    // special-casing there.
+    pivots.push({p:new THREE.Object3D(),sp:0,mesh:b.mesh,spin:b.spin});
 
-  // B no longer orbits independently -- drop its pivot (and the orbit-path
-  // ring + anything else still only attached to that pivot) from the
-  // scene, and drop its entry from pivots[] so animate() isn't still
-  // spinning a pivot nothing renders from any more.
-  systemGroup.remove(b.pivot);
-  for(i=pivots.length-1;i>=0;i--){ if(pivots[i].p===b.pivot) pivots.splice(i,1); }
-  // B's own orbital pivot is gone, but it should still spin gently on its
-  // own axis like every other planet -- give it a throwaway Object3D that's
-  // never added to the scene as a harmless stand-in "pivot" (its
-  // rotation.y ticks up doing nothing) purely so animate()'s existing
-  // per-pivots-entry loop keeps applying B's own axial spin without any
-  // special-casing there.
-  pivots.push({p:new THREE.Object3D(),sp:0,mesh:b.mesh,spin:b.spin});
+    // Fixed offset in A's own local space -- a sideways-and-back diagonal
+    // (not pure X) so the pair reads as two spheres genuinely resting
+    // against each other from most camera angles, rather than lined up
+    // dead-centre on the same orbital ring; +0.4 is a small visible gap so
+    // they touch, not fuse into one mesh. Every planet past the second
+    // rotates that same direction further around A by the golden angle so
+    // a 3rd/4th/etc planet gets its own spot instead of overlapping the
+    // ones already placed.
+    var dist=a.size+b.size+0.4;
+    var dir=baseDir.clone().applyAxisAngle(yAxis,GOLDEN_ANGLE*(i-1));
+    var newPos=a.mesh.position.clone().addScaledVector(dir,dist);
 
-  // Fixed offset in A's own local space -- a sideways-and-back diagonal
-  // (not pure X) so the pair reads as two spheres genuinely resting against
-  // each other from most camera angles, like the reference screenshot,
-  // rather than lined up dead-centre on the same orbital ring. +0.4 is a
-  // small visible gap so they touch, not fuse into one mesh.
-  var dist=a.size+b.size+0.4;
-  var dir=new THREE.Vector3(0.82,-0.22,0.53).normalize();
-  var newPos=a.mesh.position.clone().addScaledVector(dir,dist);
-
-  a.pivot.add(b.mesh);
-  b.mesh.position.copy(newPos);
-  if(b.atmo){ a.pivot.add(b.atmo); b.atmo.position.copy(newPos); }
-  if(b.moonAnchor){ a.pivot.add(b.moonAnchor); b.moonAnchor.position.copy(newPos); }
+    a.pivot.add(b.mesh);
+    b.mesh.position.copy(newPos);
+    if(b.atmo){ a.pivot.add(b.atmo); b.atmo.position.copy(newPos); }
+    if(b.moonAnchor){ a.pivot.add(b.moonAnchor); b.moonAnchor.position.copy(newPos); }
+  }
 }
 /* ============ flattened system-view helpers (2026-09-13) ============
    Added for the Cosmos-era system-view redesign: Tony's real in-game
@@ -4511,7 +4628,7 @@ function buildSystemView(s){
       }
     }
   }
-  if(s.colliding) resolvePlanetCollisions(planetEntries,s.collidingA,s.collidingB);
+  if(s.colliding) resolvePlanetCollisions(planetEntries,s.collidingSet||[]);
 }
 
 /* ============ panel ============ */
@@ -5555,6 +5672,12 @@ canvas.addEventListener("pointerleave",function(){ galaxyHovered=false; hideHove
 
 /* ============ labels ============ */
 var labelEls=[], LBL_MAX=28;
+/* Cached copy of the top toolbar's real rendered height, kept in sync by
+   syncTopOffset() (same measurement it already takes to set the --top-h CSS
+   var) so updateLabels() -- which runs every single animation frame -- never
+   has to do its own getComputedStyle/getBoundingClientRect read on #top just
+   to know where the toolbar's bottom edge is. */
+var topBarH=60;
 function initLabels(){
   var box=document.getElementById("labels"),i;
   for(i=0;i<LBL_MAX;i++){
@@ -5719,6 +5842,22 @@ function updateLabels(){
       if(ly0-ly>48*lz){ fits=false; break; }
     }
     if(!fits){ el.style.display="none"; continue; }
+    /* Site review 2026-09-13: "Star labels render behind the top toolbar" --
+       reproduced jumping RANDOM onto systems with neighbours near the top
+       edge (e.g. "Bukyun"). #labels sits at z-index:15, #top at z-index:30
+       (deliberately, so the toolbar's own buttons stay clickable above
+       everything), so a label anchored near the top of the screen was never
+       actually broken -- it was rendering exactly where it should, just
+       behind an opaque toolbar sitting on top of it, cutting it off
+       mid-glyph instead of showing cleanly. Each label also floats ABOVE
+       its own anchor point (.lbl's -150% Y translate, ~1.5 line-heights),
+       so the true cutoff line is some way below topBarH, not right at it --
+       36*lz reproduces that same translate distance at the current
+       accessibility text-size multiplier. Hiding here (rather than
+       clamping ly down to fit) matches the bail-out just above: a label
+       that's missing near the toolbar reads better than one detached from
+       its real star. */
+    if(ly-36*lz<topBarH){ el.style.display="none"; continue; }
     placed.push({x:lx,y:ly});
     el.style.left=lx+"px";
     el.style.top=ly+"px";
@@ -6387,6 +6526,11 @@ document.getElementById("bMark").addEventListener("click",function(){
   var k=skey(selected);
   if(store.marks[k]) delete store.marks[k]; else store.marks[k]=1;
   saveStore(); applyFilter(); updatePanel(selected); buildGalaxyMarks();
+  // Keep the Favourites list live if it's already open in the background --
+  // same reasoning as the other refreshes on this line, just scoped to only
+  // do the extra work when there's actually a list on screen to update.
+  var favPopEl=document.getElementById("favPop");
+  if(favPopEl && favPopEl.classList.contains("show")) renderFavouritesList();
   toast(store.marks[k]?"Bookmarked":"Bookmark removed");
 });
 document.getElementById("bCopy").addEventListener("click",function(){
@@ -7490,13 +7634,16 @@ var editBodies=[];
 var bodyUidSeq=1;
 var editSignals=[];
 var signalUidSeq=1; // stable per-row id, survives add/remove reordering during a single edit session
-/* uids (not positions -- same reasoning as bfOrbits above) of the two
-   traveller-picked colliding planets, kept in module scope so a selection
-   survives re-renders triggered by adding/removing/reordering bodies. Only
-   the traveller who actually saw the overlap in-game can know which two --
-   this is deliberately NOT auto-detected from generated size/position, since
-   that's a guess and can miss or misidentify the real pair. */
-var collidingAUid="", collidingBUid="";
+/* uids (not positions -- same reasoning as bfOrbits above) of every
+   traveller-picked colliding planet, in pick order, kept in module scope so
+   a selection survives re-renders triggered by adding/removing/reordering
+   bodies. Only the traveller who actually saw the overlap in-game can know
+   which ones -- this is deliberately NOT auto-detected from generated
+   size/position, since that's a guess and can miss or misidentify the real
+   cluster. Was a fixed collidingAUid/collidingBUid pair until 2026-09-13
+   (goodguyfree found a real in-game system with 4 planets colliding at
+   once) -- an ordered array supports any cluster size, 2 and up. */
+var collidingUids=[];
 function renderCollidingSelectors(){
   var wrap=document.getElementById("edCollidingPair");
   var on=document.getElementById("edColliding").checked;
@@ -7504,6 +7651,15 @@ function renderCollidingSelectors(){
   if(!on) return;
   var isGiantSys=document.getElementById("edGiant").checked;
   var planets=editBodies.filter(function(b){ return !b.moon; });
+  // Drop any pick whose planet row no longer exists (removed from the
+  // system since it was picked), same reasoning as bfOrbits' own cleanup.
+  collidingUids=collidingUids.filter(function(uid){
+    return planets.some(function(p){ return String(p.uid)===String(uid); });
+  });
+  // A freshly-ticked checkbox (or one left with fewer than 2 valid picks
+  // after the cleanup above) always starts at 2 empty rows -- the real-game
+  // minimum for "colliding" to mean anything -- same as the old fixed pair.
+  while(collidingUids.length<2) collidingUids.push("");
   function opts(selectedUid){
     var html='<option value="">Choose a planet&hellip;</option>';
     for(var p=0;p<planets.length;p++){
@@ -7513,15 +7669,37 @@ function renderCollidingSelectors(){
     }
     return html;
   }
-  document.getElementById("edCollidingA").innerHTML=opts(collidingAUid);
-  document.getElementById("edCollidingB").innerHTML=opts(collidingBUid);
+  var ordinal=["First planet","Second planet","Third planet","Fourth planet","Fifth planet","Sixth planet"];
+  var html="";
+  for(var i=0;i<collidingUids.length;i++){
+    html+='<div class="starRow">'+
+      '<div class="mfld" style="margin-bottom:0;flex:1"><div class="lb">'+(ordinal[i]||("Planet "+(i+1)))+'</div>'+
+      '<select class="collidingSel" data-ci="'+i+'">'+opts(collidingUids[i])+'</select></div>'+
+      (collidingUids.length>2?'<span class="bx" data-colliding-remove="'+i+'" title="Remove">&times;</span>':'')+
+    '</div>';
+  }
+  document.getElementById("collidingEditList").innerHTML=html;
 }
 document.getElementById("edColliding").addEventListener("change",renderCollidingSelectors);
 document.getElementById("edStation").addEventListener("change",function(){
   document.getElementById("edStationNameWrap").style.display=this.checked?"block":"none";
 });
-document.getElementById("edCollidingA").addEventListener("change",function(e){ collidingAUid=e.target.value; });
-document.getElementById("edCollidingB").addEventListener("change",function(e){ collidingBUid=e.target.value; });
+document.getElementById("collidingEditList").addEventListener("change",function(e){
+  var ci=e.target.getAttribute("data-ci"); if(ci===null) return;
+  collidingUids[+ci]=e.target.value;
+});
+document.getElementById("collidingEditList").addEventListener("click",function(e){
+  var rm=e.target.getAttribute("data-colliding-remove"); if(rm===null) return;
+  if(collidingUids.length<=2) return; // every colliding cluster needs at least 2 planets
+  collidingUids.splice(+rm,1);
+  renderCollidingSelectors();
+});
+document.getElementById("edAddColliding").addEventListener("click",function(){
+  var planetCount=editBodies.filter(function(b){ return !b.moon; }).length;
+  if(collidingUids.length>=planetCount){ toast("Every planet in this system is already in the colliding list."); return; }
+  collidingUids.push("");
+  renderCollidingSelectors();
+});
 // Each row starts collapsed (just a name summary) so a system with several
 // planets doesn't turn the modal into a huge scroll -- only the row the
 // traveller is actively adding/editing expands, accordion-style, so Save
@@ -8122,10 +8300,11 @@ function openEditModal(){
     editBodies[pj].orbits=(pp>=1 && editBodies[pp-1])?editBodies[pp-1].uid:"";
     delete editBodies[pj].parentPos;
   }
-  // resolve the saved 1-based colliding-pair positions to this session's
+  // resolve the saved 1-based colliding-cluster positions to this session's
   // uids, same reasoning as the moon-orbits resolution just above
-  collidingAUid=(s.collidingA>=1 && editBodies[s.collidingA-1])?editBodies[s.collidingA-1].uid:"";
-  collidingBUid=(s.collidingB>=1 && editBodies[s.collidingB-1])?editBodies[s.collidingB-1].uid:"";
+  collidingUids=(s.collidingSet||[]).map(function(pos){
+    return (pos>=1 && editBodies[pos-1])?editBodies[pos-1].uid:null;
+  }).filter(function(uid){ return uid; });
   renderBodyEditList();
   editSignals=(s.signals||[]).map(function(g){
     return {
@@ -8923,8 +9102,17 @@ document.getElementById("hyperOpenFilters").addEventListener("click",function(){
 var TOUR_STEPS=[
   {sel:"#mGal",title:"A real 3D galaxy",
     body:"You're looking at one of 256 real No Man's Sky galaxies, generated from a portal address -- not a static image, a galaxy you can actually fly through and zoom into."},
+  /* Site review 2026-09-13: this used to be one step that name-dropped "Warp
+     Manifest" and "Galactic Navigator" before a first-timer had seen either
+     -- "a first-timer has nothing to hang those terms on yet". Split into
+     two steps, both still spotlighting Local (nothing else on the toolbar
+     to point at yet), so the basic hover/click/panel interactions land
+     first and the routing vocabulary only shows up once there's already a
+     star field on screen to plot a course through. */
   {sel:"#mLoc",title:"Local view",
-    body:"Local shows the real star field around you. Hover a star (mouse) for a quick popup, or click for the full panel -- race, economy, conflict, planets. Plotted course draws a line that's solid for a single jump, dashed for multi-hop, red if your drive can't reach it, and opens the Warp Manifest for the full itinerary. Enter system for a full 3D view, or add your own in-game data via Edit system. Once a course is plotted, PLAN JOURNEY on that same Warp Manifest card takes this same tab to the Galactic Navigator for turn-by-turn tracking of that real route -- it remembers your progress if you close the tab, and its own Back to Map / View Map buttons bring you right back here."},
+    body:"Local shows the real star field around you. Hover a star (mouse) for a quick popup, or click for the full panel -- race, economy, conflict, planets. Enter system for a full 3D view, or add your own in-game data via Edit system."},
+  {sel:"#mLoc",title:"Plotting a route",
+    body:"Click any star to plot a course to it -- solid line for a single jump, dashed for multi-hop, red if your current drive can't reach it. That opens the Warp Manifest, a full jump-by-jump itinerary, and its PLAN JOURNEY button hands the route to the Galactic Navigator for turn-by-turn tracking -- it remembers your progress if you close the tab, and its own Back to Map / View Map buttons bring you right back here."},
   {sel:"#inAddr",title:"Type an address",
     body:"Paste or type a 12-character portal address here and hit Jump to fly straight to that exact system."},
   {sel:"#bKeys",title:"No address handy?",
@@ -9869,6 +10057,54 @@ function renderFindMatches(results,radius,capped,thinned,mode,q){
   });
 })();
 
+/* #favPop open/close/position -- same pattern as #routesPop just above. */
+(function(){
+  var btn=document.getElementById("bFav"), pop=document.getElementById("favPop");
+  function positionUnderFavBtn(){
+    var r=btn.getBoundingClientRect();
+    var pw=pop.offsetWidth||300;
+    var left=Math.min(window.innerWidth-pw-8,Math.max(8,r.left));
+    var top=r.bottom+8;
+    var badge=document.getElementById("galInfo");
+    if(badge){
+      var br=badge.getBoundingClientRect();
+      if(br.height>0) top=Math.max(top,br.bottom+8);
+    }
+    var panelEl=document.getElementById("panel");
+    if(panelEl && panelEl.classList.contains("show")){
+      var pr=panelEl.getBoundingClientRect();
+      if(pr.width>0 && left+pw>pr.left-8 && left<pr.right){
+        left=Math.max(8,pr.left-pw-8);
+      }
+    }
+    pop.style.position="fixed";
+    pop.style.left=left+"px"; pop.style.right="auto";
+    pop.style.top=top+"px"; pop.style.bottom="auto";
+    clampPopoverTop(pop);
+  }
+  function remeasureScroll(){
+    pop.classList.remove("scroll");
+    if(pop.scrollHeight>pop.clientHeight+3) pop.classList.add("scroll");
+    clampPopoverTop(pop);
+  }
+  function openFav(){
+    pop.classList.add("show");
+    btn.classList.add("on");
+    positionUnderFavBtn();
+    renderFavouritesList();
+    remeasureScroll();
+  }
+  function closeFav(){ pop.classList.remove("show"); btn.classList.remove("on"); }
+  window.closeFavPop=closeFav;
+  btn.addEventListener("click",function(e){
+    e.stopPropagation();
+    if(pop.classList.contains("show")) closeFav(); else openFav();
+  });
+  document.addEventListener("click",function(e){
+    if(pop.classList.contains("show") && !pop.contains(e.target) && e.target!==btn) closeFav();
+  });
+})();
+
 /* Real bug fixed 2026-08-16 (Tony: "on other windows clicking outside
    closes it, but with these it just clicks a different star"). Every other
    closeable box in this app either sits inside #modalWrap's own opaque
@@ -10139,8 +10375,9 @@ document.getElementById("edSubmit").addEventListener("click",function(){
     outlaw:document.getElementById("edOutlaw").checked,
     abandoned:document.getElementById("edAbandoned").checked,
     colliding:document.getElementById("edColliding").checked,
-    collidingA:(document.getElementById("edColliding").checked&&uidToPos[collidingAUid])?uidToPos[collidingAUid]:0,
-    collidingB:(document.getElementById("edColliding").checked&&uidToPos[collidingBUid])?uidToPos[collidingBUid]:0,
+    collidingSet:document.getElementById("edColliding").checked
+      ? collidingUids.map(function(uid){ return uidToPos[uid]||0; }).filter(function(pos){ return pos>0; })
+      : [],
     hasStation:document.getElementById("edStation").checked,
     stationName:document.getElementById("edStation").checked?document.getElementById("edStationName").value.trim():"",
     allianceName:document.getElementById("edStation").checked?document.getElementById("edAllianceName").value.trim():"",
@@ -10722,7 +10959,8 @@ function resize(){
 function syncTopOffset(){
   var top=document.getElementById("top");
   if(!top) return;
-  document.documentElement.style.setProperty("--top-h",top.offsetHeight+"px");
+  topBarH=top.offsetHeight;
+  document.documentElement.style.setProperty("--top-h",topBarH+"px");
 }
 /* Positions the 10th-anniversary badge directly under #bAccess (the gear/
    accessibility button), matching its real rendered rect rather than a
