@@ -1508,6 +1508,7 @@ function refreshAfterOverrides(){
         // leave this one label stuck on the pre-edit name.
         var _sysBanner=document.getElementById("sysBanner");
         if(_sysBanner) _sysBanner.textContent=selected.name;
+        positionSysBanner();
       }
     }
   }
@@ -5721,6 +5722,7 @@ function setMode(m){
   if(m==="system"&&selected){
     sysBanner.textContent=selected.name;
     sysBanner.style.display="block";
+    positionSysBanner();
   } else {
     sysBanner.style.display="none";
   }
@@ -5773,7 +5775,7 @@ function setMode(m){
      1 to 10 planets, then fit a line through the results: dist tracks
      featureR almost exactly linearly (R²-clean, not just close), so one
      linear formula covers every system size instead of a fixed guess. */
-  if(m==="system"){ cam.dist=selected?(systemFeatureR(selected)*1.61+9.3):65; cam.phi=0.8; flyPos.set(0,34,50); }
+  if(m==="system"){ cam.dist=selected?(systemFeatureR(selected)*1.27+7.34):65; cam.phi=0.8; flyPos.set(0,34,50); }
   aimFly(cam.target);
   applyCam();
 }
@@ -10642,6 +10644,7 @@ function resize(){
   camera.aspect=w/h; camera.updateProjectionMatrix();
   syncTopOffset();
   positionAnnivBadge();
+  positionSysBanner();
   _lastOccludeW=-1; /* force syncPanelOffset() to recompute against the new size next frame */
 }
 /* The mobile layout (leftcol/keys/stats) positions itself below the top
@@ -10667,6 +10670,13 @@ function syncTopOffset(){
    from resize() below so it re-syncs whenever the toolbar layout could
    have changed -- never from anything mode-related, so it never moves or
    hides when switching Galaxy/Local/System. */
+function positionSysBanner(){
+  var topEl=document.getElementById("top"), el=document.getElementById("sysBanner");
+  if(!topEl||!el||el.style.display==="none") return;
+  var r=topEl.getBoundingClientRect();
+  if(r.width===0 && r.height===0) return; /* not laid out yet */
+  el.style.top=Math.round(r.bottom+10)+"px";
+}
 function positionAnnivBadge(){
   var hud=document.getElementById("galHud"), el=document.getElementById("annivBadge");
   if(!hud||!el) return;
@@ -11247,6 +11257,7 @@ if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){
   function syncOverlays(){
     syncTopOffset();
     positionAnnivBadge();
+    positionSysBanner();
     /* 2026-08-30 (later same day, Tony: still out of sync once controls were
        fully shown again): the immediate call above still isn't enough on its
        own -- this cascade fires a syncOverlays() every STAGGER(180ms) as each
@@ -11260,6 +11271,7 @@ if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){
        settled -- same fix already used for this exact class of race
        elsewhere in this file (see updateGalInfoBadge() above). */
     timers.push(setTimeout(positionAnnivBadge,180));
+    timers.push(setTimeout(positionSysBanner,180));
   }
   /* 2026-08-31: was one forced synchronous reflow (`void el.offsetWidth`)
      PER BUTTON in a tier -- needed once, to make the browser notice the

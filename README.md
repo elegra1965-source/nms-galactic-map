@@ -165,7 +165,7 @@ and ternary stars, planets and moons on real orbits with rings where the
 generator rolled them, and (where the region has one) a black hole or Atlas
 Interface rendered as its own object rather than swapped in for the star.
 
-![3D system view](screenshots/03-system-3d-view.jpg)
+![3D system view](screenshots/03-system-3d-view.png)
 
 **Filters.** Narrow the local star field by colour, race, economy, or special
 system types (outlaw, black holes, Atlas interfaces, phantom/shadow stars),
@@ -179,7 +179,7 @@ you've ever bookmarked, waypointed, visited, or edited, regardless of where
 you currently are, use Search with an empty query instead (see "Search by
 name" below) -- that's the actual way back to it.
 
-![Filters panel](screenshots/04-filters-panel.jpg)
+![Filters panel](screenshots/04-filters-panel.png)
 
 **Edit system.** Every system starts as a plausible procedural guess. Edit
 system lets you overwrite that with what you actually see in-game -- stars,
@@ -249,7 +249,7 @@ image is available. Each marker also carries a free-text name, category,
 signal type, and route note -- type what your own report actually said,
 same as everything else in this section.
 
-![Edit system modal](screenshots/05-edit-system-modal.jpg)
+![Edit system modal](screenshots/05-edit-system-modal.png)
 
 Once saved, both show up right in the system info panel for every visitor
 -- **Community notes** and **Screenshot** as two clearly separate,
@@ -270,7 +270,7 @@ recover automatically; everything else still needs typing in by hand.
 directly -- both stay in sync, so you can decode a screenshot from your own
 game without knowing the hex first.
 
-![Portal glyph keypad](screenshots/06-glyph-keypad.jpg)
+![Portal glyph keypad](screenshots/06-glyph-keypad.png)
 
 **Search & Scan.** No reverse index exists across the whole procedural
 galaxy -- names are generated *from* the address, not the other way round --
@@ -320,7 +320,7 @@ system.
 Daltonization colour-correction (not simulation) for protanopia, deuteranopia,
 and tritanopia -- built into the map itself, not bolted on as an afterthought.
 
-![Accessibility panel](screenshots/08-accessibility-panel.jpg)
+![Accessibility panel](screenshots/08-accessibility-panel.png)
 
 **Draggable panels.** Filters, the system info panel, Course plotted, the
 Warp Manifest, the glyph keypad, Search, Edit system, and Accessibility can
