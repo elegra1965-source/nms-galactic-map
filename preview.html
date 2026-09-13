@@ -141,7 +141,16 @@
 html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);
   font-family:'Rajdhani',system-ui,sans-serif;-webkit-font-smoothing:antialiased;
   -webkit-tap-highlight-color:transparent}
-canvas#c{display:block;position:fixed;inset:0;touch-action:none}
+/* 2026-09-13, Tony: "when the curser is over either the galaxy map or local
+   map it needs to change to a grabbing hand so users know its moveable, as
+   its just a arrow at the moment" -- grab at rest (the canvas is always
+   pan/orbit-draggable in every mode, not just Galaxy/Local), swapped for
+   grabbing the moment a real drag starts (see the pointerdown/endPointer
+   handlers below) and back to grab when it ends. The existing hover-pointer
+   affordance for a clickable Galaxy-view marker (handleHoverRay) already
+   clears its own inline cursor back to "" while not hovering one, which
+   now falls through to this grab default instead of the plain arrow. */
+canvas#c{display:block;position:fixed;inset:0;touch-action:none;cursor:grab}
 
 .kicker{font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:.18em;
   color:var(--gold);text-transform:uppercase}
@@ -243,7 +252,20 @@ canvas#c{display:block;position:fixed;inset:0;touch-action:none}
    never read as grouped even though the dividers were always there. Bumped
    to a visible cyan line with a little breathing room on each side. */
 .sep{width:2px;height:22px;background:rgba(0,229,255,.35);align-self:center;margin:0 4px}
-@property --bevAng{syntax:'<angle>';inherits:false;initial-value:0deg}
+/* 2026-09-13, Tony: "can the yellow be in sync on all buttons as its
+   distracting when look that they rotate at different times" -- inherits
+   was false, so every .btn.beveled got its OWN independent --bevAng
+   starting from 0deg at whatever real moment IT first started animating
+   (page load for toolbar buttons always on screen, but much later --
+   and different again each time -- for one that only exists inside a
+   popover, or that only just gained .beveled/.on). Same duration on all
+   of them was never enough to keep them in phase with each other.
+   Fix: inherits:true plus ONE animation on html below (not each button)
+   means every button just reads the SAME live --bevAng off the document
+   root, so they're mechanically always in lockstep, regardless of when
+   each one appeared or turned on -- not a coincidence of matching timers. */
+@property --bevAng{syntax:'<angle>';inherits:true;initial-value:0deg}
+html{animation:bevTrace 6s linear infinite}
 .btn.beveled{
   position:relative;
   clip-path:polygon(7px 0,100% 0,100% calc(100% - 7px),calc(100% - 7px) 100%,0 100%,0 7px);
@@ -253,7 +275,6 @@ canvas#c{display:block;position:fixed;inset:0;touch-action:none}
     conic-gradient(from var(--bevAng),transparent 0deg,rgba(0,229,255,.18) 16deg,var(--cyan) 26deg,
       transparent 68deg,transparent 360deg) border-box;
   text-shadow:0 0 5px rgba(0,229,255,.3);
-  animation:bevTrace 6s linear infinite;
 }
 .btn.beveled:hover{border-color:transparent;
   background:
@@ -270,7 +291,8 @@ canvas#c{display:block;position:fixed;inset:0;touch-action:none}
 }
 @keyframes bevTrace{to{--bevAng:360deg}}
 @media (prefers-reduced-motion:reduce){
-  .btn.beveled{animation:none;
+  html{animation:none}
+  .btn.beveled{
     background:
       linear-gradient(rgba(13,19,28,.92),rgba(13,19,28,.92)) padding-box,
       linear-gradient(90deg,var(--cyan),var(--border)) border-box;}
@@ -667,7 +689,14 @@ html.hc-on .btn{border-width:2px}
 .guessVal{opacity:.55}
 .tag.guess{border-color:var(--text-faint);color:var(--text-faint);border-style:dashed}
 .tag.fs-disputed{border-color:var(--fs-disputed);color:var(--fs-disputed);box-shadow:none;padding-left:7px}
-.seqbox{border:1px solid var(--border-soft);border-radius:var(--r-sm);padding:7px;margin-top:10px;background:#04070c}
+/* 2026-09-13: collapsible sub-sections inside #panel (see the HTML comment
+   just above #pSeqHead) -- deliberately plain text + arrow, not a boxed
+   .btn, so these read as section labels you *can* click rather than
+   actions sitting in the same visual rank as Enter System/Bookmark/etc. */
+.panelFoldHead{cursor:pointer;user-select:none;margin-top:10px;font-size:9px;
+  letter-spacing:.12em;color:var(--text-faint);text-transform:uppercase}
+.panelFoldHead:hover{color:var(--cyan)}
+.seqbox{border:1px solid var(--border-soft);border-radius:var(--r-sm);padding:7px;margin-top:6px;background:#04070c}
 .seqbox .lb{font-size:9px;letter-spacing:.16em;color:var(--gold);text-align:center;margin-bottom:5px}
 .seq{display:grid;grid-template-columns:repeat(12,1fr);gap:2px}
 .seq img{width:100%;filter:drop-shadow(0 0 4px rgba(0,229,255,.5))}
@@ -1740,13 +1769,23 @@ nearby procedural space within a radius.">Search</button>
     </div>
     <div id="pEditorLine" style="font-size:10.5px;color:var(--text-faint);margin-top:5px;display:none"></div>
   </div>
-  <div class="seqbox">
+  <!-- 2026-09-13, Tony's own review feedback: the info panel had grown long
+       enough that reaching these action buttons meant scrolling past a
+       glyph sequence and a surveyor log most visits don't need. Collapsed
+       by default (see togglePanelFold() / the reset in updatePanel()) --
+       one click reopens either; same ▸/▾ + hidden-body idiom toggleFold()
+       already uses for Filters/Tweak, just scoped to a section inside this
+       one panel instead of a whole floating box. -->
+  <div class="lb panelFoldHead" id="pSeqHead" role="button" tabindex="0" aria-expanded="false" aria-controls="pSeqBody">&#9656; Portal sequence &amp; coordinates</div>
+  <div class="seqbox" id="pSeqBody" style="display:none">
     <div class="lb">Portal sequence</div>
     <div class="seq" id="pSeq"></div>
     <div id="pAddr">—</div>
     <div class="lb pCoordsLb">Matrix vector points</div>
     <div id="pCoords">X: — | Y: — | Z: —</div>
   </div>
+  <div class="lb panelFoldHead" id="pNoteHead" role="button" tabindex="0" aria-expanded="false" aria-controls="pNoteBody" style="margin-top:8px">&#9656; Surveyor log</div>
+  <div id="pNoteBody" style="display:none">
   <textarea id="pNote" placeholder="Surveyor notes..."></textarea>
   <!-- 2026-09-01, Tony: same screenshot idea as Edit system's public notes
        (see pubScreenshotWrap above), but private -- attached to your own
@@ -1767,6 +1806,7 @@ nearby procedural space within a radius.">Search</button>
   </div>
   <div class="prow">
     <button class="btn" id="bSave" title="Save your surveyor notes for this system to this device.">Save log</button>
+  </div>
   </div>
 </div>
 

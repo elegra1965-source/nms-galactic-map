@@ -4859,6 +4859,7 @@ canvas.addEventListener("pointerdown",function(e){
      the order the fingers happen to lift in. */
   if(Object.keys(pointers).length>=2) wasPinch=true;
   drag=true; lastX=e.clientX; lastY=e.clientY; moved=0;
+  canvas.style.cursor="grabbing"; // 2026-09-13, Tony: grab feedback for an active drag (see canvas#c's resting "grab" in preview.html)
   canvas.setPointerCapture(e.pointerId);
 });
 canvas.addEventListener("pointermove",function(e){
@@ -4913,6 +4914,7 @@ function endPointer(e){
     if(drag&&moved<6&&!wasPinch) tryPick(e.clientX,e.clientY);
     drag=false;
     wasPinch=false;
+    canvas.style.cursor="grab"; // back to the resting drag affordance once the gesture ends
   }
 }
 canvas.addEventListener("pointerup",endPointer);
@@ -6389,6 +6391,26 @@ function skipWarp(){
    Prefers directly under #course (keeps the Course/Manifest pair visually
    grouped); falls back to immediately left of the system info panel --
    Tony's own ask, and the same spot #course itself defaults to. */
+/* 2026-09-13, honest-review fix: every button-anchored popover below sets
+   top=triggerButton.bottom+8 with nothing stopping that from landing so
+   low that part of the box -- #searchPop's own Scan button, confirmed live
+   -- renders below window.innerHeight. html/body are overflow:hidden
+   everywhere in this app (fixed canvas layout), so there's no page scroll
+   to fall back on, and a popover's own .scroll class (see #searchPop's
+   remeasureScroll()) only helps when ITS CONTENT is taller than its own
+   box -- it does nothing when the box itself is positioned past the
+   bottom edge. Same "measure real space, don't guess" fix as
+   positionHyperPanel()/tourPosition() elsewhere in this file: after a
+   popover is positioned, or its content height changes, pull its top up
+   just enough to keep its own bottom on-screen. Shared here rather than
+   re-derived per box (#searchPop, #routesPop, #accessPop, this manifest
+   card all anchor the same way). */
+function clampPopoverTop(pop,minTop){
+  var r=pop.getBoundingClientRect();
+  if(!r.height) return; // not open/laid out yet -- nothing to clamp
+  var top=Math.min(r.top,window.innerHeight-8-r.height);
+  pop.style.top=Math.max(minTop||8,top)+"px";
+}
 function positionManifestCard(){
   var card=document.getElementById("route-itinerary-card");
   if(!card) return;
@@ -6415,6 +6437,7 @@ function positionManifestCard(){
   card.style.top=top+"px";
   card.style.right="auto";
   card.style.transform="none";
+  clampPopoverTop(card);
 }
 /* Fills in the manifest's content. As of 2026-08-21 this no longer forces
    the card open on every course plot (Tony: clicking any star re-plots the
@@ -8713,6 +8736,7 @@ applyA11y();
     pop.style.right="auto";
     pop.style.top=top+"px";
     pop.style.bottom="auto";
+    clampPopoverTop(pop);
   }
   function open(){
     clearTimeout(hideT);
@@ -9023,6 +9047,7 @@ function renderMatches(matches,emptyMsg){
     pop.style.position="fixed";
     pop.style.left=left+"px"; pop.style.right="auto";
     pop.style.top=top+"px"; pop.style.bottom="auto";
+    clampPopoverTop(pop);
   }
   /* Same measure-don't-guess fix as positionHyperPanel()/openHyperNotice()
      -- only opt into a real scrollbar once actual overflow is confirmed
@@ -9037,6 +9062,7 @@ function renderMatches(matches,emptyMsg){
   function remeasureScroll(){
     pop.classList.remove("scroll");
     if(pop.scrollHeight>pop.clientHeight+3) pop.classList.add("scroll");
+    clampPopoverTop(pop);
   }
   function openSearch(){
     pop.classList.add("show");
@@ -9304,6 +9330,7 @@ function remeasureSearchPop(){
   if(!pop) return;
   pop.classList.remove("scroll");
   if(pop.scrollHeight>pop.clientHeight+3) pop.classList.add("scroll");
+  clampPopoverTop(pop);
 }
 function renderFindMatches(results,radius,capped,thinned,mode,q){
   var box=document.getElementById("findScanResults");
@@ -9436,10 +9463,12 @@ function renderFindMatches(results,radius,capped,thinned,mode,q){
     pop.style.position="fixed";
     pop.style.left=left+"px"; pop.style.right="auto";
     pop.style.top=top+"px"; pop.style.bottom="auto";
+    clampPopoverTop(pop);
   }
   function remeasureScroll(){
     pop.classList.remove("scroll");
     if(pop.scrollHeight>pop.clientHeight+3) pop.classList.add("scroll");
+    clampPopoverTop(pop);
   }
   function openRoutes(){
     pop.classList.add("show");
