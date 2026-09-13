@@ -3872,8 +3872,20 @@ function buildStationCard(s,pos){
   var h=5.6, w=h*(CW/CH);
   spr.scale.set(w,h,1);
   spr.position.copy(pos);
+  // 2026-09-13, Tony: an uninhabited system can still carry a real
+  // manually-flagged station (hasStation is entirely traveller-submitted,
+  // never tied to race -- see the Edit system form's own "Space station
+  // directorship" comment) -- notable enough to call out right on the tag
+  // itself rather than only being discoverable by opening the full info
+  // panel and checking Race separately. Tony's own follow-up: the
+  // "(Uninhabited)" tag is only ever the DEFAULT placeholder state -- a
+  // traveller can still submit a real station name once they know it
+  // (someone can found/name a station in a system the procedural roll
+  // called Uninhabited), and once a real name exists that name is the
+  // known fact, not the procedural guess, so the tag drops off rather than
+  // sitting there looking like it contradicts the name right next to it.
   spr.userData={feature:true,stationCard:true,
-    name:(s.stationName?("Station: "+s.stationName):"Space station")+(s.allianceName?(" (Alliance: "+s.allianceName+")"):""),sys:s};
+    name:(s.stationName?("Station: "+s.stationName):("Space station"+(s.race==="Uninhabited"?" (Uninhabited)":"")))+(s.allianceName?(" (Alliance: "+s.allianceName+")"):""),sys:s};
   featureMeshes.push(spr);
   var img=new Image();
   img.crossOrigin="anonymous";
@@ -4272,8 +4284,12 @@ function buildDefaultStationIcon(s){
      default icon in line with it, and picks up the traveller's real
      stationName the same way buildStationCard does rather than always
      showing the generic "Space station" fallback. */
+  // Same "(Uninhabited)"-only-while-unnamed tag as buildStationCard's own
+  // userData.name -- see that function's comment for the why. Kept
+  // identical between the two so the tag reads the same whether or not a
+  // real station photo exists.
   spr.userData={feature:true,stationCard:true,sys:s,
-    name:(s.stationName?("Station: "+s.stationName):"Space station")+(s.allianceName?(" (Alliance: "+s.allianceName+")"):"")};
+    name:(s.stationName?("Station: "+s.stationName):("Space station"+(s.race==="Uninhabited"?" (Uninhabited)":"")))+(s.allianceName?(" (Alliance: "+s.allianceName+")"):"")};
   featureMeshes.push(spr);
   return spr;
 }
