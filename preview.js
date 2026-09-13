@@ -1758,23 +1758,48 @@ function closestCanonMatch(value,canonArr){
   var allowed=maxLen<=5?1:(maxLen<=10?2:3);
   return bestDist<=allowed ? {term:best,dist:bestDist} : null;
 }
-// Checks one field's whole comma value. "Known" = an exact (case-
-// insensitive) match to canon, the shared community list, OR this
-// browser's own past input -- none of those get touched or flagged, only
-// something never seen before by anyone goes through the distance check.
+// Checks one field's whole comma value against three sources, in a
+// specific priority order -- canon FIRST, always, then community/learned:
+// 2026-09-13 real bug (Tony: typed "Cooper" on Ayne, got the auto-correct
+// toast, saved fine -- but "Cobolt" on Tanh, same submission, same typo
+// shape, saved as the literal typo and STAYED that way on every re-edit).
+// Root cause: the old version treated an exact match to canon, the shared
+// community list, or this browser's own past input as equally "known" and
+// skipped the distance check for all three alike. But community/learned
+// terms are just "something a traveller typed once and confirmed" -- not
+// reviewed, not necessarily correct. The very first time ANY typo (of a
+// real canon item) got confirmed through the "add anyway" dialog, it was
+// unconditionally folded into the shared community list server-side (see
+// addCommunityTerms() in lib/shared.mjs -- happens for every submitted
+// value, flagged or not) and from that point on it matched the community
+// check first and skipped correction forever after, for every future
+// traveller who typed that same typo, on any system. "Cobolt" and, it
+// turns out, "Cooper" itself are both sitting in the real live community
+// list right now -- confirmed live on the deployed site, not guessed.
+// Fix: try an exact CANON match first, then the distance check against
+// canon (so a real typo of a real item always gets pulled toward the
+// correct spelling, no matter what's already sitting in the community
+// list), and only fall back to "already confirmed by the community/this
+// browser" for a value that ISN'T close to anything on canon -- i.e. a
+// genuinely new, non-canon item like "Salvageable scrap", which is exactly
+// what that fallback should be for.
 function checkFieldAgainstCanon(field,rawValue){
   var canonArr=CANON_TERMS_BY_FIELD[field];
   var items=String(rawValue||"").split(",").map(function(x){return x.trim();}).filter(Boolean);
   if(!canonArr) return {items:items,corrected:[],flagged:[]};
   var community=(OVERRIDES.communityTerms&&OVERRIDES.communityTerms[field])||[];
   var learned=knownTerms[field]||[];
-  var knownLo={};
-  canonArr.concat(community).concat(learned).forEach(function(v){ knownLo[v.toLowerCase()]=1; });
+  var canonLo={};
+  canonArr.forEach(function(v){ canonLo[v.toLowerCase()]=1; });
+  var communityLearnedLo={};
+  community.concat(learned).forEach(function(v){ communityLearnedLo[v.toLowerCase()]=1; });
   var corrected=[], flagged=[];
   var outItems=items.map(function(v){
-    if(knownLo[v.toLowerCase()]) return v;
+    var vLo=v.toLowerCase();
+    if(canonLo[vLo]) return v;
     var m=closestCanonMatch(v,canonArr);
     if(m && m.dist>0){ corrected.push({from:v,to:m.term}); return m.term; }
+    if(communityLearnedLo[vLo]) return v;
     flagged.push(v);
     return v;
   });
