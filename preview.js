@@ -3691,14 +3691,22 @@ function buildStar(s,i,pos){
     new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:0.72,
       blending:THREE.AdditiveBlending,depthWrite:false}));
   grp.add(tint);
-  var sh1=new THREE.Mesh(new THREE.SphereGeometry(rad*1.5,24,18),
+  /* Corona/glow scaled down (2026-09-13, Tony live-site feedback: "star
+     seams a bit big taking over the system") -- rad*11 for the billboard
+     plane and rad*2.3 for the outer glow shell were tuned only by eye
+     against a single mockup frame, and on a real (often smaller) system
+     the additive-blended bloom reads as far bigger than its literal
+     texture bounds, visually dominating the whole flattened disc. Trimmed
+     the plane and both glow shells; sh1/rad itself untouched (that's the
+     star's actual visible disc size, not the bloom around it). */
+  var sh1=new THREE.Mesh(new THREE.SphereGeometry(rad*1.35,24,18),
     new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:0.22,
       blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.BackSide}));
-  var sh2=new THREE.Mesh(new THREE.SphereGeometry(rad*2.3,20,16),
+  var sh2=new THREE.Mesh(new THREE.SphereGeometry(rad*1.7,20,16),
     new THREE.MeshBasicMaterial({color:col,transparent:true,opacity:0.10,
       blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.BackSide}));
   grp.add(sh1); grp.add(sh2);
-  var cor=new THREE.Mesh(new THREE.PlaneGeometry(rad*11,rad*11),
+  var cor=new THREE.Mesh(new THREE.PlaneGeometry(rad*7,rad*7),
     new THREE.MeshBasicMaterial({map:CORONA,color:col,transparent:true,
       opacity:0.95,blending:THREE.AdditiveBlending,depthWrite:false,
       side:THREE.DoubleSide}));
@@ -4167,6 +4175,17 @@ var DEFAULT_STATION_TEX=[
   {tex:TEX_LOADER.load("icons-web/feature-station-default4.png"),aspect:640/364},
   {tex:TEX_LOADER.load("icons-web/feature-station-default5.png"),aspect:438/482}
 ];
+/* Shared with setMode()'s camera-fit (2026-09-13, Tony live feedback: system
+   view "needs to fill screen more, little small") -- both need the exact
+   same "how big is this system" number, factored out so they can't drift
+   out of sync the way two separately-typed copies of the same formula
+   eventually do. lastOrbitR is the outermost planet's orbit radius (see
+   buildSystemView's own orbitR formula below); featureR pushes 12 further
+   out, clear of that ring, which is also where the star/black hole/Atlas
+   get placed. */
+function systemFeatureR(s){
+  return 8+Math.max(0,s.planets-1)*3.7+12;
+}
 function buildDefaultStationIcon(s){
   var pick=DEFAULT_STATION_TEX[Math.floor(mulberry32(s.idx^0x53544144)()*DEFAULT_STATION_TEX.length)];
   var mat=new THREE.SpriteMaterial({map:pick.tex,transparent:true,depthWrite:false});
@@ -4174,8 +4193,18 @@ function buildDefaultStationIcon(s){
   var h=5.0,w=h*pick.aspect;
   spr.scale.set(w,h,1);
   spr.position.set(0,0,0);
-  spr.userData={feature:true,stationCard:true,
-    name:"Space station"+(s.allianceName?(" (Alliance: "+s.allianceName+")"):"")};
+  /* Real bug (2026-09-13, Tony: clicked the default station icon live and
+     got "Cannot read properties of undefined (reading 'stars')"): this
+     userData was missing `sys`, but tryPick()'s system branch always calls
+     updatePanel(ud.sys) for anything with ud.feature true -- so clicking
+     this icon called updatePanel(undefined), which crashed the moment it
+     tried starSwatches(undefined).stars. buildStationCard (the real-photo
+     twin of this function) already carried sys -- this just brings the
+     default icon in line with it, and picks up the traveller's real
+     stationName the same way buildStationCard does rather than always
+     showing the generic "Space station" fallback. */
+  spr.userData={feature:true,stationCard:true,sys:s,
+    name:(s.stationName?("Station: "+s.stationName):"Space station")+(s.allianceName?(" (Alliance: "+s.allianceName+")"):"")};
   featureMeshes.push(spr);
   return spr;
 }
@@ -4195,8 +4224,7 @@ function buildSystemView(s){
      clearance margin. Computed BEFORE the star loop now (2026-09-13,
      flattened system-view redesign) because the star cluster is also
      positioned off featureR -- see below. */
-  var lastOrbitR=8+Math.max(0,s.planets-1)*3.7;
-  var featureR=lastOrbitR+12;
+  var featureR=systemFeatureR(s);
   /* Flattened system view (2026-09-13, Tony -- Cosmos-era reference
      screenshots): the star used to sit at the scene's exact centre, with
      every planet orbiting it directly. The reference instead keeps the
@@ -5269,16 +5297,42 @@ function hideHoverPop(){
 function showSystemHoverPop(ud,cx,cy){
   var pop=document.getElementById("hoverPop"),html;
   if(ud.body){
-    var b=ud.body,subParts=[];
-    if(b.biome) subParts.push(b.biome);
-    if(b.water) subParts.push("Water");
-    if(b.ring) subParts.push("Ring");
+    /* Enriched 2026-09-13 (Tony live feedback: "not a lot of information
+       in planet tab") -- was just name + biome/water/ring folded into one
+       line. Now mirrors the same fields showBody()'s full click-through
+       panel already shows (biome/subtype -- "Unknown" until a traveller's
+       confirmed it, same strict rule as the panel -- terrain, water, and
+       any of the panel's own tag pills that apply), just condensed to a
+       couple of lines instead of the panel's full layout. */
+    var b=ud.body;
+    var biomeTxt=b.biomeOverridden?(b.biome+(b.subtype?" ("+b.subtype+")":"")):"Unknown";
+    var tags=[];
+    if(b.bodyOverridden&&b.ring) tags.push("Ring");
+    if(b.base) tags.push(b.baseName?('Base: "'+b.baseName+'"'):"Base");
+    if(b.ruins) tags.push("Ruins");
+    if(b.reliquary) tags.push("Reliquary");
     html='<div class="hpName">'+(b.moon?"↳ ":"")+b.name+'</div>'+
-      (subParts.length?'<div class="hpCls">'+subParts.join(" // ")+'</div>':'');
+      '<div class="hpCls">'+biomeTxt+'</div>'+
+      '<div class="hpSub">'+b.terrain+(b.water?" // Water":" // No water")+'</div>'+
+      (tags.length?'<div class="hpSub">'+tags.join(" // ")+'</div>':'');
   } else if(ud.star){
-    var spec=(ud.sys&&ud.sys.spectral)?ud.sys.spectral:"";
-    html='<div class="hpName">★ '+ud.name+'</div>'+
-      (spec?'<div class="hpCls">'+spec+'</div>':'');
+    /* Enriched 2026-09-13 (Tony live feedback: "star not much information
+       again") -- reuses the exact same race/economy/conflict block Local's
+       showHoverPop() already builds for its "full" tier (same sy.race/
+       econType/econName/sell/buy/econDesc/conflict/conTier fields -- a
+       System-view star's ud.sys is the very same system object), just
+       always shown rather than zoom-gated the way Local's is, since
+       System view has no equivalent of Local's cam.dist to gate on. */
+    var sy=ud.sys,spec=(sy&&sy.spectral)?sy.spectral:"";
+    html='<div class="hpName">★ '+ud.name+'</div>'+(spec?'<div class="hpCls">'+spec+'</div>':'');
+    if(sy){
+      html+='<div class="hpDetail">'+
+        '<div class="hpRow">'+raceIcon(sy.race)+'<span class="hpLbl">'+sy.race+'</span></div>'+
+        '<div class="hpRow">'+econIcon(sy.econType)+'<span class="hpLbl">'+(sy.uncharted?"Uncharted":sy.econName)+'</span></div>'+
+        (sy.uncharted?'':'<div class="hpSub">Sell: '+sy.sell+'% Buy: '+sy.buy+'% // '+sy.econDesc+'</div>')+
+        (sy.conflict==="Not Available"?'':'<div class="hpRow">'+svg(IC_CONFLICT,CONFLICT_COL[sy.conTier])+conBadge(sy)+'<span class="hpLbl">'+sy.conflict+'</span></div>')+
+        '</div>';
+    }
   } else {
     html='<div class="hpName">'+ud.name+'</div>';
   }
@@ -5667,8 +5721,22 @@ function setMode(m){
      (previously system mode inherited whatever phi Local last had, ~1.55
      rad -- nearly edge-on -- which would show the new flat shared orbital
      plane as barely more than a line). Raked down closer to Galaxy's own
-     angle instead so the flattened disc actually reads as a disc. */
-  if(m==="system"){ cam.dist=65; cam.phi=0.8; flyPos.set(0,34,50); }
+     angle instead so the flattened disc actually reads as a disc.
+     cam.dist was a flat 65 (2026-09-13 first pass) -- fine for the one
+     4-planet scene it was eyeballed against, but Tony's live-site feedback
+     the same day was "needs to fill screen more, little small": a flat
+     distance means a small (fewer-planet) system just sits lost in empty
+     space while a big one clips, since neither scales with how far out
+     this system's own rings/star/features actually reach. Refit
+     (2026-09-13, second pass) via the same headless-Three.js harness
+     verification as the rest of this redesign -- binary-searched, at the
+     real camera's actual fov (58), the tightest dist that keeps every
+     ring point + the star's full corona + every feature within 85% of
+     the frame (a small safety margin, not clipped) for system sizes from
+     1 to 10 planets, then fit a line through the results: dist tracks
+     featureR almost exactly linearly (R²-clean, not just close), so one
+     linear formula covers every system size instead of a fixed guess. */
+  if(m==="system"){ cam.dist=selected?(systemFeatureR(selected)*1.61+9.3):65; cam.phi=0.8; flyPos.set(0,34,50); }
   aimFly(cam.target);
   applyCam();
 }
