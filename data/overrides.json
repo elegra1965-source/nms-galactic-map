@@ -9826,7 +9826,7 @@
             "minerals": [
               "Silver",
               "Dioxite",
-              "Cooper"
+              "Copper"
             ],
             "salvage": [],
             "fossils": [],
@@ -9970,7 +9970,7 @@
         "stationPhoto": "",
         "signals": []
       },
-      "editedAt": "2026-09-13T19:23:10.354Z",
+      "editedAt": "2026-09-13T19:30:05.816Z",
       "editedByIp": "5.133.46.24",
       "flaggedFields": [],
       "disputedFields": [],
@@ -10057,6 +10057,10 @@
         },
         {
           "at": "2026-09-13T19:23:10.354Z",
+          "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-09-13T19:30:05.816Z",
           "text": "edited by a traveller"
         }
       ],
@@ -35449,7 +35453,8 @@
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1789327390354
+      1789327390354,
+      1789327805816
     ]
   },
   "flagLog": {},
