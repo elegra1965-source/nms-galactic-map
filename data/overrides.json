@@ -9772,14 +9772,15 @@
         "colliding": false,
         "collidingA": 0,
         "collidingB": 0,
-        "editorName": "t672b774",
-        "editorFriendCode": "MGD8-C6PP-XKFGT",
+        "editorName": "",
+        "editorFriendCode": "",
         "bodies": [
           {
             "name": "Naupac Minor",
             "moon": false,
             "orbits": 0,
             "biome": "Radioactive",
+            "subtype": "",
             "descriptor": "Radioactive storms",
             "water": true,
             "ring": "gold",
@@ -9801,6 +9802,8 @@
             "fossils": [],
             "sentinel": "Spread Thin",
             "autophage": false,
+            "reliquary": false,
+            "ruins": false,
             "base": false,
             "baseName": ""
           },
@@ -9809,6 +9812,7 @@
             "moon": false,
             "orbits": 0,
             "biome": "Volcanic",
+            "subtype": "",
             "descriptor": "Raging snowstorms",
             "water": true,
             "ring": false,
@@ -9821,13 +9825,15 @@
             "fauna": [],
             "minerals": [
               "Silver",
-              "Dioxide",
+              "Dioxite",
               "Cooper"
             ],
             "salvage": [],
             "fossils": [],
             "sentinel": "Ever-present",
             "autophage": false,
+            "reliquary": false,
+            "ruins": false,
             "base": false,
             "baseName": ""
           },
@@ -9836,6 +9842,7 @@
             "moon": false,
             "orbits": 0,
             "biome": "Radioactive",
+            "subtype": "",
             "descriptor": "Airless",
             "water": false,
             "ring": false,
@@ -9856,6 +9863,8 @@
             "fossils": [],
             "sentinel": "Observant",
             "autophage": false,
+            "reliquary": false,
+            "ruins": false,
             "base": false,
             "baseName": ""
           },
@@ -9864,9 +9873,10 @@
             "moon": false,
             "orbits": 0,
             "biome": "Lush",
+            "subtype": "",
             "descriptor": "Mostly Calm",
             "water": true,
-            "ring": "tan",
+            "ring": false,
             "resources": [
               "Star Bulbs"
             ],
@@ -9883,6 +9893,8 @@
             "fossils": [],
             "sentinel": "Low",
             "autophage": false,
+            "reliquary": false,
+            "ruins": false,
             "base": false,
             "baseName": ""
           },
@@ -9891,6 +9903,7 @@
             "moon": false,
             "orbits": 0,
             "biome": "Frozen",
+            "subtype": "",
             "descriptor": "Freezing",
             "water": true,
             "ring": false,
@@ -9903,7 +9916,7 @@
             "fauna": [],
             "minerals": [
               "Salt",
-              "Dioxide",
+              "Dioxite",
               "Copper"
             ],
             "salvage": [
@@ -9912,6 +9925,8 @@
             "fossils": [],
             "sentinel": "Answer To None",
             "autophage": false,
+            "reliquary": false,
+            "ruins": false,
             "base": false,
             "baseName": ""
           },
@@ -9920,6 +9935,7 @@
             "moon": false,
             "orbits": 0,
             "biome": "Arid",
+            "subtype": "",
             "descriptor": "Self-Igniting Storms",
             "water": true,
             "ring": false,
@@ -9931,7 +9947,7 @@
             ],
             "fauna": [],
             "minerals": [
-              "Magnatised Ferrite",
+              "Magnetised Ferrite",
               "Phosphorus",
               "Activated Copper"
             ],
@@ -9939,14 +9955,22 @@
             "fossils": [],
             "sentinel": "Dissonant",
             "autophage": false,
+            "reliquary": false,
+            "ruins": false,
             "base": false,
             "baseName": ""
           }
         ],
         "screenshot": "https://raw.githubusercontent.com/elegra1965-source/nms-galactic-map/main/user-screenshots/0-1058E1434753-mtj0kzeo-o5cil3.jpg",
-        "genVersion": "1.3.0"
+        "genVersion": "1.3.0",
+        "abandoned": false,
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": []
       },
-      "editedAt": "2026-09-01T18:42:13.741Z",
+      "editedAt": "2026-09-13T19:23:10.354Z",
       "editedByIp": "5.133.46.24",
       "flaggedFields": [],
       "disputedFields": [],
@@ -10029,6 +10053,10 @@
         },
         {
           "at": "2026-09-01T18:42:13.741Z",
+          "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-09-13T19:23:10.354Z",
           "text": "edited by a traveller"
         }
       ],
@@ -35421,7 +35449,7 @@
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1788355249202
+      1789327390354
     ]
   },
   "flagLog": {},
@@ -35430,7 +35458,12 @@
       "Silver",
       "Gold",
       "Sodium",
-      "Salt"
+      "Salt",
+      "Gamma Roots",
+      "Frost Crystals",
+      "Magnetised Ferrite",
+      "Star Bulbs",
+      "Solanium"
     ],
     "flora": [
       "Sporadic",
@@ -35438,7 +35471,9 @@
       "Full",
       "Generous",
       "Copious",
-      "Absent"
+      "Absent",
+      "Fair",
+      "Ample"
     ],
     "fauna": [
       "Devoid",
@@ -35459,9 +35494,22 @@
       "Star Bulb",
       "Paraffinium",
       "Frost Crystal",
-      "Dioxide"
+      "Dioxide",
+      "Uranium",
+      "Activated Copper",
+      "Silver",
+      "Dioxite",
+      "Cooper",
+      "Salt",
+      "Rusted Metal",
+      "Copper",
+      "Cobolt",
+      "Magnetised Ferrite",
+      "Phosphorus"
     ],
-    "salvage": [],
+    "salvage": [
+      "Salvageable scrap"
+    ],
     "fossils": [
       "Ancient Bones"
     ],
@@ -35471,7 +35519,21 @@
       "High Verable Temperatures",
       "Poison Cyclones",
       "Dangerously Hot Fog",
-      "Frequent Blizzards"
+      "Frequent Blizzards",
+      "Radioactive storms",
+      "Raging snowstorms",
+      "Airless",
+      "Mostly Calm",
+      "Freezing",
+      "Self-Igniting Storms"
+    ],
+    "biome": [
+      "Radioactive",
+      "Volcanic",
+      "Lush",
+      "Frozen",
+      "Arid"
     ]
-  }
+  },
+  "alliances": {}
 }
