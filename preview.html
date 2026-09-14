@@ -151,6 +151,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);
    clears its own inline cursor back to "" while not hovering one, which
    now falls through to this grab default instead of the plain arrow. */
 canvas#c{display:block;position:fixed;inset:0;touch-action:none;cursor:grab}
+canvas#tstars{display:none;position:fixed;inset:0;pointer-events:none;z-index:1}
 
 .kicker{font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:.18em;
   color:var(--gold);text-transform:uppercase}
@@ -1461,6 +1462,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   </div>
 </noscript>
 <canvas id="c"></canvas>
+<canvas id="tstars"></canvas>
 <!-- WARP TRANSITION video overlay (spec item 9) -->
 <div id="warp-overlay" onclick="skipWarp()">
   <video id="warp-vid" muted playsinline preload="auto">

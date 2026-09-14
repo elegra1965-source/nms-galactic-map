@@ -2179,6 +2179,8 @@ var focus={x:0,y:0,z:0}, focusSystem=null, courseTarget=null;
    defeating the whole point of not showing a specific system by default. */
 var hasRealLocation=false;
 var mode="galaxy", ctrl="orbit", selected=null, labelsOn=true;
+/* Local/System 2D backdrop re-rolls its cloud shapes once per page load (Tony: change on refresh, not on every view switch -- that read as flicker in testing). Colour is never random -- see buildLocalSystemBackdrop() below, keyed off galaxyType(GALAXY). */
+var BG_SEED=Math.floor(Math.random()*1e9);
 
 /* "You are here" beacon in the big 3D galaxy view -- always positioned at
    the last real jump (voxelToGalaxy(focus)), billboarded to face the
@@ -2450,6 +2452,222 @@ function drawGalIcon(){
   ctx.beginPath(); ctx.arc(cx,cy,size*0.16,0,Math.PI*2); ctx.fill();
   ctx.globalAlpha=1; ctx.globalCompositeOperation="source-over";
 }
+/* ============ Local/System 2D backdrop (2026-09-14) ============
+   Local and System view had no backdrop at all -- flat renderer clear
+   colour (Tony: "where is my background picture... should be galaxy/
+   nebula as background"). Galaxy view already has its own full 3D nebula
+   (buildNebula() above) so this is deliberately left out of Galaxy mode.
+   Built as a scene.background CanvasTexture rather than a 3D object, so it
+   costs nothing per frame beyond the one-time canvas draw + GPU upload,
+   and reuses the exact same GALAXY_TYPE_INFO colour identity as
+   buildNebula()/drawGalIcon() above so it's always correct for whichever
+   galaxy you're actually in -- never a random/mismatched colour.
+   Went through several visual passes with Tony before landing here: round
+   radial-gradient blobs read as "just blobs, no structure"; a scaled-up
+   drawGalIcon() spiral blew out to solid white; blending the colour ramp
+   in plain RGB produces a muddy grey/tan patch wherever two bands sit far
+   apart on the hue wheel (this palette's teal mid-band to gold hi-band,
+   ~130 degrees apart) -- HSL-space blending was tried as a fix but looked
+   worse (introduced a harsh neon edge), so this keeps the plain RGB blend
+   and accepts the rare patch as a known follow-up if it bothers Tony once
+   he's lived with it. */
+var BG_PALETTES={
+  Harsh:{lo:0x2a0e08,mid:0xb03a2a,hi:0xffab5c},
+  Lush: {lo:0x0b1f14,mid:0x2f9e5a,hi:0xd8ffb0},
+  Empty:{lo:0x0d1626,mid:0x2f5f9a,hi:0xdcecff},
+  Norm: {lo:0x140a24,mid:0x1f9e8f,hi:0xffd88a}
+};
+function bgHash2(ix,iy,seed){
+  var h=(ix*374761393+iy*668265263+seed*2246822519)|0;
+  h=Math.imul(h^(h>>>13),1274126177);
+  h=h^(h>>>16);
+  return((h>>>0)%100000)/100000;
+}
+function bgVNoise(x,y,seed){
+  var x0=Math.floor(x),y0=Math.floor(y);
+  var sx=x-x0,sy=y-y0;
+  sx=sx*sx*(3-2*sx); sy=sy*sy*(3-2*sy);
+  var n00=bgHash2(x0,y0,seed),n10=bgHash2(x0+1,y0,seed);
+  var n01=bgHash2(x0,y0+1,seed),n11=bgHash2(x0+1,y0+1,seed);
+  var a=n00+(n10-n00)*sx,b=n01+(n11-n01)*sx;
+  return a+(b-a)*sy;
+}
+function bgFbm(x,y,seed,octaves){
+  var val=0,amp=0.5,freq=1,max=0;
+  for(var o=0;o<octaves;o++){
+    val+=bgVNoise(x*freq,y*freq,seed+o*101)*amp;
+    max+=amp; amp*=0.5; freq*=2.13;
+  }
+  return val/max;
+}
+function bgWarpedField(x,y,seed){
+  var qx=bgFbm(x+1.7,y+9.2,seed+11,3);
+  var qy=bgFbm(x+8.3,y+2.8,seed+23,3);
+  return bgFbm(x+2.4*qx,y+2.4*qy,seed+41,4);
+}
+function bgLerpCol(c1,c2,t){
+  var r1=(c1>>16)&255,g1=(c1>>8)&255,b1=c1&255;
+  var r2=(c2>>16)&255,g2=(c2>>8)&255,b2=c2&255;
+  return[Math.round(r1+(r2-r1)*t),Math.round(g1+(g2-g1)*t),Math.round(b1+(b2-b1)*t)];
+}
+function bgFieldColor(pal,v){
+  if(v<0.5) return bgLerpCol(pal.lo,pal.mid,v/0.5);
+  return bgLerpCol(pal.mid,pal.hi,(v-0.5)/0.5);
+}
+function bgRenderLayer(ctx,w,h,pal,seed,layer){
+  var cellsW=layer===0?60:90, cellsH=Math.round(cellsW*h/w);
+  var off=document.createElement("canvas");
+  off.width=cellsW; off.height=cellsH;
+  var octx=off.getContext("2d");
+  var img=octx.createImageData(cellsW,cellsH);
+  var scale=layer===0?0.028:0.06;
+  var cLo=layer===0?0.30:0.42, cHi=layer===0?0.72:0.9;
+  var maxAlpha=layer===0?130:170;
+  for(var y=0;y<cellsH;y++){
+    for(var x=0;x<cellsW;x++){
+      var v=bgWarpedField(x*scale,y*scale,seed+layer*777);
+      var t=Math.max(0,Math.min(1,(v-cLo)/(cHi-cLo)));
+      var shaped=Math.pow(t,layer===0?1.6:1.3);
+      var col=bgFieldColor(pal,shaped);
+      var idx=(y*cellsW+x)*4;
+      img.data[idx]=col[0]; img.data[idx+1]=col[1]; img.data[idx+2]=col[2];
+      img.data[idx+3]=Math.round(shaped*maxAlpha);
+    }
+  }
+  octx.putImageData(img,0,0);
+  ctx.imageSmoothingEnabled=true;
+  ctx.drawImage(off,0,0,cellsW,cellsH,0,0,w,h);
+}
+var bgCanvas=null, bgTexture=null, bgLastKey=null;
+function buildLocalSystemBackdrop(force){
+  var gt=galaxyType(GALAXY);
+  var pal=BG_PALETTES[gt.k]||BG_PALETTES.Norm; /* Unknown falls back to Norm, same as buildNebula()/drawGalIcon() */
+  var w=window.innerWidth, h=window.innerHeight;
+  var key=gt.k+"|"+BG_SEED+"|"+w+"x"+h;
+  if(!force && key===bgLastKey) return;
+  bgLastKey=key;
+  if(!bgCanvas){ bgCanvas=document.createElement("canvas"); }
+  bgCanvas.width=w; bgCanvas.height=h;
+  var ctx=bgCanvas.getContext("2d");
+  ctx.fillStyle="#020308"; ctx.fillRect(0,0,w,h);
+  ctx.globalCompositeOperation="lighter";
+  bgRenderLayer(ctx,w,h,pal,BG_SEED,0);
+  bgRenderLayer(ctx,w,h,pal,BG_SEED+9001,1);
+  ctx.globalCompositeOperation="source-over";
+  if(!bgTexture){ bgTexture=new THREE.CanvasTexture(bgCanvas); }
+  else { bgTexture.needsUpdate=true; }
+  scene.background=bgTexture;
+}
+var bgResizeT=null;
+function scheduleBackdropResize(){
+  if(mode==="galaxy") return;
+  clearTimeout(bgResizeT);
+  bgResizeT=setTimeout(function(){ buildLocalSystemBackdrop(true); },200);
+}
+
+/* ============ System-view twinkle stars (2026-09-14) ============
+   Ported from navigator/index.html's twinkle-star canvas -- same per-star
+   random position/size/colour/timing technique, same ~11fps throttle --
+   so System view gets the same "varying random brightness" look already
+   proven on the Navigator page. Local view deliberately does NOT get
+   this: Local's own coloured system dots already are a dense field of
+   real, interactive markers, and layering decorative stars on top of them
+   read as clutter that competed with what you're meant to click (Tony's
+   direct feedback testing the mockup). Runs as its own always-present 2D
+   canvas (#tstars in preview.html) rather than inside the WebGL scene, so
+   it costs nothing on the GPU side and matches the Navigator's proven,
+   already-tuned performance profile exactly. */
+var TWINKLE_COLOURS=["#ffffff","#ffffff","#bcd7ff","#8fb8ff","#ffd9a0","#ff9d5c","#ff6f6f","#ff6ec7","#c9a0ff","#7ed6ff"];
+function twHexA(hex,a){
+  var v=parseInt(hex.slice(1),16);
+  return "rgba("+((v>>16)&255)+","+((v>>8)&255)+","+(v&255)+","+a+")";
+}
+function twPickCol(){ return TWINKLE_COLOURS[Math.floor(Math.random()*TWINKLE_COLOURS.length)]; }
+function makeTwinkleStars(cssW,cssH){
+  var area=Math.max(1,cssW*cssH);
+  var n=Math.min(260,Math.max(40,Math.round(area/1600)));
+  var stars=[];
+  for(var i=0;i<n;i++){
+    var roll=Math.random();
+    var rMin,rMax,aMin,aMax;
+    if(roll<0.58){ rMin=0.3;rMax=0.65;aMin=0.18;aMax=0.4; }
+    else if(roll<0.88){ rMin=0.65;rMax=1.15;aMin=0.38;aMax=0.62; }
+    else{ rMin=1.15;rMax=1.9;aMin=0.6;aMax=0.9; }
+    stars.push({x:Math.random()*cssW,y:Math.random()*cssH,r:rMin+Math.random()*(rMax-rMin),
+      col:twPickCol(),base:aMin+Math.random()*(aMax-aMin),phase:Math.random()*Math.PI*2,
+      period:2200+Math.random()*4600,flare:false});
+  }
+  var flareBig=Math.min(9,Math.max(2,Math.round(n*0.035)));
+  for(var f=0;f<flareBig;f++){
+    stars.push({x:Math.random()*cssW,y:Math.random()*cssH,r:1.6+Math.random()*1.0,
+      col:twPickCol(),base:0.8+Math.random()*0.2,phase:Math.random()*Math.PI*2,
+      period:3200+Math.random()*5200,flare:true,big:true,spike:10+Math.random()*10});
+  }
+  var flareSmall=Math.min(24,Math.max(6,Math.round(n*0.10)));
+  for(var s2=0;s2<flareSmall;s2++){
+    stars.push({x:Math.random()*cssW,y:Math.random()*cssH,r:0.8+Math.random()*0.7,
+      col:twPickCol(),base:0.55+Math.random()*0.3,phase:Math.random()*Math.PI*2,
+      period:2600+Math.random()*4400,flare:true,big:false,spike:3.5+Math.random()*4});
+  }
+  return stars;
+}
+function drawTwinkleStar(ctx,s,alpha){
+  if(!s.flare){
+    ctx.globalAlpha=alpha; ctx.fillStyle=s.col;
+    ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fill();
+    return;
+  }
+  var spike=s.spike;
+  if(s.big){
+    var glow=ctx.createRadialGradient(s.x,s.y,0,s.x,s.y,spike*0.85);
+    glow.addColorStop(0,twHexA(s.col,1)); glow.addColorStop(0.35,twHexA(s.col,0.45)); glow.addColorStop(1,twHexA(s.col,0));
+    ctx.globalAlpha=alpha; ctx.fillStyle=glow;
+    ctx.beginPath(); ctx.arc(s.x,s.y,spike*0.85,0,Math.PI*2); ctx.fill();
+  }
+  ctx.globalAlpha=alpha*(s.big?0.85:0.65); ctx.lineWidth=s.big?0.6:0.45;
+  [0,Math.PI/2].forEach(function(rot){
+    var dx=Math.cos(rot)*spike, dy=Math.sin(rot)*spike;
+    var g=ctx.createLinearGradient(s.x-dx,s.y-dy,s.x+dx,s.y+dy);
+    g.addColorStop(0,twHexA(s.col,0)); g.addColorStop(0.5,twHexA(s.col,s.big?0.9:0.7)); g.addColorStop(1,twHexA(s.col,0));
+    ctx.strokeStyle=g;
+    ctx.beginPath(); ctx.moveTo(s.x-dx,s.y-dy); ctx.lineTo(s.x+dx,s.y+dy); ctx.stroke();
+  });
+  ctx.globalAlpha=alpha; ctx.fillStyle=twHexA(s.col,1);
+  ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fill();
+}
+var twStars=[], twLastDraw=0, twRAF=null, twCanvas=null;
+function twSized(){
+  if(!twCanvas) return;
+  var w=twCanvas.clientWidth, h=twCanvas.clientHeight;
+  var dpr=Math.min(window.devicePixelRatio||1,2);
+  twCanvas.width=w*dpr; twCanvas.height=h*dpr;
+  var ctx=twCanvas.getContext("2d"); ctx.setTransform(dpr,0,0,dpr,0,0);
+  twStars=makeTwinkleStars(w,h);
+}
+function twLoop(t){
+  twRAF=requestAnimationFrame(twLoop);
+  if(mode!=="system"||!twCanvas||twCanvas.style.display==="none") return;
+  if(t-twLastDraw<=90) return;
+  twLastDraw=t;
+  var w=twCanvas.clientWidth, h=twCanvas.clientHeight;
+  var ctx=twCanvas.getContext("2d");
+  ctx.clearRect(0,0,w,h);
+  for(var i=0;i<twStars.length;i++){
+    var s=twStars[i];
+    var wob=0.28*Math.sin((t/1000)*(2*Math.PI/(s.period/1000))+s.phase);
+    var alpha=Math.max(0.05,Math.min(1,s.base+wob*s.base));
+    drawTwinkleStar(ctx,s,alpha);
+  }
+  ctx.globalAlpha=1;
+}
+function initTwinkleStars(){
+  twCanvas=document.getElementById("tstars");
+  if(!twCanvas) return;
+  twSized();
+  twRAF=requestAnimationFrame(twLoop);
+  window.addEventListener("resize",function(){ clearTimeout(twCanvas._rt); twCanvas._rt=setTimeout(twSized,200); });
+}
+
 /* ============ Item 8: starfield parallax backdrop ============
    2200 cool-white points on a large sphere (radius 1100-1500 wu) —
    renders before galaxy/nebula so it sits behind everything.
@@ -5900,6 +6118,12 @@ function drawKeypad(){
 function setMode(m){
   hideHoverPop(); clearCoursePreview();
   mode=m;
+  /* Local/System 2D backdrop + System-only twinkle stars, see the block
+     above buildBackdrop() below for the full writeup. */
+  if(m==="local"||m==="system"){ buildLocalSystemBackdrop(false); }
+  else { scene.background=null; }
+  var tstarsEl=document.getElementById("tstars");
+  if(tstarsEl) tstarsEl.style.display=(m==="system")?"block":"none";
   galaxyGroup.visible=(m==="galaxy");
   localGroup.visible=(m==="local");
   systemGroup.visible=(m==="system");
@@ -10952,6 +11176,7 @@ function resize(){
   positionAnnivBadge();
   positionSysBanner();
   _lastOccludeW=-1; /* force syncPanelOffset() to recompute against the new size next frame */
+  scheduleBackdropResize();
 }
 /* The mobile layout (leftcol/keys/stats) positions itself below the top
    toolbar, but the toolbar's real height is NOT a fixed number -- it wraps
@@ -11327,6 +11552,7 @@ buildBackdrop();
 buildGalaxy();
 buildNebula();
 drawGalIcon();
+initTwinkleStars();
 loadAtlasPOIs();
 /* Random per-visit starting coordinate (2026-08-26, Tony: "why is it always
    that number, shouldn't it be random... every traveller does not start at
