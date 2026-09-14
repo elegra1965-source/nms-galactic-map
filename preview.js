@@ -11133,7 +11133,7 @@ function animate(){
       frames=0; fpsT=now;
     }
     if(ctrl==="fly") flyStep(dt);
-    if(mode==="galaxy") galaxyGroup.rotation.y+=GAL_ROT_SPD*(galaxyHovered?0.2:1);
+    if(mode==="galaxy") galaxyGroup.rotation.y+=GAL_ROT_SPD*((galaxyHovered&&atlasOn)?0.2:1);
     /* Tony confirmed live: the icon spun the opposite way to the real 3D
        galaxy, and at a different speed. Fixed by matching both exactly --
        same per-frame magnitude as galaxyGroup.rotation.y above (0.0003,
