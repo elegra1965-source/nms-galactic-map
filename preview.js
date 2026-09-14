@@ -2568,8 +2568,10 @@ function scheduleBackdropResize(){
 /* ============ System-view twinkle stars (2026-09-14) ============
    Ported from navigator/index.html's twinkle-star canvas -- same per-star
    random position/size/colour/timing technique, same ~11fps throttle --
-   so System view gets the same "varying random brightness" look already
-   proven on the Navigator page. Local view deliberately does NOT get
+   so System and Galaxy view get the same "varying random brightness" look
+   already proven on the Navigator page (added to Galaxy after Tony felt
+   its existing plain white-dot backdrop looked neglected next to the
+   richer Local/System treatment). Local view deliberately does NOT get
    this: Local's own coloured system dots already are a dense field of
    real, interactive markers, and layering decorative stars on top of them
    read as clutter that competed with what you're meant to click (Tony's
@@ -2646,7 +2648,7 @@ function twSized(){
 }
 function twLoop(t){
   twRAF=requestAnimationFrame(twLoop);
-  if(mode!=="system"||!twCanvas||twCanvas.style.display==="none") return;
+  if(mode==="local"||!twCanvas||twCanvas.style.display==="none") return;
   if(t-twLastDraw<=90) return;
   twLastDraw=t;
   var w=twCanvas.clientWidth, h=twCanvas.clientHeight;
@@ -6123,7 +6125,13 @@ function setMode(m){
   if(m==="local"||m==="system"){ buildLocalSystemBackdrop(false); }
   else { scene.background=null; }
   var tstarsEl=document.getElementById("tstars");
-  if(tstarsEl) tstarsEl.style.display=(m==="system")?"block":"none";
+  /* 2026-09-14 follow-up: Tony wanted Galaxy view's stars to match too --
+     the existing 3D buildBackdrop() starfield (plain uniform white dots)
+     read as barely-there/neglected next to Local/System's new richer
+     twinkle stars, so this now shows on Galaxy as well. Local stays
+     excluded (its own dense real system-dot field is the reason this
+     started only on System in the first place). */
+  if(tstarsEl) tstarsEl.style.display=(m==="local")?"none":"block";
   galaxyGroup.visible=(m==="galaxy");
   localGroup.visible=(m==="local");
   systemGroup.visible=(m==="system");
