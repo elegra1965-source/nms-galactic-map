@@ -2544,7 +2544,16 @@ function buildLocalSystemBackdrop(force){
   var pal=BG_PALETTES[gt.k]||BG_PALETTES.Norm; /* Unknown falls back to Norm, same as buildNebula()/drawGalIcon() */
   var w=window.innerWidth, h=window.innerHeight;
   var key=gt.k+"|"+BG_SEED+"|"+w+"x"+h;
-  if(!force && key===bgLastKey) return;
+  /* 2026-09-14 fix: the memo guard used to be "key===bgLastKey" alone, which
+     is right for skipping the expensive noise re-render, but setMode() nulls
+     scene.background whenever Galaxy is entered (see setMode below) without
+     touching bgLastKey -- so going Local -> Galaxy -> Local left the key
+     unchanged, this function returned early, and scene.background stayed null
+     until a full page refresh reset bgLastKey. Also requiring the texture to
+     already be the active background makes the reassignment happen whenever
+     it is missing, while still skipping the actual canvas re-render when
+     nothing about the key changed (Tony's live-test report, 2026-09-14). */
+  if(!force && key===bgLastKey && scene.background===bgTexture) return;
   bgLastKey=key;
   if(!bgCanvas){ bgCanvas=document.createElement("canvas"); }
   bgCanvas.width=w; bgCanvas.height=h;
@@ -2641,6 +2650,18 @@ var twStars=[], twLastDraw=0, twRAF=null, twCanvas=null;
 function twSized(){
   if(!twCanvas) return;
   var w=twCanvas.clientWidth, h=twCanvas.clientHeight;
+  /* 2026-09-14 fix: initTwinkleStars() calls this once at boot, synchronously
+     before setMode() has ever run -- #tstars is still its CSS default
+     display:none at that point, so clientWidth/clientHeight both read 0.
+     Without this guard that built a real (but degenerate) 40+ star field
+     with every star's x/y = Math.random()*0 = 0, i.e. a single invisible
+     clump in the corner -- and since nothing but a window resize event ever
+     called this again, Galaxy view (which never triggers a resize on its
+     own) stayed starless even after a hard reset (Tony's live-test report).
+     Bailing out here on a zero-size read leaves twStars empty until setMode()
+     explicitly re-sizes it below, once the canvas is actually visible and
+     has real dimensions. */
+  if(!w||!h) return;
   var dpr=Math.min(window.devicePixelRatio||1,2);
   twCanvas.width=w*dpr; twCanvas.height=h*dpr;
   var ctx=twCanvas.getContext("2d"); ctx.setTransform(dpr,0,0,dpr,0,0);
@@ -6131,7 +6152,20 @@ function setMode(m){
      twinkle stars, so this now shows on Galaxy as well. Local stays
      excluded (its own dense real system-dot field is the reason this
      started only on System in the first place). */
-  if(tstarsEl) tstarsEl.style.display=(m==="local")?"none":"block";
+  if(tstarsEl){
+    var showTw=(m!=="local");
+    tstarsEl.style.display=showTw?"block":"none";
+    /* 2026-09-14 fix: force a resize/rebuild every time the canvas becomes
+       visible (reading clientWidth right after flipping display triggers a
+       synchronous layout, so this always sees real dimensions). Covers the
+       very first time it's ever shown -- previously only a window resize
+       event re-ran twSized(), so a canvas first sized while hidden (boot,
+       before setMode() has run once) could stay a degenerate 0x0 star field
+       forever on a session that never resized. Cheap (tens to a couple
+       hundred small objects), so re-rolling positions/flares on every
+       Local<->System/Galaxy switch is not a concern. */
+    if(showTw) twSized();
+  }
   galaxyGroup.visible=(m==="galaxy");
   localGroup.visible=(m==="local");
   systemGroup.visible=(m==="system");
