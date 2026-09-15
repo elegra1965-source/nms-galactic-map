@@ -35983,6 +35983,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:115DF9555C30": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Ageocomp",
+        "race": "Korvax",
+        "region": "Canthian",
+        "starClass": "F9pf",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "High Tech",
+        "sell": "65.7",
+        "buy": "-26.3",
+        "econDesc": "Balanced",
+        "conflict": "1",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-15T10:09:42.567Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-15T10:09:42.567Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -35990,7 +36039,8 @@
     "5.133.46.24": [
       1789466950396,
       1789466961031,
-      1789466971688
+      1789466971688,
+      1789466982567
     ]
   },
   "flagLog": {},
