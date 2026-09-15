@@ -8100,7 +8100,7 @@ function renderBodyEditList(){
   var isGiantSys=document.getElementById("edGiant").checked;
   for(i=0;i<editBodies.length;i++){
     var b=editBodies[i];
-    var summary=escAttr(b.name||"(unnamed)");
+    var summary=escAttr(b.name||b.nameGuess||"(unnamed)");
     html+='<div class="bodyEdit'+(b.open?" open":"")+'" data-i="'+i+'">'+
       '<div class="bhead">'+
         '<span class="bhLabel">'+(b.moon?"Moon":(isGiantSys?"Giant":"Planet"))+' #'+(i+1)+' &mdash; '+summary+'</span>'+
@@ -8109,7 +8109,7 @@ function renderBodyEditList(){
       '</div>';
     if(b.open){
       html+='<div class="brow2">'+
-          '<div class="mfld" style="margin-bottom:0"><div class="lb">Name</div><input type="text" class="bfName" data-i="'+i+'" maxlength="30" value="'+escAttr(b.name)+'"></div>'+
+          '<div class="mfld" style="margin-bottom:0"><div class="lb">Name</div><input type="text" class="bfName" data-i="'+i+'" maxlength="30" placeholder="'+(b.nameGuess?escAttr("Guess: "+b.nameGuess):"")+'" value="'+escAttr(b.name)+'"></div>'+
           '<label class="chk2"><input type="checkbox" class="bfMoon" data-i="'+i+'"'+(b.moon?" checked":"")+'> Moon</label>'+
         '</div>'+
         '<div class="brow2">'+
@@ -8167,7 +8167,7 @@ function renderBodyEditList(){
         for(var p=0;p<editBodies.length;p++){
           if(p===i || editBodies[p].moon) continue;
           orbOpts+='<option value="'+editBodies[p].uid+'"'+(String(b.orbits)===String(editBodies[p].uid)?" selected":"")+
-            '>'+(isGiantSys?"Giant":("Planet #"+(p+1)))+' — '+escAttr(editBodies[p].name||"(unnamed)")+'</option>';
+            '>'+(isGiantSys?"Giant":("Planet #"+(p+1)))+' — '+escAttr(editBodies[p].name||editBodies[p].nameGuess||"(unnamed)")+'</option>';
         }
         html+='<div class="mfld" style="margin-bottom:0"><div class="lb">Orbits</div><select class="bfOrbits" data-i="'+i+'">'+orbOpts+'</select></div>';
       }
@@ -8649,7 +8649,16 @@ function openEditModal(){
   editBodies=s.bodies.map(function(b){
     return {
       uid:bodyUidSeq++,
-      name:b.name,
+      // 2026-09-15 (Tony): same fix as biome below -- b.name is NEVER actually
+      // blank here either (upgradeBodyNames() always writes the procedural
+      // nms-core guess into it for display when no real name was ever
+      // submitted), so pre-filling with it unconditionally meant saving the
+      // form untouched silently resubmitted the guess as if it were a real
+      // traveller name. Gate on b.nameOverridden, keep the guess separately
+      // as nameGuess so the input can still show it as a (non-authoritative)
+      // grey placeholder instead of forcing an empty box.
+      name:b.nameOverridden?b.name:"",
+      nameGuess:b.name||"",
       moon:!!b.moon,
       // 2026-09-08 (Tony/goodguyfree): starts blank/"Unknown" rather than
       // pre-filled with a guessed biome key. FIXED same day -- b.biome is
@@ -9021,7 +9030,7 @@ function renderSignalEditList(){
         '<div class="mfld" style="margin-bottom:0"><div class="lb">Near which planet/moon</div><select class="sgPlanet" data-si="'+i+'"><option value="">Not linked (floating)</option>';
       for(var pj=0;pj<editBodies.length;pj++){
         html+='<option value="'+editBodies[pj].uid+'"'+(String(g.planetUid)===String(editBodies[pj].uid)?" selected":"")+
-          '>'+(editBodies[pj].moon?"Moon":"Planet")+' #'+(pj+1)+' \u2014 '+escAttr(editBodies[pj].name||"(unnamed)")+'</option>';
+          '>'+(editBodies[pj].moon?"Moon":"Planet")+' #'+(pj+1)+' \u2014 '+escAttr(editBodies[pj].name||editBodies[pj].nameGuess||"(unnamed)")+'</option>';
       }
       html+='</select></div>';
     }
