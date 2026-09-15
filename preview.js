@@ -2649,39 +2649,63 @@ function drawTwinkleStar(ctx,s,alpha){
 var twStars=[], twLastDraw=0, twRAF=null, twCanvas=null;
 function twSized(){
   if(!twCanvas) return;
-  var w=twCanvas.clientWidth, h=twCanvas.clientHeight;
-  /* 2026-09-14 fix: initTwinkleStars() calls this once at boot, synchronously
-     before setMode() has ever run -- #tstars is still its CSS default
-     display:none at that point, so clientWidth/clientHeight both read 0.
-     Without this guard that built a real (but degenerate) 40+ star field
-     with every star's x/y = Math.random()*0 = 0, i.e. a single invisible
-     clump in the corner -- and since nothing but a window resize event ever
-     called this again, Galaxy view (which never triggers a resize on its
-     own) stayed starless even after a hard reset (Tony's live-test report).
-     Bailing out here on a zero-size read leaves twStars empty until setMode()
-     explicitly re-sizes it below, once the canvas is actually visible and
-     has real dimensions. */
+  /* 2026-09-15 fix (round 2), Tony's live-test report ("still only white
+     dots, except for 2 stars top left"): the previous two fixes here both
+     read twCanvas.clientWidth/clientHeight to decide how big to make the
+     canvas -- but a <canvas> is a "replaced element", and a replaced
+     element with position:fixed;inset:0 and NO width/height style of its
+     own does not stretch to fill the viewport the way a plain <div> would.
+     It falls back to its intrinsic default size, 300x150, anchored at
+     top-left. So the very first real (non-zero) read of clientWidth/
+     clientHeight was already wrong -- 300x150, not the actual window size
+     -- and this function then took that wrong value and wrote it back as
+     an EXPLICIT style.width/height, permanently locking the canvas to a
+     300x150 box in the corner. Every later call (window resize, mode
+     switch) just re-read that same self-inflicted 300x150 and re-locked
+     it, so it never recovered on its own -- confirmed live by inspecting
+     the deployed page: #tstars really was sitting at style.width:"300px",
+     clientWidth:300, with 48 stars all packed inside that corner.
+     window.innerWidth/innerHeight is what canvas#c's own resize() already
+     uses for exactly this reason (its own comment above says so) -- doing
+     the same here sidesteps the replaced-element quirk entirely instead
+     of asking the canvas what size it thinks it already is. */
+  var w=window.innerWidth, h=window.innerHeight;
   if(!w||!h) return;
   var dpr=Math.min(window.devicePixelRatio||1,2);
-  /* 2026-09-15 fix, Tony's live-test report ("stars mainly to my left,
-     virtually none on my right, looks like dead space"): this canvas's
-     CSS box was never given an explicit style.width/height, only its
-     drawing-buffer attribute size (width/height = css size * dpr) --
-     exactly the "false" mistake resize()'s own comment above warns about
-     for the main WebGL canvas, just never applied here too. Absent a CSS
-     size, a <canvas> is a replaced element whose box defaults to its
-     attribute values treated as CSS pixels, so at any dpr above 1 this
-     rendered up to 2x too wide/tall, anchored top-left -- everything
-     drawn past roughly the halfway mark (in logical coordinates 0..w/0..h,
-     which the ctx.setTransform below maps onto the oversized buffer) fell
-     outside the actual viewport and was simply never visible. Setting the
-     CSS size explicitly to the real w/h keeps the crisp high-DPI buffer
-     but displays it at the correct on-screen size, same fix already
-     applied to canvas#c via renderer.setSize(w,h,true). */
   twCanvas.style.width=w+"px"; twCanvas.style.height=h+"px";
   twCanvas.width=w*dpr; twCanvas.height=h*dpr;
   var ctx=twCanvas.getContext("2d"); ctx.setTransform(dpr,0,0,dpr,0,0);
   twStars=makeTwinkleStars(w,h);
+}
+/* 2026-09-15, Tony: "i dont want any stars on top of the galaxy spoils the
+   effect" -- the galaxy disc itself is a real 3D object (nebulaGroup's
+   cloud sprites + coreMesh), not a flat 2D texture like Local/System's
+   backdrop, so there's no single static screen rect to just cut a hole
+   in: panning/zooming/orbiting constantly changes how much screen space
+   it covers. Reprojecting the disc's own known world-space radius (GAL_R)
+   through the live camera every draw tick gets an on-screen exclusion
+   ellipse that always matches the current view, at negligible cost (a
+   couple dozen vector projections at the same ~11fps this loop already
+   throttles to) -- cheaper and more robust than reading back rendered
+   WebGL pixels to test occlusion. Rotation around Y doesn't need
+   accounting for: a circle centered on that same axis projects to the
+   identical outline at every rotation angle. Only applies in Galaxy mode
+   -- System/Local have no such disc to avoid. */
+function galaxyStarExclusion(){
+  if(mode!=="galaxy"||!camera) return null;
+  var rad=GAL_R*1.2; // a little past the outermost arm sprites' own visual edge
+  var minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity,seen=0;
+  for(var i=0;i<20;i++){
+    var ang=(i/20)*Math.PI*2;
+    var v=new THREE.Vector3(Math.cos(ang)*rad,0,Math.sin(ang)*rad);
+    v.project(camera);
+    if(!isFinite(v.x)||!isFinite(v.y)||v.z>1) continue; // behind camera / degenerate
+    var sx=(v.x*0.5+0.5)*window.innerWidth, sy=(1-(v.y*0.5+0.5))*window.innerHeight;
+    if(sx<minX)minX=sx; if(sx>maxX)maxX=sx; if(sy<minY)minY=sy; if(sy>maxY)maxY=sy;
+    seen++;
+  }
+  if(seen<20) return null; // camera angle made part of the circle unprojectable this frame -- skip masking rather than guess
+  return {cx:(minX+maxX)/2, cy:(minY+maxY)/2, rx:(maxX-minX)/2, ry:(maxY-minY)/2};
 }
 function twLoop(t){
   twRAF=requestAnimationFrame(twLoop);
@@ -2691,8 +2715,13 @@ function twLoop(t){
   var w=twCanvas.clientWidth, h=twCanvas.clientHeight;
   var ctx=twCanvas.getContext("2d");
   ctx.clearRect(0,0,w,h);
+  var excl=galaxyStarExclusion();
   for(var i=0;i<twStars.length;i++){
     var s=twStars[i];
+    if(excl){
+      var dx=(s.x-excl.cx)/excl.rx, dy=(s.y-excl.cy)/excl.ry;
+      if(dx*dx+dy*dy<1) continue; // falls over the galaxy graphic this frame -- leave it hidden
+    }
     var wob=0.28*Math.sin((t/1000)*(2*Math.PI/(s.period/1000))+s.phase);
     var alpha=Math.max(0.05,Math.min(1,s.base+wob*s.base));
     drawTwinkleStar(ctx,s,alpha);
@@ -4663,7 +4692,29 @@ var RACE_STATION_TEX={
 };
 var OUTLAW_STATION_TEX=[
   {tex:TEX_LOADER.load("icons-web/feature-station-outlaw1.png"),aspect:637/700},
-  {tex:TEX_LOADER.load("icons-web/feature-station-outlaw2.png"),aspect:354/700}
+  /* 2026-09-15 correction: the image originally shipped here as "outlaw
+     space station 2" wasn't actually a 2nd outlaw photo Tony had sent --
+     replaced with the real one (feature-station-outlaw2.png re-exported
+     from the correct source image, same filename/slot so nothing else
+     needs to change). */
+  {tex:TEX_LOADER.load("icons-web/feature-station-outlaw2.png"),aspect:700/412}
+];
+/* 2026-09-15, Tony: "just got 2 abandoned space stations" -- same
+   independent-boolean situation as Outlaw above: s.abandoned (see
+   generateSystem()'s flavor.abandoned) is its own flag on top of race,
+   not a race of its own, and already gets its own "(Abandoned)" tag next
+   to the race name in the info panel (see pRace's innerHTML elsewhere).
+   Ranked above Outlaw in buildDefaultStationIcon() below: a wrecked/
+   decommissioned station looks abandoned regardless of who built or ran
+   it, which reads as the more specific visual fact when a system happens
+   to roll both flags at once. Background-removed the same flood-fill way
+   as the other pools -- one of these two source photos actually had its
+   "background" pre-rendered as a checkerboard (not real alpha, a plain
+   flat JPEG), which the near-white flood-fill mask still catches fine
+   since the checker's light-grey squares are well within its threshold. */
+var ABANDONED_STATION_TEX=[
+  {tex:TEX_LOADER.load("icons-web/feature-station-abandoned1.png"),aspect:563/535},
+  {tex:TEX_LOADER.load("icons-web/feature-station-abandoned2.png"),aspect:700/639}
 ];
 /* Shared with setMode()'s camera-fit (2026-09-13, Tony live feedback: system
    view "needs to fill screen more, little small") -- both need the exact
@@ -4677,17 +4728,19 @@ function systemFeatureR(s){
   return 8+Math.max(0,s.planets-1)*3.7+12;
 }
 function buildDefaultStationIcon(s){
-  /* Outlaw first (see RACE_STATION_TEX's comment above for why it outranks
-     race), then the system's own race, falling back to the original
-     race-neutral pool for Uninhabited systems or any race string that
-     doesn't have dedicated art (belt and braces -- RACES only ever
-     produces Gek/Vy'keen/Korvax today, but this way a future race never
-     silently crashes here). Same mulberry32-off-s.idx determinism as
-     before, XORed with a different constant per pool so an outlaw Gek
-     system's pick doesn't happen to always land on the same index its
-     race pool would have picked. */
-  var pool=s.outlaw?OUTLAW_STATION_TEX:(RACE_STATION_TEX[s.race]||DEFAULT_STATION_TEX);
-  var seed=s.idx^(s.outlaw?0x4f55544c:0x53544144);
+  /* Abandoned first (see ABANDONED_STATION_TEX's comment above -- a system
+     can roll s.abandoned and s.outlaw and have a race all at once, since
+     all three are independent flags, so this is the priority order for
+     whichever art wins), then Outlaw, then the system's own race, falling
+     back to the original race-neutral pool for Uninhabited systems or any
+     race string that doesn't have dedicated art (belt and braces --
+     RACES only ever produces Gek/Vy'keen/Korvax today, but this way a
+     future race never silently crashes here). Same mulberry32-off-s.idx
+     determinism as before, XORed with a different constant per pool so a
+     system flagged for more than one pool doesn't happen to always land
+     on the same index each pool would have picked. */
+  var pool=s.abandoned?ABANDONED_STATION_TEX:(s.outlaw?OUTLAW_STATION_TEX:(RACE_STATION_TEX[s.race]||DEFAULT_STATION_TEX));
+  var seed=s.idx^(s.abandoned?0x41424e44:(s.outlaw?0x4f55544c:0x53544144));
   var pick=pool[Math.floor(mulberry32(seed)()*pool.length)];
   var mat=new THREE.SpriteMaterial({map:pick.tex,transparent:true,depthWrite:false});
   var spr=new THREE.Sprite(mat);
