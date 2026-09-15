@@ -36130,6 +36130,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1147F8556C30": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Akungoi-Kumu IV",
+        "race": "Gek",
+        "region": "Nonlopsi Instability",
+        "starClass": "F4",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Fuel Generation",
+        "sell": "71.6",
+        "buy": "-15.5",
+        "econDesc": "★★★ (Flourishing)",
+        "conflict": "★★ (Unruly)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-15T10:10:13.875Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-15T10:10:13.875Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -36140,7 +36189,8 @@
       1789466971688,
       1789466982567,
       1789466992793,
-      1789467003192
+      1789467003192,
+      1789467013875
     ]
   },
   "flagLog": {},
