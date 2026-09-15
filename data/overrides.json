@@ -36032,6 +36032,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:10CFF9555C30": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Aichiura",
+        "race": "Vy'keen",
+        "region": "Canthian",
+        "starClass": "F8f",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Manufacturing",
+        "sell": "49.3",
+        "buy": "-23.9",
+        "econDesc": "★★★ (Advanced)",
+        "conflict": "★ (Tranquil)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-15T10:09:52.793Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-15T10:09:52.793Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -36040,7 +36089,8 @@
       1789466950396,
       1789466961031,
       1789466971688,
-      1789466982567
+      1789466982567,
+      1789466992793
     ]
   },
   "flagLog": {},
