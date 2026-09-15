@@ -2663,6 +2663,22 @@ function twSized(){
      has real dimensions. */
   if(!w||!h) return;
   var dpr=Math.min(window.devicePixelRatio||1,2);
+  /* 2026-09-15 fix, Tony's live-test report ("stars mainly to my left,
+     virtually none on my right, looks like dead space"): this canvas's
+     CSS box was never given an explicit style.width/height, only its
+     drawing-buffer attribute size (width/height = css size * dpr) --
+     exactly the "false" mistake resize()'s own comment above warns about
+     for the main WebGL canvas, just never applied here too. Absent a CSS
+     size, a <canvas> is a replaced element whose box defaults to its
+     attribute values treated as CSS pixels, so at any dpr above 1 this
+     rendered up to 2x too wide/tall, anchored top-left -- everything
+     drawn past roughly the halfway mark (in logical coordinates 0..w/0..h,
+     which the ctx.setTransform below maps onto the oversized buffer) fell
+     outside the actual viewport and was simply never visible. Setting the
+     CSS size explicitly to the real w/h keeps the crisp high-DPI buffer
+     but displays it at the correct on-screen size, same fix already
+     applied to canvas#c via renderer.setSize(w,h,true). */
+  twCanvas.style.width=w+"px"; twCanvas.style.height=h+"px";
   twCanvas.width=w*dpr; twCanvas.height=h*dpr;
   var ctx=twCanvas.getContext("2d"); ctx.setTransform(dpr,0,0,dpr,0,0);
   twStars=makeTwinkleStars(w,h);
@@ -4606,13 +4622,48 @@ function orbitRingMesh(orbitR,idx){
    so one shared aspect would squash most of them), picked STABLY per
    system (mulberry32 off s.idx, same determinism pattern every other
    seeded roll in this file already uses) so a system shows the same
-   default icon on every visit rather than a different one each time. */
+   default icon on every visit rather than a different one each time.
+   Kept as the race-neutral pool below, used only for Uninhabited systems
+   now that race-specific art exists (2026-09-15). */
 var DEFAULT_STATION_TEX=[
   {tex:TEX_LOADER.load("icons-web/feature-station-default1.png"),aspect:160/316},
   {tex:TEX_LOADER.load("icons-web/feature-station-default2.png"),aspect:332/332},
   {tex:TEX_LOADER.load("icons-web/feature-station-default3.png"),aspect:640/607},
   {tex:TEX_LOADER.load("icons-web/feature-station-default4.png"),aspect:640/364},
   {tex:TEX_LOADER.load("icons-web/feature-station-default5.png"),aspect:438/482}
+];
+/* 2026-09-15, Tony: "I now have space stations for each race... to use in
+   systems space station depending on which race the system belongs to".
+   Backgrounds removed the same way as DEFAULT_STATION_TEX above (flood-fill
+   from the image border through near-white pixels, morphological opening
+   to sever thin bridges into the ship's own light-coloured panels before
+   they can get swept up as "background" -- one of the source photos had a
+   red/white panel right next to a gap in its ring geometry, easy to
+   over-erase without that safeguard). Keyed by race string exactly as
+   generateSystem() sets s.race (RACES array up top), PLUS a separate
+   "Outlaw" pool: s.outlaw is its own independent boolean (any race can
+   roll it, see flavor.outlaw in generateSystem()) rather than a 4th race,
+   so an outlaw system of any race pulls from here instead -- outlaw takes
+   priority in buildDefaultStationIcon() below since a lawless station is
+   the more specific/visible fact about that system. Uninhabited systems
+   have no race and keep using the original race-neutral DEFAULT_STATION_TEX
+   pool above rather than needing dedicated art of their own. */
+var RACE_STATION_TEX={
+  "Gek":[
+    {tex:TEX_LOADER.load("icons-web/feature-station-gek1.png"),aspect:700/387},
+    {tex:TEX_LOADER.load("icons-web/feature-station-gek2.png"),aspect:387/700}
+  ],
+  "Vy'keen":[
+    {tex:TEX_LOADER.load("icons-web/feature-station-vykeen1.png"),aspect:700/668}
+  ],
+  "Korvax":[
+    {tex:TEX_LOADER.load("icons-web/feature-station-korvax1.png"),aspect:689/700},
+    {tex:TEX_LOADER.load("icons-web/feature-station-korvax2.png"),aspect:700/387}
+  ]
+};
+var OUTLAW_STATION_TEX=[
+  {tex:TEX_LOADER.load("icons-web/feature-station-outlaw1.png"),aspect:637/700},
+  {tex:TEX_LOADER.load("icons-web/feature-station-outlaw2.png"),aspect:354/700}
 ];
 /* Shared with setMode()'s camera-fit (2026-09-13, Tony live feedback: system
    view "needs to fill screen more, little small") -- both need the exact
@@ -4626,7 +4677,18 @@ function systemFeatureR(s){
   return 8+Math.max(0,s.planets-1)*3.7+12;
 }
 function buildDefaultStationIcon(s){
-  var pick=DEFAULT_STATION_TEX[Math.floor(mulberry32(s.idx^0x53544144)()*DEFAULT_STATION_TEX.length)];
+  /* Outlaw first (see RACE_STATION_TEX's comment above for why it outranks
+     race), then the system's own race, falling back to the original
+     race-neutral pool for Uninhabited systems or any race string that
+     doesn't have dedicated art (belt and braces -- RACES only ever
+     produces Gek/Vy'keen/Korvax today, but this way a future race never
+     silently crashes here). Same mulberry32-off-s.idx determinism as
+     before, XORed with a different constant per pool so an outlaw Gek
+     system's pick doesn't happen to always land on the same index its
+     race pool would have picked. */
+  var pool=s.outlaw?OUTLAW_STATION_TEX:(RACE_STATION_TEX[s.race]||DEFAULT_STATION_TEX);
+  var seed=s.idx^(s.outlaw?0x4f55544c:0x53544144);
+  var pick=pool[Math.floor(mulberry32(seed)()*pool.length)];
   var mat=new THREE.SpriteMaterial({map:pick.tex,transparent:true,depthWrite:false});
   var spr=new THREE.Sprite(mat);
   var h=5.0,w=h*pick.aspect;
