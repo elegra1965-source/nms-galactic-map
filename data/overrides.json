@@ -36501,18 +36501,194 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1079E1435753": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Luettir",
+        "race": "Vy'keen",
+        "region": "Susfiel Spur",
+        "starClass": "F4f",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": true,
+        "giant": false,
+        "econName": "Power Generation",
+        "sell": "68.3",
+        "buy": "29.7",
+        "econDesc": "Medium Supply",
+        "conflict": "Intermittent",
+        "blackHole": true,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [
+          {
+            "name": "MS Jiokaz XIV",
+            "category": "Space Hulk",
+            "icon": "mineral",
+            "signalType": "Large Spaceship Wreck",
+            "route": "Salcage operations",
+            "planet": 0
+          },
+          {
+            "name": "MS Yotsu XIV",
+            "category": "Space Hulk",
+            "icon": "mineral",
+            "signalType": "Large Spaceship Wreck",
+            "route": "Salvage operations",
+            "planet": 0
+          },
+          {
+            "name": "The Ugina",
+            "category": "Ice field",
+            "icon": "frozen",
+            "signalType": "Frozen planetiod debris",
+            "route": "Rich vein of comet fragments",
+            "planet": 0
+          },
+          {
+            "name": "MS Omoro VII",
+            "category": "Minor Wreckage",
+            "icon": "cargo",
+            "signalType": "Space junk",
+            "route": "Salvageing Oppertunities",
+            "planet": 0
+          },
+          {
+            "name": "Planetoid noic IX",
+            "category": "Habital asteroid",
+            "icon": "mineral",
+            "signalType": "extraterrestrial rock",
+            "route": "flat plane detected ideal site for orbital base construction",
+            "planet": 0
+          },
+          {
+            "name": "Ehilik Infestation",
+            "category": "Infected Outpost",
+            "icon": "mineral",
+            "signalType": "",
+            "route": "",
+            "planet": 0
+          }
+        ],
+        "editorName": "",
+        "editorFriendCode": "",
+        "genVersion": "1.3.0",
+        "bodies": [
+          {
+            "name": "Dohur XIV",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Lush",
+            "subtype": "Viridescent",
+            "descriptor": "viridescent",
+            "water": true,
+            "ring": false,
+            "resources": [
+              "Activated Copper",
+              "Magnetised Ferrite"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [
+              "Activated Copper",
+              "Paraffinium",
+              "Star Bulb"
+            ],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "None",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "Exhiltonsa Edoga",
+            "moon": true,
+            "orbits": 1,
+            "biome": "causatic nightmare",
+            "subtype": "",
+            "descriptor": "",
+            "water": true,
+            "ring": false,
+            "resources": [
+              "Copper",
+              "Silver"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [
+              "Ammonia",
+              "Fungal Mould"
+            ],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Frequent",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "Oswest J36",
+            "moon": true,
+            "orbits": 2,
+            "biome": "Dead",
+            "subtype": "",
+            "descriptor": "",
+            "water": false,
+            "ring": false,
+            "resources": [
+              "Copper",
+              "Rusted Metal",
+              "Cobalt"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Observant",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          }
+        ]
+      },
+      "editedAt": "2026-09-16T15:47:12.622Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-16T15:47:12.622Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1789556414448,
-      1789556424986,
-      1789556435260,
-      1789556446599,
-      1789556457142,
-      1789556467287,
-      1789556477473
+      1789573632622
     ]
   },
   "flagLog": {},
@@ -36527,7 +36703,10 @@
       "Magnetised Ferrite",
       "Star Bulbs",
       "Solanium",
-      "Cobalt"
+      "Cobalt",
+      "Activated Copper",
+      "Copper",
+      "Rusted Metal"
     ],
     "flora": [
       "Sporadic",
@@ -36589,14 +36768,20 @@
       "Airless",
       "Mostly Calm",
       "Freezing",
-      "Self-Igniting Storms"
+      "Self-Igniting Storms",
+      "viridescent"
     ],
     "biome": [
       "Radioactive",
       "Volcanic",
       "Lush",
       "Frozen",
-      "Arid"
+      "Arid",
+      "causatic nightmare",
+      "Dead"
+    ],
+    "subtype": [
+      "Viridescent"
     ]
   },
   "alliances": {}
