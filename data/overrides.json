@@ -19266,16 +19266,44 @@
         "econDesc": "Developing",
         "sell": "71.2",
         "buy": "-21.2",
-        "editorName": "Added -- no original editor name available",
-        "notes": "Sourced from a public NMS wiki corpus (compiled by hadsh/nms_namegen, 2026-08-23) -- originally documented at: Anisshid (https://nomanssky.fandom.com/wiki/Anisshid). If you know the original contributor, or this is your own system, feel free to update it via Edit system."
+        "editorName": "Galactic Hub Wiki (import)",
+        "notes": "Sourced from a public NMS wiki corpus (compiled by hadsh/nms_namegen, 2026-08-23) -- originally documented at: Anisshid ( If you know the original contributor, or this is your own system, feel free to update it via Edit system. | Cross-referenced from the Galactic Hub community wiki (",
+        "name": "Anisshid",
+        "region": "Iptrevs Fringe",
+        "stars": [
+          "yellow"
+        ],
+        "giant": false,
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
       },
-      "editedAt": "2026-08-23T14:58:34.292Z",
+      "editedAt": "2026-09-16T11:00:46.599Z",
       "history": [
         {
           "at": "2026-08-23T14:58:34.292Z",
           "text": "Imported from a public, wiki-documented ground-truth corpus (hadsh/nms_namegen, compiled 2026-08-23) -- see notes for the source citation."
+        },
+        {
+          "at": "2026-09-16T11:00:46.599Z",
+          "text": "edited by a traveller"
         }
-      ]
+      ],
+      "editedByIp": "5.133.46.24"
     },
     "9:118D03954F26": {
       "galaxy": 9,
@@ -36333,7 +36361,8 @@
     "5.133.46.24": [
       1789556414448,
       1789556424986,
-      1789556435260
+      1789556435260,
+      1789556446599
     ]
   },
   "flagLog": {},
