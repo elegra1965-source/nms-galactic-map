@@ -36452,6 +36452,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "2:10B8F9554C32": {
+      "galaxy": 2,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Arninak",
+        "race": "Korvax",
+        "region": "Etiusin Cloud",
+        "starClass": "F5pf",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Research",
+        "sell": "63.5",
+        "buy": "-20.5",
+        "econDesc": "★★",
+        "conflict": "★★★",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-16T11:01:17.473Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-16T11:01:17.473Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -36462,7 +36511,8 @@
       1789556435260,
       1789556446599,
       1789556457142,
-      1789556467287
+      1789556467287,
+      1789556477473
     ]
   },
   "flagLog": {},
