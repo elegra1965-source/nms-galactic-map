@@ -36403,6 +36403,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:114EF9555C30": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Arasumo",
+        "race": "Gek",
+        "region": "Canthian",
+        "starClass": "F8pf",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Mass Production",
+        "sell": "73.8",
+        "buy": "-10.2",
+        "econDesc": "Opulent",
+        "conflict": "1",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-16T11:01:07.287Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-16T11:01:07.287Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -36412,7 +36461,8 @@
       1789556424986,
       1789556435260,
       1789556446599,
-      1789556457142
+      1789556457142,
+      1789556467287
     ]
   },
   "flagLog": {},
