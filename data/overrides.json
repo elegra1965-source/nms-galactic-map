@@ -36179,18 +36179,61 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:10DDFA555C31": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Akyots-Kolle",
+        "race": "",
+        "region": "Iptrevs Fringe",
+        "starClass": "E6f",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Data Unavailable",
+        "sell": "47.0",
+        "buy": "-16.8",
+        "econDesc": "",
+        "conflict": "Data Unavailable",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-16T11:00:14.448Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-16T11:00:14.448Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1789466950396,
-      1789466961031,
-      1789466971688,
-      1789466982567,
-      1789466992793,
-      1789467003192,
-      1789467013875
+      1789556414448
     ]
   },
   "flagLog": {},
