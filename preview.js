@@ -667,8 +667,33 @@ var RES_ICON_CAT={
   // base") -- the glyph is a building/horizon silhouette, closest real
   // match to a base or other surface structure, but keeping the label
   // honest about the uncertainty rather than asserting "Base" outright.
-  base:{icon:null,color:"#8fd0ff",label:"Base / Structure"}
+  base:{icon:null,color:"#8fd0ff",label:"Base / Structure"},
+  // 5 more added 2026-09-17 from Tony's real-device playtest ("these to
+  // be added to list infected outpost, habitable asteroid, space hulk,
+  // asteroid belt, extraterrestrial rock") -- same as every category since
+  // outpost above, deliberately never wired into RES_ICON_BIOME_CAT
+  // (manual-only, traveller-submitted markers, never an automatic
+  // per-planet guess), and no existing SVG icon resembles any of these so
+  // they all get a hand-drawn canvas glyph (see drawExtraIconGlyph()
+  // below) rather than a real reference image, same as hazard.
+  infectedoutpost:{icon:null,color:"#a84fd1",label:"Infected Outpost"},
+  habitableasteroid:{icon:null,color:"#7ec9a3",label:"Habitable Asteroid"},
+  spacehulk:{icon:null,color:"#6b6f76",label:"Space Hulk"},
+  asteroidbelt:{icon:null,color:"#a89a7a",label:"Asteroid Belt"},
+  extraterrestrialrock:{icon:null,color:"#4fd1c5",label:"Extraterrestrial Rock"}
 };
+/* Single shared source of truth for "every valid signal-marker icon
+   category" -- added 2026-09-17 alongside the 5 new categories above,
+   after finding "base" (added 2026-09-13) had silently drifted out of
+   sync in 3 of the 4 places that used to each keep their own hardcoded
+   copy of this list (preview.js's Edit-System fill-form population and
+   its save-payload assembly both still allowlisted only the original 9,
+   silently coercing a saved "base" marker back to "mineral" on reopen AND
+   on save; filter.mjs's server-side SIGNAL_ICONS had the same gap). Every
+   one of those now reads off this single array (derived from RES_ICON_CAT
+   itself, so it can never drift from the categories that actually exist)
+   instead of keeping its own copy. */
+var SIGNAL_ICON_CATS=Object.keys(RES_ICON_CAT);
 /* Real icon images (2026-09-09, Tony: "just got grok to isolate icons" --
    he ran his own reference photos through Grok to get clean isolated
    versions, one per category, dropped in New Map/). Only these 6 categories
@@ -4111,7 +4136,16 @@ document.getElementById("favResults").addEventListener("click",function(e){
 var bodyMeshes=[], pivots=[], starMeshes=[], coronas=[], featureMeshes=[], resourceMeshes=[];
 function buildStar(s,i,pos){
   var col=s.starColors[i%s.starColors.length];
-  var rad=1.6;
+  /* 2026-09-17, Tony (real-device screenshot): the star was still reading
+     as way too big next to its own planets even after the 2026-09-13 pass
+     that trimmed the corona/glow multipliers -- that pass explicitly left
+     this base radius alone, calling it "the star's actual visible disc
+     size, not the bloom around it". Halved per Tony's own suggested
+     starting point ("reduce it... by half"); everything else in this
+     function (tint shell, both glow shells, the corona plane) is sized as
+     a multiple of rad, so this scales the whole star down proportionally
+     rather than needing each of those retuned separately. */
+  var rad=0.8;
   /* Each additional star in a multi-star system additively blends its own
      corona/glow on top of the first (2026-09-13, Tony: "if more than 1 star
      would defiantly over powering") -- a binary would otherwise stack two
@@ -4155,8 +4189,13 @@ function buildStar(s,i,pos){
 }
 function buildFeature(s,kind,pos){
   var tex=kind==="bh"?BH_TEX:ATLAS_TEX;
-  var aspect=kind==="bh"?(512/346):(443/512);
-  var h=kind==="bh"?5.2:6.4, w=h*aspect;
+  /* 2026-09-17, Tony: swapped feature-blackhole.png for his own reference
+     image (a real in-game-style black diamond with a white spiral) -- cut
+     out and cropped to a 512x512 square, replacing the old wide 512x346
+     art this aspect/size pair was originally tuned for. Matched to Atlas's
+     own h/aspect (6.4, 1:1-ish) now that both are diamond icons. */
+  var aspect=kind==="bh"?1:(443/512);
+  var h=6.4, w=h*aspect;
   var mat=new THREE.SpriteMaterial({map:tex,transparent:true,depthWrite:false});
   var spr=new THREE.Sprite(mat);
   spr.scale.set(w,h,1);
@@ -4332,6 +4371,58 @@ function drawExtraIconGlyph(ctx,cat){
     ctx.strokeRect(-6,-10,12,20);
     ctx.beginPath(); ctx.moveTo(-6,-3); ctx.lineTo(6,-3); ctx.moveTo(-6,4); ctx.lineTo(6,4); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(0,-4); ctx.lineTo(4,0); ctx.lineTo(0,4); ctx.lineTo(-4,0); ctx.closePath(); ctx.stroke();
+  } else if(cat==="infectedoutpost"){
+    // A small station core (reusing the outpost silhouette's own body
+    // shape) with jagged corruption spikes bursting outward instead of the
+    // outpost's clean solar-panel struts -- reads as "diseased/overrun"
+    // rather than "operational", no reference image to match against for
+    // this one (2026-09-17, Tony's own request, no screenshot given).
+    ctx.strokeRect(-4,-4,8,8);
+    for(var ia=0; ia<6; ia++){
+      ctx.save(); ctx.rotate(ia*Math.PI/3);
+      ctx.beginPath(); ctx.moveTo(4,0); ctx.lineTo(9,-2); ctx.lineTo(7,1); ctx.lineTo(12,3); ctx.stroke();
+      ctx.restore();
+    }
+  } else if(cat==="habitableasteroid"){
+    // An irregular rock outline with a small forking sprout on top --
+    // distinguishes it from the plain rocks in asteroidbelt/spacehulk/
+    // extraterrestrialrock below by being the one with visible life on it.
+    ctx.beginPath();
+    ctx.moveTo(-8,2); ctx.lineTo(-5,-7); ctx.lineTo(2,-9); ctx.lineTo(9,-3); ctx.lineTo(7,6); ctx.lineTo(-2,9); ctx.closePath();
+    ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0,-9); ctx.quadraticCurveTo(-3,-14,-1,-16); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0,-9); ctx.quadraticCurveTo(3,-14,1,-16); ctx.stroke();
+  } else if(cat==="spacehulk"){
+    // An elongated, jagged broken-hull silhouette with a crack running
+    // through it -- a large derelict wreck, distinct from cargo's small
+    // intact-looking canister above.
+    ctx.beginPath();
+    ctx.moveTo(-10,-3); ctx.lineTo(-4,-8); ctx.lineTo(3,-6); ctx.lineTo(10,-9); ctx.lineTo(8,-1);
+    ctx.lineTo(11,4); ctx.lineTo(2,7); ctx.lineTo(-6,9); ctx.lineTo(-9,3); ctx.closePath();
+    ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-6,-4); ctx.lineTo(-1,1); ctx.lineTo(-4,3); ctx.lineTo(2,8); ctx.stroke();
+  } else if(cat==="asteroidbelt"){
+    // A dashed elliptical belt path with several small irregular rocks
+    // scattered along it -- a cluster/field rather than one single object,
+    // distinct from the single rocks in habitableasteroid/spacehulk/
+    // extraterrestrialrock.
+    ctx.save(); ctx.setLineDash([2,3]);
+    ctx.beginPath(); ctx.ellipse(0,0,11,6,0,0,Math.PI*2); ctx.stroke();
+    ctx.restore();
+    ctx.beginPath(); ctx.moveTo(-7,-3); ctx.lineTo(-5,-6); ctx.lineTo(-2,-5); ctx.lineTo(-3,-2); ctx.closePath(); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(2,-6); ctx.lineTo(5,-5); ctx.lineTo(4,-2); ctx.lineTo(1,-3); ctx.closePath(); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(4,2); ctx.lineTo(7,3); ctx.lineTo(6,6); ctx.lineTo(3,5); ctx.closePath(); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-4,3); ctx.lineTo(-1,4); ctx.lineTo(-2,7); ctx.lineTo(-5,6); ctx.closePath(); ctx.stroke();
+  } else if(cat==="extraterrestrialrock"){
+    // A single angular, geometric rock (deliberately less "natural"-looking
+    // than the organic outlines above) with a small alien marking -- a
+    // circle-and-cross rune -- at its centre, to read as "not from around
+    // here" rather than an ordinary asteroid.
+    ctx.beginPath();
+    ctx.moveTo(0,-11); ctx.lineTo(7,-4); ctx.lineTo(5,7); ctx.lineTo(-5,8); ctx.lineTo(-7,-3); ctx.closePath();
+    ctx.stroke();
+    ctx.beginPath(); ctx.arc(0,0,2.4,0,Math.PI*2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-4,0); ctx.lineTo(4,0); ctx.moveTo(0,-4); ctx.lineTo(0,4); ctx.stroke();
   }
   ctx.restore();
 }
@@ -4426,7 +4517,7 @@ function buildResourceIcon(s,b,pivot,localPos){
    exactly like an automatic icon) or null for a free-floating marker
    (added straight to systemGroup at a world-space position instead). */
 function buildManualSignalIcon(s,sig,parent,pos){
-  var cat=(["mineral","flora","frozen","tech","outpost","creature","hazard","cargo","atlasstation","base"].indexOf(sig.icon)>=0)?sig.icon:"mineral";
+  var cat=(SIGNAL_ICON_CATS.indexOf(sig.icon)>=0)?sig.icon:"mineral";
   var cfg=RES_ICON_CAT[cat];
   var mat;
   if(REAL_ICON_TEX[cat]){
@@ -4456,7 +4547,7 @@ function buildManualSignalIcon(s,sig,parent,pos){
     ctx.shadowBlur=0;
     ctx.strokeStyle=cfg.color; ctx.lineWidth=1.6;
     ctx.lineCap="round"; ctx.lineJoin="round";
-    if(cat==="hazard"){
+    if(!cfg.icon){
       drawExtraIconGlyph(ctx,cat);
     } else {
       var m=/d="([^"]+)"/.exec(cfg.icon);
@@ -4803,7 +4894,7 @@ function buildSystemView(s){
   }
   starLight.color.setHex(s.starColors[0]);
   starLight.position.set(0,0,0);
-  if(s.blackHole) systemGroup.add(buildFeature(s,"bh",new THREE.Vector3(featureR*0.82,featureR*0.18,-featureR*0.55)));
+  if(s.blackHole) systemGroup.add(buildFeature(s,"bh",new THREE.Vector3(featureR*1.148,featureR*0.252,-featureR*0.77)));
   if(s.atlas) systemGroup.add(buildFeature(s,"atlas",new THREE.Vector3(-featureR*0.85,-featureR*0.15,featureR*0.5)));
   /* Station is now ALWAYS shown at the scene centre -- either the real
      submitted photo (buildStationCard, unchanged) or, when no photo has
@@ -5752,12 +5843,19 @@ function handleHoverRay(e){
   galaxyHovered=true;
   if(!_hoverCapable||e.pointerType!=="mouse"||drag) return;
   /* 2026-08-27: cursor-pointer affordance for the clickable galaxy-view
-     marker (see tryPick()'s galaxy branch) -- nothing else on this canvas
-     gets a cursor change (stars in Local view rely on the hover popup
-     itself as the affordance), but the marker has no equivalent popup, so
-     without this there's no visual hint it's clickable at all. Kept in
-     this same function/throttle rather than a separate listener since it's
-     the same kind of "raycast on hover, mouse only" concern. */
+     marker (see tryPick()'s galaxy branch) -- the marker has no hover
+     popup of its own, so without this there's no visual hint it's
+     clickable at all. Kept in this same function/throttle rather than a
+     separate listener since it's the same kind of "raycast on hover,
+     mouse only" concern.
+     2026-09-17, Tony (real-device playtest): the assumption below that
+     Local's own hover popup was affordance enough turned out not to hold
+     up in practice -- a highlighted/popped-up star still looked no
+     different from empty space you'd just drag past, so there was no way
+     to tell "clicking here opens something" from "dragging here orbits
+     the view" until you actually tried it. Local's own branch further
+     down now sets the same cursor:pointer on a hit, cleared alongside the
+     rest of its hover state on a miss. */
   if(mode==="galaxy"){
     var nowG=performance.now();
     if(nowG-_hoverRayT<70) return; _hoverRayT=nowG;
@@ -5800,9 +5898,11 @@ function handleHoverRay(e){
     var hs=shown[hits[0].instanceId];
     showHoverPop(hs,e.clientX,e.clientY);
     updateCoursePreviewHover(hs);
+    canvas.style.cursor="pointer";
   } else {
     hideHoverPop();
     clearCoursePreview();
+    canvas.style.cursor="";
   }
 }
 /* Declutters by zoom exactly like updateLabels() already does off cam.dist
@@ -8706,7 +8806,7 @@ function openEditModal(){
     return {
       uid:signalUidSeq++,
       name:g.name||"", category:g.category||"",
-      icon:(["mineral","flora","frozen","tech","outpost","creature","hazard","cargo","atlasstation"].indexOf(g.icon)>=0)?g.icon:"mineral",
+      icon:(SIGNAL_ICON_CATS.indexOf(g.icon)>=0)?g.icon:"mineral",
       signalType:g.signalType||"", route:g.route||"",
       planetPos:g.planet||0, open:false
     };
@@ -8930,7 +9030,7 @@ document.getElementById("edGiant").addEventListener("change",renderBodyEditList)
 // render function rather than folded into editBodies -- a signal marker
 // isn't a body, and giving it a fake body-shaped row would make both
 // this list and the save payload harder to reason about for no benefit.
-var ICON_SWATCH_CATS=["mineral","flora","frozen","tech","outpost","creature","hazard","cargo","atlasstation","base"];
+var ICON_SWATCH_CATS=SIGNAL_ICON_CATS;
 var iconSwatchCache={};
 /* Small preview image for the icon-type picker below (2026-09-09, Tony:
    "add the icons in front of names" in the Icon type dropdown). For the 6
@@ -9011,16 +9111,23 @@ function renderSignalEditList(){
               '</div>'+
             '</div>'+
             '<select class="sgIcon" data-si="'+i+'" style="display:none">'+
-              '<option value="mineral"'+(g.icon==="mineral"?" selected":"")+'>Mineral</option>'+
-              '<option value="flora"'+(g.icon==="flora"?" selected":"")+'>Flora</option>'+
-              '<option value="frozen"'+(g.icon==="frozen"?" selected":"")+'>Frozen</option>'+
-              '<option value="tech"'+(g.icon==="tech"?" selected":"")+'>Tech</option>'+
-              '<option value="outpost"'+(g.icon==="outpost"?" selected":"")+'>Outpost / Construction</option>'+
-              '<option value="creature"'+(g.icon==="creature"?" selected":"")+'>Cosmic Whale</option>'+
-              '<option value="hazard"'+(g.icon==="hazard"?" selected":"")+'>Hazard / Danger</option>'+
-              '<option value="cargo"'+(g.icon==="cargo"?" selected":"")+'>Minor Wreckage</option>'+
-              '<option value="atlasstation"'+(g.icon==="atlasstation"?" selected":"")+'>Atlas Station</option>'+
-              '<option value="base"'+(g.icon==="base"?" selected":"")+'>Base / Structure</option>'+
+              // 2026-09-17: was 10 hardcoded <option> lines (one per
+              // category, hand-typed) -- this is exactly how "base" (added
+              // 2026-09-13) ended up silently missing here and coercing
+              // back to "mineral" on reopen, since adding a category meant
+              // remembering to update 4 separate places by hand and one
+              // got missed. Now a straight loop over the single shared
+              // SIGNAL_ICON_CATS list (same one the visible iconPickList
+              // just above already loops over), so a future addition to
+              // RES_ICON_CAT is automatically reflected here too.
+              (function(){
+                var oh="";
+                for(var si2=0; si2<SIGNAL_ICON_CATS.length; si2++){
+                  var scat=SIGNAL_ICON_CATS[si2];
+                  oh+='<option value="'+scat+'"'+(g.icon===scat?" selected":"")+'>'+RES_ICON_CAT[scat].label+'</option>';
+                }
+                return oh;
+              })()+
             '</select>'+
           '</div>'+
         '</div>'+
@@ -9098,7 +9205,7 @@ document.addEventListener("click",function(e){
   });
 });
 document.getElementById("edAddSignal").addEventListener("click",function(){
-  if(editSignals.length>=6){ toast("6 is the limit for resource/signal markers per system."); return; }
+  if(editSignals.length>=10){ toast("10 is the limit for resource/signal markers per system."); return; }
   for(var j=0;j<editSignals.length;j++) editSignals[j].open=false;
   editSignals.push({uid:signalUidSeq++,name:"",category:"",icon:"mineral",signalType:"",route:"",planetUid:"",open:true});
   renderSignalEditList();
@@ -10816,7 +10923,7 @@ document.getElementById("edSubmit").addEventListener("click",function(){
       return {
         name:(g.name||"").trim(),
         category:(g.category||"").trim(),
-        icon:(["mineral","flora","frozen","tech","outpost","creature","hazard","cargo","atlasstation"].indexOf(g.icon)>=0)?g.icon:"mineral",
+        icon:(SIGNAL_ICON_CATS.indexOf(g.icon)>=0)?g.icon:"mineral",
         signalType:(g.signalType||"").trim(),
         route:(g.route||"").trim(),
         planet:(g.planetUid && uidToPos[g.planetUid])?uidToPos[g.planetUid]:0

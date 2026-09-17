@@ -2181,6 +2181,27 @@ window.MOCK_JOURNEYS = [
     return (address || "").split("").map(glyphTile).join("");
   }
 
+  /* 2026-09-17, Tony (real-device playtest): "changing ly jump distance
+     does not change the jump count" -- TOTAL JUMPS was reading straight
+     from session.route.totalJumps, which is just jumps().length-1 (the
+     number of charted legs on the route), fixed the moment the route was
+     plotted and never touched again. It never accounted for warpRangeLY
+     at all, even though each leg is already checked against it below
+     (renderManifest()'s own overRange/MULTI-WARP flag on j.distance >
+     warpRangeLY) -- a leg longer than your current range needs more than
+     one real hyperdrive activation to cover, so the honest jump count is
+     per-leg ceil(distance / warpRangeLY), not a flat 1. jl[0] is the
+     origin system itself (no incoming leg, distance 0/undefined), so it's
+     skipped rather than counted as a jump. */
+  function computeJumpCount() {
+    var jl = jumps();
+    var total = 0;
+    for (var i = 1; i < jl.length; i++) {
+      total += Math.max(1, Math.ceil((jl[i].distance || 0) / warpRangeLY));
+    }
+    return total;
+  }
+
   // ---- rendering ----------------------------------------------------------
 
   function renderPicker() {
@@ -2210,7 +2231,7 @@ window.MOCK_JOURNEYS = [
     $("destination").textContent = session.destination.systemName;
     $("destSub").textContent = "HEX ADDRESS " + session.destination.address;
     $("destGlyphs").innerHTML = glyphStrip(session.destination.address);
-    $("jumpCount").textContent = session.route.totalJumps;
+    $("jumpCount").textContent = computeJumpCount();
 
     var jl = jumps();
     var remaining = 0;
@@ -2964,7 +2985,7 @@ window.MOCK_JOURNEYS = [
   $("driveSelect").value = currentDriveKey;
   $("rangeSelect").value = String(warpRangeLY);
   $("driveSelect").onchange = function () { currentDriveKey = this.value; setWarpDisplay(); };
-  $("rangeSelect").onchange = function () { warpRangeLY = Number(this.value); setWarpDisplay(); renderManifest(); };
+  $("rangeSelect").onchange = function () { warpRangeLY = Number(this.value); setWarpDisplay(); renderManifest(); renderRoutePanel(); };
   setWarpDisplay();
 
   // ---- mobile nav ------------------------------------------------------

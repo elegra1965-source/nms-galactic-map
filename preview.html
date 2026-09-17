@@ -265,42 +265,39 @@ canvas#tstars{display:none;position:fixed;inset:0;pointer-events:none;z-index:1}
    means every button just reads the SAME live --bevAng off the document
    root, so they're mechanically always in lockstep, regardless of when
    each one appeared or turned on -- not a coincidence of matching timers. */
-@property --bevAng{syntax:'<angle>';inherits:true;initial-value:0deg}
-html{animation:bevTrace 6s linear infinite}
+/* 2026-09-17, Tony (real-device playtest): "remove the animation/
+   circling colours around the buttons as i believe thats why is making it
+   lag". The animated version below drove a registered @property --bevAng
+   through a conic-gradient() background on every single .btn.beveled
+   element via one shared html-level @keyframes -- same root-cause class as
+   the toolbarRowReveal filter:drop-shadow bug fixed back in Session 49:
+   animating something a gradient/filter depends on forces a real per-frame
+   repaint of every element using it, which a fast desktop GPU hides
+   completely and a weaker device's GPU visibly cannot keep up with. A
+   static, non-animated fallback for this exact styling already existed
+   below for prefers-reduced-motion -- promoted it to the permanent default
+   instead of writing a new one, so this is a pure removal, not a redesign.
+   If this turns out not to be the whole story, the git history has the
+   animated version to restore/compare against. */
 .btn.beveled{
   position:relative;
   clip-path:polygon(7px 0,100% 0,100% calc(100% - 7px),calc(100% - 7px) 100%,0 100%,0 7px);
   border:1.5px solid transparent;
   background:
     linear-gradient(rgba(13,19,28,.92),rgba(13,19,28,.92)) padding-box,
-    conic-gradient(from var(--bevAng),transparent 0deg,rgba(0,229,255,.18) 16deg,var(--cyan) 26deg,
-      transparent 68deg,transparent 360deg) border-box;
+    linear-gradient(90deg,var(--cyan),var(--border)) border-box;
   text-shadow:0 0 5px rgba(0,229,255,.3);
 }
 .btn.beveled:hover{border-color:transparent;
   background:
     linear-gradient(rgba(19,27,39,.92),rgba(19,27,39,.92)) padding-box,
-    conic-gradient(from var(--bevAng),transparent 0deg,rgba(0,229,255,.18) 16deg,var(--cyan) 26deg,
-      transparent 68deg,transparent 360deg) border-box;
+    linear-gradient(90deg,var(--cyan),var(--border)) border-box;
 }
 .btn.beveled.on,.btn.beveled.primary{
   color:var(--gold);text-shadow:0 0 7px rgba(240,165,0,.55);
   background:
     linear-gradient(rgba(240,165,0,.10),rgba(240,165,0,.10)) padding-box,
-    conic-gradient(from var(--bevAng),transparent 0deg,rgba(240,165,0,.20) 16deg,var(--gold) 26deg,
-      transparent 68deg,transparent 360deg) border-box;
-}
-@keyframes bevTrace{to{--bevAng:360deg}}
-@media (prefers-reduced-motion:reduce){
-  html{animation:none}
-  .btn.beveled{
-    background:
-      linear-gradient(rgba(13,19,28,.92),rgba(13,19,28,.92)) padding-box,
-      linear-gradient(90deg,var(--cyan),var(--border)) border-box;}
-  .btn.beveled.on,.btn.beveled.primary{
-    background:
-      linear-gradient(rgba(240,165,0,.10),rgba(240,165,0,.10)) padding-box,
-      linear-gradient(90deg,var(--gold),var(--border)) border-box;}
+    linear-gradient(90deg,var(--gold),var(--border)) border-box;
 }
 input[type=text]{font-family:'Orbitron',monospace;font-size:11px;letter-spacing:.12em;
   background:#04070c;border:1px solid var(--border);color:var(--cyan);
@@ -1159,6 +1156,18 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
      the instant you tap a system, and the rest of the detail scrolls underneath. */
   #prowEnter{order:-1;position:sticky;top:0;z-index:2;background:rgba(11,17,25,.97);
     margin:0 -14px;padding:10px 14px 8px;border-bottom:1px solid var(--border-soft)}
+  /* 2026-09-17, Tony (real-device playtest): "can not click collapse on some
+     screens" -- on this mobile layout #panel is a scrolling flex column and
+     #prowEnter above is pinned (position:sticky, opaque bg) to its top. .phead
+     (the name row that holds #bPanelMin) isn't positioned, so as soon as the
+     panel is scrolled at all, .phead slides up underneath that pinned bar and
+     paints BEHIND it -- the whole header, collapse button included, becomes
+     covered and unclickable for as long as anything is scrolled past the top.
+     Giving .phead a z-index above #prowEnter's (both need `position` for
+     z-index to apply at all) keeps it painting on top whenever the two
+     overlap during a scroll, so the collapse button stays reachable no
+     matter where the panel is scrolled to. */
+  .phead{position:relative;z-index:3}
   #course{top:calc(var(--top-h,150px) + 8px);left:50%;transform:translateX(-50%);width:210px}
   #leftcol{bottom:auto;top:calc(var(--top-h,150px) + 140px);flex-direction:column;align-items:flex-start}
   /* 2026-08-30, Tony: the toolbar hide/show cascade now keeps --top-h in
@@ -2329,7 +2338,7 @@ nearby procedural space within a radius.">Search</button>
     </div>
     <div class="mfld">
       <div class="lb" style="display:flex;justify-content:space-between;align-items:center">
-        <span>Resource / signal markers (Cosmos-era, max 6)</span>
+        <span>Resource / signal markers (Cosmos-era, max 10)</span>
         <button class="btn" id="edAddSignal" type="button" style="padding:3px 8px">+ Add</button>
       </div>
       <div class="fldHint" style="margin-top:-4px;margin-bottom:6px">The floating diamond-shaped signals you see near objects in-game -- type what your own \u201cStarmap Analysis Report\u201d popup actually said, and optionally pick which planet/moon it floats near (or leave it as a free-floating marker).</div>
