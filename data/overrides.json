@@ -36584,6 +36584,38 @@
             "signalType": "",
             "route": "",
             "planet": 0
+          },
+          {
+            "name": "Duporpe's Calamity",
+            "category": "ice field",
+            "icon": "frozen",
+            "signalType": "frozen planetiod debris",
+            "route": "rich vain of comets fragments",
+            "planet": 0
+          },
+          {
+            "name": "Planetoid Nisar VI",
+            "category": "habital asteroid",
+            "icon": "mineral",
+            "signalType": "exteraterestrial rock",
+            "route": "flat plane detected, ideal for orbital base construction",
+            "planet": 0
+          },
+          {
+            "name": "",
+            "category": "",
+            "icon": "mineral",
+            "signalType": "",
+            "route": "",
+            "planet": 0
+          },
+          {
+            "name": "Luettir Shattered Planetoid",
+            "category": "Astoroid belt",
+            "icon": "mineral",
+            "signalType": "planetoid debris",
+            "route": "rich vainof comet fragments",
+            "planet": 0
           }
         ],
         "editorName": "",
@@ -36612,7 +36644,7 @@
             ],
             "salvage": [],
             "fossils": [],
-            "sentinel": "None",
+            "sentinel": "Frequent",
             "autophage": false,
             "reliquary": false,
             "ruins": false,
@@ -36650,7 +36682,7 @@
           {
             "name": "Oswest J36",
             "moon": true,
-            "orbits": 2,
+            "orbits": 1,
             "biome": "Dead",
             "subtype": "",
             "descriptor": "",
@@ -36675,11 +36707,15 @@
           }
         ]
       },
-      "editedAt": "2026-09-16T15:47:12.622Z",
+      "editedAt": "2026-09-17T22:12:32.228Z",
       "editedByIp": "5.133.46.24",
       "history": [
         {
           "at": "2026-09-16T15:47:12.622Z",
+          "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-09-17T22:12:32.228Z",
           "text": "edited by a traveller"
         }
       ]
@@ -37224,8 +37260,8 @@
   },
   "reports": [],
   "ipLog": {
-    "24.162.6.56": [
-      1789671241681
+    "5.133.46.24": [
+      1789683152228
     ]
   },
   "flagLog": {},
@@ -37319,6 +37355,17 @@
     ],
     "subtype": [
       "Viridescent"
+    ],
+    "signalName": [
+      "MS Jiokaz XIV",
+      "MS Yotsu XIV",
+      "The Ugina",
+      "MS Omoro VII",
+      "Planetoid noic IX",
+      "Ehilik Infestation",
+      "Duporpe's Calamity",
+      "Planetoid Nisar VI",
+      "Luettir Shattered Planetoid"
     ]
   },
   "alliances": {}
