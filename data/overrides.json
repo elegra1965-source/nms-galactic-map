@@ -36977,6 +36977,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:11DDFA556C30": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Bihiros-Sarsk",
+        "race": "Vy'keen",
+        "region": "Savenix Instability",
+        "starClass": "F2p",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Mercantile",
+        "sell": "67.5",
+        "buy": "-26.2",
+        "econDesc": "2 (Balanced)",
+        "conflict": "2 (Medium)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-17T11:01:19.472Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-17T11:01:19.472Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -36987,7 +37036,8 @@
       1789642837671,
       1789642847938,
       1789642858053,
-      1789642868672
+      1789642868672,
+      1789642879472
     ]
   },
   "flagLog": {},
