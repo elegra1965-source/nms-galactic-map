@@ -566,7 +566,7 @@ export function filterSystemEdit(payload){
   // procedural per-planet path, see preview.html's RES_ICON_CAT comment.
   out.signals = [];
   var signals = Array.isArray(payload.signals) ? payload.signals : [];
-  if(signals.length > 6) errors.push("A system can have at most 6 resource/signal markers");
+  if(signals.length > 10) errors.push("A system can have at most 10 resource/signal markers");
   // creature/hazard/cargo added 2026-09-09, same session -- 3 more real
   // in-game icon glyphs from Tony's own reference photos, added as
   // traveller-selectable options rather than guessed-at "official"
@@ -574,8 +574,17 @@ export function filterSystemEdit(payload){
   // atlasstation added later the same day -- Hello Games' own real Atlas
   // Station icon (Tony confirmed it directly), not a fan reading of an
   // ambiguous photo like creature/hazard/cargo were.
-  var SIGNAL_ICONS = ["mineral","flora","frozen","tech","outpost","creature","hazard","cargo","atlasstation"];
-  for(var sgI=0; sgI<Math.min(signals.length,6); sgI++){
+  // 2026-09-17: "base" (added 2026-09-13) was missing from this allowlist --
+  // a saved "base" marker was silently coerced to "mineral" server-side on
+  // every save, not just on the client's own reopen-form path (which had
+  // the identical gap, now fixed in preview.js). Added it back plus the 5
+  // new categories from this same session's playtest feedback (infected
+  // outpost, habitable asteroid, space hulk, asteroid belt, extraterrestrial
+  // rock) -- kept as a plain literal array here (this file has no access to
+  // preview.js's RES_ICON_CAT), so it must be kept in sync by hand if more
+  // categories are ever added client-side.
+  var SIGNAL_ICONS = ["mineral","flora","frozen","tech","outpost","creature","hazard","cargo","atlasstation","base","infectedoutpost","habitableasteroid","spacehulk","asteroidbelt","extraterrestrialrock"];
+  for(var sgI=0; sgI<Math.min(signals.length,10); sgI++){
     var sg = signals[sgI] || {};
     var sgNameR = filterText(sg.name, {maxLen:40, fieldName:"Signal marker name"});
     if(!sgNameR.ok){ errors.push(sgNameR.reason); continue; }

@@ -2367,6 +2367,11 @@ nearby procedural space within a radius.">Search</button>
        see buildCommaCombo() -- also fixed those fields' suggestions coming
        out in wiki-category order instead of alphabetical. -->
   <datalist id="dlDescriptor"></datalist>
+  <!-- 2026-09-17, Tony: the Resource/signal marker Name field (in Edit
+       system) had no suggestions at all -- populated live by the same
+       populateDatalists() above, from signal names travellers have
+       actually typed before (see KNOWN_TERMS_FIELDS/COMMUNITY_TERM_FIELDS). -->
+  <datalist id="dlSignalName"></datalist>
 
   <div class="box modal" id="reportModal" style="max-width:340px;display:none">
     <h3>Report this system</h3>

@@ -16,7 +16,7 @@
                          giant, ruins, outlaw, abandoned, phantom, econName, sell, buy, econDesc, conflict, blackHole, atlas, notes,
                          screenshot, editorName, editorFriendCode, genVersion, colliding, collidingSet,
                          hasStation, stationName, allianceName, stationPhoto,
-                         signals:[{name, category, icon, signalType, route, planet}, ...] (max 6),
+                         signals:[{name, category, icon, signalType, route, planet}, ...] (max 10),
                          bodies:[{name, moon, orbits, biome, subtype, descriptor, water, ring, resources,
                                   flora, fauna, minerals, salvage, fossils, sentinel, autophage,
                                   reliquary, ruins, base, baseName}, ...]}
@@ -971,6 +971,14 @@ export default async (req, context) => {
       // traveller's real on-screen sub-name feeds the shared vocabulary so
       // subtypeComboGroups() can surface it for every OTHER traveller too.
       if(b.subtype) addCommunityTerms(current.data, "subtype", [b.subtype]);
+    });
+    // Signal names (2026-09-17, Tony: no suggestions at all on this field)
+    // -- reads off sysRec.data.signals, the value the TOP_CATS loop above
+    // just committed (so, same as bodies above, this learns from a signal
+    // still under flag/dispute review's PRE-EDIT value, never from a
+    // submission that didn't win).
+    ((sysRec.data.signals)||[]).forEach(function(sig){
+      if(sig && sig.name) addCommunityTerms(current.data, "signalName", [sig.name]);
     });
 
     sysRec.editedAt = new Date(now).toISOString();

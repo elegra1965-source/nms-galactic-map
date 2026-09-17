@@ -362,7 +362,12 @@ export async function invalidateGetCache(){
 // "subtype" added 2026-09-08 -- Sub type, split out of Biome (see
 // system-edit.mjs's own comment on why): same treatment, a traveller's
 // typed sub-name becomes a future suggestion for every other traveller.
-export const COMMUNITY_TERM_FIELDS = ["resources","flora","fauna","minerals","salvage","fossils","descriptor","biome","subtype"];
+// "signalName" added 2026-09-17 (Tony, real device: no suggestions at all
+// on the Resource/signal marker Name field) -- same treatment, a
+// traveller's typed signal name becomes a future suggestion for every
+// other traveller. See system-edit.mjs's addCommunityTerms call for this
+// field, and preview.js's dlSignalName datalist that surfaces it.
+export const COMMUNITY_TERM_FIELDS = ["resources","flora","fauna","minerals","salvage","fossils","descriptor","biome","subtype","signalName"];
 var MAX_COMMUNITY_TERMS_PER_FIELD = 500;
 export function addCommunityTerms(data, field, values){
   if(COMMUNITY_TERM_FIELDS.indexOf(field) < 0) return;

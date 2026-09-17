@@ -1678,7 +1678,13 @@ var KNOWN_TERMS_K="nms-galmap-known-terms";
 // "subtype" added 2026-09-08 -- the new per-body Sub type field (see
 // subtypeComboGroups() above), same reasoning as biome: a traveller's own
 // typed sub-name not on the researched list becomes a future suggestion.
-var KNOWN_TERMS_FIELDS=["resources","flora","fauna","minerals","salvage","fossils","descriptor","biome","subtype"];
+// "signalName" added 2026-09-17 (Tony, real device: "no suggestions come up
+// from list input" on the Resource/signal marker Name field) -- same
+// reasoning as every other field here: a traveller's own typed signal name
+// becomes a future suggestion, not just saved and forgotten. See
+// populateDatalists()'s dlSignalName entry and system-edit.mjs's matching
+// server-side addCommunityTerms("signalName",...) call.
+var KNOWN_TERMS_FIELDS=["resources","flora","fauna","minerals","salvage","fossils","descriptor","biome","subtype","signalName"];
 var knownTerms={};
 function loadKnownTerms(){
   knownTerms={};
@@ -1724,6 +1730,8 @@ function rememberKnownTerms(payload){
     if(b.biome) rememberTerms(knownTerms.biome,[b.biome]);
     if(b.subtype) rememberTerms(knownTerms.subtype,[b.subtype]);
   });
+  var signalNames=(payload&&payload.signals||[]).map(function(g){ return g.name; }).filter(Boolean);
+  if(signalNames.length) rememberTerms(knownTerms.signalName,signalNames);
   saveKnownTerms();
   populateDatalists();
 }
@@ -1905,7 +1913,11 @@ function populateDatalists(){
   // rememberKnownTerms, initial load) and an empty map keeps all of those
   // call sites harmless without hunting down and removing each one. The
   // orphaned #dlDescriptor <datalist> element itself is simply unused now.
-  var map={};
+  // dlSignalName (2026-09-17) is the one field that DOES still use this --
+  // a signal Name is a single free-text value per entry (not the
+  // comma-separated shape that broke the datalist approach for Resources/
+  // Flora/etc.), so the plain native mechanism works fine here.
+  var map={signalName:"dlSignalName"};
   Object.keys(map).forEach(function(k){
     var dl=document.getElementById(map[k]); if(!dl) return;
     // Real wiki-sourced items first (if this field has any), then whatever
@@ -4191,11 +4203,20 @@ function buildFeature(s,kind,pos){
   var tex=kind==="bh"?BH_TEX:ATLAS_TEX;
   /* 2026-09-17, Tony: swapped feature-blackhole.png for his own reference
      image (a real in-game-style black diamond with a white spiral) -- cut
-     out and cropped to a 512x512 square, replacing the old wide 512x346
-     art this aspect/size pair was originally tuned for. Matched to Atlas's
-     own h/aspect (6.4, 1:1-ish) now that both are diamond icons. */
+     out and cropped to a 512x512 square (aspect 1), replacing the old wide
+     512x346 art this was originally tuned for.
+     Follow-up same day, real-device screenshot: matching it to Atlas's own
+     h (6.4) read as way too big -- Tony's ask was for it to sit at the
+     same visual weight as the small resource/signal marker icons dotted
+     around a system. First correction used buildResourceIcon()'s h formula
+     (0.85+b.size*0.55) as the reference, but that function turned out to
+     be dead code (see its own comment a few hundred lines up) -- every
+     marker actually rendered today goes through buildManualSignalIcon(),
+     whose real, currently-live scale is a flat 1.3. Matched to that exact
+     value instead. Atlas's own h is untouched, only the black hole was
+     flagged as oversized. */
   var aspect=kind==="bh"?1:(443/512);
-  var h=6.4, w=h*aspect;
+  var h=kind==="bh"?1.3:6.4, w=h*aspect;
   var mat=new THREE.SpriteMaterial({map:tex,transparent:true,depthWrite:false});
   var spr=new THREE.Sprite(mat);
   spr.scale.set(w,h,1);
@@ -4687,6 +4708,11 @@ var SYSTEM_TILT=0;
    styles visible in the real reference screenshot: solid -> red
    segmented "scan band" -> solid white -> fine dashed (outermost of the
    4, repeats again for a 5th/6th planet if a system has that many). */
+/* Fixed minimum ring count so every system shows the same set of orbit
+   lanes regardless of planet count, matching the real game (2026-09-17,
+   Tony's own in-game screenshot) -- see buildSystemView()'s own comment
+   on the follow-up loop that uses this. */
+var MIN_ORBIT_RINGS=4;
 var ORBIT_RING_STYLES=[
   {color:0x00e5ff,opacity:0.55,dash:null},
   {color:0xff4646,opacity:0.65,dash:[34,7,12,7,55,7,18,7,70,7]},
@@ -4894,7 +4920,8 @@ function buildSystemView(s){
   }
   starLight.color.setHex(s.starColors[0]);
   starLight.position.set(0,0,0);
-  if(s.blackHole) systemGroup.add(buildFeature(s,"bh",new THREE.Vector3(featureR*1.148,featureR*0.252,-featureR*0.77)));
+  var lastOrbitR=8+Math.max(0,s.planets-1)*3.7; // same formula the planets themselves use, see systemFeatureR()'s comment
+  if(s.blackHole) systemGroup.add(buildFeature(s,"bh",new THREE.Vector3(lastOrbitR*0.531,lastOrbitR*0.117,-lastOrbitR*0.356)));
   if(s.atlas) systemGroup.add(buildFeature(s,"atlas",new THREE.Vector3(-featureR*0.85,-featureR*0.15,featureR*0.5)));
   /* Station is now ALWAYS shown at the scene centre -- either the real
      submitted photo (buildStationCard, unchanged) or, when no photo has
@@ -5015,6 +5042,31 @@ function buildSystemView(s){
     lastPlanetAnchorKey=b.index;
     planetEntries.push({pivot:pivot,mesh:mesh,size:b.size,moonAnchor:pMoonAnchor,index:b.index,atmo:atmo});
     planetIdx++;
+  }
+  /* 2026-09-17, Tony (his own in-game screenshot of this exact system,
+     "THE LUETTIR SYSTEM"): the real game always shows a fixed set of orbit
+     rings regardless of how many planets are actually present -- his
+     2-planet reference still shows multiple ring lanes out past both
+     planets. Here, orbitRingMesh() only ever got called once per REAL
+     planet, so a system with fewer planets than ORBIT_RING_STYLES has
+     entries (4) never showed the later styles at all -- not a rendering
+     bug in those styles themselves (confirmed by re-reading them, still
+     all 4 present and cycling correctly), just nothing ever asked for
+     ring index 3 on a 1-2 planet system. This is also the real explanation
+     for "where did the red/dashed ring go" from the previous screenshot,
+     not just two different systems being compared as I'd guessed then.
+     Fills in any remaining ring slots up to MIN_ORBIT_RINGS with bare,
+     planet-less decorative rings at the same orbitR formula the real
+     planets use, so every system shows the same fixed ring pattern the
+     game does. Radius tops out at 8+3*3.7=19.1 for the worst case (a
+     1-planet system), comfortably inside systemFeatureR()'s own minimum
+     (20) so this can't push a decorative ring out past where the camera
+     or the star/black-hole/Atlas placements expect the disc to end. */
+  for(; planetIdx<MIN_ORBIT_RINGS; planetIdx++){
+    var decoR=8+planetIdx*3.7;
+    var decoPivot=new THREE.Object3D(); systemGroup.add(decoPivot);
+    decoPivot.rotation.x=SYSTEM_TILT;
+    decoPivot.add(orbitRingMesh(decoR,planetIdx));
   }
   for(var mi=0; mi<moonBodies.length; mi++){
     var mb=moonBodies[mi];
@@ -9089,7 +9141,7 @@ function renderSignalEditList(){
       '</div>';
     if(g.open){
       html+='<div class="brow2">'+
-          '<div class="mfld" style="margin-bottom:0"><div class="lb">Name</div><input type="text" class="sgName" data-si="'+i+'" maxlength="40" placeholder="e.g. The Afaye Cluster" value="'+escAttr(g.name)+'"></div>'+
+          '<div class="mfld" style="margin-bottom:0"><div class="lb">Name</div><input type="text" class="sgName" list="dlSignalName" data-si="'+i+'" maxlength="40" placeholder="e.g. The Afaye Cluster" value="'+escAttr(g.name)+'"></div>'+
           '<div class="mfld" style="margin-bottom:0"><div class="lb">Icon type</div>'+
             '<div class="iconPick" data-si="'+i+'">'+
               '<button type="button" class="iconPickBtn" data-si="'+i+'">'+
