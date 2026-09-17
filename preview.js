@@ -4300,7 +4300,12 @@ function buildStationCard(s,pos){
   tex.minFilter=THREE.LinearFilter;
   var mat=new THREE.SpriteMaterial({map:tex,transparent:true,depthWrite:false});
   var spr=new THREE.Sprite(mat);
-  var h=5.6, w=h*(CW/CH);
+  /* 2026-09-17, Tony (real-device playtest): same "space station icon too
+     big, half size smaller" ask as buildDefaultStationIcon()'s sibling fix
+     -- was 5.6, halved to 2.8, kept in step with that function so a
+     system doesn't visibly resize depending on whether it has a real
+     station photo. */
+  var h=2.8, w=h*(CW/CH);
   spr.scale.set(w,h,1);
   spr.position.copy(pos);
   // 2026-09-13, Tony: an uninhabited system can still carry a real
@@ -4861,7 +4866,10 @@ function buildDefaultStationIcon(s){
   var pick=pool[Math.floor(mulberry32(seed)()*pool.length)];
   var mat=new THREE.SpriteMaterial({map:pick.tex,transparent:true,depthWrite:false});
   var spr=new THREE.Sprite(mat);
-  var h=5.0,w=h*pick.aspect;
+  /* 2026-09-17, Tony (real-device playtest, Luettir system): "space
+     station icon still to big need to half size smaller" -- was 5.0,
+     halved to 2.5. */
+  var h=2.5,w=h*pick.aspect;
   spr.scale.set(w,h,1);
   spr.position.set(0,0,0);
   /* Real bug (2026-09-13, Tony: clicked the default station icon live and
