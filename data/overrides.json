@@ -37459,6 +37459,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:101AF9557C30": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Chwonsana",
+        "race": "Korvax",
+        "region": "Uefert Nebula",
+        "starClass": "F9f",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Material Fusion",
+        "sell": "66.1",
+        "buy": "-29.1",
+        "econDesc": "Comfortable",
+        "conflict": "High",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-18T11:01:08.369Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-18T11:01:08.369Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -37468,7 +37517,8 @@
       1789729226389,
       1789729237112,
       1789729247503,
-      1789729258180
+      1789729258180,
+      1789729268369
     ]
   },
   "flagLog": {},
