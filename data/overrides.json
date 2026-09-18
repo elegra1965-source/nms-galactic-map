@@ -18645,16 +18645,44 @@
         "econDesc": "Balanced",
         "sell": "44.9",
         "buy": "-25.6",
-        "editorName": "Added -- no original editor name available",
-        "notes": "Sourced from a public NMS wiki corpus (compiled by hadsh/nms_namegen, 2026-08-23) -- originally documented at: Birchon-Est (https://nomanssky.fandom.com/wiki/Birchon-Est). If you know the original contributor, or this is your own system, feel free to update it via Edit system."
+        "editorName": "Galactic Hub Wiki (import)",
+        "notes": "Sourced from a public NMS wiki corpus (compiled by hadsh/nms_namegen, 2026-08-23) -- originally documented at: Birchon-Est ( If you know the original contributor, or this is your own system, feel free to update it via Edit system. | Cross-referenced from the Galactic Hub community wiki (",
+        "name": "Birchon-Est",
+        "region": "Unbice Shallows",
+        "stars": [
+          "yellow"
+        ],
+        "giant": false,
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
       },
-      "editedAt": "2026-08-23T14:58:34.292Z",
+      "editedAt": "2026-09-18T11:00:26.389Z",
       "history": [
         {
           "at": "2026-08-23T14:58:34.292Z",
           "text": "Imported from a public, wiki-documented ground-truth corpus (hadsh/nms_namegen, compiled 2026-08-23) -- see notes for the source citation."
+        },
+        {
+          "at": "2026-09-18T11:00:26.389Z",
+          "text": "edited by a traveller"
         }
-      ]
+      ],
+      "editedByIp": "5.133.46.24"
     },
     "2:1195F3545C3E": {
       "galaxy": 2,
@@ -37289,7 +37317,8 @@
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1789729215835
+      1789729215835,
+      1789729226389
     ]
   },
   "flagLog": {},
