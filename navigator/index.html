@@ -126,6 +126,7 @@ main{min-height:calc(100vh - 60px - 26px);display:grid;grid-template-columns:290
 .panelCollapse:hover{border-color:var(--cyan);color:var(--cyan)}
 .panelBody{padding:18px;overflow:hidden;flex:1;min-height:0}
 .panelBody.scroll{overflow-y:auto;overflow-x:hidden}
+.panelBody>*:last-child{margin-bottom:0}
 .panel.collapsed .panelBody{display:none}
 /* pinned footer for a panel's one must-always-be-reachable action (e.g. Restart
    this journey) -- a flex sibling of .panelBody, not inside its scroll area, so
@@ -3121,13 +3122,14 @@ window.MOCK_JOURNEYS = [
   });
 
   // Real overflow only -- a plain scrollHeight>clientHeight check with a
-  // small tolerance (sub-pixel line-height/font-metric rounding can read
-  // as a few px of "overflow" that was never actually there, same quirk
-  // already documented for other panels elsewhere in this project).
+  // tolerance wide enough to absorb sub-pixel line-height/font-metric
+  // rounding (a real device can render a few px taller than this sandbox's
+  // own measurements) without masking genuine overflow, same quirk already
+  // documented for other panels elsewhere in this project.
   var PANEL_SCROLL_BODIES = [$("routePanelBody"), $("manifestPanelBody")];
   function remeasurePanelScroll(el) {
     if (!el) return;
-    if (el.scrollHeight - el.clientHeight > 2) el.classList.add("scroll");
+    if (el.scrollHeight - el.clientHeight > 6) el.classList.add("scroll");
     else el.classList.remove("scroll");
   }
   if (window.ResizeObserver) {
