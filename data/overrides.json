@@ -37361,6 +37361,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1176F9555C30": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Bukaiwar",
+        "race": "Korvax",
+        "region": "Canthian",
+        "starClass": "F7",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Construction",
+        "sell": "60.5",
+        "buy": "-15.2",
+        "econDesc": "Satisfactory",
+        "conflict": "1",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-18T11:00:47.503Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-18T11:00:47.503Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -37368,7 +37417,8 @@
     "5.133.46.24": [
       1789729215835,
       1789729226389,
-      1789729237112
+      1789729237112,
+      1789729247503
     ]
   },
   "flagLog": {},
