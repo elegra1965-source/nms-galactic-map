@@ -19167,16 +19167,44 @@
         "econDesc": "Promising",
         "sell": "54.4",
         "buy": "-24.3",
-        "editorName": "Added -- no original editor name available",
-        "notes": "Sourced from a public NMS wiki corpus (compiled by hadsh/nms_namegen, 2026-08-23) -- originally documented at: Biraso-Onmat III (https://nomanssky.fandom.com/wiki/Biraso-Onmat_III). If you know the original contributor, or this is your own system, feel free to update it via Edit system."
+        "editorName": "Galactic Hub Wiki (import)",
+        "notes": "Sourced from a public NMS wiki corpus (compiled by hadsh/nms_namegen, 2026-08-23) -- originally documented at: Biraso-Onmat III ( If you know the original contributor, or this is your own system, feel free to update it via Edit system. | Cross-referenced from the Galactic Hub community wiki (",
+        "name": "Biraso-Onmat III",
+        "region": "Iptrevs Fringe",
+        "stars": [
+          "yellow"
+        ],
+        "giant": false,
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
       },
-      "editedAt": "2026-08-23T14:58:34.292Z",
+      "editedAt": "2026-09-18T11:00:15.835Z",
       "history": [
         {
           "at": "2026-08-23T14:58:34.292Z",
           "text": "Imported from a public, wiki-documented ground-truth corpus (hadsh/nms_namegen, compiled 2026-08-23) -- see notes for the source citation."
+        },
+        {
+          "at": "2026-09-18T11:00:15.835Z",
+          "text": "edited by a traveller"
         }
-      ]
+      ],
+      "editedByIp": "5.133.46.24"
     },
     "9:113A03954F26": {
       "galaxy": 9,
@@ -37261,7 +37289,7 @@
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1789683152228
+      1789729215835
     ]
   },
   "flagLog": {},
