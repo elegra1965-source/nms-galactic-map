@@ -5942,8 +5942,19 @@ function handleHoverRay(e){
     ndc.y=-((e.clientY-rectSys.top)/rectSys.height)*2+1;
     ray.setFromCamera(ndc,camera);
     var hitsSys=ray.intersectObjects(bodyMeshes.concat(starMeshes).concat(featureMeshes));
-    if(hitsSys.length) showSystemHoverPop(hitsSys[0].object.userData,e.clientX,e.clientY);
-    else hideHoverPop();
+    if(hitsSys.length){
+      showSystemHoverPop(hitsSys[0].object.userData,e.clientX,e.clientY);
+      canvas.style.cursor="pointer";
+    } else {
+      hideHoverPop();
+      /* 2026-09-18, Tony (real-device playtest): resourceMeshes (signal
+         markers) are click-only by design -- their own "Starmap Analysis
+         Report" card, see tryPick()'s system branch -- and deliberately
+         get no hover popup above, but the resting drag-hand cursor gave
+         no hint they're clickable at all either. Raycast them too, purely
+         for the cursor affordance -- doesn't touch the popup logic above. */
+      canvas.style.cursor=ray.intersectObjects(resourceMeshes).length?"pointer":"";
+    }
     return;
   }
   if(mode!=="local"||!locInstMesh) return;

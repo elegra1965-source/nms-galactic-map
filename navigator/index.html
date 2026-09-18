@@ -126,6 +126,14 @@ main{min-height:calc(100vh - 60px - 26px);display:grid;grid-template-columns:290
 .panelCollapse:hover{border-color:var(--cyan);color:var(--cyan)}
 .panelBody{padding:18px;overflow:auto;flex:1;min-height:0}
 .panel.collapsed .panelBody{display:none}
+/* pinned footer for a panel's one must-always-be-reachable action (e.g. Restart
+   this journey) -- a flex sibling of .panelBody, not inside its scroll area, so
+   it's always visible regardless of scroll position or content length, on both
+   the desktop floating panel and the mobile bottom-sheet layout (both use
+   .panel{display:flex;flex-direction:column}). Added 2026-09-18. */
+.panelFooter{flex:none;padding:12px 18px;border-top:1px solid var(--border-soft);background:rgba(4,10,20,.9)}
+.panelFooter .danger{margin-top:0}
+.panel.collapsed .panelFooter{display:none}
 
 .eyebrow{font-size:9px;letter-spacing:.18em;color:var(--cyan-dim);font-weight:700;font-family:'Orbitron',sans-serif}
 .panel h1{font-family:'Orbitron',sans-serif;font-size:18px;margin:8px 0 16px;color:var(--white);font-weight:700}
@@ -140,6 +148,8 @@ details.pickerFold>summary::-webkit-details-marker{display:none}
 details.pickerFold>summary::after{content:"▾";color:var(--cyan-dim)}
 details.pickerFold[open]>summary::after{content:"▴"}
 details.pickerFold .journeyPicker{padding:0 9px 9px;margin-bottom:0}
+.pickerFold .infoFoldBody{padding:0 9px 9px}
+.pickerFold .infoFoldBody .warning{margin-top:10px}
 
 .journeyPicker{display:flex;flex-direction:column;gap:6px;margin-bottom:18px}
 .journeyPicker button{text-align:left;background:var(--panel);border:1px solid var(--border-soft);color:var(--text-dim);padding:9px 10px;border-radius:var(--r);font-size:11px;line-height:1.35}
@@ -620,15 +630,20 @@ window.nmsCoreReady = new Promise(function (res) { window.__nmsCoreResolve = res
               <option value="6000">6000 LY</option>
             </select>
           </div>
-          <p id="warpRangeHint">Jumps beyond your current warp range are flagged in the manifest as needing a multi-warp hop.</p>
         </div>
 
-        <div class="warning">
-          <b>BLACK HOLES</b>
-          <p>Black-hole exits are random. This journey never treats one as a guaranteed final destination — you'll be asked to confirm where you actually emerged.</p>
+        <details class="pickerFold">
+          <summary>WARP RANGE &amp; BLACK HOLES &mdash; TAP FOR INFO</summary>
+          <div class="infoFoldBody">
+            <p id="warpRangeHint">Jumps beyond your current warp range are flagged in the manifest as needing a multi-warp hop.</p>
+            <div class="warning">
+              <b>BLACK HOLES</b>
+              <p>Black-hole exits are random. This journey never treats one as a guaranteed final destination — you'll be asked to confirm where you actually emerged.</p>
+            </div>
+          </div>
+        </details>
         </div>
-        <button class="danger" id="resetJourney" style="margin-top:16px">RESTART THIS JOURNEY</button>
-        </div>
+        <div class="panelFooter"><button class="danger" id="resetJourney">RESTART THIS JOURNEY</button></div>
       </aside>
 
       <section id="galaxy" class="galaxy">
