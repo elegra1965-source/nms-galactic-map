@@ -124,7 +124,8 @@ main{min-height:calc(100vh - 60px - 26px);display:grid;grid-template-columns:290
 .panelTitle{flex:1;font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:.14em;color:var(--cyan-dim)}
 .panelCollapse{background:none;border:1px solid var(--border-soft);color:var(--text-dim);width:22px;height:22px;border-radius:4px;font-size:14px;line-height:1;padding:0;flex:none}
 .panelCollapse:hover{border-color:var(--cyan);color:var(--cyan)}
-.panelBody{padding:18px;overflow:auto;flex:1;min-height:0}
+.panelBody{padding:18px;overflow:hidden;flex:1;min-height:0}
+.panelBody.scroll{overflow-y:auto;overflow-x:hidden}
 .panel.collapsed .panelBody{display:none}
 /* pinned footer for a panel's one must-always-be-reachable action (e.g. Restart
    this journey) -- a flex sibling of .panelBody, not inside its scroll area, so
@@ -2709,6 +2710,7 @@ window.MOCK_JOURNEYS = [
     renderManifest();
     renderJumpAction();
     renderReplanNotice();
+    if (typeof PANEL_SCROLL_BODIES !== "undefined") PANEL_SCROLL_BODIES.forEach(remeasurePanelScroll);
   }
 
   // ---- manifest row interactions ------------------------------------------
@@ -3117,6 +3119,25 @@ window.MOCK_JOURNEYS = [
     makeDraggable(panel, head);
     makeCollapsible(panel, collapseBtn);
   });
+
+  // Real overflow only -- a plain scrollHeight>clientHeight check with a
+  // small tolerance (sub-pixel line-height/font-metric rounding can read
+  // as a few px of "overflow" that was never actually there, same quirk
+  // already documented for other panels elsewhere in this project).
+  var PANEL_SCROLL_BODIES = [$("routePanelBody"), $("manifestPanelBody")];
+  function remeasurePanelScroll(el) {
+    if (!el) return;
+    if (el.scrollHeight - el.clientHeight > 2) el.classList.add("scroll");
+    else el.classList.remove("scroll");
+  }
+  if (window.ResizeObserver) {
+    var panelScrollObserver = new ResizeObserver(function (entries) {
+      entries.forEach(function (entry) { remeasurePanelScroll(entry.target); });
+    });
+    PANEL_SCROLL_BODIES.forEach(function (el) { if (el) panelScrollObserver.observe(el); });
+  } else {
+    window.addEventListener("resize", function () { PANEL_SCROLL_BODIES.forEach(remeasurePanelScroll); });
+  }
 
   /* Requested-from-Galaxy-Map banner -- reads the real trip context passed
      through preview.html's PLAN JOURNEY button and surfaces it honestly.
