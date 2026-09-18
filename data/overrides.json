@@ -37410,6 +37410,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:11ACF9556C2F": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Charites",
+        "race": "Gek",
+        "region": "Airnaka Conflux",
+        "starClass": "F9f",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Prospecting",
+        "sell": "53.1",
+        "buy": "-14.0",
+        "econDesc": "",
+        "conflict": "2 - Boisterous",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-18T11:00:58.180Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-18T11:00:58.180Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -37418,7 +37467,8 @@
       1789729215835,
       1789729226389,
       1789729237112,
-      1789729247503
+      1789729247503,
+      1789729258180
     ]
   },
   "flagLog": {},
