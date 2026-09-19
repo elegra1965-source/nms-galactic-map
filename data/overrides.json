@@ -37797,12 +37797,61 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1131F9556C2F": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Degawat",
+        "race": "Gek",
+        "region": "Airnaka Conflux",
+        "starClass": "F6",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Minerals",
+        "sell": "68.5",
+        "buy": "-24.5",
+        "econDesc": "★★ (Promising)",
+        "conflict": "★★★ (At War)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-19T11:00:16.049Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-19T11:00:16.049Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
-    "71.77.149.14": [
-      1789769419707
+    "5.133.46.24": [
+      1789815616049
     ]
   },
   "flagLog": {},
