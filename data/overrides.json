@@ -38091,6 +38091,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "2:10F9F9556C31": {
+      "galaxy": 2,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Ercangb",
+        "race": "Korvax",
+        "region": "The Arm of Taticale",
+        "starClass": "O6f",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Power Generation",
+        "sell": "63.4",
+        "buy": "-29.1",
+        "econDesc": "Comfortable",
+        "conflict": "Intermittent",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-19T11:01:20.478Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-19T11:01:20.478Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -38101,7 +38150,8 @@
       1789815637489,
       1789815648771,
       1789815659191,
-      1789815669752
+      1789815669752,
+      1789815680478
     ]
   },
   "flagLog": {},
