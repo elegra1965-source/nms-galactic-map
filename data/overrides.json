@@ -38483,18 +38483,61 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:10E6F9555C30": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Gayasus",
+        "race": "",
+        "region": "Canthian",
+        "starClass": "",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Data Unavailable",
+        "sell": "",
+        "buy": "",
+        "econDesc": "",
+        "conflict": "Data Unavailable",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-20T21:11:49.516Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-20T21:11:49.516Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1789902015755,
-      1789902026068,
-      1789902036549,
-      1789902046742,
-      1789902058191,
-      1789902068687,
-      1789902079054
+      1789938709516
     ]
   },
   "flagLog": {},
