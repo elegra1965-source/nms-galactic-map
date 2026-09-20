@@ -38973,6 +38973,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:115EFA557C30": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Holban XI",
+        "race": "Vy'keen",
+        "region": "Rezhensk",
+        "starClass": "G0F",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": true,
+        "giant": false,
+        "econName": "Industrial",
+        "sell": "74.0",
+        "buy": "-22.6",
+        "econDesc": "★★ (Promising)",
+        "conflict": "★ (Tranquil)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-20T23:00:40.346Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-20T23:00:40.346Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -38980,7 +39029,8 @@
     "5.133.46.24": [
       1789945209340,
       1789945219555,
-      1789945230250
+      1789945230250,
+      1789945240346
     ]
   },
   "flagLog": {},
