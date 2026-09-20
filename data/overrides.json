@@ -38630,6 +38630,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1041F9556C31": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Gujugiol",
+        "race": "Vy'keen",
+        "region": "The Arm of Katteus",
+        "starClass": "",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Construction",
+        "sell": "",
+        "buy": "",
+        "econDesc": "Medium Supply",
+        "conflict": "1",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-20T21:12:20.450Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-20T21:12:20.450Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -38637,7 +38686,8 @@
     "5.133.46.24": [
       1789938709516,
       1789938719949,
-      1789938730268
+      1789938730268,
+      1789938740450
     ]
   },
   "flagLog": {},
