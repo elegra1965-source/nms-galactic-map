@@ -38924,13 +38924,63 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:10E1FA555C2F": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Hockhil",
+        "race": "Korvax",
+        "region": "Tavill",
+        "starClass": "G3p",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Energy Supply",
+        "sell": "69.4",
+        "buy": "-22.6",
+        "econDesc": "★ (Unpromising)",
+        "conflict": "★★ (Sporadic)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-20T23:00:30.250Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-20T23:00:30.250Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
       1789945209340,
-      1789945219555
+      1789945219555,
+      1789945230250
     ]
   },
   "flagLog": {},
