@@ -38385,6 +38385,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1174F9555C30": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Ganeiona XIV",
+        "race": "Korvax",
+        "region": "Canthian",
+        "starClass": "F7pf",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Research",
+        "sell": "58.0",
+        "buy": "-26.4",
+        "econDesc": "Prosperous",
+        "conflict": "1",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-20T11:01:08.687Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-20T11:01:08.687Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -38394,7 +38443,8 @@
       1789902026068,
       1789902036549,
       1789902046742,
-      1789902058191
+      1789902058191,
+      1789902068687
     ]
   },
   "flagLog": {},
