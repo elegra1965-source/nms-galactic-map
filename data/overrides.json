@@ -41084,6 +41084,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:11B7D0589C1E": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB10-1B7 Fineshrine",
+        "race": "Vy'keen",
+        "region": "Davikto Sector",
+        "starClass": "G7",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Scientific",
+        "sell": "69.4",
+        "buy": "-13.3",
+        "econDesc": "Low Supply",
+        "conflict": "Critical",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-21T09:01:02.654Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-21T09:01:02.654Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -41093,7 +41142,8 @@
       1789981219861,
       1789981230581,
       1789981241321,
-      1789981251888
+      1789981251888,
+      1789981262654
     ]
   },
   "flagLog": {},
