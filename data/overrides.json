@@ -42554,18 +42554,67 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:10DD0A555D30": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB11-DD Rois-Da",
+        "race": "Korvax",
+        "region": "Yithrun Expanse",
+        "starClass": "E4pf",
+        "stars": [
+          "green"
+        ],
+        "water": false,
+        "dissonant": true,
+        "giant": false,
+        "econName": "Scientific",
+        "sell": "67.6",
+        "buy": "-20.1",
+        "econDesc": "★★★ (Affluent)",
+        "conflict": "3 (Lawless)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-21T16:00:13.944Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-21T16:00:13.944Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790002809225,
       1790002820203,
       1790002830866,
       1790002841719,
       1790002852263,
       1790002863264,
-      1790002873698
+      1790002873698,
+      1790006413944
     ]
   },
   "flagLog": {},
