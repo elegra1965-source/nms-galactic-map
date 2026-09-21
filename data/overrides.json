@@ -39316,18 +39316,67 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1134F9555C30": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB-EHQ - Euclid Galaxy HQ",
+        "race": "Korvax",
+        "region": "Canthian",
+        "starClass": "F0",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Shipping",
+        "sell": "41.7",
+        "buy": "-16.3",
+        "econDesc": "Black Market",
+        "conflict": "Pirate Controlled",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-21T00:00:45.985Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-21T00:00:45.985Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1789945240346,
       1789945251790,
       1789945262202,
       1789945272576,
       1789948813264,
       1789948823688,
-      1789948834554
+      1789948834554,
+      1789948845985
     ]
   },
   "flagLog": {},
