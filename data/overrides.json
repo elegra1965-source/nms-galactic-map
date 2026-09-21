@@ -40496,18 +40496,61 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "2:141AF9556C30": {
+      "galaxy": 2,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB1-41A Bihnutl-Dign V",
+        "race": "Gek",
+        "region": "Uisaor Spur",
+        "starClass": "X0",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": true,
+        "giant": false,
+        "econName": "Nano-construction",
+        "sell": "43.2",
+        "buy": "-15.8",
+        "econDesc": "★★ (Satisfactory)",
+        "conflict": "★ (Stable)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-21T07:00:09.230Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-21T07:00:09.230Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1789966814389,
-      1789966824811,
-      1789966836604,
-      1789966846840,
-      1789966857263,
-      1789966867810,
-      1789966878030
+      1789974009230
     ]
   },
   "flagLog": {},
