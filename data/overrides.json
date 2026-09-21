@@ -40986,6 +40986,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "2:1196FA556C30": {
+      "galaxy": 2,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB10-196 Hyugas",
+        "race": "",
+        "region": "Kovasu Adjunct",
+        "starClass": "E6f",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Data Unavailable",
+        "sell": "",
+        "buy": "",
+        "econDesc": "",
+        "conflict": "Data Unavailable",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-21T09:00:41.321Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-21T09:00:41.321Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -40993,7 +41042,8 @@
     "5.133.46.24": [
       1789981209258,
       1789981219861,
-      1789981230581
+      1789981230581,
+      1789981241321
     ]
   },
   "flagLog": {},
