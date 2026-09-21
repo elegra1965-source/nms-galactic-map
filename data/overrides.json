@@ -43534,18 +43534,67 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "2:10FDF9554C2F": {
+      "galaxy": 2,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB12-FD Anesterbo I",
+        "race": "Vy'keen",
+        "region": "Quverci Terminus",
+        "starClass": "E9P",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": true,
+        "giant": false,
+        "econName": "Mass Production",
+        "sell": "69.3",
+        "buy": "-10.9",
+        "econDesc": "★★ (Adequate)",
+        "conflict": "★ (Trivial)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-21T19:01:19.273Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-21T19:01:19.273Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790013676293,
       1790017214623,
       1790017225009,
       1790017236022,
       1790017246671,
       1790017257657,
-      1790017268446
+      1790017268446,
+      1790017279273
     ]
   },
   "flagLog": {},
