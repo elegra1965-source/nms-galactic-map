@@ -42309,13 +42309,63 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:13F8F8556C30": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB11-3F8 Hawkeye",
+        "race": "",
+        "region": "Nonlopsi Instability",
+        "starClass": "Y1f",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": true,
+        "giant": false,
+        "econName": "Data Unavailable",
+        "sell": "46.9",
+        "buy": "-25.1",
+        "econDesc": "",
+        "conflict": "Data Unavailable",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-21T15:00:30.866Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-21T15:00:30.866Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
       1790002809225,
-      1790002820203
+      1790002820203,
+      1790002830866
     ]
   },
   "flagLog": {},
