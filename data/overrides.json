@@ -40839,18 +40839,61 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:115C0A556D30": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB10-15C Amkara",
+        "race": "Gek",
+        "region": "Kianso Terminus",
+        "starClass": "G9",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Mercantile",
+        "sell": "77.7",
+        "buy": "-23.1",
+        "econDesc": "★★ (Promising)",
+        "conflict": "★★ (Sporadic)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-21T09:00:09.258Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-21T09:00:09.258Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1789974009230,
-      1789974019900,
-      1789974030446,
-      1789974041516,
-      1789974052072,
-      1789974062745,
-      1789974073050
+      1789981209258
     ]
   },
   "flagLog": {},
