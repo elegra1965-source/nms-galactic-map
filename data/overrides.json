@@ -41525,18 +41525,61 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:104AFA556C30": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB10-4A Yagawa-Jiyuel",
+        "race": "Vy'keen",
+        "region": "Yatrifex",
+        "starClass": "G1pf",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Shipping",
+        "sell": "78.8",
+        "buy": "-19.0",
+        "econDesc": "★ (Failing)",
+        "conflict": "★★ (Fractious)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-21T12:00:09.540Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-21T12:00:09.540Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1789984815162,
-      1789984826012,
-      1789984836631,
-      1789984847107,
-      1789984858053,
-      1789984868522,
-      1789984879436
+      1789992009540
     ]
   },
   "flagLog": {},
