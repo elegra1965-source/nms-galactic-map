@@ -42260,12 +42260,62 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:10240A555D30": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB11-24 Gaderi",
+        "race": "Gek",
+        "region": "Yithrun Expanse",
+        "starClass": "G0p // Wat",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Experimental",
+        "sell": "40.8",
+        "buy": "-19.5",
+        "econDesc": "★★ (Medium Supply)",
+        "conflict": "★ (Gentle)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-21T15:00:20.203Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-21T15:00:20.203Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790002809225
+      1790002809225,
+      1790002820203
     ]
   },
   "flagLog": {},
