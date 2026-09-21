@@ -39512,18 +39512,61 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1108F9556C30": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB1-108 Livscyk",
+        "race": "Korvax",
+        "region": "The Arm of Vezitinen",
+        "starClass": "",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Industrial",
+        "sell": "52.1",
+        "buy": "-24.5",
+        "econDesc": "Black Market",
+        "conflict": "3",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-21T02:00:08.874Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-21T02:00:08.874Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1789948813264,
-      1789948823688,
-      1789948834554,
-      1789948845985,
-      1789948856570,
-      1789948866765,
-      1789948876926
+      1789956008874
     ]
   },
   "flagLog": {},
