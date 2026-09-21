@@ -41672,6 +41672,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:106CFA556C30": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB10-6C Obihir-Shvil VII",
+        "race": "Vy'keen",
+        "region": "Yatrifex",
+        "starClass": "G0pf",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Power Generation",
+        "sell": "44.5",
+        "buy": "-29.2",
+        "econDesc": "★★★ (Wealthy)",
+        "conflict": "★ (Peaceful)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-21T12:00:41.355Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-21T12:00:41.355Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -41679,7 +41728,8 @@
     "5.133.46.24": [
       1789992009540,
       1789992020091,
-      1789992030498
+      1789992030498,
+      1789992041355
     ]
   },
   "flagLog": {},
