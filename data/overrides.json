@@ -39855,18 +39855,61 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "2:11B8F9556C30": {
+      "galaxy": 2,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB1-1B8 Eyes of the Fallen Spawn",
+        "race": "Gek",
+        "region": "Uisaor Spur",
+        "starClass": "O5f",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Manufacturing",
+        "sell": "60.6",
+        "buy": "-20.5",
+        "econDesc": "💀 (Black Market)",
+        "conflict": "💀 (Pirate Controlled)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-21T04:00:09.920Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-21T04:00:09.920Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1789956008874,
-      1789956019175,
-      1789956029365,
-      1789956040017,
-      1789956050133,
-      1789956060285,
-      1789956071560
+      1789963209920
     ]
   },
   "flagLog": {},
