@@ -41917,18 +41917,67 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:116CF8556C30": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB11-16C Kynachi System",
+        "race": "Korvax",
+        "region": "Nonlopsi Instability",
+        "starClass": "E4pf",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Alchemical",
+        "sell": "53.5",
+        "buy": "-21.0",
+        "econDesc": "★★ (Developing)",
+        "conflict": "★★★ (Lawless)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-21T13:00:24.491Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-21T13:00:24.491Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1789992020091,
       1789992030498,
       1789992041355,
       1789992052093,
       1789992062432,
       1789992073086,
-      1789995613810
+      1789995613810,
+      1789995624491
     ]
   },
   "flagLog": {},
