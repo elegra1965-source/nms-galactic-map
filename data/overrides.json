@@ -43436,18 +43436,67 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:10C1FA555C31": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB12-C1 Uwanuk-Edu",
+        "race": "Gek",
+        "region": "Iptrevs Fringe",
+        "starClass": "E6",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Engineering",
+        "sell": "74.5",
+        "buy": "-12.6",
+        "econDesc": "★★ (Sustainable)",
+        "conflict": "★★★ (Critical)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-21T19:00:57.657Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-21T19:00:57.657Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790013653689,
       1790013664525,
       1790013676293,
       1790017214623,
       1790017225009,
       1790017236022,
-      1790017246671
+      1790017246671,
+      1790017257657
     ]
   },
   "flagLog": {},
