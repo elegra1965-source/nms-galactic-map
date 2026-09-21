@@ -40202,18 +40202,67 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "2:1029F9556C30": {
+      "galaxy": 2,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB1-29 Slamyn-Tach XIX",
+        "race": "Gek",
+        "region": "Uisaor Spur",
+        "starClass": "F3f",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Power Generation",
+        "sell": "53.0",
+        "buy": "-26.8",
+        "econDesc": "★★ (Balanced)",
+        "conflict": "★ (Low)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-21T05:00:24.811Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-21T05:00:24.811Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1789963220192,
       1789963231267,
       1789963242263,
       1789963252952,
       1789963263369,
       1789963273574,
-      1789966814389
+      1789966814389,
+      1789966824811
     ]
   },
   "flagLog": {},
