@@ -42603,18 +42603,67 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:10FBFA555C30": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB11-FB Aniiak",
+        "race": "Korvax",
+        "region": "Yeiada Sector",
+        "starClass": "G3",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Trading",
+        "sell": "78.4",
+        "buy": "-21.3",
+        "econDesc": "Affluent",
+        "conflict": "Gentle (1)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-21T16:00:24.791Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-21T16:00:24.791Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790002820203,
       1790002830866,
       1790002841719,
       1790002852263,
       1790002863264,
       1790002873698,
-      1790006413944
+      1790006413944,
+      1790006424791
     ]
   },
   "flagLog": {},
