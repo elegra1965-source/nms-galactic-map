@@ -42113,18 +42113,67 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:11AC0A555D30": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB11-1AC Livonto",
+        "race": "",
+        "region": "Yithrun Expanse",
+        "starClass": "F3P",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "High Tech",
+        "sell": "52.9",
+        "buy": "-30.0",
+        "econDesc": "💀 (Black Market)",
+        "conflict": "Pirate Controlled",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-21T13:01:08.798Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-21T13:01:08.798Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1789992062432,
       1789992073086,
       1789995613810,
       1789995624491,
       1789995635633,
       1789995647183,
-      1789995658088
+      1789995658088,
+      1789995668798
     ]
   },
   "flagLog": {},
