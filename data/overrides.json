@@ -40888,12 +40888,62 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1165FA556C30": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB10-165 Lesser Faydark",
+        "race": "Gek",
+        "region": "Savenix Instability",
+        "starClass": "F3p",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Mercantile",
+        "sell": "64.9",
+        "buy": "-29.4",
+        "econDesc": "★★ (Comfortable)",
+        "conflict": "★ (Peaceful)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-21T09:00:19.861Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-21T09:00:19.861Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1789981209258
+      1789981209258,
+      1789981219861
     ]
   },
   "flagLog": {},
