@@ -39757,6 +39757,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:117909556D30": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB1-179 Maractus",
+        "race": "Gek",
+        "region": "Arfsotru Boundary",
+        "starClass": "",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Scientific / Balanced",
+        "sell": "",
+        "buy": "",
+        "econDesc": "",
+        "conflict": "Medium",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-21T02:01:00.285Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-21T02:01:00.285Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -39766,7 +39815,8 @@
       1789956019175,
       1789956029365,
       1789956040017,
-      1789956050133
+      1789956050133,
+      1789956060285
     ]
   },
   "flagLog": {},
