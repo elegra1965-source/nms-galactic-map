@@ -44220,18 +44220,67 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:11BEFA557C31": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB14-1BE Enjinin",
+        "race": "Korvax",
+        "region": "Wedragi Spur",
+        "starClass": "G6f",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Technology",
+        "sell": "53.0",
+        "buy": "-23.7",
+        "econDesc": "★★ (Promising)",
+        "conflict": "★★★ (At War)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-21T22:01:20.054Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-21T22:01:20.054Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790024476133,
       1790028014747,
       1790028025444,
       1790028036122,
       1790028047336,
       1790028058117,
-      1790028069203
+      1790028069203,
+      1790028080054
     ]
   },
   "flagLog": {},
