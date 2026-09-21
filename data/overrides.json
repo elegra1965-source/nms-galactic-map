@@ -40008,21 +40008,21 @@
       "flaggedFields": [],
       "disputedFields": [],
       "data": {
-        "name": "HUB1-1F9",
-        "race": "Gek",
+        "name": "HUB1-1F9 Eurybia",
+        "race": "Korvax",
         "region": "Arfsotru Boundary",
         "starClass": "G3pf",
         "stars": [
           "yellow"
         ],
-        "water": false,
+        "water": true,
         "dissonant": false,
         "giant": false,
-        "econName": "Alchemical",
+        "econName": "Prospecting",
         "sell": "",
         "buy": "",
-        "econDesc": "★★★ (Advanced)",
-        "conflict": "★★★ (Aggressive)",
+        "econDesc": "★★★ (Sustainable)",
+        "conflict": "★★★ (Critical)",
         "blackHole": false,
         "atlas": false,
         "ruins": false,
@@ -40043,11 +40043,15 @@
         "genVersion": "",
         "bodies": []
       },
-      "editedAt": "2026-09-21T04:00:42.263Z",
+      "editedAt": "2026-09-21T04:00:52.952Z",
       "editedByIp": "5.133.46.24",
       "history": [
         {
           "at": "2026-09-21T04:00:42.263Z",
+          "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-09-21T04:00:52.952Z",
           "text": "edited by a traveller"
         }
       ]
@@ -40059,7 +40063,8 @@
       1789963209920,
       1789963220192,
       1789963231267,
-      1789963242263
+      1789963242263,
+      1789963252952
     ]
   },
   "flagLog": {},
