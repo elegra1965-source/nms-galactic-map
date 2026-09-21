@@ -42162,18 +42162,67 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:11B20A555D30": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB11-1B2 Livesyri",
+        "race": "",
+        "region": "Yithrun Expanse",
+        "starClass": "F1f",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Manufacturing",
+        "sell": "47.8",
+        "buy": "-23.4",
+        "econDesc": "★★★ (Advanced)",
+        "conflict": "2 (Sporadic)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-21T13:01:19.714Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-21T13:01:19.714Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1789992073086,
       1789995613810,
       1789995624491,
       1789995635633,
       1789995647183,
       1789995658088,
-      1789995668798
+      1789995668798,
+      1789995679714
     ]
   },
   "flagLog": {},
