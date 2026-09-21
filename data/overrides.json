@@ -43877,6 +43877,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:102D0A556D31": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB13-2D Afu-Bir",
+        "race": "Gek",
+        "region": "Ruomiam Nebula",
+        "starClass": "F8p",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "High Tech",
+        "sell": "72.8",
+        "buy": "-27.2",
+        "econDesc": "★★★ (Prosperous)",
+        "conflict": "3 (Dangerous)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-21T21:01:16.133Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-21T21:01:16.133Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -43887,7 +43936,8 @@
       1790024431330,
       1790024441901,
       1790024453834,
-      1790024465069
+      1790024465069,
+      1790024476133
     ]
   },
   "flagLog": {},
