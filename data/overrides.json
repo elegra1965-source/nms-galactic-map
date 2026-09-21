@@ -40741,6 +40741,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "2:111FFA556C30": {
+      "galaxy": 2,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB10-11F Aerezia",
+        "race": "Korvax",
+        "region": "Kovasu Adjunct",
+        "starClass": "F8f",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Energy Supply",
+        "sell": "49.1",
+        "buy": "-24.7",
+        "econDesc": "Promising",
+        "conflict": "3",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-21T07:01:02.745Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-21T07:01:02.745Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -40750,7 +40799,8 @@
       1789974019900,
       1789974030446,
       1789974041516,
-      1789974052072
+      1789974052072,
+      1789974062745
     ]
   },
   "flagLog": {},
