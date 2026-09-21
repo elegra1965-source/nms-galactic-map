@@ -43485,18 +43485,67 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:10EB0A555D31": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB12-EB Verechiv",
+        "race": "Vy'keen",
+        "region": "Guyardm Band",
+        "starClass": "G5pf",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": true,
+        "giant": false,
+        "econName": "Mercantile",
+        "sell": "62.8",
+        "buy": "-17.1",
+        "econDesc": "★★★ (Flourishing)",
+        "conflict": "3 (Alarming)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-21T19:01:08.446Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-21T19:01:08.446Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790013664525,
       1790013676293,
       1790017214623,
       1790017225009,
       1790017236022,
       1790017246671,
-      1790017257657
+      1790017257657,
+      1790017268446
     ]
   },
   "flagLog": {},
