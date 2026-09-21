@@ -39806,6 +39806,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1018F9556C30": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB1-18 Dionysus",
+        "race": "Korvax",
+        "region": "The Arm of Vezitinen",
+        "starClass": "F8",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Industrial",
+        "sell": "75.5",
+        "buy": "-26.3",
+        "econDesc": "Fledgling",
+        "conflict": "Low (1)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-21T02:01:11.560Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-21T02:01:11.560Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -39816,7 +39865,8 @@
       1789956029365,
       1789956040017,
       1789956050133,
-      1789956060285
+      1789956060285,
+      1789956071560
     ]
   },
   "flagLog": {},
