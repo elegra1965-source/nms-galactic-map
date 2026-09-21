@@ -42358,6 +42358,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:100F0A555D30": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB11-4 Uverlo",
+        "race": "Gek",
+        "region": "Yithrun Expanse",
+        "starClass": "G6pf // Wa",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Mercantile",
+        "sell": "66.9",
+        "buy": "-26.6",
+        "econDesc": "★★ (Balanced)",
+        "conflict": "★ (Low)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-21T15:00:41.719Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-21T15:00:41.719Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -42365,7 +42414,8 @@
     "5.133.46.24": [
       1790002809225,
       1790002820203,
-      1790002830866
+      1790002830866,
+      1790002841719
     ]
   },
   "flagLog": {},
