@@ -40790,6 +40790,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1144FA556C30": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB10-144 Megaera",
+        "race": "Gek",
+        "region": "Savenix Instability",
+        "starClass": "O0F",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": true,
+        "giant": false,
+        "econName": "High Voltage T1",
+        "sell": "70.2",
+        "buy": "-14.7",
+        "econDesc": "Low Supply",
+        "conflict": "3",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-21T07:01:13.050Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-21T07:01:13.050Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -40800,7 +40849,8 @@
       1789974030446,
       1789974041516,
       1789974052072,
-      1789974062745
+      1789974062745,
+      1789974073050
     ]
   },
   "flagLog": {},
