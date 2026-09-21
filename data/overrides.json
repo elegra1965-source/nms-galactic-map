@@ -43240,18 +43240,67 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "2:1089F9554C2F": {
+      "galaxy": 2,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB12-89 Nebren-Teo",
+        "race": "Vy'keen",
+        "region": "Quverci Terminus",
+        "starClass": "F1p",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Minerals",
+        "sell": "78.5",
+        "buy": "-22.9",
+        "econDesc": "★★ (Promising)",
+        "conflict": "★★★ (At War)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-21T19:00:14.623Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-21T19:00:14.623Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790013609327,
       1790013619661,
       1790013631081,
       1790013642066,
       1790013653689,
       1790013664525,
-      1790013676293
+      1790013676293,
+      1790017214623
     ]
   },
   "flagLog": {},
