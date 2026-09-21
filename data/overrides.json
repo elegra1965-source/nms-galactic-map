@@ -40545,12 +40545,62 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:142709556D30": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB1-427 Catherinus",
+        "race": "Vy'keen",
+        "region": "Arfsotru Boundary",
+        "starClass": "Y9pf",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": true,
+        "giant": false,
+        "econName": "Alchemical",
+        "sell": "77.8",
+        "buy": "-21.9",
+        "econDesc": "💀 (Black Market)",
+        "conflict": "💀 (Pirate Controlled)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-21T07:00:19.900Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-21T07:00:19.900Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1789974009230
+      1789974009230,
+      1789974019900
     ]
   },
   "flagLog": {},
