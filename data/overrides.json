@@ -44024,18 +44024,67 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:10DF0A556D31": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB13-DF Edygose",
+        "race": "Gek",
+        "region": "Ruomiam Nebula",
+        "starClass": "F0p",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Mercantile",
+        "sell": "42.1",
+        "buy": "-16.8",
+        "econDesc": "★★★ (Flourishing)",
+        "conflict": "3 (Alarming)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-21T22:00:36.122Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-21T22:00:36.122Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790024431330,
       1790024441901,
       1790024453834,
       1790024465069,
       1790024476133,
       1790028014747,
-      1790028025444
+      1790028025444,
+      1790028036122
     ]
   },
   "flagLog": {},
