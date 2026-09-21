@@ -42407,6 +42407,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1415F8556C30": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB11-415 Uncas",
+        "race": "Vy'keen",
+        "region": "Nonlopsi Instability",
+        "starClass": "Y5p",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": true,
+        "giant": false,
+        "econName": "Mercantile",
+        "sell": "63.0",
+        "buy": "-24.4",
+        "econDesc": "★★ (Promising)",
+        "conflict": "★ (Tranquil)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-21T15:00:52.263Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-21T15:00:52.263Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -42415,7 +42464,8 @@
       1790002809225,
       1790002820203,
       1790002830866,
-      1790002841719
+      1790002841719,
+      1790002852263
     ]
   },
   "flagLog": {},
