@@ -42211,18 +42211,61 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:11E10A555D30": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB11-1E1 Ahlbeini",
+        "race": "Gek",
+        "region": "Yithrun Expanse",
+        "starClass": "G0 // Wate",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Power Generation",
+        "sell": "41.7",
+        "buy": "-25.6",
+        "econDesc": "★★ (Balanced)",
+        "conflict": "★★ (Medium)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-21T15:00:09.225Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-21T15:00:09.225Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1789995613810,
-      1789995624491,
-      1789995635633,
-      1789995647183,
-      1789995658088,
-      1789995668798,
-      1789995679714
+      1790002809225
     ]
   },
   "flagLog": {},
