@@ -43044,6 +43044,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1412D0588C1F": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB12-412 Cryptic Bonnet",
+        "race": "",
+        "region": "Funghu Terminus",
+        "starClass": "X7p",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": true,
+        "giant": false,
+        "econName": "Data Unavailable",
+        "sell": "68.0",
+        "buy": "-14.2",
+        "econDesc": "",
+        "conflict": "Data Unavailable",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-21T18:00:42.066Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-21T18:00:42.066Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -43051,7 +43100,8 @@
     "5.133.46.24": [
       1790013609327,
       1790013619661,
-      1790013631081
+      1790013631081,
+      1790013642066
     ]
   },
   "flagLog": {},
