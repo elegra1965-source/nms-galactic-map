@@ -42505,6 +42505,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "2:10ADF8556C30": {
+      "galaxy": 2,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB11-AD Yudonqua I",
+        "race": "Gek",
+        "region": "Lossians Boundary",
+        "starClass": "O5F",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Experimental",
+        "sell": "61.1",
+        "buy": "-19.3",
+        "econDesc": "Black Market",
+        "conflict": "Pirate Controlled",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-21T15:01:13.698Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-21T15:01:13.698Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -42515,7 +42564,8 @@
       1790002830866,
       1790002841719,
       1790002852263,
-      1790002863264
+      1790002863264,
+      1790002873698
     ]
   },
   "flagLog": {},
