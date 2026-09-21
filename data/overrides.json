@@ -40692,6 +40692,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:10F8CF589C1E": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB1-F8 Inexitor",
+        "race": "",
+        "region": "Sea of Xionahui",
+        "starClass": "E9pf",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "",
+        "sell": "",
+        "buy": "",
+        "econDesc": "",
+        "conflict": "",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-21T07:00:52.072Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-21T07:00:52.072Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -40700,7 +40749,8 @@
       1789974009230,
       1789974019900,
       1789974030446,
-      1789974041516
+      1789974041516,
+      1789974052072
     ]
   },
   "flagLog": {},
