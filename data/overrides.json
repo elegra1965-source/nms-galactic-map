@@ -43730,6 +43730,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:11ADD0589C1F": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB13-1AD Potoudi",
+        "race": "Gek",
+        "region": "Qerooit Terminus",
+        "starClass": "G8pf",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Mining",
+        "sell": "75.3",
+        "buy": "-20.3",
+        "econDesc": "★★ (Developing)",
+        "conflict": "★ (Relaxed)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-21T21:00:41.901Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-21T21:00:41.901Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -43737,7 +43786,8 @@
     "5.133.46.24": [
       1790024409626,
       1790024420288,
-      1790024431330
+      1790024431330,
+      1790024441901
     ]
   },
   "flagLog": {},
