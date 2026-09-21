@@ -39218,18 +39218,67 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "2:118AFA555C31": {
+      "galaxy": 2,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB 29-18A Uttsuk-Rat",
+        "race": "Korvax",
+        "region": "Yuskyala",
+        "starClass": "",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Advanced Materials",
+        "sell": "63.3",
+        "buy": "-28.0",
+        "econDesc": "★★★ (Black Market)",
+        "conflict": "★★★★ (Pirate Controlled)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-21T00:00:23.688Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-21T00:00:23.688Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1789945219555,
       1789945230250,
       1789945240346,
       1789945251790,
       1789945262202,
       1789945272576,
-      1789948813264
+      1789948813264,
+      1789948823688
     ]
   },
   "flagLog": {},
