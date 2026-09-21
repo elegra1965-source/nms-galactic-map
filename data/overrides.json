@@ -41280,18 +41280,67 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:103DFA556C30": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB10-3D Niwarao",
+        "race": "Vy'keen",
+        "region": "Yatrifex",
+        "starClass": "G3f",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Power Generation",
+        "sell": "56.6",
+        "buy": "-29.4",
+        "econDesc": "★★ (Comfortable)",
+        "conflict": "★★★ (High)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-21T10:00:36.631Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-21T10:00:36.631Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1789981230581,
       1789981241321,
       1789981251888,
       1789981262654,
       1789981272955,
       1789984815162,
-      1789984826012
+      1789984826012,
+      1789984836631
     ]
   },
   "flagLog": {},
