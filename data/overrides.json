@@ -46866,6 +46866,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:114FCE589C1E": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB19-14F Perrin&#39;s Hammer",
+        "race": "",
+        "region": "Oujeme Band",
+        "starClass": "M0f",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Data Unavailable",
+        "sell": "40.6",
+        "buy": "-20.0",
+        "econDesc": "Data Unavailable",
+        "conflict": "Data Unavailable",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-22T10:01:21.925Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-22T10:01:21.925Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -46876,7 +46925,8 @@
       1790071237645,
       1790071249281,
       1790071260357,
-      1790071271437
+      1790071271437,
+      1790071281925
     ]
   },
   "flagLog": {},
