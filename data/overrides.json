@@ -45886,6 +45886,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:11DFFA556C2F": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB17-1DF Tushceh",
+        "race": "Gek",
+        "region": "Umtats Anomaly",
+        "starClass": "G9f",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Prospecting",
+        "sell": "42.7",
+        "buy": "-13.4",
+        "econDesc": "★★★ (High Supply)",
+        "conflict": "★★ (Boisterous)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-22T06:01:05.036Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-22T06:01:05.036Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -45895,7 +45944,8 @@
       1790056819844,
       1790056831201,
       1790056841613,
-      1790056853246
+      1790056853246,
+      1790056865036
     ]
   },
   "flagLog": {},
