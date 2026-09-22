@@ -47797,6 +47797,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1111F9555C30": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB2-111 Bartram",
+        "race": "Korvax",
+        "region": "Canthian",
+        "starClass": "",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Metal Processing",
+        "sell": "",
+        "buy": "",
+        "econDesc": "Satisfactory",
+        "conflict": "3",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-22T15:00:54.291Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-22T15:00:54.291Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -47805,7 +47854,8 @@
       1790089209320,
       1790089220323,
       1790089231309,
-      1790089242857
+      1790089242857,
+      1790089254291
     ]
   },
   "flagLog": {},
