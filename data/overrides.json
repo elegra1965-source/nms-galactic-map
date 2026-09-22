@@ -44416,6 +44416,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:1230FA557C31": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB14-230 Leangjam",
+        "race": "Korvax",
+        "region": "Wedragi Spur",
+        "starClass": "G2f",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": true,
+        "giant": false,
+        "econName": "Mathematical",
+        "sell": "56.2",
+        "buy": "-11.9",
+        "econDesc": "★★ (Adequate)",
+        "conflict": "★★★ (Formidable)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-22T00:00:42.241Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-22T00:00:42.241Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -44423,7 +44472,8 @@
     "5.133.46.24": [
       1790035209503,
       1790035219921,
-      1790035230394
+      1790035230394,
+      1790035242241
     ]
   },
   "flagLog": {},
