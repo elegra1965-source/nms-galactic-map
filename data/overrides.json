@@ -49561,6 +49561,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:114CF9555C30": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB2-14C Braun",
+        "race": "Korvax",
+        "region": "Canthian",
+        "starClass": "F9",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Metal Processing",
+        "sell": "73.6",
+        "buy": "-19.3",
+        "econDesc": "Medium Supply",
+        "conflict": "2",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-22T22:43:20.793Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-22T22:43:20.793Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -49572,7 +49621,8 @@
       1790115256355,
       1790115267307,
       1790115278174,
-      1790115288783
+      1790115288783,
+      1790117000793
     ]
   },
   "flagLog": {},
