@@ -46033,18 +46033,67 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:140A0A556D2F": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB17-40A Yoksim G",
+        "race": "Vy'keen",
+        "region": "Citlasta Cluster",
+        "starClass": "Y5p",
+        "stars": [
+          "purple"
+        ],
+        "water": true,
+        "dissonant": true,
+        "giant": false,
+        "econName": "Power Generation",
+        "sell": "61.6",
+        "buy": "-24.5",
+        "econDesc": "★★ (Promising)",
+        "conflict": "1",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-22T07:00:24.298Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-22T07:00:24.298Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790056819844,
       1790056831201,
       1790056841613,
       1790056853246,
       1790056865036,
       1790056875917,
-      1790060413898
+      1790060413898,
+      1790060424298
     ]
   },
   "flagLog": {},
