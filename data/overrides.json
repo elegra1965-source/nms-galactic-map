@@ -48728,6 +48728,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1131F9555C30": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB2-131 Darth Sector",
+        "race": "Gek",
+        "region": "Canthian",
+        "starClass": "F4pf",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Shipping",
+        "sell": "46.5",
+        "buy": "-18.6",
+        "econDesc": "Medium Supply",
+        "conflict": "3",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-22T19:01:09.330Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-22T19:01:09.330Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -48737,7 +48786,8 @@
       1790103625030,
       1790103635444,
       1790103646537,
-      1790103658114
+      1790103658114,
+      1790103669330
     ]
   },
   "flagLog": {},
