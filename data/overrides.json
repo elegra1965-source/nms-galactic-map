@@ -46082,18 +46082,67 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "2:1053F9556C32": {
+      "galaxy": 2,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB17-53 Isbrixh-Fuef",
+        "race": "Vy'keen",
+        "region": "Yewaliteng Band",
+        "starClass": "F7f",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Research",
+        "sell": "51.7",
+        "buy": "-28.8",
+        "econDesc": "★★★ (Wealthy)",
+        "conflict": "★★★ (High)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-22T07:00:35.238Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-22T07:00:35.238Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790056831201,
       1790056841613,
       1790056853246,
       1790056865036,
       1790056875917,
       1790060413898,
-      1790060424298
+      1790060424298,
+      1790060435238
     ]
   },
   "flagLog": {},
