@@ -44906,18 +44906,67 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "2:1191F9554C32": {
+      "galaxy": 2,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB15-191 Ratoastun",
+        "race": "Gek",
+        "region": "Etiusin Cloud",
+        "starClass": "F8p",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Mercantile",
+        "sell": "75.8",
+        "buy": "-13.8",
+        "econDesc": "💀 (Black Market)",
+        "conflict": "💀 (Pirate Controlled)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-22T01:01:18.077Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-22T01:01:18.077Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790035274102,
       1790038813936,
       1790038824356,
       1790038835199,
       1790038845616,
       1790038856167,
-      1790038867505
+      1790038867505,
+      1790038878077
     ]
   },
   "flagLog": {},
