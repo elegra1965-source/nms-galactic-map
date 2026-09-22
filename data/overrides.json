@@ -46719,6 +46719,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:10C9F8556C30": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB19 Unurtu",
+        "race": "Vy'keen",
+        "region": "Qangew Expanse",
+        "starClass": "E4",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Research",
+        "sell": "46.5",
+        "buy": "-27.8",
+        "econDesc": "★★ (Comfortable)",
+        "conflict": "★★ (Intermittent)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-22T10:00:49.281Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-22T10:00:49.281Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -46726,7 +46775,8 @@
     "5.133.46.24": [
       1790071215722,
       1790071226622,
-      1790071237645
+      1790071237645,
+      1790071249281
     ]
   },
   "flagLog": {},
