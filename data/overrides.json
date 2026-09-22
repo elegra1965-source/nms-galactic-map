@@ -44269,18 +44269,61 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:11C4FA557C31": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB14-1C4 Sargan-Ayuw",
+        "race": "Korvax",
+        "region": "Wedragi Spur",
+        "starClass": "G3pf",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Alchemical",
+        "sell": "60.7",
+        "buy": "-24.5",
+        "econDesc": "★★ (Promising)",
+        "conflict": "★★ (Sporadic)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-22T00:00:09.503Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-22T00:00:09.503Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790028014747,
-      1790028025444,
-      1790028036122,
-      1790028047336,
-      1790028058117,
-      1790028069203,
-      1790028080054
+      1790035209503
     ]
   },
   "flagLog": {},
