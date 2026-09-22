@@ -44563,6 +44563,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1419D058AC1F": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB14-419 Asofilm-Ugino",
+        "race": "",
+        "region": "Gollodu Adjunct",
+        "starClass": "X5",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": true,
+        "giant": false,
+        "econName": "None",
+        "sell": "",
+        "buy": "",
+        "econDesc": "",
+        "conflict": "None",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-22T00:01:14.102Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-22T00:01:14.102Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -44573,7 +44622,8 @@
       1790035230394,
       1790035242241,
       1790035252955,
-      1790035263353
+      1790035263353,
+      1790035274102
     ]
   },
   "flagLog": {},
