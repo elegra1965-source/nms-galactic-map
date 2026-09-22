@@ -49218,19 +49218,61 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "48:1009FE9C3321": {
+      "galaxy": 48,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Elegraynor paradise planet no sentinels",
+        "race": "",
+        "region": "",
+        "starClass": "",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "",
+        "sell": "",
+        "buy": "",
+        "econDesc": "",
+        "conflict": "",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Filled from a traveller's own in-game waypoint notes",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Save auto-import",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-22T22:13:43.643Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-22T22:13:43.643Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790110809554,
-      1790110821208,
-      1790110831854,
-      1790110842286,
-      1790110852957,
-      1790110863984,
-      1790110874869,
-      1790111311004
+      1790115223643
     ]
   },
   "flagLog": {},
