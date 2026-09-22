@@ -44710,18 +44710,67 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:10B40A557D31": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB14-B4 Kamenkut",
+        "race": "Gek",
+        "region": "Kamyciro Boundary",
+        "starClass": "F4",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Technology",
+        "sell": "57.3",
+        "buy": "-20.2",
+        "econDesc": "★★★ (Affluent)",
+        "conflict": "3 (Lawless)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-22T01:00:35.199Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-22T01:00:35.199Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790035230394,
       1790035242241,
       1790035252955,
       1790035263353,
       1790035274102,
       1790038813936,
-      1790038824356
+      1790038824356,
+      1790038835199
     ]
   },
   "flagLog": {},
