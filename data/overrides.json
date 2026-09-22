@@ -49267,12 +49267,62 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "64:1809FE9C3321": {
+      "galaxy": 64,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "The Nest Planet with portal",
+        "race": "",
+        "region": "",
+        "starClass": "",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "",
+        "sell": "",
+        "buy": "",
+        "econDesc": "",
+        "conflict": "",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Filled from a traveller's own in-game waypoint notes",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Save auto-import",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-22T22:13:54.830Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-22T22:13:54.830Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790115223643
+      1790115223643,
+      1790115234830
     ]
   },
   "flagLog": {},
