@@ -45592,18 +45592,67 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:10B90A557D2F": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB16-B9 Eto-chivi",
+        "race": "Vy'keen",
+        "region": "Zoyinskyl Boundary",
+        "starClass": "G3",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Advanced Materials",
+        "sell": "53.2",
+        "buy": "-29.8",
+        "econDesc": "★★★ (Wealthy)",
+        "conflict": "3 (High)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-22T04:01:18.304Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-22T04:01:18.304Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790046073807,
       1790049614835,
       1790049625363,
       1790049635878,
       1790049646508,
       1790049657312,
-      1790049667958
+      1790049667958,
+      1790049678304
     ]
   },
   "flagLog": {},
