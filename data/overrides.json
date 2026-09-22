@@ -49610,19 +49610,61 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1152F9555C30": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB2-152 The Unabomber",
+        "race": "Vy'keen",
+        "region": "Canthian",
+        "starClass": "F4p",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Nano-construction",
+        "sell": "40.9",
+        "buy": "-17.9",
+        "econDesc": "Booming",
+        "conflict": "1",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-22T23:48:33.335Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-22T23:48:33.335Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790115223643,
-      1790115234830,
-      1790115245747,
-      1790115256355,
-      1790115267307,
-      1790115278174,
-      1790115288783,
-      1790117000793
+      1790120913335
     ]
   },
   "flagLog": {},
