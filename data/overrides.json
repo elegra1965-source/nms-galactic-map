@@ -47258,18 +47258,67 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:10EB08556D30": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB19-EB Onnitsaya VIII",
+        "race": "Vy'keen",
+        "region": "Aptete Instability",
+        "starClass": "F0pf",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Fuel Generation",
+        "sell": "42.8",
+        "buy": "-19.1",
+        "econDesc": "★★ (Medium Supply)",
+        "conflict": "★ (Gentle)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-22T13:00:14.031Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-22T13:00:14.031Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790078409410,
       1790078420032,
       1790078430762,
       1790078441315,
       1790078452057,
       1790078463008,
-      1790078473917
+      1790078473917,
+      1790082014031
     ]
   },
   "flagLog": {},
