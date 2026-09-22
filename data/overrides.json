@@ -49316,13 +49316,63 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "66:1E09FE9C731E": {
+      "galaxy": 66,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Cilleu Base",
+        "race": "",
+        "region": "",
+        "starClass": "",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "",
+        "sell": "",
+        "buy": "",
+        "econDesc": "",
+        "conflict": "",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Filled from a traveller's own in-game waypoint notes",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Save auto-import",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-22T22:14:05.747Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-22T22:14:05.747Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
       1790115223643,
-      1790115234830
+      1790115234830,
+      1790115245747
     ]
   },
   "flagLog": {},
