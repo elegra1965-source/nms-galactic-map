@@ -48679,6 +48679,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1130F9555C30": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB2-130 Tasht",
+        "race": "Vy'keen",
+        "region": "Canthian",
+        "starClass": "F8pf",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Technology",
+        "sell": "",
+        "buy": "",
+        "econDesc": "Promising",
+        "conflict": "2",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-22T19:00:58.114Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-22T19:00:58.114Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -48687,7 +48736,8 @@
       1790103614325,
       1790103625030,
       1790103635444,
-      1790103646537
+      1790103646537,
+      1790103658114
     ]
   },
   "flagLog": {},
