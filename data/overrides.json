@@ -45249,6 +45249,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:11D4D058AC1D": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB16-1D4 Yunque",
+        "race": "Korvax",
+        "region": "Rireith Conflux",
+        "starClass": "F3pf",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": true,
+        "giant": false,
+        "econName": "Industrial",
+        "sell": "-21.7",
+        "buy": "55.3",
+        "econDesc": "★★",
+        "conflict": "★★",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-22T03:01:13.807Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-22T03:01:13.807Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -45259,7 +45308,8 @@
       1790046030194,
       1790046042109,
       1790046052411,
-      1790046063312
+      1790046063312,
+      1790046073807
     ]
   },
   "flagLog": {},
