@@ -46327,17 +46327,66 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:11440A555D2F": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB18-144 Izugross",
+        "race": "Korvax",
+        "region": "Uevion Band",
+        "starClass": "F4",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "High Tech",
+        "sell": "57.0",
+        "buy": "-15.3",
+        "econDesc": "★★ (Satisfactory)",
+        "conflict": "2 (Unruly)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-22T08:00:31.207Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-22T08:00:31.207Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790060424298,
       1790060435238,
       1790060445878,
       1790060456572,
       1790064008886,
-      1790064019673
+      1790064019673,
+      1790064031207
     ]
   },
   "flagLog": {},
