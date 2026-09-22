@@ -49463,6 +49463,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "32:1509FF9B8326": {
+      "galaxy": 32,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Hamandr Colony",
+        "race": "",
+        "region": "",
+        "starClass": "",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "",
+        "sell": "",
+        "buy": "",
+        "econDesc": "",
+        "conflict": "",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Filled from a traveller's own in-game waypoint notes",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Save auto-import",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-22T22:14:38.174Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-22T22:14:38.174Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -49472,7 +49521,8 @@
       1790115234830,
       1790115245747,
       1790115256355,
-      1790115267307
+      1790115267307,
+      1790115278174
     ]
   },
   "flagLog": {},
