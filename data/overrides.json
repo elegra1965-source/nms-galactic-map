@@ -49120,6 +49120,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:114BF9555C30": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB2-14B KiKi Are You Riding?",
+        "race": "Vy'keen",
+        "region": "Canthian",
+        "starClass": "F2p",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Engineering",
+        "sell": "76.2",
+        "buy": "-11.5",
+        "econDesc": "Unsuccessful",
+        "conflict": "1",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-22T21:01:14.869Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-22T21:01:14.869Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -49130,7 +49179,8 @@
       1790110831854,
       1790110842286,
       1790110852957,
-      1790110863984
+      1790110863984,
+      1790110874869
     ]
   },
   "flagLog": {},
