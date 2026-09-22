@@ -45053,13 +45053,63 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:11130A557D2F": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB16-113 Obarat",
+        "race": "Gek",
+        "region": "Zoyinskyl Boundary",
+        "starClass": "F2",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Scientific",
+        "sell": "48.6",
+        "buy": "-25.7",
+        "econDesc": "★★ (Balanced)",
+        "conflict": "3 (Dangerous)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-22T03:00:30.194Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-22T03:00:30.194Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
       1790046009396,
-      1790046019859
+      1790046019859,
+      1790046030194
     ]
   },
   "flagLog": {},
