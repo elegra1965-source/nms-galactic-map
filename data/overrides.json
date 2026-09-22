@@ -46523,6 +46523,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1422D0588C1D": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB18-422 Liala&#39;s Daughters",
+        "race": "Korvax",
+        "region": "Avnise",
+        "starClass": "Y4",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": true,
+        "giant": false,
+        "econName": "Manufacturing",
+        "sell": "57.6",
+        "buy": "-14.2",
+        "econDesc": "★★ Sustainable",
+        "conflict": "★★ Boisterous",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-22T08:01:14.670Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-22T08:01:14.670Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -46533,7 +46582,8 @@
       1790064031207,
       1790064041910,
       1790064053438,
-      1790064064173
+      1790064064173,
+      1790064074670
     ]
   },
   "flagLog": {},
