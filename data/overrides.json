@@ -47013,13 +47013,63 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:13ECCE589C1E": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB19-3EC Ambrosia",
+        "race": "Gek",
+        "region": "Oujeme Band",
+        "starClass": "Y",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": true,
+        "giant": false,
+        "econName": "Mining",
+        "sell": "40.2",
+        "buy": "-24.8",
+        "econDesc": "Promising",
+        "conflict": "Tranquil",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-22T12:00:30.762Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-22T12:00:30.762Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
       1790078409410,
-      1790078420032
+      1790078420032,
+      1790078430762
     ]
   },
   "flagLog": {},
