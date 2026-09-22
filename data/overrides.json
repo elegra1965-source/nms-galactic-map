@@ -47356,18 +47356,67 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1105F9555C30": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB2-105 Dark Angel",
+        "race": "Gek",
+        "region": "Canthian",
+        "starClass": "F0p",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Power Generation",
+        "sell": "43.8",
+        "buy": "-28.5",
+        "econDesc": "★★ (Comfortable)",
+        "conflict": "★ (Peaceful)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-22T13:00:35.694Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-22T13:00:35.694Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790078430762,
       1790078441315,
       1790078452057,
       1790078463008,
       1790078473917,
       1790082014031,
-      1790082024915
+      1790082024915,
+      1790082035694
     ]
   },
   "flagLog": {},
