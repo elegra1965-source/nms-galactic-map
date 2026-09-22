@@ -46817,6 +46817,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:1123F8556C30": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB19-123 Chong",
+        "race": "Gek",
+        "region": "Qangew Expanse",
+        "starClass": "E4",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Ore Extraction",
+        "sell": "75.2",
+        "buy": "-15.5",
+        "econDesc": "★★ (Satisfactory)",
+        "conflict": "★ (Stable)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-22T10:01:11.437Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-22T10:01:11.437Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -46826,7 +46875,8 @@
       1790071226622,
       1790071237645,
       1790071249281,
-      1790071260357
+      1790071260357,
+      1790071271437
     ]
   },
   "flagLog": {},
