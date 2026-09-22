@@ -45200,6 +45200,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:11CAD058AC1D": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB16-1CA Asuma",
+        "race": "Gek",
+        "region": "Rireith Conflux",
+        "starClass": "G2",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Manufacturing",
+        "sell": "51.2",
+        "buy": "-16.7",
+        "econDesc": "★",
+        "conflict": "★",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-22T03:01:03.312Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-22T03:01:03.312Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -45209,7 +45258,8 @@
       1790046019859,
       1790046030194,
       1790046042109,
-      1790046052411
+      1790046052411,
+      1790046063312
     ]
   },
   "flagLog": {},
