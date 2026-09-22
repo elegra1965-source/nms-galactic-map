@@ -46229,18 +46229,66 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:10D2D0589C1D": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB17-D2 Bishupri",
+        "race": "",
+        "region": "Biangen Conflux",
+        "starClass": "E",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Scientific",
+        "sell": "54.5",
+        "buy": "-11.4",
+        "econDesc": "Data Unavailable",
+        "conflict": "Data Unavailable",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-22T08:00:08.886Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-22T08:00:08.886Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790056865036,
-      1790056875917,
       1790060413898,
       1790060424298,
       1790060435238,
       1790060445878,
-      1790060456572
+      1790060456572,
+      1790064008886
     ]
   },
   "flagLog": {},
