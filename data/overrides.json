@@ -45396,18 +45396,67 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:1027FA557C2F": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB16-27 Dakami",
+        "race": "Korvax",
+        "region": "Sobert Cloud",
+        "starClass": "G6f",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Nano-construction",
+        "sell": "41.8",
+        "buy": "-15.0",
+        "econDesc": "★★ (Satisfactory)",
+        "conflict": "★★★ (Alarming)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-22T04:00:35.878Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-22T04:00:35.878Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790046030194,
       1790046042109,
       1790046052411,
       1790046063312,
       1790046073807,
       1790049614835,
-      1790049625363
+      1790049625363,
+      1790049635878
     ]
   },
   "flagLog": {},
