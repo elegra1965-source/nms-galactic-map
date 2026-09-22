@@ -48483,18 +48483,61 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:112A09555D30": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB2-12A Starlight Cauldron",
+        "race": "Vy'keen",
+        "region": "Sea of Nadsky",
+        "starClass": "G3p",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": true,
+        "giant": false,
+        "econName": "Ore Extraction",
+        "sell": "54.8",
+        "buy": "-18.2",
+        "econDesc": "💀 (Black Market)",
+        "conflict": "💀 (Pirate Controlled)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-22T19:00:14.325Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-22T19:00:14.325Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790096409140,
-      1790096420498,
-      1790096432402,
-      1790096443218,
-      1790096455108,
-      1790096465980,
-      1790096476802
+      1790103614325
     ]
   },
   "flagLog": {},
