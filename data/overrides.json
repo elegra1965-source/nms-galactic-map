@@ -46768,6 +46768,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:111408556D30": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB19-114 Nebus",
+        "race": "Gek",
+        "region": "Aptete Instability",
+        "starClass": "M5pf",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Alchemical",
+        "sell": "",
+        "buy": "",
+        "econDesc": "★★★ (Advanced)",
+        "conflict": "★★★ (Aggressive)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-22T10:01:00.357Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-22T10:01:00.357Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -46776,7 +46825,8 @@
       1790071215722,
       1790071226622,
       1790071237645,
-      1790071249281
+      1790071249281,
+      1790071260357
     ]
   },
   "flagLog": {},
