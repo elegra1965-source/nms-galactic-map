@@ -49904,6 +49904,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1163F9555C30": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB2-163 Eyamaga-Unhu",
+        "race": "Vy'keen",
+        "region": "Canthian",
+        "starClass": "F6",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Scientific",
+        "sell": "57.8",
+        "buy": "-21.3",
+        "econDesc": "Developing",
+        "conflict": "2",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-22T23:49:38.240Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-22T23:49:38.240Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -49914,7 +49963,8 @@
       1790120935196,
       1790120945549,
       1790120955951,
-      1790120966769
+      1790120966769,
+      1790120978240
     ]
   },
   "flagLog": {},
