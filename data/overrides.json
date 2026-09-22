@@ -46376,17 +46376,66 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:11BCD0588C1D": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB18-1BC Iupanagj",
+        "race": "Gek",
+        "region": "Avnise",
+        "starClass": "G0pf",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Fuel Generation",
+        "sell": "41.7",
+        "buy": "-19.8",
+        "econDesc": "★★ (Medium Supply)",
+        "conflict": "★★ (Fractious)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-22T08:00:41.910Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-22T08:00:41.910Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790060435238,
       1790060445878,
       1790060456572,
       1790064008886,
       1790064019673,
-      1790064031207
+      1790064031207,
+      1790064041910
     ]
   },
   "flagLog": {},
