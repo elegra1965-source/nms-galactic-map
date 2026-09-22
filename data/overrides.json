@@ -49365,6 +49365,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "33:1909FE9CF319": {
+      "galaxy": 33,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Nugrighl-Mace Colony",
+        "race": "",
+        "region": "",
+        "starClass": "",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "",
+        "sell": "",
+        "buy": "",
+        "econDesc": "",
+        "conflict": "",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Filled from a traveller's own in-game waypoint notes",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Save auto-import",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-22T22:14:16.355Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-22T22:14:16.355Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -49372,7 +49421,8 @@
     "5.133.46.24": [
       1790115223643,
       1790115234830,
-      1790115245747
+      1790115245747,
+      1790115256355
     ]
   },
   "flagLog": {},
