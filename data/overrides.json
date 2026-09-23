@@ -53117,18 +53117,61 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:140D08555D30": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB20-64 Okyoti",
+        "race": "Gek",
+        "region": "Agputn Nebula",
+        "starClass": "Y5",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": true,
+        "giant": false,
+        "econName": "Construction",
+        "sell": "58.6",
+        "buy": "-19.8",
+        "econDesc": "★★★ (Booming)",
+        "conflict": "★ (Gentle)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-23T16:03:21.294Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-23T16:03:21.294Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790175609425,
-      1790175620639,
-      1790175633609,
-      1790175644169,
-      1790175655240,
-      1790175666770,
-      1790175678393
+      1790179401294
     ]
   },
   "flagLog": {},
