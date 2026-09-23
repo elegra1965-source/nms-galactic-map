@@ -51010,6 +51010,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:142009555D30": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB2-420 Nip-Nip",
+        "race": "Gek",
+        "region": "Sea of Nadsky",
+        "starClass": "X2p // Dis",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "High Voltage",
+        "sell": "48.7",
+        "buy": "-14.5",
+        "econDesc": "💀 (Black Market)",
+        "conflict": "💀 (Pirate Controlled)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-23T06:01:13.908Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-23T06:01:13.908Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -51020,7 +51069,8 @@
       1790143230642,
       1790143241054,
       1790143251994,
-      1790143262509
+      1790143262509,
+      1790143273908
     ]
   },
   "flagLog": {},
