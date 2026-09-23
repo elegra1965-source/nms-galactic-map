@@ -50030,18 +50030,61 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:11C70A556D30": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB10-1C7 Briasaba",
+        "race": "Gek",
+        "region": "Kianso Terminus",
+        "starClass": "G8",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Mining",
+        "sell": "73.9",
+        "buy": "-27.8",
+        "econDesc": "★★★ (Wealthy)",
+        "conflict": "2 (Intermittent)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-23T03:00:09.661Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-23T03:00:09.661Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790125823608,
-      1790125834210,
-      1790125844917,
-      1790125855305,
-      1790125865666,
-      1790125876462,
-      1790125887371
+      1790132409661
     ]
   },
   "flagLog": {},
