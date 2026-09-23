@@ -54685,6 +54685,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:10CBF8556C31": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB22-CB Cayenn III",
+        "race": "Korvax",
+        "region": "Ejongaa Anomaly",
+        "starClass": "G0",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Power Generation",
+        "sell": "44.8",
+        "buy": "-29.9",
+        "econDesc": "★★ (Comfortable)",
+        "conflict": "★ (Peaceful)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-23T23:02:53.788Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-23T23:02:53.788Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -54693,7 +54742,8 @@
       1790204409804,
       1790204541034,
       1790204551885,
-      1790204562947
+      1790204562947,
+      1790204573788
     ]
   },
   "flagLog": {},
