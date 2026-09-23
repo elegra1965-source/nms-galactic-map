@@ -54489,18 +54489,61 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:1079F8556C31": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB22-79 Uphliu-Jiyua",
+        "race": "Korvax",
+        "region": "Ejongaa Anomaly",
+        "starClass": "G0",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Mercantile",
+        "sell": "77.3",
+        "buy": "-25.0",
+        "econDesc": "★★ (Balanced)",
+        "conflict": "★★ (Medium)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-23T23:00:09.804Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-23T23:00:09.804Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790197214234,
-      1790197224817,
-      1790197236236,
-      1790197247356,
-      1790197257927,
-      1790197268678,
-      1790197280033
+      1790204409804
     ]
   },
   "flagLog": {},
