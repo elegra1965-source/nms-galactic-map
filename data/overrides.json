@@ -51647,6 +51647,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:10BA09555D30": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB2-BA Inagca",
+        "race": "Korvax",
+        "region": "Sea of Nadsky",
+        "starClass": "E3pf",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Advanced Materials",
+        "sell": "69.2",
+        "buy": "-22.9",
+        "econDesc": "Promising",
+        "conflict": "Sporadic",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-23T09:01:02.319Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-23T09:01:02.319Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -51656,7 +51705,8 @@
       1790154019983,
       1790154030404,
       1790154041283,
-      1790154051634
+      1790154051634,
+      1790154062319
     ]
   },
   "flagLog": {},
