@@ -50716,18 +50716,61 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1206F9555C30": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB2-206 Rafinesque",
+        "race": "Korvax",
+        "region": "Canthian",
+        "starClass": "F3p",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "High Voltage",
+        "sell": "56.6",
+        "buy": "-12.6",
+        "econDesc": "Sustainable",
+        "conflict": "1",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-23T06:00:09.141Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-23T06:00:09.141Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790136014039,
-      1790136024676,
-      1790136036042,
-      1790136046627,
-      1790136057459,
-      1790136067841,
-      1790136078679
+      1790143209141
     ]
   },
   "flagLog": {},
