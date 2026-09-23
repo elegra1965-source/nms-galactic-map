@@ -52725,18 +52725,67 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:100B08555D30": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB20-0B MepRace",
+        "race": "Korvax",
+        "region": "Agputn Nebula",
+        "starClass": "G4pf // Wa",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Material Fusion",
+        "sell": "56.0",
+        "buy": "-11.0",
+        "econDesc": "★ (Unsuccessful)",
+        "conflict": "★ (Trivial)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-23T13:01:20.272Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-23T13:01:20.272Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790164875874,
       1790168414128,
       1790168424963,
       1790168435767,
       1790168446600,
       1790168457463,
-      1790168469299
+      1790168469299,
+      1790168480272
     ]
   },
   "flagLog": {},
