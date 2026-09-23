@@ -54293,18 +54293,67 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "2:10F2F9558C30": {
+      "galaxy": 2,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB21-F2 Nodford",
+        "race": "Gek",
+        "region": "Joletova Boundary",
+        "starClass": "02f",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": true,
+        "giant": false,
+        "econName": "Power Generation",
+        "sell": "69.4",
+        "buy": "-15.7",
+        "econDesc": "★★ (Satisfactory)",
+        "conflict": "★ (Stable)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-23T21:00:47.356Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-23T21:00:47.356Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790193641856,
       1790193653741,
       1790193664337,
       1790193674979,
       1790197214234,
       1790197224817,
-      1790197236236
+      1790197236236,
+      1790197247356
     ]
   },
   "flagLog": {},
