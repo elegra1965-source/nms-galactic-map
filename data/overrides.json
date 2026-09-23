@@ -51108,18 +51108,67 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:105609555D30": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB2-56 Vagabond",
+        "race": "Gek",
+        "region": "Sea of Nadsky",
+        "starClass": "F8pf",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Power Generation",
+        "sell": "75.6",
+        "buy": "-19.0",
+        "econDesc": "Booming",
+        "conflict": "Gentle",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-23T07:00:25.440Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-23T07:00:25.440Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790143220239,
       1790143230642,
       1790143241054,
       1790143251994,
       1790143262509,
       1790143273908,
-      1790146814760
+      1790146814760,
+      1790146825440
     ]
   },
   "flagLog": {},
