@@ -50912,6 +50912,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:140609555D30": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB2-406 Dandelion-Puff Armada",
+        "race": "Gek",
+        "region": "Sea of Nadsky",
+        "starClass": "X6f",
+        "stars": [
+          "purple"
+        ],
+        "water": false,
+        "dissonant": true,
+        "giant": false,
+        "econName": "Metal Processing",
+        "sell": "67.9",
+        "buy": "-15.5",
+        "econDesc": "★★★ (Flourishing)",
+        "conflict": "1 (Stable)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-23T06:00:51.994Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-23T06:00:51.994Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -50920,7 +50969,8 @@
       1790143209141,
       1790143220239,
       1790143230642,
-      1790143241054
+      1790143241054,
+      1790143251994
     ]
   },
   "flagLog": {},
