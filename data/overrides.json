@@ -50422,18 +50422,67 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1171F9555C30": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB2-171 Cerberus",
+        "race": "Gek",
+        "region": "Canthian",
+        "starClass": "F1p",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Alchemical",
+        "sell": "73.6",
+        "buy": "-24.2",
+        "econDesc": "Promising",
+        "conflict": "3",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-23T04:00:24.676Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-23T04:00:24.676Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790132420382,
       1790132431153,
       1790132441483,
       1790132452362,
       1790132463571,
       1790132474655,
-      1790136014039
+      1790136014039,
+      1790136024676
     ]
   },
   "flagLog": {},
