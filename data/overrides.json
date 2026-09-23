@@ -53705,6 +53705,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:103208555D31": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB21-32 Yulnemnik",
+        "race": "",
+        "region": "Hullah",
+        "starClass": "G0pf",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Power Generation",
+        "sell": "41.4",
+        "buy": "-19.5",
+        "econDesc": "★★★ (Booming)",
+        "conflict": "1 (Gentle)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-23T18:01:10.865Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-23T18:01:10.865Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -53714,7 +53763,8 @@
       1790186426039,
       1790186436890,
       1790186448073,
-      1790186459292
+      1790186459292,
+      1790186470865
     ]
   },
   "flagLog": {},
