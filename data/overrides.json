@@ -52235,6 +52235,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:10F0F9555C30": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB2-F0 Kinasu",
+        "race": "Gek",
+        "region": "Canthian",
+        "starClass": "",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "High Voltage",
+        "sell": "",
+        "buy": "",
+        "econDesc": "Sustainable",
+        "conflict": "2",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-23T12:00:42.365Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-23T12:00:42.365Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -52242,7 +52291,8 @@
     "5.133.46.24": [
       1790164809179,
       1790164820270,
-      1790164831388
+      1790164831388,
+      1790164842365
     ]
   },
   "flagLog": {},
