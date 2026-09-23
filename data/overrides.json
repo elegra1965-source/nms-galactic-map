@@ -51206,18 +51206,67 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:105809555D30": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB2-58 Guanqin-Ukryum",
+        "race": "Korvax",
+        "region": "Sea of Nadsky",
+        "starClass": "G8p",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Minerals",
+        "sell": "78.3",
+        "buy": "-23.1",
+        "econDesc": "★★ (Promising)",
+        "conflict": "★★★ (At War)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-23T07:00:46.421Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-23T07:00:46.421Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790143241054,
       1790143251994,
       1790143262509,
       1790143273908,
       1790146814760,
       1790146825440,
-      1790146835919
+      1790146835919,
+      1790146846421
     ]
   },
   "flagLog": {},
