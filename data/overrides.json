@@ -51549,6 +51549,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "2:10A9F9555C31": {
+      "galaxy": 2,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB2-A9 Lierse",
+        "race": "Korvax",
+        "region": "Ilongl Cloud",
+        "starClass": "F1pf",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Mercantile",
+        "sell": "44.0",
+        "buy": "-28.4",
+        "econDesc": "★★★ (Wealthy)",
+        "conflict": "★★★ (High)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-23T09:00:41.283Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-23T09:00:41.283Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -51556,7 +51605,8 @@
     "5.133.46.24": [
       1790154008949,
       1790154019983,
-      1790154030404
+      1790154030404,
+      1790154041283
     ]
   },
   "flagLog": {},
