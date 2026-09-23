@@ -51255,18 +51255,67 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:105D09555D30": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB2-5D Yablun",
+        "race": "Gek",
+        "region": "Sea of Nadsky",
+        "starClass": "",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Power Generation",
+        "sell": "60.6",
+        "buy": "-26.3",
+        "econDesc": "Fledgling",
+        "conflict": "Low",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-23T07:00:56.845Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-23T07:00:56.845Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790143251994,
       1790143262509,
       1790143273908,
       1790146814760,
       1790146825440,
       1790146835919,
-      1790146846421
+      1790146846421,
+      1790146856845
     ]
   },
   "flagLog": {},
