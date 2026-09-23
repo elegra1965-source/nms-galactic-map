@@ -52921,6 +52921,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:119908555D30": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB20-199 Wecasen",
+        "race": "",
+        "region": "Agputn Nebula",
+        "starClass": "M7",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "None",
+        "sell": "67.9",
+        "buy": "-11.2",
+        "econDesc": "Data Unavailable",
+        "conflict": "Data Unavailable",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-23T15:00:44.169Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-23T15:00:44.169Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -52928,7 +52977,8 @@
     "5.133.46.24": [
       1790175609425,
       1790175620639,
-      1790175633609
+      1790175633609,
+      1790175644169
     ]
   },
   "flagLog": {},
