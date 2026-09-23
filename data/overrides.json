@@ -52774,18 +52774,61 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:114008555D30": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB20-140 Kionnekt",
+        "race": "Korvax",
+        "region": "Agputn Nebula",
+        "starClass": "G7pF",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Scientific",
+        "sell": "70.1",
+        "buy": "-29.3",
+        "econDesc": "💀 (Black Market)",
+        "conflict": "Pirate Controlled",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-23T15:00:09.425Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-23T15:00:09.425Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790168414128,
-      1790168424963,
-      1790168435767,
-      1790168446600,
-      1790168457463,
-      1790168469299,
-      1790168480272
+      1790175609425
     ]
   },
   "flagLog": {},
