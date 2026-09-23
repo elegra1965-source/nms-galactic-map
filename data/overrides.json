@@ -51696,6 +51696,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "2:18BEF9555C30": {
+      "galaxy": 2,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB2-BE Ishino-Ratsu",
+        "race": "Vy'keen",
+        "region": "The Arm of Kiffeyn",
+        "starClass": "F1f",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": true,
+        "giant": false,
+        "econName": "Technology",
+        "sell": "",
+        "buy": "",
+        "econDesc": "★ (Unpromising)",
+        "conflict": "★ (Tranquil)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-23T09:01:12.923Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-23T09:01:12.923Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -51706,7 +51755,8 @@
       1790154030404,
       1790154041283,
       1790154051634,
-      1790154062319
+      1790154062319,
+      1790154072923
     ]
   },
   "flagLog": {},
