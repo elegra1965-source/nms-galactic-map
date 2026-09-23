@@ -52970,6 +52970,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:11B908555D30": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB20-1B9 Mimantig",
+        "race": "Korvax",
+        "region": "Agputn Nebula",
+        "starClass": "G3f",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Power Generation",
+        "sell": "55.3",
+        "buy": "-14.9",
+        "econDesc": "★★★ (High Supply)",
+        "conflict": "3 (Critical)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-23T15:00:55.240Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-23T15:00:55.240Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -52978,7 +53027,8 @@
       1790175609425,
       1790175620639,
       1790175633609,
-      1790175644169
+      1790175644169,
+      1790175655240
     ]
   },
   "flagLog": {},
