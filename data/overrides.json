@@ -50569,18 +50569,67 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:11B609555D30": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB2-1B6 Cogliao",
+        "race": "Gek",
+        "region": "Sea of Nadsky",
+        "starClass": "F9",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Manufacturing",
+        "sell": "76.6",
+        "buy": "-17.9",
+        "econDesc": "Satisfactory",
+        "conflict": "Stable",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-23T04:00:57.459Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-23T04:00:57.459Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790132452362,
       1790132463571,
       1790132474655,
       1790136014039,
       1790136024676,
       1790136036042,
-      1790136046627
+      1790136046627,
+      1790136057459
     ]
   },
   "flagLog": {},
