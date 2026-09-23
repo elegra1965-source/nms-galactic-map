@@ -51745,18 +51745,67 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:100C09555D30": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB2-C Zezhaxin XIII",
+        "race": "Korvax",
+        "region": "Sea of Nadsky",
+        "starClass": "F4p",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Mercantile",
+        "sell": "59.1",
+        "buy": "-16.1",
+        "econDesc": "★★★ (Flourishing)",
+        "conflict": "2 (Unruly)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-23T10:00:13.673Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-23T10:00:13.673Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790154008949,
       1790154019983,
       1790154030404,
       1790154041283,
       1790154051634,
       1790154062319,
-      1790154072923
+      1790154072923,
+      1790157613673
     ]
   },
   "flagLog": {},
