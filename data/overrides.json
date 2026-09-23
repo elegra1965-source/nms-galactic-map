@@ -54342,18 +54342,67 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:112DF8556C31": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB22-12D Hillside",
+        "race": "Korvax",
+        "region": "Ejongaa Anomaly",
+        "starClass": "G8f",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Manufacturing",
+        "sell": "73.1",
+        "buy": "-27.2",
+        "econDesc": "★★★ (Prosperous)",
+        "conflict": "★ (Low)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-23T21:00:57.927Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-23T21:00:57.927Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790193653741,
       1790193664337,
       1790193674979,
       1790197214234,
       1790197224817,
       1790197236236,
-      1790197247356
+      1790197247356,
+      1790197257927
     ]
   },
   "flagLog": {},
