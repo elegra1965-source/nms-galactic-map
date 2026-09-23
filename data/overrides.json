@@ -51304,18 +51304,67 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:100809555D30": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB2-8 Tangash",
+        "race": "Vy'keen",
+        "region": "Sea of Nadsky",
+        "starClass": "G8",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Advanced",
+        "sell": "75.4",
+        "buy": "-23.5",
+        "econDesc": "★★★",
+        "conflict": "1",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-23T07:01:07.443Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-23T07:01:07.443Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790143262509,
       1790143273908,
       1790146814760,
       1790146825440,
       1790146835919,
       1790146846421,
-      1790146856845
+      1790146856845,
+      1790146867443
     ]
   },
   "flagLog": {},
