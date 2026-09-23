@@ -53019,6 +53019,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:11F808555D30": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB20-1F8 Shemya Z",
+        "race": "Vy'keen",
+        "region": "Agputn Nebula",
+        "starClass": "F3f",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Construction",
+        "sell": "52.3",
+        "buy": "-18.7",
+        "econDesc": "★ (Failing)",
+        "conflict": "1 (Gentle)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-23T15:01:06.770Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-23T15:01:06.770Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -53028,7 +53077,8 @@
       1790175620639,
       1790175633609,
       1790175644169,
-      1790175655240
+      1790175655240,
+      1790175666770
     ]
   },
   "flagLog": {},
