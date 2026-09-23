@@ -50863,6 +50863,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:13FD09555D30": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB2-3FD Dreamhaze Belt",
+        "race": "Gek",
+        "region": "Sea of Nadsky",
+        "starClass": "Y1p",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": true,
+        "giant": false,
+        "econName": "Power Generation",
+        "sell": "44.9",
+        "buy": "-13.3",
+        "econDesc": "★★ (Adequate)",
+        "conflict": "★★★ (Formidable)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-23T06:00:41.054Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-23T06:00:41.054Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -50870,7 +50919,8 @@
     "5.133.46.24": [
       1790143209141,
       1790143220239,
-      1790143230642
+      1790143230642,
+      1790143241054
     ]
   },
   "flagLog": {},
