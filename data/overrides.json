@@ -54048,6 +54048,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:108D08555D31": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB21-8D Mupakkar",
+        "race": "",
+        "region": "Hullah",
+        "starClass": "G1p",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Advanced Materials",
+        "sell": "47.7",
+        "buy": "-10.9",
+        "econDesc": "💀 (Black Market)",
+        "conflict": "(Pirate Controlled)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-23T20:01:04.337Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-23T20:01:04.337Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -54057,7 +54106,8 @@
       1790193620588,
       1790193630915,
       1790193641856,
-      1790193653741
+      1790193653741,
+      1790193664337
     ]
   },
   "flagLog": {},
