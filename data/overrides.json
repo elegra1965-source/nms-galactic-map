@@ -51353,18 +51353,67 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1085F9555C30": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB2-85 Solliveien",
+        "race": "Gek",
+        "region": "Canthian",
+        "starClass": "F4f",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Manufacturing",
+        "sell": "62.2",
+        "buy": "-23.8",
+        "econDesc": "★★ (Promising)",
+        "conflict": "★★ (Sporadic)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-23T07:01:17.789Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-23T07:01:17.789Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790143273908,
       1790146814760,
       1790146825440,
       1790146835919,
       1790146846421,
       1790146856845,
-      1790146867443
+      1790146867443,
+      1790146877789
     ]
   },
   "flagLog": {},
