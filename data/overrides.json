@@ -54244,18 +54244,67 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "2:10E6F9558C30": {
+      "galaxy": 2,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB21-E6 Ammodush",
+        "race": "Korvax",
+        "region": "Joletova Boundary",
+        "starClass": "B0",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Manufacturing",
+        "sell": "43.0",
+        "buy": "-26.4",
+        "econDesc": "★★ (Balanced)",
+        "conflict": "★★ (Medium)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-23T21:00:36.236Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-23T21:00:36.236Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790193630915,
       1790193641856,
       1790193653741,
       1790193664337,
       1790193674979,
       1790197214234,
-      1790197224817
+      1790197224817,
+      1790197236236
     ]
   },
   "flagLog": {},
