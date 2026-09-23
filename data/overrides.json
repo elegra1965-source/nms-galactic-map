@@ -54734,6 +54734,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1011CE58AC1F": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB23-11 Tazuphli",
+        "race": "Vy'keen",
+        "region": "The Arm of Minones",
+        "starClass": "G8f",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": true,
+        "giant": false,
+        "econName": "Power Generation",
+        "sell": "74.4",
+        "buy": "-10.5",
+        "econDesc": "★★ (Adequate)",
+        "conflict": "★★ (Testy)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-23T23:03:04.554Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-23T23:03:04.554Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -54743,7 +54792,8 @@
       1790204541034,
       1790204551885,
       1790204562947,
-      1790204573788
+      1790204573788,
+      1790204584554
     ]
   },
   "flagLog": {},
