@@ -55420,6 +55420,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "2:1191F9557C2E": {
+      "galaxy": 2,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB24-191 Mejigu",
+        "race": "",
+        "region": "Qubeld Mass",
+        "starClass": "B5f",
+        "stars": [
+          "blue"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Abandoned",
+        "sell": "60.9",
+        "buy": "-21.0",
+        "econDesc": "Data Unavailable",
+        "conflict": "Data Unavailable",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-24T03:00:59.122Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-24T03:00:59.122Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -55428,7 +55477,8 @@
       1790218814400,
       1790218825115,
       1790218836890,
-      1790218848126
+      1790218848126,
+      1790218859122
     ]
   },
   "flagLog": {},
