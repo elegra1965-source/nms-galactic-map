@@ -56008,18 +56008,67 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:118CCE58AC1D": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB25-18C Ismula",
+        "race": "Vy'keen",
+        "region": "Oilz",
+        "starClass": "G2p",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Metal Processing",
+        "sell": "50.9",
+        "buy": "-15.7",
+        "econDesc": "★★ (Satisfactory)",
+        "conflict": "★ (Stable)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-24T06:00:37.038Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-24T06:00:37.038Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790226032167,
       1790226043515,
       1790226053849,
       1790226065067,
       1790226075561,
       1790229614765,
-      1790229625758
+      1790229625758,
+      1790229637038
     ]
   },
   "flagLog": {},
