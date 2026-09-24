@@ -851,10 +851,16 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
    toolbar or canvas clicks underneath it even if it happens to overlap on
    a narrow/mobile layout -- flagged to Tony as worth a live check there. */
 #sysBanner{display:none;position:fixed;left:50%;transform:translateX(-50%);
-  z-index:32;pointer-events:none;font-family:'Orbitron',sans-serif;color:var(--gold);
-  font-size:13px;letter-spacing:.12em;text-transform:uppercase;
-  background:rgba(11,17,25,.72);border:1px solid var(--border);border-radius:var(--r-sm);
-  padding:5px 16px;text-shadow:0 1px 2px #000}
+  z-index:32;pointer-events:none;flex-direction:column;align-items:center;gap:7px;
+  max-width:92vw;text-align:center}
+/* 2026-09-24: restyled to match the in-game Cosmos system map title
+   ("THE RYLOSKY SYSTEM") -- emblem above, wide-tracked white title, no box. */
+#sysBanner .sbIcon{width:30px;height:30px;filter:drop-shadow(0 0 6px rgba(231,166,74,.55))}
+#sysBanner .sbTitle{font-family:'Rajdhani',sans-serif;font-weight:500;color:#f4f6f8;
+  font-size:22px;letter-spacing:.2em;text-transform:uppercase;line-height:1.15;white-space:nowrap;
+  text-shadow:0 0 10px rgba(255,255,255,.35),0 0 3px rgba(0,0,0,.9),0 1px 2px #000}
+@media(max-width:900px){#sysBanner .sbIcon{width:24px;height:24px}
+  #sysBanner .sbTitle{font-size:15px;letter-spacing:.14em;white-space:normal;width:88vw}}
 /* Tony (2026-08-17): the conBadge() pill reused for the hover popup's
    Conflict row is sized for the full info panel/dropdown (10px text, 8px
    radius) -- too bulky next to this popup's smaller 16px icons, so scoped

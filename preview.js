@@ -1540,8 +1540,7 @@ function refreshAfterOverrides(){
         // picked up the rename correctly). Same one-line fix setMode()
         // itself uses, just re-run here too so an in-place edit doesn't
         // leave this one label stuck on the pre-edit name.
-        var _sysBanner=document.getElementById("sysBanner");
-        if(_sysBanner) _sysBanner.textContent=selected.name;
+        setSysBanner(selected);
         positionSysBanner();
       }
     }
@@ -4921,11 +4920,14 @@ function buildSystemView(s){
      the origin (not moved with the star) so the flattened disc keeps
      even, centred lighting rather than going dark on whichever side the
      star visually isn't. */
-  var si;
-  for(si=0; si<s.stars; si++){
-    var off=new THREE.Vector3(featureR*0.66+si*3.2,featureR*0.47,-featureR*0.21-si*1.6);
-    systemGroup.add(buildStar(s,si,off));
-  }
+  /* 2026-09-24, Tony (in-game Cosmos system-map reference, "The Rylosky
+     System"): the real game's system map shows NO star mesh at all -- the
+     system is identified by a title banner across the top instead. The
+     star billboard is no longer built here; #sysBanner (setSysBanner())
+     now carries the system's identity, with its emblem tinted by the
+     primary star colour so that cue isn't lost. buildStar() itself is left
+     defined (unused) so it's a one-line revert if wanted back. starLight
+     is untouched -- planets are still lit exactly as before. */
   starLight.color.setHex(s.starColors[0]);
   starLight.position.set(0,0,0);
   var lastOrbitR=8+Math.max(0,s.planets-1)*3.7; // same formula the planets themselves use, see systemFeatureR()'s comment
@@ -6467,8 +6469,8 @@ function setMode(m){
      unconditionally here rather than needing its own separate hook. */
   var sysBanner=document.getElementById("sysBanner");
   if(m==="system"&&selected){
-    sysBanner.textContent=selected.name;
-    sysBanner.style.display="block";
+    setSysBanner(selected);
+    sysBanner.style.display="flex";
     positionSysBanner();
   } else {
     sysBanner.style.display="none";
@@ -11546,12 +11548,43 @@ function syncTopOffset(){
    from resize() below so it re-syncs whenever the toolbar layout could
    have changed -- never from anything mode-related, so it never moves or
    hides when switching Galaxy/Local/System. */
+/* In-game-style system title banner (2026-09-24, Tony -- matches the
+   Cosmos system map's "THE RYLOSKY SYSTEM" header: small gold emblem above
+   a wide-tracked white title, no box). Emblem core is tinted with the
+   system's primary star colour, since the star mesh itself is no longer
+   drawn in System view. */
+function setSysBanner(s){
+  var el=document.getElementById("sysBanner");
+  if(!el||!s) return;
+  var nm=String(s.name||"Unknown");
+  var title=/^the\s/i.test(nm)?nm:("The "+nm);
+  if(!/\ssystem$/i.test(title)) title+=" System";
+  var c=(s.starColors&&s.starColors.length)?s.starColors[0]:0xffd27a;
+  var hex="#"+("000000"+Number(c).toString(16)).slice(-6);
+  var esc=title.replace(/[&<>"]/g,function(ch){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch];});
+  el.innerHTML='<svg class="sbIcon" viewBox="0 0 32 32" aria-hidden="true">'+
+    '<circle cx="16" cy="16" r="13" fill="rgba(20,14,6,.55)" stroke="#e7a64a" stroke-width="2.2"/>'+
+    '<circle cx="16" cy="16" r="9" fill="none" stroke="#f3d9a8" stroke-width="1" opacity=".7"/>'+
+    '<path d="M16 8.5v15M8.5 16h15M11 11l10 10M21 11L11 21" stroke="'+hex+'" stroke-width="1.3" stroke-linecap="round" opacity=".9"/>'+
+    '<circle cx="16" cy="16" r="3.6" fill="#fff"/><circle cx="16" cy="16" r="3.6" fill="'+hex+'" opacity=".55"/>'+
+    '</svg><div class="sbTitle">'+esc+'</div>';
+}
 function positionSysBanner(){
   var topEl=document.getElementById("top"), el=document.getElementById("sysBanner");
   if(!topEl||!el||el.style.display==="none") return;
   var r=topEl.getBoundingClientRect();
   if(r.width===0 && r.height===0) return; /* not laid out yet */
-  el.style.top=Math.round(r.bottom+10)+"px";
+  /* 2026-09-24: Tony's screenshot showed the banner sitting on top of the
+     toolbar's wrapped 2nd row -- measure the lowest actually-visible
+     toolbar child too, not just #top's own box, so a wrapped/overflowing
+     row can never be missed. */
+  var bottom=r.bottom, kids=topEl.children, i, kr;
+  for(i=0;i<kids.length;i++){
+    if(kids[i].offsetParent===null) continue;
+    kr=kids[i].getBoundingClientRect();
+    if(kr.height>0 && kr.bottom>bottom) bottom=kr.bottom;
+  }
+  el.style.top=Math.round(bottom+14)+"px";
 }
 function positionAnnivBadge(){
   var hud=document.getElementById("galHud"), el=document.getElementById("annivBadge");
