@@ -56057,18 +56057,67 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:119408557D2F": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB25-194 Nuqelt",
+        "race": "Vy'keen",
+        "region": "Zodonib Void",
+        "starClass": "F4f",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Scientific",
+        "sell": "",
+        "buy": "",
+        "econDesc": "★★ (Satisfactory)",
+        "conflict": "2 (Unruly)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-24T06:00:48.075Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-24T06:00:48.075Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790226043515,
       1790226053849,
       1790226065067,
       1790226075561,
       1790229614765,
       1790229625758,
-      1790229637038
+      1790229637038,
+      1790229648075
     ]
   },
   "flagLog": {},
