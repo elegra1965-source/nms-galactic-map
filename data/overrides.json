@@ -55273,12 +55273,62 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1001CE58AC1E": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB24-1 Omardoins XI",
+        "race": "Gek",
+        "region": "Edvario Cloud",
+        "starClass": "F7p",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Mathematical",
+        "sell": "70.7",
+        "buy": "-13.4",
+        "econDesc": "★★ (Sustainable)",
+        "conflict": "★★★ (Critical)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-24T03:00:25.115Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-24T03:00:25.115Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790218814400
+      1790218814400,
+      1790218825115
     ]
   },
   "flagLog": {},
