@@ -280,34 +280,43 @@ canvas#tstars{display:none;position:fixed;inset:0;pointer-events:none;z-index:1}
    If this turns out not to be the whole story, the git history has the
    animated version to restore/compare against. */
 .btn.beveled{
-  position:relative;
+  position:relative;top:-1px;
   clip-path:polygon(7px 0,100% 0,100% calc(100% - 7px),calc(100% - 7px) 100%,0 100%,0 7px);
   border:1.5px solid transparent;
   background:
-    linear-gradient(rgba(13,19,28,.92),rgba(13,19,28,.92)) padding-box,
-    linear-gradient(90deg,var(--cyan),var(--border)) border-box;
-  text-shadow:0 0 5px rgba(0,229,255,.3);
+    linear-gradient(#1c2837,#0d141d) padding-box,
+    linear-gradient(180deg,#5fe9f7,#0b4d58) border-box;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.18),inset 0 -3px 0 rgba(0,0,0,.55);
+  text-shadow:0 1px 0 #000,0 0 5px rgba(0,229,255,.3);
+  transition:top .08s,box-shadow .08s,background .12s,color .12s;
 }
 .btn.beveled:hover{border-color:transparent;
   background:
-    linear-gradient(rgba(19,27,39,.92),rgba(19,27,39,.92)) padding-box,
-    linear-gradient(90deg,var(--cyan),var(--border)) border-box;
+    linear-gradient(#24344a,#121b27) padding-box,
+    linear-gradient(180deg,#8ff2fb,#0e6573) border-box;
 }
-/* 2026-09-24, Tony: gold-on-gold "on" buttons were hard to read (picture
-   of the live toolbar). Picked option E from the mockup: dark button, bold
-   italic gold text, and a small glowing gold "LED" dot on the left marking
-   the button as active. Primary actions (Jump) get the same dark fill and
-   bold gold text but no dot/italic -- they're actions, not on/off toggles. */
-.btn.beveled.on,.btn.beveled.primary{
-  color:#ffc233;font-weight:700;text-shadow:0 0 6px rgba(255,194,51,.45);
+/* 2026-09-24, Tony -- "pressed in + gold dot" (mockup option 1): OFF
+   buttons sit raised (light top edge, dark bottom lip, 1px up); ON toggles
+   are pushed down into the bar (inner top shadow, 1px down) with bold
+   italic gold text and a lit gold dot. Uses `top` rather than transform
+   because .tb-revealing's toolbarRowReveal keyframes (fill-mode both) own
+   transform on these buttons and would override it. */
+.btn.beveled.on{
+  top:1px;color:#ffc233;font-weight:700;font-style:italic;padding-left:22px;
+  text-shadow:0 0 6px rgba(255,194,51,.5);
   background:
-    linear-gradient(rgba(13,19,28,.95),rgba(13,19,28,.95)) padding-box,
-    linear-gradient(90deg,var(--gold),var(--border)) border-box;
+    linear-gradient(#03070b,#101820) padding-box,
+    linear-gradient(180deg,#6b4a00,var(--gold)) border-box;
+  box-shadow:inset 0 3px 6px rgba(0,0,0,.95),inset 0 -1px 0 rgba(255,194,51,.35);
 }
-.btn.beveled.on{font-style:italic;padding-left:22px}
 .btn.beveled.on::before{content:"";position:absolute;left:9px;top:50%;width:6px;height:6px;
-  margin-top:-3px;border-radius:50%;background:#ffc233;
+  margin-top:-2px;border-radius:50%;background:#ffc233;
   box-shadow:0 0 5px #ffc233,0 0 10px rgba(255,194,51,.8)}
+/* Action buttons (Jump, .primary): no gold at rest -- same raised look as
+   any other button, it's an action not a toggle. Every beveled button
+   (actions included) presses in only while actually being clicked. */
+#top .btn.beveled.primary{color:var(--text);font-weight:700;border-color:transparent}
+.btn.beveled:active{top:1px;box-shadow:inset 0 3px 5px rgba(0,0,0,.8)}
 input[type=text]{font-family:'Orbitron',monospace;font-size:11px;letter-spacing:.12em;
   background:#04070c;border:1px solid var(--border);color:var(--cyan);
   padding:6px 8px;border-radius:var(--r-sm);width:140px;text-transform:uppercase;outline:none}
