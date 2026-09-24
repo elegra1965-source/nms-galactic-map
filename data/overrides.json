@@ -56351,13 +56351,63 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1402CE58AC1D": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB25-402 Erbert-Kado XI",
+        "race": "Gek",
+        "region": "Oilz",
+        "starClass": "X9",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": true,
+        "giant": false,
+        "econName": "Metal Processing",
+        "sell": "76.5",
+        "buy": "-19.9",
+        "econDesc": "★★ (Medium Supply)",
+        "conflict": "★★★ (Aggressive)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-24T08:00:32.048Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-24T08:00:32.048Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
       1790236809634,
-      1790236820586
+      1790236820586,
+      1790236832048
     ]
   },
   "flagLog": {},
