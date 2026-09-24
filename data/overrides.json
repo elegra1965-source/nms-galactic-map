@@ -56498,6 +56498,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:10A808557D2F": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB25-A8 Wolagang",
+        "race": "Korvax",
+        "region": "Zodonib Void",
+        "starClass": "E5p",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Experimental",
+        "sell": "62.6",
+        "buy": "-19.8",
+        "econDesc": "💀 (Black Market)",
+        "conflict": "💀 (Pirate Controlled)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-24T08:01:07.013Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-24T08:01:07.013Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -56507,7 +56556,8 @@
       1790236820586,
       1790236832048,
       1790236843271,
-      1790236855212
+      1790236855212,
+      1790236867013
     ]
   },
   "flagLog": {},
