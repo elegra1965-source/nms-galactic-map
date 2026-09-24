@@ -11609,6 +11609,29 @@ function positionAnnivBadge(){
    full width instead of the right side, so it's correctly excluded (its rect
    starts near the left edge, not past the window's midpoint). */
 var _lastOccludeW=-1;
+/* 2026-09-24, Tony (site vs in-game screenshot): the system title banner
+   was centred on the WINDOW, but the system itself isn't -- setViewOffset()
+   above shifts the scene left to clear the info panel, and orbit/pan moves
+   it too. In-game the title sits directly above the system, so this
+   projects the system's centre (the station, at the origin) to screen each
+   frame and keeps the banner horizontally over it. Clamped so a long title
+   never runs off either edge; falls back to the canvas centre if the origin
+   is behind the camera (e.g. fly mode looking away). */
+var _sysBannerX=null, _sbV=new THREE.Vector3();
+function syncSysBannerX(){
+  var el=document.getElementById("sysBanner");
+  if(!el||el.style.display==="none") return;
+  var cr=canvas.getBoundingClientRect();
+  _sbV.set(0,0,0).project(camera);
+  var x=(_sbV.z>1||_sbV.z<-1)?(cr.left+cr.width/2):(cr.left+(_sbV.x+1)/2*cr.width);
+  var half=el.offsetWidth/2, pad=8, W=window.innerWidth;
+  if(half*2+pad*2>=W) x=W/2;
+  else x=Math.max(half+pad,Math.min(W-half-pad,x));
+  x=Math.round(x);
+  if(x===_sysBannerX) return;
+  _sysBannerX=x;
+  el.style.left=x+"px";
+}
 function syncPanelOffset(){
   var panelEl=document.getElementById("panel");
   var w=window.innerWidth,h=window.innerHeight;
@@ -11727,6 +11750,7 @@ function animate(){
     syncSizeIfChanged();
     syncPanelOffset();
     syncFiltBoundary();
+    if(mode==="system") syncSysBannerX();
     var now=performance.now();
     var dt=Math.min(0.05,(now-lastT)/1000); lastT=now;
     frames++;
