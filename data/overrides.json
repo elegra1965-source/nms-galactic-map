@@ -58164,18 +58164,67 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:113208555D2F": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB27-132 Neggorm-Oyou",
+        "race": "Gek",
+        "region": "Ewkini Adjunct",
+        "starClass": "F8 // Wate",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "High Tech",
+        "sell": "72.8",
+        "buy": "-26.9",
+        "econDesc": "★★ (Balanced)",
+        "conflict": "★★★ (Dangerous)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-24T15:01:19.095Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-24T15:01:19.095Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790258475692,
       1790262013862,
       1790262024497,
       1790262035739,
       1790262046388,
       1790262057023,
-      1790262068090
+      1790262068090,
+      1790262079095
     ]
   },
   "flagLog": {},
