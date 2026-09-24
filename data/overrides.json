@@ -58213,18 +58213,61 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:114908555D31": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB21-149 Nudunad",
+        "race": "Uninhabited",
+        "region": "Hullah",
+        "starClass": "M0p",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "None",
+        "sell": "",
+        "buy": "",
+        "econDesc": "0 (Uninhabited)",
+        "conflict": "0 (Uninhabited)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-24T17:00:08.880Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-24T17:00:08.880Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790262013862,
-      1790262024497,
-      1790262035739,
-      1790262046388,
-      1790262057023,
-      1790262068090,
-      1790262079095
+      1790269208880
     ]
   },
   "flagLog": {},
