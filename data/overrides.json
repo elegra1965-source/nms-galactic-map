@@ -58752,18 +58752,67 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1032CE588C1D": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB27-32 Jojens-Yovyyus",
+        "race": "Vy'keen",
+        "region": "Mompop Cloud",
+        "starClass": "F",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Manufacturing",
+        "sell": "67.9",
+        "buy": "-21.1",
+        "econDesc": "Developing",
+        "conflict": "Relaxed",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-24T18:00:59.151Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-24T18:00:59.151Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790269253045,
       1790269264000,
       1790269275408,
       1790272813990,
       1790272824834,
       1790272836940,
-      1790272848197
+      1790272848197,
+      1790272859151
     ]
   },
   "flagLog": {},
