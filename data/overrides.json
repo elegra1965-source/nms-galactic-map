@@ -59291,18 +59291,67 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:108DCE588C1D": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB27-8D Rajamdo-Nong VI",
+        "race": "Korvax",
+        "region": "Mompop Cloud",
+        "starClass": "F",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Advanced Materials",
+        "sell": "55.3",
+        "buy": "-23.7",
+        "econDesc": "Promising",
+        "conflict": "Tranquil",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-24T21:00:24.784Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-24T21:00:24.784Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790280021348,
       1790280032466,
       1790280044473,
       1790280056336,
       1790280067145,
       1790280079466,
-      1790283613698
+      1790283613698,
+      1790283624784
     ]
   },
   "flagLog": {},
