@@ -57625,13 +57625,63 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:141408556D2F": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB26-414 Pauleten",
+        "race": "Vy'keen",
+        "region": "The Arm of Esneyr",
+        "starClass": "Y7// Gas G",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "High Tech",
+        "sell": "71.6",
+        "buy": "-21.7",
+        "econDesc": "★★ (Developing)",
+        "conflict": "★★★ (Aggressive)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-24T14:00:31.596Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-24T14:00:31.596Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
       1790258409217,
-      1790258420492
+      1790258420492,
+      1790258431596
     ]
   },
   "flagLog": {},
