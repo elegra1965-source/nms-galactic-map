@@ -58409,6 +58409,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:11A508555D2F": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB27-1A5 Ashgar XIV",
+        "race": "Korvax",
+        "region": "Ewkini Adjunct",
+        "starClass": "G4p",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Experimental",
+        "sell": "59.5",
+        "buy": "-19.8",
+        "econDesc": "★★ (Medium Supply)",
+        "conflict": "★ (Gentle)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-24T17:00:53.045Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-24T17:00:53.045Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -58417,7 +58466,8 @@
       1790269208880,
       1790269220357,
       1790269231032,
-      1790269241912
+      1790269241912,
+      1790269253045
     ]
   },
   "flagLog": {},
