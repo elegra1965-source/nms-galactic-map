@@ -55518,6 +55518,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:102ECE58AC1E": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB24-2E Dioscoros V",
+        "race": "Korvax",
+        "region": "Edvario Cloud",
+        "starClass": "F9pf",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Advanced Materials",
+        "sell": "58.9",
+        "buy": "-12.8",
+        "econDesc": "★★★ (High Supply)",
+        "conflict": "★★★ (Critical)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-24T03:01:21.179Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-24T03:01:21.179Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -55528,7 +55577,8 @@
       1790218836890,
       1790218848126,
       1790218859122,
-      1790218870484
+      1790218870484,
+      1790218881179
     ]
   },
   "flagLog": {},
