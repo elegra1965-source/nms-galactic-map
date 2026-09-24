@@ -58899,18 +58899,61 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:13FECE588C1D": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB27-3FC Tointak-Eyua",
+        "race": "Gek",
+        "region": "Mompop Cloud",
+        "starClass": "X9p",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": true,
+        "giant": false,
+        "econName": "Manufacturing",
+        "sell": "78.0",
+        "buy": "-13.8",
+        "econDesc": "★★ (Sustainable)",
+        "conflict": "★★ (Boisterous)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-24T20:00:09.655Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-24T20:00:09.655Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790272813990,
-      1790272824834,
-      1790272836940,
-      1790272848197,
-      1790272859151,
-      1790272870861,
-      1790272882251
+      1790280009655
     ]
   },
   "flagLog": {},
