@@ -58654,18 +58654,67 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1027CE588C1D": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB27-27 Itysai-Lulr",
+        "race": "Gek",
+        "region": "Mompop Cloud",
+        "starClass": "G",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Mining",
+        "sell": "41.3",
+        "buy": "-16.7",
+        "econDesc": "Fourishing",
+        "conflict": "Stable",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-24T18:00:36.940Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-24T18:00:36.940Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790269231032,
       1790269241912,
       1790269253045,
       1790269264000,
       1790269275408,
       1790272813990,
-      1790272824834
+      1790272824834,
+      1790272836940
     ]
   },
   "flagLog": {},
