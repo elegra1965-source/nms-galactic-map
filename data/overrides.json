@@ -57478,6 +57478,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:103E08556D2F": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB26-3E Mariah",
+        "race": "Vy'keen",
+        "region": "The Arm of Esneyr",
+        "starClass": "G1p",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Power Generation",
+        "sell": "463.0",
+        "buy": "-103.0",
+        "econDesc": "2 star",
+        "conflict": "Trivial",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-24T12:01:21.234Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-24T12:01:21.234Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -57488,7 +57537,8 @@
       1790251236391,
       1790251247875,
       1790251259193,
-      1790251270401
+      1790251270401,
+      1790251281234
     ]
   },
   "flagLog": {},
