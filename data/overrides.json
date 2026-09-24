@@ -56939,17 +56939,66 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1167CE589C1D": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Hub26-167 Tachit-Lank",
+        "race": "Vy'keen",
+        "region": "Raidelsba Boundary",
+        "starClass": "G1p",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Scientific",
+        "sell": "45.3",
+        "buy": "-11.9",
+        "econDesc": "★ Unsuccessful",
+        "conflict": "2, Testy",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-24T10:00:31.372Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-24T10:00:31.372Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790240424910,
       1790240436439,
       1790240447467,
       1790240458562,
       1790244009400,
-      1790244020291
+      1790244020291,
+      1790244031372
     ]
   },
   "flagLog": {},
