@@ -59242,18 +59242,67 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1200CE588C1D": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB27-200 Yisolvfil",
+        "race": "Vy'keen",
+        "region": "Mompop Cloud",
+        "starClass": "F5p",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Mathematical",
+        "sell": "63.2",
+        "buy": "-11.6",
+        "econDesc": "★★ (Adequate)",
+        "conflict": "★ (Trivial)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-24T21:00:13.698Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-24T21:00:13.698Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790280009655,
       1790280021348,
       1790280032466,
       1790280044473,
       1790280056336,
       1790280067145,
-      1790280079466
+      1790280079466,
+      1790283613698
     ]
   },
   "flagLog": {},
