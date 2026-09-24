@@ -59487,6 +59487,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:10BCCE588C1D": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB27-BC Ekings-Itr",
+        "race": "Korvax",
+        "region": "Mompop Cloud",
+        "starClass": "F6",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Power Generation",
+        "sell": "65.0",
+        "buy": "-23.1",
+        "econDesc": "Unpromising",
+        "conflict": "Tranquil",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-24T22:00:43.675Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-24T22:00:43.675Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -59494,7 +59543,8 @@
     "5.133.46.24": [
       1790287209748,
       1790287221559,
-      1790287232998
+      1790287232998,
+      1790287243675
     ]
   },
   "flagLog": {},
