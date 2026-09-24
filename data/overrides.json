@@ -59144,6 +59144,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1067CE588C1D": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB27-67 Eistadl XVIII",
+        "race": "Vy'keen",
+        "region": "Mompop Cloud",
+        "starClass": "G",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "High Tech",
+        "sell": "58.9",
+        "buy": "-11.2",
+        "econDesc": "Adequate",
+        "conflict": "Formidable",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-24T20:01:07.145Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-24T20:01:07.145Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -59153,7 +59202,8 @@
       1790280021348,
       1790280032466,
       1790280044473,
-      1790280056336
+      1790280056336,
+      1790280067145
     ]
   },
   "flagLog": {},
