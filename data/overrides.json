@@ -56155,18 +56155,67 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:11D208557D2F": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB25-1D2 Amodros",
+        "race": "Korvax",
+        "region": "Zodonib Void",
+        "starClass": "F6f",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Mercantile",
+        "sell": "65.5",
+        "buy": "-20.9",
+        "econDesc": "★★★ (Affluent)",
+        "conflict": "nn (Descriptor)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-24T06:01:09.659Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-24T06:01:09.659Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790226065067,
       1790226075561,
       1790229614765,
       1790229625758,
       1790229637038,
       1790229648075,
-      1790229659163
+      1790229659163,
+      1790229669659
     ]
   },
   "flagLog": {},
