@@ -293,12 +293,21 @@ canvas#tstars{display:none;position:fixed;inset:0;pointer-events:none;z-index:1}
     linear-gradient(rgba(19,27,39,.92),rgba(19,27,39,.92)) padding-box,
     linear-gradient(90deg,var(--cyan),var(--border)) border-box;
 }
+/* 2026-09-24, Tony: gold-on-gold "on" buttons were hard to read (picture
+   of the live toolbar). Picked option E from the mockup: dark button, bold
+   italic gold text, and a small glowing gold "LED" dot on the left marking
+   the button as active. Primary actions (Jump) get the same dark fill and
+   bold gold text but no dot/italic -- they're actions, not on/off toggles. */
 .btn.beveled.on,.btn.beveled.primary{
-  color:var(--gold);text-shadow:0 0 7px rgba(240,165,0,.55);
+  color:#ffc233;font-weight:700;text-shadow:0 0 6px rgba(255,194,51,.45);
   background:
-    linear-gradient(rgba(240,165,0,.10),rgba(240,165,0,.10)) padding-box,
+    linear-gradient(rgba(13,19,28,.95),rgba(13,19,28,.95)) padding-box,
     linear-gradient(90deg,var(--gold),var(--border)) border-box;
 }
+.btn.beveled.on{font-style:italic;padding-left:22px}
+.btn.beveled.on::before{content:"";position:absolute;left:9px;top:50%;width:6px;height:6px;
+  margin-top:-3px;border-radius:50%;background:#ffc233;
+  box-shadow:0 0 5px #ffc233,0 0 10px rgba(255,194,51,.8)}
 input[type=text]{font-family:'Orbitron',monospace;font-size:11px;letter-spacing:.12em;
   background:#04070c;border:1px solid var(--border);color:var(--cyan);
   padding:6px 8px;border-radius:var(--r-sm);width:140px;text-transform:uppercase;outline:none}
@@ -1593,7 +1602,7 @@ nearby procedural space within a radius.">Search</button>
   <button class="btn beveled" id="cFly" style="animation-delay:-3s" title="Free flight: WASD or arrows to move, Shift to boost, Space/Q up, E down, drag to look. On touch, drag the left third as a thumbstick.">Camera</button>
   <div class="sep" id="sepE"></div>
   <button class="btn beveled" id="bInstall" title="Install this map as an app on your device." style="display:none;animation-delay:-3.5s">&#9672; Install app</button>
-  <button class="btn beveled" id="bTour" style="animation-delay:-4s" title="A quick guided tour of what this map can do.">&#9673; Tour</button>
+  <button class="btn beveled" id="bTour" style="animation-delay:-4s" title="A quick guided tour of what this map can do.">&#9655; Tour</button>
   <button class="btn beveled" id="bAbout" style="animation-delay:-4.5s" title="Fan-made disclaimer and a note on procedural vs. real system data.">&#9432; About</button>
   <button class="btn beveled" id="bAccess" style="animation-delay:-5s" title="Accessibility settings: font size, colour-blind filters, high contrast." aria-label="Accessibility settings" aria-haspopup="true" aria-expanded="false">&#9881;</button>
   </div>
