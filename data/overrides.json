@@ -56645,18 +56645,67 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1055CE589C1D": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB26-055 Nozenta-Nuda",
+        "race": "Korvax",
+        "region": "Raidelsba Boundary",
+        "starClass": "G6p",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Advanced Materials",
+        "sell": "64.5",
+        "buy": "-12.9",
+        "econDesc": "★★",
+        "conflict": "1, Untroubled",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-24T09:00:24.910Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-24T09:00:24.910Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790236820586,
       1790236832048,
       1790236843271,
       1790236855212,
       1790236867013,
       1790236877377,
-      1790240413952
+      1790240413952,
+      1790240424910
     ]
   },
   "flagLog": {},
