@@ -56106,18 +56106,67 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:11BA08557D2F": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB25-1BA Kuginin",
+        "race": "Korvax",
+        "region": "Zodonib Void",
+        "starClass": "E8",
+        "stars": [
+          "green"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Manufacturing",
+        "sell": "47.7",
+        "buy": "-12.8",
+        "econDesc": "★★ (Sustainable)",
+        "conflict": "3 (Critical)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-24T06:00:59.163Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-24T06:00:59.163Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790226053849,
       1790226065067,
       1790226075561,
       1790229614765,
       1790229625758,
       1790229637038,
-      1790229648075
+      1790229648075,
+      1790229659163
     ]
   },
   "flagLog": {},
