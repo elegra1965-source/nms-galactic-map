@@ -59536,6 +59536,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:10D308555D2F": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB27-D3 Doro",
+        "race": "Gek",
+        "region": "Ewkini Adjunct",
+        "starClass": "G3p // Wat",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Alchemical",
+        "sell": "53.9",
+        "buy": "-16.1",
+        "econDesc": "★★ (Satisfactory)",
+        "conflict": "★ (Stable)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-24T22:00:54.665Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-24T22:00:54.665Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -59544,7 +59593,8 @@
       1790287209748,
       1790287221559,
       1790287232998,
-      1790287243675
+      1790287243675,
+      1790287254665
     ]
   },
   "flagLog": {},
