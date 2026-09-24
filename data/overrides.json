@@ -58311,13 +58311,63 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "2:1147F9554C2E": {
+      "galaxy": 2,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB27-147 Asterope",
+        "race": "Vy'keen",
+        "region": "Kaperkel",
+        "starClass": "G7f",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Manufacturing",
+        "sell": "71.5",
+        "buy": "-12.0",
+        "econDesc": "★★ (Adequate)",
+        "conflict": "★★ (Testy)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-24T17:00:31.032Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-24T17:00:31.032Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
       1790269208880,
-      1790269220357
+      1790269220357,
+      1790269231032
     ]
   },
   "flagLog": {},
