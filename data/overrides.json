@@ -55763,6 +55763,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:10F8F8557C30": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB24-F8 Zomeda-Emecu I",
+        "race": "Korvax",
+        "region": "The Arm of Fupand",
+        "starClass": "G1f",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Scientific",
+        "sell": "75.4",
+        "buy": "-25.1",
+        "econDesc": "★★★ (Prosperous)",
+        "conflict": "★★★ ()",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-24T05:00:53.849Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-24T05:00:53.849Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -55771,7 +55820,8 @@
       1790226009798,
       1790226020935,
       1790226032167,
-      1790226043515
+      1790226043515,
+      1790226053849
     ]
   },
   "flagLog": {},
