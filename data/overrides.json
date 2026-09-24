@@ -55224,18 +55224,61 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:10DDCE58AC1F": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB23-DD Vitus",
+        "race": "Korvax",
+        "region": "The Arm of Minones",
+        "starClass": "F7p",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": true,
+        "giant": false,
+        "econName": "Advanced Materials",
+        "sell": "69.0",
+        "buy": "-27.5",
+        "econDesc": "★★ (Comfortable)",
+        "conflict": "★★ (Intermittent)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-24T03:00:14.400Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-24T03:00:14.400Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790211610247,
-      1790211621606,
-      1790211632739,
-      1790211644391,
-      1790211655221,
-      1790211666274,
-      1790211676938
+      1790218814400
     ]
   },
   "flagLog": {},
