@@ -55812,6 +55812,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "2:10FAF9557C2E": {
+      "galaxy": 2,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB24-FA Binose",
+        "race": "Vy'keen",
+        "region": "Qubeld Mass",
+        "starClass": "F4",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": true,
+        "giant": false,
+        "econName": "Research",
+        "sell": "56.5",
+        "buy": "-27.0",
+        "econDesc": "★★ (Balanced)",
+        "conflict": "★★★ (Dangerous)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-24T05:01:05.067Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-24T05:01:05.067Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -55821,7 +55870,8 @@
       1790226020935,
       1790226032167,
       1790226043515,
-      1790226053849
+      1790226053849,
+      1790226065067
     ]
   },
   "flagLog": {},
