@@ -57674,6 +57674,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:105F08555D2F": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB26-5F Hotane",
+        "race": "Korvax",
+        "region": "Ewkini Adjunct",
+        "starClass": "G3 // Wate",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Manufacturing",
+        "sell": "54.6",
+        "buy": "-11.1",
+        "econDesc": "★★ (Adequate)",
+        "conflict": "★★★ (Formidable)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-24T14:00:42.692Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-24T14:00:42.692Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -57681,7 +57730,8 @@
     "5.133.46.24": [
       1790258409217,
       1790258420492,
-      1790258431596
+      1790258431596,
+      1790258442692
     ]
   },
   "flagLog": {},
