@@ -55959,18 +55959,67 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:118808557D2F": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB25-188 Gochinoo",
+        "race": "Korvax",
+        "region": "Zodonib Void",
+        "starClass": "G7pf",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Power Generation",
+        "sell": "70.3",
+        "buy": "-19.6",
+        "econDesc": "★★★ (Booming)",
+        "conflict": "1 (Gentle)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-24T06:00:25.758Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-24T06:00:25.758Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790226020935,
       1790226032167,
       1790226043515,
       1790226053849,
       1790226065067,
       1790226075561,
-      1790229614765
+      1790229614765,
+      1790229625758
     ]
   },
   "flagLog": {},
