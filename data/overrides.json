@@ -57135,6 +57135,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:119D08556D2F": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB26-19D AD Udves",
+        "race": "Gek",
+        "region": "The Arm of Esneyr",
+        "starClass": "G7 // Wate",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Power Generation",
+        "sell": "68.9",
+        "buy": "-15.5",
+        "econDesc": "★★★ (Flourishing)",
+        "conflict": "★★★ (Alarming)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-24T10:01:16.233Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-24T10:01:16.233Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -57145,7 +57194,8 @@
       1790244031372,
       1790244042765,
       1790244054507,
-      1790244065128
+      1790244065128,
+      1790244076233
     ]
   },
   "flagLog": {},
