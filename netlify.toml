@@ -1,6 +1,20 @@
 [build]
   publish = "."
   functions = "netlify/functions"
+  # 2026-09-24: wiki-autofill.mjs (tools/wiki-autofill) submits real-data
+  # edits to data/overrides.json via the live system-edit endpoint, same as
+  # any traveller -- each one is its own GitHub commit, and up to
+  # SAFE_EDITS_PER_HOUR=7 land per hour while the backlog is being worked
+  # through. preview.html never reads overrides.json from the built
+  # bundle -- loadOverrides() fetches it live from the system-edit
+  # function, which reads GitHub's Contents API directly (see
+  # netlify/functions/lib/shared.mjs) -- so a full production deploy buys
+  # nothing when a commit ONLY touches that file, and was burning a full
+  # deploy's worth of credits per edit for no visible benefit. This skips
+  # the build for a commit range that touches nothing but
+  # data/overrides.json; any commit that also changes real code still
+  # builds normally.
+  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- . ':(exclude)data/overrides.json'"
 
 # Serve preview.html at the site root without renaming it to index.html.
 [[redirects]]
