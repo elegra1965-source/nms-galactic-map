@@ -57282,13 +57282,63 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:11BA08556D2F": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB26-1BA Lettere",
+        "race": "Vy'keen",
+        "region": "The Arm of Esneyr",
+        "starClass": "G2pf // Wa",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Power Generation",
+        "sell": "48.1",
+        "buy": "-17.6",
+        "econDesc": "★★★ (Booming)",
+        "conflict": "★★ (Fractious)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-24T12:00:36.391Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-24T12:00:36.391Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
       1790251214202,
-      1790251225049
+      1790251225049,
+      1790251236391
     ]
   },
   "flagLog": {},
