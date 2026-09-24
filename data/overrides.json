@@ -58850,18 +58850,67 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:13F308555D2F": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB27-3F3 AD Ribuyun",
+        "race": "Vy'keen",
+        "region": "Ewkini Adjunct",
+        "starClass": "X1pf//Diss",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": true,
+        "giant": false,
+        "econName": "Manufacturing",
+        "sell": "45.0",
+        "buy": "-21.3",
+        "econDesc": "★★ (Developing)",
+        "conflict": "★ (Relaxed)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-24T18:01:22.251Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-24T18:01:22.251Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790269275408,
       1790272813990,
       1790272824834,
       1790272836940,
       1790272848197,
       1790272859151,
-      1790272870861
+      1790272870861,
+      1790272882251
     ]
   },
   "flagLog": {},
