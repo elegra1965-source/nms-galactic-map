@@ -62917,6 +62917,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:102FF9557C31": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB5-2F Bifredi-Kuoka",
+        "race": "Gek",
+        "region": "Nugsdor Adjunct",
+        "starClass": "",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Construction",
+        "sell": "",
+        "buy": "",
+        "econDesc": "Flourishing",
+        "conflict": "3",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-25T17:01:24.342Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-25T17:01:24.342Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -62927,7 +62976,8 @@
       1790355640040,
       1790355651160,
       1790355662712,
-      1790355673333
+      1790355673333,
+      1790355684342
     ]
   },
   "flagLog": {},
