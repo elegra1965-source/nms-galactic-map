@@ -61594,18 +61594,61 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "2:13F8F9556C31": {
+      "galaxy": 2,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB4-3F5 Aotenub Sohlm",
+        "race": "Korvax",
+        "region": "The Arm of Taticale",
+        "starClass": "X4",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": true,
+        "giant": false,
+        "econName": "High Tech",
+        "sell": "59.6",
+        "buy": "-10.2",
+        "econDesc": "★★ (Adequate)",
+        "conflict": "★★ (Testy)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-25T11:00:17.999Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-25T11:00:17.999Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790326814713,
-      1790326825294,
-      1790326836069,
-      1790326846615,
-      1790326857427,
-      1790326877637,
-      1790326888403
+      1790334017999
     ]
   },
   "flagLog": {},
