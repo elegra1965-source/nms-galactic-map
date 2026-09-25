@@ -62525,6 +62525,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "2:100AFB556C30": {
+      "galaxy": 2,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB44-A Tashat",
+        "race": "Gek",
+        "region": "Niumfo Fringe",
+        "starClass": "G8pf",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Advanced Materials",
+        "sell": "75.4",
+        "buy": "-17.0",
+        "econDesc": "★ (Destitute)",
+        "conflict": "★★★ (Alarming)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-25T15:01:18.352Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-25T15:01:18.352Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -62534,7 +62583,8 @@
       1790348433846,
       1790348445308,
       1790348455993,
-      1790348467510
+      1790348467510,
+      1790348478352
     ]
   },
   "flagLog": {},
