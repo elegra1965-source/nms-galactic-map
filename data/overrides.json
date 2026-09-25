@@ -60222,6 +60222,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "2:1422FA556C2F": {
+      "galaxy": 2,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB34-422 Baro Notora",
+        "race": "Gek",
+        "region": "Sea of Ebbegg",
+        "starClass": "Y2p",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": true,
+        "giant": false,
+        "econName": "Scientific",
+        "sell": "51.9",
+        "buy": "-17.3",
+        "econDesc": "★★ Satisfactory",
+        "conflict": "★ Stable",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-25T03:00:57.459Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-25T03:00:57.459Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -60230,7 +60279,8 @@
       1790305214079,
       1790305224856,
       1790305235419,
-      1790305246664
+      1790305246664,
+      1790305257459
     ]
   },
   "flagLog": {},
