@@ -62868,6 +62868,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:114CF9557C31": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB5-14C Gostul-Enes",
+        "race": "Gek",
+        "region": "Sea of Zonyayp",
+        "starClass": "G0f",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Scientific",
+        "sell": "44.5",
+        "buy": "-23.6",
+        "econDesc": "★★ (Medium Supply)",
+        "conflict": "★★ (Fractious)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-25T17:01:13.333Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-25T17:01:13.333Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -62877,7 +62926,8 @@
       1790355628913,
       1790355640040,
       1790355651160,
-      1790355662712
+      1790355662712,
+      1790355673333
     ]
   },
   "flagLog": {},
