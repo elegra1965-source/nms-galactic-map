@@ -60467,13 +60467,63 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "2:104AF8556C31": {
+      "galaxy": 2,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB38-04A Titanus",
+        "race": "Korvax",
+        "region": "Unbice Shallows",
+        "starClass": "F5pf",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Trading",
+        "sell": "43.9",
+        "buy": "-21.3",
+        "econDesc": "★ (Declining)",
+        "conflict": "★★★ (Lawless)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-25T05:00:32.063Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-25T05:00:32.063Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
       1790312409561,
-      1790312420323
+      1790312420323,
+      1790312432063
     ]
   },
   "flagLog": {},
