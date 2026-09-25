@@ -59781,13 +59781,63 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:11DF09555D31": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB3-1DF Isshikin IX",
+        "race": "Gek",
+        "region": "Aakiang Quadrant",
+        "starClass": "E6pf",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Advanced Materials",
+        "sell": "66.4",
+        "buy": "-16.6",
+        "econDesc": "★★★ (Flourishing)",
+        "conflict": "1 (Stable)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-25T01:00:31.454Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-25T01:00:31.454Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
       1790298009444,
-      1790298020570
+      1790298020570,
+      1790298031454
     ]
   },
   "flagLog": {},
