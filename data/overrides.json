@@ -60810,18 +60810,67 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "2:112BF8556C31": {
+      "galaxy": 2,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB38-631 Breddar",
+        "race": "Korvax",
+        "region": "Unbice Shallows",
+        "starClass": "O1f",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Trading",
+        "sell": "71.0",
+        "buy": "-23.3",
+        "econDesc": "★★ (Promising)",
+        "conflict": "★★ (Sporadic)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-25T06:00:35.933Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-25T06:00:35.933Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790312432063,
       1790312443630,
       1790312454530,
       1790312465287,
       1790312476143,
       1790316014143,
-      1790316025161
+      1790316025161,
+      1790316035933
     ]
   },
   "flagLog": {},
