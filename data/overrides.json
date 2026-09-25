@@ -60663,6 +60663,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "2:1105F8556C31": {
+      "galaxy": 2,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB38-105 Togomere",
+        "race": "Gek",
+        "region": "Unbice Shallows",
+        "starClass": "O7",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Mathematical",
+        "sell": "42.2",
+        "buy": "-12.8",
+        "econDesc": "★★ (Sustainable)",
+        "conflict": "★★★ (Critical)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-25T05:01:16.143Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-25T05:01:16.143Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -60673,7 +60722,8 @@
       1790312432063,
       1790312443630,
       1790312454530,
-      1790312465287
+      1790312465287,
+      1790312476143
     ]
   },
   "flagLog": {},
