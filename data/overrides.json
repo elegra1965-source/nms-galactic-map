@@ -63260,6 +63260,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:104FF9557C31": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB5-4F Lux",
+        "race": "Gek",
+        "region": "Nugsdor Adjunct",
+        "starClass": "F3p",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Mass Production",
+        "sell": "54.0",
+        "buy": "-11.7",
+        "econDesc": "★★★ (Opulent)",
+        "conflict": "★★★ (Formidable)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-25T19:01:24.406Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-25T19:01:24.406Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -63270,7 +63319,8 @@
       1790362840364,
       1790362851820,
       1790362862896,
-      1790362873562
+      1790362873562,
+      1790362884406
     ]
   },
   "flagLog": {},
