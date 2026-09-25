@@ -59830,6 +59830,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "2:13E8F9555C31": {
+      "galaxy": 2,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB3-3E8 Lutala",
+        "race": "Gek",
+        "region": "Ilongl Cloud",
+        "starClass": "F1p",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Mercantile",
+        "sell": "",
+        "buy": "",
+        "econDesc": "★ (Fledgling)",
+        "conflict": "★ (Low)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-25T01:00:42.662Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-25T01:00:42.662Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -59837,7 +59886,8 @@
     "5.133.46.24": [
       1790298009444,
       1790298020570,
-      1790298031454
+      1790298031454,
+      1790298042662
     ]
   },
   "flagLog": {},
