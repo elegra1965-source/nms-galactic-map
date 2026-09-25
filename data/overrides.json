@@ -60124,13 +60124,63 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "2:1024FA556C2F": {
+      "galaxy": 2,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB34-024 Lechen",
+        "race": "Vy'keen",
+        "region": "Sea of Ebbegg",
+        "starClass": "F1p",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": true,
+        "giant": false,
+        "econName": "Metal Processing",
+        "sell": "46.4",
+        "buy": "-19.6",
+        "econDesc": "★★ (Medium Supply)",
+        "conflict": "★ (Gentle)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-25T03:00:35.419Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-25T03:00:35.419Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
       1790305214079,
-      1790305224856
+      1790305224856,
+      1790305235419
     ]
   },
   "flagLog": {},
