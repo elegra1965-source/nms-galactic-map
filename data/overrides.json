@@ -63407,13 +63407,63 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:10A8F9557C31": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB5-A8 Huniser",
+        "race": "Korvax",
+        "region": "Sea of Zonyayp",
+        "starClass": "G5f",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Nano-construction",
+        "sell": "79.3",
+        "buy": "-17.7",
+        "econDesc": "★★ (Medium Supply)",
+        "conflict": "★★ (Fractious)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-25T21:00:44.573Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-25T21:00:44.573Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
       1790370022908,
-      1790370033375
+      1790370033375,
+      1790370044573
     ]
   },
   "flagLog": {},
