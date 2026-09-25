@@ -59683,18 +59683,61 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:10F8CE588C1D": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB27-F8 Divalba-Unxu",
+        "race": "Gek",
+        "region": "Mompop Cloud",
+        "starClass": "G",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Mercantile",
+        "sell": "68.3",
+        "buy": "-29.0",
+        "econDesc": "Comfortable",
+        "conflict": "Peaceful",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-25T01:00:09.444Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-25T01:00:09.444Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790287209748,
-      1790287221559,
-      1790287232998,
-      1790287243675,
-      1790287254665,
-      1790287265525,
-      1790287276720
+      1790298009444
     ]
   },
   "flagLog": {},
