@@ -63505,6 +63505,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:10C0CF58AC1F": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB5-C0 Abandoned Dreams",
+        "race": "Vy'keen",
+        "region": "Jortan Spur",
+        "starClass": "O2p",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Abandoned",
+        "sell": "51.4",
+        "buy": "-22.5",
+        "econDesc": "",
+        "conflict": "",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-25T21:01:06.740Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-25T21:01:06.740Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -63513,7 +63562,8 @@
       1790370022908,
       1790370033375,
       1790370044573,
-      1790370055231
+      1790370055231,
+      1790370066740
     ]
   },
   "flagLog": {},
