@@ -60320,6 +60320,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "2:1191FA555C2F": {
+      "galaxy": 2,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB35-191 Camoscu",
+        "race": "Korvax",
+        "region": "Trzesi Cluster",
+        "starClass": "F6pf",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Manufacturing",
+        "sell": "63.6",
+        "buy": "-21.4",
+        "econDesc": "★★ (Developing)",
+        "conflict": "★ (Relaxed)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-25T03:01:19.063Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-25T03:01:19.063Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -60330,7 +60379,8 @@
       1790305235419,
       1790305246664,
       1790305257459,
-      1790305268223
+      1790305268223,
+      1790305279063
     ]
   },
   "flagLog": {},
