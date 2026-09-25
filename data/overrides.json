@@ -59977,6 +59977,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "2:10A9FA556C31": {
+      "galaxy": 2,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB30-A9 Saaninal",
+        "race": "Gek",
+        "region": "Cahuij",
+        "starClass": "G5f",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Mining",
+        "sell": "61.3",
+        "buy": "-21.0",
+        "econDesc": "★★ (Developing)",
+        "conflict": "★★ (Unstable)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-25T01:01:15.000Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-25T01:01:15.000Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -59987,7 +60036,8 @@
       1790298031454,
       1790298042662,
       1790298052837,
-      1790298064285
+      1790298064285,
+      1790298075000
     ]
   },
   "flagLog": {},
