@@ -62280,18 +62280,61 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:10B5CF589C1F": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB4-B5 Admiral&#39;s Reach",
+        "race": "Gek",
+        "region": "Nilinun Band",
+        "starClass": "M6",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Production",
+        "sell": "675.0",
+        "buy": "-122.0",
+        "econDesc": "2",
+        "conflict": "Aggressive",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-25T15:00:23.141Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-25T15:00:23.141Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790341218301,
-      1790341229486,
-      1790341240638,
-      1790341251760,
-      1790341262879,
-      1790341273774,
-      1790341284892
+      1790348423141
     ]
   },
   "flagLog": {},
