@@ -63946,6 +63946,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1411F9557C30": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB6-411 Beaker St",
+        "race": "Vy'keen",
+        "region": "Uefert Nebula",
+        "starClass": "X7",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": true,
+        "giant": false,
+        "econName": "Minerals",
+        "sell": "68.3",
+        "buy": "-20.7",
+        "econDesc": "★★ (Developing)",
+        "conflict": "★ (Relaxed)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-25T23:01:23.120Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-25T23:01:23.120Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -63956,7 +64005,8 @@
       1790377239206,
       1790377250376,
       1790377261389,
-      1790377272384
+      1790377272384,
+      1790377283120
     ]
   },
   "flagLog": {},
