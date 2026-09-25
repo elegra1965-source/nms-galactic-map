@@ -62672,12 +62672,62 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "2:11D4F7556C30": {
+      "galaxy": 2,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB45-1D4 Polistin",
+        "race": "Korvax",
+        "region": "Haliwar Band",
+        "starClass": "F5",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Mining",
+        "sell": "67.6",
+        "buy": "-28.8",
+        "econDesc": "★★ (Comfortable)",
+        "conflict": "★ (Peaceful)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-25T17:00:28.913Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-25T17:00:28.913Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790355617866
+      1790355617866,
+      1790355628913
     ]
   },
   "flagLog": {},
