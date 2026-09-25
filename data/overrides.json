@@ -60761,18 +60761,67 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "2:113BF8556C31": {
+      "galaxy": 2,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB38-13B Micharo",
+        "race": "Korvax",
+        "region": "Unbice Shallows",
+        "starClass": "F6",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Mass Production",
+        "sell": "70.7",
+        "buy": "-13.2",
+        "econDesc": "★★ (Sustainable)",
+        "conflict": "★ (Untroubled)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-25T06:00:25.161Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-25T06:00:25.161Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790312420323,
       1790312432063,
       1790312443630,
       1790312454530,
       1790312465287,
       1790312476143,
-      1790316014143
+      1790316014143,
+      1790316025161
     ]
   },
   "flagLog": {},
