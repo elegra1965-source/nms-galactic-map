@@ -60026,18 +60026,61 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "2:1187FA557C30": {
+      "galaxy": 2,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB32-187 Raistss-Buki",
+        "race": "Korvax",
+        "region": "Yehimbi",
+        "starClass": "G4f",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": true,
+        "giant": false,
+        "econName": "Engine",
+        "sell": "59.3",
+        "buy": "-13.2",
+        "econDesc": "★★ (Sustainable)",
+        "conflict": "★★ (Boisterous)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-25T03:00:14.079Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-25T03:00:14.079Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790298009444,
-      1790298020570,
-      1790298031454,
-      1790298042662,
-      1790298052837,
-      1790298064285,
-      1790298075000
+      1790305214079
     ]
   },
   "flagLog": {},
