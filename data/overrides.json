@@ -63652,18 +63652,61 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:10C9CF58AC1F": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB5-C9 Aysheking",
+        "race": "Gek",
+        "region": "Jortan Spur",
+        "starClass": "E7",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Mercantile",
+        "sell": "48.2",
+        "buy": "-15.7",
+        "econDesc": "★ (Destitute)",
+        "conflict": "★ (Stable)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-25T23:00:17.602Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-25T23:00:17.602Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790370022908,
-      1790370033375,
-      1790370044573,
-      1790370055231,
-      1790370066740,
-      1790370078228,
-      1790370089175
+      1790377217602
     ]
   },
   "flagLog": {},
