@@ -62084,6 +62084,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:106DF9556C31": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB4-6D - Mâkû",
+        "race": "Gek",
+        "region": "The Arm of Katteus",
+        "starClass": "",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Engineering",
+        "sell": "",
+        "buy": "",
+        "econDesc": "Unsuccessful",
+        "conflict": "2",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-25T13:00:51.760Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-25T13:00:51.760Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -62091,7 +62140,8 @@
     "5.133.46.24": [
       1790341218301,
       1790341229486,
-      1790341240638
+      1790341240638,
+      1790341251760
     ]
   },
   "flagLog": {},
