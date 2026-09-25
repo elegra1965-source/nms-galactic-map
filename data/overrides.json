@@ -62427,6 +62427,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "2:10A6F8557C2F": {
+      "galaxy": 2,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB41-A6 Mexoisa-Noga",
+        "race": "Vy'keen",
+        "region": "Ecimbar Quadrant",
+        "starClass": "F2pf",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Metal Processing",
+        "sell": "49.9",
+        "buy": "-17.2",
+        "econDesc": "★★ (Satisfactory)",
+        "conflict": "★★★ (Alarming)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-25T15:00:55.993Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-25T15:00:55.993Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -62434,7 +62483,8 @@
     "5.133.46.24": [
       1790348423141,
       1790348433846,
-      1790348445308
+      1790348445308,
+      1790348455993
     ]
   },
   "flagLog": {},
