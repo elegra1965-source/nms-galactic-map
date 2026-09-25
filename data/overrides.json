@@ -61006,16 +61006,65 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "2:10DBF8556C31": {
+      "galaxy": 2,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB38-DB Wilton",
+        "race": "Korvax",
+        "region": "Unbice Shallows",
+        "starClass": "F1pf",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": true,
+        "giant": false,
+        "econName": "High Tech",
+        "sell": "72.9",
+        "buy": "-22.7",
+        "econDesc": "★ (Unpromising)",
+        "conflict": "★ (Tranquil)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-25T07:00:30.603Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-25T07:00:30.603Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790316025161,
       1790316035933,
       1790316046707,
       1790319609532,
-      1790319619979
+      1790319619979,
+      1790319630603
     ]
   },
   "flagLog": {},
