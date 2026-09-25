@@ -60369,18 +60369,61 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "2:11C5F8555C30": {
+      "galaxy": 2,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB36-1C5 Pixel Kiss",
+        "race": "Korvax",
+        "region": "Egezesi",
+        "starClass": "F9f",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Manufacturing",
+        "sell": "76.3",
+        "buy": "-12.3",
+        "econDesc": "★★ (Adequate)",
+        "conflict": "★ (Trivial)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-25T05:00:09.561Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-25T05:00:09.561Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790305214079,
-      1790305224856,
-      1790305235419,
-      1790305246664,
-      1790305257459,
-      1790305268223,
-      1790305279063
+      1790312409561
     ]
   },
   "flagLog": {},
