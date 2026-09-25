@@ -63113,6 +63113,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1409CF58AC1F": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB5-409 Krytek&#39;s Daughters",
+        "race": "",
+        "region": "Jortan Spur",
+        "starClass": "Y7p",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "",
+        "sell": "71.1",
+        "buy": "-13.8",
+        "econDesc": "",
+        "conflict": "",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-25T19:00:51.820Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-25T19:00:51.820Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -63120,7 +63169,8 @@
     "5.133.46.24": [
       1790362818628,
       1790362829447,
-      1790362840364
+      1790362840364,
+      1790362851820
     ]
   },
   "flagLog": {},
