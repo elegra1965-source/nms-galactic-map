@@ -60173,6 +60173,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "2:1025FA556C2F": {
+      "galaxy": 2,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB34-025 Uvorons XIII",
+        "race": "Vy'keen",
+        "region": "Sea of Ebbegg",
+        "starClass": "F2gf",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Mercantile",
+        "sell": "50.0",
+        "buy": "-29.0",
+        "econDesc": "★★ (Comfortable)",
+        "conflict": "★ (Peaceful)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-25T03:00:46.664Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-25T03:00:46.664Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -60180,7 +60229,8 @@
     "5.133.46.24": [
       1790305214079,
       1790305224856,
-      1790305235419
+      1790305235419,
+      1790305246664
     ]
   },
   "flagLog": {},
