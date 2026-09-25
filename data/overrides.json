@@ -62231,6 +62231,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:10AFCF589C1F": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB4-AF Neushooorn",
+        "race": "Vy'keen",
+        "region": "Nilinun Band",
+        "starClass": "F9f",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": true,
+        "giant": false,
+        "econName": "Mining",
+        "sell": "78.2",
+        "buy": "-19.6",
+        "econDesc": "★★ (Medium Supply)",
+        "conflict": "★★★ (Perilous)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-25T13:01:24.892Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-25T13:01:24.892Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -62241,7 +62290,8 @@
       1790341240638,
       1790341251760,
       1790341262879,
-      1790341273774
+      1790341273774,
+      1790341284892
     ]
   },
   "flagLog": {},
