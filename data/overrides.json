@@ -60859,18 +60859,67 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "2:1098F8556C31": {
+      "galaxy": 2,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB38-98 Idpore-Nusogd",
+        "race": "Korvax",
+        "region": "Unbice Shallows",
+        "starClass": "F9pf",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Commercial",
+        "sell": "54.9",
+        "buy": "-11.2",
+        "econDesc": "★★★ (Opulent)",
+        "conflict": "★ (Trivial)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-25T06:00:46.707Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-25T06:00:46.707Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790312443630,
       1790312454530,
       1790312465287,
       1790312476143,
       1790316014143,
       1790316025161,
-      1790316035933
+      1790316035933,
+      1790316046707
     ]
   },
   "flagLog": {},
