@@ -62966,18 +62966,61 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:102F09557D31": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB5-2F Yorozawa",
+        "race": "Korvax",
+        "region": "Xejtolew Adjunct",
+        "starClass": "G2p",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": true,
+        "giant": false,
+        "econName": "Alchemical",
+        "sell": "",
+        "buy": "",
+        "econDesc": "★★★ (Affluent)",
+        "conflict": "2 (Unstable)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-25T19:00:18.628Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-25T19:00:18.628Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790355617866,
-      1790355628913,
-      1790355640040,
-      1790355651160,
-      1790355662712,
-      1790355673333,
-      1790355684342
+      1790362818628
     ]
   },
   "flagLog": {},
