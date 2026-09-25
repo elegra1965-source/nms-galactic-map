@@ -63211,6 +63211,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:104EF9557C31": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB5-4E Davier-Elsk",
+        "race": "Vy'keen",
+        "region": "Nugsdor Adjunct",
+        "starClass": "F8pf",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Industrial",
+        "sell": "66.0",
+        "buy": "-22.8",
+        "econDesc": "Promising",
+        "conflict": "1",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-25T19:01:13.562Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-25T19:01:13.562Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -63220,7 +63269,8 @@
       1790362829447,
       1790362840364,
       1790362851820,
-      1790362862896
+      1790362862896,
+      1790362873562
     ]
   },
   "flagLog": {},
