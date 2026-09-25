@@ -60614,6 +60614,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "2:1100F8556C31": {
+      "galaxy": 2,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB38-100 Cukfast",
+        "race": "Vy'keen",
+        "region": "Unbice Shallows",
+        "starClass": "F1",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Energy Supply",
+        "sell": "74.3",
+        "buy": "-23.6",
+        "econDesc": "★★★ (Advanced)",
+        "conflict": "★ (Tranquil)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-25T05:01:05.287Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-25T05:01:05.287Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -60623,7 +60672,8 @@
       1790312420323,
       1790312432063,
       1790312443630,
-      1790312454530
+      1790312454530,
+      1790312465287
     ]
   },
   "flagLog": {},
