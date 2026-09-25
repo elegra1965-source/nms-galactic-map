@@ -62182,6 +62182,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "2:10A6F9556C31": {
+      "galaxy": 2,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB4-A6 Eonpow-Aiba",
+        "race": "Gek",
+        "region": "The Arm of Taticale",
+        "starClass": "O1f",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Industrial",
+        "sell": "56.0",
+        "buy": "-24.2",
+        "econDesc": "Black Market",
+        "conflict": "Pirate Controlled",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-25T13:01:13.774Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-25T13:01:13.774Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -62191,7 +62240,8 @@
       1790341229486,
       1790341240638,
       1790341251760,
-      1790341262879
+      1790341262879,
+      1790341273774
     ]
   },
   "flagLog": {},
