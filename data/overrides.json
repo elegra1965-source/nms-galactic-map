@@ -67033,6 +67033,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:107A09555D2F": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB9-7A Vaykels XI",
+        "race": "Korvax",
+        "region": "Irtlin Expanse",
+        "starClass": "F2f",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": true,
+        "giant": false,
+        "econName": "Research",
+        "sell": "48.4",
+        "buy": "-21.7",
+        "econDesc": "Declining",
+        "conflict": "Relaxed",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-26T17:01:21.931Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-26T17:01:21.931Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -67043,7 +67092,8 @@
       1790442039976,
       1790442050411,
       1790442060865,
-      1790442071444
+      1790442071444,
+      1790442081931
     ]
   },
   "flagLog": {},
