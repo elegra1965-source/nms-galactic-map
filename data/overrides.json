@@ -66690,6 +66690,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1033F9555C2F": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB9-33 Necrotism",
+        "race": "Gek",
+        "region": "Sivess Instability",
+        "starClass": "F4p",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Energy Supply / Promising",
+        "sell": "56.8",
+        "buy": "-24.5",
+        "econDesc": "Promising",
+        "conflict": "At War",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-26T15:01:27.507Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-26T15:01:27.507Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -66700,7 +66749,8 @@
       1790434844229,
       1790434855005,
       1790434865762,
-      1790434877018
+      1790434877018,
+      1790434887507
     ]
   },
   "flagLog": {},
