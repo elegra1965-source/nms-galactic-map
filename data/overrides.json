@@ -65416,12 +65416,62 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "2:1056F9556C2F": {
+      "galaxy": 2,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB8-56 Kharion Expanse",
+        "race": "Vy'keen",
+        "region": "Imrikians Terminus",
+        "starClass": "G1pf",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Mining",
+        "sell": "47.8",
+        "buy": "22.4",
+        "econDesc": "Declining",
+        "conflict": "Relaxed",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-26T09:00:33.534Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-26T09:00:33.534Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790413222708
+      1790413222708,
+      1790413233534
     ]
   },
   "flagLog": {},
