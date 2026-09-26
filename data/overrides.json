@@ -67376,6 +67376,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:10CDF9555C2F": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB9-CD",
+        "race": "Vy'keen",
+        "region": "Sivess Instability",
+        "starClass": "F0",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Shipping",
+        "sell": "75.2",
+        "buy": "-18.3",
+        "econDesc": "★★ (Medium Supply)",
+        "conflict": "★★★ (Perilous)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-26T19:01:21.734Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-26T19:01:21.734Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -67386,7 +67435,8 @@
       1790449239071,
       1790449249917,
       1790449260534,
-      1790449271112
+      1790449271112,
+      1790449281734
     ]
   },
   "flagLog": {},
