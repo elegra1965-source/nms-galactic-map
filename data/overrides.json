@@ -66935,6 +66935,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1060F9555C2F": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB9-60 Lomonto-Kumin IX",
+        "race": "Korvax",
+        "region": "Sivess Instability",
+        "starClass": "F2p",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Engineering",
+        "sell": "57.9",
+        "buy": "-14.1",
+        "econDesc": "★★ (Sustainable)",
+        "conflict": "★★★ (Critical)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-26T17:01:00.865Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-26T17:01:00.865Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -66943,7 +66992,8 @@
       1790442018926,
       1790442029481,
       1790442039976,
-      1790442050411
+      1790442050411,
+      1790442060865
     ]
   },
   "flagLog": {},
