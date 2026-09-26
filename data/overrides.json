@@ -65269,6 +65269,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1022F9556C2F": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB8-22 Aikawana",
+        "race": "Gek",
+        "region": "Airnaka Conflux",
+        "starClass": "F5",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Power Generation",
+        "sell": "48.2",
+        "buy": "-29.5",
+        "econDesc": "Struggling",
+        "conflict": "3",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-26T07:01:11.207Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-26T07:01:11.207Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -65278,7 +65327,8 @@
       1790406028250,
       1790406039164,
       1790406049843,
-      1790406060666
+      1790406060666,
+      1790406071207
     ]
   },
   "flagLog": {},
