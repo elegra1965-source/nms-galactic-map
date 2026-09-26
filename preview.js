@@ -4145,6 +4145,7 @@ document.getElementById("favResults").addEventListener("click",function(e){
 
 /* ============ system view ============ */
 var bodyMeshes=[], pivots=[], starMeshes=[], coronas=[], featureMeshes=[], resourceMeshes=[];
+var stationSpinSpr=null; // default station icon, spun in animate() (2026-09-26)
 function buildStar(s,i,pos){
   var col=s.starColors[i%s.starColors.length];
   /* 2026-09-17, Tony (real-device screenshot): the star was still reading
@@ -4900,6 +4901,7 @@ function buildSystemView(s){
   }
   bodyMeshes=[]; pivots=[]; starMeshes=[]; coronas=[]; featureMeshes=[]; resourceMeshes=[];
   hideResourceReport();
+  stationSpinSpr=null;
   /* place clear of the outermost planet's orbit ring -- lastOrbitR mirrors
      the exact orbitR formula used below (8 + planetIdx*3.7) so this can't
      drift back inside the rings as generated bodies change; +12 is a hard
@@ -4939,7 +4941,7 @@ function buildSystemView(s){
      confirmed mockup design rather than showing an empty centre until a
      traveller uploads one. */
   if(s.hasStation && s.stationPhoto) systemGroup.add(buildStationCard(s,new THREE.Vector3(0,0,0)));
-  else systemGroup.add(buildDefaultStationIcon(s));
+  else systemGroup.add(stationSpinSpr=buildDefaultStationIcon(s));
   /* Two-pass build (2026-09-01, Tony's Nogsangh report): every planet is
      built first (pass 1, unchanged geometry/material logic from before),
      recording each one's own moonAnchor/size/running-moon-count keyed by
@@ -11774,9 +11776,15 @@ function animate(){
     if(galIconFrame%3===0) drawGalIcon();
     if(mode==="system"){
       for(var i=0;i<pivots.length;i++){
-        pivots[i].p.rotation.y+=pivots[i].sp*0.01;
+        /* 2026-09-26, Tony (in-game check): planets don't orbit the station
+           and moons don't orbit their planets on the real system map --
+           the layout is fixed and only moves when the player rotates the
+           view. Orbital advance (pivots[i].p) removed; each body keeps
+           only its own axial spin. */
         pivots[i].mesh.rotation.y+=pivots[i].spin*0.01;
       }
+      // Station stays put at centre but turns on its own axis, as in-game.
+      if(stationSpinSpr) stationSpinSpr.material.rotation+=0.004;
       for(i=0;i<coronas.length;i++) coronas[i].quaternion.copy(camera.quaternion);
     }
     marker.lookAt(camera.position);
