@@ -66886,6 +66886,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:141DF9555C2F": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB9-41D Rilinic XV",
+        "race": "Vy'keen",
+        "region": "Sivess Instability",
+        "starClass": "X8p",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": true,
+        "giant": false,
+        "econName": "Ore Extraction",
+        "sell": "73.1",
+        "buy": "-15.6",
+        "econDesc": "★★★ (Flourishing)",
+        "conflict": "★ (Stable)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-26T17:00:50.411Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-26T17:00:50.411Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -66893,7 +66942,8 @@
     "5.133.46.24": [
       1790442018926,
       1790442029481,
-      1790442039976
+      1790442039976,
+      1790442050411
     ]
   },
   "flagLog": {},
