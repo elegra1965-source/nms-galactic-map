@@ -6526,7 +6526,13 @@ function setMode(m){
      1 to 10 planets, then fit a line through the results: dist tracks
      featureR almost exactly linearly (R²-clean, not just close), so one
      linear formula covers every system size instead of a fixed guess. */
-  if(m==="system"){ cam.dist=selected?(systemFeatureR(selected)*1.27+7.34):65; cam.phi=0.8; flyPos.set(0,34,50); }
+  /* 2026-09-26, Tony (Hedutong XV vs in-game Rylosky reference): entry
+     framing was too small/top-down. His preferred view's Telemetry read
+     camera (-3.77,19.19,31.30) on a 3-planet system -> dist 36.9 (0.876x
+     the fitted formula's 42.1), phi 1.02, theta -0.12. Formula scaled by
+     that ratio so every system size gets the same framing; phi/theta now
+     reset on every System entry. */
+  if(m==="system"){ cam.dist=selected?(systemFeatureR(selected)*1.27+7.34)*0.876:57; cam.phi=1.02; cam.theta=-0.12; flyPos.set(0,34,50); }
   aimFly(cam.target);
   applyCam();
 }
