@@ -66004,6 +66004,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:113C09555D2F": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB9-13C Famisad",
+        "race": "Gek",
+        "region": "Irtlin Expanse",
+        "starClass": "B4p",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Mining",
+        "sell": "58.9",
+        "buy": "-29.4",
+        "econDesc": "💀 (Black Market)",
+        "conflict": "💀 (Pirate Controlled)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-26T11:01:21.137Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-26T11:01:21.137Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -66014,7 +66063,8 @@
       1790420439134,
       1790420449269,
       1790420459511,
-      1790420470404
+      1790420470404,
+      1790420481137
     ]
   },
   "flagLog": {},
