@@ -64877,6 +64877,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:11C5F9557C2F": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB7-1C5 Madrigal XI",
+        "race": "Korvax",
+        "region": "Umaton Instability",
+        "starClass": "G4f",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Alchemical",
+        "sell": "46.6",
+        "buy": "-24.1",
+        "econDesc": "★ (Unpromising)",
+        "conflict": "★★★ (At War)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-26T05:01:00.830Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-26T05:01:00.830Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -64885,7 +64934,8 @@
       1790398818075,
       1790398828616,
       1790398839128,
-      1790398850188
+      1790398850188,
+      1790398860830
     ]
   },
   "flagLog": {},
