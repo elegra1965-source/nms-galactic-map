@@ -66347,6 +66347,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:117CF9555C2F": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB9-17C Izkimov-Tokoh",
+        "race": "Korvax",
+        "region": "Sivess Instability",
+        "starClass": "F5p",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Mining",
+        "sell": "71.0",
+        "buy": "-24.4",
+        "econDesc": "★ (Unpromising)",
+        "conflict": "★★★ (At War)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-26T13:01:21.876Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-26T13:01:21.876Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -66357,7 +66406,8 @@
       1790427639161,
       1790427649743,
       1790427660047,
-      1790427671354
+      1790427671354,
+      1790427681876
     ]
   },
   "flagLog": {},
