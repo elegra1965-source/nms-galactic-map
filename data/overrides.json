@@ -67915,6 +67915,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:1008FA555C31": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Ihamur-Hyany",
+        "race": "Gek",
+        "region": "Iptrevs Fringe",
+        "starClass": "G0p",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Manufacturing",
+        "sell": "80.0",
+        "buy": "-25.9",
+        "econDesc": "★ (Fledgling)",
+        "conflict": "★ (Low)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-26T23:00:50.288Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-26T23:00:50.288Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -67922,7 +67971,8 @@
     "5.133.46.24": [
       1790463618244,
       1790463628845,
-      1790463640034
+      1790463640034,
+      1790463650288
     ]
   },
   "flagLog": {},
