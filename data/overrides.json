@@ -65612,6 +65612,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:10A2F9556C2F": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB8-A2 Nozents",
+        "race": "Vy'keen",
+        "region": "Airnaka Conflux",
+        "starClass": "F0pf",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Alchemical",
+        "sell": "66.2",
+        "buy": "-20.4",
+        "econDesc": "★★ (Developing)",
+        "conflict": "★★ (Unstable)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-26T09:01:17.823Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-26T09:01:17.823Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -65621,7 +65670,8 @@
       1790413233534,
       1790413244692,
       1790413256652,
-      1790413267212
+      1790413267212,
+      1790413277823
     ]
   },
   "flagLog": {},
