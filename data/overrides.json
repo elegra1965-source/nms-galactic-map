@@ -66396,18 +66396,61 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:11B8F9555C2F": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB9-1B8 Ontoru-Naya",
+        "race": "Korvax",
+        "region": "Sivess Instability",
+        "starClass": "F1",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Fuel Generation",
+        "sell": "50.3",
+        "buy": "-15.1",
+        "econDesc": "★★ (Satisfactory)",
+        "conflict": "★ (Stable)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-26T15:00:22.928Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-26T15:00:22.928Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790427618229,
-      1790427628704,
-      1790427639161,
-      1790427649743,
-      1790427660047,
-      1790427671354,
-      1790427681876
+      1790434822928
     ]
   },
   "flagLog": {},
