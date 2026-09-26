@@ -65318,6 +65318,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "2:122FF9556C2F": {
+      "galaxy": 2,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB8-22F Kadoma-Bov III",
+        "race": "Vy'keen",
+        "region": "Imrikians Terminus",
+        "starClass": "B3pf",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": true,
+        "giant": false,
+        "econName": "High Tech",
+        "sell": "54.3",
+        "buy": "-10.6",
+        "econDesc": "★★★ (Advanced)",
+        "conflict": "★ (Trivial)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-26T07:01:21.507Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-26T07:01:21.507Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -65328,7 +65377,8 @@
       1790406039164,
       1790406049843,
       1790406060666,
-      1790406071207
+      1790406071207,
+      1790406081507
     ]
   },
   "flagLog": {},
