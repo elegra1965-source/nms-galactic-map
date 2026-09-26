@@ -64142,6 +64142,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "2:1082F9557C30": {
+      "galaxy": 2,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB6-82 Edogya VIII",
+        "race": "Korvax",
+        "region": "Wakestones Expanse",
+        "starClass": "F3f",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Power Generation",
+        "sell": "55.2",
+        "buy": "-17.2",
+        "econDesc": "★ (Destitute)",
+        "conflict": "★ (Stable)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-26T01:00:50.066Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-26T01:00:50.066Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -64149,7 +64198,8 @@
     "5.133.46.24": [
       1790384418347,
       1790384428870,
-      1790384439275
+      1790384439275,
+      1790384450066
     ]
   },
   "flagLog": {},
