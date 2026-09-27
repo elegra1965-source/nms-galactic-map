@@ -68111,18 +68111,61 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "2:110EF8556C30": {
+      "galaxy": 2,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Inxokai VII",
+        "race": "Korvax",
+        "region": "Lossians Boundary",
+        "starClass": "F6f",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Scientific",
+        "sell": "69.9",
+        "buy": "-22.6",
+        "econDesc": "Promising",
+        "conflict": "1",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-27T01:00:18.338Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-27T01:00:18.338Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790463618244,
-      1790463628845,
-      1790463640034,
-      1790463650288,
-      1790463661196,
-      1790463671624,
-      1790463681905
+      1790470818338
     ]
   },
   "flagLog": {},
