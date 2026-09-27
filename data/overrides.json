@@ -70559,6 +70559,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:11D5FA557C30": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Ohtark",
+        "race": "Gek",
+        "region": "Rezhensk",
+        "starClass": "G2",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Mass Production",
+        "sell": "49.2",
+        "buy": "-14.6",
+        "econDesc": "★★★ (High Supply)",
+        "conflict": "★★★ (Formidable)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-27T12:01:05.639Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-27T12:01:05.639Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -70567,7 +70616,8 @@
       1790510422254,
       1790510432876,
       1790510443623,
-      1790510454964
+      1790510454964,
+      1790510465639
     ]
   },
   "flagLog": {},
