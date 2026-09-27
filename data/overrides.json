@@ -71543,6 +71543,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:1157FA556C30": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Tawaguc XIX",
+        "race": "Gek",
+        "region": "Yatrifex",
+        "starClass": "G5p",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Prospecting",
+        "sell": "57.9",
+        "buy": "-10.3",
+        "econDesc": "★★★ (Opulent)",
+        "conflict": "★★ (Testy)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-27T18:01:14.817Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-27T18:01:14.817Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -71551,7 +71600,8 @@
       1790532031801,
       1790532042449,
       1790532053006,
-      1790532064126
+      1790532064126,
+      1790532074817
     ]
   },
   "flagLog": {},
