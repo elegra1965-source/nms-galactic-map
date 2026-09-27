@@ -70906,6 +70906,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:11C109555D2F": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Rasjuna-Noj",
+        "race": "Gek",
+        "region": "Irtlin Expanse",
+        "starClass": "G8",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Power Generation",
+        "sell": "75.0",
+        "buy": "20.7",
+        "econDesc": "★",
+        "conflict": "1",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-27T14:01:13.668Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-27T14:01:13.668Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -70915,7 +70964,8 @@
       1790517630381,
       1790517641130,
       1790517651755,
-      1790517662751
+      1790517662751,
+      1790517673668
     ]
   },
   "flagLog": {},
