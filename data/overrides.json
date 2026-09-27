@@ -68601,6 +68601,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:10DDF9555C30": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Jukuchu-Dega",
+        "race": "Gek",
+        "region": "Canthian",
+        "starClass": "",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Material Fusion",
+        "sell": "",
+        "buy": "",
+        "econDesc": "Fledgling",
+        "conflict": "2",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-27T03:00:55.092Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-27T03:00:55.092Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -68608,7 +68657,8 @@
     "5.133.46.24": [
       1790478022927,
       1790478033537,
-      1790478044537
+      1790478044537,
+      1790478055092
     ]
   },
   "flagLog": {},
