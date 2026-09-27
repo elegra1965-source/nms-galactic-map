@@ -70857,6 +70857,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:114DF9555C30": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Rakizu-Leydo",
+        "race": "",
+        "region": "Canthian",
+        "starClass": "M4f",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Data Unavailable",
+        "sell": "58.0",
+        "buy": "-20.1",
+        "econDesc": "",
+        "conflict": "Data Unavailable",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-27T14:01:02.751Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-27T14:01:02.751Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -70865,7 +70914,8 @@
       1790517618159,
       1790517630381,
       1790517641130,
-      1790517651755
+      1790517651755,
+      1790517662751
     ]
   },
   "flagLog": {},
