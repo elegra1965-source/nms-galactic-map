@@ -72327,6 +72327,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1044F9556C31": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Wugarze-Ikeda",
+        "race": "Vy'keen",
+        "region": "The Arm of Katteus",
+        "starClass": "",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Prospecting",
+        "sell": "",
+        "buy": "",
+        "econDesc": "Unsuccessful",
+        "conflict": "3",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-27T22:01:31.214Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-27T22:01:31.214Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -72337,7 +72386,8 @@
       1790546448205,
       1790546458919,
       1790546469839,
-      1790546480756
+      1790546480756,
+      1790546491214
     ]
   },
   "flagLog": {},
