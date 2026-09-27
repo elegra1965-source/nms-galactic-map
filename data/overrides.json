@@ -68650,6 +68650,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1050F9556C2F": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Kagawa-Gafenn",
+        "race": "Vy'keen",
+        "region": "Airnaka Conflux",
+        "starClass": "F0p",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Mercantile",
+        "sell": "44.8",
+        "buy": "-25.2",
+        "econDesc": "★ (Fledgling)",
+        "conflict": "★★★ (Dangerous)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-27T03:01:05.376Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-27T03:01:05.376Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -68658,7 +68707,8 @@
       1790478022927,
       1790478033537,
       1790478044537,
-      1790478055092
+      1790478055092,
+      1790478065376
     ]
   },
   "flagLog": {},
