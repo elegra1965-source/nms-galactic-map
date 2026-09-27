@@ -69140,18 +69140,67 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:11C4FA555C31": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Kiharazu",
+        "race": "Korvax",
+        "region": "Iptrevs Fringe",
+        "starClass": "E6",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Prospecting",
+        "sell": "68.4",
+        "buy": "-10.4",
+        "econDesc": "★★ (Adequate)",
+        "conflict": "★★★ (Formidable)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-27T06:00:22.979Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-27T06:00:22.979Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790485209346,
       1790485228597,
       1790485239014,
       1790485249540,
       1790485259866,
       1790485270272,
-      1790485280592
+      1790485280592,
+      1790488822979
     ]
   },
   "flagLog": {},
