@@ -70955,6 +70955,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:1052F9557C2F": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Reyrir HT/W",
+        "race": "Korvax",
+        "region": "Umaton Instability",
+        "starClass": "G6pf",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "High Tech",
+        "sell": "72.1",
+        "buy": "-28.6",
+        "econDesc": "★★★ (Wealthy)",
+        "conflict": "★★★ (High)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-27T14:01:24.393Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-27T14:01:24.393Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -70965,7 +71014,8 @@
       1790517641130,
       1790517651755,
       1790517662751,
-      1790517673668
+      1790517673668,
+      1790517684393
     ]
   },
   "flagLog": {},
