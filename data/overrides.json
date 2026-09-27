@@ -71690,18 +71690,61 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:1004FA555C31": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Tobama",
+        "race": "Korvax",
+        "region": "Iptrevs Fringe",
+        "starClass": "G5p",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": true,
+        "giant": false,
+        "econName": "High Tech",
+        "sell": "52.8",
+        "buy": "-29.4",
+        "econDesc": "★★★ (Wealthy)",
+        "conflict": "★ (Peaceful)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-27T20:00:27.348Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-27T20:00:27.348Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790532031801,
-      1790532042449,
-      1790532053006,
-      1790532064126,
-      1790532074817,
-      1790532085342,
-      1790532095682
+      1790539227348
     ]
   },
   "flagLog": {},
