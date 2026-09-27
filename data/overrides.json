@@ -71886,6 +71886,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:109AF8556C30": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Udeale-Kihya",
+        "race": "Gek",
+        "region": "Qangew Expanse",
+        "starClass": "G2pf",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Ore Processing",
+        "sell": "46.0",
+        "buy": "-14.4",
+        "econDesc": "★★ (Sustainable)",
+        "conflict": "★★★ (Critical)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-27T20:01:10.212Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-27T20:01:10.212Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -71894,7 +71943,8 @@
       1790539227348,
       1790539238448,
       1790539248930,
-      1790539259548
+      1790539259548,
+      1790539270212
     ]
   },
   "flagLog": {},
