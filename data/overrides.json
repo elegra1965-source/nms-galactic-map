@@ -69336,18 +69336,67 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1010FA556C30": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Maurice Lapointe",
+        "race": "Korvax",
+        "region": "Savenix Instability",
+        "starClass": "F6pf",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Mercantile",
+        "sell": "75.0",
+        "buy": "-12.2",
+        "econDesc": "Adequate",
+        "conflict": "Trivial",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-27T06:01:06.825Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-27T06:01:06.825Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790485259866,
       1790485270272,
       1790485280592,
       1790488822979,
       1790488834595,
       1790488845953,
-      1790488856421
+      1790488856421,
+      1790488866825
     ]
   },
   "flagLog": {},
