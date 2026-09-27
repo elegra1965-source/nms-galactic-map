@@ -35545,7 +35545,7 @@
         "stars": [
           "yellow"
         ],
-        "water": false,
+        "water": true,
         "dissonant": true,
         "giant": false,
         "econName": "Shipping",
@@ -35559,7 +35559,7 @@
         "outlaw": false,
         "abandoned": false,
         "phantom": "",
-        "notes": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
         "colliding": false,
         "collidingSet": [],
         "screenshot": "",
@@ -35568,7 +35568,7 @@
         "allianceName": "",
         "stationPhoto": "",
         "signals": [],
-        "editorName": "",
+        "editorName": "Galactic Hub Wiki (import)",
         "editorFriendCode": "",
         "genVersion": "1.3.0",
         "bodies": [
@@ -35718,11 +35718,15 @@
           }
         ]
       },
-      "editedAt": "2026-09-14T01:17:22.949Z",
-      "editedByIp": "172.59.176.207",
+      "editedAt": "2026-09-27T14:00:41.130Z",
+      "editedByIp": "5.133.46.24",
       "history": [
         {
           "at": "2026-09-14T01:17:22.949Z",
+          "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-09-27T14:00:41.130Z",
           "text": "edited by a traveller"
         }
       ]
@@ -70810,7 +70814,8 @@
   "ipLog": {
     "5.133.46.24": [
       1790517618159,
-      1790517630381
+      1790517630381,
+      1790517641130
     ]
   },
   "flagLog": {},
