@@ -71004,18 +71004,61 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1032F9556C2F": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Rigusu-Vivik",
+        "race": "Korvax",
+        "region": "Airnaka Conflux",
+        "starClass": "",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Mining",
+        "sell": "73.0",
+        "buy": "-28.1",
+        "econDesc": "Struggling",
+        "conflict": "Intermittent",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-27T16:00:18.618Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-27T16:00:18.618Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790517618159,
-      1790517630381,
-      1790517641130,
-      1790517651755,
-      1790517662751,
-      1790517673668,
-      1790517684393
+      1790524818618
     ]
   },
   "flagLog": {},
