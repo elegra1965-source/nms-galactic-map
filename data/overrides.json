@@ -70020,21 +70020,61 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1170F9555C2F": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Nashochist V",
+        "race": "",
+        "region": "Sivess Instability",
+        "starClass": "M6p",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Data Unavailable",
+        "sell": "50.8",
+        "buy": "-17.5",
+        "econDesc": "",
+        "conflict": "Data Unavailable",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-27T10:00:18.081Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-27T10:00:18.081Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790496017644,
-      1790496028072,
-      1790496038265,
-      1790496048589,
-      1790496059184,
-      1790496069532,
-      1790496079869
-    ],
-    "190.20.138.53": [
-      1790496698414
+      1790503218081
     ]
   },
   "flagLog": {},
