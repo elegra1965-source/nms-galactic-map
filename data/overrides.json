@@ -70167,6 +70167,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:11A3F9555C30": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Noganei-Touc",
+        "race": "Korvax",
+        "region": "Canthian",
+        "starClass": "E7f",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Data Unavailable",
+        "sell": "45.7",
+        "buy": "-25.1",
+        "econDesc": "",
+        "conflict": "Data Unavailable",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-27T10:00:50.471Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-27T10:00:50.471Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -70174,7 +70223,8 @@
     "5.133.46.24": [
       1790503218081,
       1790503228557,
-      1790503239736
+      1790503239736,
+      1790503250471
     ]
   },
   "flagLog": {},
