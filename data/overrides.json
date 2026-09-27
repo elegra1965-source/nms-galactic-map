@@ -72229,6 +72229,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:1114FA555C31": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Wakabe V",
+        "race": "Gek",
+        "region": "Iptrevs Fringe",
+        "starClass": "E6f",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Technology",
+        "sell": "56.3",
+        "buy": "-22.6",
+        "econDesc": "★ (Unpromising)",
+        "conflict": "★★★ (At War)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-27T22:01:09.839Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-27T22:01:09.839Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -72237,7 +72286,8 @@
       1790546426475,
       1790546437124,
       1790546448205,
-      1790546458919
+      1790546458919,
+      1790546469839
     ]
   },
   "flagLog": {},
