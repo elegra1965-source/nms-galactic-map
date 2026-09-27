@@ -68797,18 +68797,61 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:101B0A555D2F": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB18-1B Nobeokal",
+        "race": "Gek",
+        "region": "Uevion Band",
+        "starClass": "G8",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Advanced Materials",
+        "sell": "75.6",
+        "buy": "-17.5",
+        "econDesc": "★★★ (Booming)",
+        "conflict": "2 (Fractious)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-27T05:00:09.346Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-27T05:00:09.346Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790478022927,
-      1790478033537,
-      1790478044537,
-      1790478055092,
-      1790478065376,
-      1790478075891,
-      1790478086336
+      1790485209346
     ]
   },
   "flagLog": {},
