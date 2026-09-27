@@ -72033,18 +72033,61 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "2:1419FA557C2F": {
+      "galaxy": 2,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Unzents-Laer",
+        "race": "",
+        "region": "Tesinio Expanse",
+        "starClass": "Y9",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": true,
+        "giant": false,
+        "econName": "Data Unavailable",
+        "sell": "77.9",
+        "buy": "-14.4",
+        "econDesc": "",
+        "conflict": "Data Unavailable",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-27T22:00:26.475Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-27T22:00:26.475Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790539227348,
-      1790539238448,
-      1790539248930,
-      1790539259548,
-      1790539270212,
-      1790539280678,
-      1790539291541
+      1790546426475
     ]
   },
   "flagLog": {},
