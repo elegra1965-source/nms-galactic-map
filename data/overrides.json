@@ -71494,6 +71494,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1143F9555C30": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Suchibet",
+        "race": "Gek",
+        "region": "Canthian",
+        "starClass": "F5p",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Ore Processing",
+        "sell": "44.1",
+        "buy": "-13.1",
+        "econDesc": "Sustainable",
+        "conflict": "2",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-27T18:01:04.126Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-27T18:01:04.126Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -71501,7 +71550,8 @@
     "5.133.46.24": [
       1790532031801,
       1790532042449,
-      1790532053006
+      1790532053006,
+      1790532064126
     ]
   },
   "flagLog": {},
