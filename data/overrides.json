@@ -73302,16 +73302,61 @@
           "text": "Imported from a traveller's real save file (base name/address/discovery data)"
         }
       ]
+    },
+    "0:11FFCF58AC1E": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB6-1FF Mikopid-Urpa",
+        "race": "Vy'keen",
+        "region": "Tujmareg",
+        "starClass": "F6f",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Mining",
+        "sell": "67.2",
+        "buy": "-13.2",
+        "econDesc": "★ (Low Supply)",
+        "conflict": "★★ (Boisterous)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-28T18:00:19.329Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-28T18:00:19.329Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790560837540,
-      1790560848265,
-      1790560859030,
-      1790560869997,
-      1790560882534
+      1790618419329
     ]
   },
   "flagLog": {},
