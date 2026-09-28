@@ -72572,6 +72572,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1172F9555C30": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Yatott",
+        "race": "Gek",
+        "region": "Canthian",
+        "starClass": "F5f",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Metal Processing",
+        "sell": "58.1",
+        "buy": "-15.0",
+        "econDesc": "Black Market",
+        "conflict": "Pirate Controlled",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-28T00:01:14.427Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-28T00:01:14.427Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -72580,7 +72629,8 @@
       1790553631383,
       1790553642027,
       1790553652685,
-      1790553663570
+      1790553663570,
+      1790553674427
     ]
   },
   "flagLog": {},
