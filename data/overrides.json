@@ -72719,18 +72719,61 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1147F9555C30": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Yugaras VII",
+        "race": "Korvax",
+        "region": "Canthian",
+        "starClass": "F6p",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Material Fusion",
+        "sell": "54.9",
+        "buy": "-29.4",
+        "econDesc": "Black Market",
+        "conflict": "Pirate Controlled",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-28T02:00:37.540Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-28T02:00:37.540Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790553631383,
-      1790553642027,
-      1790553652685,
-      1790553663570,
-      1790553674427,
-      1790553685246,
-      1790553695981
+      1790560837540
     ]
   },
   "flagLog": {},
