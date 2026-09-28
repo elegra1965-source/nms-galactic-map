@@ -72523,6 +72523,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1157FA556C30": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Yatoma-Sosak",
+        "race": "Uninhabited",
+        "region": "Savenix Instability",
+        "starClass": "E6",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "None (Uncharted)",
+        "sell": "",
+        "buy": "",
+        "econDesc": "",
+        "conflict": "None (Uncharted)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-28T00:01:03.570Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-28T00:01:03.570Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -72530,7 +72579,8 @@
     "5.133.46.24": [
       1790553631383,
       1790553642027,
-      1790553652685
+      1790553652685,
+      1790553663570
     ]
   },
   "flagLog": {},
