@@ -72915,6 +72915,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1148F9555C30": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Zunokune",
+        "race": "Vy'keen",
+        "region": "Canthian",
+        "starClass": "F7f",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Scientific",
+        "sell": "53.3",
+        "buy": "-21.9",
+        "econDesc": "Declining",
+        "conflict": "1",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-28T02:01:22.534Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-28T02:01:22.534Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -72923,7 +72972,8 @@
       1790560837540,
       1790560848265,
       1790560859030,
-      1790560869997
+      1790560869997,
+      1790560882534
     ]
   },
   "flagLog": {},
