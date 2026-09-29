@@ -7759,27 +7759,50 @@ var ECON_TIER_LB=["Poor","Average","Good"];
    instead of floating over the whole viewport. The input's own .value IS
    the saved field (same as the old select's .value) so every downstream
    read (openEditModal, validateEdit, the save payload) needed zero changes. */
-function buildIconCombo(inputId,listId,groups,blankLabel,allowCustom){
+function buildIconCombo(inputId,listId,groups,blankLabel,allowCustom,onPick){
   var inp=document.getElementById(inputId), list=document.getElementById(listId);
-  var items=[], i, j;
-  if(blankLabel) items.push({label:"",display:blankLabel,groupLabel:null,iconHtml:svg(IC_UNINHAB)});
-  for(i=0;i<groups.length;i++){
-    var g=groups[i];
-    for(j=0;j<g.items.length;j++){
-      // Item can be a plain string (existing Economy/Conflict/Sentinel
-      // combos -- label and display are the same, exactly as before) or an
-      // {v,d} object (added 2026-09-06 for the Biome combo's sub-name
-      // support below): v is what actually gets stored/submitted, d is
-      // what's shown/searched in the list. Lets a traveller find and pick
-      // "Airless" while the field still saves "Dead" -- see
-      // biomeComboGroups() and BIOME_SUBNAMES above for why.
-      var raw=g.items[j];
-      var val=(raw&&typeof raw==="object")?raw.v:raw;
-      var disp=(raw&&typeof raw==="object")?raw.d:raw;
-      items.push({label:val,display:disp,groupLabel:g.label,iconHtml:g.iconHtml});
+  if(!inp||!list) return;
+  function makeItems(grps){
+    var out=[], i, j;
+    if(blankLabel) out.push({label:"",display:blankLabel,groupLabel:null,iconHtml:svg(IC_UNINHAB)});
+    for(i=0;i<grps.length;i++){
+      var g=grps[i];
+      for(j=0;j<g.items.length;j++){
+        // Item can be a plain string (Economy/Conflict/Sentinel -- label and
+        // display are the same) or an {v,d} object (Biome sub-names): v is
+        // what's stored in THIS field, d is what's shown/searched.
+        var raw=g.items[j];
+        var val=(raw&&typeof raw==="object")?raw.v:raw;
+        var disp=(raw&&typeof raw==="object")?raw.d:raw;
+        out.push({label:val,display:disp,groupLabel:g.label,iconHtml:g.iconHtml});
+      }
     }
+    return out;
   }
+  var items=makeItems(groups);
+  /* Fix 2026-09-29: rebuildBiomeDependentCombos() re-calls this on the SAME
+     Sub type / Conditions inputs every time Biome changes -- the old version
+     stacked a fresh set of focus/input/keydown/blur/mousedown listeners on
+     each call, so after a few Biome changes one keypress/click ran several
+     stale handlers (old item lists, old lastCommitted) at once. Now the
+     listeners are attached once; a rebuild just swaps the item list. */
+  if(inp._icomboSetItems){ inp._icomboSetItems(items,onPick); return; }
   var lastCommitted=inp.value||"";
+  // Case-insensitive exact match on what's shown, then on the stored value.
+  // Fix 2026-09-29: typing "frequent" or "forsaken" (wrong case) used to
+  // miss the real option and either snap back or save odd-cased text.
+  function findMatch(text){
+    var q=String(text||"").trim().toLowerCase(), k;
+    for(k=0;k<items.length;k++) if(items[k].display.toLowerCase()===q) return items[k];
+    for(k=0;k<items.length;k++) if(String(items[k].label).toLowerCase()===q) return items[k];
+    return null;
+  }
+  function pickItem(it){
+    inp.value=it.label; lastCommitted=inp.value;
+    list.classList.remove("show");
+    inp.dispatchEvent(new Event("change",{bubbles:true}));
+    if(onPick) onPick(it);
+  }
   function render(filterText){
     var q=(filterText||"").trim().toLowerCase(), html="", lastGrp, shown=0, k, it;
     for(k=0;k<items.length;k++){
@@ -7789,7 +7812,7 @@ function buildIconCombo(inputId,listId,groups,blankLabel,allowCustom){
         if(it.groupLabel) html+='<div class="icomboGrp">'+escAttr(it.groupLabel)+'</div>';
         lastGrp=it.groupLabel;
       }
-      html+='<div class="icomboOpt" data-val="'+escAttr(it.label)+'">'+it.iconHtml+
+      html+='<div class="icomboOpt" data-k="'+k+'" data-val="'+escAttr(it.label)+'">'+it.iconHtml+
         '<span>'+escAttr(it.display)+'</span></div>';
       shown++;
     }
@@ -7800,14 +7823,26 @@ function buildIconCombo(inputId,listId,groups,blankLabel,allowCustom){
     }
     list.innerHTML=html;
   }
+  inp._icomboSetItems=function(newItems,newOnPick){
+    items=newItems; onPick=newOnPick;
+    if(list.classList.contains("show")) render(inp.value);
+  };
   inp.addEventListener("focus",function(){ lastCommitted=inp.value; render(""); list.classList.add("show"); });
   inp.addEventListener("input",function(){ render(inp.value); list.classList.add("show"); });
   inp.addEventListener("keydown",function(e){
     if(e.key==="Escape"){ list.classList.remove("show"); inp.blur(); }
     else if(e.key==="Enter"){
-      var first=list.querySelector(".icomboOpt");
-      if(first){ inp.value=first.getAttribute("data-val"); lastCommitted=inp.value; list.classList.remove("show"); e.preventDefault();
-        inp.dispatchEvent(new Event("change",{bubbles:true})); }
+      /* Fix 2026-09-29: Enter used to always grab the FIRST suggestion, so a
+         brand-new type that merely contained some existing word got swapped
+         for that word. Now: an exact match wins; otherwise the first
+         suggestion is only auto-picked when it's the ONLY one (or the field
+         doesn't allow new values); otherwise a new value is kept as typed. */
+      var exact=findMatch(inp.value);
+      var opts=list.querySelectorAll(".icomboOpt");
+      if(exact){ pickItem(exact); e.preventDefault(); }
+      else if(opts.length && (opts.length===1 || !allowCustom)){
+        pickItem(items[+opts[0].getAttribute("data-k")]); e.preventDefault();
+      }
       else if(allowCustom && inp.value.trim()){
         inp.value=inp.value.trim(); lastCommitted=inp.value; list.classList.remove("show"); e.preventDefault();
         inp.dispatchEvent(new Event("change",{bubbles:true}));
@@ -7817,40 +7852,26 @@ function buildIconCombo(inputId,listId,groups,blankLabel,allowCustom){
   list.addEventListener("mousedown",function(e){
     var row=e.target.closest?e.target.closest(".icomboOpt"):null;
     if(!row) return;
-    inp.value=row.getAttribute("data-val"); lastCommitted=inp.value;
-    list.classList.remove("show");
-    inp.dispatchEvent(new Event("change",{bubbles:true}));
+    var it=items[+row.getAttribute("data-k")];
+    if(it) pickItem(it);
   });
-  /* commitNow() is the same "does the typed text exactly match a real
-     option?" check the blur handler below runs, pulled into its own
-     function and attached to the input itself (inp._icomboCommit) so it
-     can ALSO be run synchronously on demand -- see flushAllCombos().
-     Real bug this fixes (Tony, 2026-08-17): typing a value straight into
-     the box (not clicking a suggestion from the list) then immediately
-     clicking Save blurs this input -- but blur's own commit used to be
-     deliberately delayed 120ms (to let a mousedown list-selection's own
-     value land first), so Save's click handler ran and read the OLD
-     editBodies value before that 120ms timeout ever fired. The typed text
-     was visibly sitting in the box, looked saved, but silently never made
-     it into the payload -- exactly Tony's "put in Frequent, saved, came
-     back as None" report, and only for typed (not clicked) values, which
-     is why it looked intermittent rather than always-broken. */
+  /* commitNow(): run on blur (after a short delay so a list click lands
+     first) and synchronously by flushAllCombos() at the top of Save -- see
+     that function for the 2026-08-17 typed-then-Save race it fixes. */
   function commitNow(){
     var v=inp.value.trim();
-    var valid = v==="" ? !!blankLabel : (allowCustom ? true : items.some(function(it2){ return it2.label===v; }));
-    inp.value = valid ? inp.value : lastCommitted;
-    if(valid){ lastCommitted=inp.value; inp.dispatchEvent(new Event("change",{bubbles:true})); }
+    if(v===""){
+      if(blankLabel){ lastCommitted=""; inp.value=""; inp.dispatchEvent(new Event("change",{bubbles:true})); }
+      else inp.value=lastCommitted;
+      return;
+    }
+    var m=findMatch(v);
+    if(m){ inp.value=m.label; lastCommitted=inp.value; inp.dispatchEvent(new Event("change",{bubbles:true})); if(onPick) onPick(m); return; }
+    if(allowCustom){ inp.value=v; lastCommitted=v; inp.dispatchEvent(new Event("change",{bubbles:true})); return; }
+    inp.value=lastCommitted; // fixed word list + typo: snap back
   }
   inp._icomboCommit=commitNow;
   inp.addEventListener("blur",function(){
-    /* Deliberate typo guard: since typed text now goes straight into the
-       real saved field, a partial/misspelled entry left uncommitted (no
-       click, no Enter) would otherwise submit garbage to a field the site
-       and filter.mjs both treat as a fixed word list -- so on blur, only
-       keep the typed text if it exactly matches a real option (or is blank
-       and blank is allowed), otherwise snap back to whatever was valid
-       before this focus. setTimeout lets a mousedown selection above land
-       first (mousedown fires before this blur). */
     setTimeout(function(){ commitNow(); list.classList.remove("show"); },120);
   });
 }
@@ -8010,7 +8031,8 @@ buildEconConflictSelects();
 // name itself plus every sub-name -- shares that group's {v:k} value, so
 // picking any of them stores and submits the same canonical key; the
 // input box settling on the canonical name after a sub-name is picked is
-// intentional (matches what's actually saved), not a bug.
+// intentional -- since 2026-09-29 the picked sub-name also fills Category
+// type (see biomeSubPick()), so it's no longer thrown away.
 // Mega Exotic's Red/Green/Blue name pools are colour-locked in the real
 // game (2026-09-08 research) -- this returns the union of whichever pools
 // apply to the star colour(s) currently selected in the Edit System form
@@ -8160,6 +8182,20 @@ function conditionsComboGroups(biomeKey){
 // commitNow() only accepts a blank field on blur when blankLabel is truthy,
 // so an empty string here would have silently snapped back to whatever was
 // last saved instead of actually clearing.
+/* Fix 2026-09-29 (Tony: picked "Forsaken" under Biome, box went back to
+   "Dead" and Forsaken was lost). Picking a biome SUB-NAME (e.g. Forsaken,
+   listed under Dead) still stores the real biome ("Dead") in Biome --
+   that's what drives textures, rings, filters and resource lists -- but
+   now also fills Category type with the exact word picked, so nothing the
+   traveller chose is thrown away. Info panel shows it as "Dead (Forsaken)". */
+function biomeSubPick(i){
+  return function(it){
+    if(!it || it.display===it.label || !it.label) return;
+    var st=document.getElementById("bfSubtype-"+i);
+    if(editBodies[i]) editBodies[i].subtype=it.display;
+    if(st){ st.value=it.display; st.dispatchEvent(new Event("change",{bubbles:true})); }
+  };
+}
 function rebuildBiomeDependentCombos(i){
   var biomeVal=(editBodies[i]&&editBodies[i].biome)||"";
   buildIconCombo("bfSubtype-"+i,"bfSubtypeList-"+i,subtypeComboGroups(biomeVal),"Unknown",true);
@@ -8381,7 +8417,7 @@ function renderBodyEditList(){
     // field genuinely start/stay empty (a valid, keepable state, not just
     // something commitNow() snaps back out of on blur) rather than always
     // needing SOME biome picked. See editBodies' own default biome:"" below.
-    buildIconCombo("bfBiome-"+i,"bfBiomeList-"+i,biomeComboGroups(),"Unknown",true);
+    buildIconCombo("bfBiome-"+i,"bfBiomeList-"+i,biomeComboGroups(),"Unknown",true,biomeSubPick(i));
     buildIconCombo("bfSentinel-"+i,"bfSentinelList-"+i,sentinelComboGroups());
     // Sub type/Conditions (2026-09-08) -- both filtered to this body's
     // CURRENT Biome value; rebuildBiomeDependentCombos() re-runs these same
