@@ -73449,12 +73449,61 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "2:13FAF8557C30": {
+      "galaxy": 2,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB40-3FA Elisbor II",
+        "race": "",
+        "region": "Esburybur",
+        "starClass": "Y9pf",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": true,
+        "giant": false,
+        "econName": "Mining",
+        "sell": "78.1",
+        "buy": "-27.2",
+        "econDesc": "★★ Balanced",
+        "conflict": "2 Medium",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-09-29T21:00:17.869Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-09-29T21:00:17.869Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1790708414176
+      1790715617869
     ]
   },
   "flagLog": {},
