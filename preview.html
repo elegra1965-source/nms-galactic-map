@@ -85,7 +85,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="format-detection" content="telephone=no">
 <meta name="apple-mobile-web-app-title" content="Galactic Map">
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Julius+Sans+One&family=Roboto:wght@400&display=swap" rel="stylesheet">
 <style>
 :root{
   --gold:#f0a500; --gold-dim:#a06800; --cyan:#00e5ff; --cyan-dim:#0096a8;
@@ -874,13 +874,21 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 /* 2026-09-24: restyled to match the in-game Cosmos system map title
    ("THE RYLOSKY SYSTEM") -- emblem above, wide-tracked white title, no box. */
 #sysBanner .sbIcon{width:30px;height:30px;filter:drop-shadow(0 0 6px rgba(231,166,74,.55))}
-#sysBanner .sbTitle{font-family:'Rajdhani',sans-serif;font-weight:500;color:#f4f6f8;
-  font-size:22px;letter-spacing:.2em;text-transform:uppercase;line-height:1.15;white-space:nowrap;
+/* 2026-09-30: fonts matched to the in-game map -- Julius Sans One (thin
+   geometric, close to NMS's own title face) + Roboto for the subtitle; the
+   in-game crossbar-less "A" is drawn as an inline SVG chevron (.sbLam). */
+#sysBanner .sbTitle{font-family:'Julius Sans One','Rajdhani',sans-serif;font-weight:400;color:#f4f6f8;
+  -webkit-text-stroke:.5px #f4f6f8;
+  font-size:24px;letter-spacing:.16em;text-transform:uppercase;line-height:1.15;white-space:nowrap;
   text-shadow:0 0 10px rgba(255,255,255,.35),0 0 3px rgba(0,0,0,.9),0 1px 2px #000}
-#sysBanner .sbRule{width:min(560px,80vw);height:1px;margin-top:2px;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,.75),transparent)}
-#sysBanner .sbSub{font-family:'Rajdhani',sans-serif;font-weight:500;color:#e6ecf0;font-size:15px;
-  letter-spacing:.04em;white-space:nowrap;text-shadow:0 0 3px rgba(0,0,0,.9),0 1px 2px #000}
+#sysBanner .sbLam{display:inline-block;height:.74em;width:.62em;vertical-align:baseline;overflow:visible}
+/* beam of light rather than a hairline: bright 3px core + soft blurred halo */
+#sysBanner .sbRule{position:relative;width:min(600px,82vw);height:3px;margin-top:3px;border-radius:2px;
+  background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,.55) 18%,#fff 50%,rgba(255,255,255,.55) 82%,transparent 100%)}
+#sysBanner .sbRule::after{content:"";position:absolute;left:4%;right:4%;top:-4px;height:11px;border-radius:50%;
+  background:radial-gradient(ellipse at center,rgba(255,255,255,.45),rgba(210,240,255,.12) 55%,transparent 72%);filter:blur(3px)}
+#sysBanner .sbSub{font-family:'Roboto','Rajdhani',sans-serif;font-weight:400;color:#eef2f4;font-size:16px;
+  letter-spacing:.02em;white-space:nowrap;text-shadow:0 0 3px rgba(0,0,0,.9),0 1px 2px #000}
 @media(max-width:900px){#sysBanner .sbSub{font-size:12px;white-space:normal}}
 @media(max-width:900px){#sysBanner .sbIcon{width:24px;height:24px}
   #sysBanner .sbTitle{font-size:15px;letter-spacing:.14em;white-space:normal;width:88vw}}

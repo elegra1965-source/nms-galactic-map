@@ -11619,13 +11619,13 @@ function setSysBanner(s){
   if(!/\ssystem$/i.test(title)) title+=" System";
   var c=(s.starColors&&s.starColors.length)?s.starColors[0]:0xffd27a;
   var hex="#"+("000000"+Number(c).toString(16)).slice(-6);
-  var esc=title.replace(/[&<>"]/g,function(ch){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch];});
+  var esc=title.toUpperCase().replace(/[&<>"]/g,function(ch){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch];});
   el.innerHTML='<svg class="sbIcon" viewBox="0 0 32 32" aria-hidden="true">'+
     '<circle cx="16" cy="16" r="13" fill="rgba(20,14,6,.55)" stroke="#e7a64a" stroke-width="2.2"/>'+
     '<circle cx="16" cy="16" r="9" fill="none" stroke="#f3d9a8" stroke-width="1" opacity=".7"/>'+
     '<path d="M16 8.5v15M8.5 16h15M11 11l10 10M21 11L11 21" stroke="'+hex+'" stroke-width="1.3" stroke-linecap="round" opacity=".9"/>'+
     '<circle cx="16" cy="16" r="3.6" fill="#fff"/><circle cx="16" cy="16" r="3.6" fill="'+hex+'" opacity=".55"/>'+
-    '</svg><div class="sbTitle">'+esc+'</div><div class="sbRule"></div>'+
+    '</svg><div class="sbTitle" aria-label="'+esc+'">'+esc.replace(/&[A-Z]+;|A/g,function(m){ return m!=="A"?m.toLowerCase():"\u0001"; }).replace(/\u0001/g,'<svg class="sbLam" viewBox="0 0 10 12" preserveAspectRatio="none" aria-hidden="true"><path d="M.8 12 5 .6 9.2 12" fill="none" stroke="currentColor" stroke-width="1.15"/></svg>')+'</div><div class="sbRule"></div>'+
     '<div class="sbSub">'+sysLocLine(s).replace(/[&<>"]/g,function(ch){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch];})+'</div>';
 }
 function positionSysBanner(){
