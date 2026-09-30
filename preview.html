@@ -877,6 +877,11 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 #sysBanner .sbTitle{font-family:'Rajdhani',sans-serif;font-weight:500;color:#f4f6f8;
   font-size:22px;letter-spacing:.2em;text-transform:uppercase;line-height:1.15;white-space:nowrap;
   text-shadow:0 0 10px rgba(255,255,255,.35),0 0 3px rgba(0,0,0,.9),0 1px 2px #000}
+#sysBanner .sbRule{width:min(560px,80vw);height:1px;margin-top:2px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.75),transparent)}
+#sysBanner .sbSub{font-family:'Rajdhani',sans-serif;font-weight:500;color:#e6ecf0;font-size:15px;
+  letter-spacing:.04em;white-space:nowrap;text-shadow:0 0 3px rgba(0,0,0,.9),0 1px 2px #000}
+@media(max-width:900px){#sysBanner .sbSub{font-size:12px;white-space:normal}}
 @media(max-width:900px){#sysBanner .sbIcon{width:24px;height:24px}
   #sysBanner .sbTitle{font-size:15px;letter-spacing:.14em;white-space:normal;width:88vw}}
 /* Tony (2026-08-17): the conBadge() pill reused for the hover popup's
@@ -2156,6 +2161,7 @@ nearby procedural space within a radius.">Search</button>
     <div class="edhead" id="edHead">
       <div>
         <h3>Edit system</h3>
+        <div id="edLocLine" style="font-family:'Rajdhani',sans-serif;font-size:13px;letter-spacing:.06em;color:var(--gold,#e7a64a);margin:2px 0 6px"></div>
         <div class="msub">Enter your real in-game data. This replaces the generated placeholder for everyone who visits this address, including you if you reload -- there's no undo button on the site itself, but every save is a git commit elegra1965 can revert on GitHub.</div>
       </div>
       <button class="btn" id="bEditMin" type="button" title="Collapse or expand this form.">&#9662;</button>

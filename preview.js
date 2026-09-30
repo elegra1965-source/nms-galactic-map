@@ -7794,6 +7794,10 @@ function buildIconCombo(inputId,listId,groups,blankLabel,allowCustom,onPick){
   function findMatch(text){
     var q=String(text||"").trim().toLowerCase(), k;
     for(k=0;k<items.length;k++) if(items[k].display.toLowerCase()===q) return items[k];
+    // In-game the scanner reads e.g. "Forsaken Planet" / "Frozen Moon" --
+    // a traveller copying that verbatim should still land on "Forsaken".
+    var q2=q.replace(/\s+(planet|moon|world)$/,"");
+    if(q2!==q) for(k=0;k<items.length;k++) if(items[k].display.toLowerCase()===q2) return items[k];
     for(k=0;k<items.length;k++) if(String(items[k].label).toLowerCase()===q) return items[k];
     return null;
   }
@@ -8813,6 +8817,8 @@ function openEditModal(){
   if(!selected) return;
   var s=selected;
   groupEditSections();
+  var locEl=document.getElementById("edLocLine");
+  if(locEl) locEl.textContent=sysLocLine(s);
   // Shows what's already saved for this address BEFORE the form below
   // pre-fills over it with the same values, so a visitor about to overwrite
   // real community data (not just a procedural placeholder) sees that
@@ -11597,6 +11603,14 @@ function syncTopOffset(){
    a wide-tracked white title, no box). Emblem core is tinted with the
    system's primary star colour, since the star mesh itself is no longer
    drawn in System view. */
+/* "Euclid Galaxy :: 713,247 LY from galactic core" -- same line the in-game
+   system map shows under the system title (Tony, 2026-09-30). */
+function sysLocLine(s){
+  var g=(s&&typeof s.galaxy==="number")?s.galaxy:GALAXY;
+  var gn=GALAXIES[g]||("Galaxy #"+(g+1));
+  var ly=(s&&typeof s.vx==="number")?coreLY(s.vx,s.vy,s.vz):0;
+  return gn+" Galaxy :: "+ly.toLocaleString("en-GB")+" LY from galactic core";
+}
 function setSysBanner(s){
   var el=document.getElementById("sysBanner");
   if(!el||!s) return;
@@ -11611,7 +11625,8 @@ function setSysBanner(s){
     '<circle cx="16" cy="16" r="9" fill="none" stroke="#f3d9a8" stroke-width="1" opacity=".7"/>'+
     '<path d="M16 8.5v15M8.5 16h15M11 11l10 10M21 11L11 21" stroke="'+hex+'" stroke-width="1.3" stroke-linecap="round" opacity=".9"/>'+
     '<circle cx="16" cy="16" r="3.6" fill="#fff"/><circle cx="16" cy="16" r="3.6" fill="'+hex+'" opacity=".55"/>'+
-    '</svg><div class="sbTitle">'+esc+'</div>';
+    '</svg><div class="sbTitle">'+esc+'</div><div class="sbRule"></div>'+
+    '<div class="sbSub">'+sysLocLine(s).replace(/[&<>"]/g,function(ch){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch];})+'</div>';
 }
 function positionSysBanner(){
   var topEl=document.getElementById("top"), el=document.getElementById("sysBanner");
@@ -11826,7 +11841,7 @@ function animate(){
         pivots[i].mesh.rotation.y+=pivots[i].spin*0.01;
       }
       // Station stays put at centre but turns on its own axis, as in-game.
-      if(stationSpinSpr) stationSpinSpr.material.rotation+=0.004;
+      if(stationSpinSpr) stationSpinSpr.material.rotation+=0.002; // halved 2026-09-30 (Tony)
       for(i=0;i<coronas.length;i++) coronas[i].quaternion.copy(camera.quaternion);
     }
     marker.lookAt(camera.position);
