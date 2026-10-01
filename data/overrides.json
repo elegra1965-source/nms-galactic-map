@@ -73596,14 +73596,190 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1145FFBB4590": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Gal-Lax",
+        "race": "Korvax",
+        "region": "Olluscap Fringe",
+        "starClass": "F3",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Mercantile",
+        "sell": "55.6",
+        "buy": "26.2",
+        "econDesc": "Fledgling",
+        "conflict": "Medium",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "",
+        "editorFriendCode": "",
+        "genVersion": "1.3.0",
+        "bodies": [
+          {
+            "name": "New Soulana",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Scorched",
+            "subtype": "Scalding",
+            "descriptor": "Infrequent Heat Storms",
+            "water": false,
+            "ring": "gold",
+            "resources": [
+              "Solanium",
+              "Magnetised Ferrite",
+              "Copper"
+            ],
+            "flora": [
+              "Rich"
+            ],
+            "fauna": [
+              "Abundant"
+            ],
+            "minerals": [
+              "Phosphorus"
+            ],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Minimal",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "",
+            "subtype": "",
+            "descriptor": "",
+            "water": false,
+            "ring": "tan",
+            "resources": [
+              "Cobalt"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Few",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": true,
+            "orbits": 2,
+            "biome": "",
+            "subtype": "",
+            "descriptor": "",
+            "water": false,
+            "ring": false,
+            "resources": [
+              "Sodium"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Observant",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "",
+            "subtype": "",
+            "descriptor": "",
+            "water": true,
+            "ring": false,
+            "resources": [
+              "Cobalt"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Low Security",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": true,
+            "orbits": 4,
+            "biome": "",
+            "subtype": "",
+            "descriptor": "",
+            "water": false,
+            "ring": false,
+            "resources": [
+              "Cobalt"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Observant",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          }
+        ]
+      },
+      "editedAt": "2026-10-01T05:20:48.185Z",
+      "editedByIp": "46.110.84.140",
+      "history": [
+        {
+          "at": "2026-10-01T05:20:48.185Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
-    "5.133.46.24": [
-      1790715617869,
-      1790715629877,
-      1790719214160
+    "46.110.84.140": [
+      1790832048185
     ]
   },
   "flagLog": {},
@@ -73633,7 +73809,8 @@
       "Fair",
       "Ample",
       "Abundant",
-      "Bountiful"
+      "Bountiful",
+      "Rich"
     ],
     "fauna": [
       "Devoid",
@@ -73641,7 +73818,8 @@
       "Copious",
       "Frequent",
       "Rare",
-      "Generous"
+      "Generous",
+      "Abundant"
     ],
     "minerals": [
       "Magnatised Ferrite",
@@ -73691,7 +73869,8 @@
       "Reactive Rain",
       "Sand Blizzards",
       "Molten Rain",
-      "Humid"
+      "Humid",
+      "Infrequent Heat Storms"
     ],
     "biome": [
       "Radioactive",
@@ -73702,7 +73881,8 @@
       "causatic nightmare",
       "Dead",
       "Irradiated",
-      "Barren"
+      "Barren",
+      "Scorched"
     ],
     "subtype": [
       "Viridescent",
@@ -73711,7 +73891,8 @@
       "Airless",
       "Abandoned",
       "Magma",
-      "Paradise"
+      "Paradise",
+      "Scalding"
     ],
     "signalName": [
       "MS Jiokaz XIV",
