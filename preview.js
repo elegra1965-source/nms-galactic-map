@@ -7139,7 +7139,7 @@ function havenRender(body,d){
   });
   var foot=havenEl("div",null,"margin-top:6px;font-size:10px;color:var(--text-faint)");
   foot.appendChild(document.createTextNode("Data via "));
-  var a=havenEl("a","Voyager's Haven"); a.href=h.url; a.target="_blank"; a.rel="noopener";
+  var a=havenEl("a","Voyager's Haven","color:var(--cyan)"); a.href=h.url; a.target="_blank"; a.rel="noopener";
   foot.appendChild(a); foot.appendChild(document.createTextNode(" — community-submitted, separate from this map's own data."));
   body.appendChild(foot);
 }

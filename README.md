@@ -593,6 +593,13 @@ biome can never disagree on what their rings look like. The one thing that
 the known `nms-core` limitation noted above — everything else (star type,
 system/region name, planet count, economy/conflict/race) should match.
 
+At scale: `tools/haven-calibrate` compares the generator against ~29,000 real
+systems recorded on [Voyager's Haven](https://havenmap.online). On data logged
+since the Cosmos update it matches **99.7-99.9%** on star colour, race,
+economy type, wealth and conflict -- see
+[`nms-core/README.md`](nms-core/README.md#independent-check-against-voyagers-haven-2026-10-02)
+for the full table and what it doesn't cover.
+
 </details>
 
 ## Is it accessible?
