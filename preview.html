@@ -898,6 +898,33 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
    down just here rather than shrinking it everywhere it's reused. */
 .hoverpop .conBadge b{font-size:8px;padding:0 4px;border-radius:6px}
 .hoverpop .conBadge{gap:3px}
+/* 2026-10-02: in-game-style analysis cards (System view hover) */
+.hoverpop.acard{padding:0;width:300px;max-width:calc(100vw - 12px);white-space:normal;overflow:hidden;
+  background:rgba(8,12,18,.94);border:1px solid rgba(255,255,255,.14);border-radius:3px;
+  box-shadow:0 8px 26px rgba(0,0,0,.55);transform:translate(-50%,calc(-100% - 18px))}
+.hoverpop.acard.below{transform:translate(-50%,22px)}
+.hoverpop .acHead{padding:9px 14px 8px;color:#fff}
+.hoverpop .acTitle{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:15px;letter-spacing:.06em;line-height:1.15}
+.hoverpop .acSub{font-family:'Rajdhani',sans-serif;font-size:11px;letter-spacing:.03em;opacity:.85;margin-top:1px}
+.hoverpop .ac-signal{background:linear-gradient(90deg,#1b8a7c,#2a9f8e)}
+.hoverpop .ac-station,.hoverpop .ac-star{background:linear-gradient(90deg,#e9a01a,#d3862a);color:#1a1004}
+.hoverpop .ac-bh{background:linear-gradient(90deg,#5a2fa0,#7a46c4)}
+.hoverpop .ac-atlas{background:linear-gradient(90deg,#9c2330,#c23a3f)}
+.hoverpop .ac-body{background:linear-gradient(90deg,#1e5c8a,#2b78a8)}
+.hoverpop .acBody{padding:10px 14px 11px;font-family:'Rajdhani',sans-serif;font-size:13px;color:var(--text);line-height:1.45}
+.hoverpop .acRow{margin:0 0 4px}
+.hoverpop .acRow:last-child{margin-bottom:0}
+.hoverpop .acLbl{color:var(--text-dim)}
+.hoverpop .acVal b{color:#fff;font-weight:700}
+.hoverpop .acDim{color:var(--text-dim)}
+.hoverpop .acIc{display:inline-flex;vertical-align:-3px;margin:0 3px 0 1px}
+.hoverpop .acIc .icimg{width:16px;height:16px;object-fit:contain}
+.hoverpop .acIc svg{width:15px;height:15px;stroke:currentColor;fill:none}
+/* signal report card (click) header matched to the teal hover card */
+.resreport .rrHead{background:linear-gradient(90deg,#1b8a7c,#2a9f8e)!important;border-bottom:none!important}
+.resreport .rrName{color:#fff!important;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:15px!important}
+.resreport .rrCat{color:rgba(255,255,255,.85)!important}
+.resreport .rrClose{color:rgba(255,255,255,.8)}
 .resreport{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:37;
   width:280px;font-family:'Orbitron',sans-serif;
   background:rgba(6,12,20,0.94);border:1px solid var(--border);border-radius:var(--r-sm);

@@ -5825,7 +5825,7 @@ function tryPick(cx,cy){
     var bh=ray.intersectObjects(bodyMeshes.concat(starMeshes).concat(featureMeshes).concat(resourceMeshes));
     if(bh.length){
       var ud=bh[0].object.userData;
-      if(ud.resourceIcon){ showResourceReport(ud); }
+      if(ud.resourceIcon){ hideHoverPop(); showResourceReport(ud); }
       else {
         hideResourceReport();
         if(ud.star||ud.feature) updatePanel(ud.sys);
@@ -5945,7 +5945,8 @@ function handleHoverRay(e){
     ndc.x=((e.clientX-rectSys.left)/rectSys.width)*2-1;
     ndc.y=-((e.clientY-rectSys.top)/rectSys.height)*2+1;
     ray.setFromCamera(ndc,camera);
-    var hitsSys=ray.intersectObjects(bodyMeshes.concat(starMeshes).concat(featureMeshes));
+    // 2026-10-02: signal markers (resourceMeshes) now get the hover card too.
+    var hitsSys=ray.intersectObjects(bodyMeshes.concat(starMeshes).concat(featureMeshes).concat(resourceMeshes));
     if(hitsSys.length){
       showSystemHoverPop(hitsSys[0].object.userData,e.clientX,e.clientY);
       canvas.style.cursor="pointer";
@@ -6008,6 +6009,7 @@ function showHoverPop(s,cx,cy){
       (s.conflict==="Not Available"?'':'<div class="hpRow">'+svg(IC_CONFLICT,CONFLICT_COL[s.conTier])+conBadge(s)+'<span class="hpLbl">'+s.conflict+'</span></div>')+
       '</div>';
   }
+  pop.className="hoverpop";
   pop.innerHTML=html;
   pop.style.left=cx+"px"; pop.style.top=cy+"px";
   pop.style.display="block";
@@ -6027,16 +6029,62 @@ function hideHoverPop(){
    clicking any of these already opens the real info panel/body card via
    tryPick()'s system branch, so this is just a lightweight "what's this"
    label, not a second copy of the full panel. */
+/* 2026-10-02, Tony: in-game-style "analysis card" hover popups for System
+   view (his reference: a teal "DEEP-SPACE OUTPOST / Starmap Analysis
+   Report" card over a signal marker, and a gold "XVI STELLAR OBSERVER /
+   Space Station" card with Dominant Lifeform / Economy / Conflict level
+   over the station). Every System-view hover (station, signal markers,
+   planets/moons, black hole, Atlas) now uses the same card: coloured
+   header bar (title + subtitle), dark body of "Label: value" rows. Same
+   #hoverPop element, just the extra "acard" class -- Local view's own
+   hover (showHoverPop) is unchanged. All traveller-typed text goes
+   through acEsc() before it hits innerHTML. */
+function acEsc(t){return String(t==null?"":t).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c];});}
+function acRow(lbl,valHtml){return '<div class="acRow"><span class="acLbl">'+lbl+':</span> <span class="acVal">'+valHtml+'</span></div>';}
+function acCard(kind,title,sub,rows){
+  return '<div class="acHead ac-'+kind+'"><div class="acTitle">'+acEsc(title).toUpperCase()+'</div>'+
+    (sub?'<div class="acSub">'+acEsc(sub)+'</div>':'')+'</div>'+
+    '<div class="acBody">'+rows.join("")+'</div>';
+}
+/* Station / star card body -- Dominant Lifeform / Economy / Conflict
+   level, same fields the info panel shows (race, econName, conflict). */
+function acSystemRows(sy){
+  if(!sy) return [];
+  var race=sy.race||"Unknown";
+  var raceHtml='<span class="acIc">'+raceIcon(race)+'</span><b>'+acEsc(race)+'</b>'+(sy.abandoned?' <span class="acDim">(Abandoned)</span>':'');
+  var econ=(sy.uncharted||!sy.econName)?"Data Unavailable":sy.econName;
+  var con=(!sy.conflict||sy.conflict==="Not Available")?"Data Unavailable":sy.conflict;
+  var conCol=(con==="Data Unavailable")?"var(--text-dim)":(CONFLICT_COL[sy.conTier]||"var(--text)");
+  var rows=[acRow("Dominant Lifeform",raceHtml),acRow("Economy",'<b>'+acEsc(econ)+'</b>'),
+    acRow("Conflict level",'<b style="color:'+conCol+'">'+acEsc(con)+'</b>')];
+  if(sy.outlaw) rows.push(acRow("Status",'<b style="color:var(--gold)">Outlaw system</b>'));
+  return rows;
+}
 function showSystemHoverPop(ud,cx,cy){
   var pop=document.getElementById("hoverPop"),html;
-  if(ud.body){
-    /* Enriched 2026-09-13 (Tony live feedback: "not a lot of information
-       in planet tab") -- was just name + biome/water/ring folded into one
-       line. Now mirrors the same fields showBody()'s full click-through
-       panel already shows (biome/subtype -- "Unknown" until a traveller's
-       confirmed it, same strict rule as the panel -- terrain, water, and
-       any of the panel's own tag pills that apply), just condensed to a
-       couple of lines instead of the panel's full layout. */
+  if(ud.resourceIcon){
+    // Signal marker -- teal "Starmap Analysis Report" card (picture 1).
+    var cat=(ud.catLabel&&ud.catLabel!=="Signal"&&ud.catLabel.toLowerCase()!==String(ud.name).toLowerCase())?ud.catLabel:"";
+    var rr=[];
+    if(cat) rr.push(acRow("Category",acEsc(cat)));
+    rr.push(acRow("Signal Type",acEsc(ud.signalType)+(/[.!?]$/.test(ud.signalType||"")?"":".")));
+    rr.push(acRow("Route recommendation",acEsc(ud.route)));
+    html=acCard("signal",ud.name,"Starmap Analysis Report",rr);
+  } else if(ud.feature&&ud.stationCard){
+    // Space station -- gold card (picture 2).
+    var sy=ud.sys||{};
+    var title=sy.stationName?sy.stationName:"Space station";
+    var sub="Space Station"+(sy.allianceName?" · Alliance: "+sy.allianceName:"");
+    html=acCard("station",title,sub,acSystemRows(sy));
+  } else if(ud.feature){
+    var isBh=ud.name==="Black hole";
+    html=acCard(isBh?"bh":"atlas",isBh?"Black hole":"Atlas Interface","Anomaly",
+      isBh?[acRow("Signal Type","Gravitational singularity."),acRow("Route recommendation","Enter to jump toward the galactic core.")]
+          :[acRow("Signal Type","Atlas station."),acRow("Route recommendation","Seek the Atlas.")]);
+  } else if(ud.body){
+    /* Planet/moon -- same fields the previous hover showed (biome only
+       once a traveller's confirmed it, terrain, water, tags, top 3
+       resources), now laid out as card rows. */
     var b=ud.body;
     var biomeTxt=b.biomeOverridden?(b.biome+(b.subtype?" ("+b.subtype+")":"")):"Unknown";
     var tags=[];
@@ -6044,44 +6092,35 @@ function showSystemHoverPop(ud,cx,cy){
     if(b.base) tags.push(b.baseName?('Base: "'+b.baseName+'"'):"Base");
     if(b.ruins) tags.push("Ruins");
     if(b.reliquary) tags.push("Reliquary");
-    html='<div class="hpName">'+(b.moon?"↳ ":"")+b.name+'</div>'+
-      '<div class="hpCls">'+biomeTxt+'</div>'+
-      '<div class="hpSub">'+b.terrain+(b.water?" // Water":" // No water")+'</div>'+
-      (tags.length?'<div class="hpSub">'+tags.join(" // ")+'</div>':'')+
-      // Resources line (2026-09-13, Tony: compared a real in-game discovery
-      // popup showing its resource list against this card showing none) --
-      // b.resUni is the exact same combined list the info panel's own
-      // "Resources" row already shows (biome-typical + stellar element +
-      // any traveller-submitted Common resources, see updatePanel()), so
-      // this reuses it rather than inventing a second resource computation.
-      // Capped at 3 so the hover stays a quick glance, not a second panel;
-      // omitted entirely when nothing's known yet, same as the tags line.
-      (b.resUni&&b.resUni.length?'<div class="hpSub">'+b.resUni.slice(0,3).join(", ")+'</div>':'');
+    var br=[acRow("Biome",'<b>'+acEsc(biomeTxt)+'</b>'),
+      acRow("Terrain",acEsc(b.terrain)+(b.water?" · Water":" · No water"))];
+    if(b.resUni&&b.resUni.length) br.push(acRow("Resources",acEsc(b.resUni.slice(0,3).join(", "))));
+    if(tags.length) br.push(acRow("Notes",acEsc(tags.join(" · "))));
+    html=acCard("body",b.name,b.moon?"Moon":"Planet",br);
   } else if(ud.star){
-    /* Enriched 2026-09-13 (Tony live feedback: "star not much information
-       again") -- reuses the exact same race/economy/conflict block Local's
-       showHoverPop() already builds for its "full" tier (same sy.race/
-       econType/econName/sell/buy/econDesc/conflict/conTier fields -- a
-       System-view star's ud.sys is the very same system object), just
-       always shown rather than zoom-gated the way Local's is, since
-       System view has no equivalent of Local's cam.dist to gate on. */
-    var sy=ud.sys,spec=(sy&&sy.spectral)?sy.spectral:"";
-    html='<div class="hpName">★ '+ud.name+'</div>'+(spec?'<div class="hpCls">'+spec+'</div>':'');
-    if(sy){
-      html+='<div class="hpDetail">'+
-        '<div class="hpRow">'+raceIcon(sy.race)+'<span class="hpLbl">'+sy.race+'</span></div>'+
-        '<div class="hpRow">'+econIcon(sy.econType)+'<span class="hpLbl">'+(sy.uncharted?"Uncharted":sy.econName)+'</span></div>'+
-        (sy.uncharted?'':'<div class="hpSub">Sell: '+sy.sell+'% Buy: '+sy.buy+'% // '+sy.econDesc+'</div>')+
-        (sy.conflict==="Not Available"?'':'<div class="hpRow">'+svg(IC_CONFLICT,CONFLICT_COL[sy.conTier])+conBadge(sy)+'<span class="hpLbl">'+sy.conflict+'</span></div>')+
-        '</div>';
-    }
+    var st=ud.sys||{};
+    html=acCard("star",ud.name,"Star"+(st.spectral?" · Class "+st.spectral:""),acSystemRows(st));
   } else {
-    html='<div class="hpName">'+ud.name+'</div>';
+    html=acCard("body",ud.name||"Unknown","",[]);
   }
+  pop.className="hoverpop acard";
   pop.innerHTML=html;
+  placeHoverPop(pop,cx,cy);
+  hoverPopVisible=true;
+}
+/* Shows the card above the cursor, flips it below when it would run up
+   into the toolbar, and nudges it sideways to stay on screen. */
+function placeHoverPop(pop,cx,cy){
+  pop.classList.remove("below");
   pop.style.left=cx+"px"; pop.style.top=cy+"px";
   pop.style.display="block";
-  hoverPopVisible=true;
+  var r=pop.getBoundingClientRect();
+  var topEl=document.getElementById("top");
+  var topLim=topEl?topEl.getBoundingClientRect().bottom:0;
+  if(r.top<topLim+4){ pop.classList.add("below"); r=pop.getBoundingClientRect(); }
+  var dx=0;
+  if(r.left<6) dx=6-r.left; else if(r.right>window.innerWidth-6) dx=(window.innerWidth-6)-r.right;
+  if(dx) pop.style.left=(cx+dx)+"px";
 }
 /* Corrected 2026-08-17 after Tony's live feedback: his original "only
    during Set course" answer was interpreted as "only once a panel is
