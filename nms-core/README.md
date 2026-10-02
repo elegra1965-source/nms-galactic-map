@@ -1,193 +1,161 @@
-# nms-core
+# Save-file waypoint auto-fill tool ("companion app")
 
-Game-accurate star type, planet count, black hole / Atlas placement, system/region/planet name generation, and (since 2026-08-23) real economy/wealth/conflict/race/uncharted/abandoned/pirate derivation for **No Man's Sky**, exported as a vanilla ES module.
+This folder holds a standalone script that reads your real local **No Man's Sky
+save file** — the one Hello Games Cloud cross-save writes to this PC after you
+open the game here and pull your PS5 progress down — and fills in blank
+**names** on your live map for any of your own in-game waypoints/bookmarks that
+land on a system your map doesn't have a name for yet.
 
-Ported from [hadsh/nms_namegen](https://github.com/hadsh/nms_namegen) (itself a fork of [Stuart Coyle's](https://github.com/stu-/nms_namegen) original work, co-authored with GoodGuysFree). The probability tables, hash function, and name-generation logic here are reverse-engineered from the game — not invented. See attribution below.
+It **never overwrites anything already documented** by you or another
+traveller. It only ever touches the `name` field, and only when that field is
+currently blank. It never touches bodies, rings, stations, signals,
+screenshots, race/economy/conflict data, or anything else — your save doesn't
+carry that kind of data, so this tool doesn't guess at it.
 
-`economy.js` is separate original work (elegra1965) — the economy/conflict/race/outlaw/ring logic that `nms_namegen` never modelled. Its numeric probability tables were decompiled directly from a legitimately-owned game install; see the file header for detail.
+## Where your waypoint names come from
 
-`save-import/` is also separate original work — a client-side-only reader for real NMS `.hg` save files (name + real base list), unrelated to the procedural generation the rest of this module does. See [`save-import/README.md`](./save-import/README.md) for the full writeup; it's covered here only for completeness.
+Every waypoint/bookmark you've ever set in-game (`Cetanle Base`, `Portal
+planet`, `New galaxy`, and so on) is stored in your save file along with its
+real galactic address. This tool decodes that list directly from the save —
+there's no separate "discovery log" to read, and nothing here talks to Hello
+Games or PSN. It only reads a file already sitting on this PC.
 
-Used by the [NMS Galactic Map](https://nms-galaxy-map.netlify.app) — a free, fan-made 3D portal decoder and galaxy explorer.
+Names like "New galaxy" or "Portal planet" are **not** treated as junk or
+filtered out — the system's address is what makes each map entry unique, not
+the name text, so two different real places sharing a generic-sounding name is
+expected and completely fine.
 
----
+If several of your waypoints land on the exact same system (common — you can
+bookmark more than one planet in a system, but the map has one name slot per
+system), only the first one found is used to fill that blank; the rest are
+written to `nms-save-autofill-skipped.txt` so you can see what didn't make it
+in.
 
-## What's in here
+## Why you have to run this yourself
 
-| File | Source | What it does |
-|---|---|---|
-| `iprng.js` | ported (hadsh) | Threefish/Skein-style 64-bit hash — the game's real seed mixer |
-| `prng.js` | ported (hadsh) | 32-bit multiplicative PRNG, seeded from the hash |
-| `region.js` | ported (hadsh) | Voxel→region seed, region name, voxel attributes — including real black hole/Atlas placement, corrected 2026-08-23 (see Known limitations) |
-| `system.js` | ported (hadsh) | Star type, planet/moon counts, safe-start planet, system name, plus (since 2026-08-23) `economy_type`, `wealth`, `conflict_level`, `dominant_race`, `uncharted`, `abandoned`, `pirate` — the real reverse-engineered algorithm, not a statistical guess |
-| `planet.js` | ported (hadsh) | Per-planet name from the system seed |
-| `generator.js` | ported (hadsh) | Weighted-Markov name assembler |
-| `roman.js` | ported (hadsh) | Roman numeral formatter (moon suffixes) |
-| `alphasets.js` | ported (hadsh) | Character-triplet corpora for name generation |
-| `loadLetterMap.js` | ported (hadsh) | Lazy loader for the 8 letter_map JSON shards |
-| `economy.js` | original (elegra1965) | Economy/conflict/race/outlaw/abandoned/ring logic with real decompiled probability tables |
-| `letter-map/` | ported (hadsh) | 8 JSON data shards required by the name generator (~3 MB total) |
-| `save-import/` | original (elegra1965), + real mapping data from oxur/nms-copilot | Client-side `.hg` save file reader — see its own [README](./save-import/README.md) |
+Just like the wiki auto-fill tool, this can't run inside a Claude Cowork
+session or through any Claude-controlled shell — `nms-galaxy-map.netlify.app`
+is behind the same account-level network proxy that blocks the wiki tool,
+confirmed directly while building this. Your own terminal isn't behind that
+proxy, so it reaches your map fine.
 
----
+That's why this is a script **you** run — a real Command Prompt/PowerShell
+window, a double-clicked `.bat` file, or Windows Task Scheduler — never
+something Claude runs for you.
 
-## Usage
+## Before you run it — sync your save
 
-### Loading the module
+Because this only reads a save file already on this PC, you need to pull your
+latest progress down first if you've been playing on PS5:
 
-The module is pure ES module (`type="module"`). In a browser:
+1. Open No Man's Sky **on this PC**.
+2. If Cross-Save is set up, use the in-game **Cross-Save Manager** to download
+   your most recent save (the one from PS5, if that's where you played last).
+3. You can close the game again once that's done — the script only reads the
+   save file on disk, it doesn't need the game running.
 
-```html
-<script type="module">
-  import * as NMSCore from './nms-core/index.js';
-  import { rollSystemFlavor, rollRing } from './nms-core/economy.js';
-</script>
+The script always reads whichever of your save slots was modified most
+recently, so if you play on both PC and PS5, always sync PS5→PC before running
+a real pass, or you'll be importing stale waypoints.
+
+## First-time setup
+
+You already have everything needed — Node.js is installed on this machine,
+and the script has zero external dependencies (no `npm install` required).
+
+This folder should live at:
+`C:\Users\elegr\Claude\Projects\NMS Galactic Map\tools\nms-save-autofill\`
+(two levels under the project root, same as the wiki tool.)
+
+## Step 1 — always dry-run first
+
+```
+node nms-save-autofill.mjs --dry-run
 ```
 
-Or in Node.js / a bundler:
+This reads your save, decodes your waypoints, fetches your live map data, and
+prints exactly what it *would* fill in — **nothing is written or submitted**.
+Read through the list. If a name looks wrong for where you'd expect it, that's
+the signal to stop and tell me before doing a real run.
 
-```js
-import * as NMSCore from './nms-core/index.js';
-import { rollSystemFlavor, rollRing } from './nms-core/economy.js';
+## Step 2 — do a real run
+
+```
+node nms-save-autofill.mjs
 ```
 
-### Loading the letter map (required for name generation)
+This submits through the same public "Edit System" endpoint your own map's
+edit form uses — one system at a time, with an 8-second pause between each,
+and it stops itself automatically once it's sent 7 in the current rolling hour
+(the server's real limit is 8/hour; this keeps one in reserve). If the server
+ever says "too many submissions" anyway, it backs off and waits out the full
+hour before continuing on its own.
 
-Planet/system/region names need the letter map shards. Load them once before calling any name functions:
+It's safe to run over and over:
+- re-reads your save each time (so a fresh Cross-Save sync is picked up),
+- re-reads your live map (so it never fights anything you've since documented
+  by hand),
+- picks up exactly where the last run left off — progress is tracked in
+  `nms-save-autofill-state.json`, right next to the script,
+- everything it does is logged to `nms-save-autofill-log.txt`, also right
+  here.
 
-```js
-import { loadLetterMap } from './nms-core/loadLetterMap.js';
+Unlike the wiki tool, once a given waypoint's name has been used to fill a
+blank (or the site rejects it), there's nothing new for it to do on a later
+run — new runs are really only useful after you've set new waypoints in-game
+and synced them down.
 
-// Pass a base URL so the shards can be fetched
-const letterMap = await loadLetterMap('./nms-core/letter-map/');
+## Automating it (Windows Task Scheduler)
 
-// Then pass it into name functions
-const name = NMSCore.systemName(seed, letterMap);
-```
+Same approach as the wiki tool, if you want this to check itself periodically:
 
-Planet names are expensive to generate for large batches. If you're iterating many systems, generate system/region names eagerly and planet names lazily (only for the system a user actually opens).
+1. Open **Task Scheduler**.
+2. **Create Task...**.
+3. **General** tab: name it `NMS Save Autofill`. Tick "Run whether user is
+   logged on or not" if you want it to run while you're away.
+4. **Triggers** tab → **New...** → "On a schedule" → whatever cadence you
+   like (this only finds new work after you've synced a fresh save down, so
+   there's no benefit to running it more than a few times a day).
+5. **Actions** tab → **New...**:
+   - Program/script: `node`
+   - Add arguments: `nms-save-autofill.mjs`
+   - Start in:
+     `C:\Users\elegr\Claude\Projects\NMS Galactic Map\tools\nms-save-autofill`
+6. **Conditions** tab: untick "Start the task only if the computer is on AC
+   power" if this is a laptop and you want it to run on battery too.
+7. Save.
 
-### Getting system data from a portal address
+Check `nms-save-autofill-log.txt` occasionally to see what it's been doing.
 
-A 12-glyph portal address encodes a 3D position. Convert glyphs to a hex string, then:
+## Just want to run it by hand?
 
-```js
-import { voxelAttributes } from './nms-core/region.js';
-import { systemAttributes } from './nms-core/system.js';
+Double-click `run-save-autofill.bat` in this folder (or copy it to your
+Desktop). It runs a normal (non-dry-run) pass and pauses at the end so the
+window doesn't just vanish. If you ever want to dry-run instead, open a
+Command Prompt in this folder and run `node nms-save-autofill.mjs --dry-run`
+directly.
 
-// "0807F07FFFFF" — 12 hex chars (glyphs 0–F)
-const addr = "0807F07FFFFF";
+## Important — do not deploy this folder
 
-// Parse into coordinates
-const planet = parseInt(addr[0], 16);           // glyph 0: planet index
-const ssi    = parseInt(addr.slice(1,4), 16);   // glyphs 1-3: system index within region
-const y      = parseInt(addr.slice(4,6), 16);   // glyphs 4-5: Y voxel (signed)
-const z      = parseInt(addr.slice(6,9), 16);   // glyphs 6-8: Z voxel (signed)
-const x      = parseInt(addr.slice(9,12), 16);  // glyphs 9-11: X voxel (signed)
+This `tools/nms-save-autofill/` folder (and the
+`nms-save-autofill-state.json` / `nms-save-autofill-log.txt` /
+`nms-save-autofill-skipped.txt` files it creates) is **local tooling only**.
+Like `CLAUDE.md`, `HANDOVER.md`, and `overrides.json`, it must **never** be
+included in a GitHub push or Netlify deploy for this project.
 
-const voxel = voxelAttributes(x, y, z, 0); // 0 = Euclid
-const attrs = systemAttributes(voxel.regionSeed, ssi, letterMap);
+## What it actually changes, precisely
 
-console.log(attrs.starType);    // e.g. "F2p" (yellow dwarf with planet variant)
-console.log(attrs.numPlanets);  // e.g. 4
-console.log(attrs.name);        // e.g. "Sranch Op10079"
-```
+For each of your waypoints that resolves to a valid galactic address, it only
+fills the map's `name` field if your map's current value for that system is
+genuinely blank. It never touches any other field. When it fills a name, it
+appends a line to that system's notes crediting it as "Filled from a
+traveller's own in-game waypoint notes," so it's always clear where the data
+came from.
 
-### Economy, conflict, race
-
-```js
-import { rollSystemFlavor, rollRing, ECON, CONFLICT, RACES } from './nms-core/economy.js';
-
-// mulberry32-style seeded RNG, or any function returning [0,1)
-function makeRng(seed) {
-  let s = seed >>> 0;
-  return () => { s ^= s << 13; s ^= s >> 17; s ^= s << 5; return (s >>> 0) / 4294967296; };
-}
-
-const rng = makeRng(attrs.seed);
-const flavor = rollSystemFlavor(rng, attrs.starType[0]); // first char = colour key
-
-console.log(flavor.race);       // "Gek" | "Vy'keen" | "Korvax" | "Uninhabited"
-console.log(flavor.economy);    // e.g. "Advanced Mining"
-console.log(flavor.conflict);   // e.g. "Fractious"
-console.log(flavor.abandoned);  // true/false
-console.log(flavor.uncharted);  // true/false
-console.log(flavor.outlaw);     // true/false
-
-// Per-planet ring roll (not per system)
-const bodyRng = makeRng(planetSeed);
-const ring = rollRing(bodyRng, "Frozen", false); // (rng, biome, isMoon)
-// Returns false | "icy" | "tan" | "ash" | "gold" | "split"
-```
-
-**2026-08-23: the real algorithm, not a guess — and now wired together.** `system.js`'s `systemAttributes()` returns the actual reverse-engineered economy/wealth/conflict/race/uncharted/abandoned/pirate values, drawn from the same RNG stream already used for `star_type`/`planet_count` — corpus-validated to 98–99% accuracy against 1000 real systems, not an approximation:
-
-```js
-const attrs = systemAttributes(portalCodeBigInt, galaxyIndex);
-
-console.log(attrs.economy_type);    // 1-7: trading/advanced materials/scientific/mining/manufacturing/technology/power generation
-console.log(attrs.wealth);          // 1-3: low/medium/high
-console.log(attrs.conflict_level);  // 1-3: low/medium/high
-console.log(attrs.dominant_race);   // 0-3: none/Gek/Korvax/Vy'keen
-console.log(attrs.uncharted);       // true/false
-console.log(attrs.abandoned);       // true/false
-console.log(attrs.pirate);          // true/false
-```
-
-`rollSystemFlavor()` above (independent word-pool rolls, star-colour only) used to be the only way to get race/economy/conflict text out of `economy.js`, with no connection to `attrs` at all. As of this same date, `economy.js` also exports **`rollSystemFlavorFromAttrs(rng, attrs)`** — pass it the real `attrs` object above and it takes economy_type/wealth/conflict_level/dominant_race/uncharted/abandoned/pirate as given, only rolling what `systemAttributes()` still doesn't model: which specific word to show within that type/tier (`econName`/`econDesc`/`conflict`), and sell%/buy% (refit this same day against 822 real corpus records — see the function's own header in `economy.js` for the numbers). This is now the preferred path whenever a portal code is available (i.e. almost always); `rollSystemFlavor()` stays as the fallback for when it isn't. `preview.html`'s `generateSystem()` was updated to call it this way:
-
-```js
-const flavor = rollSystemFlavorFromAttrs(rng, attrs); // preferred: attrs is real
-// vs. flavor = rollSystemFlavor(rng, attrs.starType[0]); // fallback: no portal code
-```
-
-### Biome/Sentinel-flavoured planet names (optional)
-
-`planetName()` takes an optional 4th `opts` argument: `{biome, sentinel}`. When
-supplied, the generic Prime/Major/Omega-style adornment word swaps for a
-pool matched to that biome (e.g. Lush leans toward "Verdance"/"Bloom",
-Volcanic toward "Cinder"/"Magma"), with a hostile-Sentinel-activity pool
-taking priority over biome when both are given. Omit `opts` entirely (or
-call with the original 3-arg signature) and output is byte-identical to
-before this was added — every existing caller keeps working unchanged.
-
-```js
-const name = NMSCore.planetName(seed, undefined, letterMap, { biome: "Volcanic", sentinel: "Aggressive" });
-```
-
-Still a disclosed stylistic guess, not a real algorithm — see "Known
-limitations" below and `planet.js`'s own header comment for why.
-
----
-
-## Known limitations
-
-- **Planet names** are a plausible, unverified reverse-engineering guess. Star type, region names, and system names were validated against a real corpus; planet naming was not. `nms_namegen`'s own README says the same.
-- **Economy/wealth/conflict/race/uncharted/abandoned/pirate** (`system.js`'s `systemAttributes()`, added 2026-08-23) *are* the real, reverse-engineered algorithm — validated against upstream's own 10 unit-test vectors, 443 golden regression vectors, and 1000 real ground-truth systems (star colour 99.10%, uncharted 99.80%, dominant race 99.10%, conflict level 99.03%, economy category 99.02%, wealth tier 98.90%, planet count 98.80%). Not currently wired into this project's own live site (`preview.html` still rolls economy/race/conflict through a separate, independently-seeded RNG in `economy.js`) — that's a deliberate, still-open integration task on the consuming site's side, not a limitation of this module.
-
-Two limitations that used to be listed here were fixed 2026-08-23 and no longer apply, kept below for anyone tracking an older copy of this module:
-
-- ~~The hash function (`iprng.js`) crashes on region-local system index 0 in every region.~~ **Fixed.** Python's `o[-1]` list indexing wraps to the last element; a plain JS array returns `undefined` at a negative index instead, which crashed on the exact input that produces `oCounter=-1`. `iprng.js` now wraps the index explicitly to match Python's behaviour.
-- ~~Black hole / Atlas placement uses raw unsigned portal-code bits, not signed voxel coordinates. The dead-core fix is only symmetric in the positive-coordinate octant.~~ **Fixed.** `voxelAttributes()` in `region.js` now folds x/y/z to signed offsets from the galactic centre before computing distance, matching the game's own coordinate model in every octant, not just the positive one. This was also missing an integer-truncation step on the centre-distance calculation, fixed at the same time.
-
----
-
-## Attribution
-
-The name-generation logic in this module (all files except `economy.js`) is a JavaScript port of [hadsh/nms_namegen](https://github.com/hadsh/nms_namegen), itself a fork of [Stuart Coyle's original nms_namegen](https://github.com/stu-/nms_namegen), co-authored with GoodGuysFree. hadsh's repository states this work is MIT-licensed. Credit for the underlying reverse-engineered generation algorithms belongs to:
-
-- **Stuart Coyle** — original author
-- **GoodGuysFree** — co-author of the hadsh fork
-- **hadsh** — fork maintainer
-
-Each ported file carries a "Ported from hadsh/nms_namegen (MIT licensed)" comment with the upstream URL at the top, per MIT's own requirement that the original notice travel with the code.
-
-`economy.js` is original work by elegra1965, licensed MIT separately. Its probability tables are decompiled from a legitimately-owned NMS install; see the file header for detail.
-
----
-
-## License
-
-MIT — see [LICENSE](./LICENSE).
-
-This module is a fan project and is not affiliated with, sponsored by, or endorsed by Hello Games.
+It skips, and never guesses at:
+- the literal word "Default" (the game's own placeholder for an unnamed
+  marker, not something you actually typed),
+- any waypoint whose address it can't confidently decode (older save format,
+  a non-spatial waypoint like a stored freighter position, etc) — these are
+  logged, not silently dropped,
+- a system your map already has a name for, however it got there.
