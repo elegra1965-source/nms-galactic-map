@@ -270,6 +270,17 @@ records don't store player-given planet names at all, only base names do
 (confirmed against a real save file), so that's the one thing this can
 recover automatically; everything else still needs typing in by hand.
 
+**Voyager's Haven data.** The system info panel has a collapsible
+**Voyager's Haven data** section that, when opened, looks the same portal
+address up in [Voyager's Haven](https://havenmap.online) -- a separate,
+community-run NMS database with tens of thousands of player-charted systems
+-- and shows what travellers have recorded there (star, lifeform, economy,
+conflict, discoverer, and each planet's biome, weather, sentinels, fauna,
+flora and resources). It's read-only and clearly labelled as Haven's data:
+it's never merged into this map's own community edits. Looked up by a small
+Netlify Function (`netlify/functions/haven-lookup.mjs`) that caches results,
+and only when you actually open the section.
+
 **Portal glyph keypad.** Type a hex address or tap the real 16 in-game glyphs
 directly -- both stay in sync, so you can decode a screenshot from your own
 game without knowing the hex first.
@@ -613,3 +624,8 @@ attribution. Economy/conflict/race/ring probability data is decompiled from
 a legitimately-owned NMS install. Portal glyphs and race/economy iconography
 are cropped from the game itself, used here for a free, non-commercial fan
 tool.
+
+Cross-referenced system data comes from **[Voyager's Haven](https://havenmap.online)**,
+built and run by **[u/IAmThe-Ekimo-1920](https://www.reddit.com/user/IAmThe-Ekimo-1920/)**,
+who offered to link the two maps -- thanks for opening up the Haven API and
+for the work behind it. Haven's data belongs to Haven and its contributors.

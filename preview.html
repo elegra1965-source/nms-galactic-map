@@ -1904,6 +1904,11 @@ nearby procedural space within a radius.">Search</button>
        one click reopens either; same ▸/▾ + hidden-body idiom toggleFold()
        already uses for Filters/Tweak, just scoped to a section inside this
        one panel instead of a whole floating box. -->
+  <!-- 2026-10-02: read-only data from Voyager's Haven (havenmap.online),
+       fetched only when this fold is opened -- see haven-lookup.mjs. Kept
+       as its own labelled source, never merged into community overrides. -->
+  <div class="lb panelFoldHead" id="pHavenHead" role="button" tabindex="0" aria-expanded="false" aria-controls="pHavenBody">&#9656; Voyager's Haven data</div>
+  <div id="pHavenBody" style="display:none;font-size:11px;line-height:1.5;color:var(--text-dim)"></div>
   <div class="lb panelFoldHead" id="pSeqHead" role="button" tabindex="0" aria-expanded="false" aria-controls="pSeqBody">&#9656; Portal sequence &amp; coordinates</div>
   <div class="seqbox" id="pSeqBody" style="display:none">
     <div class="lb">Portal sequence</div>

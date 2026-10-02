@@ -5307,6 +5307,8 @@ function updatePanel(s){
   document.getElementById("pBody").style.display="none";
   closePanelFold("pSeqHead","pSeqBody");
   closePanelFold("pNoteHead","pNoteBody");
+  closePanelFold("pHavenHead","pHavenBody");
+  havenReset();
   document.getElementById("pStars").innerHTML=starSwatches(s);
   document.getElementById("pName").textContent=s.name;
   document.getElementById("pReg").textContent="REGION: "+s.region;
@@ -7110,6 +7112,49 @@ document.getElementById("pNoteHead").addEventListener("keydown",function(e){ pan
 // checkbox block gets the same collapsible treatment via the same
 // togglePanelFold()/panelFoldKey() helpers -- see the fTogHead/fTogBody
 // HTML comment for why only this block folds and not the whole panel.
+/* 2026-10-02: Voyager's Haven (havenmap.online) cross-reference, by
+   u/IAmThe-Ekimo-1920. Lazy: only calls haven-lookup.mjs when the fold is
+   opened, once per selected system. Built with textContent only (no
+   innerHTML) since the data is third-party. */
+var havenFor=null;
+function havenReset(){ havenFor=null; var b=document.getElementById("pHavenBody"); if(b) b.textContent=""; }
+function havenEl(tag,text,css){ var e=document.createElement(tag); if(text!=null) e.textContent=text; if(css) e.style.cssText=css; return e; }
+function havenRender(body,d){
+  body.textContent="";
+  if(!d||!d.ok){ body.appendChild(havenEl("div","Couldn't reach Voyager's Haven right now. Try again later.")); return; }
+  if(!d.found){ body.appendChild(havenEl("div","Not charted on Voyager's Haven yet.")); return; }
+  var h=d.system, rows=[
+    ["Name",h.name],["Region",h.region],["Star",[h.star,h.stellarClass].filter(Boolean).join(" · ")],
+    ["Lifeform",h.lifeform],["Economy",[h.economy,h.economyTier].filter(Boolean).join(" · ")],
+    ["Conflict",h.conflict],["Space station",h.noStation?"None":null],
+    ["Discovered by",[h.discoveredBy,h.community?"("+h.community+")":null].filter(Boolean).join(" ")]
+  ];
+  rows.forEach(function(r){ if(!r[1]) return; var d2=havenEl("div"); d2.appendChild(havenEl("b",r[0]+": ")); d2.appendChild(document.createTextNode(r[1])); body.appendChild(d2); });
+  (h.planets||[]).forEach(function(p){
+    var bits=[p.biome&&(p.biome+(p.biomeSub?" ("+p.biomeSub+")":"")),p.weather,p.sentinels&&("Sentinels: "+p.sentinels),p.fauna&&("Fauna: "+p.fauna),p.flora&&("Flora: "+p.flora),p.resources].filter(Boolean);
+    var pd=havenEl("div",null,"margin-top:5px");
+    pd.appendChild(havenEl("b",(p.moon?"☾ ":"● ")+(p.name||"Unnamed")));
+    if(bits.length) pd.appendChild(havenEl("div",bits.join(" · "),"color:var(--text-faint)"));
+    body.appendChild(pd);
+  });
+  var foot=havenEl("div",null,"margin-top:6px;font-size:10px;color:var(--text-faint)");
+  foot.appendChild(document.createTextNode("Data via "));
+  var a=havenEl("a","Voyager's Haven"); a.href=h.url; a.target="_blank"; a.rel="noopener";
+  foot.appendChild(a); foot.appendChild(document.createTextNode(" — community-submitted, separate from this map's own data."));
+  body.appendChild(foot);
+}
+function havenLoad(){
+  var s=selected, body=document.getElementById("pHavenBody");
+  if(!s||!body||body.style.display==="none") return;
+  var k=skey(s); if(havenFor===k) return; havenFor=k;
+  body.textContent="Checking Voyager's Haven…";
+  fetch("/.netlify/functions/haven-lookup?addr="+encodeURIComponent(s.address)+"&gname="+encodeURIComponent(GALAXIES[s.galaxy]||""))
+    .then(function(r){ return r.json(); })
+    .catch(function(){ return {ok:false}; })
+    .then(function(d){ if(selected&&skey(selected)===k) havenRender(body,d); });
+}
+document.getElementById("pHavenHead").addEventListener("click",function(){ togglePanelFold("pHavenHead","pHavenBody"); havenLoad(); });
+document.getElementById("pHavenHead").addEventListener("keydown",function(e){ panelFoldKey(e,"pHavenHead","pHavenBody"); havenLoad(); });
 document.getElementById("fTogHead").addEventListener("click",function(){ togglePanelFold("fTogHead","fTogBody"); });
 document.getElementById("fTogHead").addEventListener("keydown",function(e){ panelFoldKey(e,"fTogHead","fTogBody"); });
 document.getElementById("bSave").addEventListener("click",function(){
