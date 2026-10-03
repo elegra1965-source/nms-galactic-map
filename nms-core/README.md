@@ -1,161 +1,138 @@
-# Save-file waypoint auto-fill tool ("companion app")
+# NMS Galaxy Generation Core (ported from nms_namegen)
 
-This folder holds a standalone script that reads your real local **No Man's Sky
-save file** — the one Hello Games Cloud cross-save writes to this PC after you
-open the game here and pull your PS5 progress down — and fills in blank
-**names** on your live map for any of your own in-game waypoints/bookmarks that
-land on a system your map doesn't have a name for yet.
+A JavaScript/ESM port of the real, disassembly-derived No Man's Sky
+generation algorithm from
+[hadsh/nms_namegen](https://github.com/hadsh/nms_namegen) (a fork of
+[stuart/nms_namegen](https://github.com/stuart/nms_namegen), MIT licensed).
+Covers both system/planet **attributes** (star type, planet/moon counts,
+black hole/Atlas placement) and **name generation** (system, region, and
+planet names), all verified byte-for-byte against the Python source.
 
-It **never overwrites anything already documented** by you or another
-traveller. It only ever touches the `name` field, and only when that field is
-currently blank. It never touches bodies, rings, stations, signals,
-screenshots, race/economy/conflict data, or anything else — your save doesn't
-carry that kind of data, so this tool doesn't guess at it.
+**Keep the MIT attribution** (this README + the header comments) if you
+publish the project, per the license terms.
 
-## Where your waypoint names come from
+## What's in here
 
-Every waypoint/bookmark you've ever set in-game (`Cetanle Base`, `Portal
-planet`, `New galaxy`, and so on) is stored in your save file along with its
-real galactic address. This tool decodes that list directly from the save —
-there's no separate "discovery log" to read, and nothing here talks to Hello
-Games or PSN. It only reads a file already sitting on this PC.
+| File | What it does |
+|---|---|
+| `iprng.js` | Threefish/Skein-style 64-bit hash: universal address -> system seed |
+| `prng.js` | The game's 32-bit multiplicative PRNG everything else draws from |
+| `region.js` | `voxelAttributes()` (black hole/Atlas/guide-star counts by distance from galaxy centre) and `regionName()` |
+| `system.js` | `systemAttributes()`, `planetSeeds()`, and `systemName()` |
+| `planet.js` | `planetName()` — full planet-naming logic (styles, adornments, short/long codes) |
+| `generator.js` | The weighted-Markov name generator both `systemName`/`regionName`/`planetName` are built on |
+| `alphasets.js` | 8 character-triplet corpora the generator draws from (~72KB, bundle-safe) |
+| `roman.js` | Roman numeral formatting (used in system/planet names) |
+| `letter_map_0.json` .. `letter_map_7.json` | The real per-triplet letter-frequency corpus, split into 8 shards (one per alphaset) — see loading notes below |
+| `loadLetterMap.js` | Fetches and merges the shards at runtime |
+| `index.js` | Barrel file — import everything from here |
 
-Names like "New galaxy" or "Portal planet" are **not** treated as junk or
-filtered out — the system's address is what makes each map entry unique, not
-the name text, so two different real places sharing a generic-sounding name is
-expected and completely fine.
+All BigInt-based, zero dependencies.
 
-If several of your waypoints land on the exact same system (common — you can
-bookmark more than one planet in a system, but the map has one name slot per
-system), only the first one found is used to fill that blank; the rest are
-written to `nms-save-autofill-skipped.txt` so you can see what didn't make it
-in.
+## The structural fix to your existing plan
 
-## Why you have to run this yourself
+Your SPEC.md assumed black hole = fixed index `079`, Atlas station = fixed
+index `07A`, in every region. The real rule (`voxelAttributes()` in
+`region.js`) computes these from the region's **3D distance from the
+galaxy centre**:
 
-Just like the wiki auto-fill tool, this can't run inside a Claude Cowork
-session or through any Claude-controlled shell — `nms-galaxy-map.netlify.app`
-is behind the same account-level network proxy that blocks the wiki tool,
-confirmed directly while building this. Your own terminal isn't behind that
-proxy, so it reaches your map fine.
+- Distance < 8 voxels: dead core — zero guide stars, zero black holes,
+  zero Atlas stations (`inside_gap: 1`)
+- Distance 8–1440 voxels: guide star count tapers down from 120 as you
+  move outward, feeding a "renegade star" count that boosts star-type
+  variety near the core
+- Black hole / Atlas station counts are typically 1 each per region,
+  placed wherever the anomaly draw lands — not a fixed slot
 
-That's why this is a script **you** run — a real Command Prompt/PowerShell
-window, a double-clicked `.bat` file, or Windows Task Scheduler — never
-something Claude runs for you.
+## letter_map — loading notes
 
-## Before you run it — sync your save
+The original `letter_map.json` was 5.3MB (517KB gzipped) as one file. Split
+into 8 shards by alphaset (`letter_map_0.json` .. `letter_map_7.json`,
+62KB–1MB each, reassembling to byte-identical content — verified), it's
+easier to serve and easier to eventually lazy-load per-shard if you want to
+get fancier later. For now, `loadLetterMap.js` just fetches all 8 in
+parallel and merges them, which is what the original single-file approach
+did anyway — the actual fix is keeping it **out of your main JS bundle**
+(don't `import` the JSON files directly, that inlines them) so it doesn't
+block first paint.
 
-Because this only reads a save file already on this PC, you need to pull your
-latest progress down first if you've been playing on PS5:
+1. Put all 8 `letter_map_*.json` files in your `public/nms-core/` folder
+   (Vite serves `public/` as static assets, untouched).
+2. Copy `loadLetterMap.js` alongside your other `lib/nms-core/` files.
+3. Call it once, lazily, the first time you need a name:
 
-1. Open No Man's Sky **on this PC**.
-2. If Cross-Save is set up, use the in-game **Cross-Save Manager** to download
-   your most recent save (the one from PS5, if that's where you played last).
-3. You can close the game again once that's done — the script only reads the
-   save file on disk, it doesn't need the game running.
+```js
+import { systemName, regionName, planetName } from './lib/nms-core/index.js';
+import { loadLetterMap } from './lib/nms-core/loadLetterMap.js';
 
-The script always reads whichever of your save slots was modified most
-recently, so if you play on both PC and PS5, always sync PS5→PC before running
-a real pass, or you'll be importing stale waypoints.
-
-## First-time setup
-
-You already have everything needed — Node.js is installed on this machine,
-and the script has zero external dependencies (no `npm install` required).
-
-This folder should live at:
-`C:\Users\elegr\Claude\Projects\NMS Galactic Map\tools\nms-save-autofill\`
-(two levels under the project root, same as the wiki tool.)
-
-## Step 1 — always dry-run first
-
-```
-node nms-save-autofill.mjs --dry-run
+const letterMap = await loadLetterMap('/nms-core'); // fetches all 8 shards + caches
+const name = systemName(portalCode, galaxy, letterMap);
 ```
 
-This reads your save, decodes your waypoints, fetches your live map data, and
-prints exactly what it *would* fill in — **nothing is written or submitted**.
-Read through the list. If a name looks wrong for where you'd expect it, that's
-the signal to stop and tell me before doing a real run.
+If you later want tighter control (e.g. only fetch the shards a specific
+call path needs), `loadLetterMapShards([indices], baseUrl)` is also
+exported and takes an explicit list of alphaset indices (0-7).
 
-## Step 2 — do a real run
+## How to drop it in
 
+1. Copy this folder into your project, e.g. `src/lib/nms-core/`, **except**
+   the `letter_map_*.json` shards — move those to `public/nms-core/`
+   instead (see above).
+2. Attributes (star type, planet count, gas giant, black hole/Atlas
+   placement) don't need the letter map at all:
+
+```js
+import { systemAttributes, planetSeeds, voxelAttributes } from './lib/nms-core/index.js';
+
+const attrs = systemAttributes(portalCode, galaxy);
+// -> { planet_count, prime_planet_count, safe_start_planet, gas_giant, star_type }
+
+const bodies = planetSeeds(portalCode, galaxy);
+// -> { planet_seeds: BigInt[], planet_count, moon_count }
+
+const region = voxelAttributes(portalCode);
+// -> { guide_star_count, black_hole_count, atlas_station_count, inside_gap, guide_star_renegade_count }
 ```
-node nms-save-autofill.mjs
+
+3. Names need the (lazy-loaded) letter map as a third argument:
+
+```js
+import { systemName, regionName, planetName } from './lib/nms-core/index.js';
+
+const system = systemName(portalCode, galaxy, letterMap);   // "Abarof-Dulin"
+const region = regionName(portalCode, galaxy, letterMap);   // "Yihelli Quadrant"
+const planet = planetName(portalCode, galaxy, letterMap);   // "Edershar K25"
+// planetName also accepts a raw planet seed directly (galaxy omitted):
+const p2 = planetName(planetSeedBigInt, undefined, letterMap);
 ```
 
-This submits through the same public "Edit System" endpoint your own map's
-edit form uses — one system at a time, with an 8-second pause between each,
-and it stops itself automatically once it's sent 7 in the current rolling hour
-(the server's real limit is 8/hour; this keeps one in reserve). If the server
-ever says "too many submissions" anyway, it backs off and waits out the full
-hour before continuing on its own.
+4. `attrs.star_type` (0-4) maps directly to your spectral-class table
+   (0=yellow/white, 1=green, 2=blue, 3=red, 4=purple).
+5. `attrs.gas_giant` means render exactly 1 planet + 5 moons — handle this
+   before looping over `planet_seeds`.
+6. Everything you've already designed on top — economy, conflict level,
+   race, outlaw/uncharted/abandoned display flags, the 3D scene — stays
+   exactly as planned; none of it is covered by the disassembly.
 
-It's safe to run over and over:
-- re-reads your save each time (so a fresh Cross-Save sync is picked up),
-- re-reads your live map (so it never fights anything you've since documented
-  by hand),
-- picks up exactly where the last run left off — progress is tracked in
-  `nms-save-autofill-state.json`, right next to the script,
-- everything it does is logged to `nms-save-autofill-log.txt`, also right
-  here.
+## Verification
 
-Unlike the wiki tool, once a given waypoint's name has been used to fill a
-blank (or the site rejects it), there's nothing new for it to do on a later
-run — new runs are really only useful after you've set new waypoints in-game
-and synced them down.
+- `systemAttributes()`, `planetSeeds()`, `voxelAttributes()`: the Python
+  reference's own unit tests (10/10) plus 200 randomized cross-checks,
+  field-by-field including full seed lists — all exact matches.
+- `systemName()`, `regionName()`: 100/100 randomized cross-checks against
+  the Python reference, plus both of the source repo's own README examples
+  reproduced exactly (`Abarof-Dulin`, `Yihelli Quadrant`).
+- `planetName()`: 44/44 randomized cross-checks (6 inputs hit a pre-existing
+  edge case in the Python reference itself, unrelated to the port), plus
+  both of the source repo's own README examples reproduced exactly
+  (`Edershar K25`, `Nutsvill Sigma`).
 
-## Automating it (Windows Task Scheduler)
+The Python source itself is corpus-verified against ~1,000-2,700 real
+systems from wiki/AGT data (see comments in the original `system.py`).
 
-Same approach as the wiki tool, if you want this to check itself periodically:
+## Attribution
 
-1. Open **Task Scheduler**.
-2. **Create Task...**.
-3. **General** tab: name it `NMS Save Autofill`. Tick "Run whether user is
-   logged on or not" if you want it to run while you're away.
-4. **Triggers** tab → **New...** → "On a schedule" → whatever cadence you
-   like (this only finds new work after you've synced a fresh save down, so
-   there's no benefit to running it more than a few times a day).
-5. **Actions** tab → **New...**:
-   - Program/script: `node`
-   - Add arguments: `nms-save-autofill.mjs`
-   - Start in:
-     `C:\Users\elegr\Claude\Projects\NMS Galactic Map\tools\nms-save-autofill`
-6. **Conditions** tab: untick "Start the task only if the computer is on AC
-   power" if this is a laptop and you want it to run on battery too.
-7. Save.
-
-Check `nms-save-autofill-log.txt` occasionally to see what it's been doing.
-
-## Just want to run it by hand?
-
-Double-click `run-save-autofill.bat` in this folder (or copy it to your
-Desktop). It runs a normal (non-dry-run) pass and pauses at the end so the
-window doesn't just vanish. If you ever want to dry-run instead, open a
-Command Prompt in this folder and run `node nms-save-autofill.mjs --dry-run`
-directly.
-
-## Important — do not deploy this folder
-
-This `tools/nms-save-autofill/` folder (and the
-`nms-save-autofill-state.json` / `nms-save-autofill-log.txt` /
-`nms-save-autofill-skipped.txt` files it creates) is **local tooling only**.
-Like `CLAUDE.md`, `HANDOVER.md`, and `overrides.json`, it must **never** be
-included in a GitHub push or Netlify deploy for this project.
-
-## What it actually changes, precisely
-
-For each of your waypoints that resolves to a valid galactic address, it only
-fills the map's `name` field if your map's current value for that system is
-genuinely blank. It never touches any other field. When it fills a name, it
-appends a line to that system's notes crediting it as "Filled from a
-traveller's own in-game waypoint notes," so it's always clear where the data
-came from.
-
-It skips, and never guesses at:
-- the literal word "Default" (the game's own placeholder for an unnamed
-  marker, not something you actually typed),
-- any waypoint whose address it can't confidently decode (older save format,
-  a non-spatial waypoint like a stored freighter position, etc) — these are
-  logged, not silently dropped,
-- a system your map already has a name for, however it got there.
+Original algorithm reverse-engineered by GoodGuysFree and hadsh, building
+on Stuart Coyle's `nms_namegen` and Andraemon/monkeyman192's
+`SystemNameCalculator`. MIT licensed — see upstream repo for full license
+text.
