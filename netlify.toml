@@ -14,7 +14,7 @@
   # the build for a commit range that touches nothing but
   # data/overrides.json; any commit that also changes real code still
   # builds normally.
-  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- . ':(exclude)data/overrides.json'"
+  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- . ':(exclude)data/overrides.json' ':(exclude)*.md'"
 
 # Serve preview.html at the site root without renaming it to index.html.
 [[redirects]]
