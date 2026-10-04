@@ -15,6 +15,27 @@
 // purged.
 const CACHE = 'nms-galmap-v2';
 
+/* 2026-09-15, Tony's live-test report: refreshing into Local (or any mode)
+   left drag/orbit feeling frozen for a few seconds before "catching up" --
+   traced to preview.js's render loop not starting until it finishes
+   fetching the 8 letter_map_N.json shards (nms-core's proc-gen naming
+   data, ~2.94MB combined) that window.nmsCoreReady gates on. The
+   network-first strategy below was making EVERY load, including repeat
+   visits/refreshes, redo that full fetch from scratch -- there was no fast
+   path back to a copy already sitting in this cache.
+   These shard files are static generated data, not hand-edited content
+   Tony expects to see update instantly (unlike preview.js/preview.html),
+   so a cache-first/stale-while-revalidate read is the right trade here:
+   an already-cached visit gets them back near-instantly (render loop can
+   start right away, no more frozen-drag window), while still refreshing
+   the cache in the background on every load in case the shards themselves
+   are ever regenerated -- so this never goes stale forever the way v1's
+   blanket cache-first bug (see the CACHE comment above) did. Scoped
+   narrowly to just this one folder rather than widening cache-first to
+   everything, so preview.html/preview.js/etc keep the network-first
+   always-fresh behaviour the v1->v2 change was specifically for. */
+const CACHE_FIRST_RE = /\/nms-core\/letter-map\/letter_map_\d+\.json$/;
+
 const CORE_FILES = [
   '/',
   '/preview.html',
@@ -58,6 +79,21 @@ self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
   if (!e.request.url.startsWith('http')) return;
   if (e.request.url.indexOf('/.netlify/functions/') !== -1) return; // let it hit the network untouched
+
+  if (CACHE_FIRST_RE.test(e.request.url)) {
+    e.respondWith(
+      caches.open(CACHE).then(cache => cache.match(e.request).then(cached => {
+        const network = fetch(e.request).then(response => {
+          if (response && response.status === 200 && response.type === 'basic') {
+            cache.put(e.request, response.clone());
+          }
+          return response;
+        }).catch(() => cached); // offline and nothing cached yet -- let it reject same as before
+        return cached || network;
+      }))
+    );
+    return;
+  }
 
   e.respondWith(
     fetch(e.request).then(response => {
