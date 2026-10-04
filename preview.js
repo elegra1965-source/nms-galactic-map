@@ -551,6 +551,32 @@ var MEGA_EXOTIC_SUBNAMES={
   green: ["Planetary Anomaly","Lost Green","Stellar Corruption Detected","Chromatic Fog","Vile Anomaly","Toxic Anomaly","Doomed Jade","Emeril","Deathly Green Anomaly"],
   blue: ["Planetary Anomaly","Lost Blue","Stellar Corruption Detected","Chromatic Fog","Harsh Blue Globe","Frozen Anomaly","Azure","Cerulean","Ultramarine"]
 };
+/* Exotic sub-biome grouping (2026-10-04, Tony) -- the game doesn't treat
+   Exotic as one flat pool: each sub-biome has its own 3-word prefix set
+   (2026-09-08 wiki/MBIN research, biome-subnames-research.md). Group labels
+   are the player-facing exotic flora names (Bubble Cluster, Rattle Spine...)
+   cross-checked against a fan "Biome Naming Guide" chart Tony found; where
+   that chart disagreed (it puts Calcified under Calcishroom) the wiki/MBIN
+   grouping wins (Calcified = Ossified Star / M Structure). Only used by the
+   Sub type combo (subtypeComboGroups) to show labelled groups -- the stored
+   value is still the plain word (e.g. "Bubbling"), nothing saved changes.
+   "Breached" is also on the Glitch list in-game; shown once, under Light
+   Fissure. Any BIOME_SUBNAMES.Exotic word not listed here falls into the
+   leading "General" group automatically so nothing can go missing. */
+var EXOTIC_SUBTYPE_GROUPS=[
+  {label:"Bubble Cluster",items:["Bubbling","Frothing","Foaming"]},
+  {label:"Cable Pod",items:["Contoured","Cabled","Webbed"]},
+  {label:"Calcishroom",items:["Fungal","Sporal","Capped"]},
+  {label:"Capillary Shell",items:["Finned","Bladed","Shell-Strewn"]},
+  {label:"Electric Cube",items:["Shattered","Fractured","Fragmented"]},
+  {label:"Glitching Separator",items:["Columned","Sharded","Pillared"]},
+  {label:"Hexplate Bush",items:["Hexagonal","Plated","Scaly"]},
+  {label:"Light Fissure",items:["Fissured","of Light","Breached"]},
+  {label:"Ossified Star",items:["Ossified","Petrified","Calcified"]},
+  {label:"Rattle Spine",items:["Rattling","Spined","Skeletal"]},
+  {label:"Terbium Growth",items:["Mechanical","Metallic","Metallurgic"]},
+  {label:"Glitch (rare)",items:["Crimson","Planetary Anomaly","Malfunctioning","Infected","Glassy","Thirsty","Doomed","Erased","Temporary","Corrupted"]}
+];
 /* Safe palette lookup for any biome VALUE, including a custom/unrecognised
    traveller-typed name (allowed since 2026-08-26 -- the Biome combo lets a
    traveller type real in-game wording that isn't one of this site's own 12
@@ -7858,7 +7884,7 @@ function buildIconCombo(inputId,listId,groups,blankLabel,allowCustom,onPick){
         var raw=g.items[j];
         var val=(raw&&typeof raw==="object")?raw.v:raw;
         var disp=(raw&&typeof raw==="object")?raw.d:raw;
-        out.push({label:val,display:disp,groupLabel:g.label,iconHtml:g.iconHtml});
+        out.push({label:val,display:disp,groupLabel:g.label,searchGrp:!!g.searchLabel,iconHtml:g.iconHtml});
       }
     }
     return out;
@@ -7895,7 +7921,7 @@ function buildIconCombo(inputId,listId,groups,blankLabel,allowCustom,onPick){
     var q=(filterText||"").trim().toLowerCase(), html="", lastGrp, shown=0, k, it;
     for(k=0;k<items.length;k++){
       it=items[k];
-      if(q && it.display.toLowerCase().indexOf(q)<0) continue;
+      if(q && it.display.toLowerCase().indexOf(q)<0 && !(it.searchGrp && String(it.groupLabel).toLowerCase().indexOf(q)>=0)) continue;
       if(it.groupLabel!==lastGrp){
         if(it.groupLabel) html+='<div class="icomboGrp">'+escAttr(it.groupLabel)+'</div>';
         lastGrp=it.groupLabel;
@@ -8206,7 +8232,21 @@ function subtypeComboGroups(biomeKey){
   var subs=(biomeKey==="Mega Exotic")?megaExoticSubs():(BIOME_SUBNAMES[biomeKey]||[]);
   var usedLower={};
   subs.forEach(function(s){ usedLower[s.toLowerCase()]=1; });
-  var groups=subs.length?[{label:null,items:subs.map(function(s){ return {v:s,d:s}; }),iconHtml:svg(IC_BIOME,(BIOMES[biomeKey]||BIOMES.Barren).base)}]:[];
+  var subIcon=svg(IC_BIOME,(BIOMES[biomeKey]||BIOMES.Barren).base);
+  var groups;
+  if(biomeKey==="Exotic"){
+    // Labelled per sub-biome (see EXOTIC_SUBTYPE_GROUPS). searchLabel lets
+    // typing a flora name ("bubble") list that whole group.
+    var grouped={};
+    EXOTIC_SUBTYPE_GROUPS.forEach(function(g){ g.items.forEach(function(w){ grouped[w.toLowerCase()]=1; }); });
+    var general=subs.filter(function(w){ return !grouped[w.toLowerCase()]; });
+    groups=(general.length?[{label:"General",items:general.map(function(w){ return {v:w,d:w}; }),iconHtml:subIcon}]:[])
+      .concat(EXOTIC_SUBTYPE_GROUPS.map(function(g){
+        return {label:g.label,searchLabel:true,items:g.items.map(function(w){ return {v:w,d:w}; }),iconHtml:subIcon};
+      }));
+  } else {
+    groups=subs.length?[{label:null,items:subs.map(function(s){ return {v:s,d:s}; }),iconHtml:subIcon}]:[];
+  }
   var extras=subtypeCommunityExtras(usedLower);
   if(extras.length) groups.push({label:"Other reported",items:extras.map(function(s){ return {v:s,d:s}; }),iconHtml:svg(IC_BIOME,"#8892a6")});
   return groups;
