@@ -74213,6 +74213,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:104009557D2F": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB7-40 Yarkasio",
+        "race": "Vy'keen",
+        "region": "Lugalus Fringe",
+        "starClass": "G5f",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Power Generation",
+        "sell": "61.1",
+        "buy": "-13.3",
+        "econDesc": "★★★ (High Supply)",
+        "conflict": "3 (Critical)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-10-07T20:01:06.322Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-10-07T20:01:06.322Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -74222,7 +74271,8 @@
       1791403221046,
       1791403233221,
       1791403244233,
-      1791403255412
+      1791403255412,
+      1791403266322
     ]
   },
   "flagLog": {},
