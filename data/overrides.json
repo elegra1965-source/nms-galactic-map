@@ -74066,13 +74066,63 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:103808557D31": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB23-38 Kudalaine",
+        "race": "Gek",
+        "region": "Dejigaha",
+        "starClass": "G6",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Scientific",
+        "sell": "66.1",
+        "buy": "-12.7",
+        "econDesc": "★★★ (High Supply)",
+        "conflict": "1 (Untroubled)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-10-07T20:00:33.221Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-10-07T20:00:33.221Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
       1791403209569,
-      1791403221046
+      1791403221046,
+      1791403233221
     ]
   },
   "flagLog": {},
