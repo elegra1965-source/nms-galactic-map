@@ -74017,12 +74017,62 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:10E80A557D30": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB15-E8 Odnandva",
+        "race": "Korvax",
+        "region": "Eiense",
+        "starClass": "F4p",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Maufacturing",
+        "sell": "57.7",
+        "buy": "-10.5",
+        "econDesc": "★★★ (Opulent)",
+        "conflict": "3 (Formidable)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-10-07T20:00:21.046Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-10-07T20:00:21.046Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
-      1791403209569
+      1791403209569,
+      1791403221046
     ]
   },
   "flagLog": {},
