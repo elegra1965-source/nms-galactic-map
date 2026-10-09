@@ -1009,6 +1009,11 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   color:var(--white);margin-bottom:2px;text-transform:uppercase}
 .modal .msub{font-size:11px;color:var(--text-faint);margin-bottom:12px}
 #disclaimerModal .msub{font-style:italic;cursor:default}
+#disclaimerModal.quick .mfld,#disclaimerModal.quick #discReadToggleRow,#disclaimerModal.quick #discReadBar{display:none!important}
+#disclaimerModal:not(.quick) #discQuick{display:none}
+#discQuick .dq-list{margin:0 0 10px;padding-left:20px;font-size:13px;line-height:1.55;color:var(--text-dim)}
+#discQuick .dq-list li{margin-bottom:8px}#discQuick .dq-list b{color:var(--text)}
+#discQuick .dq-note{font-size:11px;color:var(--text-faint);margin-bottom:10px}
 .mfld{margin-bottom:10px}
 .mfld .lb{font-size:9px;letter-spacing:.12em;color:var(--text-faint);text-transform:uppercase;margin-bottom:3px}
 /* About-modal accordion header (2026-08-25, honest-review fix): every .lb
@@ -2532,6 +2537,16 @@ nearby procedural space within a radius.">Search</button>
   <div class="box modal" id="disclaimerModal" style="max-width:380px;display:none">
     <h3>Before you explore</h3>
     <div class="msub" style="margin-bottom:12px">A few quick things:</div>
+    <!-- 2026-10-09: first visit shows three quick tips; the full 20-topic guide is one tap away (and is what About opens) -->
+    <div id="discQuick">
+      <ol class="dq-list">
+        <li><b>Spin, zoom and tap any star</b> to open its system. Every star is generated from its real portal address.</li>
+        <li><b>Got a portal address?</b> Use the glyph keypad to jump straight there, with glyphs or hex.</li>
+        <li><b>Plot a course</b> from any system for a real multi-jump route that fits your hyperdrive.</li>
+      </ol>
+      <div class="dq-note">Fan-made and unofficial. Not affiliated with Hello Games.</div>
+      <button type="button" class="btn" id="discFull" style="width:100%;text-align:center">Full guide &middot; all topics &#9662;</button>
+    </div>
     <div id="discReadToggleRow">
       <span id="discReadToggleLabel">Read aloud</span>
       <button type="button" id="discReadToggle" role="switch" aria-checked="false" aria-label="Toggle read-aloud controls for this page"><span class="thumb"></span></button>

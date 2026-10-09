@@ -4803,11 +4803,11 @@ function orbitRingMesh(orbitR,idx){
    Kept as the race-neutral pool below, used only for Uninhabited systems
    now that race-specific art exists (2026-09-15). */
 var DEFAULT_STATION_TEX=[
-  {tex:TEX_LOADER.load("icons-web/feature-station-default1.png"),aspect:160/316},
-  {tex:TEX_LOADER.load("icons-web/feature-station-default2.png"),aspect:332/332},
-  {tex:TEX_LOADER.load("icons-web/feature-station-default3.png"),aspect:640/607},
-  {tex:TEX_LOADER.load("icons-web/feature-station-default4.png"),aspect:640/364},
-  {tex:TEX_LOADER.load("icons-web/feature-station-default5.png"),aspect:438/482}
+  {tex:TEX_LOADER.load("icons-web/feature-station-default1.webp"),aspect:160/316},
+  {tex:TEX_LOADER.load("icons-web/feature-station-default2.webp"),aspect:332/332},
+  {tex:TEX_LOADER.load("icons-web/feature-station-default3.webp"),aspect:640/607},
+  {tex:TEX_LOADER.load("icons-web/feature-station-default4.webp"),aspect:640/364},
+  {tex:TEX_LOADER.load("icons-web/feature-station-default5.webp"),aspect:438/482}
 ];
 /* 2026-09-15, Tony: "I now have space stations for each race... to use in
    systems space station depending on which race the system belongs to".
@@ -4827,25 +4827,25 @@ var DEFAULT_STATION_TEX=[
    pool above rather than needing dedicated art of their own. */
 var RACE_STATION_TEX={
   "Gek":[
-    {tex:TEX_LOADER.load("icons-web/feature-station-gek1.png"),aspect:700/387},
-    {tex:TEX_LOADER.load("icons-web/feature-station-gek2.png"),aspect:387/700}
+    {tex:TEX_LOADER.load("icons-web/feature-station-gek1.webp"),aspect:700/387},
+    {tex:TEX_LOADER.load("icons-web/feature-station-gek2.webp"),aspect:387/700}
   ],
   "Vy'keen":[
-    {tex:TEX_LOADER.load("icons-web/feature-station-vykeen1.png"),aspect:700/668}
+    {tex:TEX_LOADER.load("icons-web/feature-station-vykeen1.webp"),aspect:700/668}
   ],
   "Korvax":[
-    {tex:TEX_LOADER.load("icons-web/feature-station-korvax1.png"),aspect:689/700},
-    {tex:TEX_LOADER.load("icons-web/feature-station-korvax2.png"),aspect:700/387}
+    {tex:TEX_LOADER.load("icons-web/feature-station-korvax1.webp"),aspect:689/700},
+    {tex:TEX_LOADER.load("icons-web/feature-station-korvax2.webp"),aspect:700/387}
   ]
 };
 var OUTLAW_STATION_TEX=[
-  {tex:TEX_LOADER.load("icons-web/feature-station-outlaw1.png"),aspect:637/700},
+  {tex:TEX_LOADER.load("icons-web/feature-station-outlaw1.webp"),aspect:637/700},
   /* 2026-09-15 correction: the image originally shipped here as "outlaw
      space station 2" wasn't actually a 2nd outlaw photo Tony had sent --
      replaced with the real one (feature-station-outlaw2.png re-exported
      from the correct source image, same filename/slot so nothing else
      needs to change). */
-  {tex:TEX_LOADER.load("icons-web/feature-station-outlaw2.png"),aspect:700/412}
+  {tex:TEX_LOADER.load("icons-web/feature-station-outlaw2.webp"),aspect:700/412}
 ];
 /* 2026-09-15, Tony: "just got 2 abandoned space stations" -- same
    independent-boolean situation as Outlaw above: s.abandoned (see
@@ -4861,8 +4861,8 @@ var OUTLAW_STATION_TEX=[
    flat JPEG), which the near-white flood-fill mask still catches fine
    since the checker's light-grey squares are well within its threshold. */
 var ABANDONED_STATION_TEX=[
-  {tex:TEX_LOADER.load("icons-web/feature-station-abandoned1.png"),aspect:563/535},
-  {tex:TEX_LOADER.load("icons-web/feature-station-abandoned2.png"),aspect:700/639}
+  {tex:TEX_LOADER.load("icons-web/feature-station-abandoned1.webp"),aspect:563/535},
+  {tex:TEX_LOADER.load("icons-web/feature-station-abandoned2.webp"),aspect:700/639}
 ];
 /* Shared with setMode()'s camera-fit (2026-09-13, Tony live feedback: system
    view "needs to fill screen more, little small") -- both need the exact
@@ -9556,7 +9556,8 @@ function openDisclaimer(){
   document.getElementById("modalWrap").classList.add("show");
   remeasureDisclaimerScroll();
 }
-document.getElementById("bAbout").addEventListener("click",openDisclaimer);
+document.getElementById("bAbout").addEventListener("click",function(){ document.getElementById("disclaimerModal").classList.remove("quick"); openDisclaimer(); });
+document.getElementById("discFull").addEventListener("click",function(){ document.getElementById("disclaimerModal").classList.remove("quick"); remeasureDisclaimerScroll(); });
 /* About accordion + read-aloud (Tony, 2026-09-05): the open/close mechanics
    below are the same exclusive-accordion behaviour from 2026-08-22 -- click
    a header, it opens and every other section closes. Two things added on
@@ -9789,10 +9790,10 @@ document.getElementById("discOk").addEventListener("click",function(){
   closeModal();
 });
 try{
-  if(!localStorage.getItem(DISCLAIMER_KEY)) openDisclaimer();
+  if(!localStorage.getItem(DISCLAIMER_KEY)){ document.getElementById("disclaimerModal").classList.add("quick"); openDisclaimer(); }
 }catch(e){
   /* localStorage blocked (private browsing etc) -- show it once per page load instead of never */
-  openDisclaimer();
+  document.getElementById("disclaimerModal").classList.add("quick"); openDisclaimer();
 }
 
 /* ============ hyperdrive-range first-time notice ============
