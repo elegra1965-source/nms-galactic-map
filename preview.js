@@ -12136,6 +12136,18 @@ if(LAST_POS){
   GALAXY=LAST_POS.galaxy;
   document.getElementById("galSel").value=String(GALAXY);
 }
+else{
+  /* first visit with a Traveller ID from the Hub (shared .nomansskyhub.app cookie):
+     open in their home galaxy instead of Euclid (2026-10-09) */
+  try{
+    var tidM=document.cookie.match(/(?:^|; )nmsTraveller=([^;]*)/);
+    var tidG=tidM?JSON.parse(decodeURIComponent(tidM[1])).g:null;
+    if(typeof tidG==="number"&&tidG>0&&tidG<GALAXIES.length){
+      GALAXY=tidG;
+      document.getElementById("galSel").value=String(GALAXY);
+    }
+  }catch(e){}
+}
 updateGalaxyInfo();
 updateHyperSummary();
 resize();
