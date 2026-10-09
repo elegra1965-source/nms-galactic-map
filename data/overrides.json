@@ -74456,12 +74456,206 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1052F9557C30": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Galactic Hub Capitol",
+        "race": "Vy'keen",
+        "region": "Uefert Nebula",
+        "starClass": "F4pf",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Construction",
+        "sell": "54.2",
+        "buy": "-16.6",
+        "econDesc": "Destitute",
+        "conflict": "Sporadic",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "",
+        "editorFriendCode": "",
+        "genVersion": "1.3.0",
+        "bodies": [
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "",
+            "subtype": "",
+            "descriptor": "",
+            "water": false,
+            "ring": false,
+            "resources": [
+              "Cobalt"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Require Orthodoxy",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "",
+            "subtype": "",
+            "descriptor": "",
+            "water": true,
+            "ring": false,
+            "resources": [
+              "Magnetised Ferrite"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Enforcing",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "",
+            "subtype": "",
+            "descriptor": "",
+            "water": false,
+            "ring": false,
+            "resources": [
+              "Silver"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Attentive",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "",
+            "subtype": "",
+            "descriptor": "",
+            "water": false,
+            "ring": false,
+            "resources": [
+              "Magnetised Ferrite"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Few",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "",
+            "subtype": "",
+            "descriptor": "",
+            "water": false,
+            "ring": false,
+            "resources": [
+              "Cobalt"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Isolated",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "",
+            "subtype": "",
+            "descriptor": "",
+            "water": true,
+            "ring": false,
+            "resources": [
+              "Sodium"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Attentive",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          }
+        ]
+      },
+      "editedAt": "2026-10-09T07:18:22.250Z",
+      "editedByIp": "172.59.170.204",
+      "history": [
+        {
+          "at": "2026-10-09T07:18:22.250Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
-    "2001:9e8:fac4:1500:9cb9:94c1:c41f:2815": [
-      1791500619563
+    "172.59.170.204": [
+      1791530302250
     ]
   },
   "flagLog": {},
