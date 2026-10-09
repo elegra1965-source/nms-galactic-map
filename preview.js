@@ -1970,7 +1970,7 @@ function toast(msg,ms){
   toast._t=setTimeout(function(){ t.style.display="none"; },ms||1800);
 }
 function shareTo(t){
-  var url="https://nms-galaxy-map.netlify.app",
+  var url="https://map.nomansskyhub.app",
       txt="NMS Galactic Map \u2014 a fan-made 3D No Man's Sky galaxy map and portal address decoder, by elegra1965.";
   if(t==="x") window.open("https://twitter.com/intent/tweet?text="+encodeURIComponent(txt)+"&url="+encodeURIComponent(url),"_blank");
   else if(t==="reddit") window.open("https://www.reddit.com/submit?url="+encodeURIComponent(url)+"&title="+encodeURIComponent("NMS Galactic Map"),"_blank");
