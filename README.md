@@ -45,6 +45,9 @@ Screenshots from the live site, in the order you'd actually hit them. The
 site itself also has a live version of this same walkthrough -- hit **Tour**
 in the toolbar (or "Take a quick tour" on the first-visit disclaimer) for a
 9-step guided spotlight over the real UI instead of static images.
+On a first visit the disclaimer now shows three quick tips with the full
+guide one tap away (About always opens the full guide), and if you saved a
+Traveller ID on the Hub the map opens in your home galaxy.
 
 **Galaxy view.** Every one of the 256 real galaxies rendered as a proper 3D
 spiral, colour-matched to its actual type (Normal / Harsh / Empty / Lush) --
