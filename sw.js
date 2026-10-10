@@ -13,7 +13,7 @@
 // constant shouldn't need bumping again for a normal content update -- only
 // if this file (sw.js) ITSELF changes again in a way that needs old caches
 // purged.
-const CACHE = 'nms-galmap-v6';
+const CACHE = 'nms-galmap-v7';
 
 /* 2026-09-15, Tony's live-test report: refreshing into Local (or any mode)
    left drag/orbit feeling frozen for a few seconds before "catching up" --

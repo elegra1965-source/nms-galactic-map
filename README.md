@@ -49,6 +49,12 @@ On a first visit the disclaimer now shows three quick tips with the full
 guide one tap away (About always opens the full guide), and if you saved a
 Traveller ID on the Hub the map opens in your home galaxy.
 
+**Share this system.** Pick any system and hit **Share system** in its info
+panel: the map draws a picture card (system name, star, lifeform, economy,
+conflict, features, the 12 portal glyphs and the hex) sized for Reddit,
+Discord and X, and opens your phone's share sheet with a fly-there link.
+On a desktop it saves the picture and copies the link.
+
 **Galaxy view.** Every one of the 256 real galaxies rendered as a proper 3D
 spiral, colour-matched to its actual type (Normal / Harsh / Empty / Lush) --
 not a static image, a real navigable scene you fly through. Switch galaxies
