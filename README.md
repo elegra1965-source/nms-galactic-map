@@ -55,6 +55,8 @@ conflict, features, the 12 portal glyphs and the hex) sized for Reddit,
 Discord and X, and opens your phone's share sheet with a fly-there link.
 On a desktop it saves the picture and copies the link.
 
+<img src="screenshots/16-share-system-card.jpg" alt="Share system card: Galactic Hub Capitol with star, facts, portal glyphs and hex" width="360">
+
 **Galaxy view.** Every one of the 256 real galaxies rendered as a proper 3D
 spiral, colour-matched to its actual type (Normal / Harsh / Empty / Lush) --
 not a static image, a real navigable scene you fly through. Switch galaxies
