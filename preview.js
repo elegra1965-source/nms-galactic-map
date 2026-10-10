@@ -12135,7 +12135,14 @@ function readArrivalHandoff(){
     return {galaxy:g, address:addr};
   }catch(e){ return null; }
 }
-var LAST_POS=readArrivalHandoff()||loadLastPosition();
+var ARRIVAL=readArrivalHandoff();
+var LAST_POS=ARRIVAL||loadLastPosition();
+/* 2026-10-10: a link from the Hub dialer / Translator glyph reader may carry a planet glyph other
+   than 1. The map works per system (its addresses always use planet 1), so say so instead of
+   leaving the traveller wondering why the first glyph changed. */
+if(ARRIVAL&&ARRIVAL.address.charAt(0).toUpperCase()!=="1"){
+  setTimeout(function(){ toast("The first glyph picks the planet. The map shows the whole system, so it starts at planet 1 -- dial "+ARRIVAL.address.toUpperCase().replace(/[^0-9A-F]/g,"")+" in game to land on that planet.",9000); },4500);
+}
 if(LAST_POS){
   GALAXY=LAST_POS.galaxy;
   document.getElementById("galSel").value=String(GALAXY);
