@@ -961,6 +961,8 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 #galIcon{width:84px;height:84px;flex:none;display:block;pointer-events:auto;
   -webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 #galHud div{white-space:nowrap}
+/* 2026-10-10: phones, System view -- the title banner already shows galaxy + core distance, and these overlapped it */
+@media(max-width:699px){html.sys-mode #galHud,html.sys-mode #annivBadge{display:none!important}}
 #galHud .galHudTxt{text-shadow:0 1px 2px #000,0 -1px 2px #000,1px 0 2px #000,-1px 0 2px #000,0 0 6px #000}
 #galHudName{font-size:11px;letter-spacing:.06em;opacity:.92}
 #galHudDist{font-size:13px;letter-spacing:.04em;margin-top:1px}

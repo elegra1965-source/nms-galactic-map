@@ -6544,6 +6544,10 @@ function setMode(m){
   } else {
     sysBanner.style.display="none";
   }
+  /* 2026-10-10: html.sys-mode lets CSS hide the Galactic Core readout on
+     phones in System view -- it overlapped the system title, and the
+     banner's own subtitle already shows the galaxy and core distance. */
+  document.documentElement.classList.toggle("sys-mode", m==="system"&&!!selected);
   updateGalInfoBadge();
   hideLabels();
   document.getElementById("empty").style.display=(m==="local"&&shown.length===0)?"block":"none";
