@@ -11020,6 +11020,71 @@ function startAtlasWait(txtEl, iconWrap, iconImg){
   }, 5000);
   return function stop(){ clearTimeout(slowTimer); };
 }
+/* ============ Send to Voyager's Haven (2026-10-12) ============
+   Opt-in ("Also send to Voyager's Haven" tick box in Edit System). Runs
+   only AFTER our own save succeeded, and turns the saved payload into the
+   shape Haven's submission endpoint expects (see
+   netlify/functions/haven-submit.mjs, which re-checks every field and holds
+   the Hub's submit-only key). Haven reviews every submission before it goes
+   live. Sends only what Haven has a clear field for: system name, galaxy,
+   star colour, economy type + strength tier, conflict tier, race, and per
+   planet its name/biome/weather/sentinels. Abandoned systems skip race and
+   economy (Haven's own abandoned status isn't a submit field, and sending
+   the old race would make it look like a normal system). */
+var HAVEN_SEND_K="nms-galmap-haven-send";
+function havenTierOf(word, tiers){
+  var w=String(word||"").trim().toLowerCase(); if(!w) return "";
+  for(var i=0;i<tiers.length;i++) for(var j=0;j<tiers[i].length;j++) if(tiers[i][j].toLowerCase()===w) return ["Low","Medium","High"][i];
+  return "";
+}
+function havenEconTypeOf(name){
+  var w=String(name||"").trim().toLowerCase(); if(!w) return "";
+  for(var i=0;i<ECON.length;i++){
+    if(ECON[i][0].toLowerCase()===w) return ECON[i][0];
+    for(var j=0;j<ECON[i][1].length;j++) if(ECON[i][1][j].toLowerCase()===w) return ECON[i][0];
+  }
+  return "";
+}
+function buildHavenSubmission(address, galaxy, payload){
+  var star=(payload.stars&&payload.stars[0])||"";
+  var abandoned=!!payload.abandoned;
+  var race=payload.race||"";
+  return {
+    glyph_code:address,
+    galaxy_name:GALAXIES[galaxy]||"",
+    system_name:payload.name||"",
+    star_color:star?star.charAt(0).toUpperCase()+star.slice(1):"",
+    economy_type:abandoned?"":havenEconTypeOf(payload.econName),
+    economy_strength:abandoned?"":havenTierOf(payload.econDesc, ECON_S),
+    conflict_level:havenTierOf(payload.conflict, CONFLICT),
+    dominant_lifeform:(abandoned||race==="Uninhabited")?"":race,
+    discord_username:payload.editorName||"",
+    planets:(payload.bodies||[]).map(function(b){
+      return {
+        planet_name:b.name||"",
+        biome:(b.biome&&b.biome!=="Unknown")?b.biome:"",
+        weather:b.descriptor||"",
+        sentinel_level:(b.sentinel&&b.sentinel!=="None"&&b.sentinel!=="Not shown")?b.sentinel:"",
+        is_moon:!!b.moon
+      };
+    })
+  };
+}
+function sendToHaven(address, galaxy, payload){
+  var sub=buildHavenSubmission(address, galaxy, payload);
+  fetch("/.netlify/functions/haven-submit",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(sub)})
+  .then(function(r){ return r.json().catch(function(){ return {}; }); })
+  .then(function(j){
+    setTimeout(function(){ toast(j.message||(j.ok?"Sent to Voyager's Haven":"Couldn't send to Voyager's Haven"),4200); },2600);
+  }).catch(function(){
+    setTimeout(function(){ toast("Couldn't reach Voyager's Haven -- your map edit is still saved",4200); },2600);
+  });
+}
+(function(){
+  var cb=document.getElementById("edHavenSend"); if(!cb) return;
+  try{ cb.checked=localStorage.getItem(HAVEN_SEND_K)==="1"; }catch(e){}
+  cb.addEventListener("change",function(){ try{ localStorage.setItem(HAVEN_SEND_K,cb.checked?"1":"0"); }catch(e){} });
+})();
 function submitEditPayload(address, galaxy, payload){
   var errEl=document.getElementById("editErr"), retryBtn=document.getElementById("edRetry");
   var spin=document.getElementById("editSpin"), spinTxt=document.getElementById("editSpinTxt"), btn=document.getElementById("edSubmit");
@@ -11042,7 +11107,9 @@ function submitEditPayload(address, galaxy, payload){
     }
     hideStatusIcon(iconWrap);
     rememberKnownTerms(payload);
+    var sendHaven=document.getElementById("edHavenSend").checked;
     closeModal(); toast("System saved -- visible to everyone"); loadOverrides();
+    if(sendHaven) sendToHaven(address, galaxy, payload);
   }).catch(function(){
     stopWait(); spin.style.display="none"; btn.disabled=false;
     showStatusIcon(iconWrap,iconImg,"grave");

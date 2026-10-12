@@ -292,6 +292,15 @@ it's never merged into this map's own community edits. Looked up by a small
 Netlify Function (`netlify/functions/haven-lookup.mjs`) that caches results,
 and only when you actually open the section.
 
+**Send to Voyager's Haven.** Edit System has an opt-in tick box, *Also send
+to Voyager's Haven*. After your edit saves here, the system (name, galaxy, star
+colour, economy, conflict, race, and each planet's biome, weather and
+sentinels) is sent to Haven under the No Man's Sky Hub community tag
+(NMSHUB). Haven checks every submission before it goes live, and once approved
+it's credited to the name you entered. A system already on Haven is sent as an
+update. Handled by `netlify/functions/haven-submit.mjs`, which keeps the Hub's
+submit-only key on the server and limits each traveller to 5 sends an hour.
+
 **Portal glyph keypad.** Type a hex address or tap the real 16 in-game glyphs
 directly -- both stay in sync, so you can decode a screenshot from your own
 game without knowing the hex first.
