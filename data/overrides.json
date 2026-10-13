@@ -51033,8 +51033,8 @@
         "econName": "High Voltage",
         "sell": "48.7",
         "buy": "-14.5",
-        "econDesc": "💀 (Black Market)",
-        "conflict": "💀 (Pirate Controlled)",
+        "econDesc": "",
+        "conflict": "",
         "blackHole": false,
         "atlas": false,
         "ruins": false,
@@ -51050,16 +51050,175 @@
         "allianceName": "",
         "stationPhoto": "",
         "signals": [],
-        "editorName": "Galactic Hub Wiki (import)",
+        "editorName": "",
         "editorFriendCode": "",
-        "genVersion": "",
-        "bodies": []
+        "genVersion": "1.3.0",
+        "bodies": [
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "",
+            "subtype": "",
+            "descriptor": "",
+            "water": true,
+            "ring": false,
+            "resources": [
+              "Magnetised Ferrite"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Isolated",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "",
+            "subtype": "",
+            "descriptor": "",
+            "water": true,
+            "ring": false,
+            "resources": [
+              "Magnetised Ferrite"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Hostile Patrols",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "",
+            "subtype": "",
+            "descriptor": "",
+            "water": true,
+            "ring": false,
+            "resources": [
+              "Salt"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Answer To None",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "",
+            "subtype": "",
+            "descriptor": "",
+            "water": true,
+            "ring": "tan",
+            "resources": [
+              "Silver"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Ever-present",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": true,
+            "orbits": 4,
+            "biome": "",
+            "subtype": "",
+            "descriptor": "",
+            "water": false,
+            "ring": false,
+            "resources": [
+              "Salt"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Limited",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": true,
+            "orbits": 0,
+            "biome": "Lush",
+            "subtype": "Paradise",
+            "descriptor": "Balmy",
+            "water": true,
+            "ring": false,
+            "resources": [
+              "Cobalt",
+              "Star Bulb"
+            ],
+            "flora": [
+              "Rich"
+            ],
+            "fauna": [
+              "Rich"
+            ],
+            "minerals": [
+              "Quartzite",
+              "Paraffinium"
+            ],
+            "salvage": [],
+            "fossils": [
+              "Ancient Bones"
+            ],
+            "sentinel": "Infrequent",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          }
+        ]
       },
-      "editedAt": "2026-09-23T06:01:13.908Z",
-      "editedByIp": "5.133.46.24",
+      "editedAt": "2026-10-13T09:20:21.244Z",
+      "editedByIp": "72.223.117.245",
       "history": [
         {
           "at": "2026-09-23T06:01:13.908Z",
+          "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-10-13T09:20:21.244Z",
           "text": "edited by a traveller"
         }
       ]
@@ -75261,9 +75420,8 @@
   },
   "reports": [],
   "ipLog": {
-    "185.213.229.66": [
-      1791792001469,
-      1791792643193
+    "72.223.117.245": [
+      1791883221244
     ]
   },
   "flagLog": {},
@@ -75281,7 +75439,8 @@
       "Cobalt",
       "Activated Copper",
       "Copper",
-      "Rusted Metal"
+      "Rusted Metal",
+      "Star Bulb"
     ],
     "flora": [
       "Sporadic",
@@ -75303,7 +75462,8 @@
       "Frequent",
       "Rare",
       "Generous",
-      "Abundant"
+      "Abundant",
+      "Rich"
     ],
     "minerals": [
       "Magnatised Ferrite",
@@ -75363,7 +75523,8 @@
       "Molten Rain",
       "Humid",
       "Infrequent Heat Storms",
-      "Beautiful"
+      "Beautiful",
+      "Balmy"
     ],
     "biome": [
       "Radioactive",
