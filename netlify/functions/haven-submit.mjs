@@ -89,8 +89,10 @@ export function buildHavenPayload(input){
     set(cp, "biome", txt(p.biome, 30, "Planet " + (i + 1) + " biome"));
     set(cp, "weather", txt(p.weather, 50, "Planet " + (i + 1) + " weather"));
     set(cp, "sentinel_level", txt(p.sentinel_level, 30, "Planet " + (i + 1) + " sentinels"));
+    set(cp, "common_resource", txt(p.common_resource, 40, "Planet " + (i + 1) + " common resource"));
+    set(cp, "uncommon_resource", txt(p.uncommon_resource, 40, "Planet " + (i + 1) + " uncommon resource"));
     cp.is_moon = !!p.is_moon;
-    if(cp.planet_name || cp.biome || cp.weather || cp.sentinel_level) cleanPlanets.push(cp);
+    if(cp.planet_name || cp.biome || cp.weather || cp.sentinel_level || cp.common_resource || cp.uncommon_resource) cleanPlanets.push(cp);
   });
   if(cleanPlanets.length) out.planets = cleanPlanets;
   return out;

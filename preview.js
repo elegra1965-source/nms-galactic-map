@@ -11065,6 +11065,9 @@ function buildHavenSubmission(address, galaxy, payload){
         biome:(b.biome&&b.biome!=="Unknown")?b.biome:"",
         weather:b.descriptor||"",
         sentinel_level:(b.sentinel&&b.sentinel!=="None"&&b.sentinel!=="Not shown")?b.sentinel:"",
+        // Haven takes one of each; the map's Common/Uncommon resources lists -> first entry.
+        common_resource:(b.resources&&b.resources[0])||"",
+        uncommon_resource:(b.minerals&&b.minerals[0])||"",
         is_moon:!!b.moon
       };
     })
