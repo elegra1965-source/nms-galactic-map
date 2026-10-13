@@ -1,138 +1,212 @@
-# NMS Galaxy Generation Core (ported from nms_namegen)
+# nms-core
 
-A JavaScript/ESM port of the real, disassembly-derived No Man's Sky
-generation algorithm from
-[hadsh/nms_namegen](https://github.com/hadsh/nms_namegen) (a fork of
-[stuart/nms_namegen](https://github.com/stuart/nms_namegen), MIT licensed).
-Covers both system/planet **attributes** (star type, planet/moon counts,
-black hole/Atlas placement) and **name generation** (system, region, and
-planet names), all verified byte-for-byte against the Python source.
+Game-accurate star type, planet count, black hole / Atlas placement, system/region/planet name generation, and (since 2026-08-23) real economy/wealth/conflict/race/uncharted/abandoned/pirate derivation for **No Man's Sky**, exported as a vanilla ES module.
 
-**Keep the MIT attribution** (this README + the header comments) if you
-publish the project, per the license terms.
+Ported from [hadsh/nms_namegen](https://github.com/hadsh/nms_namegen) (itself a fork of [Stuart Coyle's](https://github.com/stu-/nms_namegen) original work, co-authored with GoodGuysFree). The probability tables, hash function, and name-generation logic here are reverse-engineered from the game — not invented. See attribution below.
+
+`economy.js` is separate original work (elegra1965) — the economy/conflict/race/outlaw/ring logic that `nms_namegen` never modelled. Its numeric probability tables were decompiled directly from a legitimately-owned game install; see the file header for detail.
+
+`save-import/` is also separate original work — a client-side-only reader for real NMS `.hg` save files (name + real base list), unrelated to the procedural generation the rest of this module does. See [`save-import/README.md`](./save-import/README.md) for the full writeup; it's covered here only for completeness.
+
+Used by the [NMS Galactic Map](https://nms-galaxy-map.netlify.app) — a free, fan-made 3D portal decoder and galaxy explorer.
+
+---
 
 ## What's in here
 
-| File | What it does |
-|---|---|
-| `iprng.js` | Threefish/Skein-style 64-bit hash: universal address -> system seed |
-| `prng.js` | The game's 32-bit multiplicative PRNG everything else draws from |
-| `region.js` | `voxelAttributes()` (black hole/Atlas/guide-star counts by distance from galaxy centre) and `regionName()` |
-| `system.js` | `systemAttributes()`, `planetSeeds()`, and `systemName()` |
-| `planet.js` | `planetName()` — full planet-naming logic (styles, adornments, short/long codes) |
-| `generator.js` | The weighted-Markov name generator both `systemName`/`regionName`/`planetName` are built on |
-| `alphasets.js` | 8 character-triplet corpora the generator draws from (~72KB, bundle-safe) |
-| `roman.js` | Roman numeral formatting (used in system/planet names) |
-| `letter_map_0.json` .. `letter_map_7.json` | The real per-triplet letter-frequency corpus, split into 8 shards (one per alphaset) — see loading notes below |
-| `loadLetterMap.js` | Fetches and merges the shards at runtime |
-| `index.js` | Barrel file — import everything from here |
+| File | Source | What it does |
+|---|---|---|
+| `iprng.js` | ported (hadsh) | Threefish/Skein-style 64-bit hash — the game's real seed mixer |
+| `prng.js` | ported (hadsh) | 32-bit multiplicative PRNG, seeded from the hash |
+| `region.js` | ported (hadsh) | Voxel→region seed, region name, voxel attributes — including real black hole/Atlas placement, corrected 2026-08-23 (see Known limitations) |
+| `system.js` | ported (hadsh) | Star type, planet/moon counts, safe-start planet, system name, plus (since 2026-08-23) `economy_type`, `wealth`, `conflict_level`, `dominant_race`, `uncharted`, `abandoned`, `pirate` — the real reverse-engineered algorithm, not a statistical guess. Also `sellBuy()` (2026-10-13, found by elegra1965): the real sell%/buy% — first two draws of the planetSeeds() stream, `buy = -30 + 20*u1`, `sell = 40 + 40*u2`; 93.5% exact on 1,444 player-recorded systems |
+| `planet.js` | ported (hadsh) | Per-planet name from the system seed |
+| `generator.js` | ported (hadsh) | Weighted-Markov name assembler |
+| `roman.js` | ported (hadsh) | Roman numeral formatter (moon suffixes) |
+| `alphasets.js` | ported (hadsh) | Character-triplet corpora for name generation |
+| `loadLetterMap.js` | ported (hadsh) | Lazy loader for the 8 letter_map JSON shards |
+| `economy.js` | original (elegra1965) | Economy/conflict/race/outlaw/abandoned/ring logic with real decompiled probability tables |
+| `letter-map/` | ported (hadsh) | 8 JSON data shards required by the name generator (~3 MB total) |
+| `save-import/` | original (elegra1965), + real mapping data from oxur/nms-copilot | Client-side `.hg` save file reader — see its own [README](./save-import/README.md) |
 
-All BigInt-based, zero dependencies.
+---
 
-## The structural fix to your existing plan
+## Usage
 
-Your SPEC.md assumed black hole = fixed index `079`, Atlas station = fixed
-index `07A`, in every region. The real rule (`voxelAttributes()` in
-`region.js`) computes these from the region's **3D distance from the
-galaxy centre**:
+### Loading the module
 
-- Distance < 8 voxels: dead core — zero guide stars, zero black holes,
-  zero Atlas stations (`inside_gap: 1`)
-- Distance 8–1440 voxels: guide star count tapers down from 120 as you
-  move outward, feeding a "renegade star" count that boosts star-type
-  variety near the core
-- Black hole / Atlas station counts are typically 1 each per region,
-  placed wherever the anomaly draw lands — not a fixed slot
+The module is pure ES module (`type="module"`). In a browser:
 
-## letter_map — loading notes
-
-The original `letter_map.json` was 5.3MB (517KB gzipped) as one file. Split
-into 8 shards by alphaset (`letter_map_0.json` .. `letter_map_7.json`,
-62KB–1MB each, reassembling to byte-identical content — verified), it's
-easier to serve and easier to eventually lazy-load per-shard if you want to
-get fancier later. For now, `loadLetterMap.js` just fetches all 8 in
-parallel and merges them, which is what the original single-file approach
-did anyway — the actual fix is keeping it **out of your main JS bundle**
-(don't `import` the JSON files directly, that inlines them) so it doesn't
-block first paint.
-
-1. Put all 8 `letter_map_*.json` files in your `public/nms-core/` folder
-   (Vite serves `public/` as static assets, untouched).
-2. Copy `loadLetterMap.js` alongside your other `lib/nms-core/` files.
-3. Call it once, lazily, the first time you need a name:
-
-```js
-import { systemName, regionName, planetName } from './lib/nms-core/index.js';
-import { loadLetterMap } from './lib/nms-core/loadLetterMap.js';
-
-const letterMap = await loadLetterMap('/nms-core'); // fetches all 8 shards + caches
-const name = systemName(portalCode, galaxy, letterMap);
+```html
+<script type="module">
+  import * as NMSCore from './nms-core/index.js';
+  import { rollSystemFlavor, rollRing } from './nms-core/economy.js';
+</script>
 ```
 
-If you later want tighter control (e.g. only fetch the shards a specific
-call path needs), `loadLetterMapShards([indices], baseUrl)` is also
-exported and takes an explicit list of alphaset indices (0-7).
-
-## How to drop it in
-
-1. Copy this folder into your project, e.g. `src/lib/nms-core/`, **except**
-   the `letter_map_*.json` shards — move those to `public/nms-core/`
-   instead (see above).
-2. Attributes (star type, planet count, gas giant, black hole/Atlas
-   placement) don't need the letter map at all:
+Or in Node.js / a bundler:
 
 ```js
-import { systemAttributes, planetSeeds, voxelAttributes } from './lib/nms-core/index.js';
-
-const attrs = systemAttributes(portalCode, galaxy);
-// -> { planet_count, prime_planet_count, safe_start_planet, gas_giant, star_type }
-
-const bodies = planetSeeds(portalCode, galaxy);
-// -> { planet_seeds: BigInt[], planet_count, moon_count }
-
-const region = voxelAttributes(portalCode);
-// -> { guide_star_count, black_hole_count, atlas_station_count, inside_gap, guide_star_renegade_count }
+import * as NMSCore from './nms-core/index.js';
+import { rollSystemFlavor, rollRing } from './nms-core/economy.js';
 ```
 
-3. Names need the (lazy-loaded) letter map as a third argument:
+### Loading the letter map (required for name generation)
+
+Planet/system/region names need the letter map shards. Load them once before calling any name functions:
 
 ```js
-import { systemName, regionName, planetName } from './lib/nms-core/index.js';
+import { loadLetterMap } from './nms-core/loadLetterMap.js';
 
-const system = systemName(portalCode, galaxy, letterMap);   // "Abarof-Dulin"
-const region = regionName(portalCode, galaxy, letterMap);   // "Yihelli Quadrant"
-const planet = planetName(portalCode, galaxy, letterMap);   // "Edershar K25"
-// planetName also accepts a raw planet seed directly (galaxy omitted):
-const p2 = planetName(planetSeedBigInt, undefined, letterMap);
+// Pass a base URL so the shards can be fetched
+const letterMap = await loadLetterMap('./nms-core/letter-map/');
+
+// Then pass it into name functions
+const name = NMSCore.systemName(seed, letterMap);
 ```
 
-4. `attrs.star_type` (0-4) maps directly to your spectral-class table
-   (0=yellow/white, 1=green, 2=blue, 3=red, 4=purple).
-5. `attrs.gas_giant` means render exactly 1 planet + 5 moons — handle this
-   before looping over `planet_seeds`.
-6. Everything you've already designed on top — economy, conflict level,
-   race, outlaw/uncharted/abandoned display flags, the 3D scene — stays
-   exactly as planned; none of it is covered by the disassembly.
+Planet names are expensive to generate for large batches. If you're iterating many systems, generate system/region names eagerly and planet names lazily (only for the system a user actually opens).
 
-## Verification
+### Getting system data from a portal address
 
-- `systemAttributes()`, `planetSeeds()`, `voxelAttributes()`: the Python
-  reference's own unit tests (10/10) plus 200 randomized cross-checks,
-  field-by-field including full seed lists — all exact matches.
-- `systemName()`, `regionName()`: 100/100 randomized cross-checks against
-  the Python reference, plus both of the source repo's own README examples
-  reproduced exactly (`Abarof-Dulin`, `Yihelli Quadrant`).
-- `planetName()`: 44/44 randomized cross-checks (6 inputs hit a pre-existing
-  edge case in the Python reference itself, unrelated to the port), plus
-  both of the source repo's own README examples reproduced exactly
-  (`Edershar K25`, `Nutsvill Sigma`).
+A 12-glyph portal address encodes a 3D position. Convert glyphs to a hex string, then:
 
-The Python source itself is corpus-verified against ~1,000-2,700 real
-systems from wiki/AGT data (see comments in the original `system.py`).
+```js
+import { voxelAttributes } from './nms-core/region.js';
+import { systemAttributes } from './nms-core/system.js';
+
+// "0807F07FFFFF" — 12 hex chars (glyphs 0–F)
+const addr = "0807F07FFFFF";
+
+// Parse into coordinates
+const planet = parseInt(addr[0], 16);           // glyph 0: planet index
+const ssi    = parseInt(addr.slice(1,4), 16);   // glyphs 1-3: system index within region
+const y      = parseInt(addr.slice(4,6), 16);   // glyphs 4-5: Y voxel (signed)
+const z      = parseInt(addr.slice(6,9), 16);   // glyphs 6-8: Z voxel (signed)
+const x      = parseInt(addr.slice(9,12), 16);  // glyphs 9-11: X voxel (signed)
+
+const voxel = voxelAttributes(x, y, z, 0); // 0 = Euclid
+const attrs = systemAttributes(voxel.regionSeed, ssi, letterMap);
+
+console.log(attrs.starType);    // e.g. "F2p" (yellow dwarf with planet variant)
+console.log(attrs.numPlanets);  // e.g. 4
+console.log(attrs.name);        // e.g. "Sranch Op10079"
+```
+
+### Economy, conflict, race
+
+```js
+import { rollSystemFlavor, rollRing, ECON, CONFLICT, RACES } from './nms-core/economy.js';
+
+// mulberry32-style seeded RNG, or any function returning [0,1)
+function makeRng(seed) {
+  let s = seed >>> 0;
+  return () => { s ^= s << 13; s ^= s >> 17; s ^= s << 5; return (s >>> 0) / 4294967296; };
+}
+
+const rng = makeRng(attrs.seed);
+const flavor = rollSystemFlavor(rng, attrs.starType[0]); // first char = colour key
+
+console.log(flavor.race);       // "Gek" | "Vy'keen" | "Korvax" | "Uninhabited"
+console.log(flavor.economy);    // e.g. "Advanced Mining"
+console.log(flavor.conflict);   // e.g. "Fractious"
+console.log(flavor.abandoned);  // true/false
+console.log(flavor.uncharted);  // true/false
+console.log(flavor.outlaw);     // true/false
+
+// Per-planet ring roll (not per system)
+const bodyRng = makeRng(planetSeed);
+const ring = rollRing(bodyRng, "Frozen", false); // (rng, biome, isMoon)
+// Returns false | "icy" | "tan" | "ash" | "gold" | "split"
+```
+
+**2026-08-23: the real algorithm, not a guess — and now wired together.** `system.js`'s `systemAttributes()` returns the actual reverse-engineered economy/wealth/conflict/race/uncharted/abandoned/pirate values, drawn from the same RNG stream already used for `star_type`/`planet_count` — corpus-validated to 98–99% accuracy against 1000 real systems, not an approximation:
+
+```js
+const attrs = systemAttributes(portalCodeBigInt, galaxyIndex);
+
+console.log(attrs.economy_type);    // 1-7: trading/advanced materials/scientific/mining/manufacturing/technology/power generation
+console.log(attrs.wealth);          // 1-3: low/medium/high
+console.log(attrs.conflict_level);  // 1-3: low/medium/high
+console.log(attrs.dominant_race);   // 0-3: none/Gek/Korvax/Vy'keen
+console.log(attrs.uncharted);       // true/false
+console.log(attrs.abandoned);       // true/false
+console.log(attrs.pirate);          // true/false
+```
+
+`rollSystemFlavor()` above (independent word-pool rolls, star-colour only) used to be the only way to get race/economy/conflict text out of `economy.js`, with no connection to `attrs` at all. As of this same date, `economy.js` also exports **`rollSystemFlavorFromAttrs(rng, attrs)`** — pass it the real `attrs` object above and it takes economy_type/wealth/conflict_level/dominant_race/uncharted/abandoned/pirate as given, only rolling what `systemAttributes()` still doesn't model: which specific word to show within that type/tier (`econName`/`econDesc`/`conflict`), and sell%/buy% (refit this same day against 822 real corpus records — see the function's own header in `economy.js` for the numbers). This is now the preferred path whenever a portal code is available (i.e. almost always); `rollSystemFlavor()` stays as the fallback for when it isn't. `preview.html`'s `generateSystem()` was updated to call it this way:
+
+```js
+const flavor = rollSystemFlavorFromAttrs(rng, attrs); // preferred: attrs is real
+// vs. flavor = rollSystemFlavor(rng, attrs.starType[0]); // fallback: no portal code
+```
+
+### Biome/Sentinel-flavoured planet names (optional)
+
+`planetName()` takes an optional 4th `opts` argument: `{biome, sentinel}`. When
+supplied, the generic Prime/Major/Omega-style adornment word swaps for a
+pool matched to that biome (e.g. Lush leans toward "Verdance"/"Bloom",
+Volcanic toward "Cinder"/"Magma"), with a hostile-Sentinel-activity pool
+taking priority over biome when both are given. Omit `opts` entirely (or
+call with the original 3-arg signature) and output is byte-identical to
+before this was added — every existing caller keeps working unchanged.
+
+```js
+const name = NMSCore.planetName(seed, undefined, letterMap, { biome: "Volcanic", sentinel: "Aggressive" });
+```
+
+Still a disclosed stylistic guess, not a real algorithm — see "Known
+limitations" below and `planet.js`'s own header comment for why.
+
+---
+
+## Independent check against Voyager's Haven (2026-10-02)
+
+`systemAttributes()` was cross-checked against ~29,000 real player-recorded systems from [Voyager's Haven](https://havenmap.online) (u/IAmThe-Ekimo-1920), using the project's `tools/haven-calibrate` script.
+
+![Haven calibration report: 99.7-99.9% match on post-Cosmos systems](docs/haven-calibration.png) On systems logged since the Cosmos update (10 Aug 2026, ~12,000-15,000 per field):
+
+| Field | Match |
+|---|---:|
+| Star colour | 99.7% |
+| Dominant race | 99.9% |
+| Economy type | 99.8% |
+| Wealth tier | 99.9% |
+| Conflict level | 99.9% |
+| Status (normal / uncharted / pirate / abandoned) | 97.7%, ~99.9% excluding a known batch of older Haven Extractor uploads that missed the abandoned flag |
+
+Older (pre-Cosmos) records score 91-96%, with errors spread evenly in every direction -- consistent with stale or mis-entered data rather than a generator fault. The reverse-engineering credit belongs to hadsh/nms_namegen (and Stuart Coyle / GoodGuysFree before it); this check confirms it at a much larger scale.
+
+What this does **not** cover: planet-level data (biomes, planet names), spectral class digits, the specific economy word shown within a type (e.g. "Ore Processing" vs "Metal Processing" -- both Advanced Materials), and sell/buy percentages.
+
+## Known limitations
+
+- **Planet names** are a plausible, unverified reverse-engineering guess. Star type, region names, and system names were validated against a real corpus; planet naming was not. `nms_namegen`'s own README says the same.
+- **Economy/wealth/conflict/race/uncharted/abandoned/pirate** (`system.js`'s `systemAttributes()`, added 2026-08-23) *are* the real, reverse-engineered algorithm — validated against upstream's own 10 unit-test vectors, 443 golden regression vectors, and 1000 real ground-truth systems (star colour 99.10%, uncharted 99.80%, dominant race 99.10%, conflict level 99.03%, economy category 99.02%, wealth tier 98.90%, planet count 98.80%). Not currently wired into this project's own live site (`preview.html` still rolls economy/race/conflict through a separate, independently-seeded RNG in `economy.js`) — that's a deliberate, still-open integration task on the consuming site's side, not a limitation of this module.
+
+Two limitations that used to be listed here were fixed 2026-08-23 and no longer apply, kept below for anyone tracking an older copy of this module:
+
+- ~~The hash function (`iprng.js`) crashes on region-local system index 0 in every region.~~ **Fixed.** Python's `o[-1]` list indexing wraps to the last element; a plain JS array returns `undefined` at a negative index instead, which crashed on the exact input that produces `oCounter=-1`. `iprng.js` now wraps the index explicitly to match Python's behaviour.
+- ~~Black hole / Atlas placement uses raw unsigned portal-code bits, not signed voxel coordinates. The dead-core fix is only symmetric in the positive-coordinate octant.~~ **Fixed.** `voxelAttributes()` in `region.js` now folds x/y/z to signed offsets from the galactic centre before computing distance, matching the game's own coordinate model in every octant, not just the positive one. This was also missing an integer-truncation step on the centre-distance calculation, fixed at the same time.
+
+---
 
 ## Attribution
 
-Original algorithm reverse-engineered by GoodGuysFree and hadsh, building
-on Stuart Coyle's `nms_namegen` and Andraemon/monkeyman192's
-`SystemNameCalculator`. MIT licensed — see upstream repo for full license
-text.
+The name-generation logic in this module (all files except `economy.js`) is a JavaScript port of [hadsh/nms_namegen](https://github.com/hadsh/nms_namegen), itself a fork of [Stuart Coyle's original nms_namegen](https://github.com/stu-/nms_namegen), co-authored with GoodGuysFree. hadsh's repository states this work is MIT-licensed. Credit for the underlying reverse-engineered generation algorithms belongs to:
+
+- **Stuart Coyle** — original author
+- **GoodGuysFree** — co-author of the hadsh fork
+- **hadsh** — fork maintainer
+
+Each ported file carries a "Ported from hadsh/nms_namegen (MIT licensed)" comment with the upstream URL at the top, per MIT's own requirement that the original notice travel with the code.
+
+`economy.js` is original work by elegra1965, licensed MIT separately. Its probability tables are decompiled from a legitimately-owned NMS install; see the file header for detail.
+
+---
+
+## License
+
+MIT — see [LICENSE](./LICENSE).
+
+This module is a fan project and is not affiliated with, sponsored by, or endorsed by Hello Games.
