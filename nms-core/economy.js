@@ -370,7 +370,9 @@ function rollRing(br, biome, isMoon) {
  * biome. Order matches BIOME_WEIGHTS' column order below; not alphabetical.
  */
 var BIOME_ORDER = ["Lush", "Barren", "Dead", "Exotic", "Mega Exotic",
-  "Scorched", "Frozen", "Toxic", "Radioactive", "Marsh", "Volcanic"];
+  "Scorched", "Frozen", "Toxic", "Radioactive", "Marsh", "Volcanic", "Water World"];
+// "Water World" added 2026-10-13 (12th key): Haven shows it only around purple
+// stars (5% of their planets), only on prime/extra slots, never on a moon.
 
 /**
  * Relative weights (NOT percentages -- see pickBiome()/weightedPick() for
@@ -418,18 +420,36 @@ var BIOME_WEIGHTS_WIKI_368 = {
  * guess anyway). Gas giants, Water World and The Reliquary aren't picked here.
  * Still exactly one r() draw per pick, so nothing else in the stream moves.
  */
+// 2026-10-13 (later): split into normal and prime slots. Matching Haven planet
+// names to the map's own names (94% exact) tells us each planet's slot, and
+// the slot decides the table: normal slots (index < systemAttributes()
+// planet_count) never get Marsh/Volcanic, prime slots do -- the same shape as
+// the wiki's two tables, but with today's real numbers. 110,688 planets.
 var BIOME_WEIGHTS_HAVEN = {
-    yellowNorm:    [19.2,  9.8,  8.2,  5.8,  0.2, 13.7, 13.7, 11.8, 12.3,  2.7,  2.6], // 28,901 planets
-    yellowLush:    [40.6,  8.3,  2.7,  9.0,  4.3,  8.3,  8.2,  7.8,  7.9,  1.4,  1.5], // 26,349 planets
-    yellowEmpty:   [12.3,  8.7, 11.6, 12.0,  6.0, 12.5, 10.6, 11.6, 10.1,  1.7,  2.9], // 415 planets (all sources)
-    yellowHarsh:   [19.2,  9.4,  8.1,  7.5,  0.0, 13.0, 14.1, 13.1, 10.7,  2.4,  2.4], // 702 planets (all sources)
-    yellowUnknown: [28.7,  9.2,  7.2,  7.2,  0.0, 11.3, 11.7, 10.0,  9.9,  2.6,  2.3], // 12,131 planets
-    red:           [10.2,  8.4,  6.8, 21.6, 12.3,  9.9,  8.7,  9.1,  8.3,  0.0,  4.6], // 4,530 planets
-    green:         [17.2,  9.2,  6.7, 13.4, 12.5,  9.5,  9.2,  9.7,  9.0,  3.6,  0.0], // 6,401 planets
-    blue:          [14.4,  8.9,  6.7, 18.8, 12.4,  8.8, 10.0,  8.0,  8.1,  2.2,  1.8], // 5,204 planets
-    purple:        [17.1,  8.6,  9.0,  8.8, 18.1,  9.0,  8.7,  9.1,  8.5,  1.7,  1.5], // 5,964 planets
+  normal: {
+    yellowNorm:    [16.6,  9.2,  8.9,  7.5,  0.0, 14.6, 14.6, 14.0, 14.6,  0.0,  0.0,  0.0], // 20,229 planets
+    yellowLush:    [41.1,  9.0,  2.5, 10.9,  0.0,  9.0,  8.8,  9.3,  9.3,  0.0,  0.0,  0.0], // 19,388 planets
+    yellowEmpty:   [ 9.0,  8.2, 15.2, 15.2,  0.0, 13.3, 12.1, 15.2, 10.9,  0.4,  0.4,  0.0], // 256 planets (all sources)
+    yellowHarsh:   [16.9,  8.9,  8.2,  9.9,  0.0, 12.5, 15.4, 15.2, 13.0,  0.0,  0.0,  0.0], // 514 planets (all sources)
+    yellowUnknown: [26.9,  9.3,  8.0,  9.4,  0.0, 11.3, 11.9, 11.6, 11.5,  0.0,  0.0,  0.0], // 8,891 planets
+    red:           [ 9.9,  8.0,  7.9, 26.9,  9.1, 10.2,  9.2,  9.4,  9.5,  0.0,  0.0,  0.0], // 3,265 planets
+    green:         [17.7,  9.0,  7.4, 16.3,  9.4, 10.0,  9.7, 10.1, 10.4,  0.0,  0.0,  0.0], // 4,734 planets
+    blue:          [14.0,  8.9,  7.4, 23.4,  8.0,  9.0, 10.2,  9.1,  9.9,  0.0,  0.0,  0.0], // 3,728 planets
+    purple:        [15.5,  8.3,  8.7,  8.4, 17.3,  8.6,  8.4,  8.8,  8.0,  1.6,  1.4,  5.0], // 5,914 planets (purple bodies are all prime -- same as prime)
+  },
+  prime: {
+    yellowNorm:    [22.7, 12.7,  5.7,  0.1,  0.0, 12.1, 11.7,  5.3,  5.9, 12.2, 11.7,  0.0], // 6,013 planets
+    yellowLush:    [39.1,  6.0,  3.2,  2.9, 18.3,  6.3,  5.6,  2.8,  3.1,  6.2,  6.4,  0.0], // 5,948 planets
+    yellowEmpty:   [14.1,  9.0,  0.0,  0.0, 29.5, 14.1, 10.3,  1.3,  7.7,  5.1,  9.0,  0.0], // 78 planets (all sources)
+    yellowHarsh:   [25.9, 12.2,  9.4,  0.0,  0.0, 13.7, 10.1,  5.0,  2.2, 10.8, 10.8,  0.0], // 139 planets (all sources)
+    yellowUnknown: [34.6,  8.9,  4.6,  0.0,  0.0, 11.1, 10.7,  4.8,  4.7, 11.0,  9.7,  0.0], // 2,721 planets
+    red:           [10.2,  9.4,  3.6,  4.5, 23.3,  9.3,  7.1,  8.8,  4.4,  0.0, 19.4,  0.0], // 1,051 planets
+    green:         [15.0,  9.8,  4.1,  4.0, 23.6,  7.7,  7.3,  8.0,  4.3, 16.3,  0.0,  0.0], // 1,392 planets
+    blue:          [14.1,  9.0,  3.8,  4.2, 25.3,  8.9, 10.0,  4.9,  3.5,  8.9,  7.4,  0.0], // 1,209 planets
+    purple:        [15.5,  8.3,  8.7,  8.4, 17.3,  8.6,  8.4,  8.8,  8.0,  1.6,  1.4,  5.0], // 5,914 planets
+  },
 };
-var BIOME_WEIGHTS = { normal: BIOME_WEIGHTS_HAVEN, prime: BIOME_WEIGHTS_HAVEN };
+var BIOME_WEIGHTS = BIOME_WEIGHTS_HAVEN;
 
 var HARSH_MULTIPLIER = 2;
 var HARSH_BOOST_KEYS = ["Scorched", "Frozen", "Toxic", "Radioactive", "Volcanic"];
@@ -441,7 +461,7 @@ var HARSH_BOOST_KEYS = ["Scorched", "Frozen", "Toxic", "Radioactive", "Volcanic"
 function avgPurpleColumn(table) {
   var cols = [table.yellowNorm, table.yellowLush, table.yellowEmpty, table.red, table.green, table.blue];
   var n = BIOME_ORDER.length, out = new Array(n).fill(0), ci, i;
-  for (ci = 0; ci < cols.length; ci++) for (i = 0; i < n; i++) out[i] += cols[ci][i];
+  for (ci = 0; ci < cols.length; ci++) for (i = 0; i < n; i++) out[i] += (cols[ci][i] || 0);
   for (i = 0; i < n; i++) out[i] = out[i] / cols.length;
   return out;
 }
@@ -506,6 +526,9 @@ function pickBiome(r, opts) {
   else col = table.yellowNorm;
 
   var weights = col.slice();
+  // Water World is never a moon (Haven: 0 of 465) -- same single draw either way.
+  var wi = BIOME_ORDER.indexOf("Water World");
+  if (opts.isMoon && wi >= 0 && wi < weights.length) weights[wi] = 0;
   // Real Harsh data only exists for yellow stars; other colours keep the placeholder boost.
   if (gType === "Harsh" && !realHarsh) {
     for (var hi = 0; hi < BIOME_ORDER.length; hi++) {

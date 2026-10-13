@@ -141,7 +141,7 @@ function starTypeForIdx(vx,vy,vz,idx){
    under the new one and flag mismatches through the existing dispute
    system, instead of either guessing blind or manually re-checking ~260+
    records by hand. */
-var GEN_VERSION="1.5.0"; // 2026-10-13: biome odds now the real shares from Voyager's Haven (nms-core/economy.js BIOME_WEIGHTS_HAVEN). 1.4.0: real sell%/buy% (sellBuy()).
+var GEN_VERSION="1.6.0"; // 2026-10-13: biome odds split normal/prime slot from Haven + Water World (purple, prime, never a moon). 1.5.0: biome odds now the real shares from Voyager's Haven (nms-core/economy.js BIOME_WEIGHTS_HAVEN). 1.4.0: real sell%/buy% (sellBuy()).
   // Before that, 1.3.0: // bumped 2026-08-24: planet/moon biome selection
   // now uses nms-core/economy.js's pickBiome() -- a real wiki-sourced
   // weighted table by star colour x galaxy type x Prime-vs-Normal slot --
@@ -1140,7 +1140,7 @@ function generateSystem(vx,vy,vz,idx,noOverride){
     // original flat uniform pick, unchanged -- verified byte-identical draw
     // count via a dedicated parity test either way.
     var biome = window.NMSEconomy
-      ? window.NMSEconomy.pickBiome(br,{starKey:s.type,galaxyType:gxType,isPrime:isPrimeBody})
+      ? window.NMSEconomy.pickBiome(br,{starKey:s.type,galaxyType:gxType,isPrime:isPrimeBody,isMoon:isMoon})
       : pickOne(br,GEN_BIOME_KEYS);
     var bd=BIOMES[biome];
     var canWater = bd.water && !isMoon;
