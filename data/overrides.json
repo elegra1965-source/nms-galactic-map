@@ -51056,7 +51056,7 @@
             "icon": "outpost",
             "signalType": "Deep-Space Trading Outpost",
             "route": "Profitable salvage and contracting opportunities detected. Additional income stream note: Package Delivery",
-            "planet": 0
+            "planet": 3
           },
           {
             "name": "Nedziojin’s Lost Moon",
@@ -51235,7 +51235,7 @@
           }
         ]
       },
-      "editedAt": "2026-10-13T09:43:40.633Z",
+      "editedAt": "2026-10-13T09:45:27.571Z",
       "editedByIp": "72.223.117.245",
       "history": [
         {
@@ -51260,6 +51260,10 @@
         },
         {
           "at": "2026-10-13T09:43:40.633Z",
+          "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-10-13T09:45:27.571Z",
           "text": "edited by a traveller"
         }
       ]
@@ -75466,7 +75470,8 @@
       1791883548341,
       1791883609219,
       1791884332057,
-      1791884620633
+      1791884620633,
+      1791884727571
     ]
   },
   "flagLog": {},
