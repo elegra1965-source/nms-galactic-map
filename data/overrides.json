@@ -51033,8 +51033,8 @@
         "econName": "High Voltage",
         "sell": "48.7",
         "buy": "-14.5",
-        "econDesc": "",
-        "conflict": "",
+        "econDesc": "Fledgling",
+        "conflict": "Intermittent",
         "blackHole": false,
         "atlas": false,
         "ruins": false,
@@ -51152,22 +51152,30 @@
           },
           {
             "name": "",
-            "moon": true,
-            "orbits": 4,
-            "biome": "",
-            "subtype": "",
-            "descriptor": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Barren",
+            "subtype": "Rocky",
+            "descriptor": "Blasted Atmosphere",
             "water": false,
             "ring": false,
             "resources": [
-              "Salt"
+              "Magnetised Ferrite"
             ],
-            "flora": [],
-            "fauna": [],
-            "minerals": [],
+            "flora": [
+              "Sparse"
+            ],
+            "fauna": [
+              "Generous"
+            ],
+            "minerals": [
+              "Cactus Flesh",
+              "Pyrite",
+              "Quartzite"
+            ],
             "salvage": [],
             "fossils": [],
-            "sentinel": "Limited",
+            "sentinel": "Low",
             "autophage": false,
             "reliquary": false,
             "ruins": false,
@@ -51177,7 +51185,7 @@
           {
             "name": "",
             "moon": true,
-            "orbits": 0,
+            "orbits": 4,
             "biome": "Lush",
             "subtype": "Paradise",
             "descriptor": "Balmy",
@@ -51210,7 +51218,7 @@
           }
         ]
       },
-      "editedAt": "2026-10-13T09:20:21.244Z",
+      "editedAt": "2026-10-13T09:25:48.341Z",
       "editedByIp": "72.223.117.245",
       "history": [
         {
@@ -51219,6 +51227,10 @@
         },
         {
           "at": "2026-10-13T09:20:21.244Z",
+          "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-10-13T09:25:48.341Z",
           "text": "edited by a traveller"
         }
       ]
@@ -75421,7 +75433,8 @@
   "reports": [],
   "ipLog": {
     "72.223.117.245": [
-      1791883221244
+      1791883221244,
+      1791883548341
     ]
   },
   "flagLog": {},
@@ -75453,7 +75466,8 @@
       "Ample",
       "Abundant",
       "Bountiful",
-      "Rich"
+      "Rich",
+      "Sparse"
     ],
     "fauna": [
       "Devoid",
@@ -75491,7 +75505,8 @@
       "Activated Cadmium",
       "Activated Emeril",
       "Activated Indium",
-      "Activat"
+      "Activat",
+      "Cactus Flesh"
     ],
     "salvage": [
       "Salvageable scrap",
@@ -75524,7 +75539,8 @@
       "Humid",
       "Infrequent Heat Storms",
       "Beautiful",
-      "Balmy"
+      "Balmy",
+      "Blasted Atmosphere"
     ],
     "biome": [
       "Radioactive",
@@ -75546,7 +75562,8 @@
       "Abandoned",
       "Magma",
       "Paradise",
-      "Scalding"
+      "Scalding",
+      "Rocky"
     ],
     "signalName": [
       "MS Jiokaz XIV",
