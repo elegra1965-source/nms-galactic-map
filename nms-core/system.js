@@ -27,11 +27,11 @@
 // tracked in TODO.md and deliberately NOT done in this file -- that's a
 // separate, reviewable change.
 
-import { PRNG, MULTIPLIER } from './prng.js?v=20260906';
-import { indexPrimedPRNG } from './iprng.js?v=20260906';
-import { voxelAttributes } from './region.js?v=20260906';
-import { generateName } from './generator.js?v=20260906';
-import { toRoman } from './roman.js?v=20260906';
+import { PRNG, MULTIPLIER } from './prng.js?v=20261013';
+import { indexPrimedPRNG } from './iprng.js?v=20261013';
+import { voxelAttributes } from './region.js?v=20261013';
+import { generateName } from './generator.js?v=20261013';
+import { toRoman } from './roman.js?v=20261013';
 
 const MASK64 = 0xFFFFFFFFFFFFFFFFn;
 const CONST_A = 0x64DD81482CBD31D7n;
@@ -509,4 +509,40 @@ function systemName(portalCode, galaxy, letterMap) {
   return name;
 }
 
-export { systemAttributes, planetSeeds, systemName };
+/**
+ * Real sell% / buy% for a system (what the galaxy map shows as
+ * "Sell: +x%  Buy: -y%"). Found 2026-10-13 by elegra1965 (NMS Galactic Map):
+ * they are the first two draws of the SAME PRNG stream planetSeeds() uses
+ * (seed from systemIndex|galacticCoords, CONST_A/CONST_B mixing), not the
+ * systemAttributes() stream:
+ *   buy  = -30 + 20 * u1     (u_k = low 32 bits after k updates / 2^32)
+ *   sell =  40 + 40 * u2
+ * Checked against 1,444 player-recorded systems: 93.5% match both values
+ * exactly to 1 decimal; nearly all misses are mistyped/swapped records.
+ * The planet digit (top nibble) of portalCode is ignored.
+ * @returns {{sell:number, buy:number}} rounded to 1 decimal place
+ */
+function sellBuy(portalCode, galaxy) {
+  const pc = BigInt(portalCode);
+  const gal = BigInt(galaxy);
+  const galacticCoords = pc & 0xFFFFFFFFn;
+  const systemIndex = ((pc & 0x0FFF00000000n) >> 24n) | gal;
+  let register = (systemIndex << 0x20n) | galacticCoords;
+  register = (((register >> 33n) ^ register) * CONST_A) & MASK64;
+  register = (((register >> 33n) ^ register) * CONST_B) & MASK64;
+  register = ((register >> 33n) ^ register) & MASK64;
+  let seedH =
+    ((((register & 0xFFFF0000n) >> 16n) | ((register & 0x0000FFFFn) << 16n)) ^
+    (register & 0xFFFFFFFFn) ^
+    (register >> 32n)) & 0xFFFFFFFFFFFFFFFFn;
+  if (seedH === 0n) seedH = 1n;
+  const rng = new PRNG((seedH << 32n) | (register & 0xFFFFFFFFn));
+  const u1 = Number(rng.randi()) / 4294967296;
+  const u2 = Number(rng.randi()) / 4294967296;
+  return {
+    sell: Math.round((40 + 40 * u2) * 10) / 10,
+    buy: Math.round((-30 + 20 * u1) * 10) / 10,
+  };
+}
+
+export { systemAttributes, planetSeeds, systemName, sellBuy };
