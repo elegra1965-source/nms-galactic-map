@@ -381,7 +381,7 @@ var BIOME_ORDER = ["Lush", "Barren", "Dead", "Exotic", "Mega Exotic",
  * green/blue are stated on the wiki as NOT varying by galaxy type. No
  * purple column exists (see avgPurpleColumn() below).
  */
-var BIOME_WEIGHTS = {
+var BIOME_WEIGHTS_WIKI_368 = {
   normal: {
     yellowNorm:  [2, 1, 2,   0,   0, 1, 1, 1, 1, 0, 0],
     yellowLush:  [4, 1, 0.5, 1,   0, 1, 1, 1, 1, 0, 0],
@@ -403,6 +403,34 @@ var BIOME_WEIGHTS = {
 /** Disclosed placeholder -- see the 2026-08-24 header addendum above. Not a
  * decompiled value; the wiki's Harsh_galaxy page describes the direction
  * ("much more likely") but publishes no exact multiplier. */
+/**
+ * 2026-10-13: REAL biome shares, replacing the wiki 3.68 table above (kept as
+ * BIOME_WEIGHTS_WIKI_368 for reference). Counted from Voyager's Haven
+ * (havenmap.online) player-recorded planets and moons, star colour worked out
+ * from each address by systemAttributes() (99.7% right against Haven), galaxy
+ * type from preview.js GALAXY_TYPES. Haven Extractor uploads (read from the
+ * game) where there are plenty; all sources for the small Empty/Harsh
+ * columns. Haven's "Red/Green/Blue" biome names counted as Mega Exotic.
+ * Percentages, same column order as BIOME_ORDER. The wiki table had e.g.
+ * Dead at 22% (yellow, Normal galaxy) vs 8% real, and no Marsh/Volcanic on
+ * normal planets vs 2-3% real. Haven doesn't say which planets are "prime",
+ * so normal and prime use the same real shares (the map's prime slot is a
+ * guess anyway). Gas giants, Water World and The Reliquary aren't picked here.
+ * Still exactly one r() draw per pick, so nothing else in the stream moves.
+ */
+var BIOME_WEIGHTS_HAVEN = {
+    yellowNorm:    [19.2,  9.8,  8.2,  5.8,  0.2, 13.7, 13.7, 11.8, 12.3,  2.7,  2.6], // 28,901 planets
+    yellowLush:    [40.6,  8.3,  2.7,  9.0,  4.3,  8.3,  8.2,  7.8,  7.9,  1.4,  1.5], // 26,349 planets
+    yellowEmpty:   [12.3,  8.7, 11.6, 12.0,  6.0, 12.5, 10.6, 11.6, 10.1,  1.7,  2.9], // 415 planets (all sources)
+    yellowHarsh:   [19.2,  9.4,  8.1,  7.5,  0.0, 13.0, 14.1, 13.1, 10.7,  2.4,  2.4], // 702 planets (all sources)
+    yellowUnknown: [28.7,  9.2,  7.2,  7.2,  0.0, 11.3, 11.7, 10.0,  9.9,  2.6,  2.3], // 12,131 planets
+    red:           [10.2,  8.4,  6.8, 21.6, 12.3,  9.9,  8.7,  9.1,  8.3,  0.0,  4.6], // 4,530 planets
+    green:         [17.2,  9.2,  6.7, 13.4, 12.5,  9.5,  9.2,  9.7,  9.0,  3.6,  0.0], // 6,401 planets
+    blue:          [14.4,  8.9,  6.7, 18.8, 12.4,  8.8, 10.0,  8.0,  8.1,  2.2,  1.8], // 5,204 planets
+    purple:        [17.1,  8.6,  9.0,  8.8, 18.1,  9.0,  8.7,  9.1,  8.5,  1.7,  1.5], // 5,964 planets
+};
+var BIOME_WEIGHTS = { normal: BIOME_WEIGHTS_HAVEN, prime: BIOME_WEIGHTS_HAVEN };
+
 var HARSH_MULTIPLIER = 2;
 var HARSH_BOOST_KEYS = ["Scorched", "Frozen", "Toxic", "Radioactive", "Volcanic"];
 
@@ -464,18 +492,22 @@ function pickBiome(r, opts) {
   var table = opts.isPrime ? BIOME_WEIGHTS.prime : BIOME_WEIGHTS.normal;
 
   var col;
+  var realHarsh = false;
   if (starKey === "yellow") {
     col = (gType === "Lush") ? table.yellowLush
         : (gType === "Empty") ? table.yellowEmpty
-        : table.yellowNorm; // Norm, Harsh (boosted below) and Unknown all share this base column
+        : (gType === "Harsh" && table.yellowHarsh) ? (realHarsh = true, table.yellowHarsh)
+        : (gType === "Unknown" && table.yellowUnknown) ? table.yellowUnknown
+        : table.yellowNorm;
   } else if (starKey === "red") col = table.red;
   else if (starKey === "green") col = table.green;
   else if (starKey === "blue") col = table.blue;
-  else if (starKey === "purple") col = avgPurpleColumn(table);
+  else if (starKey === "purple") col = table.purple || avgPurpleColumn(table);
   else col = table.yellowNorm;
 
   var weights = col.slice();
-  if (gType === "Harsh") {
+  // Real Harsh data only exists for yellow stars; other colours keep the placeholder boost.
+  if (gType === "Harsh" && !realHarsh) {
     for (var hi = 0; hi < BIOME_ORDER.length; hi++) {
       if (HARSH_BOOST_KEYS.indexOf(BIOME_ORDER[hi]) >= 0) weights[hi] = weights[hi] * HARSH_MULTIPLIER;
     }
@@ -487,5 +519,5 @@ export {
   ODDS, RING_CHANCE, GIANT_CHANCE, RACES, RACE_BY_DOMINANT_CODE, ECON, ECON_S, CONFLICT,
   STELLAR_EL, UNIVERSAL_EL, RING_STYLE_BY_BIOME,
   rollSystemFlavor, rollSystemFlavorFromAttrs, rollRing,
-  BIOME_ORDER, BIOME_WEIGHTS, HARSH_MULTIPLIER, HARSH_BOOST_KEYS, pickBiome,
+  BIOME_ORDER, BIOME_WEIGHTS, BIOME_WEIGHTS_HAVEN, BIOME_WEIGHTS_WIKI_368, HARSH_MULTIPLIER, HARSH_BOOST_KEYS, pickBiome,
 };
