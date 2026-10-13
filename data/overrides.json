@@ -51049,7 +51049,16 @@
         "stationName": "",
         "allianceName": "",
         "stationPhoto": "",
-        "signals": [],
+        "signals": [
+          {
+            "name": "Nedziojin Overwatch",
+            "category": "Deep Space",
+            "icon": "outpost",
+            "signalType": "Deep-Space Trading Outpost",
+            "route": "Profitable salvage and contracting opportunities detected. Additional income stream note: Package Delivery",
+            "planet": 0
+          }
+        ],
         "editorName": "",
         "editorFriendCode": "",
         "genVersion": "1.3.0",
@@ -51218,7 +51227,7 @@
           }
         ]
       },
-      "editedAt": "2026-10-13T09:26:49.219Z",
+      "editedAt": "2026-10-13T09:38:52.057Z",
       "editedByIp": "72.223.117.245",
       "history": [
         {
@@ -51235,6 +51244,10 @@
         },
         {
           "at": "2026-10-13T09:26:49.219Z",
+          "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-10-13T09:38:52.057Z",
           "text": "edited by a traveller"
         }
       ]
@@ -75439,7 +75452,8 @@
     "72.223.117.245": [
       1791883221244,
       1791883548341,
-      1791883609219
+      1791883609219,
+      1791884332057
     ]
   },
   "flagLog": {},
@@ -75579,7 +75593,8 @@
       "Ehilik Infestation",
       "Duporpe's Calamity",
       "Planetoid Nisar VI",
-      "Luettir Shattered Planetoid"
+      "Luettir Shattered Planetoid",
+      "Nedziojin Overwatch"
     ]
   },
   "alliances": {},
