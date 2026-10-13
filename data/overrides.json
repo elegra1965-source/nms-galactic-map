@@ -51065,6 +51065,14 @@
             "signalType": "Planetoid Debris",
             "route": "Rich vein of comet fragments. Harvest opportunities detected.",
             "planet": 0
+          },
+          {
+            "name": "Planetoid Iigar IX",
+            "category": "Habitable Asteroid",
+            "icon": "habitableasteroid",
+            "signalType": "Extraterrestrial Rock",
+            "route": "Flat plane detected. Ideal site for orbital base construction",
+            "planet": 0
           }
         ],
         "editorName": "",
@@ -51235,7 +51243,7 @@
           }
         ]
       },
-      "editedAt": "2026-10-13T09:45:27.571Z",
+      "editedAt": "2026-10-13T09:51:51.538Z",
       "editedByIp": "72.223.117.245",
       "history": [
         {
@@ -51264,6 +51272,10 @@
         },
         {
           "at": "2026-10-13T09:45:27.571Z",
+          "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-10-13T09:51:51.538Z",
           "text": "edited by a traveller"
         }
       ]
@@ -75471,7 +75483,8 @@
       1791883609219,
       1791884332057,
       1791884620633,
-      1791884727571
+      1791884727571,
+      1791885111538
     ]
   },
   "flagLog": {},
@@ -75613,7 +75626,8 @@
       "Planetoid Nisar VI",
       "Luettir Shattered Planetoid",
       "Nedziojin Overwatch",
-      "Nedziojin’s Lost Moon"
+      "Nedziojin’s Lost Moon",
+      "Planetoid Iigar IX"
     ]
   },
   "alliances": {},
