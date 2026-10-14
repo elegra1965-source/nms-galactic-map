@@ -491,7 +491,19 @@ function upsertAllianceBadge(data, allianceName, badgeUrl, edHash, now, editorNa
   }
 }
 
+/* 2026-10-14: ?sys=<galaxy>:<12 hex> returns just that one system (planet glyph ignored, same
+   as the map itself), for the Theme Pack Home Portal widget -- same public fields, same cache,
+   so it costs no extra GitHub reads and never exposes anything the full GET does not. */
+function pickOne(out, sys, headers){
+  var m = /^(\d{1,3}):([0-9A-F]{12})$/.exec(String(sys||"").toUpperCase());
+  if(!m) return json(400, {ok:false, error:"bad sys"});
+  var g = m[1], suffix = m[2].slice(1), hit = null, systems = (out && out.systems) || {};
+  for(var k in systems){ var p = k.split(":"); if(p[0] === g && p[1] && p[1].slice(1) === suffix){ hit = systems[k]; break; } }
+  return json(200, {ok:true, found:!!hit, system: hit ? {data: hit.data, editedAt: hit.editedAt} : null}, headers);
+}
+
 async function handleGet(req, token){
+  var sysParam = new URL(req.url).searchParams.get("sys");
   // Tony-only view: append ?token=<ADMIN_TOKEN> (set as a Netlify env var,
   // separate from GITHUB_TOKEN) to also see the flagged/reports queue, so he
   // can periodically skim it without digging through raw JSON on GitHub.
@@ -507,6 +519,7 @@ async function handleGet(req, token){
   var cache = await getGetCache();
 
   if(!isAdmin && cache.data && (now - cache.fetchedAt) < GET_CACHE_TTL_MS){
+    if(sysParam) return pickOne(cache.data, sysParam, cacheHeaders);
     return json(200, cache.data, cacheHeaders);
   }
 
@@ -519,7 +532,7 @@ async function handleGet(req, token){
     // alive through a transient GitHub problem instead of every visitor's map
     // silently losing shared edits for the duration (loadOverrides() in
     // preview.html treats a failed GET as "no shared edits", not an error).
-    if(!isAdmin && cache.data) return json(200, cache.data, cacheHeaders);
+    if(!isAdmin && cache.data) return sysParam ? pickOne(cache.data, sysParam, cacheHeaders) : json(200, cache.data, cacheHeaders);
     return json(502, {ok:false, error:"Could not read shared data store: "+e.message});
   }
 
@@ -588,6 +601,7 @@ async function handleGet(req, token){
   }
 
   await setGetCache(out, now);
+  if(sysParam) return pickOne(out, sysParam, cacheHeaders);
   return json(200, out, cacheHeaders);
 }
 
