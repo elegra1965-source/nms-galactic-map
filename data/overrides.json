@@ -75571,13 +75571,63 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:108D08555D30": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB20-8D Effrejar",
+        "race": "Gek",
+        "region": "Agputn Nebula",
+        "starClass": "GGGG",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Advanced Materials",
+        "sell": "60.2",
+        "buy": "-13.5",
+        "econDesc": "★★★ (High Supply)",
+        "conflict": "3 (Critical)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-10-14T22:00:35.244Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-10-14T22:00:35.244Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "5.133.46.24": [
       1792015212597,
-      1792015223994
+      1792015223994,
+      1792015235244
     ]
   },
   "flagLog": {},
