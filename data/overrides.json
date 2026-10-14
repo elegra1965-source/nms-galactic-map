@@ -75473,18 +75473,61 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:10B10A557D30": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB15-B1 Kedegan",
+        "race": "Gek",
+        "region": "Eiense",
+        "starClass": "F7f",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Power Generation",
+        "sell": "71.4",
+        "buy": "12.5",
+        "econDesc": "★ (Low Supply)",
+        "conflict": "3 (Critical)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-10-14T22:00:12.597Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-10-14T22:00:12.597Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
-    "72.223.117.245": [
-      1791883221244,
-      1791883548341,
-      1791883609219,
-      1791884332057,
-      1791884620633,
-      1791884727571,
-      1791885111538
+    "5.133.46.24": [
+      1792015212597
     ]
   },
   "flagLog": {},
