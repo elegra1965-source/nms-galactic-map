@@ -141,7 +141,7 @@ function starTypeForIdx(vx,vy,vz,idx){
    under the new one and flag mismatches through the existing dispute
    system, instead of either guessing blind or manually re-checking ~260+
    records by hand. */
-var GEN_VERSION="1.8.0"; // 2026-10-14: sentinel tiers = real Haven mix, no longer tied to conflict. 1.7.0: 2026-10-14: ring odds from Haven (normal planets only, by star colour; nms-core RING_CHANCE_HAVEN). 1.6.0: 2026-10-13: biome odds split normal/prime slot from Haven + Water World (purple, prime, never a moon). 1.5.0: biome odds now the real shares from Voyager's Haven (nms-core/economy.js BIOME_WEIGHTS_HAVEN). 1.4.0: real sell%/buy% (sellBuy()).
+var GEN_VERSION="1.9.0"; // 2026-10-14: dissonant systems at Haven rates by star; corrupted Sentinels only on the dissonant planet. 1.8.0: 2026-10-14: sentinel tiers = real Haven mix, no longer tied to conflict. 1.7.0: 2026-10-14: ring odds from Haven (normal planets only, by star colour; nms-core RING_CHANCE_HAVEN). 1.6.0: 2026-10-13: biome odds split normal/prime slot from Haven + Water World (purple, prime, never a moon). 1.5.0: biome odds now the real shares from Voyager's Haven (nms-core/economy.js BIOME_WEIGHTS_HAVEN). 1.4.0: real sell%/buy% (sellBuy()).
   // Before that, 1.3.0: // bumped 2026-08-24: planet/moon biome selection
   // now uses nms-core/economy.js's pickBiome() -- a real wiki-sourced
   // weighted table by star colour x galaxy type x Prime-vs-Normal slot --
@@ -323,11 +323,17 @@ function sentinelColor(word){
    corrupted 1.3% (corrupted is almost only dissonant planets). Old guessed
    rows were [.55,.35,.08,.02] / [.20,.45,.28,.07] / [.05,.20,.50,.25].
    Still 2 br() draws per body, so nothing else moves. */
+/* Corrupted is now 0 here: in-game a planet's Sentinel level only reads
+   corrupted on a dissonant planet (Haven: 100% of 556 dissonant planets, ~0
+   elsewhere -- the corrupted Sentinels at scrap dig sites and settlement raids
+   are encounters, not the planet's level). Dissonant systems get one
+   corrupted planet in a post-pass after the body loop (no extra br() draws). */
 var SENTINEL_TIER_WEIGHTS_BY_CONTIER=[
-  [0.764,0.114,0.110,0.012], // conTier 0 (low conflict)
-  [0.764,0.114,0.110,0.012], // conTier 1 (medium conflict)
-  [0.764,0.114,0.110,0.012]  // conTier 2 (high conflict)
+  [0.774,0.115,0.111,0], // conTier 0 (low conflict)
+  [0.774,0.115,0.111,0], // conTier 1 (medium conflict)
+  [0.774,0.115,0.111,0]  // conTier 2 (high conflict)
 ];
+var DISSONANT_CHANCE_BY_STAR={yellow:0.016,green:0.020,blue:0.019,red:0.032,purple:0.075};
 /* Consumes exactly 2 br() draws (tier pick, then word-within-tier) -- always
    called last for a body, after every other br() draw for that body (ring/
    resUni/size/tilt/spin), so it can never desync anything that came before
@@ -964,7 +970,10 @@ function generateSystem(vx,vy,vz,idx,noOverride){
   s.giant = attrs ? !!attrs.gas_giant
                   : (s.type==="purple" && mulberry32(gseed(vx,vy,vz,idx^0x61A47))()<GIANT_CHANCE);
   s.spectral=pickOne(r,st.cls)+Math.floor(r()*10)+pickOne(r,["","","","f","p","pf"]);
-  s.water=r()<0.18; s.dissonant=r()<0.10;
+  // dissonant: 2026-10-14 real share from Haven (systems with a dissonant planet,
+  // Extractor data): purple 7.5%, red 3.2%, green 2.0%, blue 1.9%, yellow 1.6%
+  // (was a flat 10% guess). Same single r() draw.
+  s.water=r()<0.18; s.dissonant=r()<(DISSONANT_CHANCE_BY_STAR[s.type]||0.023);
   var sc=r(); s.stars = sc<0.80?1:(sc<0.95?2:3);
   /* binary and ternary systems: each star a different colour */
   s.starColors=[st.col];
@@ -1236,6 +1245,15 @@ function generateSystem(vx,vy,vz,idx,noOverride){
     for(var rgj=0; rgj<ringedIdx.length; rgj++){
       if(ringedIdx[rgj]!==keepRingIdx) s.bodies[ringedIdx[rgj]].ring=false;
     }
+  }
+  // Dissonant system: one planet's Sentinels read corrupted (Haven: 590 of 629
+  // dissonant systems have exactly one dissonant planet). Own seeded RNG so no
+  // other draw moves.
+  if(s.dissonant && s.bodies.length){
+    var disR=mulberry32(gseed(vx,vy,vz,idx^0x0D155));
+    var disIdx=Math.floor(disR()*s.bodies.length);
+    s.bodies[disIdx].sentinel=pickOne(disR,SENTINEL_WORDS[3]);
+    s.bodies[disIdx].dissonant=true;
   }
   s.address=address;
   s.coreLY=coreLY(vx,vy,vz);
