@@ -421,7 +421,7 @@ var BIOMES={
   "Lush":       {base:"#1d5f31",land:["#2f8f45","#3fa855","#256b30","#6f9438"],sea:"#12406e",cap:"#dce9f4",water:true, atmo:0x6fd8ff, res:["Paraffinium","Star Bulb","Nitrogen"]},
   "Barren":     {base:"#8a6a42",land:["#a9834f","#7a5c39","#c19a63","#6b4f31"],sea:"#2b4c5c",cap:"#cdbb9c",water:true, atmo:0xffcf8a, res:["Pyrite","Cactus Flesh","Sulphurine"]},
   "Dead":       {base:"#6a6a6a",land:["#7e7e7e","#5a5a5a","#909090","#4a4a4a"],sea:null,     cap:"#8a8a8a",water:false,atmo:0, res:["Rusted Metal"]},
-  "Exotic":     {base:"#3a2a55",land:["#5a3f7a","#2b1e40","#7a4f9a","#241a38"],sea:null,     cap:"#4a3a66",water:false,atmo:0, res:null},
+  "Exotic":     {base:"#3a2a55",land:["#5a3f7a","#2b1e40","#7a4f9a","#241a38"],sea:null,     cap:"#4a3a66",water:false,atmo:0, res:["Gold"]}, // res 2026-10-14: Haven Extractor, Gold on 7,048 of 7,916 Exotic planets
   "Mega Exotic":{base:"#7a2f2f",land:["#a34040","#5a2222","#c05a3a","#481919"],sea:"#3a2a4a",cap:"#c9a0a0",water:true, atmo:0xff8a6a, res:null},
   "Scorched":   {base:"#4a2418",land:["#6b3320","#341a12","#8a4526","#26120c"],sea:"#3a2a1a",cap:"#7a4a2a",water:true, atmo:0xff9a4a,glow:"#ff7b2a", res:["Phosphorus","Solanium","Sulphurine"]},
   "Frozen":     {base:"#c6dced",land:["#e8f4ff","#a9c8dd","#ffffff","#8fb4cc"],sea:"#3f6f8f",cap:"#ffffff",water:true, atmo:0xbfe6ff, res:["Dioxite","Frost Crystal","Radon"]},
@@ -446,8 +446,8 @@ var BIOMES={
      it). Same texture/colour data as Radioactive since it's the same
      underlying biome. */
   "Irradiated": {base:"#8fae1b",land:["#a6c92e","#6e8a14","#c4e83f","#516610"],sea:"#20402a",cap:"#d8f06a",water:true, atmo:0xccff33,glow:"#ccff33", res:["Uranium","Gamma Root","Radon"]},
-  "Marsh":      {base:"#38473a",land:["#4f6b4a","#2a3a2a","#66805a","#1e2a1e"],sea:"#2f4a4a",cap:"#9aa89a",water:true, atmo:0x9ad8b0, res:null},
-  "Volcanic":   {base:"#241a18",land:["#3a2a24","#140f0e","#4a3028","#0d0908"],sea:"#2a1a14",cap:"#5a4a44",water:true, atmo:0xff6a3a,glow:"#ff4a1a", res:null},
+  "Marsh":      {base:"#38473a",land:["#4f6b4a","#2a3a2a","#66805a","#1e2a1e"],sea:"#2f4a4a",cap:"#9aa89a",water:true, atmo:0x9ad8b0, res:["Faecium","Paraffinium","Sulphurine"]}, // res 2026-10-14: Haven Extractor (Marsh mixes all three)
+  "Volcanic":   {base:"#241a18",land:["#3a2a24","#140f0e","#4a3028","#0d0908"],sea:"#2a1a14",cap:"#5a4a44",water:true, atmo:0xff6a3a,glow:"#ff4a1a", res:["Pyrite","Basalt"]}, // res 2026-10-14: Haven Extractor (Pyrite 1,032, Basalt 506)
   /* Added 2026-08-26 (Tony) -- a real, separately-documented type on the
      wiki (its own "Biome - Waterworld" page, distinct from the 11 above),
      previously missing entirely. Manual-select only for now: NOT wired into
