@@ -352,9 +352,28 @@ function rollSystemFlavorFromAttrs(r, attrs) {
  * @returns {string|false} the ring style key ("icy"|"tan"|"ash"|"gold"|
  *   "split"), or false for no ring
  */
-function rollRing(br, biome, isMoon) {
+/**
+ * 2026-10-14: real ring odds from Voyager's Haven (Haven Extractor, ~21,900
+ * systems). Only ever one ringed planet per system (the map's own cap was
+ * right), never on prime/extra slots, never around purple stars. Per normal
+ * planet, tuned (after preview.js's one-ring-per-system cap) so the map's share
+ * of systems with a ringed planet matches Haven: 2,637 vs 2,743 real on 14,079
+ * Extractor systems since Cosmos (was 10,365 at a flat 30%). Red and blue stars
+ * have rings most often, yellow least.
+ * RING_CHANCE (0.30) is the game file's own PlanetRingProbability but is
+ * evidently applied at a stage we don't model, so it's only the fallback.
+ */
+var RING_CHANCE_HAVEN = { yellow: 0.062, green: 0.077, blue: 0.113, red: 0.134, purple: 0 };
+
+function rollRing(br, biome, isMoon, opts) {
   if (isMoon) return false;
-  if (br() >= RING_CHANCE) return false;
+  var x = br(); // always exactly one draw for a non-moon, same as before
+  var chance = RING_CHANCE;
+  if (opts) {
+    chance = opts.isPrime ? 0
+      : (RING_CHANCE_HAVEN[opts.starKey] !== undefined ? RING_CHANCE_HAVEN[opts.starKey] : RING_CHANCE);
+  }
+  if (x >= chance) return false;
   return RING_STYLE_BY_BIOME[biome] || "tan";
 }
 
@@ -541,6 +560,6 @@ function pickBiome(r, opts) {
 export {
   ODDS, RING_CHANCE, GIANT_CHANCE, RACES, RACE_BY_DOMINANT_CODE, ECON, ECON_S, CONFLICT,
   STELLAR_EL, UNIVERSAL_EL, RING_STYLE_BY_BIOME,
-  rollSystemFlavor, rollSystemFlavorFromAttrs, rollRing,
+  rollSystemFlavor, rollSystemFlavorFromAttrs, rollRing, RING_CHANCE_HAVEN,
   BIOME_ORDER, BIOME_WEIGHTS, BIOME_WEIGHTS_HAVEN, BIOME_WEIGHTS_WIKI_368, HARSH_MULTIPLIER, HARSH_BOOST_KEYS, pickBiome,
 };

@@ -141,7 +141,7 @@ function starTypeForIdx(vx,vy,vz,idx){
    under the new one and flag mismatches through the existing dispute
    system, instead of either guessing blind or manually re-checking ~260+
    records by hand. */
-var GEN_VERSION="1.6.0"; // 2026-10-13: biome odds split normal/prime slot from Haven + Water World (purple, prime, never a moon). 1.5.0: biome odds now the real shares from Voyager's Haven (nms-core/economy.js BIOME_WEIGHTS_HAVEN). 1.4.0: real sell%/buy% (sellBuy()).
+var GEN_VERSION="1.7.0"; // 2026-10-14: ring odds from Haven (normal planets only, by star colour; nms-core RING_CHANCE_HAVEN). 1.6.0: 2026-10-13: biome odds split normal/prime slot from Haven + Water World (purple, prime, never a moon). 1.5.0: biome odds now the real shares from Voyager's Haven (nms-core/economy.js BIOME_WEIGHTS_HAVEN). 1.4.0: real sell%/buy% (sellBuy()).
   // Before that, 1.3.0: // bumped 2026-08-24: planet/moon biome selection
   // now uses nms-core/economy.js's pickBiome() -- a real wiki-sourced
   // weighted table by star colour x galaxy type x Prime-vs-Normal slot --
@@ -1151,7 +1151,7 @@ function generateSystem(vx,vy,vz,idx,noOverride){
     // consuming br() entirely for moons, preserving downstream br() draws
     // for resUni/size/tilt/spin below) via the same parity test.
     var ringStyle = window.NMSEconomy
-      ? window.NMSEconomy.rollRing(br,biome,isMoon)
+      ? window.NMSEconomy.rollRing(br,biome,isMoon,{starKey:s.type,isPrime:isPrimeBody})
       : (!isMoon && br()<RING_CHANCE ? (RING_STYLE_BY_BIOME[biome]||"tan") : false);
     var hasRing = !!ringStyle;
     // Resource-count cap -- 2026-08-23, per Tony's own real-gameplay count
