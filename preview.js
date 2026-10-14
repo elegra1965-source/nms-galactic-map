@@ -141,7 +141,7 @@ function starTypeForIdx(vx,vy,vz,idx){
    under the new one and flag mismatches through the existing dispute
    system, instead of either guessing blind or manually re-checking ~260+
    records by hand. */
-var GEN_VERSION="1.7.0"; // 2026-10-14: ring odds from Haven (normal planets only, by star colour; nms-core RING_CHANCE_HAVEN). 1.6.0: 2026-10-13: biome odds split normal/prime slot from Haven + Water World (purple, prime, never a moon). 1.5.0: biome odds now the real shares from Voyager's Haven (nms-core/economy.js BIOME_WEIGHTS_HAVEN). 1.4.0: real sell%/buy% (sellBuy()).
+var GEN_VERSION="1.8.0"; // 2026-10-14: sentinel tiers = real Haven mix, no longer tied to conflict. 1.7.0: 2026-10-14: ring odds from Haven (normal planets only, by star colour; nms-core RING_CHANCE_HAVEN). 1.6.0: 2026-10-13: biome odds split normal/prime slot from Haven + Water World (purple, prime, never a moon). 1.5.0: biome odds now the real shares from Voyager's Haven (nms-core/economy.js BIOME_WEIGHTS_HAVEN). 1.4.0: real sell%/buy% (sellBuy()).
   // Before that, 1.3.0: // bumped 2026-08-24: planet/moon biome selection
   // now uses nms-core/economy.js's pickBiome() -- a real wiki-sourced
   // weighted table by star colour x galaxy type x Prime-vs-Normal slot --
@@ -316,10 +316,17 @@ function sentinelColor(word){
    conflict skews toward Low/High sentinel presence, high conflict skews
    toward Aggressive, with Corrupted kept rare everywhere (it's flavour text
    for "gone rogue", not just "very hostile"). */
+/* 2026-10-14: real sentinel tiers from Voyager's Haven (84,619 planets read
+   from the game by the Haven Extractor). System conflict level makes NO
+   difference in the real data (same mix at every level), so all three rows
+   are now the same real mix: low 76.4%, attentive 11.4%, aggressive 11.0%,
+   corrupted 1.3% (corrupted is almost only dissonant planets). Old guessed
+   rows were [.55,.35,.08,.02] / [.20,.45,.28,.07] / [.05,.20,.50,.25].
+   Still 2 br() draws per body, so nothing else moves. */
 var SENTINEL_TIER_WEIGHTS_BY_CONTIER=[
-  [0.55,0.35,0.08,0.02], // conTier 0 (low conflict)
-  [0.20,0.45,0.28,0.07], // conTier 1 (medium conflict)
-  [0.05,0.20,0.50,0.25]  // conTier 2 (high conflict)
+  [0.764,0.114,0.110,0.012], // conTier 0 (low conflict)
+  [0.764,0.114,0.110,0.012], // conTier 1 (medium conflict)
+  [0.764,0.114,0.110,0.012]  // conTier 2 (high conflict)
 ];
 /* Consumes exactly 2 br() draws (tier pick, then word-within-tier) -- always
    called last for a body, after every other br() draw for that body (ring/
