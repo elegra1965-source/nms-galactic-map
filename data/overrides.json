@@ -75620,6 +75620,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:10C708555D31": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB21-C7 Nityak",
+        "race": "Vy'keen",
+        "region": "Hullah",
+        "starClass": "M4p",
+        "stars": [
+          "red"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "High Tech",
+        "sell": "58.3",
+        "buy": "-11.5",
+        "econDesc": "💀 (Black Market)",
+        "conflict": "3 (Pirate Controlled)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-10-14T22:00:47.433Z",
+      "editedByIp": "5.133.46.24",
+      "history": [
+        {
+          "at": "2026-10-14T22:00:47.433Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -75627,7 +75676,8 @@
     "5.133.46.24": [
       1792015212597,
       1792015223994,
-      1792015235244
+      1792015235244,
+      1792015247433
     ]
   },
   "flagLog": {},
