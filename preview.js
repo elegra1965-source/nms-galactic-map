@@ -8316,6 +8316,19 @@ var CONDITIONS_CANON={
   "Mega Exotic": ["Burning Crimson","Scarlet Rain","Fevered Clouds","Carmine Winds","Red Mist","Flaming Hail","Vermillion Storms","Rain of Atlas","Angered Clouds","Blood Rain","Bilious Storms","Deadly Pressure Variations","Harsh Toxic Wind","Corrupted Blood","Infinite Toxic Mist","Echoes of Acid","Poison Cyclones","Inescapable Toxins","Clouds of Haunted Green","Invisible Jade Winds","Frozen Mists","Electric Rain","Azure Storms","Extreme Low Pressure","All-Consuming Cold","Winds from Beyond","Unfathomable Storms","Unimaginable Blue","Ultramarine Wind","Inverted Superstorms"],
   "Water World": ["Coastal Storm"]
 };
+/* 2026-10-14: extra real weather phrases from Voyager's Haven (Haven Extractor,
+   read from the game), added to the Conditions suggestions only -- nothing is
+   generated from them. Phrases seen on at least 10 planets of that biome (any
+   count for Dead/Frozen/Gas Giant), skipping Haven's own category codes like
+   "Snow"/"Fire". Dead and Gas Giant had no list before. */
+(function(){
+  var add={"Lush": ["Tropical Storms", "Clammy Menace", "Superheated Mists", "Soggy Danger", "Hazardous Moisture", "Sticky Heat", "Infrequent Torrents", "Oppressive", "Painful Mist", "All-Consuming Fog", "Mild Damp", "Cataclysmic Monsoons", "Occasional Boiling Fog", "Liquid Hell", "Temperate Murk", "Melting Deluges", "Warm Dewdrops", "Muggy Haze", "Mists of Annihilation", "Damp Misery", "Sweaty Drizzle", "Sultry Disaster", "Gentle Mist", "Tepid Damp"], "Scorched": ["Incendiary Winds", "Unpredictable Conflagrations", "Molten Rain", "Burning Mists", "Smothering Ash", "Drifting Firestorms", "Sulfur Fumes", "Heated Gas Pockets", "Pillars of Flame", "Enveloping Ash", "Ash Wisps", "Clouds of Fire", "Plumes of Fire", "Ash Plumes", "Ashen Winds", "Ashen Destruction", "Drifting Smog", "Explosive Gas Eruptions", "Sulphurous Haze", "Sulphurous Inferno", "Occasional Firestorms"], "Frozen": ["Fresh", "Blizzard", "Harsh Frost"], "Exotic": ["Invisible Jade Winds", "Corrupted Blood", "Clouds of Haunted Green", "Inescapable Toxins", "Echoes of Acid", "Poison Cyclones", "Bilious Storms"], "Barren": ["Heated Atmosphere", "Superheated Gas Pockets", "Occasional Ash Storms", "Dangerously Hot", "Wandering Hot Spots", "Combustible Dust", "Burning Gas Clouds", "Rare Firestorms", "Atmospheric Heat Instabilities", "Direct Sunlight", "Burning Air", "Incendiary Dust", "Infrequent Heat Storms", "Inferno Winds", "Intense Heat", "Firestorms", "Superheated Air", "Dehydrated", "Sweltering", "Scalding Heat"], "Dead": ["Airless", "Peaceful", "No Atmosphere", "Perfectly Clear", "Silent", "Absent", "Utterly Still", "Eerily Calm", "Inert"], "Gas Giant": ["Constant Pressure Storms", "Eternal Cyclones", "Gas Storms", "Planet-Wide Maelstrom"]};
+  Object.keys(add).forEach(function(k){
+    var cur=CONDITIONS_CANON[k]||(CONDITIONS_CANON[k]=[]);
+    var have={}; cur.forEach(function(w){ have[w.toLowerCase()]=1; });
+    add[k].forEach(function(w){ if(!have[w.toLowerCase()]){ cur.push(w); have[w.toLowerCase()]=1; } });
+  });
+})();
 function conditionsCommunityExtras(usedLower){
   var learned=(typeof knownTerms!=="undefined"&&knownTerms.descriptor)||[];
   var community=(typeof OVERRIDES!=="undefined"&&OVERRIDES.communityTerms&&OVERRIDES.communityTerms.descriptor)||[];
