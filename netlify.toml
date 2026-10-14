@@ -39,3 +39,11 @@
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+
+# 2026-10-14: the Theme Pack's Home Portal widget (theme.nomansskyhub.app/widgets.html?w=portal)
+# loads nms-core straight from here to work out a system's name/region/race/economy from its
+# glyphs, so these read-only module + letter-map files need to be loadable from other sites.
+[[headers]]
+  for = "/nms-core/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
