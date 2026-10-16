@@ -77284,18 +77284,197 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:10E308556D2F": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "[HUB26-E3] Aximuss-Snai XV",
+        "race": "Gek",
+        "region": "The Arm of Esneyr",
+        "starClass": "F9f",
+        "stars": [
+          "yellow",
+          "purple"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Power Generation",
+        "sell": "77.4",
+        "buy": "-19.0",
+        "econDesc": "Medium Supply",
+        "conflict": "Fractious",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "OldSaltySak",
+        "editorFriendCode": "H0ZJ-YBTF-C5TRR",
+        "genVersion": "1.9.0",
+        "bodies": [
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Barren",
+            "subtype": "Parched",
+            "descriptor": "Sporadic Grit Storms",
+            "water": false,
+            "ring": false,
+            "resources": [
+              "Magnetised Ferrite",
+              "Copper"
+            ],
+            "flora": [
+              "Copious"
+            ],
+            "fauna": [
+              "Abundant"
+            ],
+            "minerals": [
+              "Cactus Flesh",
+              "Pyrite"
+            ],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Intermittent",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Toxic",
+            "subtype": "Acidic",
+            "descriptor": "Poisonous Gas",
+            "water": false,
+            "ring": false,
+            "resources": [
+              "Cobalt",
+              "Copper"
+            ],
+            "flora": [
+              "Sparse"
+            ],
+            "fauna": [
+              "Ample"
+            ],
+            "minerals": [
+              "Fungal Mould",
+              "Ammonia"
+            ],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Sparse",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Exotic",
+            "subtype": "Xeno-Colony",
+            "descriptor": "Mild Rain",
+            "water": true,
+            "ring": false,
+            "resources": [
+              "Cobalt",
+              "Copper"
+            ],
+            "flora": [
+              "Generous"
+            ],
+            "fauna": [
+              "Rich"
+            ],
+            "minerals": [
+              "Star Bulb",
+              "Paraffinium"
+            ],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Irregular Patrols",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Barren",
+            "subtype": "Infested",
+            "descriptor": "Freezing Night Winds",
+            "water": false,
+            "ring": false,
+            "resources": [
+              "Sodium",
+              "Copper"
+            ],
+            "flora": [
+              "Invasive"
+            ],
+            "fauna": [
+              "Abundant"
+            ],
+            "minerals": [
+              "Cactus Flesh",
+              "Pyrite"
+            ],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Sparse",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          }
+        ]
+      },
+      "editedAt": "2026-10-16T23:30:36.019Z",
+      "editedByIp": "72.223.117.245",
+      "history": [
+        {
+          "at": "2026-10-16T23:30:36.019Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "72.223.117.245": [
-      1792189474153,
       1792191585879,
       1792191626048,
       1792191708001,
       1792191769100,
       1792191812233,
-      1792192348875
+      1792192348875,
+      1792193436019
     ]
   },
   "flagLog": {},
@@ -77337,7 +77516,8 @@
       "Medium",
       "Low",
       "Uprooted",
-      "Lost"
+      "Lost",
+      "Invasive"
     ],
     "fauna": [
       "Devoid",
@@ -77450,7 +77630,10 @@
       "Mellow",
       "Intermittent Wind Blasting",
       "Memories of Frost",
-      "Mild Rain"
+      "Mild Rain",
+      "Sporadic Grit Storms",
+      "Poisonous Gas",
+      "Freezing Night Winds"
     ],
     "biome": [
       "Radioactive",
@@ -77495,7 +77678,11 @@
       "High Radio Source",
       "Ossified",
       "Verdant",
-      "Cabled"
+      "Cabled",
+      "Parched",
+      "Acidic",
+      "Xeno-Colony",
+      "Infested"
     ],
     "signalName": [
       "MS Jiokaz XIV",
