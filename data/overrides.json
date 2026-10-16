@@ -75816,18 +75816,226 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "29:11BBF8FEEFEF": {
+      "galaxy": 29,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "GBR - Unideco",
+        "race": "Vy'keen",
+        "region": "Eomett Instability",
+        "starClass": "G4",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Metal Processing",
+        "sell": "59.3",
+        "buy": "-13.6",
+        "econDesc": "High Supply",
+        "conflict": "Untroubled",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "System Claimed by Galactic Bilge Rats | Base \"The Crow's Nest\" on Eppinandy",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "https://raw.githubusercontent.com/elegra1965-source/nms-galactic-map/main/user-screenshots/29-11BBF8FEEFEF-mvadz502-i7ho75.jpg",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Kaziaki (XBOX)",
+        "editorFriendCode": "",
+        "genVersion": "1.9.0",
+        "bodies": [
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Toxic",
+            "subtype": "Blighted",
+            "descriptor": "Acidic Deluges",
+            "water": true,
+            "ring": false,
+            "resources": [
+              "Salt",
+              "Activated Copper"
+            ],
+            "flora": [
+              "Generous"
+            ],
+            "fauna": [
+              "Full"
+            ],
+            "minerals": [
+              "Ammonia",
+              "Star Bulb"
+            ],
+            "salvage": [],
+            "fossils": [
+              "Ancient Bones"
+            ],
+            "sentinel": "Low Security",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Irradiated",
+            "subtype": "",
+            "descriptor": "Occasional Radiation Outbursts",
+            "water": true,
+            "ring": false,
+            "resources": [
+              "Copper",
+              "Cobalt"
+            ],
+            "flora": [
+              "Abundant"
+            ],
+            "fauna": [
+              "Full"
+            ],
+            "minerals": [
+              "Gamma Root",
+              "Uranium"
+            ],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Ever-present",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "Ennecti",
+            "moon": true,
+            "orbits": 2,
+            "biome": "Barren",
+            "subtype": "Bleak",
+            "descriptor": "Parched Sands",
+            "water": false,
+            "ring": false,
+            "resources": [
+              "Cobalt",
+              "Copper"
+            ],
+            "flora": [
+              "Abundant"
+            ],
+            "fauna": [
+              "Frequent"
+            ],
+            "minerals": [
+              "Pyrite",
+              "Cactus Flesh"
+            ],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Limited",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "Eppinandy",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Lush",
+            "subtype": "Overgrown",
+            "descriptor": "Usually Mild",
+            "water": true,
+            "ring": false,
+            "resources": [
+              "Copper",
+              "Sodium"
+            ],
+            "flora": [
+              "Ample"
+            ],
+            "fauna": [
+              "Rich"
+            ],
+            "minerals": [
+              "Paraffinium",
+              "Star Bulb"
+            ],
+            "salvage": [],
+            "fossils": [
+              "Ancient Bones"
+            ],
+            "sentinel": "Observant",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": true,
+            "baseName": "The Crow's Nest"
+          },
+          {
+            "name": "Honm 84/M1",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Scorched",
+            "subtype": "Scalding",
+            "descriptor": "Dehydrated",
+            "water": false,
+            "ring": "gold",
+            "resources": [
+              "Cobalt",
+              "Copper"
+            ],
+            "flora": [
+              "Rich"
+            ],
+            "fauna": [
+              "Copious"
+            ],
+            "minerals": [
+              "Solanium",
+              "Phosphorus"
+            ],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Irregular Patrols",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          }
+        ]
+      },
+      "editedAt": "2026-10-16T03:06:37.975Z",
+      "editedByIp": "170.85.154.179",
+      "history": [
+        {
+          "at": "2026-10-16T03:06:37.975Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
-    "5.133.46.24": [
-      1792015212597,
-      1792015223994,
-      1792015235244,
-      1792015247433,
-      1792015259036,
-      1792015270234,
-      1792015281799
+    "170.85.154.179": [
+      1792119997975
     ]
   },
   "flagLog": {},
@@ -75899,7 +76107,9 @@
       "Activated Emeril",
       "Activated Indium",
       "Activat",
-      "Cactus Flesh"
+      "Cactus Flesh",
+      "Gamma Root",
+      "Solanium"
     ],
     "salvage": [
       "Salvageable scrap",
@@ -75933,7 +76143,12 @@
       "Infrequent Heat Storms",
       "Beautiful",
       "Balmy",
-      "Blasted Atmosphere"
+      "Blasted Atmosphere",
+      "Acidic Deluges",
+      "Occasional Radiation Outbursts",
+      "Parched Sands",
+      "Usually Mild",
+      "Dehydrated"
     ],
     "biome": [
       "Radioactive",
@@ -75945,7 +76160,8 @@
       "Dead",
       "Irradiated",
       "Barren",
-      "Scorched"
+      "Scorched",
+      "Toxic"
     ],
     "subtype": [
       "Viridescent",
@@ -75956,7 +76172,10 @@
       "Magma",
       "Paradise",
       "Scalding",
-      "Rocky"
+      "Rocky",
+      "Blighted",
+      "Bleak",
+      "Overgrown"
     ],
     "signalName": [
       "MS Jiokaz XIV",
