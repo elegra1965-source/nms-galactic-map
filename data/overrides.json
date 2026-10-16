@@ -77086,7 +77086,7 @@
         "collidingSet": [],
         "screenshot": "https://raw.githubusercontent.com/elegra1965-source/nms-galactic-map/main/user-screenshots/9-102908556D2F-mvbklige-czghgb.jpg",
         "hasStation": true,
-        "stationName": "[HUB26-29] Odiushi-Tunis Rend",
+        "stationName": "[HUB26-29] Odiushi-Tumis Rend",
         "allianceName": "Galactic Hub Alliance",
         "stationPhoto": "https://raw.githubusercontent.com/elegra1965-source/nms-galactic-map/main/user-screenshots/9-102908556D2F-station-mvbkljey-wox6bz.jpg",
         "signals": [],
@@ -77216,7 +77216,7 @@
           }
         ]
       },
-      "editedAt": "2026-10-16T23:01:48.001Z",
+      "editedAt": "2026-10-16T23:02:49.100Z",
       "editedByIp": "72.223.117.245",
       "history": [
         {
@@ -77230,6 +77230,10 @@
         {
           "at": "2026-10-16T23:01:48.001Z",
           "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-10-16T23:02:49.100Z",
+          "text": "edited by a traveller"
         }
       ]
     }
@@ -77240,7 +77244,8 @@
       1792189474153,
       1792191585879,
       1792191626048,
-      1792191708001
+      1792191708001,
+      1792191769100
     ]
   },
   "flagLog": {},
