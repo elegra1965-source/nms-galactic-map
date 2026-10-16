@@ -51023,28 +51023,28 @@
         "name": "HUB2-420 Nip-Nip",
         "race": "Gek",
         "region": "Sea of Nadsky",
-        "starClass": "X2p // Dis",
+        "starClass": "X2p",
         "stars": [
           "yellow"
         ],
         "water": false,
-        "dissonant": false,
+        "dissonant": true,
         "giant": false,
         "econName": "High Voltage",
         "sell": "48.7",
         "buy": "-14.5",
         "econDesc": "Fledgling",
-        "conflict": "Intermittent",
+        "conflict": "Pirate Controlled",
         "blackHole": false,
         "atlas": false,
         "ruins": false,
-        "outlaw": false,
+        "outlaw": true,
         "abandoned": false,
         "phantom": "",
-        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "notes": "Cross-referenced from the Galactic Hub community wiki",
         "colliding": false,
         "collidingSet": [],
-        "screenshot": "",
+        "screenshot": "https://raw.githubusercontent.com/elegra1965-source/nms-galactic-map/main/user-screenshots/9-142009555D30-mvauk355-bnhztq.jpg",
         "hasStation": false,
         "stationName": "",
         "allianceName": "",
@@ -51073,30 +51073,64 @@
             "signalType": "Extraterrestrial Rock",
             "route": "Flat plane detected. Ideal site for orbital base construction",
             "planet": 0
+          },
+          {
+            "name": "Planetoid Tebas X",
+            "category": "Habitable Asteroid",
+            "icon": "habitableasteroid",
+            "signalType": "Extraterrestrial Rock",
+            "route": "The Drift Knaves Deep-Space Outpost",
+            "planet": 4
+          },
+          {
+            "name": "Nedziojin Cluster III",
+            "category": "Asteroid Belt",
+            "icon": "asteroidbelt",
+            "signalType": "Planetoid Debris",
+            "route": "",
+            "planet": 0
+          },
+          {
+            "name": "Nedziojin Outpost Alpha",
+            "category": "Infested Outpost",
+            "icon": "infectedoutpost",
+            "signalType": "Former Deep-Space Outpost",
+            "route": "Salvage and cleanup opportunities",
+            "planet": 0
           }
         ],
-        "editorName": "",
-        "editorFriendCode": "",
-        "genVersion": "1.3.0",
+        "editorName": "OldSaltySak",
+        "editorFriendCode": "H0ZJ-YBTF-C5TRR",
+        "genVersion": "1.9.0",
         "bodies": [
           {
             "name": "",
             "moon": false,
             "orbits": 0,
-            "biome": "",
-            "subtype": "",
-            "descriptor": "",
+            "biome": "Toxic",
+            "subtype": "Rotting",
+            "descriptor": "Pouring Toxic Rain",
             "water": true,
             "ring": false,
             "resources": [
               "Magnetised Ferrite"
             ],
-            "flora": [],
-            "fauna": [],
-            "minerals": [],
+            "flora": [
+              "Abundant"
+            ],
+            "fauna": [
+              "Frequent"
+            ],
+            "minerals": [
+              "Fungal Mould",
+              "Activated Quartzite",
+              "Ammonia"
+            ],
             "salvage": [],
-            "fossils": [],
-            "sentinel": "Isolated",
+            "fossils": [
+              "Vile Brood"
+            ],
+            "sentinel": "Irregular Patrols",
             "autophage": false,
             "reliquary": false,
             "ruins": false,
@@ -51107,20 +51141,32 @@
             "name": "",
             "moon": false,
             "orbits": 0,
-            "biome": "",
+            "biome": "Radioactive",
             "subtype": "",
-            "descriptor": "",
+            "descriptor": "Radioactive Dust Storms",
             "water": true,
             "ring": false,
             "resources": [
-              "Magnetised Ferrite"
+              "Cobalt"
             ],
-            "flora": [],
-            "fauna": [],
-            "minerals": [],
-            "salvage": [],
-            "fossils": [],
-            "sentinel": "Hostile Patrols",
+            "flora": [
+              "Ample"
+            ],
+            "fauna": [
+              "Generous"
+            ],
+            "minerals": [
+              "Gamma Root",
+              "Quartzite",
+              "Uranium"
+            ],
+            "salvage": [
+              "Swarm Debris"
+            ],
+            "fossils": [
+              "Dissonance Detected"
+            ],
+            "sentinel": "Infrequent",
             "autophage": false,
             "reliquary": false,
             "ruins": false,
@@ -51131,20 +51177,28 @@
             "name": "",
             "moon": false,
             "orbits": 0,
-            "biome": "",
-            "subtype": "",
-            "descriptor": "",
+            "biome": "Irradiated",
+            "subtype": "Nuclear",
+            "descriptor": "Gamma Cyclones",
             "water": true,
             "ring": false,
             "resources": [
               "Salt"
             ],
-            "flora": [],
-            "fauna": [],
-            "minerals": [],
+            "flora": [
+              "Copious"
+            ],
+            "fauna": [
+              "Abundant"
+            ],
+            "minerals": [
+              "Gamma Root",
+              "Activated Quartzite",
+              "Uranium"
+            ],
             "salvage": [],
             "fossils": [],
-            "sentinel": "Answer To None",
+            "sentinel": "Infrequent",
             "autophage": false,
             "reliquary": false,
             "ruins": false,
@@ -51155,20 +51209,30 @@
             "name": "",
             "moon": false,
             "orbits": 0,
-            "biome": "",
-            "subtype": "",
-            "descriptor": "",
-            "water": true,
-            "ring": "tan",
+            "biome": "Scorched",
+            "subtype": "Scalding",
+            "descriptor": "Firestorms",
+            "water": false,
+            "ring": false,
             "resources": [
-              "Silver"
+              "Sodium"
             ],
-            "flora": [],
-            "fauna": [],
-            "minerals": [],
-            "salvage": [],
+            "flora": [
+              "Full"
+            ],
+            "fauna": [
+              "Bountiful"
+            ],
+            "minerals": [
+              "Solanium",
+              "Phosphorus",
+              "Activated Quartzite"
+            ],
+            "salvage": [
+              "Salvageable scrap"
+            ],
             "fossils": [],
-            "sentinel": "Ever-present",
+            "sentinel": "Low",
             "autophage": false,
             "reliquary": false,
             "ruins": false,
@@ -51243,7 +51307,7 @@
           }
         ]
       },
-      "editedAt": "2026-10-13T09:51:51.538Z",
+      "editedAt": "2026-10-16T10:50:49.069Z",
       "editedByIp": "72.223.117.245",
       "history": [
         {
@@ -51276,6 +51340,10 @@
         },
         {
           "at": "2026-10-13T09:51:51.538Z",
+          "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-10-16T10:50:49.069Z",
           "text": "edited by a traveller"
         }
       ]
@@ -76304,7 +76372,8 @@
   "reports": [],
   "ipLog": {
     "72.223.117.245": [
-      1792145015943
+      1792145015943,
+      1792147849069
     ]
   },
   "flagLog": {},
@@ -76390,10 +76459,13 @@
       "Access Card",
       "Advanced Crafted Product",
       "Advanced Research Module",
-      "Anomalous Data"
+      "Anomalous Data",
+      "Swarm Debris"
     ],
     "fossils": [
-      "Ancient Bones"
+      "Ancient Bones",
+      "Vile Brood",
+      "Dissonance Detected"
     ],
     "descriptor": [
       "Eternal Cyclones",
@@ -76424,7 +76496,11 @@
       "Usually Mild",
       "Dehydrated",
       "Boiling Monsoons",
-      "Parched"
+      "Parched",
+      "Pouring Toxic Rain",
+      "Radioactive Dust Storms",
+      "Gamma Cyclones",
+      "Firestorms"
     ],
     "biome": [
       "Radioactive",
@@ -76455,7 +76531,9 @@
       "Overgrown",
       "Flourishing",
       "Glacial",
-      "Fiery"
+      "Fiery",
+      "Rotting",
+      "Nuclear"
     ],
     "signalName": [
       "MS Jiokaz XIV",
@@ -76475,7 +76553,10 @@
       "Thfieldeb’s Lost Moon",
       "SS Claw of Ageolu",
       "Thfielded Fuel Depot",
-      "SV Invinciable Habikon"
+      "SV Invinciable Habikon",
+      "Planetoid Tebas X",
+      "Nedziojin Cluster III",
+      "Nedziojin Outpost Alpha"
     ]
   },
   "alliances": {},
