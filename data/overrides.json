@@ -77315,11 +77315,11 @@
         "notes": "",
         "colliding": false,
         "collidingSet": [],
-        "screenshot": "",
-        "hasStation": false,
-        "stationName": "",
-        "allianceName": "",
-        "stationPhoto": "",
+        "screenshot": "https://raw.githubusercontent.com/elegra1965-source/nms-galactic-map/main/user-screenshots/9-10E308556D2F-mvbmmacj-bshz2w.jpg",
+        "hasStation": true,
+        "stationName": "[HUB26-E3] Aximuss-Sani XV",
+        "allianceName": "Galactic Hub Alliance",
+        "stationPhoto": "https://raw.githubusercontent.com/elegra1965-source/nms-galactic-map/main/user-screenshots/9-10E308556D2F-station-mvbmmb9b-i8o95i.jpg",
         "signals": [],
         "editorName": "OldSaltySak",
         "editorFriendCode": "H0ZJ-YBTF-C5TRR",
@@ -77455,11 +77455,15 @@
           }
         ]
       },
-      "editedAt": "2026-10-16T23:30:36.019Z",
+      "editedAt": "2026-10-16T23:56:21.218Z",
       "editedByIp": "72.223.117.245",
       "history": [
         {
           "at": "2026-10-16T23:30:36.019Z",
+          "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-10-16T23:56:21.218Z",
           "text": "edited by a traveller"
         }
       ]
@@ -77474,7 +77478,8 @@
       1792191769100,
       1792191812233,
       1792192348875,
-      1792193436019
+      1792193436019,
+      1792194981218
     ]
   },
   "flagLog": {},
