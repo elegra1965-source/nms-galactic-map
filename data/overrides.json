@@ -76034,15 +76034,277 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:100C08556D2F": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "[HUB26-C] Thfieldeb",
+        "race": "Vy'keen",
+        "region": "The Arm of Esneyr",
+        "starClass": "F2p",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Mercantile",
+        "sell": "50.9",
+        "buy": "-25.2",
+        "econDesc": "Balanced",
+        "conflict": "Low",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "https://raw.githubusercontent.com/elegra1965-source/nms-galactic-map/main/user-screenshots/9-100C08556D2F-mvasvcy0-b18p73.jpg",
+        "hasStation": true,
+        "stationName": "[HUB26-C] Thfieldeb Rendezvous",
+        "allianceName": "Galactic Hub Alliance",
+        "stationPhoto": "",
+        "signals": [
+          {
+            "name": "Thfieldeb Relay",
+            "category": "Deep-space Outpost",
+            "icon": "outpost",
+            "signalType": "Deep-space Trading Outpost",
+            "route": "",
+            "planet": 0
+          },
+          {
+            "name": "MS Star of Idaki",
+            "category": "Minor Wreckage",
+            "icon": "cargo",
+            "signalType": "Space Junk",
+            "route": "Salvaging Opportunities",
+            "planet": 2
+          },
+          {
+            "name": "Thfieldeb’s Lost Moon",
+            "category": "Asteroid Belt",
+            "icon": "asteroidbelt",
+            "signalType": "Planwtoid Debris",
+            "route": "Rich vein of comet fragments. Harvest opportunities",
+            "planet": 0
+          },
+          {
+            "name": "SS Claw of Ageolu",
+            "category": "Minor Wreckage",
+            "icon": "cargo",
+            "signalType": "Space Junk",
+            "route": "Salvaging opportunities",
+            "planet": 0
+          },
+          {
+            "name": "Thfielded Fuel Depot",
+            "category": "Infested Outpost",
+            "icon": "infectedoutpost",
+            "signalType": "Former Deep-Space Outpost",
+            "route": "Salvaging Opportunities",
+            "planet": 0
+          },
+          {
+            "name": "SV Invinciable Habikon",
+            "category": "Space Hulk",
+            "icon": "spacehulk",
+            "signalType": "Large Spaceship Wreck",
+            "route": "Profitable salvage opportunities and Clean-up opportunities",
+            "planet": 0
+          }
+        ],
+        "editorName": "OldSaltySak",
+        "editorFriendCode": "H0ZJ-YBTF-C5TRR",
+        "genVersion": "1.9.0",
+        "bodies": [
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Lush",
+            "subtype": "Flourishing",
+            "descriptor": "Boiling Monsoons",
+            "water": true,
+            "ring": "tan",
+            "resources": [
+              "Silver",
+              "Star Bulb",
+              "Activated Copper"
+            ],
+            "flora": [
+              "Ample"
+            ],
+            "fauna": [
+              "Hiigh"
+            ],
+            "minerals": [
+              "Paraffinium"
+            ],
+            "salvage": [
+              "Salvageable scrap"
+            ],
+            "fossils": [],
+            "sentinel": "Spread Thin",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Frozen",
+            "subtype": "Glacial",
+            "descriptor": "Boiling Monsoons",
+            "water": false,
+            "ring": false,
+            "resources": [
+              "Frost Crystal",
+              "Copper",
+              "Magnetised Ferrite"
+            ],
+            "flora": [
+              "Numerous"
+            ],
+            "fauna": [
+              "Abundant"
+            ],
+            "minerals": [
+              "Dioxite"
+            ],
+            "salvage": [
+              "Salvageable scrap"
+            ],
+            "fossils": [],
+            "sentinel": "Spread Thin",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Usually Mild",
+            "subtype": "",
+            "descriptor": "",
+            "water": false,
+            "ring": false,
+            "resources": [
+              "Copper",
+              "Cobalt",
+              "Star Bulb"
+            ],
+            "flora": [
+              "Abundant"
+            ],
+            "fauna": [
+              "Full"
+            ],
+            "minerals": [
+              "Paraffinium"
+            ],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Isolated",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Lush",
+            "subtype": "Paradise",
+            "descriptor": "Beautiful",
+            "water": true,
+            "ring": false,
+            "resources": [
+              "Copper",
+              "Silver",
+              "Star Bulb"
+            ],
+            "flora": [
+              "Bountiful"
+            ],
+            "fauna": [
+              "Typical"
+            ],
+            "minerals": [
+              "Paraffinium"
+            ],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Low",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Scorched",
+            "subtype": "Fiery",
+            "descriptor": "Parched",
+            "water": false,
+            "ring": false,
+            "resources": [
+              "Solanium",
+              "Copper",
+              "Sodium"
+            ],
+            "flora": [
+              "Rich"
+            ],
+            "fauna": [
+              "Bountiful"
+            ],
+            "minerals": [
+              "Phosphorus"
+            ],
+            "salvage": [
+              "Salvageable scrap"
+            ],
+            "fossils": [],
+            "sentinel": "Irregular Patrols",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          }
+        ]
+      },
+      "editedAt": "2026-10-16T10:03:35.943Z",
+      "editedByIp": "72.223.117.245",
+      "history": [
+        {
+          "at": "2026-10-16T10:03:35.943Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
-    "170.85.154.179": [
-      1792119997975
-    ],
-    "170.85.154.195": [
-      1792120402613
+    "72.223.117.245": [
+      1792145015943
     ]
   },
   "flagLog": {},
@@ -76061,7 +76323,8 @@
       "Activated Copper",
       "Copper",
       "Rusted Metal",
-      "Star Bulb"
+      "Star Bulb",
+      "Frost Crystal"
     ],
     "flora": [
       "Sporadic",
@@ -76075,7 +76338,8 @@
       "Abundant",
       "Bountiful",
       "Rich",
-      "Sparse"
+      "Sparse",
+      "Numerous"
     ],
     "fauna": [
       "Devoid",
@@ -76085,7 +76349,10 @@
       "Rare",
       "Generous",
       "Abundant",
-      "Rich"
+      "Rich",
+      "Hiigh",
+      "Typical",
+      "Bountiful"
     ],
     "minerals": [
       "Magnatised Ferrite",
@@ -76155,7 +76422,9 @@
       "Occasional Radiation Outbursts",
       "Parched Sands",
       "Usually Mild",
-      "Dehydrated"
+      "Dehydrated",
+      "Boiling Monsoons",
+      "Parched"
     ],
     "biome": [
       "Radioactive",
@@ -76168,7 +76437,8 @@
       "Irradiated",
       "Barren",
       "Scorched",
-      "Toxic"
+      "Toxic",
+      "Usually Mild"
     ],
     "subtype": [
       "Viridescent",
@@ -76182,7 +76452,10 @@
       "Rocky",
       "Blighted",
       "Bleak",
-      "Overgrown"
+      "Overgrown",
+      "Flourishing",
+      "Glacial",
+      "Fiery"
     ],
     "signalName": [
       "MS Jiokaz XIV",
@@ -76196,7 +76469,13 @@
       "Luettir Shattered Planetoid",
       "Nedziojin Overwatch",
       "Nedziojin’s Lost Moon",
-      "Planetoid Iigar IX"
+      "Planetoid Iigar IX",
+      "Thfieldeb Relay",
+      "MS Star of Idaki",
+      "Thfieldeb’s Lost Moon",
+      "SS Claw of Ageolu",
+      "Thfielded Fuel Depot",
+      "SV Invinciable Habikon"
     ]
   },
   "alliances": {},
