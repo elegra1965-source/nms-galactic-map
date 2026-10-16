@@ -76805,13 +76805,262 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:105008556D2F": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "[HUB26-50] Chcommo",
+        "race": "Korvax",
+        "region": "The Arm of Esneyr",
+        "starClass": "G8pf",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": true,
+        "giant": false,
+        "econName": "Mercantile",
+        "sell": "74.0",
+        "buy": "-14.7",
+        "econDesc": "Sustainable",
+        "conflict": "Boisterous",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "https://raw.githubusercontent.com/elegra1965-source/nms-galactic-map/main/user-screenshots/9-105008556D2F-mvbjc91d-q471we.jpg",
+        "hasStation": true,
+        "stationName": "[HUB26-50] Chcommo Rendezvous",
+        "allianceName": "Galactic Hub Alliance",
+        "stationPhoto": "https://raw.githubusercontent.com/elegra1965-source/nms-galactic-map/main/user-screenshots/9-105008556D2F-station-mvbjc9z5-mhpfix.jpg",
+        "signals": [],
+        "editorName": "OldSaltySak",
+        "editorFriendCode": "H0ZJ-YBTF-C5TRR",
+        "genVersion": "1.9.0",
+        "bodies": [
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Lush",
+            "subtype": "Grassy",
+            "descriptor": "Broiling Humidity",
+            "water": true,
+            "ring": false,
+            "resources": [
+              "Sodium",
+              "Activated Copper"
+            ],
+            "flora": [
+              "Scarce"
+            ],
+            "fauna": [
+              "Rich"
+            ],
+            "minerals": [
+              "Star Bulb",
+              "Paraffinium"
+            ],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Intermittent",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Irradiated",
+            "subtype": "High Radio Source",
+            "descriptor": "Particulate Winds",
+            "water": true,
+            "ring": false,
+            "resources": [
+              "Sodium",
+              "Copper"
+            ],
+            "flora": [
+              "Medium"
+            ],
+            "fauna": [
+              "Copious"
+            ],
+            "minerals": [
+              "Uranium",
+              "Gamma Root"
+            ],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Irregular Patrols",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Lush",
+            "subtype": "Paradise",
+            "descriptor": "Mellow",
+            "water": true,
+            "ring": "tan",
+            "resources": [
+              "Magnetised Ferrite",
+              "Copper"
+            ],
+            "flora": [
+              "High"
+            ],
+            "fauna": [
+              "Fair"
+            ],
+            "minerals": [
+              "Star Bulb",
+              "Paraffinium"
+            ],
+            "salvage": [
+              "Salvageable scrap"
+            ],
+            "fossils": [],
+            "sentinel": "Isolated",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": true,
+            "orbits": 3,
+            "biome": "Scorched",
+            "subtype": "Charred",
+            "descriptor": "Infrequent Heat Storms",
+            "water": false,
+            "ring": false,
+            "resources": [
+              "Salt",
+              "Copper"
+            ],
+            "flora": [
+              "Rich"
+            ],
+            "fauna": [
+              "Rich"
+            ],
+            "minerals": [
+              "Solanium",
+              "Phosphorus"
+            ],
+            "salvage": [
+              "Salvageable scrap"
+            ],
+            "fossils": [
+              "Swarm Debris"
+            ],
+            "sentinel": "Remote",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": true,
+            "orbits": 3,
+            "biome": "Barren",
+            "subtype": "Bleak",
+            "descriptor": "Intermittent Wind Blasting",
+            "water": false,
+            "ring": false,
+            "resources": [
+              "Magnetised Ferrite",
+              "Copper"
+            ],
+            "flora": [
+              "Low"
+            ],
+            "fauna": [
+              "Sparse"
+            ],
+            "minerals": [
+              "Cactus Flesh",
+              "Pyrite"
+            ],
+            "salvage": [],
+            "fossils": [
+              "Ancient Bones"
+            ],
+            "sentinel": "Remote",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Exotic",
+            "subtype": "Ossified",
+            "descriptor": "Memories of Frost",
+            "water": false,
+            "ring": false,
+            "resources": [
+              "Magnetised Ferrite",
+              "Gold",
+              "Copper"
+            ],
+            "flora": [
+              "Uprooted"
+            ],
+            "fauna": [
+              "Unusual"
+            ],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Spread Thin",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          }
+        ]
+      },
+      "editedAt": "2026-10-16T22:24:34.153Z",
+      "editedByIp": "72.223.117.245",
+      "history": [
+        {
+          "at": "2026-10-16T22:24:34.153Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "72.223.117.245": [
       1792187057419,
-      1792187607331
+      1792187607331,
+      1792189474153
     ]
   },
   "flagLog": {},
@@ -76848,7 +77097,11 @@
       "Sparse",
       "Numerous",
       "Frequent",
-      "Misplaced"
+      "Misplaced",
+      "Scarce",
+      "Medium",
+      "Low",
+      "Uprooted"
     ],
     "fauna": [
       "Devoid",
@@ -76865,7 +77118,10 @@
       "Between Worlds",
       "Average",
       "Intermittent",
-      "Ample"
+      "Ample",
+      "Fair",
+      "Sparse",
+      "Unusual"
     ],
     "minerals": [
       "Magnatised Ferrite",
@@ -76909,7 +77165,8 @@
     "fossils": [
       "Ancient Bones",
       "Vile Brood",
-      "Dissonance Detected"
+      "Dissonance Detected",
+      "Swarm Debris"
     ],
     "descriptor": [
       "Eternal Cyclones",
@@ -76950,7 +77207,12 @@
       "Nuclidic Atmosphere",
       "Refreshing Breeze",
       "Superheated Drizzle",
-      "Temperate"
+      "Temperate",
+      "Broiling Humidity",
+      "Particulate Winds",
+      "Mellow",
+      "Intermittent Wind Blasting",
+      "Memories of Frost"
     ],
     "biome": [
       "Radioactive",
@@ -76990,7 +77252,10 @@
       "Webbed",
       "Supercritical",
       "Humid",
-      "Vapour"
+      "Vapour",
+      "Grassy",
+      "High Radio Source",
+      "Ossified"
     ],
     "signalName": [
       "MS Jiokaz XIV",
