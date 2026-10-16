@@ -51020,7 +51020,7 @@
       "flaggedFields": [],
       "disputedFields": [],
       "data": {
-        "name": "HUB2-420 Nip-Nip",
+        "name": "[HUB2-420] Nip-Nip",
         "race": "Gek",
         "region": "Sea of Nadsky",
         "starClass": "X2p",
@@ -51031,7 +51031,7 @@
         "water": false,
         "dissonant": true,
         "giant": false,
-        "econName": "High Voltage",
+        "econName": "Power Generation",
         "sell": "48.7",
         "buy": "-14.5",
         "econDesc": "Fledgling",
@@ -51046,10 +51046,10 @@
         "colliding": false,
         "collidingSet": [],
         "screenshot": "https://raw.githubusercontent.com/elegra1965-source/nms-galactic-map/main/user-screenshots/9-142009555D30-mvauk355-bnhztq.jpg",
-        "hasStation": false,
-        "stationName": "",
+        "hasStation": true,
+        "stationName": "[HUB26-420] Nip Nip Station Ma",
         "allianceName": "",
-        "stationPhoto": "",
+        "stationPhoto": "https://raw.githubusercontent.com/elegra1965-source/nms-galactic-map/main/user-screenshots/9-142009555D30-station-mvbi88pd-vf5zec.jpg",
         "signals": [
           {
             "name": "Nedziojin Overwatch",
@@ -51308,7 +51308,7 @@
           }
         ]
       },
-      "editedAt": "2026-10-16T10:52:30.717Z",
+      "editedAt": "2026-10-16T21:53:27.331Z",
       "editedByIp": "72.223.117.245",
       "history": [
         {
@@ -51349,6 +51349,10 @@
         },
         {
           "at": "2026-10-16T10:52:30.717Z",
+          "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-10-16T21:53:27.331Z",
           "text": "edited by a traveller"
         }
       ]
@@ -76806,7 +76810,8 @@
   "reports": [],
   "ipLog": {
     "72.223.117.245": [
-      1792187057419
+      1792187057419,
+      1792187607331
     ]
   },
   "flagLog": {},
