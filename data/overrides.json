@@ -76372,14 +76372,263 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:104F08556D2F": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "[HUB26-4F] Bonnai-Amze",
+        "race": "Gek",
+        "region": "The Arm of Esneyr",
+        "starClass": "G4",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Alchemical",
+        "sell": "58.0",
+        "buy": "-29.7",
+        "econDesc": "Comfortable",
+        "conflict": "Peaceful",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "https://raw.githubusercontent.com/elegra1965-source/nms-galactic-map/main/user-screenshots/9-104F08556D2F-mvbfd7p4-vo63bl.jpg",
+        "hasStation": true,
+        "stationName": "[HUB26-4F] Bonnai-Amze Rendzvo",
+        "allianceName": "Galactic Hub Alliance",
+        "stationPhoto": "https://raw.githubusercontent.com/elegra1965-source/nms-galactic-map/main/user-screenshots/9-104F08556D2F-station-mvbfd8lu-sfwr1c.jpg",
+        "signals": [
+          {
+            "name": "Bonnai-Amze Listening Post",
+            "category": "Deep-Sapce Outpost",
+            "icon": "outpost",
+            "signalType": "Deep-Space Trading Outpost",
+            "route": "Profitable salvage and contracting opportunities. Package delivery.",
+            "planet": 0
+          },
+          {
+            "name": "SV Zawac XVI",
+            "category": "Minor Wreckage",
+            "icon": "cargo",
+            "signalType": "Space Junk",
+            "route": "Salvaging opportunities",
+            "planet": 3
+          },
+          {
+            "name": "Downha’s Calmity",
+            "category": "Asteroid Belt",
+            "icon": "asteroidbelt",
+            "signalType": "Planetoid Debris",
+            "route": "Rich vein of comet fragments",
+            "planet": 0
+          },
+          {
+            "name": "Bonnai-Amze Accrection",
+            "category": "Ice Fields",
+            "icon": "frozen",
+            "signalType": "Frozen Planetoid Debris",
+            "route": "Rich vein of comet fragments",
+            "planet": 0
+          },
+          {
+            "name": "Messenger of Atlas",
+            "category": "Anomalous Signal",
+            "icon": "tech",
+            "signalType": "Anomalous Deep-Space Object",
+            "route": "Anomalous Signal",
+            "planet": 0
+          }
+        ],
+        "editorName": "OldSaltySak",
+        "editorFriendCode": "H0ZJ-YBTF-C5TRR",
+        "genVersion": "1.9.0",
+        "bodies": [
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Scorched",
+            "subtype": "Charred",
+            "descriptor": "Atmospheric Heat Instabilities",
+            "water": true,
+            "ring": false,
+            "resources": [
+              "Cobalt",
+              "Copper"
+            ],
+            "flora": [
+              "Frequent"
+            ],
+            "fauna": [
+              "Generous"
+            ],
+            "minerals": [
+              "Solanium",
+              "Phosphorus"
+            ],
+            "salvage": [],
+            "fossils": [
+              "Ancient Bones"
+            ],
+            "sentinel": "Low",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": true,
+            "orbits": 1,
+            "biome": "Exotic",
+            "subtype": "Webbed",
+            "descriptor": "Redacted",
+            "water": false,
+            "ring": false,
+            "resources": [
+              "Sodium",
+              "Gold",
+              "Copper"
+            ],
+            "flora": [
+              "Misplaced"
+            ],
+            "fauna": [
+              "Between Worlds"
+            ],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Low Security",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Irradiated",
+            "subtype": "Supercritical",
+            "descriptor": "Nuclidic Atmosphere",
+            "water": true,
+            "ring": "gold",
+            "resources": [
+              "Silver",
+              "Copper"
+            ],
+            "flora": [
+              "Generous"
+            ],
+            "fauna": [
+              "Generous"
+            ],
+            "minerals": [
+              "Gamma Root",
+              "Uranium"
+            ],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Few",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Lush",
+            "subtype": "Paradise",
+            "descriptor": "Refreshing Breeze",
+            "water": true,
+            "ring": false,
+            "resources": [
+              "Silver",
+              "Copper"
+            ],
+            "flora": [
+              "Full"
+            ],
+            "fauna": [
+              "Average"
+            ],
+            "minerals": [
+              "Star Bulb",
+              "Uranium"
+            ],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Low Security",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Lush",
+            "subtype": "Humid",
+            "descriptor": "Superheated Drizzle",
+            "water": true,
+            "ring": false,
+            "resources": [
+              "Cobalt",
+              "Copper"
+            ],
+            "flora": [
+              "Bountiful"
+            ],
+            "fauna": [
+              "Generous"
+            ],
+            "minerals": [
+              "Star Bulb",
+              "Paraffinium"
+            ],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Isolated",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          }
+        ]
+      },
+      "editedAt": "2026-10-16T20:33:20.504Z",
+      "editedByIp": "72.223.117.245",
+      "history": [
+        {
+          "at": "2026-10-16T20:33:20.504Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "72.223.117.245": [
-      1792145015943,
-      1792147849069,
-      1792147950717
+      1792182800504
     ]
   },
   "flagLog": {},
@@ -76414,7 +76663,9 @@
       "Bountiful",
       "Rich",
       "Sparse",
-      "Numerous"
+      "Numerous",
+      "Frequent",
+      "Misplaced"
     ],
     "fauna": [
       "Devoid",
@@ -76427,7 +76678,9 @@
       "Rich",
       "Hiigh",
       "Typical",
-      "Bountiful"
+      "Bountiful",
+      "Between Worlds",
+      "Average"
     ],
     "minerals": [
       "Magnatised Ferrite",
@@ -76506,7 +76759,12 @@
       "Pouring Toxic Rain",
       "Radioactive Dust Storms",
       "Gamma Cyclones",
-      "Firestorms"
+      "Firestorms",
+      "Atmospheric Heat Instabilities",
+      "Redacted",
+      "Nuclidic Atmosphere",
+      "Refreshing Breeze",
+      "Superheated Drizzle"
     ],
     "biome": [
       "Radioactive",
@@ -76520,7 +76778,8 @@
       "Barren",
       "Scorched",
       "Toxic",
-      "Usually Mild"
+      "Usually Mild",
+      "Exotic"
     ],
     "subtype": [
       "Viridescent",
@@ -76539,7 +76798,11 @@
       "Glacial",
       "Fiery",
       "Rotting",
-      "Nuclear"
+      "Nuclear",
+      "Charred",
+      "Webbed",
+      "Supercritical",
+      "Humid"
     ],
     "signalName": [
       "MS Jiokaz XIV",
@@ -76562,7 +76825,12 @@
       "SV Invinciable Habikon",
       "Planetoid Tebas X",
       "Nedziojin Cluster III",
-      "Nedziojin Outpost Alpha"
+      "Nedziojin Outpost Alpha",
+      "Bonnai-Amze Listening Post",
+      "SV Zawac XVI",
+      "Downha’s Calmity",
+      "Bonnai-Amze Accrection",
+      "Messenger of Atlas"
     ]
   },
   "alliances": {},
