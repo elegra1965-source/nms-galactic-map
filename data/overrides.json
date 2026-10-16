@@ -51025,7 +51025,8 @@
         "region": "Sea of Nadsky",
         "starClass": "X2p",
         "stars": [
-          "yellow"
+          "yellow",
+          "blue"
         ],
         "water": false,
         "dissonant": true,
@@ -51307,7 +51308,7 @@
           }
         ]
       },
-      "editedAt": "2026-10-16T10:50:49.069Z",
+      "editedAt": "2026-10-16T10:52:30.717Z",
       "editedByIp": "72.223.117.245",
       "history": [
         {
@@ -51344,6 +51345,10 @@
         },
         {
           "at": "2026-10-16T10:50:49.069Z",
+          "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-10-16T10:52:30.717Z",
           "text": "edited by a traveller"
         }
       ]
@@ -76373,7 +76378,8 @@
   "ipLog": {
     "72.223.117.245": [
       1792145015943,
-      1792147849069
+      1792147849069,
+      1792147950717
     ]
   },
   "flagLog": {},
