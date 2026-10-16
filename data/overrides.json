@@ -77098,20 +77098,28 @@
             "name": "",
             "moon": false,
             "orbits": 0,
-            "biome": "",
-            "subtype": "",
-            "descriptor": "",
-            "water": false,
-            "ring": false,
+            "biome": "Lush",
+            "subtype": "Verdant",
+            "descriptor": "Mostly Calm",
+            "water": true,
+            "ring": "tan",
             "resources": [
-              "Salt"
+              "Silver",
+              "Copper"
             ],
-            "flora": [],
-            "fauna": [],
-            "minerals": [],
+            "flora": [
+              "Copious"
+            ],
+            "fauna": [
+              "Frequent"
+            ],
+            "minerals": [
+              "Star Bulb",
+              "Paraffinium"
+            ],
             "salvage": [],
             "fossils": [],
-            "sentinel": "Remote",
+            "sentinel": "Isolated",
             "autophage": false,
             "reliquary": false,
             "ruins": false,
@@ -77122,20 +77130,28 @@
             "name": "",
             "moon": false,
             "orbits": 0,
-            "biome": "",
-            "subtype": "",
-            "descriptor": "",
+            "biome": "Lush",
+            "subtype": "Paradise",
+            "descriptor": "Mild Rain",
             "water": true,
             "ring": false,
             "resources": [
-              "Salt"
+              "Sodium",
+              "Copper"
             ],
-            "flora": [],
-            "fauna": [],
-            "minerals": [],
+            "flora": [
+              "Rich"
+            ],
+            "fauna": [
+              "Occasional"
+            ],
+            "minerals": [
+              "Star Bulb",
+              "Paraffinium"
+            ],
             "salvage": [],
             "fossils": [],
-            "sentinel": "High Security",
+            "sentinel": "Sparse",
             "autophage": false,
             "reliquary": false,
             "ruins": false,
@@ -77146,17 +77162,25 @@
             "name": "",
             "moon": false,
             "orbits": 0,
-            "biome": "",
-            "subtype": "",
+            "biome": "Barren",
+            "subtype": "Bleak",
             "descriptor": "",
             "water": true,
             "ring": false,
             "resources": [
-              "Cobalt"
+              "Sodium",
+              "Activated Copper"
             ],
-            "flora": [],
-            "fauna": [],
-            "minerals": [],
+            "flora": [
+              "Abundant"
+            ],
+            "fauna": [
+              "Copious"
+            ],
+            "minerals": [
+              "Cactus Flesh",
+              "Pyrite"
+            ],
             "salvage": [],
             "fossils": [],
             "sentinel": "Irregular Patrols",
@@ -77170,20 +77194,26 @@
             "name": "",
             "moon": false,
             "orbits": 0,
-            "biome": "",
-            "subtype": "",
+            "biome": "Exotic",
+            "subtype": "Cabled",
             "descriptor": "",
             "water": false,
             "ring": false,
             "resources": [
-              "Cobalt"
+              "Cobalt",
+              "Gold",
+              "Copper"
             ],
-            "flora": [],
-            "fauna": [],
+            "flora": [
+              "Lost"
+            ],
+            "fauna": [
+              "Unusual"
+            ],
             "minerals": [],
             "salvage": [],
             "fossils": [],
-            "sentinel": "Infrequent",
+            "sentinel": "Intermittent",
             "autophage": false,
             "reliquary": false,
             "ruins": false,
@@ -77194,20 +77224,30 @@
             "name": "",
             "moon": false,
             "orbits": 0,
-            "biome": "",
-            "subtype": "",
-            "descriptor": "",
+            "biome": "Lush",
+            "subtype": "Flourishing",
+            "descriptor": "Blistering Damp",
             "water": true,
             "ring": false,
             "resources": [
-              "Gold"
+              "Sodium",
+              "Copper"
             ],
-            "flora": [],
-            "fauna": [],
-            "minerals": [],
+            "flora": [
+              "Abundant"
+            ],
+            "fauna": [
+              "Rich"
+            ],
+            "minerals": [
+              "Star Bulb",
+              "Paraffinium"
+            ],
             "salvage": [],
-            "fossils": [],
-            "sentinel": "Minimal",
+            "fossils": [
+              "Ancient Bones"
+            ],
+            "sentinel": "Sparse",
             "autophage": false,
             "reliquary": false,
             "ruins": false,
@@ -77216,7 +77256,7 @@
           }
         ]
       },
-      "editedAt": "2026-10-16T23:03:32.233Z",
+      "editedAt": "2026-10-16T23:12:28.875Z",
       "editedByIp": "72.223.117.245",
       "history": [
         {
@@ -77238,6 +77278,10 @@
         {
           "at": "2026-10-16T23:03:32.233Z",
           "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-10-16T23:12:28.875Z",
+          "text": "edited by a traveller"
         }
       ]
     }
@@ -77250,7 +77294,8 @@
       1792191626048,
       1792191708001,
       1792191769100,
-      1792191812233
+      1792191812233,
+      1792192348875
     ]
   },
   "flagLog": {},
@@ -77291,7 +77336,8 @@
       "Scarce",
       "Medium",
       "Low",
-      "Uprooted"
+      "Uprooted",
+      "Lost"
     ],
     "fauna": [
       "Devoid",
@@ -77311,7 +77357,8 @@
       "Ample",
       "Fair",
       "Sparse",
-      "Unusual"
+      "Unusual",
+      "Occasional"
     ],
     "minerals": [
       "Magnatised Ferrite",
@@ -77402,7 +77449,8 @@
       "Particulate Winds",
       "Mellow",
       "Intermittent Wind Blasting",
-      "Memories of Frost"
+      "Memories of Frost",
+      "Mild Rain"
     ],
     "biome": [
       "Radioactive",
@@ -77445,7 +77493,9 @@
       "Vapour",
       "Grassy",
       "High Radio Source",
-      "Ossified"
+      "Ossified",
+      "Verdant",
+      "Cabled"
     ],
     "signalName": [
       "MS Jiokaz XIV",
