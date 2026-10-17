@@ -241,6 +241,13 @@ station or region, so it's tracked the same optional way as the station name
 itself. This is still a foundation pass: existence, name, photo, and
 alliance name are tracked, not any deeper director-specific detail.
 
+**Your own station photo.** In system view, a system with no station photo
+shows a generic station icon. Players can customise their stations in-game,
+so the system's info panel has an **📷 Add your station photo** button: it
+opens Edit system with the station ticked and the photo picker already open.
+Once you Save, your photo replaces the generic icon for every visitor, shown
+as a framed card with the station's name.
+
 **Signal markers (added 2026-09-09).** Edit system can also record the
 floating diamond-shaped signals you see near objects in-game -- what your
 own "Starmap Analysis Report" popup actually told you was there. Like
@@ -274,7 +281,7 @@ has been filled in.
 ![System info panel showing Community notes text and a submitted screenshot as two separate titled sections](screenshots/17-public-screenshot-notes.jpg)
 
 **Recently charted.** Beside *Show controls* at the top, a small counter
-(for example *◈ 4 charted today ›*) shows how many systems travellers have
+(for example *◈ 4 systems charted today ›*) shows how many systems travellers have
 documented today. Tap it for the list of everything charted in the last 7
 days: system name, who charted it, galaxy, how long ago, and the portal
 glyphs with the hex address. Tap a system to fly straight there, switching
@@ -284,7 +291,7 @@ people. The Hub's ticker links here with `?recent=1`, which opens the list
 straight away. A small feed for other sites lives at
 `/.netlify/functions/system-edit?recent=1`.
 
-<img src="screenshots/18-recently-charted.jpg" alt="Recently charted list on a phone: the 4 charted today counter beside Hide controls, and systems with who charted them, galaxy, time and portal glyphs" width="360">
+<img src="screenshots/18-recently-charted.jpg" alt="Recently charted list on a phone: the 4 systems charted today counter beside Hide controls, and systems with who charted them, galaxy, time and portal glyphs" width="360">
 
 **Import from my save file.** Inside Edit system, an optional button reads a
 real Steam/GOG `.hg` save file entirely in your own browser -- nothing is

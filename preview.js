@@ -4336,10 +4336,18 @@ function buildStationCard(s,pos){
   canvas.width=CW; canvas.height=CH;
   var ctx=canvas.getContext("2d");
   var label=(s.stationName?s.stationName:"Space station").toUpperCase();
-  function drawChrome(){
+  /* 2026-10-17 fix (Tony: station card showed his photo almost black): the
+     dark card fill used to be part of drawChrome(), which onload calls AFTER
+     drawing the photo -- so a 94%-opaque fill landed on top of the picture.
+     The fill is now drawBg(), drawn first; drawChrome() is only the border
+     and the label, safe to draw over the photo. */
+  function drawBg(){
     _roundRectPath(ctx,2,2,CW-4,CH-4,14);
     ctx.fillStyle="rgba(6,12,20,0.94)";
     ctx.fill();
+  }
+  function drawChrome(){
+    _roundRectPath(ctx,2,2,CW-4,CH-4,14);
     ctx.lineWidth=3;
     ctx.strokeStyle="#5ad7ff";
     ctx.stroke();
@@ -4354,6 +4362,7 @@ function buildStationCard(s,pos){
     ctx.fillText(txt,CW/2,CH-9);
   }
   ctx.clearRect(0,0,CW,CH);
+  drawBg();
   drawChrome();
   var tex=new THREE.CanvasTexture(canvas);
   tex.minFilter=THREE.LinearFilter;
@@ -4392,6 +4401,7 @@ function buildStationCard(s,pos){
     var dw=iw*scale, dh=ih*scale;
     var dx=innerX+(innerW-dw)/2, dy=innerY+(innerH-dh)/2;
     ctx.clearRect(0,0,CW,CH);
+    drawBg();
     ctx.save();
     _roundRectPath(ctx,innerX,innerY,innerW,innerH,8);
     ctx.clip();
@@ -5469,6 +5479,8 @@ function updatePanel(s){
   else { pubShotImg.src=""; pubShotWrap.style.display="none"; }
   var pubStPhotoWrap=document.getElementById("pubStationPhotoWrap"), pubStPhotoImg=document.getElementById("pubStationPhoto");
   if(s.hasStation && s.stationPhoto){ pubStPhotoImg.src=s.stationPhoto; pubStPhotoWrap.style.display="block"; }
+  var stPhotoRow=document.getElementById("stationPhotoRow");
+  if(stPhotoRow) stPhotoRow.style.display=(s.hasStation && s.stationPhoto)?"none":"";
   else { pubStPhotoImg.src=""; pubStPhotoWrap.style.display="none"; }
   pnb.style.display=(s.publicNotes||editorTxt||s.publicScreenshot||(s.hasStation&&s.stationPhoto))?"":"none";
   setFsClass("pubNoteBox","notes",s);
@@ -9511,6 +9523,18 @@ document.getElementById("edAddSignal").addEventListener("click",function(){
   if(last) last.scrollIntoView({block:"nearest",behavior:"smooth"});
 });
 document.getElementById("bEdit").addEventListener("click",function(){ if(selected) openEditModal(); });
+/* "Add your station photo" (2026-10-17): opens Edit system with the station
+   ticked and the photo picker already open -- the picker has to be opened in
+   this same tap, browsers refuse it from a timer. Nothing is saved until the
+   traveller presses Save, same as any other edit. */
+document.getElementById("bStationPhoto").addEventListener("click",function(){
+  if(!selected) return;
+  openEditModal();
+  var st=document.getElementById("edStation");
+  if(!st.checked){ st.checked=true; st.dispatchEvent(new Event("change")); }
+  document.getElementById("edStationPhotoFile").click();
+  setTimeout(function(){ var b=document.getElementById("edStationPhotoBtn"); if(b) b.scrollIntoView({block:"center"}); },60);
+});
 /* Human-readable labels for the "Flag this field" picker -- must list the
    exact same 14 categories as FLAG_CATEGORIES above (kept in sync by hand
    with FLAG_FIELDS in netlify/functions/lib/shared.mjs, same caveat).

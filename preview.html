@@ -1898,6 +1898,12 @@ nearby procedural space within a radius.">Search</button>
     <button class="btn" id="bEdit" title="Enter your real in-game data for this system -- name, race, economy, conflict, planets/moons and resources. Saved for every visitor to see.">Edit system</button>
     <button class="btn" id="bReport" title="Flag this system's data as wrong or inappropriate so it can be reviewed.">Report</button>
   </div>
+  <!-- 2026-10-17, Tony: players can customise their stations (Cosmos), so make
+       swapping the generic station icon for their own photo one tap away instead
+       of buried in Edit system. Hidden once the system already has a photo. -->
+  <div class="prow" id="stationPhotoRow">
+    <button class="btn" id="bStationPhoto" type="button" style="flex:1" title="Swap the generic station icon for a photo of your own customised station. Opens Edit system with the photo picker ready; your photo shows for every visitor once you Save.">&#128247; Add your station photo</button>
+  </div>
   <div id="pubNoteBox" style="display:none">
     <div class="lb" style="font-size:9px;letter-spacing:.12em;color:var(--text-faint);text-transform:uppercase;margin:8px 0 3px">Community notes</div>
     <div id="pubNote" style="font-size:12px;color:var(--text-dim);white-space:pre-wrap"></div>
@@ -2082,7 +2088,7 @@ nearby procedural space within a radius.">Search</button>
 </div>
 
 <div class="box" id="chartedPop" role="dialog" aria-label="Recently charted">
-  <div class="kicker" style="margin-bottom:2px">&#9672; Recently charted</div>
+  <div class="kicker" style="margin-bottom:2px">&#9672; Recently charted by travellers</div>
   <div class="searchResMeta" id="chartedSub" style="margin-bottom:6px"></div>
   <div id="chartedList"></div>
 </div>

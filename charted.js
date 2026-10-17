@@ -54,10 +54,11 @@
     var start = new Date(); start.setHours(0, 0, 0, 0);
     var today = items.filter(function(x){ return x.t >= start.getTime(); }).length;
     if(!items.length){ line.hidden = true; return; }
-    line.textContent = "◈ " + (today ? today + " charted today" : items.length + " charted this week") + " ›";
+    var sys = function(v){ return v === 1 ? " system" : " systems"; };
+    line.textContent = "◈ " + (today ? today + sys(today) + " charted today" : items.length + sys(items.length) + " charted this week") + " ›";
     line.setAttribute("aria-label", today + " systems charted today, " + items.length + " this week. Show the list.");
     line.hidden = false;
-    if(sub) sub.textContent = today + " today · " + items.length + " this week";
+    if(sub) sub.textContent = "Systems travellers documented on this map: " + today + " today · " + items.length + " this week. Tap one to fly there.";
     if(pop.classList.contains("show")) fill();
     if(openOnLoad){ openOnLoad = false; openWhenClear(); }
   }
