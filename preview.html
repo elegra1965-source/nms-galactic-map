@@ -659,8 +659,14 @@ html.hc-on .box{background:#000;border-width:2px}
 html.hc-on .box::before,html.hc-on .box::after{border-color:#fff}
 html.hc-on .btn{border-width:2px}
 
-#panel{position:fixed;top:50px;right:10px;width:278px;z-index:25;padding:13px 14px;
-  display:none;max-height:calc(100vh - 70px);overflow-y:auto;overflow-x:hidden}
+/* 2026-10-17, Tony: top was a fixed 50px, so whenever the toolbar wrapped
+   onto 2-3 rows the panel sat on top of the buttons. Now docked to the
+   bottom-right instead: it's only as tall as its content, so it starts low,
+   and opening a fold (Tags & planets etc.) grows it UPWARD -- capped just
+   below the toolbar's real measured height (--top-h, set by
+   syncTopOffset()), after which it scrolls. */
+#panel{position:fixed;top:auto;bottom:10px;right:10px;width:278px;z-index:25;padding:13px 14px;
+  display:none;max-height:calc(100vh - var(--top-h,60px) - 20px);overflow-y:auto;overflow-x:hidden}
 #panel.show{display:block}
 .phead{display:flex;gap:10px;align-items:flex-start;margin-bottom:8px}
 .stars{display:flex;gap:4px;flex:none;padding-top:2px}
@@ -1864,9 +1870,15 @@ nearby procedural space within a radius.">Search</button>
       <div><div class="lb">Economy<span class="starRating" id="pEcoStars"></span><span class="tag guess" id="pEcoGuess" style="margin-left:6px;display:none" title="Invented flavour -- this system's real economy couldn't be computed (no portal address available, or a component failed to load), so this is an unconfirmed guess. Use Edit system to submit the real value.">Procedural</span></div><div class="vl" id="pEco">—</div><div class="sub" id="pEcoSub">—</div></div></div>
     <div class="row" id="pConRow"><span id="icCon"></span>
       <div><div class="lb">Conflict<span class="conBadge" id="pConBadge" style="margin-left:6px;vertical-align:middle"></span><span class="tag guess" id="pConGuess" style="margin-left:6px;display:none" title="Invented flavour -- this system's real conflict level couldn't be computed (no portal address available, or a component failed to load), so this is an unconfirmed guess. Use Edit system to submit the real value.">Procedural</span></div><div class="vl" id="pCon">—</div></div></div>
+    <!-- 2026-10-17, Tony: tags + planet list folded by default so the panel
+         is shorter and the action buttons sit higher. Stays open/closed as
+         the traveller left it when picking another system. -->
+    <div class="lb panelFoldHead" id="pDetHead" role="button" tabindex="0" aria-expanded="false" aria-controls="pDetBody">&#9656; Tags &amp; planets</div>
+    <div id="pDetBody" style="display:none">
     <div class="tags" id="pTags"></div>
     <div class="bodylist" id="pBodies"></div>
     <div id="pNameDisclaimer" style="font-size:10px;color:var(--text-faint);line-height:1.4;margin-top:5px">Planet names are a procedural guess, not your save data (<span style="text-decoration:underline;cursor:pointer" onclick="openDisclaimer()">see About</span>) -- Edit system to add the real ones.</div>
+    </div>
   </div>
   <div id="pBody" style="display:none">
     <button class="btn" id="bBodyBack" type="button" title="Return to this system's planet/moon list." style="margin-bottom:10px">&larr; Back to planet list</button>

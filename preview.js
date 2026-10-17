@@ -7180,6 +7180,8 @@ function panelFoldKey(e,headId,bodyId){
   if(e.key==="Enter"||e.key===" "){ e.preventDefault(); togglePanelFold(headId,bodyId); }
 }
 document.getElementById("pSeqHead").addEventListener("click",function(){ togglePanelFold("pSeqHead","pSeqBody"); });
+document.getElementById("pDetHead").addEventListener("click",function(){ togglePanelFold("pDetHead","pDetBody"); });
+document.getElementById("pDetHead").addEventListener("keydown",function(e){ panelFoldKey(e,"pDetHead","pDetBody"); });
 document.getElementById("pNoteHead").addEventListener("click",function(){ togglePanelFold("pNoteHead","pNoteBody"); });
 document.getElementById("pSeqHead").addEventListener("keydown",function(e){ panelFoldKey(e,"pSeqHead","pSeqBody"); });
 document.getElementById("pNoteHead").addEventListener("keydown",function(e){ panelFoldKey(e,"pNoteHead","pNoteBody"); });
