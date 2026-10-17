@@ -77670,7 +77670,7 @@
         "screenshot": "https://raw.githubusercontent.com/elegra1965-source/nms-galactic-map/main/user-screenshots/9-105200000000-mvbq3ao0-owj19s.jpg",
         "hasStation": true,
         "stationName": "[PSA-E10] Jura-Tempest Federat",
-        "allianceName": "Phantom Star Alliances",
+        "allianceName": "Phantom Star Alliance",
         "stationPhoto": "https://raw.githubusercontent.com/elegra1965-source/nms-galactic-map/main/user-screenshots/9-105200000000-station-mvbq3be2-munqra.jpg",
         "signals": [],
         "editorName": "OldSaltySak",
@@ -77841,7 +77841,7 @@
           }
         ]
       },
-      "editedAt": "2026-10-17T01:44:11.337Z",
+      "editedAt": "2026-10-17T01:45:18.146Z",
       "editedByIp": "72.223.117.245",
       "history": [
         {
@@ -77859,6 +77859,10 @@
         {
           "at": "2026-10-17T01:44:11.337Z",
           "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-10-17T01:45:18.146Z",
+          "text": "edited by a traveller"
         }
       ]
     }
@@ -77869,7 +77873,8 @@
       1792200813593,
       1792201220883,
       1792201427498,
-      1792201451337
+      1792201451337,
+      1792201518146
     ]
   },
   "flagLog": {},
