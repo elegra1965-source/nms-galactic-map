@@ -530,9 +530,8 @@ function recentOf(full, now){
    commit's time and first message line go out -- nothing else. Kept for two
    minutes in this warm container so repeated refreshes stay cheap. */
 var _activityCache = { at: 0, body: null };
-async function handleActivity(token, now){
-  var headers = { "Cache-Control": "public, max-age=60, s-maxage=120" };
-  if(_activityCache.body && now - _activityCache.at < 120000) return json(200, _activityCache.body, headers);
+async function getCommits(token, now){
+  if(_activityCache.body && now - _activityCache.at < 120000) return _activityCache.body.commits;
   var since = new Date(now - 14*86400000).toISOString(), out = [];
   try {
     for(var page = 1; page <= 15; page++){
@@ -548,15 +547,67 @@ async function handleActivity(token, now){
       if(list.length < 100) break;
     }
   } catch(e){
-    if(_activityCache.body) return json(200, _activityCache.body, headers);
-    return json(502, { ok:false, error: "Could not read the edit history: "+e.message });
+    if(_activityCache.body) return _activityCache.body.commits; // stale beats nothing
+    throw e;
   }
   _activityCache = { at: now, body: { ok:true, commits: out } };
+  return out;
+}
+async function handleActivity(token, now){
+  var headers = { "Cache-Control": "public, max-age=60, s-maxage=120" };
+  try { await getCommits(token, now); }
+  catch(e){ return json(502, { ok:false, error: "Could not read the edit history: "+e.message }); }
   return json(200, _activityCache.body, headers);
+}
+
+/* ?discoveries=1 (2026-10-17): the public "Traveller Discoveries" feed for the
+   Hub section and map.nomansskyhub.app/community. Everything a traveller chose to
+   make public about the last 14 days, already joined up so pages stay small:
+   one event per save (time, kind, system), plus each touched system's public
+   fields. Bulk imports (wiki pass, no-name backfill) are left out so the
+   numbers mean people. No IPs, hashes or anything private ever goes out. */
+var _discCache = { at: 0, body: null };
+var DISC_EDIT_RE = /^(Edit system|Add screenshot for) (\d+):([0-9A-F]{12})(-station|-alliance)? via site/;
+var DISC_BULK_RE = /^Bulk save-file import: (\d+) new, (\d+) merged.*\(([^)]+)\)\s*$/;
+function isImportName(who){ return /\(import\)|no original editor name/i.test(String(who||"")); }
+async function handleDiscoveries(token, now){
+  var headers = { "Cache-Control": "public, max-age=60, s-maxage=120" };
+  if(_discCache.body && now - _discCache.at < 120000) return json(200, _discCache.body, headers);
+  var commits, systems;
+  try {
+    commits = await getCommits(token, now);
+    var cache = await getGetCache();
+    if(cache.data && cache.data.systems && now - cache.fetchedAt < 10*60000) systems = cache.data.systems;
+    else systems = (await githubGetFile(token)).data.systems;
+  } catch(e){
+    if(_discCache.body) return json(200, _discCache.body, headers);
+    return json(502, { ok:false, error: "Could not build discoveries: "+e.message });
+  }
+  var events = [], out = {};
+  function pub(key){
+    if(out[key]) return out[key];
+    var r = systems[key]; if(!r) return null;
+    var d = r.data || {}, p = parseCompositeKey(key); if(!p) return null;
+    if(isImportName(d.editorName)) return null;
+    var ok = function(u){ return (typeof u === "string" && u.indexOf(screenshotUrlPrefix()) === 0) ? u : ""; };
+    out[key] = { galaxy:p.galaxy, address:p.address, name:d.name||"", editor:String(d.editorName||"").trim(),
+                 race:d.race||"", alliance:d.allianceName||"", station:d.stationName||"",
+                 screenshot:ok(d.screenshot), stationPhoto:ok(d.stationPhoto), editedAt:r.editedAt||null };
+    return out[key];
+  }
+  commits.forEach(function(c){
+    var m = DISC_EDIT_RE.exec(c.m||"");
+    if(m){ var key = m[2]+":"+m[3]; if(pub(key)) events.push({ t:c.t, k: m[1]==="Edit system" ? "e" : "p", key:key }); return; }
+    var b = DISC_BULK_RE.exec(c.m||"");
+    if(b && !isImportName(b[3])) events.push({ t:c.t, k:"b", who:b[3], n:(+b[1])+(+b[2]) });
+  });
+  _discCache = { at: now, body: { ok:true, events: events, systems: out } };
+  return json(200, _discCache.body, headers);
 }
 
 async function handleGet(req, token){
   if(new URL(req.url).searchParams.get("activity") === "1") return handleActivity(token, Date.now());
+  if(new URL(req.url).searchParams.get("discoveries") === "1") return handleDiscoveries(token, Date.now());
   var sysParam = new URL(req.url).searchParams.get("sys");
   // Tony-only view: append ?token=<ADMIN_TOKEN> (set as a Netlify env var,
   // separate from GITHUB_TOKEN) to also see the flagged/reports queue, so he

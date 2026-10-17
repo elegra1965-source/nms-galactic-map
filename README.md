@@ -298,6 +298,21 @@ straight away. A small feed for other sites lives at
 
 <img src="screenshots/18-recently-charted.jpg" alt="Recently charted list on a phone: the 4 systems charted today counter beside Hide controls, and systems with who charted them, galaxy, time and portal glyphs" width="360">
 
+**Traveller Discoveries page.** [map.nomansskyhub.app/community](https://map.nomansskyhub.app/community)
+is the public showcase of what players have charted: systems, travellers and
+photos this week, a **Top surveyors this week** list, saves per day for the last
+14 days, and a card for every recently charted system with its screenshot,
+station photo, who charted it, the portal glyphs with the hex address, and an
+**Open on the map** button. The *See all traveller discoveries* link at the
+bottom of the Recently charted list opens it, and the Hub has a short version
+under Galactic Alliances. It reads one small feed,
+`/.netlify/functions/system-edit?discoveries=1`, which the server builds from
+the map's save history with its own GitHub key and caches for two minutes. Bulk
+imports are left out, and only what travellers chose to make public is
+included.
+
+![Traveller Discoveries page: systems charted this week, top surveyors, saves per day and photo cards](screenshots/20-traveller-discoveries.jpg)
+
 **Import from my save file.** Inside Edit system, an optional button reads a
 real Steam/GOG `.hg` save file entirely in your own browser -- nothing is
 ever uploaded -- and can auto-fill "Your name" plus offer a one-click

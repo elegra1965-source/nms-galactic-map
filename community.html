@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Traveller Discoveries · NMS Galactic Map</title>
+<meta name="description" content="Live from the NMS Galactic Map: the No Man's Sky systems travellers have charted this week, with their screenshots, station photos, portal glyphs and who found them.">
+<link rel="canonical" href="https://map.nomansskyhub.app/community">
+<meta property="og:title" content="Traveller Discoveries · NMS Galactic Map">
+<meta property="og:description" content="The No Man's Sky systems travellers have charted this week, with screenshots and portal glyphs.">
+<meta property="og:url" content="https://map.nomansskyhub.app/community">
+<link rel="icon" href="favicon.ico">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Public "Traveller Discoveries" page (2026-10-17): the systems travellers charted
+   on the Galactic Map in the last 14 days. Built from Tony's private discoveries.html
+   (which stays as is, with its "include my edits" switch). Reads ONE small feed,
+   system-edit?discoveries=1, which already leaves out bulk imports and anything private. */
+:root{
+  --bg:#070b11; --panel:#0c131c; --panel2:#101a26; --line:rgba(0,229,255,.16);
+  --cyan:#00e5ff; --gold:#f0a500; --text:#cfe0f0; --dim:rgba(207,224,240,.62); --faint:rgba(207,224,240,.4);
+  --ok:#5be38f;
+  --disp:'Orbitron',system-ui,sans-serif; --body:'Rajdhani','Segoe UI',system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);font-size:16px}
+body{background:radial-gradient(1200px 500px at 50% -200px,rgba(0,229,255,.08),transparent 70%),var(--bg);min-height:100vh}
+a{color:var(--cyan)}
+.wrap{max-width:1080px;margin:0 auto;padding-block:28px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:26px}
+.kicker{font-family:var(--disp);font-size:11px;letter-spacing:.24em;color:var(--cyan);text-transform:uppercase}
+h1{font-family:var(--disp);font-weight:900;font-size:clamp(26px,5vw,40px);letter-spacing:.06em;margin:6px 0 4px;text-wrap:balance}
+.sub{color:var(--dim);font-size:16px;margin:0}
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.toggle{display:inline-flex;gap:8px;align-items:center;font-size:15px;color:var(--dim);cursor:pointer}
+.toggle input{accent-color:var(--cyan);width:16px;height:16px}
+button{font-family:var(--disp);font-size:11px;letter-spacing:.14em;text-transform:uppercase;background:transparent;color:var(--cyan);border:1px solid var(--line);border-radius:4px;padding:8px 12px;cursor:pointer}
+button:hover,button:focus-visible{border-color:var(--cyan);outline:none}
+
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:14px 16px;display:grid;gap:4px}
+.stat .n{font-family:var(--disp);font-weight:700;font-size:clamp(28px,5vw,40px);letter-spacing:.1em;color:#fff;font-variant-numeric:tabular-nums;line-height:1.1}
+.stat .l{font-family:var(--disp);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim)}
+.stat.hero .n{color:var(--gold)}
+@media (max-width:720px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:16px}
+@media (max-width:820px){.two{grid-template-columns:minmax(0,1fr)}}
+.box{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:16px;min-width:0}
+.box h2{font-family:var(--disp);font-size:12px;letter-spacing:.2em;text-transform:uppercase;margin:0 0 12px;color:var(--cyan);font-weight:700}
+.who{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.who li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;align-items:center}
+.who .nm{font-weight:600;font-size:17px;overflow-wrap:anywhere}
+.who .ct{font-family:var(--disp);font-size:14px;letter-spacing:.1em;color:#fff;font-variant-numeric:tabular-nums}
+.who .track{grid-column:1/-1;height:4px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden}
+.who .track i{display:block;height:100%;background:var(--cyan)}
+.who .new{font-size:11px;font-family:var(--disp);letter-spacing:.14em;color:var(--ok);margin-left:6px}
+.empty{color:var(--faint);font-size:15px;margin:0}
+
+.chart{display:grid;grid-template-columns:repeat(14,minmax(0,1fr));gap:4px;align-items:end;height:150px}
+.col{display:grid;grid-template-rows:1fr auto auto;gap:4px;height:100%;min-width:0;text-align:center}
+.col .b{align-self:end;background:linear-gradient(to top,rgba(0,229,255,.35),var(--cyan));border-radius:2px 2px 0 0;min-height:2px}
+.col.today .b{background:linear-gradient(to top,rgba(240,165,0,.4),var(--gold))}
+.col .v{font-family:var(--disp);font-size:10px;letter-spacing:.08em;color:var(--text);font-variant-numeric:tabular-nums}
+.col .d{font-size:11px;color:var(--faint)}
+
+.feedHead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.feed{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:6px;overflow:hidden;display:grid;grid-template-rows:auto 1fr;min-width:0}
+.shots{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:2px;background:#000;aspect-ratio:16/9;max-width:100%}
+.shots a{display:block;overflow:hidden}
+.shots img{width:100%;height:100%;object-fit:cover;display:block}
+.noshot{aspect-ratio:16/9;max-width:100%;display:grid;place-items:center;background:var(--panel2);color:var(--faint);font-family:var(--disp);font-size:10px;letter-spacing:.2em}
+.cb{padding:12px 14px 14px;display:grid;gap:8px;min-width:0}
+.cn{font-weight:700;font-size:19px;line-height:1.15;color:#fff;overflow-wrap:anywhere}
+.meta{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:14px;color:var(--dim)}
+.meta b{color:var(--text);font-weight:600}
+.chip{font-family:var(--disp);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;border:1px solid var(--line);border-radius:3px;padding:2px 6px;color:var(--cyan)}
+.chip.gold{color:var(--gold);border-color:rgba(240,165,0,.35)}
+.glyphs{display:flex;flex-wrap:wrap;gap:2px;align-items:center}
+.glyphs img{width:18px;height:18px}
+.hex{font-family:var(--disp);font-size:11px;letter-spacing:.16em;color:var(--dim);margin-left:6px}
+.go{justify-self:start;font-family:var(--disp);font-size:11px;letter-spacing:.14em;text-transform:uppercase;text-decoration:none;border:1px solid var(--cyan);border-radius:4px;padding:7px 11px}
+.go:hover,.go:focus-visible{background:rgba(0,229,255,.12);outline:none}
+.note{font-size:13px;color:var(--faint);margin:0}
+.status{font-size:15px;color:var(--dim)}
+.err{color:var(--gold)}
+@media (prefers-reduced-motion:no-preference){.card{animation:in .35s ease both}@keyframes in{from{opacity:.4;transform:translateY(4px)}}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header class="bar">
+    <div>
+      <div class="kicker">NMS Galactic Map · Traveller Discoveries</div>
+      <h1>Who's been charting</h1>
+      <p class="sub" id="lead">Loading the latest discoveries…</p>
+    </div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+      <a class="go" id="openMap" href="/">Open the Galactic Map →</a>
+      <button type="button" id="reload">Refresh</button>
+    </div>
+  </header>
+
+  <section class="stats" aria-label="This week">
+    <div class="stat hero"><span class="n" id="sWeek">—</span><span class="l">Systems charted · 7 days</span></div>
+    <div class="stat"><span class="n" id="sPeople">—</span><span class="l">Travellers · 7 days</span></div>
+    <div class="stat"><span class="n" id="sShots">—</span><span class="l">Photos · 7 days</span></div>
+    <div class="stat"><span class="n" id="sToday">—</span><span class="l">Saves today</span></div>
+  </section>
+
+  <section class="two">
+    <div class="box">
+      <h2>Top surveyors this week</h2>
+      <ul class="who" id="whoToday"><li class="empty">—</li></ul>
+      <h2 style="margin-top:20px">Last 14 days</h2>
+      <ul class="who" id="whoWeek"><li class="empty">—</li></ul>
+    </div>
+    <div class="box">
+      <h2>Saves per day</h2>
+      <div class="chart" id="chart" aria-label="Saves per day for the last 14 days"></div>
+      <p class="note" style="margin-top:12px">Each save counts once. A traveller who saves the same system three times while filling it in counts three.</p>
+    </div>
+  </section>
+
+  <section style="display:grid;gap:14px">
+    <div class="feedHead">
+      <h2 class="kicker" style="margin:0;font-size:12px">Latest systems</h2>
+      <span class="status" id="feedStatus"></span>
+    </div>
+    <div class="feed" id="feed"></div>
+  </section>
+
+  <p class="note">Everything here was added by players on the <a href="/">NMS Galactic Map</a>. Names are what each traveller chose to show. Want to be on it? Open any system on the map and tap <b>Edit system</b>, or <b>📷 Add your station photo</b>. Fan-made and unofficial; not affiliated with Hello Games.</p>
+</main>
+
+<script>
+(function(){
+  var REPO = "elegra1965-source/nms-galactic-map";
+  // On the live site everything is relative. Opened any other way (a copy in the
+  // Projects folder, double-clicked as a file) it reads the live site instead.
+  var SITE = (location.hostname === "map.nomansskyhub.app" || /netlify\.app$/.test(location.hostname)) ? "" : "https://map.nomansskyhub.app";
+  var IMG_PREFIX = "https://raw.githubusercontent.com/" + REPO + "/";
+  var DAYS = 14;
+  var GALAXIES = ["Euclid","Hilbert Dimension","Calypso","Hesperius Dimension","Hyades","Ickjamatew","Budullangr","Kikolgallr","Eltiensleen","Eissentam","Elkupalos","Aptarkaba","Ontiniangp","Odiwagiri","Ogtialabi","Muhacksonto","Hitonskyer","Rerasmutul","Isdoraijung","Doctinawyra","Loychazinq","Zukasizawa","Ekwathore","Yeberhahne","Twerbetek","Sivarates","Eajerandal","Aldukesci","Wotyarogii","Sudzerbal","Maupenzhay","Sugueziume","Brogoweldian","Ehbogdenbu","Ijsenufryos","Nipikulha","Autsurabin","Lusontrygiamh","Rewmanawa","Ethiophodhe","Urastrykle","Xobeurindj","Oniijialdu","Wucetosucc","Ebyeloof","Odyavanta","Milekistri","Waferganh","Agnusopwit","Teyaypilny","Zalienkosm","Ladgudiraf","Mushonponte","Amsentisz","Fladiselm","Laanawemb","Ilkerloor","Davanossi","Ploehrliou","Corpinyaya","Leckandmeram","Quulngais","Nokokipsechl","Rinblodesa","Loydporpen","Ibtrevskip","Elkowaldb","Heholhofsko","Yebrilowisod","Husalvangewi","Ovna'uesed","Bahibusey","Nuybeliaure","Doshawchuc","Ruckinarkh","Thorettac","Nuponoparau","Moglaschil","Uiweupose","Nasmilete","Ekdaluskin","Hakapanasy","Dimonimba","Cajaccari","Olonerovo","Umlanswick","Henayliszm","Utzenmate","Umirpaiya","Paholiang","Iaereznika","Yudukagath","Boealalosnj","Yaevarcko","Coellosipp","Wayndohalou","Smoduraykl","Apmaneessu","Hicanpaav","Akvasanta","Tuychelisaor","Rivskimbe","Daksanquix","Kissonlin","Aediabiel","Ulosaginyik","Roclaytonycar","Kichiaroa","Irceauffey","Nudquathsenfe","Getaizakaal","Hansolmien","Bloytisagra","Ladsenlay","Luyugoslasr","Ubredhatk","Cidoniana","Jasinessa","Torweierf","Saffneckm","Thnistner","Dotusingg","Luleukous","Jelmandan","Otimanaso","Enjaxusanto","Sezviktorew","Zikehpm","Bephembah","Broomerrai","Meximicka","Venessika","Gaiteseling","Zosakasiro","Drajayanes","Ooibekuar","Urckiansi","Dozivadido","Emiekereks","Meykinunukur","Kimycuristh","Roansfien","Isgarmeso","Daitibeli","Gucuttarik","Enlaythie","Drewweste","Akbulkabi","Homskiw","Zavainlani","Jewijkmas","Itlhotagra","Podalicess","Hiviusauer","Halsebenk","Puikitoac","Gaybakuaria","Grbodubhe","Rycempler","Indjalala","Fontenikk","Pasycihelwhee","Ikbaksmit","Telicianses","Oyleyzhan","Uagerosat","Impoxectin","Twoodmand","Hilfsesorbs","Ezdaranit","Wiensanshe","Ewheelonc","Litzmantufa","Emarmatosi","Mufimbomacvi","Wongquarum","Hapirajua","Igbinduina","Wepaitvas","Sthatigudi","Yekathsebehn","Ebedeagurst","Nolisonia","Ulexovitab","Iodhinxois","Irroswitzs","Bifredait","Beiraghedwe","Yeonatlak","Cugnatachh","Nozoryenki","Ebralduri","Evcickcandj","Ziybosswin","Heperclait","Sugiuniam","Aaseertush","Uglyestemaa","Horeroedsh","Drundemiso","Ityanianat","Purneyrine","Dokiessmat","Nupiacheh","Dihewsonj","Rudrailhik","Tweretnort","Snatreetze","Iwundaracos","Digarlewena","Erquagsta","Logovoloin","Boyaghosganh","Kuolungau","Pehneldept","Yevettiiqidcon","Sahliacabru","Noggalterpor","Chmageaki","Veticueca","Vittesbursul","Nootanore","Innebdjerah","Kisvarcini","Cuzcogipper","Pamanhermonsu","Brotoghek","Mibittara","Huruahili","Raldwicarn","Ezdartlic","Badesclema","Isenkeyan","Iadoitesu","Yagrovoisi","Ewcomechio","Inunnunnoda","Dischiutun","Yuwarugha","Ialmendra","Reponudrle","Rinjanagrbo","Zeziceloh","Oeileutasc","Zicniijinis","Dugnowarilda","Neuxoisan","Ilmenhorn","Rukwatsuku","Nepitzaspru","Chcehoemig","Haffneyrin","Uliciawai","Tuhgrespod","Iousongola","Odyalutai"];
+
+  var $ = function(id){ return document.getElementById(id); };
+  var S = { systems:{}, events:[], loaded:false };
+  if(SITE) document.getElementById("openMap").href = SITE + "/";
+
+  function el(tag, cls, text){ var e = document.createElement(tag); if(cls) e.className = cls; if(text != null) e.textContent = text; return e; }
+  function dayKey(d){ return d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate(); }
+  function nameOf(sys){ var n = sys && sys.data && sys.data.editorName; n = String(n||"").trim(); return n || "Unnamed traveller"; }
+  function decode(s){ var t = document.createElement("textarea"); t.innerHTML = String(s||""); return t.value; } // wiki imports stored "&#39;"
+  function safeImg(u){ return typeof u === "string" && u.indexOf(IMG_PREFIX) === 0 ? u : ""; }
+  function ago(t){
+    var s = Math.max(0, (Date.now() - t) / 1000);
+    if(s < 90) return "just now";
+    if(s < 3600) return Math.round(s/60) + " min ago";
+    if(s < 86400) return Math.round(s/3600) + " h ago";
+    var d = Math.round(s/86400); return d + (d === 1 ? " day ago" : " days ago");
+  }
+
+  // ---- data ----
+  // One feed: events (k: e = save, p = photo, b = save-file import) + the public
+  // fields of every system they touched. Shaped here like the map's own data.
+  function loadFeed(){
+    return fetch(SITE + "/.netlify/functions/system-edit?discoveries=1", { cache:"no-store" })
+      .then(function(r){ if(!r.ok) throw new Error("map data " + r.status); return r.json(); })
+      .then(function(j){
+        S.systems = {};
+        var sy = j.systems || {};
+        for(var k in sy){ var x = sy[k]; S.systems[k] = { editedAt:x.editedAt, data:{ name:x.name, editorName:x.editor, race:x.race, allianceName:x.alliance, screenshot:x.screenshot, stationPhoto:x.stationPhoto } }; }
+        S.events = (j.events || []).map(function(e){
+          return e.k === "b" ? { t:Date.parse(e.t), kind:"bulk", name:e.who, count:e.n } : { t:Date.parse(e.t), kind: e.k === "p" ? "photo" : "edit", key:e.key };
+        });
+      });
+  }
+
+  // ---- derive ----
+  function attributed(){
+    return S.events.map(function(e){
+      var name = e.kind === "bulk" ? e.name : nameOf(S.systems[e.key]);
+      return { t:e.t, kind:e.kind, key:e.key, name:name, count:e.count || 1 };
+    });
+  }
+  function firstSeen(evs){ // first day each traveller shows up in the window
+    var f = {};
+    evs.forEach(function(e){ if(e.kind === "photo") return; if(!f[e.name] || e.t < f[e.name]) f[e.name] = e.t; });
+    return f;
+  }
+
+  // ---- render ----
+  function renderWho(ul, rows, newSet){
+    ul.textContent = "";
+    if(!rows.length){ ul.appendChild(el("li","empty","Nobody yet. It could be you!")); return; }
+    var max = rows[0][1];
+    rows.slice(0, 12).forEach(function(r){
+      var li = el("li");
+      var nm = el("span","nm",r[0]);
+      if(newSet && newSet[r[0]]) nm.appendChild(el("span","new","NEW"));
+      li.appendChild(nm);
+      li.appendChild(el("span","ct",String(r[1])));
+      var tr = el("span","track"); var i = el("i"); i.style.width = Math.max(4, Math.round(r[1]/max*100)) + "%"; tr.appendChild(i); li.appendChild(tr);
+      ul.appendChild(li);
+    });
+  }
+  function tally(evs){
+    var m = {}; evs.forEach(function(e){ if(e.kind === "photo") return; m[e.name] = (m[e.name]||0) + e.count; });
+    return Object.keys(m).map(function(k){ return [k, m[k]]; }).sort(function(a,b){ return b[1]-a[1]; });
+  }
+  function render(){
+    var evs = attributed();
+    var now = new Date(), todayK = dayKey(now), weekAgo = Date.now() - 7*86400000;
+    var today = evs.filter(function(e){ return dayKey(new Date(e.t)) === todayK; });
+    var edits = function(list){ return list.filter(function(e){ return e.kind !== "photo"; }).reduce(function(s,e){ return s + e.count; }, 0); };
+
+    var week = evs.filter(function(e){ return e.t >= weekAgo; });
+    var tWeek = tally(week), tAll = tally(evs);
+    var weekSys = {}; week.forEach(function(e){ if(e.key && e.kind !== "photo") weekSys[e.key] = 1; });
+    var nSys = Object.keys(weekSys).length;
+    $("sWeek").textContent = nSys;
+    $("sPeople").textContent = tWeek.length;
+    $("sShots").textContent = week.filter(function(e){ return e.kind === "photo"; }).length;
+    $("sToday").textContent = edits(today);
+
+    $("lead").textContent = nSys
+      ? nSys + (nSys === 1 ? " system" : " systems") + " charted by " + tWeek.length + (tWeek.length === 1 ? " traveller" : " travellers") + " this week. Tap any one to fly there."
+      : (tAll.length ? "A quiet week so far. Here's what travellers charted in the last 14 days." : "No systems charted in the last 14 days yet. Be the first!");
+
+    var fs = firstSeen(evs), newWeek = {};
+    Object.keys(fs).forEach(function(n){ if(fs[n] >= weekAgo) newWeek[n] = 1; }); // first seen this week
+    renderWho($("whoToday"), tWeek, newWeek);
+    renderWho($("whoWeek"), tAll, null);
+
+    // chart
+    var chart = $("chart"); chart.textContent = "";
+    var days = [];
+    for(var i = DAYS - 1; i >= 0; i--){ var d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i); days.push({ d:d, k:dayKey(d), n:0 }); }
+    evs.forEach(function(e){ if(e.kind === "photo") return; var k = dayKey(new Date(e.t)); days.forEach(function(x){ if(x.k === k) x.n += e.count; }); });
+    var max = Math.max(1, Math.max.apply(null, days.map(function(x){ return x.n; })));
+    days.forEach(function(x, idx){
+      var c = el("div", "col" + (idx === days.length - 1 ? " today" : ""));
+      var b = el("div","b"); b.style.height = Math.round(x.n / max * 100) + "%"; b.title = x.n + " saves";
+      c.appendChild(b); c.appendChild(el("span","v", x.n ? String(x.n) : ""));
+      c.appendChild(el("span","d", idx === days.length - 1 ? "Today" : x.d.toLocaleDateString(undefined,{weekday:"narrow"}) + x.d.getDate()));
+      chart.appendChild(c);
+    });
+
+    // feed: one card per system, newest first
+    var bySys = {};
+    evs.forEach(function(e){ if(!e.key) return; var s = bySys[e.key] || (bySys[e.key] = { key:e.key, last:0, edits:0, photos:0 }); s.last = Math.max(s.last, e.t); if(e.kind === "photo") s.photos++; else s.edits++; });
+    var list = Object.keys(bySys).map(function(k){ return bySys[k]; }).filter(function(s){ return S.systems[s.key]; }).sort(function(a,b){ return b.last - a.last; }).slice(0, 60);
+    var feed = $("feed"); feed.textContent = "";
+    list.forEach(function(s){ feed.appendChild(card(s)); });
+    $("feedStatus").textContent = list.length ? list.length + (list.length === 1 ? " system" : " systems") + " in the last " + DAYS + " days" : "";
+    if(!list.length) feed.appendChild(el("p","empty","No systems charted in the last " + DAYS + " days yet."));
+  }
+  function card(s){
+    var sys = S.systems[s.key], d = (sys && sys.data) || {};
+    var parts = s.key.split(":"), g = parseInt(parts[0],10), addr = parts[1];
+    var c = el("article","card");
+    var shots = [safeImg(d.screenshot), safeImg(d.stationPhoto)].filter(Boolean);
+    if(shots.length){
+      var sh = el("div","shots");
+      shots.forEach(function(u, i){
+        var a = el("a"); a.href = u; a.target = "_blank"; a.rel = "noopener";
+        var im = el("img"); im.src = u; im.loading = "lazy"; im.alt = i ? "Space station photo" : "System screenshot";
+        a.appendChild(im); sh.appendChild(a);
+      });
+      c.appendChild(sh);
+    } else c.appendChild(el("div","noshot","No photo"));
+
+    var b = el("div","cb");
+    b.appendChild(el("div","cn", decode(d.name) || "Unnamed system"));
+    var meta = el("div","meta");
+    var by = el("span"); by.appendChild(document.createTextNode("by ")); by.appendChild(el("b", null, nameOf(sys))); meta.appendChild(by);
+    meta.appendChild(el("span", null, GALAXIES[g] || ("Galaxy " + (g+1))));
+    meta.appendChild(el("span", null, ago(s.last)));
+    b.appendChild(meta);
+
+    var chips = el("div","meta");
+    chips.appendChild(el("span","chip", s.edits + (s.edits === 1 ? " save" : " saves")));
+    if(shots.length) chips.appendChild(el("span","chip gold", shots.length + (shots.length === 1 ? " photo" : " photos")));
+    if(d.race) chips.appendChild(el("span","chip", decode(d.race)));
+    if(d.allianceName) chips.appendChild(el("span","chip", decode(d.allianceName)));
+    b.appendChild(chips);
+
+    var gl = el("div","glyphs"); gl.setAttribute("aria-label","Portal address " + addr);
+    addr.split("").forEach(function(ch){ var im = el("img"); im.src = (SITE ? SITE + "/" : "") + "glyphs/glyph-mask-" + ch + ".png"; im.alt = ch; gl.appendChild(im); });
+    gl.appendChild(el("span","hex", addr));
+    b.appendChild(gl);
+
+    var go = el("a","go","Open on the map →"); go.href = (SITE || "") + "/?arrival=1&addr=" + addr + "&galaxy=" + g; go.target = "_blank"; go.rel = "noopener";
+    b.appendChild(go);
+    c.appendChild(b);
+    return c;
+  }
+
+  function load(){
+    $("lead").textContent = "Loading the latest discoveries…";
+    $("lead").classList.remove("err");
+    loadFeed().then(function(){ S.loaded = true; render(); })
+      .catch(function(e){
+        $("lead").classList.add("err");
+        $("lead").textContent = "Couldn't load the map's data (" + e.message + "). Check your connection and press Refresh.";
+      });
+  }
+  $("reload").addEventListener("click", load);
+  load();
+})();
+</script>
+</body>
+</html>

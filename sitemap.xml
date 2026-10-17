@@ -6,6 +6,11 @@
     <priority>1.0</priority>
   </url>
   <url>
+    <loc>https://map.nomansskyhub.app/community</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://nms-galaxy-map.netlify.app/navigator/index.html</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
