@@ -131,6 +131,9 @@ button:hover,button:focus-visible{border-color:var(--cyan);outline:none}
 <script>
 (function(){
   var REPO = "elegra1965-source/nms-galactic-map";
+  // On the live site everything is relative. Opened any other way (a copy in the
+  // Projects folder, double-clicked as a file) it reads the live site instead.
+  var SITE = (location.hostname === "map.nomansskyhub.app" || /netlify\.app$/.test(location.hostname)) ? "" : "https://map.nomansskyhub.app";
   var IMG_PREFIX = "https://raw.githubusercontent.com/" + REPO + "/";
   var DAYS = 14;
   // Tony's own names plus the bulk imports he ran: hidden unless "Include my edits" is ticked.
@@ -159,7 +162,7 @@ button:hover,button:focus-visible{border-color:var(--cyan);outline:none}
 
   // ---- data ----
   function loadSystems(){
-    return fetch("/.netlify/functions/system-edit", { cache:"no-store" })
+    return fetch(SITE + "/.netlify/functions/system-edit", { cache:"no-store" })
       .then(function(r){ if(!r.ok) throw new Error("map data " + r.status); return r.json(); })
       .then(function(j){ S.systems = j.systems || {}; });
   }
@@ -185,7 +188,7 @@ button:hover,button:focus-visible{border-color:var(--cyan);outline:none}
     return out;
   }
   function loadCommits(){
-    return fetch("/.netlify/functions/system-edit?activity=1", { cache:"no-store" })
+    return fetch(SITE + "/.netlify/functions/system-edit?activity=1", { cache:"no-store" })
       .then(function(r){ if(!r.ok) throw new Error("history " + r.status); return r.json(); })
       .then(function(j){ S.events = parse(j.commits || []); S.partial = false; })
       .catch(function(){ S.events = null; S.partial = true; });
@@ -300,11 +303,11 @@ button:hover,button:focus-visible{border-color:var(--cyan);outline:none}
     b.appendChild(chips);
 
     var gl = el("div","glyphs"); gl.setAttribute("aria-label","Portal address " + addr);
-    addr.split("").forEach(function(ch){ var im = el("img"); im.src = "glyphs/glyph-mask-" + ch + ".png"; im.alt = ch; gl.appendChild(im); });
+    addr.split("").forEach(function(ch){ var im = el("img"); im.src = (SITE ? SITE + "/" : "") + "glyphs/glyph-mask-" + ch + ".png"; im.alt = ch; gl.appendChild(im); });
     gl.appendChild(el("span","hex", addr));
     b.appendChild(gl);
 
-    var go = el("a","go","Open on the map →"); go.href = "/?arrival=1&addr=" + addr + "&galaxy=" + g; go.target = "_blank"; go.rel = "noopener";
+    var go = el("a","go","Open on the map →"); go.href = (SITE || "") + "/?arrival=1&addr=" + addr + "&galaxy=" + g; go.target = "_blank"; go.rel = "noopener";
     b.appendChild(go);
     c.appendChild(b);
     return c;
