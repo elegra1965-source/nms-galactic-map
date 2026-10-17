@@ -42,7 +42,7 @@
 import { filterText } from "./filter.mjs";
 import {
   json, isValidAddress, githubGetFile, githubPutFile, pruneLog,
-  editorHash, invalidateGetCache, isValidFlagField,
+  editorHash, ipKey, invalidateGetCache, isValidFlagField,
   isValidGalaxy, compositeKey,
   GITHUB_OWNER, GITHUB_REPO
 } from "./lib/shared.mjs";
@@ -101,7 +101,7 @@ export default async (req, context) => {
   var noteR = filterText(body.note, {maxLen:200, fieldName:"Note"});
   if(!noteR.ok) return json(422, {ok:false, error:"Rejected by content filter", details:[noteR.reason]});
 
-  var ip = req.headers.get("x-nf-client-connection-ip") || context.ip || "unknown";
+  var ip = await ipKey(req.headers.get("x-nf-client-connection-ip") || context.ip || "unknown");
   var now = Date.now();
 
   var current;

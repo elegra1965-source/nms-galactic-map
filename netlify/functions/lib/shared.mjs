@@ -166,6 +166,7 @@ export async function githubGetFile(token){
 }
 
 export async function githubPutFile(token, data, sha, commitMessage){
+  scrubRawIps(data);
   var url = "https://api.github.com/repos/"+GITHUB_OWNER+"/"+GITHUB_REPO+"/contents/"+DATA_PATH;
   var content = Buffer.from(JSON.stringify(data, null, 2), "utf8").toString("base64");
   var payload = {
@@ -255,6 +256,35 @@ export async function githubPutBinaryFile(token, path, base64Content, commitMess
     throw new Error("GitHub screenshot write failed: "+res.status+" "+(await res.text()));
   }
   return res.json();
+}
+
+/* Security fix 2026-10-17: overrides.json lives in a PUBLIC repo, so raw
+   visitor IPs must never be written into it. ipKey() turns an IP into an
+   opaque id with an HMAC keyed by a server-only secret (IP_HASH_SALT if
+   set, otherwise GITHUB_TOKEN, which is always set and never public), so
+   nobody can reverse it by brute-forcing the IPv4 range the way they could
+   with a salt published in this file. scrubRawIps() runs on every write and
+   cleans out any raw IPs left over from before this fix. */
+export async function ipKey(ip){
+  var secret = process.env.IP_HASH_SALT || process.env.GITHUB_TOKEN || "nms-galmap";
+  var key = await crypto.subtle.importKey("raw", new TextEncoder().encode(secret), { name:"HMAC", hash:"SHA-256" }, false, ["sign"]);
+  var sig = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(String(ip||"unknown")));
+  return "ip_"+Array.from(new Uint8Array(sig)).slice(0,8).map(function(b){ return b.toString(16).padStart(2,"0"); }).join("");
+}
+var RAW_IP_RE = /^(\d{1,3}\.){3}\d{1,3}$|^[0-9a-f]{0,4}(:[0-9a-f]{0,4}){2,7}$/i;
+function scrubRawIps(data){
+  ["ipLog","flagLog","bulkImportLog"].forEach(function(n){
+    var log = data[n]; if(!log) return;
+    for(var k in log){ if(RAW_IP_RE.test(k)) delete log[k]; }
+  });
+  var systems = data.systems || {};
+  for(var sk in systems){
+    var r = systems[sk];
+    if(r && typeof r.editedByIp === "string" && RAW_IP_RE.test(r.editedByIp)) r.editedByIp = "redacted";
+  }
+  (data.reports || []).forEach(function(r){
+    if(r && typeof r.reportedByIp === "string" && RAW_IP_RE.test(r.reportedByIp)) r.reportedByIp = "redacted";
+  });
 }
 
 export function pruneLog(log, now){

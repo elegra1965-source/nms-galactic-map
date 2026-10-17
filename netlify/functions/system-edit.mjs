@@ -227,7 +227,7 @@
 import { filterSystemEdit, filterReport, filterBulkImport } from "./filter.mjs";
 import {
   json, isValidAddress, githubGetFile, githubPutFile, pruneLog,
-  editorHash, getGetCache, setGetCache, invalidateGetCache,
+  editorHash, ipKey, getGetCache, setGetCache, invalidateGetCache,
   isValidFlagField, isValidGalaxy, compositeKey, parseCompositeKey,
   githubPutBinaryFile, screenshotPathFor, screenshotUrlPrefix,
   addCommunityTerms, normalizeAllianceKey
@@ -823,7 +823,7 @@ export default async (req, context) => {
   if(action === "resolve-flag") return handleResolveFlag(req, token, body);
 
   // Netlify supplies the real client IP in this header on their edge network.
-  var ip = req.headers.get("x-nf-client-connection-ip") || context.ip || "unknown";
+  var ip = await ipKey(req.headers.get("x-nf-client-connection-ip") || context.ip || "unknown");
   var now = Date.now();
 
   if(action === "bulk-import") return handleBulkImport(req, token, body, ip, now);

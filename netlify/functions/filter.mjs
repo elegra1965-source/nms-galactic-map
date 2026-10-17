@@ -161,7 +161,7 @@ export function filterText(raw, opts){
 
   if(!s) return {ok:true, cleaned:""};
 
-  s = stripHtml(s);
+  s = stripHtml(s).replace(/[<>]/g, "");
   s = stripUrls(s);
   if(!opts.allowNewlines) s = s.replace(/[\r\n\t]+/g, " ");
   s = s.replace(/\s{2,}/g, " ").trim();
@@ -214,12 +214,13 @@ function filterScreenshot(raw, fieldName){
   if(!s) return {ok:true, cleaned:""};
   if(/^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(s)){
     if(s.length > MAX_SCREENSHOT_DATAURL_CHARS) return {ok:false, cleaned:"", reason:fn+" is too large -- try picking it again, it should compress automatically"};
+    if(s.indexOf("data:image/jpeg;base64,/9j/") !== 0) return {ok:false, cleaned:"", reason:fn+" must be a JPEG photo"};
     return {ok:true, cleaned:s};
   }
   // Anything else claiming to be "leave the existing one as it is": only a
   // plain, short https URL is plausible as an already-stored screenshot
   // link -- never anything else (no javascript:, no arbitrary long string).
-  if(/^https:\/\/\S+$/.test(s) && s.length <= 300) return {ok:true, cleaned:s};
+  if(s.indexOf("https://raw.githubusercontent.com/elegra1965-source/nms-galactic-map/") === 0 && /^\S+$/.test(s) && s.length <= 300) return {ok:true, cleaned:s};
   return {ok:false, cleaned:"", reason:fn+" must be a photo you just added, or left exactly as it was"};
 }
 

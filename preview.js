@@ -6051,7 +6051,7 @@ function showHoverPop(s,cx,cy){
   var suffixParts=[]; if(s.water) suffixParts.push("Water"); if(s.dissonant) suffixParts.push("Dissonant");
   var suffix=suffixParts.length?" // "+suffixParts.join(" "):"";
   var full=cam.dist<=HOVER_ZOOM_FULL;
-  var html='<div class="hpName">'+s.name+'</div>';
+  var html='<div class="hpName">'+acEsc(s.name)+'</div>';
   if(full){
     html+='<div class="hpCls">'+commas(distanceLY(s))+' LY // '+s.spectral+suffix+'</div>';
     /* Reuses the exact same icon calls the full info panel already uses
@@ -6063,10 +6063,10 @@ function showHoverPop(s,cx,cy){
        Reuses the exact same s.sell/s.buy/s.econDesc/s.conflict fields the
        full info panel already displays at pEcoSub/pCon -- no new data. */
     html+='<div class="hpDetail">'+
-      '<div class="hpRow">'+raceIcon(s.race)+'<span class="hpLbl">'+s.race+'</span></div>'+
-      '<div class="hpRow">'+econIcon(s.econType)+'<span class="hpLbl">'+(s.uncharted?"Uncharted":s.econName)+'</span></div>'+
-      (s.uncharted?'':'<div class="hpSub">Sell: '+s.sell+'% Buy: '+s.buy+'% // '+s.econDesc+'</div>')+
-      (s.conflict==="Not Available"?'':'<div class="hpRow">'+svg(IC_CONFLICT,CONFLICT_COL[s.conTier])+conBadge(s)+'<span class="hpLbl">'+s.conflict+'</span></div>')+
+      '<div class="hpRow">'+raceIcon(s.race)+'<span class="hpLbl">'+acEsc(s.race)+'</span></div>'+
+      '<div class="hpRow">'+econIcon(s.econType)+'<span class="hpLbl">'+(s.uncharted?"Uncharted":acEsc(s.econName))+'</span></div>'+
+      (s.uncharted?'':'<div class="hpSub">Sell: '+s.sell+'% Buy: '+s.buy+'% // '+acEsc(s.econDesc)+'</div>')+
+      (s.conflict==="Not Available"?'':'<div class="hpRow">'+svg(IC_CONFLICT,CONFLICT_COL[s.conTier])+conBadge(s)+'<span class="hpLbl">'+acEsc(s.conflict)+'</span></div>')+
       '</div>';
   }
   pop.className="hoverpop";
