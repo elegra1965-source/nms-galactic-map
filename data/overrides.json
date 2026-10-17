@@ -77678,23 +77678,33 @@
         "genVersion": "1.9.0",
         "bodies": [
           {
-            "name": "",
+            "name": "Jura-Tempest Zeta",
             "moon": false,
             "orbits": 0,
-            "biome": "",
-            "subtype": "",
-            "descriptor": "",
+            "biome": "Frozen",
+            "subtype": "Hyperborean",
+            "descriptor": "Migratory Blizzards",
             "water": true,
             "ring": false,
             "resources": [
-              "Magnetised Ferrite"
+              "Salt",
+              "Copper"
             ],
-            "flora": [],
-            "fauna": [],
-            "minerals": [],
+            "flora": [
+              "Abundant"
+            ],
+            "fauna": [
+              "Full"
+            ],
+            "minerals": [
+              "Frost Crystal",
+              "Dioxite"
+            ],
             "salvage": [],
-            "fossils": [],
-            "sentinel": "Low",
+            "fossils": [
+              "Ancient Bones"
+            ],
+            "sentinel": "Spread Thin",
             "autophage": false,
             "reliquary": false,
             "ruins": false,
@@ -77727,7 +77737,7 @@
           },
           {
             "name": "",
-            "moon": false,
+            "moon": true,
             "orbits": 0,
             "biome": "",
             "subtype": "",
@@ -77750,23 +77760,31 @@
             "baseName": ""
           },
           {
-            "name": "",
-            "moon": true,
-            "orbits": 3,
-            "biome": "",
-            "subtype": "",
-            "descriptor": "",
+            "name": "Jura-Tempest Delta",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Scorched",
+            "subtype": "High Temperature",
+            "descriptor": "Heated Atmosphere",
             "water": false,
             "ring": false,
             "resources": [
-              "Silver"
+              "Cobalt",
+              "Copper"
             ],
-            "flora": [],
-            "fauna": [],
-            "minerals": [],
+            "flora": [
+              "Frequent"
+            ],
+            "fauna": [
+              "Full"
+            ],
+            "minerals": [
+              "Solanium",
+              "Phosphorus"
+            ],
             "salvage": [],
             "fossils": [],
-            "sentinel": "Sparse",
+            "sentinel": "Remote",
             "autophage": false,
             "reliquary": false,
             "ruins": false,
@@ -77774,23 +77792,31 @@
             "baseName": ""
           },
           {
-            "name": "",
+            "name": "Jura-Tempest Prime",
             "moon": false,
             "orbits": 0,
-            "biome": "",
-            "subtype": "",
-            "descriptor": "",
+            "biome": "Lush",
+            "subtype": "Paradise",
+            "descriptor": "Humid",
             "water": true,
             "ring": false,
             "resources": [
-              "Sodium"
+              "Silver",
+              "Copper"
             ],
-            "flora": [],
-            "fauna": [],
-            "minerals": [],
+            "flora": [
+              "Full"
+            ],
+            "fauna": [
+              "Fair"
+            ],
+            "minerals": [
+              "Star Bulb",
+              "Paraffinium"
+            ],
             "salvage": [],
             "fossils": [],
-            "sentinel": "Intermittent",
+            "sentinel": "Isolated",
             "autophage": false,
             "reliquary": false,
             "ruins": false,
@@ -77799,11 +77825,15 @@
           }
         ]
       },
-      "editedAt": "2026-10-17T01:33:33.593Z",
+      "editedAt": "2026-10-17T01:40:20.883Z",
       "editedByIp": "72.223.117.245",
       "history": [
         {
           "at": "2026-10-17T01:33:33.593Z",
+          "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-10-17T01:40:20.883Z",
           "text": "edited by a traveller"
         }
       ]
@@ -77812,7 +77842,8 @@
   "reports": [],
   "ipLog": {
     "72.223.117.245": [
-      1792200813593
+      1792200813593,
+      1792201220883
     ]
   },
   "flagLog": {},
@@ -77971,7 +78002,9 @@
       "Mild Rain",
       "Sporadic Grit Storms",
       "Poisonous Gas",
-      "Freezing Night Winds"
+      "Freezing Night Winds",
+      "Migratory Blizzards",
+      "Heated Atmosphere"
     ],
     "biome": [
       "Radioactive",
@@ -78020,7 +78053,9 @@
       "Parched",
       "Acidic",
       "Xeno-Colony",
-      "Infested"
+      "Infested",
+      "Hyperborean",
+      "High Temperature"
     ],
     "signalName": [
       "MS Jiokaz XIV",
