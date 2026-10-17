@@ -230,7 +230,7 @@ import {
   editorHash, ipKey, getGetCache, setGetCache, invalidateGetCache,
   isValidFlagField, isValidGalaxy, compositeKey, parseCompositeKey,
   githubPutBinaryFile, screenshotPathFor, screenshotUrlPrefix,
-  addCommunityTerms, normalizeAllianceKey
+  addCommunityTerms, normalizeAllianceKey, GITHUB_OWNER, GITHUB_REPO
 } from "./lib/shared.mjs";
 
 const MAX_EDITS_PER_IP_PER_HOUR = 8;
@@ -522,7 +522,41 @@ function recentOf(full, now){
   return { ok:true, systems: out.slice(0, 300) };
 }
 
+/* ?activity=1 (2026-10-17): the last 14 days of this repo's commit log, for the
+   private discoveries.html page. Read here with the site's own GitHub token
+   (5,000 reads an hour) instead of from the visitor's browser, where the
+   unauthenticated API allows only 60 an hour per connection and ad/privacy
+   blockers often block api.github.com outright ("Failed to fetch"). Only each
+   commit's time and first message line go out -- nothing else. Kept for two
+   minutes in this warm container so repeated refreshes stay cheap. */
+var _activityCache = { at: 0, body: null };
+async function handleActivity(token, now){
+  var headers = { "Cache-Control": "public, max-age=60, s-maxage=120" };
+  if(_activityCache.body && now - _activityCache.at < 120000) return json(200, _activityCache.body, headers);
+  var since = new Date(now - 14*86400000).toISOString(), out = [];
+  try {
+    for(var page = 1; page <= 15; page++){
+      var res = await fetch("https://api.github.com/repos/"+GITHUB_OWNER+"/"+GITHUB_REPO+"/commits?per_page=100&page="+page+"&since="+encodeURIComponent(since), {
+        headers: { "Authorization": "Bearer "+token, "Accept": "application/vnd.github+json", "User-Agent": "nms-galactic-map-function" }
+      });
+      if(!res.ok) throw new Error("GitHub "+res.status);
+      var list = await res.json();
+      list.forEach(function(c){
+        var cm = c && c.commit;
+        out.push({ t: cm && cm.committer && cm.committer.date, m: String(cm && cm.message || "").split("\n")[0].slice(0, 200) });
+      });
+      if(list.length < 100) break;
+    }
+  } catch(e){
+    if(_activityCache.body) return json(200, _activityCache.body, headers);
+    return json(502, { ok:false, error: "Could not read the edit history: "+e.message });
+  }
+  _activityCache = { at: now, body: { ok:true, commits: out } };
+  return json(200, _activityCache.body, headers);
+}
+
 async function handleGet(req, token){
+  if(new URL(req.url).searchParams.get("activity") === "1") return handleActivity(token, Date.now());
   var sysParam = new URL(req.url).searchParams.get("sys");
   // Tony-only view: append ?token=<ADMIN_TOKEN> (set as a Netlify env var,
   // separate from GITHUB_TOKEN) to also see the flagged/reports queue, so he

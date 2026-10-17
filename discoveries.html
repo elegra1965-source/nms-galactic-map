@@ -125,7 +125,7 @@ button:hover,button:focus-visible{border-color:var(--cyan);outline:none}
     <div class="feed" id="feed"></div>
   </section>
 
-  <p class="note">Private page: not linked from the map and hidden from search engines. Edits come from the map's GitHub history; names are what each traveller typed in "Your name".</p>
+  <p class="note">Private page: not linked from the map and hidden from search engines. Edits come from the map's save history; names are what each traveller typed in "Your name".</p>
 </main>
 
 <script>
@@ -165,28 +165,30 @@ button:hover,button:focus-visible{border-color:var(--cyan);outline:none}
   }
   var EDIT_RE = /^(Edit system|Add screenshot for) (\d+):([0-9A-F]{12})(-station|-alliance)? via site/;
   var BULK_RE = /^Bulk save-file import: (\d+) new, (\d+) merged.*\(([^)]+)\)\s*$/;
-  function loadCommits(){
-    var since = new Date(Date.now() - DAYS * 86400000).toISOString();
+  // The edit history comes from the map's own server (?activity=1), which reads GitHub
+  // with the site's key: no 60-an-hour limit, and blockers don't stop it.
+  function parse(list){
     var out = [];
-    function page(n){
-      var url = "https://api.github.com/repos/" + REPO + "/commits?per_page=100&page=" + n + "&since=" + encodeURIComponent(since);
-      return fetch(url, { headers:{ "Accept":"application/vnd.github+json" } }).then(function(r){
-        if(r.status === 403 || r.status === 429) throw new Error("rate");
-        if(!r.ok) throw new Error("github " + r.status);
-        return r.json();
-      }).then(function(list){
-        list.forEach(function(c){
-          var msg = (c.commit && c.commit.message || "").split("\n")[0];
-          var t = Date.parse(c.commit && c.commit.committer && c.commit.committer.date);
-          var m = EDIT_RE.exec(msg);
-          if(m){ out.push({ t:t, kind: m[1] === "Edit system" ? "edit" : "photo", key: m[2] + ":" + m[3] }); return; }
-          var b = BULK_RE.exec(msg);
-          if(b){ out.push({ t:t, kind:"bulk", name:b[3], count:(+b[1]) + (+b[2]) }); }
-        });
-        if(list.length === 100 && n < 15) return page(n + 1);
-      });
-    }
-    return page(1).then(function(){ S.events = out; });
+    list.forEach(function(c){
+      var msg = String(c.m || ""), t = Date.parse(c.t);
+      var m = EDIT_RE.exec(msg);
+      if(m){ out.push({ t:t, kind: m[1] === "Edit system" ? "edit" : "photo", key: m[2] + ":" + m[3] }); return; }
+      var b = BULK_RE.exec(msg);
+      if(b){ out.push({ t:t, kind:"bulk", name:b[3], count:(+b[1]) + (+b[2]) }); }
+    });
+    return out;
+  }
+  // Fallback if the history can't be read: one event per system from its last-edited time.
+  function fromSystems(){
+    var out = [], cutoff = Date.now() - DAYS * 86400000;
+    for(var k in S.systems){ var t = Date.parse(S.systems[k].editedAt); if(t > cutoff) out.push({ t:t, kind:"edit", key:k }); }
+    return out;
+  }
+  function loadCommits(){
+    return fetch("/.netlify/functions/system-edit?activity=1", { cache:"no-store" })
+      .then(function(r){ if(!r.ok) throw new Error("history " + r.status); return r.json(); })
+      .then(function(j){ S.events = parse(j.commits || []); S.partial = false; })
+      .catch(function(){ S.events = null; S.partial = true; });
   }
 
   // ---- derive ----
@@ -311,12 +313,14 @@ button:hover,button:focus-visible{border-color:var(--cyan);outline:none}
   function load(){
     $("lead").textContent = "Loading the latest edits…";
     $("lead").classList.remove("err");
-    Promise.all([loadSystems(), loadCommits()]).then(function(){ S.loaded = true; render(); })
+    Promise.all([loadSystems(), loadCommits()]).then(function(){
+        if(!S.events) S.events = fromSystems();
+        S.loaded = true; render();
+        if(S.partial) $("lead").textContent += " (Edit history unavailable right now, so each system counts once, by its latest edit.)";
+      })
       .catch(function(e){
         $("lead").classList.add("err");
-        $("lead").textContent = e.message === "rate"
-          ? "GitHub limits how often its history can be read (60 times an hour per connection). Try again in a few minutes."
-          : "Couldn't load the edits (" + e.message + "). Check your connection and press Refresh.";
+        $("lead").textContent = "Couldn't load the map's data (" + e.message + "). Check your connection and press Refresh.";
       });
   }
   $("showMine").addEventListener("change", function(){
