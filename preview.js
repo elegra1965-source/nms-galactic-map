@@ -11925,6 +11925,7 @@ function positionSysBanner(){
   el.style.top=Math.round(bottom+14)+"px";
 }
 function positionAnnivBadge(){
+  return; /* 2026-10-17: badge now lives inside #title (normal flex flow) */
   var hud=document.getElementById("galHud"), el=document.getElementById("annivBadge");
   if(!hud||!el) return;
   var r=hud.getBoundingClientRect();
@@ -12413,8 +12414,10 @@ if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){
   var textEl=document.getElementById('titleText');
   if(!box||!textEl) return;
   var FULL=textEl.textContent.trim();
+  var anniv=document.getElementById('annivBadge');
   if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches){
     textEl.textContent=FULL;
+    if(anniv) anniv.classList.add('show');
     return;
   }
   var CURSOR=String.fromCharCode(0x258C); // "▌"
@@ -12463,6 +12466,17 @@ if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){
     if(remaining<=0){
       textEl.textContent=FULL;
       box.classList.remove('typing'); // hands off to the CSS breathing animation
+      // 2026-10-17: the reserved cursor width left a gap between "P" and the
+      // anniversary badge -- drop the reservation and hand the same width to
+      // the badge's right margin so the badge sits right after "P" and
+      // nothing to the title's right moves. Then fade the badge in.
+      if(anniv){
+        var wRes=textEl.getBoundingClientRect().width;
+        textEl.style.minWidth='0';
+        var wNat=textEl.getBoundingClientRect().width;
+        anniv.style.marginRight=Math.max(0,Math.round(wRes-wNat))+'px';
+        anniv.classList.add('show');
+      }
       return;
     }
     textEl.textContent=FULL+(remaining%2===0?'':CURSOR);

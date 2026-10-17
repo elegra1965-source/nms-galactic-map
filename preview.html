@@ -545,8 +545,14 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border:none;border-ra
    window width and after any toolbar re-wrap. Real badge art is taller
    than wide (1336x1536 source crop), so the box keeps that ratio rather
    than forcing a square and distorting it. */
-#annivBadge{position:fixed;z-index:31;width:26px;height:30px;pointer-events:none;
-  transition:left .15s,top .15s}
+/* 2026-10-17, Tony: moved INTO the #title box, right after "MAP", so it no
+   longer floats over the map and can't cover the System view's title
+   banner. Holds its space from the start (opacity only) so the toolbar never
+   shifts, and fades in once the title has finished typing (.show, set by the
+   typewriter script). positionAnnivBadge() is now a no-op. */
+#annivBadge{flex:none;width:23px;height:26px;pointer-events:none;
+  opacity:0;transition:opacity .9s ease}
+#annivBadge.show{opacity:1}
 #annivBadge img{width:100%;height:100%;display:block;
   filter:drop-shadow(0 0 5px rgba(240,90,40,.4))}
 #top,#leftcol,#tel,#panel,#course,#modalWrap .modal,#galHud,#accessPop,#searchPop,#routesPop,#favPop,#chartedPop,#keys{
@@ -978,7 +984,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   -webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 #galHud div{white-space:nowrap}
 /* 2026-10-10: phones, System view -- the title banner already shows galaxy + core distance, and these overlapped it */
-@media(max-width:699px){html.sys-mode #galHud,html.sys-mode #annivBadge{display:none!important}}
+@media(max-width:699px){html.sys-mode #galHud{display:none!important}}
 #galHud .galHudTxt{text-shadow:0 1px 2px #000,0 -1px 2px #000,1px 0 2px #000,-1px 0 2px #000,0 0 6px #000}
 #galHudName{font-size:11px;letter-spacing:.06em;opacity:.92}
 #galHudDist{font-size:13px;letter-spacing:.04em;margin-top:1px}
@@ -1638,7 +1644,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 </div>
 
 <div id="top">
-  <div id="title" aria-label="NMS Galactic Map"><img id="titleIcon" src="favicon/favicon-32x32.png" alt=""><span id="titleText" aria-hidden="true">NMS GALACTIC MAP</span></div>
+  <div id="title" aria-label="NMS Galactic Map"><img id="titleIcon" src="favicon/favicon-32x32.png" alt=""><span id="titleText" aria-hidden="true">NMS GALACTIC MAP</span><div id="annivBadge" title="10 years of No Man's Sky -- 2016-2026. Fan-made tribute, not an official Hello Games asset."><img src="icons-web/anniv-10th-badge.png" alt="No Man's Sky 10th Anniversary"></div></div>
   <div id="toggleRow">
   <button type="button" id="chartedLine" hidden aria-haspopup="dialog" aria-expanded="false" title="Systems other travellers have charted this week">&#9672; charted</button>
   <button type="button" id="toolbarToggle" aria-expanded="true" title="Hide or show the map controls below the title.">&#9650; Hide controls</button>
@@ -1689,7 +1695,6 @@ nearby procedural space within a radius.">Search</button>
   </div>
 </div>
 
-<div id="annivBadge" title="10 years of No Man's Sky -- 2016-2026. Fan-made tribute, not an official Hello Games asset."><img src="icons-web/anniv-10th-badge.png" alt="No Man's Sky 10th Anniversary"></div>
 
 <div id="leftcol">
   <div id="filt" class="box fold min">
