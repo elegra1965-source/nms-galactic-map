@@ -77715,20 +77715,28 @@
             "name": "",
             "moon": true,
             "orbits": 1,
-            "biome": "",
-            "subtype": "",
-            "descriptor": "",
-            "water": false,
+            "biome": "Lush",
+            "subtype": "Paradise",
+            "descriptor": "Mild Rain",
+            "water": true,
             "ring": false,
             "resources": [
-              "Gold"
+              "Cobalt",
+              "Copper"
             ],
-            "flora": [],
-            "fauna": [],
-            "minerals": [],
+            "flora": [
+              "Infrequent"
+            ],
+            "fauna": [
+              "Ample"
+            ],
+            "minerals": [
+              "Star Bulb",
+              "Paraffinium"
+            ],
             "salvage": [],
             "fossils": [],
-            "sentinel": "Low",
+            "sentinel": "Intermittent",
             "autophage": false,
             "reliquary": false,
             "ruins": false,
@@ -77738,21 +77746,29 @@
           {
             "name": "",
             "moon": true,
-            "orbits": 0,
-            "biome": "",
-            "subtype": "",
-            "descriptor": "",
+            "orbits": 1,
+            "biome": "Frozen",
+            "subtype": "Icebound",
+            "descriptor": "Infrequent Blizzards",
             "water": true,
             "ring": false,
             "resources": [
-              "Gold"
+              "Sodium",
+              "Copper"
             ],
-            "flora": [],
-            "fauna": [],
-            "minerals": [],
+            "flora": [
+              "Medium"
+            ],
+            "fauna": [
+              "Bountiful"
+            ],
+            "minerals": [
+              "Frost Crystal",
+              "Dioxite"
+            ],
             "salvage": [],
             "fossils": [],
-            "sentinel": "Low Security",
+            "sentinel": "Remote",
             "autophage": false,
             "reliquary": false,
             "ruins": false,
@@ -77825,7 +77841,7 @@
           }
         ]
       },
-      "editedAt": "2026-10-17T01:40:20.883Z",
+      "editedAt": "2026-10-17T01:43:47.498Z",
       "editedByIp": "72.223.117.245",
       "history": [
         {
@@ -77835,6 +77851,10 @@
         {
           "at": "2026-10-17T01:40:20.883Z",
           "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-10-17T01:43:47.498Z",
+          "text": "edited by a traveller"
         }
       ]
     }
@@ -77843,7 +77863,8 @@
   "ipLog": {
     "72.223.117.245": [
       1792200813593,
-      1792201220883
+      1792201220883,
+      1792201427498
     ]
   },
   "flagLog": {},
@@ -77886,7 +77907,8 @@
       "Low",
       "Uprooted",
       "Lost",
-      "Invasive"
+      "Invasive",
+      "Infrequent"
     ],
     "fauna": [
       "Devoid",
@@ -78004,7 +78026,8 @@
       "Poisonous Gas",
       "Freezing Night Winds",
       "Migratory Blizzards",
-      "Heated Atmosphere"
+      "Heated Atmosphere",
+      "Infrequent Blizzards"
     ],
     "biome": [
       "Radioactive",
@@ -78055,7 +78078,8 @@
       "Xeno-Colony",
       "Infested",
       "Hyperborean",
-      "High Temperature"
+      "High Temperature",
+      "Icebound"
     ],
     "signalName": [
       "MS Jiokaz XIV",
