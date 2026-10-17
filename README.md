@@ -244,9 +244,12 @@ alliance name are tracked, not any deeper director-specific detail.
 **Your own station photo.** In system view, a system with no station photo
 shows a generic station icon. Players can customise their stations in-game,
 so the system's info panel has an **📷 Add your station photo** button: it
-opens Edit system with the station ticked and the photo picker already open.
-Once you Save, your photo replaces the generic icon for every visitor, shown
-as a framed card with the station's name.
+opens Edit system on Special Features with the station ticked and the photo
+picker already open. Pick a photo and press **Done**: Edit system stays open
+with the photo held, so you can fill in anything else, then press Save once
+and everything goes up together in one upload. Your photo then replaces the
+generic icon for every visitor, shown as a framed card with the station's
+name.
 
 **Signal markers (added 2026-09-09).** Edit system can also record the
 floating diamond-shaped signals you see near objects in-game -- what your

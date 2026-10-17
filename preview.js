@@ -8787,7 +8787,16 @@ function renderEdStationPhotoPreview(){
   var addBtnTxt=document.getElementById("edStationPhotoBtnTxt");
   if(v){ img.src=v; wrap.style.display="block"; removeBtn.style.display="inline-block"; addBtnTxt.textContent="Replace photo"; }
   else { img.src=""; wrap.style.display="none"; removeBtn.style.display="none"; addBtnTxt.textContent="Add station photo"; }
+  // a freshly picked photo (not yet uploaded) gets the "Done, carry on" box
+  var ready=document.getElementById("edStationPhotoReady");
+  if(ready) ready.style.display=(typeof edStationPhotoNew==="string" && edStationPhotoNew.indexOf("data:")===0)?"block":"none";
 }
+document.getElementById("edStationPhotoDone").addEventListener("click",function(){
+  document.getElementById("edStationPhotoReady").style.display="none";
+  edGoTo(EDSEC_ORDER[0]);
+  var m=document.getElementById("editModal"); if(m) m.scrollTop=0;
+  toast("Photo kept. Add anything else, then Save once at the end",3200);
+});
 document.getElementById("edStationPhotoBtn").addEventListener("click",function(){ document.getElementById("edStationPhotoFile").click(); });
 document.getElementById("edStationPhotoPreview").addEventListener("click",function(){ openScreenshotLightbox(this.src); });
 document.getElementById("edStationPhotoRemoveBtn").addEventListener("click",function(){ edStationPhotoNew=""; renderEdStationPhotoPreview(); });
@@ -9530,6 +9539,7 @@ document.getElementById("bEdit").addEventListener("click",function(){ if(selecte
 document.getElementById("bStationPhoto").addEventListener("click",function(){
   if(!selected) return;
   openEditModal();
+  edGoTo("features"); // the station photo lives on the Special Features step
   var st=document.getElementById("edStation");
   if(!st.checked){ st.checked=true; st.dispatchEvent(new Event("change")); }
   document.getElementById("edStationPhotoFile").click();

@@ -2391,6 +2391,13 @@ nearby procedural space within a radius.">Search</button>
             <button class="btn" id="edStationPhotoRemoveBtn" type="button" style="flex:1;padding:4px 10px;font-size:11px;text-align:center;display:none" title="Remove this system's station photo.">Remove photo</button>
           </div>
           <div id="edStationPhotoHint" style="font-size:10.5px;color:var(--text-faint);margin-top:4px"></div>
+          <!-- 2026-10-17, Tony: picking a photo must not feel like a finished save. Done keeps
+               Edit system open with the photo held, so the traveller can fill in the rest and
+               press Save ONCE (one upload, one commit, no "already edited" on a second save). -->
+          <div id="edStationPhotoReady" style="display:none;margin-top:6px;padding:7px 9px;border:1px solid rgba(91,227,143,.45);border-radius:var(--r-sm);background:rgba(91,227,143,.07)">
+            <div style="font-size:11px;color:var(--text);line-height:1.4">&#10003; Photo added to this edit. Nothing is uploaded yet: press <b>Done</b>, fill in anything else you know, then press <b>Save</b> once at the end and it all goes up together.</div>
+            <button class="btn primary" id="edStationPhotoDone" type="button" style="margin-top:6px;width:100%;padding:5px 10px;font-size:11px">&#10003; Done &mdash; back to the rest of the edit</button>
+          </div>
         </div>
       </div>
       <label class="chk"><input type="checkbox" id="edGiant"> Gas giant (purple systems only -- limits to 1 planet + up to 5 moons; renamed from "Giant planet" to match the real in-game term)</label>
