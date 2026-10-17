@@ -273,6 +273,19 @@ has been filled in.
 
 ![System info panel showing Community notes text and a submitted screenshot as two separate titled sections](screenshots/17-public-screenshot-notes.jpg)
 
+**Recently charted.** Beside *Show controls* at the top, a small counter
+(for example *◈ 4 charted today ›*) shows how many systems travellers have
+documented today. Tap it for the list of everything charted in the last 7
+days: system name, who charted it, galaxy, how long ago, and the portal
+glyphs with the hex address. Tap a system to fly straight there, switching
+galaxy if needed. It's built from the shared edits the map already loads, so
+it costs no extra requests, and bulk imports are left out so the numbers mean
+people. The Hub's ticker links here with `?recent=1`, which opens the list
+straight away. A small feed for other sites lives at
+`/.netlify/functions/system-edit?recent=1`.
+
+<img src="screenshots/18-recently-charted.jpg" alt="Recently charted list on a phone: the 4 charted today counter beside Hide controls, and systems with who charted them, galaxy, time and portal glyphs" width="360">
+
 **Import from my save file.** Inside Edit system, an optional button reads a
 real Steam/GOG `.hg` save file entirely in your own browser -- nothing is
 ever uploaded -- and can auto-fill "Your name" plus offer a one-click

@@ -502,6 +502,26 @@ function pickOne(out, sys, headers){
   return json(200, {ok:true, found:!!hit, system: hit ? {data: hit.data, editedAt: hit.editedAt} : null}, headers);
 }
 
+/* Systems charted by travellers in the last 8 days, newest first: just what a
+   ticker or a "recently charted" list needs. Bulk imports (the Galactic Hub
+   wiki pass, the no-name backfill) are left out so the counts mean people. */
+function recentOf(full, now){
+  var cutoff = now - 8*86400000, out = [];
+  var systems = (full && full.systems) || {};
+  for(var k in systems){
+    var r = systems[k], t = Date.parse(r && r.editedAt);
+    if(!(t > cutoff)) continue;
+    var d = r.data || {}, who = String(d.editorName || "").trim();
+    if(/\(import\)|no original editor name/i.test(who)) continue;
+    var p = parseCompositeKey(k);
+    if(!p) continue;
+    out.push({ galaxy:p.galaxy, address:p.address, name:d.name || "", editor:who, editedAt:r.editedAt,
+               screenshot:(typeof d.screenshot === "string" && d.screenshot.indexOf(screenshotUrlPrefix()) === 0) ? d.screenshot : "" });
+  }
+  out.sort(function(a,b){ return Date.parse(b.editedAt) - Date.parse(a.editedAt); });
+  return { ok:true, systems: out.slice(0, 300) };
+}
+
 async function handleGet(req, token){
   var sysParam = new URL(req.url).searchParams.get("sys");
   // Tony-only view: append ?token=<ADMIN_TOKEN> (set as a Netlify env var,
@@ -518,7 +538,11 @@ async function handleGet(req, token){
   var cacheHeaders = { "Cache-Control": "public, max-age=60, s-maxage=60" };
   var cache = await getGetCache();
 
+  // ?recent=1 (2026-10-17): small "recently charted" feed for the Hub ticker
+  // and anyone else, so they don't download the whole systems dict.
+  var wantRecent = url.searchParams.get("recent") === "1";
   if(!isAdmin && cache.data && (now - cache.fetchedAt) < GET_CACHE_TTL_MS){
+    if(wantRecent) return json(200, recentOf(cache.data, now), cacheHeaders);
     if(sysParam) return pickOne(cache.data, sysParam, cacheHeaders);
     return json(200, cache.data, cacheHeaders);
   }
@@ -532,6 +556,7 @@ async function handleGet(req, token){
     // alive through a transient GitHub problem instead of every visitor's map
     // silently losing shared edits for the duration (loadOverrides() in
     // preview.html treats a failed GET as "no shared edits", not an error).
+    if(!isAdmin && cache.data && wantRecent) return json(200, recentOf(cache.data, now), cacheHeaders);
     if(!isAdmin && cache.data) return sysParam ? pickOne(cache.data, sysParam, cacheHeaders) : json(200, cache.data, cacheHeaders);
     return json(502, {ok:false, error:"Could not read shared data store: "+e.message});
   }
@@ -601,6 +626,7 @@ async function handleGet(req, token){
   }
 
   await setGetCache(out, now);
+  if(wantRecent) return json(200, recentOf(out, now), cacheHeaders);
   if(sysParam) return pickOne(out, sysParam, cacheHeaders);
   return json(200, out, cacheHeaders);
 }

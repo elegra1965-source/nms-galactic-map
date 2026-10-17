@@ -549,7 +549,7 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border:none;border-ra
   transition:left .15s,top .15s}
 #annivBadge img{width:100%;height:100%;display:block;
   filter:drop-shadow(0 0 5px rgba(240,90,40,.4))}
-#top,#leftcol,#tel,#panel,#course,#modalWrap .modal,#galHud,#accessPop,#searchPop,#routesPop,#favPop,#keys{
+#top,#leftcol,#tel,#panel,#course,#modalWrap .modal,#galHud,#accessPop,#searchPop,#routesPop,#favPop,#chartedPop,#keys{
   zoom:var(--ui-zoom,1)}
 #accessPop{position:fixed;z-index:36;width:198px;padding:11px 13px;
   top:calc(var(--top-h,60px) + 8px);right:10px;display:none}
@@ -600,6 +600,22 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border:none;border-ra
   max-height:60vh;overflow-y:hidden;overflow-x:hidden}
 #favPop.show{display:block}
 #favPop.scroll{overflow-y:auto}
+/* "Recently charted" counter + list (2026-10-17) -- see charted.js. On desktop the
+   counter sits in #top's own row after the title; on phones it shares the Show
+   controls row (see the phone block below). */
+#toggleRow{display:contents}
+#chartedLine{background:transparent;border:none;color:var(--cyan);cursor:pointer;
+  font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  padding:2px 4px 6px;white-space:nowrap}
+#chartedLine:hover,#chartedLine:focus-visible{color:#fff;text-shadow:0 0 8px rgba(0,229,255,.8);outline:none}
+#chartedPop{position:fixed;z-index:41;width:310px;max-width:calc(100vw - 16px);padding:11px 13px;
+  top:calc(var(--top-h,60px) + 8px);left:10px;display:none;
+  max-height:60vh;overflow-y:hidden;overflow-x:hidden}
+#chartedPop.show{display:block}
+#chartedPop.scroll{overflow-y:auto}
+.chartedRow{display:block;width:100%;text-align:left;background:none;border:0;border-top:1px solid var(--border-soft);font:inherit;color:inherit}
+.chartedRow:focus-visible{outline:1px solid var(--cyan)}
+.chartedGlyphs img{height:12px;width:12px;vertical-align:-2px;margin-right:1px}
 .routeRes{cursor:default}
 .routeRowActions{display:flex;gap:5px;margin-top:5px;flex-wrap:wrap}
 .routeActBtn{background:transparent;border:1px solid var(--border-soft);color:var(--text-dim);
@@ -1334,6 +1350,10 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
     100%{color:var(--cyan);text-shadow:none}
   }
   #toolbarToggle.flash{animation:toolbarTogglePress .35s ease-out}
+  /* 2026-10-17: the "charted today" counter shares this row, on the left */
+  #toggleRow{display:flex;order:2;flex:0 0 100%;align-items:center;justify-content:space-between;gap:8px}
+  #toggleRow #toolbarToggle{flex:0 0 auto;margin-left:auto}
+  #chartedLine{padding:2px 2px 4px}
   /* 2026-08-30, Tony (round 8): "reveal one row at a time smoothly with same
      glow as title but then looses glow... remove one at a time... not too
      quick not too slow" -- round 7's single max-height slide on the whole
@@ -1619,7 +1639,10 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 
 <div id="top">
   <div id="title" aria-label="NMS Galactic Map"><img id="titleIcon" src="favicon/favicon-32x32.png" alt=""><span id="titleText" aria-hidden="true">NMS GALACTIC MAP</span></div>
+  <div id="toggleRow">
+  <button type="button" id="chartedLine" hidden aria-haspopup="dialog" aria-expanded="false" title="Systems other travellers have charted this week">&#9672; charted</button>
   <button type="button" id="toolbarToggle" aria-expanded="true" title="Hide or show the map controls below the title.">&#9650; Hide controls</button>
+  </div>
   <div id="toolbarBody">
   <select id="galSel"></select>
   <select id="galTypeFilter" title="Narrow the galaxy list above to just one type -- Normal, Harsh, Empty or Lush -- picked from Tony's own reference list of all 255 real galaxy types." style="max-width:104px;font-family:'Orbitron',sans-serif;font-size:9px">
@@ -2056,6 +2079,12 @@ nearby procedural space within a radius.">Search</button>
   <div class="fbody" id="favBody">
     <div id="favResults"></div>
   </div>
+</div>
+
+<div class="box" id="chartedPop" role="dialog" aria-label="Recently charted">
+  <div class="kicker" style="margin-bottom:2px">&#9672; Recently charted</div>
+  <div class="searchResMeta" id="chartedSub" style="margin-bottom:6px"></div>
+  <div id="chartedList"></div>
 </div>
 
 <div class="box" id="accessPop" role="dialog" aria-label="Accessibility settings">
@@ -2819,6 +2848,7 @@ loadLetterMap('./nms-core/letter-map').then(function(lm){
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="preview.js"></script>
 <script src="share-system.js"></script>
+<script src="charted.js"></script>
 <script type="module" src="send-button.js"></script>
 </body>
 </html>

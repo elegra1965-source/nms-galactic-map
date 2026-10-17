@@ -1546,6 +1546,7 @@ function loadOverrides(){
     ALLIANCES=data.alliances||{};
     populateDatalists();
     if(Object.keys(OVERRIDES.systems).length) refreshAfterOverrides();
+    if(window.renderCharted) window.renderCharted(); // "charted today" counter, see charted.js
   }).catch(function(){
     /* Shared edits are a nice-to-have layer -- if the Function isn't set up yet
        (no GITHUB_TOKEN, not deployed via GitHub yet, etc.) the map must still
