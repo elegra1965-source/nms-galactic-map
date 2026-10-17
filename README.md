@@ -251,6 +251,8 @@ and everything goes up together in one upload. Your photo then replaces the
 generic icon for every visitor, shown as a framed card with the station's
 name.
 
+<img src="screenshots/19-add-station-photo.jpg" alt="Edit system, Special Features: a station photo picked, with the box saying it is added but not uploaded yet and a Done button" width="360"> <img src="screenshots/19b-station-card.jpg" alt="The player's station photo shown as a framed card with the station's name in system view" width="300">
+
 **Signal markers (added 2026-09-09).** Edit system can also record the
 floating diamond-shaped signals you see near objects in-game -- what your
 own "Starmap Analysis Report" popup actually told you was there. Like
