@@ -555,7 +555,7 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border:none;border-ra
 #annivBadge.show{opacity:1}
 #annivBadge img{width:100%;height:100%;display:block;
   filter:drop-shadow(0 0 5px rgba(240,90,40,.4))}
-#top,#leftcol,#tel,#panel,#course,#modalWrap .modal,#galHud,#accessPop,#searchPop,#routesPop,#favPop,#chartedPop,#keys{
+#top,#leftcol,#tel,#panel,#course,#modalWrap .modal,#galHud,#accessPop,#searchPop,#routesPop,#favPop,#chartedPop,#trendPop,#keys{
   zoom:var(--ui-zoom,1)}
 #accessPop{position:fixed;z-index:36;width:198px;padding:11px 13px;
   top:calc(var(--top-h,60px) + 8px);right:10px;display:none}
@@ -619,6 +619,26 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border:none;border-ra
   max-height:60vh;overflow-y:hidden;overflow-x:hidden}
 #chartedPop.show{display:block}
 #chartedPop.scroll{overflow-y:auto}
+/* "Trending this week" (2026-10-19) -- see trending.js */
+#trendLine{background:transparent;border:none;color:#f0a500;cursor:pointer;
+  font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  padding:2px 4px 6px;white-space:nowrap}
+#trendLine:hover,#trendLine:focus-visible{color:#fff;text-shadow:0 0 8px rgba(240,165,0,.8);outline:none}
+#trendPop{position:fixed;z-index:41;width:320px;max-width:calc(100vw - 16px);padding:11px 13px;
+  top:calc(var(--top-h,60px) + 8px);left:10px;display:none;max-height:60vh;overflow-y:hidden;overflow-x:hidden}
+#trendPop.show{display:block}
+#trendPop.scroll{overflow-y:auto}
+.trTop{display:flex;align-items:center;gap:7px}
+.trPos{flex:none;min-width:24px;font-family:'Orbitron',sans-serif;font-size:11px;letter-spacing:.08em;color:#f0a500}
+.trPos.medal{font-size:17px;letter-spacing:0}
+.trName{flex:1;min-width:0}
+.trMove{flex:none;font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:.08em;color:var(--text-faint)}
+.trMove.up{color:#00ff88}.trMove.dn{color:#ff8c00}.trMove.new{color:var(--cyan)}
+.trLast{margin-top:8px;padding-top:8px;border-top:1px solid var(--border-soft);font-size:11px;color:var(--text-dim)}
+.trLast .trLastBtn{display:inline;width:auto;border:0;padding:0;color:#f0a500;cursor:pointer;text-decoration:underline}
+#trendBadge{margin-top:3px;display:inline-block;padding:2px 8px;border:1px solid rgba(240,165,0,.55);border-radius:999px;
+  font-family:'Orbitron',sans-serif;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#f0a500;background:rgba(240,165,0,.08)}
+#trendBadge[hidden]{display:none}
 .chartedRow{display:block;width:100%;text-align:left;background:none;border:0;border-top:1px solid var(--border-soft);font:inherit;color:inherit}
 .chartedRow:focus-visible{outline:1px solid var(--cyan)}
 .chartedGlyphs img{height:12px;width:12px;vertical-align:-2px;margin-right:1px}
@@ -1366,6 +1386,9 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   #toggleRow{display:flex;order:2;flex:0 0 100%;align-items:center;justify-content:space-between;gap:8px}
   #toggleRow #toolbarToggle{flex:0 0 auto;margin-left:auto}
   #chartedLine{padding:2px 2px 4px}
+  /* 2026-10-19: no room for three on one phone row -- Trending gets its own short line underneath */
+  #toggleRow{flex-wrap:wrap;row-gap:0}
+  #trendLine{order:3;padding:0 2px 4px;text-align:left}
   /* 2026-08-30, Tony (round 8): "reveal one row at a time smoothly with same
      glow as title but then looses glow... remove one at a time... not too
      quick not too slow" -- round 7's single max-height slide on the whole
@@ -1653,6 +1676,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   <div id="title" aria-label="NMS Galactic Map"><img id="titleIcon" src="favicon/favicon-32x32.png" alt=""><span id="titleText" aria-hidden="true">NMS GALACTIC MAP</span><div id="annivBadge" title="10 years of No Man's Sky -- 2016-2026. Fan-made tribute, not an official Hello Games asset."><img src="icons-web/anniv-10th-badge.png" alt="No Man's Sky 10th Anniversary"></div></div>
   <div id="toggleRow">
   <button type="button" id="chartedLine" hidden aria-haspopup="dialog" aria-expanded="false" title="Systems other travellers have charted this week">&#9672; charted</button>
+  <button type="button" id="trendLine" hidden aria-haspopup="dialog" aria-expanded="false" title="The most-viewed charted systems this week">&#128293; Trending &rsaquo;</button>
   <button type="button" id="toolbarToggle" aria-expanded="true" title="Hide or show the map controls below the title.">&#9650; Hide controls</button>
   </div>
   <div id="toolbarBody">
@@ -2111,6 +2135,12 @@ nearby procedural space within a radius.">Search</button>
   <div class="searchResMeta" id="chartedSub" style="margin-bottom:6px"></div>
   <div id="chartedList"></div>
   <a href="/community" target="_blank" rel="noopener" style="display:block;margin-top:8px;padding-top:8px;border-top:1px solid var(--border-soft);font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--cyan);text-decoration:none">&#9672; See all traveller discoveries &rsaquo;</a>
+</div>
+
+<div class="box" id="trendPop" role="dialog" aria-label="Trending this week">
+  <div class="kicker" style="margin-bottom:2px">&#128293; Trending this week</div>
+  <div class="searchResMeta" style="margin-bottom:6px">The charted systems travellers opened most this week. Resets every Monday. Tap one to fly there.</div>
+  <div id="trendList"></div>
 </div>
 
 <div class="box" id="accessPop" role="dialog" aria-label="Accessibility settings">
@@ -2915,6 +2945,7 @@ loadLetterMap('./nms-core/letter-map').then(function(lm){
 <script src="preview.js"></script>
 <script src="share-system.js"></script>
 <script src="charted.js"></script>
+<script src="trending.js"></script>
 <script type="module" src="send-button.js"></script>
 </body>
 </html>

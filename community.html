@@ -309,6 +309,31 @@ button:hover,button:focus-visible{border-color:var(--cyan);outline:none}
   $("reload").addEventListener("click", load);
   load();
 })();
+
+/* Trending medals (2026-10-19): a top-3 system's card gets its medal. */
+(function(){
+  var SITE = (location.hostname === "map.nomansskyhub.app" || /netlify\.app$/.test(location.hostname)) ? "" : "https://map.nomansskyhub.app";
+  var MEDAL = ["\uD83E\uDD47", "\uD83E\uDD48", "\uD83E\uDD49"], rank = {};
+  function decorate(){
+    var cards = document.querySelectorAll("#feed .card");
+    for(var i = 0; i < cards.length; i++){
+      var c = cards[i], go = c.querySelector("a.go"), cn = c.querySelector(".cn");
+      if(!go || !cn || cn.querySelector(".trMedal")) continue;
+      var m = /addr=([0-9A-F]{12})&galaxy=(\d+)/.exec(go.getAttribute("href") || ""); if(!m) continue;
+      var r = rank[m[2] + ":" + m[1]]; if(!r || r > 3) continue;
+      var b = document.createElement("span"); b.className = "trMedal";
+      b.textContent = MEDAL[r - 1] + " #" + r + " TRENDING";
+      b.style.cssText = "display:inline-block;margin-left:8px;padding:2px 7px;border:1px solid rgba(240,165,0,.55);border-radius:999px;font-size:10px;letter-spacing:.1em;color:#f0a500;vertical-align:3px;font-weight:600";
+      cn.appendChild(b);
+    }
+  }
+  fetch(SITE + "/.netlify/functions/trending").then(function(r){ return r.json(); }).then(function(j){
+    (j.top || []).forEach(function(x){ rank[x.key] = x.rank; });
+    decorate();
+    var feed = document.getElementById("feed");
+    if(feed && window.MutationObserver) new MutationObserver(decorate).observe(feed, { childList: true });
+  }).catch(function(){});
+})();
 </script>
 </body>
 </html>
