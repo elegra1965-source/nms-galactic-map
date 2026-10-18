@@ -1913,13 +1913,15 @@ nearby procedural space within a radius.">Search</button>
   </div>
   <div class="prow">
     <button class="btn" id="bEdit" title="Enter your real in-game data for this system -- name, race, economy, conflict, planets/moons and resources. Saved for every visitor to see.">Edit system</button>
-    <button class="btn" id="bReport" title="Flag this system's data as wrong or inappropriate so it can be reviewed.">Report</button>
+    <!-- 2026-10-17, Tony: players can customise their stations (Cosmos), so make
+         swapping the generic station icon for their own photo one tap away instead
+         of buried in Edit system. Hidden once the system already has a photo
+         (2026-10-18: moved beside Edit system to save a row). -->
+    <button class="btn" id="bStationPhoto" type="button" title="Swap the generic station icon for a photo of your own customised station. Opens Edit system with the photo picker ready; your photo shows for every visitor once you Save.">&#128247; Add station photo</button>
   </div>
-  <!-- 2026-10-17, Tony: players can customise their stations (Cosmos), so make
-       swapping the generic station icon for their own photo one tap away instead
-       of buried in Edit system. Hidden once the system already has a photo. -->
-  <div class="prow" id="stationPhotoRow">
-    <button class="btn" id="bStationPhoto" type="button" style="flex:1" title="Swap the generic station icon for a photo of your own customised station. Opens Edit system with the photo picker ready; your photo shows for every visitor once you Save.">&#128247; Add your station photo</button>
+  <div class="prow">
+    <button class="btn" id="bReport" title="Flag this system's data as wrong or inappropriate so it can be reviewed.">Report</button>
+    <button class="btn" id="bPrivCode" type="button" title="Your private code: load your private systems on another device, back them up, or ask for a lost code.">&#128274; Private code</button>
   </div>
   <div id="pubNoteBox" style="display:none">
     <div class="lb" style="font-size:9px;letter-spacing:.12em;color:var(--text-faint);text-transform:uppercase;margin:8px 0 3px">Community notes</div>
@@ -2470,15 +2472,7 @@ nearby procedural space within a radius.">Search</button>
         <input type="checkbox" id="edPrivate" style="margin:0">
         <span>&#128274; Keep this system private <span style="color:var(--text-faint)">(hidden from other travellers -- only you and the site owner can see it)</span></span>
       </label>
-      <button type="button" id="privToggle" class="btn" style="margin:6px 0 0 22px;padding:3px 8px;font-size:10.5px">Private code &amp; backup</button>
-      <div id="privBox" style="display:none;margin:8px 0 0 22px;padding:9px 10px;border:1px solid rgba(240,165,0,.35);border-radius:8px;font-size:11px;color:var(--text-dim);line-height:1.5">
-        <div id="privNewMsg" style="display:none;color:#f0a500;margin-bottom:6px">This is your private code -- save it somewhere safe. Enter it on another phone or PC to load your private systems there.</div>
-        <div>Your private code: <b id="privCodeTxt" style="color:#f0a500;letter-spacing:.08em"></b> <button type="button" id="privCopy" class="btn" style="padding:2px 7px;font-size:10px">Copy</button></div>
-        <div id="privCount" style="color:var(--text-faint)"></div>
-        <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap"><input type="text" id="privCodeIn" maxlength="20" placeholder="Have a code? NMS-XXXX-XXXX-XXXX" style="flex:1;min-width:170px;text-transform:uppercase"><button type="button" id="privLoad" class="btn" style="padding:3px 9px">Load</button></div>
-        <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;align-items:center"><button type="button" id="privExport" class="btn" style="padding:3px 9px">Export my private systems</button><label class="btn" style="padding:3px 9px;cursor:pointer">Import file<input type="file" id="privImport" accept="application/json,.json" style="display:none"></label></div>
-        <div style="margin-top:6px;color:var(--text-faint)">Lost your code? Message <b>u/Elegra1965</b> on Reddit with the glyphs of one of your private systems and he'll send it back.</div>
-      </div>
+      <button type="button" id="privToggle" class="btn" style="margin:6px 0 0 22px;padding:3px 8px;font-size:10.5px">&#128274; Private code &amp; backup</button>
     </div>
     <div class="mfld" style="margin-top:-6px">
       <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-dim);cursor:pointer" title="Also sends this system to Voyager's Haven (havenmap.online), the community NMS database, under the No Man's Sky Hub tag (NMSHUB). It goes into Haven's approval queue first; once approved it's credited to your name above.">
@@ -2564,6 +2558,32 @@ nearby procedural space within a radius.">Search</button>
       <button class="btn primary" id="repSubmit">Send report</button>
       <button class="btn" id="repCancel">Cancel</button>
     </div>
+  </div>
+
+  <div class="box modal" id="privModal" style="max-width:380px;display:none">
+    <h3>&#128274; Private code</h3>
+    <div class="msub">Private systems are hidden from other travellers. Only you (with your code) and the site owner, elegra1965, can see them.</div>
+    <div id="privNewMsg" style="display:none;color:#f0a500;font-size:11.5px;margin-bottom:8px">This is your private code -- save it somewhere safe. Enter it on another phone or PC to load your private systems there.</div>
+    <div class="mfld"><div class="lb">Your private code</div>
+      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap"><b id="privCodeTxt" style="color:#f0a500;letter-spacing:.08em;font-size:13px"></b><button type="button" id="privCopy" class="btn" style="padding:2px 8px;font-size:10.5px">Copy</button></div>
+      <div id="privCount" style="font-size:11px;color:var(--text-faint);margin-top:3px"></div>
+    </div>
+    <div class="mfld"><div class="lb">Have a code from another device?</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap"><input type="text" id="privCodeIn" maxlength="20" placeholder="NMS-XXXX-XXXX-XXXX" style="flex:1;min-width:160px;text-transform:uppercase"><button type="button" id="privLoad" class="btn" style="padding:3px 10px">Load</button></div>
+    </div>
+    <div class="mfld"><div class="lb">Backup file</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><button type="button" id="privExport" class="btn" style="padding:3px 10px">Export</button><label class="btn" style="padding:3px 10px;cursor:pointer">Import<input type="file" id="privImport" accept="application/json,.json" style="display:none"></label></div>
+    </div>
+    <details id="privLost" style="margin:4px 0 12px;font-size:11.5px;color:var(--text-dim)">
+      <summary style="cursor:pointer;color:var(--cyan)">Lost your code? Ask for it</summary>
+      <div style="margin-top:8px;line-height:1.5">Open one of your private systems on the map first -- its address fills in below. The request goes privately to elegra1965 (not to GitHub or anywhere public), who'll send your code back.</div>
+      <div class="mfld" style="margin-top:8px"><div class="lb">System</div><div id="privReqSys" style="font-size:12px"></div></div>
+      <div class="mfld"><div class="lb">Your Reddit username or email</div><input type="text" id="privReqContact" maxlength="80" placeholder="e.g. u/YourName"></div>
+      <div class="mfld"><div class="lb">Name you used (optional)</div><input type="text" id="privReqName" maxlength="30"></div>
+      <button type="button" id="privReqSend" class="btn primary" style="padding:4px 12px">Send request</button>
+      <div id="privReqMsg" style="margin-top:6px;color:var(--text-faint)"></div>
+    </details>
+    <div class="modalBtns"><button class="btn" id="privClose">Close</button></div>
   </div>
 
   <!-- General site feedback (2026-08-16, Tony's ask) -- distinct from the

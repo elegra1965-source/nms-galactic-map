@@ -20,6 +20,9 @@
    GET  ?admin=1&token=ADMIN_TOKEN          -> { ok, owners:[...] } (no photos)
    POST { action:"save", code?, key, data, name? } -> { ok, code, created }
    POST { action:"delete", code, key }      -> { ok }
+   POST { action:"recover", key, contact, name?, note? } -> lost-code request,
+        stored privately (req/...) with the matching code(s) for the owner
+   POST { action:"resolve", token, id }     -> owner marks a request done
    ============================================================ */
 
 import { getStore } from "@netlify/blobs";
@@ -107,7 +110,14 @@ export default async (req, context) => {
         owners.push({ code: rec.code, name: rec.name || "", createdAt: rec.createdAt, updatedAt: rec.updatedAt, systems: sys });
       }
       owners.sort(function(a, b){ return String(b.updatedAt).localeCompare(String(a.updatedAt)); });
-      return json(200, { ok: true, owners: owners }, H);
+      var requests = [];
+      var rl = await store.list({ prefix: "req/" });
+      for(var q = 0; q < rl.blobs.length; q++){
+        var rq = await store.get(rl.blobs[q].key, { type: "json" }).catch(function(){ return null; });
+        if(rq){ rq.id = rl.blobs[q].key.slice(4); requests.push(rq); }
+      }
+      requests.sort(function(a, b){ return String(b.at).localeCompare(String(a.at)); });
+      return json(200, { ok: true, owners: owners, requests: requests }, H);
     }
     var code = normCode(url.searchParams.get("code"));
     if(!CODE_RE.test(code)) return json(400, { ok: false, error: "bad-code", message: "That doesn't look like a private code (NMS-XXXX-XXXX-XXXX)." }, H);
@@ -121,8 +131,33 @@ export default async (req, context) => {
   var body;
   try { body = await req.json(); } catch(e){ return json(400, { ok: false, error: "bad json" }, H); }
   var action = body && body.action;
+  if(action === "resolve"){
+    var adm2 = process.env.ADMIN_TOKEN;
+    if(!adm2 || body.token !== adm2) return json(403, { ok: false, error: "forbidden" }, H);
+    if(typeof body.id !== "string" || !/^[\w.:-]{1,60}$/.test(body.id)) return json(400, { ok: false, error: "bad-id" }, H);
+    try { await store.delete("req/" + body.id); } catch(e){}
+    return json(200, { ok: true }, H);
+  }
   var key = String((body && body.key) || "").toUpperCase();
   if(!KEY_RE.test(key) || Number(key.split(":")[0]) > 255) return json(400, { ok: false, error: "bad-key" }, H);
+  if(action === "recover"){
+    // Lost-code request: stored privately for the owner, with the matching
+    // code(s) looked up here. Nothing about the match goes back to the requester.
+    var contact = String(body.contact || "").replace(/[<>]/g, "").trim().slice(0, 80);
+    if(contact.length < 3) return json(400, { ok: false, error: "contact", message: "Add a Reddit username or email so the code can be sent back to you." }, H);
+    if(!(await allow(store, "rl/recover/" + who, 3, now))) return json(429, { ok: false, error: "rate", message: "Too many requests this hour -- try again later." }, H);
+    var matches = [];
+    var all = await store.list({ prefix: "code/" });
+    for(var m = 0; m < all.blobs.length; m++){
+      var rr = await store.get(all.blobs[m].key, { type: "json" }).catch(function(){ return null; });
+      if(rr && rr.systems && rr.systems[key]) matches.push(rr.code);
+    }
+    var id = new Date(now).toISOString().replace(/[:.]/g, "-") + "-" + Math.random().toString(36).slice(2, 7);
+    await store.setJSON("req/" + id, { at: new Date(now).toISOString(), key: key, contact: contact,
+      name: String(body.name || "").replace(/[<>]/g, "").trim().slice(0, 30),
+      note: String(body.note || "").replace(/[<>]/g, "").trim().slice(0, 200), matches: matches });
+    return json(200, { ok: true, message: "Request sent -- elegra1965 will check it and reply to " + contact + "." }, H);
+  }
   if(!(await allow(store, "rl/write/" + who, LIMITS.write, now))) return json(429, { ok: false, error: "rate", message: "Too many private saves this hour -- try again later." }, H);
 
   var code2 = normCode(body.code), created = false, rec2 = null;

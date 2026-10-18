@@ -1407,16 +1407,46 @@ function renderPrivBox(){
   document.getElementById("privCopy").style.display=c?"":"none";
   document.getElementById("privCount").textContent=n?(n+(n===1?" private system":" private systems")+" on this device"):"";
 }
-function showPrivCode(isNew){
-  var box=document.getElementById("privBox"); if(!box) return;
-  box.style.display="block";
-  var m=document.getElementById("privNewMsg"); if(m) m.style.display=isNew?"block":"none";
-  if(isNew) toast("Your private code: "+privCode()+" -- keep it safe",6000);
+var privFromEdit=false;
+function openPrivModal(fromEdit, isNew){
+  privFromEdit=!!fromEdit;
+  closeAllModalBoxes();
+  document.getElementById("privNewMsg").style.display=isNew?"block":"none";
+  renderPrivBox(); renderPrivReq();
+  document.getElementById("privModal").style.display="";
+  document.getElementById("modalWrap").classList.add("show");
+}
+function showPrivCode(isNew){ if(isNew) openPrivModal(false, true); }
+function renderPrivReq(){
+  var el=document.getElementById("privReqSys"); if(!el) return;
+  if(!selected){ el.textContent="Open one of your private systems on the map first."; return; }
+  var h="";
+  for(var i=0;i<selected.address.length;i++) h+='<img alt="'+selected.address[i]+'" src="'+glyphSrc(selected.address[i])+'" style="width:16px;height:16px;vertical-align:middle">';
+  el.innerHTML=h+' <span style="letter-spacing:.12em;color:var(--text-dim)">'+selected.address+'</span> &middot; '+(GALAXIES[selected.galaxy]||("Galaxy "+(selected.galaxy+1)));
+  document.getElementById("privReqMsg").textContent="";
 }
 (function(){
   var p=document.getElementById("edPrivate"); if(p) p.addEventListener("change",syncPrivUI);
-  var tg=document.getElementById("privToggle"), box=document.getElementById("privBox");
-  if(tg&&box) tg.addEventListener("click",function(){ box.style.display=box.style.display==="block"?"none":"block"; renderPrivBox(); });
+  var tg=document.getElementById("privToggle");
+  if(tg) tg.addEventListener("click",function(){ openPrivModal(true,false); });
+  var pb=document.getElementById("bPrivCode");
+  if(pb) pb.addEventListener("click",function(){ openPrivModal(false,false); });
+  var pc=document.getElementById("privClose");
+  if(pc) pc.addEventListener("click",function(){
+    if(privFromEdit){ document.getElementById("privModal").style.display="none"; document.getElementById("editModal").style.display=""; privFromEdit=false; }
+    else closeModal();
+  });
+  var rs=document.getElementById("privReqSend");
+  if(rs) rs.addEventListener("click",function(){
+    var msg=document.getElementById("privReqMsg");
+    if(!selected){ msg.textContent="Open one of your private systems on the map first."; return; }
+    var contact=document.getElementById("privReqContact").value.trim();
+    if(contact.length<3){ msg.textContent="Add your Reddit username or email so the code can be sent back."; return; }
+    rs.disabled=true; msg.textContent="Sending...";
+    privPost({action:"recover",key:selected.galaxy+":"+selected.address,contact:contact,name:document.getElementById("privReqName").value.trim()})
+    .then(function(j){ rs.disabled=false; msg.textContent=(j&&j.message)||(j&&j.ok?"Request sent.":"Couldn't send -- try again later."); })
+    .catch(function(){ rs.disabled=false; msg.textContent="Couldn't send -- check your connection."; });
+  });
   var cp=document.getElementById("privCopy");
   if(cp) cp.addEventListener("click",function(){
     var c=privCode(); if(!c) return;
@@ -5645,9 +5675,9 @@ function updatePanel(s){
   else { pubShotImg.src=""; pubShotWrap.style.display="none"; }
   var pubStPhotoWrap=document.getElementById("pubStationPhotoWrap"), pubStPhotoImg=document.getElementById("pubStationPhoto");
   if(s.hasStation && s.stationPhoto){ pubStPhotoImg.src=s.stationPhoto; pubStPhotoWrap.style.display="block"; }
-  var stPhotoRow=document.getElementById("stationPhotoRow");
-  if(stPhotoRow) stPhotoRow.style.display=(s.hasStation && s.stationPhoto)?"none":"";
   else { pubStPhotoImg.src=""; pubStPhotoWrap.style.display="none"; }
+  var stPhotoBtn=document.getElementById("bStationPhoto");
+  if(stPhotoBtn) stPhotoBtn.style.display=(s.hasStation && s.stationPhoto)?"none":"";
   pnb.style.display=(s.publicNotes||editorTxt||s.publicScreenshot||(s.hasStation&&s.stationPhoto))?"":"none";
   setFsClass("pubNoteBox","notes",s);
   setFsClass("pubScreenshotWrap","screenshot",s);
@@ -9339,6 +9369,7 @@ function closeAllModalBoxes(){
   document.getElementById("feedbackModal").style.display="none";
   document.getElementById("saveImportModal").style.display="none";
   document.getElementById("termConfirmModal").style.display="none";
+  document.getElementById("privModal").style.display="none";
 }
 function closeModal(){ document.getElementById("modalWrap").classList.remove("show"); }
 function clientPrecheck(){

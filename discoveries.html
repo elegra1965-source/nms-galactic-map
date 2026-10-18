@@ -135,7 +135,8 @@ button:hover,button:focus-visible{border-color:var(--cyan);outline:none}
       <button type="button" id="privLoadBtn">Show private systems</button>
       <input type="search" id="privFind" placeholder="Find by glyph hex, system, traveller or code" style="flex:1 1 220px;background:transparent;color:var(--text);border:1px solid var(--line);border-radius:4px;padding:8px">
     </div>
-    <p class="sub" style="margin:0">For code recovery: ask the traveller for the glyphs of one of their private systems, type the hex here, and send them the code shown.</p>
+    <p class="sub" style="margin:0">Code requests from the map's "Lost your code?" form show first, with the matching code already found. Copy the reply and send it to them (Reddit chat or email), then press Done.</p>
+    <div id="privReqs" style="display:grid;gap:10px"></div>
     <div id="privList" style="display:grid;gap:10px"></div>
   </section>
 
@@ -355,9 +356,57 @@ button:hover,button:focus-visible{border-color:var(--cyan);outline:none}
   var SITE = (location.hostname === "map.nomansskyhub.app" || /netlify\.app$/.test(location.hostname)) ? "" : "https://map.nomansskyhub.app";
   var GAL = ["Euclid","Hilbert Dimension","Calypso","Hesperius Dimension","Hyades","Ickjamatew","Budullangr","Kikolgallr","Eltiensleen","Eissentam","Elkupalos","Aptarkaba","Ontiniangp","Odiwagiri","Ogtialabi","Muhacksonto","Hitonskyer","Rerasmutul","Isdoraijung","Doctinawyra","Loychazinq","Zukasizawa","Ekwathore","Yeberhahne","Twerbetek","Sivarates","Eajerandal","Aldukesci","Wotyarogii","Sudzerbal","Maupenzhay","Sugueziume","Brogoweldian","Ehbogdenbu","Ijsenufryos","Nipikulha","Autsurabin","Lusontrygiamh","Rewmanawa","Ethiophodhe","Urastrykle","Xobeurindj","Oniijialdu","Wucetosucc","Ebyeloof","Odyavanta","Milekistri","Waferganh","Agnusopwit","Teyaypilny","Zalienkosm","Ladgudiraf","Mushonponte","Amsentisz","Fladiselm","Laanawemb","Ilkerloor","Davanossi","Ploehrliou","Corpinyaya","Leckandmeram","Quulngais","Nokokipsechl","Rinblodesa","Loydporpen","Ibtrevskip","Elkowaldb","Heholhofsko","Yebrilowisod","Husalvangewi","Ovna'uesed","Bahibusey","Nuybeliaure","Doshawchuc","Ruckinarkh","Thorettac","Nuponoparau","Moglaschil","Uiweupose","Nasmilete","Ekdaluskin","Hakapanasy","Dimonimba","Cajaccari","Olonerovo","Umlanswick","Henayliszm","Utzenmate","Umirpaiya","Paholiang","Iaereznika","Yudukagath","Boealalosnj","Yaevarcko","Coellosipp","Wayndohalou","Smoduraykl","Apmaneessu","Hicanpaav","Akvasanta","Tuychelisaor","Rivskimbe","Daksanquix","Kissonlin","Aediabiel","Ulosaginyik","Roclaytonycar","Kichiaroa","Irceauffey","Nudquathsenfe","Getaizakaal","Hansolmien","Bloytisagra","Ladsenlay","Luyugoslasr","Ubredhatk","Cidoniana","Jasinessa","Torweierf","Saffneckm","Thnistner","Dotusingg","Luleukous","Jelmandan","Otimanaso","Enjaxusanto","Sezviktorew","Zikehpm","Bephembah","Broomerrai","Meximicka","Venessika","Gaiteseling","Zosakasiro","Drajayanes","Ooibekuar","Urckiansi","Dozivadido","Emiekereks","Meykinunukur","Kimycuristh","Roansfien","Isgarmeso","Daitibeli","Gucuttarik","Enlaythie","Drewweste","Akbulkabi","Homskiw","Zavainlani","Jewijkmas","Itlhotagra","Podalicess","Hiviusauer","Halsebenk","Puikitoac","Gaybakuaria","Grbodubhe","Rycempler","Indjalala","Fontenikk","Pasycihelwhee","Ikbaksmit","Telicianses","Oyleyzhan","Uagerosat","Impoxectin","Twoodmand","Hilfsesorbs","Ezdaranit","Wiensanshe","Ewheelonc","Litzmantufa","Emarmatosi","Mufimbomacvi","Wongquarum","Hapirajua","Igbinduina","Wepaitvas","Sthatigudi","Yekathsebehn","Ebedeagurst","Nolisonia","Ulexovitab","Iodhinxois","Irroswitzs","Bifredait","Beiraghedwe","Yeonatlak","Cugnatachh","Nozoryenki","Ebralduri","Evcickcandj","Ziybosswin","Heperclait","Sugiuniam","Aaseertush","Uglyestemaa","Horeroedsh","Drundemiso","Ityanianat","Purneyrine","Dokiessmat","Nupiacheh","Dihewsonj","Rudrailhik","Tweretnort","Snatreetze","Iwundaracos","Digarlewena","Erquagsta","Logovoloin","Boyaghosganh","Kuolungau","Pehneldept","Yevettiiqidcon","Sahliacabru","Noggalterpor","Chmageaki","Veticueca","Vittesbursul","Nootanore","Innebdjerah","Kisvarcini","Cuzcogipper","Pamanhermonsu","Brotoghek","Mibittara","Huruahili","Raldwicarn","Ezdartlic","Badesclema","Isenkeyan","Iadoitesu","Yagrovoisi","Ewcomechio","Inunnunnoda","Dischiutun","Yuwarugha","Ialmendra","Reponudrle","Rinjanagrbo","Zeziceloh","Oeileutasc","Zicniijinis","Dugnowarilda","Neuxoisan","Ilmenhorn","Rukwatsuku","Nepitzaspru","Chcehoemig","Haffneyrin","Uliciawai","Tuhgrespod","Iousongola","Odyalutai"];
   var $ = function(id){ return document.getElementById(id); };
-  var owners = [];
+  var owners = [], requests = [];
   try { $("privTok").value = localStorage.getItem("disc_admin_token") || ""; } catch(e){}
   function el(tag, cls, text){ var e = document.createElement(tag); if(cls) e.className = cls; if(text != null) e.textContent = text; return e; }
+  function glyphRow(addr){
+    var gl = el("div","glyphs"); gl.setAttribute("aria-label","Portal address " + addr);
+    addr.split("").forEach(function(ch){ var im = el("img"); im.src = (SITE ? SITE + "/" : "") + "glyphs/glyph-mask-" + ch + ".png"; im.alt = ch; gl.appendChild(im); });
+    gl.appendChild(el("span","hex", addr));
+    return gl;
+  }
+  function renderReqs(){
+    var box = $("privReqs"); box.innerHTML = "";
+    if(!requests.length) return;
+    box.appendChild(el("h2","kicker","Code requests (" + requests.length + ")"));
+    requests.forEach(function(r){
+      var g = parseInt(r.key.split(":")[0],10), addr = r.key.split(":")[1];
+      var c = el("article","card"); c.style.gridTemplateRows = "auto"; c.style.borderColor = "rgba(240,165,0,.5)";
+      var b = el("div","cb");
+      var m = el("div","meta");
+      m.appendChild(el("b", null, "Reply to: " + r.contact));
+      if(r.name) m.appendChild(el("span", null, "Name used: " + r.name));
+      m.appendChild(el("span", null, String(r.at).slice(0,16).replace("T"," ")));
+      b.appendChild(m);
+      var m2 = el("div","meta"); m2.appendChild(el("span", null, GAL[g] || ("Galaxy " + (g+1)))); b.appendChild(m2);
+      b.appendChild(glyphRow(addr));
+      var res = el("div","meta");
+      if(r.matches && r.matches.length) r.matches.forEach(function(code){ res.appendChild(el("span","chip gold", code)); });
+      else res.appendChild(el("span","chip","No private code holds this system -- ask them to check the address and galaxy"));
+      b.appendChild(res);
+      var acts = el("div"); acts.style.cssText = "display:flex;gap:8px;flex-wrap:wrap;margin-top:6px";
+      if(r.matches && r.matches.length){
+        var cp = el("button", null, "Copy reply");
+        cp.addEventListener("click", function(){
+          var txt = "Hi! Your No Man's Sky Hub private code is " + r.matches.join(" / ") + ". On the Galactic Map, open any system, tap \uD83D\uDD12 Private code and enter it under \"Have a code from another device?\" to load your private systems. Keep it somewhere safe!";
+          (navigator.clipboard ? navigator.clipboard.writeText(txt) : Promise.reject()).then(function(){ cp.textContent = "Copied"; }, function(){ prompt("Copy this reply:", txt); });
+        });
+        acts.appendChild(cp);
+      }
+      var done = el("button", null, "Done");
+      done.addEventListener("click", function(){
+        done.disabled = true;
+        fetch(SITE + "/.netlify/functions/private-systems", { method:"POST", headers:{"Content-Type":"application/json"},
+          body: JSON.stringify({ action:"resolve", token: $("privTok").value.trim(), id: r.id }) })
+          .then(function(x){ return x.json(); })
+          .then(function(j){ if(j.ok){ requests = requests.filter(function(q){ return q.id !== r.id; }); renderReqs(); } else done.disabled = false; })
+          .catch(function(){ done.disabled = false; });
+      });
+      acts.appendChild(done);
+      b.appendChild(acts);
+      c.appendChild(b); box.appendChild(c);
+    });
+  }
   function render(){
     var q = $("privFind").value.trim().toUpperCase(), list = $("privList"); list.innerHTML = "";
     var shown = 0;
@@ -402,7 +451,7 @@ button:hover,button:focus-visible{border-color:var(--cyan);outline:none}
       .then(function(r){ return r.json(); })
       .then(function(j){
         if(!j.ok){ $("privStatus").textContent = j.error === "forbidden" ? "Wrong admin token" : "Couldn't load"; return; }
-        owners = j.owners || []; render();
+        owners = j.owners || []; requests = j.requests || []; renderReqs(); render();
         if(!owners.length) $("privStatus").textContent = "No private systems yet";
       })
       .catch(function(){ $("privStatus").textContent = "Couldn't reach the private store"; });
