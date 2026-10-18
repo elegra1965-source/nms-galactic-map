@@ -2466,10 +2466,19 @@ nearby procedural space within a radius.">Search</button>
       </label>
     </div>
     <div class="mfld" style="margin-top:-6px">
-      <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-dim);cursor:pointer" title="Saves this system only in this browser on this device. Nothing is sent to the shared map, Voyager's Haven or anyone else -- not even the site owner. Clearing your browser data removes it.">
+      <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-dim);cursor:pointer" title="Not shown on the map or anywhere public. Kept on this device and in a private store under your private code, so you can load it on another device. Only you (with your code) and the site owner can see it.">
         <input type="checkbox" id="edPrivate" style="margin:0">
-        <span>&#128274; Keep this system private <span style="color:var(--text-faint)">(saved on this device only -- nobody else sees it)</span></span>
+        <span>&#128274; Keep this system private <span style="color:var(--text-faint)">(hidden from other travellers -- only you and the site owner can see it)</span></span>
       </label>
+      <button type="button" id="privToggle" class="btn" style="margin:6px 0 0 22px;padding:3px 8px;font-size:10.5px">Private code &amp; backup</button>
+      <div id="privBox" style="display:none;margin:8px 0 0 22px;padding:9px 10px;border:1px solid rgba(240,165,0,.35);border-radius:8px;font-size:11px;color:var(--text-dim);line-height:1.5">
+        <div id="privNewMsg" style="display:none;color:#f0a500;margin-bottom:6px">This is your private code -- save it somewhere safe. Enter it on another phone or PC to load your private systems there.</div>
+        <div>Your private code: <b id="privCodeTxt" style="color:#f0a500;letter-spacing:.08em"></b> <button type="button" id="privCopy" class="btn" style="padding:2px 7px;font-size:10px">Copy</button></div>
+        <div id="privCount" style="color:var(--text-faint)"></div>
+        <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap"><input type="text" id="privCodeIn" maxlength="20" placeholder="Have a code? NMS-XXXX-XXXX-XXXX" style="flex:1;min-width:170px;text-transform:uppercase"><button type="button" id="privLoad" class="btn" style="padding:3px 9px">Load</button></div>
+        <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;align-items:center"><button type="button" id="privExport" class="btn" style="padding:3px 9px">Export my private systems</button><label class="btn" style="padding:3px 9px;cursor:pointer">Import file<input type="file" id="privImport" accept="application/json,.json" style="display:none"></label></div>
+        <div style="margin-top:6px;color:var(--text-faint)">Lost your code? Message <b>u/Elegra1965</b> on Reddit with the glyphs of one of your private systems and he'll send it back.</div>
+      </div>
     </div>
     <div class="mfld" style="margin-top:-6px">
       <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-dim);cursor:pointer" title="Also sends this system to Voyager's Haven (havenmap.online), the community NMS database, under the No Man's Sky Hub tag (NMSHUB). It goes into Haven's approval queue first; once approved it's credited to your name above.">

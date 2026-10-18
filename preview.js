@@ -1304,11 +1304,16 @@ function allianceBadgeTagHtml(name){
 var FLAG_CATEGORIES=["name","race","region","starClass","stars","suffix","giant","economy","conflict","blackHole","atlas","phantom","notes","screenshot"];
 /* ============ Private systems (2026-10-18) ============
    "Keep this system private" tick box in Edit system (asked for on
-   r/NMSCoordinateExchange). A private save never leaves the browser: it is
-   kept in localStorage under PRIV_K, keyed "galaxy:ADDRESS" like skey(),
-   and layered over the public record (if any) in applyOverride() -- so only
-   this traveller, on this device, sees it. Nothing is POSTed. */
+   r/NMSCoordinateExchange). A private save never goes into the public
+   overrides.json. It is kept in this browser (localStorage PRIV_K, keyed
+   "galaxy:ADDRESS" like skey()) and also synced to the separate private
+   store (netlify/functions/private-systems.mjs) under the traveller's
+   private code, so it survives clearing the browser and can be loaded on
+   another device. Layered over the public record in applyOverride().
+   Visible only to the code holder and the site owner (code recovery). */
 var PRIV_K="nms-galmap-private";
+var PRIV_CODE_K="nms-galmap-private-code";
+var PRIV_URL="/.netlify/functions/private-systems";
 var PRIV=null;
 function privAll(){
   if(PRIV) return PRIV;
@@ -1317,21 +1322,72 @@ function privAll(){
 }
 function privGet(key){ var a=privAll(); return a[key]||null; }
 function privWrite(){ localStorage.setItem(PRIV_K,JSON.stringify(PRIV||{})); }
-function privDel(key){ var a=privAll(); if(!a[key]) return; delete a[key]; try{ privWrite(); }catch(e){} }
+function privCode(){ try{ return localStorage.getItem(PRIV_CODE_K)||""; }catch(e){ return ""; } }
+function privSetCode(c){ try{ if(c) localStorage.setItem(PRIV_CODE_K,c); else localStorage.removeItem(PRIV_CODE_K); }catch(e){} renderPrivBox(); }
+function privPost(body){
+  return fetch(PRIV_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)})
+    .then(function(r){ return r.json().catch(function(){ return {ok:false}; }); });
+}
+/* Push one entry to the private store; makes a code on the first save. */
+function privPush(key, entry){
+  var e=entry||privGet(key); if(!e) return Promise.resolve(null);
+  return privPost({action:"save",code:privCode()||null,key:key,data:e.data,savedAt:e.savedAt}).then(function(j){
+    if(j&&j.ok&&j.code){
+      var isNew=j.code!==privCode();
+      privSetCode(j.code);
+      if(isNew) showPrivCode(true);
+    }
+    return j;
+  });
+}
+/* Push several entries one after another (the first may create the code). */
+function privPushAll(keys){
+  var p=Promise.resolve();
+  keys.forEach(function(k){ p=p.then(function(){ return privPush(k).catch(function(){}); }); });
+  return p;
+}
+function privDel(key){
+  var a=privAll(); if(!a[key]) return; delete a[key]; try{ privWrite(); }catch(e){}
+  if(privCode()) privPost({action:"delete",code:privCode(),key:key}).catch(function(){});
+}
+/* Load this code's systems from the private store and merge (newest wins);
+   anything only on this device gets pushed up. */
+function privPull(code, quiet){
+  code=code||privCode(); if(!code) return Promise.resolve(false);
+  return fetch(PRIV_URL+"?code="+encodeURIComponent(code),{cache:"no-store"})
+  .then(function(r){ return r.json(); })
+  .then(function(j){
+    if(!j||!j.ok){ if(!quiet) toast(j&&j.message||"Couldn't load that code",4200); return false; }
+    privSetCode(j.code);
+    var a=privAll(), changed=false, up=[];
+    for(var k in j.systems){
+      var srv=j.systems[k];
+      if(!a[k]||String(srv.savedAt)>String(a[k].savedAt)){ a[k]=srv; changed=true; }
+    }
+    for(var k2 in a){ if(!j.systems[k2]||String(a[k2].savedAt)>String(j.systems[k2].savedAt)) up.push(k2); }
+    if(changed){ try{ privWrite(); }catch(e){} try{ refreshAfterOverrides(); }catch(e){} }
+    if(up.length) privPushAll(up);
+    if(!quiet) toast("Loaded "+Object.keys(j.systems).length+" private system(s)",3200);
+    renderPrivBox();
+    return true;
+  }).catch(function(){ if(!quiet) toast("Couldn't reach the private store -- try again",4200); return false; });
+}
 function savePrivateEdit(address, galaxy, payload){
-  var key=galaxy+":"+address, a=privAll(), dropped=false;
-  a[key]={data:payload, savedAt:new Date().toISOString()};
+  var key=galaxy+":"+address, a=privAll(), full={data:payload, savedAt:new Date().toISOString()};
+  a[key]=full;
   try{ privWrite(); }
   catch(e){
-    // Photos are the big part -- if the browser's storage is full, keep the text.
-    var lite=Object.assign({},payload,{screenshot:"",stationPhoto:"",allianceBadge:""});
-    a[key]={data:lite, savedAt:new Date().toISOString()}; dropped=true;
+    // Browser storage full: keep the text here; the private store still gets the photos.
+    a[key]={data:Object.assign({},payload,{screenshot:"",stationPhoto:"",allianceBadge:""}), savedAt:full.savedAt};
     try{ privWrite(); }
     catch(e2){ delete a[key]; toast("Couldn't save privately -- this browser's storage is full",4200); return false; }
   }
   closeModal();
-  toast(dropped?"Saved privately on this device (photos too big to keep)":"Saved privately -- only on this device",3600);
+  toast("Saved privately -- hidden from other travellers",3600);
   refreshAfterOverrides();
+  privPush(key, full).then(function(j){
+    if(!j||!j.ok) setTimeout(function(){ toast((j&&j.message)||"Saved on this device only -- couldn't reach the private store",4200); },3800);
+  }).catch(function(){ setTimeout(function(){ toast("Saved on this device only -- couldn't reach the private store",4200); },3800); });
   return true;
 }
 function syncPrivUI(){
@@ -1342,9 +1398,69 @@ function syncPrivUI(){
     if(!b.dataset.pubLabel) b.dataset.pubLabel=b.innerHTML;
     b.innerHTML=p.checked?"&#128274; Save privately":b.dataset.pubLabel;
   }
+  renderPrivBox();
+}
+function renderPrivBox(){
+  var t=document.getElementById("privCodeTxt"); if(!t) return;
+  var c=privCode(), n=Object.keys(privAll()).length;
+  t.textContent=c||"none yet -- made on your first private save";
+  document.getElementById("privCopy").style.display=c?"":"none";
+  document.getElementById("privCount").textContent=n?(n+(n===1?" private system":" private systems")+" on this device"):"";
+}
+function showPrivCode(isNew){
+  var box=document.getElementById("privBox"); if(!box) return;
+  box.style.display="block";
+  var m=document.getElementById("privNewMsg"); if(m) m.style.display=isNew?"block":"none";
+  if(isNew) toast("Your private code: "+privCode()+" -- keep it safe",6000);
 }
 (function(){
   var p=document.getElementById("edPrivate"); if(p) p.addEventListener("change",syncPrivUI);
+  var tg=document.getElementById("privToggle"), box=document.getElementById("privBox");
+  if(tg&&box) tg.addEventListener("click",function(){ box.style.display=box.style.display==="block"?"none":"block"; renderPrivBox(); });
+  var cp=document.getElementById("privCopy");
+  if(cp) cp.addEventListener("click",function(){
+    var c=privCode(); if(!c) return;
+    (navigator.clipboard?navigator.clipboard.writeText(c):Promise.reject()).then(function(){ toast("Private code copied",2000); },function(){ prompt("Your private code:",c); });
+  });
+  var ld=document.getElementById("privLoad");
+  if(ld) ld.addEventListener("click",function(){
+    var v=document.getElementById("privCodeIn").value.trim().toUpperCase();
+    if(!v) return;
+    privPull(v,false).then(function(ok){ if(ok) document.getElementById("privCodeIn").value=""; });
+  });
+  var ex=document.getElementById("privExport");
+  if(ex) ex.addEventListener("click",function(){
+    var a=privAll();
+    if(!Object.keys(a).length){ toast("No private systems to export yet",2600); return; }
+    var blob=new Blob([JSON.stringify({type:"nms-galmap-private",v:1,code:privCode(),exportedAt:new Date().toISOString(),systems:a})],{type:"application/json"});
+    var u=URL.createObjectURL(blob), l=document.createElement("a");
+    l.href=u; l.download="nms-private-systems-"+new Date().toISOString().slice(0,10)+".json";
+    document.body.appendChild(l); l.click(); l.remove(); setTimeout(function(){ URL.revokeObjectURL(u); },4000);
+  });
+  var im=document.getElementById("privImport");
+  if(im) im.addEventListener("change",function(){
+    var f=im.files&&im.files[0]; if(!f) return;
+    var rd=new FileReader();
+    rd.onload=function(){
+      var j=null; try{ j=JSON.parse(rd.result); }catch(e){}
+      if(!j||j.type!=="nms-galmap-private"||!j.systems){ toast("That isn't a private systems file",3600); return; }
+      var a=privAll(), keys=[];
+      for(var k in j.systems){
+        var e=j.systems[k];
+        if(!/^\d{1,3}:[0-9A-F]{12}$/.test(k)||!e||!e.data) continue;
+        if(!a[k]||String(e.savedAt)>String(a[k].savedAt)){ a[k]=e; keys.push(k); }
+      }
+      try{ privWrite(); }catch(e){ toast("This browser's storage is full",3600); }
+      if(!privCode()&&j.code) privSetCode(j.code);
+      try{ refreshAfterOverrides(); }catch(e){}
+      privPushAll(keys);
+      toast("Imported "+keys.length+" private system(s)",3200);
+      renderPrivBox(); im.value="";
+    };
+    rd.readAsText(f);
+  });
+  // Bring this device up to date with its private code.
+  if(privCode()) setTimeout(function(){ privPull(null,true); },2500);
 })();
 function applyOverride(s){
   // Real per-galaxy addressing (2026-08-22): the shared systems dict is
@@ -5509,7 +5625,7 @@ function updatePanel(s){
   if(store.waypoints[skey(s)]) tags.push(["wp","Waypoint"]);
   if(store.visited[skey(s)]) tags.push(["","Visited"]);
   if(s.override&&!s.privateOnly) tags.push(["hot","Community edited"]);
-  if(s.privateEdit) tags.push(["wp","\uD83D\uDD12 Private \u00B7 only on this device"]);
+  if(s.privateEdit) tags.push(["wp","\uD83D\uDD12 Private \u00B7 hidden from others"]);
   var html="",i;
   for(i=0;i<tags.length;i++){
     var extraCls=tags[i][0], cat=tags[i][2], tip=tags[i][3];

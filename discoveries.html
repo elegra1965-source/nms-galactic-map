@@ -125,6 +125,20 @@ button:hover,button:focus-visible{border-color:var(--cyan);outline:none}
     <div class="feed" id="feed"></div>
   </section>
 
+  <section id="privSec" style="display:grid;gap:12px;margin-top:8px">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+      <h2 class="kicker" style="margin:0;font-size:12px">Private systems (owner only)</h2>
+      <span class="status" id="privStatus"></span>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <input type="password" id="privTok" placeholder="Admin token" style="flex:0 1 200px;background:transparent;color:var(--text);border:1px solid var(--line);border-radius:4px;padding:8px">
+      <button type="button" id="privLoadBtn">Show private systems</button>
+      <input type="search" id="privFind" placeholder="Find by glyph hex, system, traveller or code" style="flex:1 1 220px;background:transparent;color:var(--text);border:1px solid var(--line);border-radius:4px;padding:8px">
+    </div>
+    <p class="sub" style="margin:0">For code recovery: ask the traveller for the glyphs of one of their private systems, type the hex here, and send them the code shown.</p>
+    <div id="privList" style="display:grid;gap:10px"></div>
+  </section>
+
   <p class="note">Private page: not linked from the map and hidden from search engines. Edits come from the map's save history; names are what each traveller typed in "Your name".</p>
 </main>
 
@@ -333,6 +347,69 @@ button:hover,button:focus-visible{border-color:var(--cyan);outline:none}
   });
   $("reload").addEventListener("click", load);
   load();
+})();
+
+/* Private systems, owner view (2026-10-18) -- reads the private store with the
+   admin token; nothing here is public. Glyphs + hex for every system. */
+(function(){
+  var SITE = (location.hostname === "map.nomansskyhub.app" || /netlify\.app$/.test(location.hostname)) ? "" : "https://map.nomansskyhub.app";
+  var GAL = ["Euclid","Hilbert Dimension","Calypso","Hesperius Dimension","Hyades","Ickjamatew","Budullangr","Kikolgallr","Eltiensleen","Eissentam","Elkupalos","Aptarkaba","Ontiniangp","Odiwagiri","Ogtialabi","Muhacksonto","Hitonskyer","Rerasmutul","Isdoraijung","Doctinawyra","Loychazinq","Zukasizawa","Ekwathore","Yeberhahne","Twerbetek","Sivarates","Eajerandal","Aldukesci","Wotyarogii","Sudzerbal","Maupenzhay","Sugueziume","Brogoweldian","Ehbogdenbu","Ijsenufryos","Nipikulha","Autsurabin","Lusontrygiamh","Rewmanawa","Ethiophodhe","Urastrykle","Xobeurindj","Oniijialdu","Wucetosucc","Ebyeloof","Odyavanta","Milekistri","Waferganh","Agnusopwit","Teyaypilny","Zalienkosm","Ladgudiraf","Mushonponte","Amsentisz","Fladiselm","Laanawemb","Ilkerloor","Davanossi","Ploehrliou","Corpinyaya","Leckandmeram","Quulngais","Nokokipsechl","Rinblodesa","Loydporpen","Ibtrevskip","Elkowaldb","Heholhofsko","Yebrilowisod","Husalvangewi","Ovna'uesed","Bahibusey","Nuybeliaure","Doshawchuc","Ruckinarkh","Thorettac","Nuponoparau","Moglaschil","Uiweupose","Nasmilete","Ekdaluskin","Hakapanasy","Dimonimba","Cajaccari","Olonerovo","Umlanswick","Henayliszm","Utzenmate","Umirpaiya","Paholiang","Iaereznika","Yudukagath","Boealalosnj","Yaevarcko","Coellosipp","Wayndohalou","Smoduraykl","Apmaneessu","Hicanpaav","Akvasanta","Tuychelisaor","Rivskimbe","Daksanquix","Kissonlin","Aediabiel","Ulosaginyik","Roclaytonycar","Kichiaroa","Irceauffey","Nudquathsenfe","Getaizakaal","Hansolmien","Bloytisagra","Ladsenlay","Luyugoslasr","Ubredhatk","Cidoniana","Jasinessa","Torweierf","Saffneckm","Thnistner","Dotusingg","Luleukous","Jelmandan","Otimanaso","Enjaxusanto","Sezviktorew","Zikehpm","Bephembah","Broomerrai","Meximicka","Venessika","Gaiteseling","Zosakasiro","Drajayanes","Ooibekuar","Urckiansi","Dozivadido","Emiekereks","Meykinunukur","Kimycuristh","Roansfien","Isgarmeso","Daitibeli","Gucuttarik","Enlaythie","Drewweste","Akbulkabi","Homskiw","Zavainlani","Jewijkmas","Itlhotagra","Podalicess","Hiviusauer","Halsebenk","Puikitoac","Gaybakuaria","Grbodubhe","Rycempler","Indjalala","Fontenikk","Pasycihelwhee","Ikbaksmit","Telicianses","Oyleyzhan","Uagerosat","Impoxectin","Twoodmand","Hilfsesorbs","Ezdaranit","Wiensanshe","Ewheelonc","Litzmantufa","Emarmatosi","Mufimbomacvi","Wongquarum","Hapirajua","Igbinduina","Wepaitvas","Sthatigudi","Yekathsebehn","Ebedeagurst","Nolisonia","Ulexovitab","Iodhinxois","Irroswitzs","Bifredait","Beiraghedwe","Yeonatlak","Cugnatachh","Nozoryenki","Ebralduri","Evcickcandj","Ziybosswin","Heperclait","Sugiuniam","Aaseertush","Uglyestemaa","Horeroedsh","Drundemiso","Ityanianat","Purneyrine","Dokiessmat","Nupiacheh","Dihewsonj","Rudrailhik","Tweretnort","Snatreetze","Iwundaracos","Digarlewena","Erquagsta","Logovoloin","Boyaghosganh","Kuolungau","Pehneldept","Yevettiiqidcon","Sahliacabru","Noggalterpor","Chmageaki","Veticueca","Vittesbursul","Nootanore","Innebdjerah","Kisvarcini","Cuzcogipper","Pamanhermonsu","Brotoghek","Mibittara","Huruahili","Raldwicarn","Ezdartlic","Badesclema","Isenkeyan","Iadoitesu","Yagrovoisi","Ewcomechio","Inunnunnoda","Dischiutun","Yuwarugha","Ialmendra","Reponudrle","Rinjanagrbo","Zeziceloh","Oeileutasc","Zicniijinis","Dugnowarilda","Neuxoisan","Ilmenhorn","Rukwatsuku","Nepitzaspru","Chcehoemig","Haffneyrin","Uliciawai","Tuhgrespod","Iousongola","Odyalutai"];
+  var $ = function(id){ return document.getElementById(id); };
+  var owners = [];
+  try { $("privTok").value = localStorage.getItem("disc_admin_token") || ""; } catch(e){}
+  function el(tag, cls, text){ var e = document.createElement(tag); if(cls) e.className = cls; if(text != null) e.textContent = text; return e; }
+  function render(){
+    var q = $("privFind").value.trim().toUpperCase(), list = $("privList"); list.innerHTML = "";
+    var shown = 0;
+    owners.forEach(function(o){
+      var keys = Object.keys(o.systems || {});
+      var hit = !q || o.code.indexOf(q) >= 0 || String(o.name).toUpperCase().indexOf(q) >= 0 ||
+        keys.some(function(k){ return k.indexOf(q) >= 0 || String(o.systems[k].name).toUpperCase().indexOf(q) >= 0; });
+      if(!hit) return;
+      shown++;
+      var c = el("article","card"); c.style.gridTemplateRows = "auto";
+      var b = el("div","cb");
+      var head = el("div","cn"); head.appendChild(el("span", null, o.code)); head.style.color = "var(--gold, #f0a500)"; head.style.letterSpacing = ".08em";
+      b.appendChild(head);
+      var meta = el("div","meta");
+      meta.appendChild(el("span", null, o.name ? "Traveller: " + o.name : "No name given"));
+      meta.appendChild(el("span", null, keys.length + (keys.length === 1 ? " system" : " systems")));
+      meta.appendChild(el("span", null, "Updated " + String(o.updatedAt || "").slice(0,16).replace("T"," ")));
+      b.appendChild(meta);
+      keys.forEach(function(k){
+        var s = o.systems[k], g = parseInt(k.split(":")[0],10), addr = k.split(":")[1];
+        var row = el("div"); row.style.cssText = "border-top:1px solid var(--line);padding-top:8px;margin-top:8px;display:grid;gap:4px";
+        var m2 = el("div","meta");
+        m2.appendChild(el("b", null, s.name || "Unnamed system"));
+        m2.appendChild(el("span", null, GAL[g] || ("Galaxy " + (g+1))));
+        if(s.photos) m2.appendChild(el("span","chip gold", s.photos + (s.photos === 1 ? " photo" : " photos")));
+        row.appendChild(m2);
+        var gl = el("div","glyphs"); gl.setAttribute("aria-label","Portal address " + addr);
+        addr.split("").forEach(function(ch){ var im = el("img"); im.src = (SITE ? SITE + "/" : "") + "glyphs/glyph-mask-" + ch + ".png"; im.alt = ch; gl.appendChild(im); });
+        gl.appendChild(el("span","hex", addr));
+        row.appendChild(gl);
+        b.appendChild(row);
+      });
+      c.appendChild(b); list.appendChild(c);
+    });
+    $("privStatus").textContent = owners.length ? (shown + " of " + owners.length + " private codes") : "";
+  }
+  function load(){
+    var tok = $("privTok").value.trim(); if(!tok){ $("privStatus").textContent = "Enter your admin token"; return; }
+    try { localStorage.setItem("disc_admin_token", tok); } catch(e){}
+    $("privStatus").textContent = "Loading…";
+    fetch(SITE + "/.netlify/functions/private-systems?admin=1&token=" + encodeURIComponent(tok), { cache:"no-store" })
+      .then(function(r){ return r.json(); })
+      .then(function(j){
+        if(!j.ok){ $("privStatus").textContent = j.error === "forbidden" ? "Wrong admin token" : "Couldn't load"; return; }
+        owners = j.owners || []; render();
+        if(!owners.length) $("privStatus").textContent = "No private systems yet";
+      })
+      .catch(function(){ $("privStatus").textContent = "Couldn't reach the private store"; });
+  }
+  $("privLoadBtn").addEventListener("click", load);
+  $("privFind").addEventListener("input", render);
+  if($("privTok").value) load();
 })();
 </script>
 </body>
