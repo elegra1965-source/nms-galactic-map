@@ -12,13 +12,17 @@
    - The browser sends each system at most once per device per day, and
      leaves out systems the traveller charted themselves (trending.js);
      here, per-IP limits stop anyone inflating a count.
-   - Weeks run Monday-Sunday (UTC), stored per week in Netlify Blobs
+   - Weeks run Monday-Sunday, resetting at midnight UK time (Europe/London,
+     so it stays midnight through the clock changes), stored per week in Netlify Blobs
      (store nms-galmap-trending). Writes nothing to GitHub, no deploys.
    - Movement arrows compare today's ranks with the first snapshot taken
      today, so they show change "since this morning".
 
    POST { views:["g:HEX", ...] }  (also accepts a sendBeacon text body)
-   GET                            -> { ok, week, top:[...], lastWeek }
+   GET -> { ok, week, top:[...this week], lastWeekTop:[...last week's final],
+            lastWeek, mode, show }. Until this week has 3 entries, mode is
+            "last" and show = last week's final standings, so the board is
+            never empty on a quiet Monday; after that mode "week", show = top.
    ============================================================ */
 
 import { getStore } from "@netlify/blobs";
@@ -29,10 +33,16 @@ const KEY_RE = /^\d{1,3}:[0-9A-F]{12}$/;
 const HOUR = 3600000;
 const PER_IP_PER_HOUR = 300;
 const TOP_N = 10;
+const FIRST_WEEK = "2026-10-19"; // launch week; anything before it was testing
 const H = { "Access-Control-Allow-Methods": "GET, POST, OPTIONS" };
 
+// UK calendar date ("YYYY-MM-DD") and the Monday that starts its week.
+function ukDate(d){
+  var p = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/London", year: "numeric", month: "2-digit", day: "2-digit" }).format(d);
+  return p; // en-CA formats as YYYY-MM-DD
+}
 function mondayOf(d){
-  var x = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+  var x = new Date(ukDate(d) + "T12:00:00Z");
   var day = (x.getUTCDay() + 6) % 7; // Monday = 0
   x.setUTCDate(x.getUTCDate() - day);
   return x.toISOString().slice(0, 10);
@@ -105,7 +115,7 @@ export default async (req, context) => {
   var list = ranked(counts).slice(0, TOP_N);
 
   // movement since the first look today
-  var today = now.toISOString().slice(0, 10), snapKey = "snap/" + week + "/" + today;
+  var today = ukDate(now), snapKey = "snap/" + week + "/" + today;
   var snap = await store.get(snapKey, { type: "json" }).catch(function(){ return null; });
   if(!snap){
     snap = {}; list.forEach(function(x, i){ snap[x.key] = i + 1; });
@@ -117,16 +127,16 @@ export default async (req, context) => {
     return o;
   });
 
-  var prevMon = new Date(Date.parse(week + "T00:00:00Z") - 7 * 86400000).toISOString().slice(0, 10);
-  var prev = await store.get("wk/" + prevMon, { type: "json" }).catch(function(){ return null; });
-  var lastWeek = null;
+  var prevMon = new Date(Date.parse(week + "T12:00:00Z") - 7 * 86400000).toISOString().slice(0, 10);
+  var prev = prevMon < FIRST_WEEK ? null : await store.get("wk/" + prevMon, { type: "json" }).catch(function(){ return null; });
+  var lastWeekTop = [];
   if(prev && prev.counts){
     var pc = {}; for(var k3 in prev.counts) if(sys2[k3] && sys2[k3].data) pc[k3] = prev.counts[k3];
-    var pr = ranked(pc);
-    if(pr.length) lastWeek = describe(sys2, pr[0], 0);
+    lastWeekTop = ranked(pc).slice(0, TOP_N).map(function(x, i){ return describe(sys2, x, i); });
   }
-
-  var out = { ok: true, week: week, top: top, lastWeek: lastWeek };
+  var mode = (top.length >= 3 || !lastWeekTop.length) ? "week" : "last";
+  var out = { ok: true, week: week, top: top, lastWeekTop: lastWeekTop, lastWeek: lastWeekTop[0] || null,
+              mode: mode, show: mode === "week" ? top : lastWeekTop };
   _get = { at: +now, body: out };
   return json(200, out, cacheH);
 };

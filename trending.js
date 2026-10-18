@@ -19,7 +19,7 @@
   var pop = document.getElementById("trendPop");
   var list = document.getElementById("trendList");
   var queue = [];
-  var T = { top: [], lastWeek: null, rank: {} };
+  var T = { top: [], lastWeek: null, rank: {}, mode: "week" };
   window.TRENDING = T;
 
   function el(tag, cls, text){ var e = document.createElement(tag); if(cls) e.className = cls; if(text != null) e.textContent = text; return e; }
@@ -63,7 +63,7 @@
     if(!name) return;
     if(!b){ b = el("div"); b.id = "trendBadge"; name.parentNode.insertBefore(b, name.nextSibling); }
     var r = s && !s.privateOnly ? T.rank[s.galaxy + ":" + s.address] : 0;
-    if(r && r <= 3){ b.textContent = MEDAL[r - 1] + " #" + r + " Trending this week"; b.hidden = false; }
+    if(r && r <= 3){ b.textContent = MEDAL[r - 1] + " #" + r + (T.mode === "last" ? " last week" : " Trending this week"); b.hidden = false; }
     else { b.textContent = ""; b.hidden = true; }
   }
 
@@ -101,17 +101,22 @@
     var top = el("div", "trTop");
     top.appendChild(el("span", "trPos" + (x.rank <= 3 ? " medal" : ""), x.rank <= 3 ? MEDAL[x.rank - 1] : "#" + x.rank));
     top.appendChild(el("span", "searchResName trName", plain(x.name) || "Unnamed system"));
-    top.appendChild(moveEl(x.move));
+    if(T.mode !== "last") top.appendChild(moveEl(x.move));
     r.appendChild(top);
     r.appendChild(el("div", "searchResMeta", (x.editor ? "by " + plain(x.editor) + " · " : "") + gal(x.galaxy) + " · " + x.views + (x.views === 1 ? " view" : " views")));
     r.appendChild(glyphs(x.address));
     return r;
   }
   function fill(){
+    var kick = document.getElementById("trendKick"), sub = document.getElementById("trendSub");
+    if(kick) kick.textContent = T.mode === "last" ? "\uD83D\uDD25 Last week's final standings" : "\uD83D\uDD25 Trending this week";
+    if(sub) sub.textContent = T.mode === "last"
+      ? "A new week has started. These were last week's winners until this week's list fills up. Tap one to fly there."
+      : "The charted systems travellers opened most this week. Resets every Monday at midnight (UK). Tap one to fly there.";
     list.textContent = "";
     if(!T.top.length) list.appendChild(el("div", "searchEmpty", "Nothing trending yet this week. Open some charted systems and check back!"));
     T.top.forEach(function(x){ list.appendChild(row(x)); });
-    if(T.lastWeek){
+    if(T.lastWeek && T.mode !== "last"){
       var lw = el("div", "trLast");
       lw.appendChild(el("span", null, "Last week's 🥇 #1: "));
       var b = el("button", "trLastBtn", plain(T.lastWeek.name) || "Unnamed system");
@@ -125,7 +130,8 @@
   function load(){
     fetch(URL_T, { cache: "no-store" }).then(function(r){ return r.json(); }).then(function(j){
       if(!j || !j.ok) return;
-      T.top = j.top || []; T.lastWeek = j.lastWeek || null; T.rank = {};
+      T.mode = j.mode || "week";
+      T.top = j.show || j.top || []; T.lastWeek = j.lastWeek || null; T.rank = {};
       T.top.forEach(function(x){ T.rank[x.key] = x.rank; });
       if(line) line.hidden = !(T.top.length || T.lastWeek);
       if(pop && pop.classList.contains("show")) fill();
