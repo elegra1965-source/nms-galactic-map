@@ -1302,6 +1302,50 @@ function allianceBadgeTagHtml(name){
    Netlify Functions here). "bodies.N" (N=0..5) is the 13th category,
    generated dynamically per system rather than listed here. */
 var FLAG_CATEGORIES=["name","race","region","starClass","stars","suffix","giant","economy","conflict","blackHole","atlas","phantom","notes","screenshot"];
+/* ============ Private systems (2026-10-18) ============
+   "Keep this system private" tick box in Edit system (asked for on
+   r/NMSCoordinateExchange). A private save never leaves the browser: it is
+   kept in localStorage under PRIV_K, keyed "galaxy:ADDRESS" like skey(),
+   and layered over the public record (if any) in applyOverride() -- so only
+   this traveller, on this device, sees it. Nothing is POSTed. */
+var PRIV_K="nms-galmap-private";
+var PRIV=null;
+function privAll(){
+  if(PRIV) return PRIV;
+  try{ PRIV=JSON.parse(localStorage.getItem(PRIV_K)||"{}")||{}; }catch(e){ PRIV={}; }
+  return PRIV;
+}
+function privGet(key){ var a=privAll(); return a[key]||null; }
+function privWrite(){ localStorage.setItem(PRIV_K,JSON.stringify(PRIV||{})); }
+function privDel(key){ var a=privAll(); if(!a[key]) return; delete a[key]; try{ privWrite(); }catch(e){} }
+function savePrivateEdit(address, galaxy, payload){
+  var key=galaxy+":"+address, a=privAll(), dropped=false;
+  a[key]={data:payload, savedAt:new Date().toISOString()};
+  try{ privWrite(); }
+  catch(e){
+    // Photos are the big part -- if the browser's storage is full, keep the text.
+    var lite=Object.assign({},payload,{screenshot:"",stationPhoto:"",allianceBadge:""});
+    a[key]={data:lite, savedAt:new Date().toISOString()}; dropped=true;
+    try{ privWrite(); }
+    catch(e2){ delete a[key]; toast("Couldn't save privately -- this browser's storage is full",4200); return false; }
+  }
+  closeModal();
+  toast(dropped?"Saved privately on this device (photos too big to keep)":"Saved privately -- only on this device",3600);
+  refreshAfterOverrides();
+  return true;
+}
+function syncPrivUI(){
+  var p=document.getElementById("edPrivate"), h=document.getElementById("edHavenSend"), b=document.getElementById("edSubmit");
+  if(!p) return;
+  if(h){ h.disabled=p.checked; h.parentNode.style.opacity=p.checked?".45":""; }
+  if(b){
+    if(!b.dataset.pubLabel) b.dataset.pubLabel=b.innerHTML;
+    b.innerHTML=p.checked?"&#128274; Save privately":b.dataset.pubLabel;
+  }
+}
+(function(){
+  var p=document.getElementById("edPrivate"); if(p) p.addEventListener("change",syncPrivUI);
+})();
 function applyOverride(s){
   // Real per-galaxy addressing (2026-08-22): the shared systems dict is
   // keyed "galaxy:ADDRESS" now, not just ADDRESS (see lib/shared.mjs's
@@ -1315,6 +1359,11 @@ function applyOverride(s){
   // already exists for this address (a fresh post-migration or newly-
   // edited record always wins).
   if(!ov && OVERRIDES.systems && s.galaxy===0) ov=OVERRIDES.systems[s.address];
+  // Private save on this device (see privGet above) wins over the public record.
+  var pv=privGet(skey(s));
+  s.privateEdit=!!pv;
+  s.privateOnly=!!pv && !(ov && ov.data);
+  if(pv){ ov=Object.assign({},ov||{}); ov.data=Object.assign({},ov.data||{},pv.data); ov.editedAt=pv.savedAt; }
   // Flag/dispute status can exist on a system that's never been edited at
   // all (a visitor can flag a purely procedural value as "this looks
   // wrong" without providing a correction) -- so this has to be read BEFORE
@@ -5459,7 +5508,8 @@ function updatePanel(s){
   if(store.marks[skey(s)]) tags.push(["hot","Bookmarked"]);
   if(store.waypoints[skey(s)]) tags.push(["wp","Waypoint"]);
   if(store.visited[skey(s)]) tags.push(["","Visited"]);
-  if(s.override) tags.push(["hot","Community edited"]);
+  if(s.override&&!s.privateOnly) tags.push(["hot","Community edited"]);
+  if(s.privateEdit) tags.push(["wp","\uD83D\uDD12 Private \u00B7 only on this device"]);
   var html="",i;
   for(i=0;i<tags.length;i++){
     var extraCls=tags[i][0], cat=tags[i][2], tip=tags[i][3];
@@ -9066,6 +9116,8 @@ function openEditModal(){
   document.getElementById("edEditorName").value=myId.name;
   document.getElementById("edEditorCode").value=myId.code;
   document.getElementById("edEditorCodeVisible").checked=myId.codeVisible;
+  document.getElementById("edPrivate").checked=!!privGet(skey(s));
+  syncPrivUI();
   editBodies=s.bodies.map(function(b){
     return {
       uid:bodyUidSeq++,
@@ -11174,6 +11226,7 @@ function submitEditPayload(address, galaxy, payload){
   var errEl=document.getElementById("editErr"), retryBtn=document.getElementById("edRetry");
   var spin=document.getElementById("editSpin"), spinTxt=document.getElementById("editSpinTxt"), btn=document.getElementById("edSubmit");
   var iconWrap=document.getElementById("editIconWrap"), iconImg=document.getElementById("editIconImg");
+  if(document.getElementById("edPrivate").checked){ savePrivateEdit(address, galaxy, payload); return; }
   lastEditAttempt={address:address,galaxy:galaxy,payload:payload};
   retryBtn.style.display="none";
   spin.style.display="flex"; btn.disabled=true;
@@ -11193,6 +11246,7 @@ function submitEditPayload(address, galaxy, payload){
     hideStatusIcon(iconWrap);
     rememberKnownTerms(payload);
     var sendHaven=document.getElementById("edHavenSend").checked;
+    privDel(galaxy+":"+address); // went public, so the private copy is no longer needed
     closeModal(); toast("System saved -- visible to everyone"); loadOverrides();
     if(sendHaven) sendToHaven(address, galaxy, payload);
   }).catch(function(){
