@@ -6560,8 +6560,22 @@ function initLabels(){
     d.className="lbl"; d.style.display="none";
     box.appendChild(d); labelEls.push(d);
   }
+  /* 2026-10-19, Tony: System view's boxed labels draw a thin leader line from
+     each box back to its planet/station, so a box can sit clear of the
+     station photo / other boxes without losing what it points at. One
+     pooled <line> per label slot, same reuse pattern as labelEls. */
+  var NS="http://www.w3.org/2000/svg";
+  lblLineSvg=document.createElementNS(NS,"svg");
+  lblLineSvg.setAttribute("class","lblLines");
+  box.insertBefore(lblLineSvg,box.firstChild);
+  for(i=0;i<LBL_MAX;i++){
+    var ln=document.createElementNS(NS,"line");
+    ln.style.display="none"; lblLineSvg.appendChild(ln); lblLineEls.push(ln);
+  }
 }
-function hideLabels(){ for(var i=0;i<labelEls.length;i++) labelEls[i].style.display="none"; }
+var lblLineSvg=null, lblLineEls=[];
+function hideLblLines(){ for(var i=0;i<lblLineEls.length;i++) lblLineEls[i].style.display="none"; }
+function hideLabels(){ for(var i=0;i<labelEls.length;i++) labelEls[i].style.display="none"; hideLblLines(); }
 function toggleLabels(){
   labelsOn=!labelsOn;
   document.getElementById("bLbl").classList.toggle("on",labelsOn);
@@ -6646,6 +6660,9 @@ function updateAtlasOverlay(){
 var _v=new THREE.Vector3(), _w=new THREE.Vector3();
 function updateLabels(){
   if(!labelsOn||mode==="galaxy"){ hideLabels(); return; }
+  if(mode!=="local"){ updateSystemLabels(); return; }
+  hideLblLines();
+  for(var r=0;r<labelEls.length;r++){ if(labelEls[r]._bx){ labelEls[r].className="lbl"; labelEls[r]._bx=false; labelEls[r]._key=""; } }
   var cands=[],i;
   if(mode==="local"){
     for(i=0;i<shown.length;i++){
@@ -6738,6 +6755,149 @@ function updateLabels(){
     el.style.top=ly+"px";
     el.textContent=cd.t;
   }
+}
+
+/* ============ system-view boxed labels ============
+   2026-10-19, Tony (phone screenshot, a system with a named station +
+   alliance): the plain one-line labels ran off both edges of the screen
+   ("ation: [PSA-E10] Jura-Tempest Federat (Alliance: Phantom Star Allia")
+   and the station photo card sat on top of the planet names. System view
+   now uses boxed labels instead: each box wraps long names onto extra
+   lines (max-width in CSS), has a coloured edge by type (gold station,
+   cyan planet, grey moon, orange point of interest, white star), is
+   placed in whichever of 8 spots around its object doesn't hit another
+   box, the station photo or the screen edges, and gets a thin leader
+   line back to the object. Local view keeps the old plain labels.
+   Every name here can be traveller-submitted, so content is built with
+   textContent only, never innerHTML. */
+var _sv1=new THREE.Vector3(), _sv2=new THREE.Vector3(), _camUp=new THREE.Vector3(), _camRt=new THREE.Vector3();
+function lblScreenR(wp,worldR,w,h){
+  /* pixel radius of a sphere of worldR at world point wp */
+  _sv1.copy(wp).project(camera);
+  _sv2.copy(wp).addScaledVector(_camUp,worldR).project(camera);
+  return Math.hypot((_sv2.x-_sv1.x)*0.5*w,(_sv2.y-_sv1.y)*0.5*h);
+}
+function fillLblBox(el,key,kind,title,sub,top){
+  if(el._key===key) return;
+  el._key=key; el._bx=true;
+  el.className="lbl bx bx-"+kind;
+  el.textContent="";
+  if(top){ var t=document.createElement("small"); t.textContent=top; el.appendChild(t); }
+  var n=document.createElement("span"); n.textContent=title; el.appendChild(n);
+  if(sub){ var u=document.createElement("small"); u.textContent=sub; el.appendChild(u); }
+  el.style.display="block";
+  el._w=el.offsetWidth; el._h=el.offsetHeight;
+}
+function updateSystemLabels(){
+  var w=window.innerWidth,h=window.innerHeight,i,k;
+  camera.updateMatrixWorld();
+  _camUp.set(0,1,0).applyQuaternion(camera.quaternion);
+  _camRt.set(1,0,0).applyQuaternion(camera.quaternion);
+  var cands=[],blocks=[];
+  /* bottom info panel (when open) is a no-go area for boxes too */
+  var pan=document.getElementById("panel"), botLim=h-4;
+  if(pan){ var pr=pan.getBoundingClientRect(); if(pr.width>0&&pr.top>h*0.45) botLim=pr.top-4; }
+  for(i=0;i<starMeshes.length;i++){
+    starMeshes[i].getWorldPosition(_w);
+    cands.push({wp:_w.clone(),r:lblScreenR(_w,1.2,w,h),kind:"star",title:starMeshes[i].userData.name,top:"★ Star",pri:2});
+  }
+  for(i=0;i<featureMeshes.length;i++){
+    var fm=featureMeshes[i], ud=fm.userData;
+    fm.getWorldPosition(_w);
+    if(ud.stationCard){
+      var sy=ud.sys||{};
+      /* station card/icon's own on-screen rectangle -- boxes must not cover it */
+      _v.copy(_w).project(camera);
+      if(_v.z<1){
+        var cx=(_v.x*0.5+0.5)*w, cy=(-_v.y*0.5+0.5)*h;
+        _sv2.copy(_w).addScaledVector(_camRt,fm.scale.x/2).project(camera);
+        var hw=Math.abs(_sv2.x-_v.x)*0.5*w;
+        _sv2.copy(_w).addScaledVector(_camUp,fm.scale.y/2).project(camera);
+        var hh=Math.abs(_sv2.y-_v.y)*0.5*h;
+        blocks.push({x:cx-hw,y:cy-hh,w:hw*2,h:hh*2});
+        cands.push({wp:_w.clone(),r:0,rx:hw,ry:hh,kind:"st",pri:0,
+          top:"⛶ Space station"+(!sy.stationName&&sy.race==="Uninhabited"?" (Uninhabited)":""),
+          title:sy.stationName||"Unnamed station",
+          sub:sy.allianceName?("Alliance: "+sy.allianceName):""});
+      }
+    } else {
+      cands.push({wp:_w.clone(),r:lblScreenR(_w,0.8,w,h),kind:"poi",pri:1,
+        title:(ud.name==="Black hole"?"◉ ":"◈ ")+ud.name});
+    }
+  }
+  for(i=0;i<bodyMeshes.length;i++){
+    var bm=bodyMeshes[i], b=bm.userData.body;
+    bm.getWorldPosition(_w);
+    var rad=(bm.geometry&&bm.geometry.parameters&&bm.geometry.parameters.radius)||1;
+    rad*=bm.scale.x||1;
+    cands.push({wp:_w.clone(),r:lblScreenR(_w,rad,w,h),kind:b.moon?"mn":"pl",pri:b.moon?4:3,
+      title:b.name,top:b.moon?"↳ Moon":"Planet"});
+  }
+  cands.sort(function(a,b){ return a.pri-b.pri; });
+  var lz=(typeof a11y!=="undefined"&&a11y.fs)?a11y.fs:1, gap=10*lz;
+  var placed=blocks.slice(), topLim=topBarH+4, used=0;
+  /* "THE X SYSTEM" banner under the toolbar: boxes start below it (Tony's
+     screenshot had a planet name sitting on the banner's subtitle line) */
+  var sb=document.getElementById("sysBanner");
+  if(sb){ var sr=sb.getBoundingClientRect(); if(sr.height>0&&sr.bottom<h*0.4) topLim=Math.max(topLim,sr.bottom+4); }
+  function hits(x,y,bw,bh){
+    if(x<4||y<topLim||x+bw>w-4||y+bh>botLim) return 1e6;
+    var o=0;
+    for(var q=0;q<placed.length;q++){
+      var p=placed[q];
+      var ox=Math.min(x+bw,p.x+p.w)-Math.max(x,p.x), oy=Math.min(y+bh,p.y+p.h)-Math.max(y,p.y);
+      if(ox>-3&&oy>-3) o+=(ox+3)*(oy+3);
+    }
+    return o;
+  }
+  for(i=0;i<cands.length&&used<LBL_MAX;i++){
+    var cd=cands[i];
+    _v.copy(cd.wp).project(camera);
+    if(_v.z>1||_v.x<-1.05||_v.x>1.05||_v.y<-1.05||_v.y>1.05) continue;
+    var ax=(_v.x*0.5+0.5)*w, ay=(-_v.y*0.5+0.5)*h;
+    var el=labelEls[used], ln=lblLineEls[used];
+    fillLblBox(el,cd.kind+"|"+(cd.top||"")+"|"+cd.title+"|"+(cd.sub||""),cd.kind,cd.title,cd.sub,cd.top);
+    var bw=el._w, bh=el._h;
+    var rx=(cd.rx!==undefined?cd.rx:cd.r)+gap, ry=(cd.ry!==undefined?cd.ry:cd.r)+gap;
+    /* 8 spots around the object, nearest-reading first (above, below,
+       right, left, then diagonals), then the same ring pushed further out */
+    var spots=[
+      [ax-bw/2, ay-ry-bh],[ax-bw/2, ay+ry],[ax+rx, ay-bh/2],[ax-rx-bw, ay-bh/2],
+      [ax+rx*0.7, ay-ry*0.7-bh],[ax-rx*0.7-bw, ay-ry*0.7-bh],[ax+rx*0.7, ay+ry*0.7],[ax-rx*0.7-bw, ay+ry*0.7]
+    ];
+    var n0=spots.length;
+    for(k=0;k<n0;k++){ var sp=spots[k]; spots.push([sp[0]+(sp[0]+bw/2-ax)*0.9, sp[1]+(sp[1]+bh/2-ay)*0.9]); }
+    var best=null,bestS=Infinity;
+    for(k=0;k<spots.length;k++){
+      var sx=spots[k][0], sy2=spots[k][1];
+      var sc=hits(sx,sy2,bw,bh);
+      if(sc===1e6){
+        /* off-screen: try clamping it back inside before giving up */
+        sx=Math.max(4,Math.min(w-4-bw,sx)); sy2=Math.max(topLim,Math.min(botLim-bh,sy2));
+        sc=hits(sx,sy2,bw,bh)+50;
+      }
+      sc+=k*2;
+      if(sc<bestS){ bestS=sc; best=[sx,sy2]; if(sc<1) break; }
+    }
+    /* station always shows; others hide rather than pile onto another box */
+    if(!best||(bestS>=1e6)||(cd.kind!=="st"&&bestS>bw*bh*0.25)){ continue; }
+    var bx=best[0], by=best[1];
+    placed.push({x:bx,y:by,w:bw,h:bh});
+    el.style.display="block";
+    el.style.left=bx+"px"; el.style.top=by+"px";
+    /* leader line: object edge -> nearest point on the box */
+    var px=Math.max(bx,Math.min(ax,bx+bw)), py=Math.max(by,Math.min(ay,by+bh));
+    var dx=px-ax, dy=py-ay, dl=Math.hypot(dx,dy);
+    var er=cd.kind==="st"?0:cd.r;
+    if(dl>er+6){
+      ln.setAttribute("x1",ax+dx/dl*er); ln.setAttribute("y1",ay+dy/dl*er);
+      ln.setAttribute("x2",px); ln.setAttribute("y2",py);
+      ln.setAttribute("class","ll-"+cd.kind);
+      ln.style.display="";
+    } else ln.style.display="none";
+    used++;
+  }
+  for(i=used;i<LBL_MAX;i++){ labelEls[i].style.display="none"; lblLineEls[i].style.display="none"; }
 }
 
 /* ============ keypad ============ */
