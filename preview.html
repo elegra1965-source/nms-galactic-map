@@ -957,6 +957,21 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   font-size:24px;letter-spacing:.16em;text-transform:uppercase;line-height:1.15;white-space:nowrap;
   text-shadow:0 0 10px rgba(255,255,255,.35),0 0 3px rgba(0,0,0,.9),0 1px 2px #000}
 #sysBanner .sbW{white-space:nowrap}
+/* 2026-10-19: "You're #1 this week" popup (trending.js section 4) */
+#rankPop{position:fixed;z-index:60;left:50%;top:50%;transform:translate(-50%,-50%);width:min(360px,92vw);
+  background:rgba(14,10,3,.96);border:1px solid #f2b84b;border-radius:8px;padding:16px;font-family:'Orbitron',sans-serif;
+  color:#e8f4f8;box-shadow:0 0 24px rgba(242,184,75,.25)}
+#rankPop .rpKick{font-size:12px;letter-spacing:.12em;color:#f2b84b;text-transform:uppercase}
+#rankPop .rpName{font-size:16px;letter-spacing:.06em;margin:8px 0 4px;line-height:1.35;overflow-wrap:anywhere}
+#rankPop .rpSub{font-size:11px;letter-spacing:.06em;color:#8fb4bf;line-height:1.5}
+#rankPop .chartedGlyphs{margin:8px 0 2px;font-size:11px;letter-spacing:.1em;color:#e8f4f8}
+#rankPop .chartedGlyphs img{height:18px;width:18px;vertical-align:-4px}
+#rankPop .rpBtns{display:flex;gap:8px;margin-top:12px}
+#rankPop .rpBtn{flex:1;font-family:inherit;font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:9px 4px;border-radius:4px;
+  border:1px solid var(--cyan);background:transparent;color:var(--cyan);cursor:pointer}
+#rankPop .rpBtn.gold{border-color:#f2b84b;background:#f2b84b;color:#140e03}
+#rankPop .rpBtn.x{flex:0 0 40px}
+#rankPop .rpNote{font-family:'Roboto',sans-serif;font-size:11px;color:#8fb4bf;line-height:1.45;margin-top:12px}
 #sysBanner .sbLam{display:inline-block;height:.74em;width:.62em;vertical-align:baseline;overflow:visible}
 /* beam of light rather than a hairline: bright 3px core + soft blurred halo */
 #sysBanner .sbRule{position:relative;width:min(600px,82vw);height:3px;margin-top:3px;border-radius:2px;
