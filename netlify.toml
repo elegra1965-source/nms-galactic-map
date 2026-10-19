@@ -14,7 +14,11 @@
   # the build for a commit range that touches nothing but
   # data/overrides.json; any commit that also changes real code still
   # builds normally.
-  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- . ':(exclude)data/overrides.json' ':(exclude)*.md'"
+  # 2026-10-19: README screenshots (screenshots/) excluded too, so README-only
+  # updates -- text or pictures -- never cost a deploy. The live site never
+  # needs them (only the og:image share preview uses 10-atlas-overlay.jpg --
+  # if that one is ever replaced, bundle it with a real code change).
+  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- . ':(exclude)data/overrides.json' ':(exclude)*.md' ':(exclude)screenshots/**'"
 
 # Serve preview.html at the site root without renaming it to index.html.
 [[redirects]]
