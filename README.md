@@ -355,6 +355,13 @@ same name -- if you charted on another phone or PC, or cleared your browser,
 type the name once in Edit system there. `?rankdemo=1` (or `2`, `3`) shows the
 popup with sample data.
 
+**Medal picture link.** Anywhere a picture can't be attached (Reddit
+messages, for example), paste `map.nomansskyhub.app/?rankcard=HEX&galaxy=N`
+(N = the galaxy number, Euclid = 0) and the map opens straight on that
+system's medal picture, with **Save picture** and **Fly there** buttons. It
+works for any system currently in the top three (or last week's top three);
+otherwise it says so and points to the Trending list.
+
 <img src="screenshots/24-rank-popup.jpg" alt="Popup reading You're number 1 this week, with the system name, view count, portal glyphs and hex address, and Share my rank, Fly there and close buttons" width="360"> <img src="screenshots/24b-rank-share.jpg" alt="Share picture: gold medal, number 1, Most viewed this week, the system name, galaxy and who charted it, 12 portal glyphs, the hex address and map.nomansskyhub.app" width="300">
 
 *(Popup and picture use a real charted system with example view counts.)*

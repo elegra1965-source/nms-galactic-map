@@ -134,7 +134,7 @@
       T.top = j.show || j.top || []; T.lastWeek = j.lastWeek || null; T.rank = {};
       T.top.forEach(function(x){ T.rank[x.key] = x.rank; });
       T.week = j.week || ""; T.thisWeek = j.top || []; T.lastWeekTop = j.lastWeekTop || [];
-      try { checkMyRank(); } catch(e){}
+      try { if(cardQ) checkRankCard(); else checkMyRank(); } catch(e){}
       if(line) line.hidden = !(T.top.length || T.lastWeek);
       if(pop && pop.classList.contains("show")) fill();
       if(window.selected) badge(window.selected);
@@ -250,12 +250,18 @@
     words.forEach(function(w){ var t = cur ? cur + " " + w : w; if(ctx.measureText(t).width > maxW && cur){ lines.push(cur); cur = w; } else cur = t; });
     if(cur) lines.push(cur); return lines.slice(0, 3);
   }
-  function shareRank(x, last, btn){
-    var name = plain(x.name) || "Unnamed system", W = 1080, H = 1350;
-    btn.disabled = true; btn.textContent = "Making picture…";
+  // Unnamed charted systems: use the map's own procedural name when it's the current galaxy.
+  function cardName(x){
+    var n = plain(x.name);
+    if(n) return n;
+    try { if(x.galaxy === GALAXY && typeof parseAddress === "function" && typeof generateSystem === "function"){ var a = parseAddress(x.address); if(a) return generateSystem(a.x, a.y, a.z, a.idx).name; } } catch(e){}
+    return "Unnamed system";
+  }
+  function rankCardBlob(x, last){
+    var name = cardName(x), W = 1080, H = 1350;
     var fontsReady = (document.fonts && document.fonts.load) ? Promise.all([document.fonts.load("500 60px Orbitron"), document.fonts.load("400 40px Orbitron")]).catch(function(){}) : Promise.resolve();
     var imgs = Promise.all(x.address.split("").map(function(ch){ return loadImg(typeof glyphSrc === "function" ? glyphSrc(ch) : "glyphs/glyph-mask-" + ch + ".png"); }));
-    Promise.all([fontsReady, imgs]).then(function(r){
+    return Promise.all([fontsReady, imgs]).then(function(r){
       var gl = r[1], c = document.createElement("canvas"); c.width = W; c.height = H;
       var ctx = c.getContext("2d");
       var bg = ctx.createRadialGradient(W / 2, 420, 60, W / 2, 600, 900);
@@ -282,7 +288,12 @@
       ctx.fillStyle = "#00e5ff"; ctx.font = "400 36px Orbitron, sans-serif"; if("letterSpacing" in ctx) ctx.letterSpacing = "4px";
       ctx.fillText("map.nomansskyhub.app", W / 2, H - 110);
       return new Promise(function(res){ c.toBlob(res, "image/png"); });
-    }).then(function(blob){
+    });
+  }
+  function shareRank(x, last, btn){
+    var name = cardName(x);
+    btn.disabled = true; btn.textContent = "Making picture…";
+    rankCardBlob(x, last).then(function(blob){
       btn.disabled = false; btn.textContent = "Share my rank";
       if(!blob) return;
       var text = MEDAL[x.rank - 1] + " " + name + " is #" + x.rank + " most viewed on the NMS Galactic Map " + (last ? "last week" : "this week") + "! Portal: " + x.address.toUpperCase();
@@ -297,6 +308,55 @@
       try { navigator.clipboard.writeText(text + " " + url); if(typeof toast === "function") toast("Picture saved and link copied -- paste it with the picture", 4000); } catch(e){}
     }).catch(function(){ btn.disabled = false; btn.textContent = "Share my rank"; });
   }
+  /* ---------- 5. ?rankcard=HEX(&galaxy=N) -- shareable link to a top-3 system's medal picture
+     (2026-10-19, Tony): for places that can't take a picture (Reddit messages), paste
+     map.nomansskyhub.app/?rankcard=HEX&galaxy=N and the map opens straight on the picture. */
+  var cardQ = /[?&]rankcard=([0-9A-Fa-f]{12})\b/.exec(location.search);
+  var cardGalQ = /[?&]galaxy=(\d+)\b/.exec(location.search);
+  var cardDone = false;
+  function flyTo(x){
+    if(x.galaxy !== GALAXY && typeof switchGalaxy === "function"){ switchGalaxy(x.galaxy); document.getElementById("galSel").value = String(x.galaxy); if(typeof syncGalaxyPickInput === "function") syncGalaxyPickInput(); }
+    document.getElementById("inAddr").value = x.address;
+    if(typeof setKeypad === "function") setKeypad(x.address);
+    if(jumpTo(x.address) && typeof playWarpTransition === "function") playWarpTransition("portal");
+  }
+  function checkRankCard(){
+    if(!cardQ || cardDone || !T.week) return;
+    cardDone = true;
+    var addr = cardQ[1].toUpperCase(), g = cardGalQ ? +cardGalQ[1] : null, hit = null, last = false;
+    function find(list){ (list || []).forEach(function(x){ if(!hit && x.rank <= 3 && String(x.address).toUpperCase() === addr && (g === null || x.galaxy === g)) hit = x; }); }
+    if(T.mode === "week") find(T.thisWeek);
+    if(!hit){ find(T.lastWeekTop); last = !!hit; }
+    if(!hit){ if(typeof toast === "function") toast("That system isn't in the top 3 right now -- open 🔥 Trending to see this week's list", 5000); return; }
+    var tries = 0;
+    (function whenClear(){
+      var wrap = document.getElementById("modalWrap");
+      if(((wrap && wrap.classList.contains("show")) || (typeof tourActive !== "undefined" && tourActive)) && tries++ < 40){ setTimeout(whenClear, 1000); return; }
+      rankCardBlob(hit, last).then(function(blob){
+        if(!blob) return;
+        var url = URL.createObjectURL(blob);
+        var ov = el("div"); ov.id = "rankCard"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-label", "Medal picture");
+        var im = el("img"); im.src = url; im.alt = MEDAL[hit.rank - 1] + " #" + hit.rank + " " + cardName(hit) + " -- portal address " + hit.address;
+        ov.appendChild(im);
+        var row = el("div", "rpBtns");
+        var bSave = el("button", "rpBtn gold", "Save picture"); bSave.type = "button";
+        var bFly = el("button", "rpBtn", "Fly there"); bFly.type = "button";
+        var bX = el("button", "rpBtn x", "✕"); bX.type = "button"; bX.setAttribute("aria-label", "Close");
+        row.appendChild(bSave); row.appendChild(bFly); row.appendChild(bX); ov.appendChild(row);
+        document.body.appendChild(ov);
+        function close(){ if(ov.parentNode) ov.parentNode.removeChild(ov); }
+        bX.addEventListener("click", close);
+        ov.addEventListener("click", function(e){ if(e.target === ov) close(); });
+        bSave.addEventListener("click", function(){
+          var f = null; try { f = new File([blob], "nms-rank-" + hit.address + ".png", { type: "image/png" }); } catch(e){}
+          if(f && navigator.canShare && navigator.canShare({ files: [f] })){ navigator.share({ files: [f] }).catch(function(){}); return; }
+          var a = document.createElement("a"); a.href = url; a.download = "nms-rank-" + hit.address + ".png"; document.body.appendChild(a); a.click(); a.remove();
+        });
+        bFly.addEventListener("click", function(){ close(); flyTo(hit); });
+      });
+    })();
+  }
+
   // Demo / screenshot hook: ?rankdemo=1 (or 2, 3) shows the popup with sample data.
   window.showMyRankTest = function(x){
     if(typeof x !== "object" || !x) x = { rank: x || 1, name: "Example System", galaxy: GALAXY, address: "105200000000", views: 42, move: 2, editor: myName() || "Traveller", key: "demo" };
