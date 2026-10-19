@@ -361,8 +361,10 @@ on that system's medal picture. Each top-three system in the 🔥 Trending list
 has a **🔗 Copy medal picture link** button, so anyone can grab one in a tap.
 The link looks like `map.nomansskyhub.app/?rankcard=HEX&galaxy=Eissentam` --
 the galaxy can be its name (spaces left out) or its number (Euclid = 0). It opens the picture with **Save picture** and **Fly there** buttons. It
-works for any system currently in the top three (or last week's top three);
-otherwise it says so and points to the Trending list.
+works for any system on this week's (or last week's) Trending list -- so a
+link sent while a system was #3 still works if it slips to #4 -- otherwise it
+says so and points to the Trending list. The Community page and the Hub's
+Trending board have the same copy button.
 
 <img src="screenshots/24-rank-popup.jpg" alt="Popup reading You're number 1 this week, with the system name, view count, portal glyphs and hex address, and Share my rank, Fly there and close buttons" width="360"> <img src="screenshots/24b-rank-share.jpg" alt="Share picture: gold medal, number 1, Most viewed this week, the system name, galaxy and who charted it, 12 portal glyphs, the hex address and map.nomansskyhub.app" width="300">
 

@@ -314,6 +314,7 @@ button:hover,button:focus-visible{border-color:var(--cyan);outline:none}
 (function(){
   var SITE = (location.hostname === "map.nomansskyhub.app" || /netlify\.app$/.test(location.hostname)) ? "" : "https://map.nomansskyhub.app";
   var MEDAL = ["\uD83E\uDD47", "\uD83E\uDD48", "\uD83E\uDD49"], rank = {}, mode = "week";
+  var GAL = ["Euclid","Hilbert Dimension","Calypso","Hesperius Dimension","Hyades","Ickjamatew","Budullangr","Kikolgallr","Eltiensleen","Eissentam"]; // name links for the common ones; others fall back to the number
   function decorate(){
     var cards = document.querySelectorAll("#feed .card");
     for(var i = 0; i < cards.length; i++){
@@ -325,6 +326,19 @@ button:hover,button:focus-visible{border-color:var(--cyan);outline:none}
       b.textContent = MEDAL[r - 1] + " #" + r + (mode === "last" ? " LAST WEEK" : " MOST VIEWED");
       b.style.cssText = "display:inline-block;margin-left:8px;padding:2px 7px;border:1px solid rgba(240,165,0,.55);border-radius:999px;font-size:10px;letter-spacing:.1em;color:#f0a500;vertical-align:3px;font-weight:600";
       cn.appendChild(b);
+      // 2026-10-19 (Tony): one-tap medal picture link, for pasting where pictures can't go (Reddit messages)
+      var cp = document.createElement("button"); cp.type = "button"; cp.className = "go trCopyC";
+      cp.textContent = "\uD83D\uDD17 Copy medal picture link";
+      cp.style.cssText = "background:transparent;border-color:rgba(240,165,0,.6);color:#f0a500;cursor:pointer";
+      var gname = (GAL[+m[2]] || m[2]).replace(/[^A-Za-z0-9]/g, "");
+      cp.setAttribute("data-link", "https://map.nomansskyhub.app/?rankcard=" + m[1] + "&galaxy=" + gname);
+      cp.addEventListener("click", function(){
+        var btn = this, link = btn.getAttribute("data-link"), t = btn.textContent;
+        function ok(){ btn.textContent = "\u2713 Link copied"; setTimeout(function(){ btn.textContent = t; }, 2500); }
+        if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(link).then(ok, function(){ window.prompt("Copy this link:", link); });
+        else window.prompt("Copy this link:", link);
+      });
+      go.parentNode.insertBefore(cp, go.nextSibling);
     }
   }
   fetch(SITE + "/.netlify/functions/trending").then(function(r){ return r.json(); }).then(function(j){

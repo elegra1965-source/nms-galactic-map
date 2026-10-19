@@ -119,8 +119,8 @@
       list.appendChild(row(x));
       // 2026-10-19 (Tony): top 3 get a one-tap link to their medal picture, for
       // pasting anywhere a picture can't be attached (Reddit messages etc.).
-      if(x.rank <= 3){
-        var cp = el("button", "trCopy", "🔗 Copy medal picture link");
+      if(x.rank <= 10){
+        var cp = el("button", "trCopy", x.rank <= 3 ? "🔗 Copy medal picture link" : "🔗 Copy picture link");
         cp.type = "button"; cp.setAttribute("data-link", cardLink(x));
         list.appendChild(cp);
       }
@@ -160,12 +160,13 @@
     function open(){
       if(typeof window.closeFavPop === "function") window.closeFavPop();
       var cp = document.getElementById("chartedPop"); if(cp) cp.classList.remove("show");
-      fill(); pop.classList.add("show"); line.setAttribute("aria-expanded", "true"); position();
+      fill(); pop.classList.add("show"); openedAt = Date.now(); line.setAttribute("aria-expanded", "true"); position();
       pop.classList.toggle("scroll", pop.scrollHeight > pop.clientHeight + 3);
     }
+    var openedAt = 0;
     function close(){ pop.classList.remove("show"); line.setAttribute("aria-expanded", "false"); }
     line.addEventListener("click", function(e){ e.stopPropagation(); pop.classList.contains("show") ? close() : open(); });
-    document.addEventListener("click", function(e){ if(pop.classList.contains("show") && !pop.contains(e.target) && e.target !== line) close(); });
+    document.addEventListener("click", function(e){ if(pop.classList.contains("show") && !pop.contains(e.target) && e.target !== line && Date.now() - openedAt > 1500) close(); });
     document.addEventListener("keydown", function(e){ if(e.key === "Escape" && pop.classList.contains("show")){ close(); line.focus(); } });
     window.addEventListener("resize", function(){ if(pop.classList.contains("show")) position(); });
     list.addEventListener("click", function(e){
@@ -173,7 +174,8 @@
       if(!b) return;
       e.stopPropagation();
       var link = b.getAttribute("data-link");
-      function done(){ b.textContent = "✓ Link copied -- paste it anywhere"; setTimeout(function(){ b.textContent = "🔗 Copy medal picture link"; }, 2500); }
+      var origTxt = b.getAttribute("data-label") || b.textContent; b.setAttribute("data-label", origTxt);
+      function done(){ b.textContent = "✓ Link copied -- paste it anywhere"; var orig = b.getAttribute("data-label") || b.textContent; b.setAttribute("data-label", orig); setTimeout(function(){ b.textContent = orig; }, 2500); }
       if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(link).then(done, function(){ window.prompt("Copy this link:", link); }); }
       else window.prompt("Copy this link:", link);
     });
@@ -288,7 +290,7 @@
       for(var i = 0; i < 260; i++){ ctx.fillStyle = "rgba(255,255,255," + (Math.random() * 0.6 + 0.1) + ")"; var sz = Math.random() * 2.2 + 0.4; ctx.fillRect(Math.random() * W, Math.random() * H, sz, sz); }
       ctx.strokeStyle = "#00e5ff"; ctx.lineWidth = 3; ctx.strokeRect(40, 40, W - 80, H - 80);
       ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
-      ctx.fillStyle = "#ffffff"; ctx.font = "160px serif"; ctx.fillText(MEDAL[x.rank - 1], W / 2, 290);
+      ctx.fillStyle = "#ffffff"; ctx.font = "160px serif"; ctx.fillText(MEDAL[x.rank - 1] || "🔥", W / 2, 290);
       ctx.fillStyle = "#f2b84b"; ctx.font = "500 150px Orbitron, sans-serif";
       if("letterSpacing" in ctx) ctx.letterSpacing = "15px";   // keep "#1" from reading as "N" (Orbitron rule)
       ctx.fillText("#" + x.rank, W / 2, 470);
@@ -314,7 +316,7 @@
     rankCardBlob(x, last).then(function(blob){
       btn.disabled = false; btn.textContent = "Share my rank";
       if(!blob) return;
-      var text = MEDAL[x.rank - 1] + " " + name + " is #" + x.rank + " most viewed on the NMS Galactic Map " + (last ? "last week" : "this week") + "! Portal: " + x.address.toUpperCase();
+      var text = (MEDAL[x.rank - 1] || "🔥") + " " + name + " is #" + x.rank + " most viewed on the NMS Galactic Map " + (last ? "last week" : "this week") + "! Portal: " + x.address.toUpperCase();
       var url = mapLink(x), file = null;
       try { file = new File([blob], "nms-rank-" + x.address + ".png", { type: "image/png" }); } catch(e){}
       if(file && navigator.canShare && navigator.canShare({ files: [file] })){
@@ -356,10 +358,10 @@
     if(!cardQ || cardDone || !T.week) return;
     cardDone = true;
     var addr = cardQ[1].toUpperCase(), g = cardGalQ ? parseGal(cardGalQ[1]) : null, hit = null, last = false;
-    function find(list){ (list || []).forEach(function(x){ if(!hit && x.rank <= 3 && String(x.address).toUpperCase() === addr && (g === null || x.galaxy === g)) hit = x; }); }
+    function find(list){ (list || []).forEach(function(x){ if(!hit && String(x.address).toUpperCase() === addr && (g === null || x.galaxy === g)) hit = x; }); }
     if(T.mode === "week") find(T.thisWeek);
     if(!hit){ find(T.lastWeekTop); last = !!hit; }
-    if(!hit){ if(typeof toast === "function") toast("That system isn't in the top 3 right now -- open 🔥 Trending to see this week's list", 5000); return; }
+    if(!hit){ if(typeof toast === "function") toast("That system isn't on this week's Trending list right now -- open 🔥 Trending to see this week's list", 5000); return; }
     var tries = 0;
     (function whenClear(){
       var wrap = document.getElementById("modalWrap");
@@ -368,7 +370,7 @@
         if(!blob) return;
         var url = URL.createObjectURL(blob);
         var ov = el("div"); ov.id = "rankCard"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-label", "Medal picture");
-        var im = el("img"); im.src = url; im.alt = MEDAL[hit.rank - 1] + " #" + hit.rank + " " + cardName(hit) + " -- portal address " + hit.address;
+        var im = el("img"); im.src = url; im.alt = (MEDAL[hit.rank - 1] || "") + " #" + hit.rank + " " + cardName(hit) + " -- portal address " + hit.address;
         ov.appendChild(im);
         var row = el("div", "rpBtns");
         var bSave = el("button", "rpBtn gold", "Save picture"); bSave.type = "button";
