@@ -6,8 +6,8 @@ NMS Galactic Map decodes any No Man's Sky 12-character portal address into a tru
 
 ## Pages
 
-- [Galactic Map](https://nms-galaxy-map.netlify.app/): the main 3D galaxy map, portal address decoder, and system browser.
-- [Galactic Navigator](https://nms-galaxy-map.netlify.app/navigator/index.html): plots and displays a hyperdrive-aware multi-hop route between two systems.
+- [Galactic Map](https://map.nomansskyhub.app/): the main 3D galaxy map, portal address decoder, and system browser.
+- [Galactic Navigator](https://map.nomansskyhub.app/navigator/index.html): plots and displays a hyperdrive-aware multi-hop route between two systems.
 
 ## Notes for automated readers
 

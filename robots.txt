@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://nms-galaxy-map.netlify.app/sitemap.xml
+Sitemap: https://map.nomansskyhub.app/sitemap.xml
