@@ -320,7 +320,9 @@ export function filterSystemEdit(payload){
   // moon the way a base is. stationName reuses the same 30-char cap as
   // editorName/baseName above.
   out.hasStation = !!payload.hasStation;
-  var stationNameR = filterText(payload.stationName, {maxLen:30, fieldName:"Station name"});
+  // 2026-10-19: station + alliance caps raised 30 -> 60 (Tony: real station
+  // "[PSA-E10] Jura-Tempest Federation" got cut to "...Federat").
+  var stationNameR = filterText(payload.stationName, {maxLen:60, fieldName:"Station name"});
   if(!stationNameR.ok) errors.push(stationNameR.reason); else out.stationName = stationNameR.cleaned;
   // Alliance name (2026-09-10): checked against the real Cosmos patch notes before
   // adding this. Founding an alliance is a SEPARATE, OPTIONAL action a station
@@ -328,7 +330,7 @@ export function filterSystemEdit(payload){
   // so this is optional here too, same 30-char cap and same always-optional
   // treatment as stationName (filterText already passes an empty string through
   // as ok:true, no separate "required" branch needed).
-  var allianceNameR = filterText(payload.allianceName, {maxLen:30, fieldName:"Alliance name"});
+  var allianceNameR = filterText(payload.allianceName, {maxLen:60, fieldName:"Alliance name"});
   if(!allianceNameR.ok) errors.push(allianceNameR.reason); else out.allianceName = allianceNameR.cleaned;
   // Station photo (2026-09-09, Tony: "user being able to upload a picture
   // of their space station... like atlas station is"). A DEDICATED upload,

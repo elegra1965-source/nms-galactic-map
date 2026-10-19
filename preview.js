@@ -6830,8 +6830,14 @@ function updateSystemLabels(){
     bm.getWorldPosition(_w);
     var rad=(bm.geometry&&bm.geometry.parameters&&bm.geometry.parameters.radius)||1;
     rad*=bm.scale.x||1;
-    cands.push({wp:_w.clone(),r:lblScreenR(_w,rad,w,h),kind:b.moon?"mn":"pl",pri:b.moon?4:3,
+    var br=lblScreenR(_w,rad,w,h);
+    cands.push({wp:_w.clone(),r:br,kind:b.moon?"mn":"pl",pri:b.moon?4:3,
       title:b.name,top:b.moon?"↳ Moon":"Planet"});
+    /* 2026-10-19 follow-up (Tony's live screenshot): boxes were landing on
+       top of planet spheres -- every visible planet/moon disc is now a
+       no-go area too, same as the station photo */
+    _v.copy(_w).project(camera);
+    if(_v.z<1){ var bcx=(_v.x*0.5+0.5)*w, bcy=(-_v.y*0.5+0.5)*h; blocks.push({x:bcx-br,y:bcy-br,w:br*2,h:br*2}); }
   }
   cands.sort(function(a,b){ return a.pri-b.pri; });
   var lz=(typeof a11y!=="undefined"&&a11y.fs)?a11y.fs:1, gap=10*lz;
@@ -12304,7 +12310,9 @@ function setSysBanner(s){
     '<circle cx="16" cy="16" r="9" fill="none" stroke="#f3d9a8" stroke-width="1" opacity=".7"/>'+
     '<path d="M16 8.5v15M8.5 16h15M11 11l10 10M21 11L11 21" stroke="'+hex+'" stroke-width="1.3" stroke-linecap="round" opacity=".9"/>'+
     '<circle cx="16" cy="16" r="3.6" fill="#fff"/><circle cx="16" cy="16" r="3.6" fill="'+hex+'" opacity=".55"/>'+
-    '</svg><div class="sbTitle" aria-label="'+esc+'">'+esc.replace(/&[A-Z]+;|A/g,function(m){ return m!=="A"?m.toLowerCase():"\u0001"; }).replace(/\u0001/g,'<svg class="sbLam" viewBox="0 0 10 12" preserveAspectRatio="none" aria-hidden="true"><path d="M.8 12 5 .6 9.2 12" fill="none" stroke="currentColor" stroke-width="1.15"/></svg>')+'</div><div class="sbRule"></div>'+
+    /* 2026-10-19: each word wrapped in a nowrap span -- the inline-SVG "A"s
+       gave the browser break points mid-word on phones ("FEDERA / TION") */
+    '</svg><div class="sbTitle" aria-label="'+esc+'">'+esc.split(" ").map(function(wd){ return "\u0002"+wd+"\u0003"; }).join(" ").replace(/&[A-Z]+;|A/g,function(m){ return m!=="A"?m.toLowerCase():"\u0001"; }).replace(/\u0001/g,'<svg class="sbLam" viewBox="0 0 10 12" preserveAspectRatio="none" aria-hidden="true"><path d="M.8 12 5 .6 9.2 12" fill="none" stroke="currentColor" stroke-width="1.15"/></svg>').replace(/\u0002/g,'<span class="sbW">').replace(/\u0003/g,'</span>')+'</div><div class="sbRule"></div>'+
     '<div class="sbSub">'+sysLocLine(s).replace(/[&<>"]/g,function(ch){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch];})+'</div>';
 }
 function positionSysBanner(){

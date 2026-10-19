@@ -956,6 +956,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   -webkit-text-stroke:.5px #f4f6f8;
   font-size:24px;letter-spacing:.16em;text-transform:uppercase;line-height:1.15;white-space:nowrap;
   text-shadow:0 0 10px rgba(255,255,255,.35),0 0 3px rgba(0,0,0,.9),0 1px 2px #000}
+#sysBanner .sbW{white-space:nowrap}
 #sysBanner .sbLam{display:inline-block;height:.74em;width:.62em;vertical-align:baseline;overflow:visible}
 /* beam of light rather than a hairline: bright 3px core + soft blurred halo */
 #sysBanner .sbRule{position:relative;width:min(600px,82vw);height:3px;margin-top:3px;border-radius:2px;
@@ -2424,7 +2425,7 @@ nearby procedural space within a radius.">Search</button>
       <label class="chk"><input type="checkbox" id="edAtlas"> Atlas station present</label>
       <label class="chk" title="Added 2026-09-09 for the real &quot;Cosmos&quot; 10th-anniversary update (Update 7.0): players can now become director of a system's space station and personalise it. Manual-only, same as the other special features here -- only you can know this from actually seeing it in-game. This is a foundation pass, more station detail may be added later."><input type="checkbox" id="edStation"> Space station directorship</label>
       <div id="edStationNameWrap" style="display:none;margin:4px 0 8px 19px">
-        <div class="mfld" style="margin-bottom:6px"><div class="lb">Station name</div><input type="text" id="edStationName" maxlength="30" placeholder="e.g. The Wandering Star" autocomplete="off"></div>
+        <div class="mfld" style="margin-bottom:6px"><div class="lb">Station name</div><input type="text" id="edStationName" maxlength="60" placeholder="e.g. The Wandering Star" autocomplete="off"></div>
         <!-- 2026-09-10: checked against the real Cosmos (Update 7.0) patch notes before
              adding this -- founding an alliance is its OWN separate, OPTIONAL action a
              station director may take ("directors MAY found their own alliance..."), not
@@ -2433,7 +2434,7 @@ nearby procedural space within a radius.">Search</button>
              system its founder directs, and other travellers can join up to 3 alliances
              from any owned station. So this stays optional here, same treatment as
              stationName, not gated behind it. -->
-        <div class="mfld" style="margin-bottom:6px"><div class="lb">Alliance name <span style="color:var(--text-faint)">(optional -- only if this director founded one)</span></div><input type="text" id="edAllianceName" maxlength="30" placeholder="e.g. The Wandering Star Compact" autocomplete="off"></div>
+        <div class="mfld" style="margin-bottom:6px"><div class="lb">Alliance name <span style="color:var(--text-faint)">(optional -- only if this director founded one)</span></div><input type="text" id="edAllianceName" maxlength="60" placeholder="e.g. The Wandering Star Compact" autocomplete="off"></div>
         <!-- Alliance badge (2026-09-10, Tony's own follow-up once Alliance
              name was live: "logic dictates they should be searchable... their
              system/systems should show" -- which is also what made Alliance
