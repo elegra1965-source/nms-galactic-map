@@ -115,7 +115,16 @@
       : "The charted systems travellers opened most this week. Resets every Monday at midnight (UK). Tap one to fly there.";
     list.textContent = "";
     if(!T.top.length) list.appendChild(el("div", "searchEmpty", "Nothing trending yet this week. Open some charted systems and check back!"));
-    T.top.forEach(function(x){ list.appendChild(row(x)); });
+    T.top.forEach(function(x){
+      list.appendChild(row(x));
+      // 2026-10-19 (Tony): top 3 get a one-tap link to their medal picture, for
+      // pasting anywhere a picture can't be attached (Reddit messages etc.).
+      if(x.rank <= 3){
+        var cp = el("button", "trCopy", "🔗 Copy medal picture link");
+        cp.type = "button"; cp.setAttribute("data-link", cardLink(x));
+        list.appendChild(cp);
+      }
+    });
     if(T.lastWeek && T.mode !== "last"){
       var lw = el("div", "trLast");
       lw.appendChild(el("span", null, "Last week's 🥇 #1: "));
@@ -159,6 +168,15 @@
     document.addEventListener("click", function(e){ if(pop.classList.contains("show") && !pop.contains(e.target) && e.target !== line) close(); });
     document.addEventListener("keydown", function(e){ if(e.key === "Escape" && pop.classList.contains("show")){ close(); line.focus(); } });
     window.addEventListener("resize", function(){ if(pop.classList.contains("show")) position(); });
+    list.addEventListener("click", function(e){
+      var b = e.target.closest ? e.target.closest(".trCopy") : null;
+      if(!b) return;
+      e.stopPropagation();
+      var link = b.getAttribute("data-link");
+      function done(){ b.textContent = "✓ Link copied -- paste it anywhere"; setTimeout(function(){ b.textContent = "🔗 Copy medal picture link"; }, 2500); }
+      if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(link).then(done, function(){ window.prompt("Copy this link:", link); }); }
+      else window.prompt("Copy this link:", link);
+    });
     // Same jump as Recently charted / Favourites.
     list.addEventListener("click", function(e){
       var r = e.target.closest ? e.target.closest(".chartedRow") : null;
@@ -312,7 +330,21 @@
      (2026-10-19, Tony): for places that can't take a picture (Reddit messages), paste
      map.nomansskyhub.app/?rankcard=HEX&galaxy=N and the map opens straight on the picture. */
   var cardQ = /[?&]rankcard=([0-9A-Fa-f]{12})\b/.exec(location.search);
-  var cardGalQ = /[?&]galaxy=(\d+)\b/.exec(location.search);
+  var cardGalQ = /[?&]galaxy=([^&#]+)/.exec(location.search);
+  // Galaxy can be a number (Euclid = 0) or a name ("Eissentam", "HilbertDimension"),
+  // so people writing a link by hand don't need to know the number.
+  function galSlug(name){ return String(name || "").toLowerCase().replace(/[^a-z0-9]/g, ""); }
+  function parseGal(v){
+    v = decodeURIComponent(v || "");
+    if(/^\d+$/.test(v)) return +v;
+    var want = galSlug(v);
+    if(window.GALAXIES) for(var i = 0; i < GALAXIES.length; i++) if(galSlug(GALAXIES[i]) === want) return i;
+    return null;
+  }
+  function cardLink(x){
+    var gname = (window.GALAXIES && GALAXIES[x.galaxy]) ? String(GALAXIES[x.galaxy]).replace(/[^A-Za-z0-9]/g, "") : String(x.galaxy);
+    return "https://map.nomansskyhub.app/?rankcard=" + String(x.address).toUpperCase() + "&galaxy=" + gname;
+  }
   var cardDone = false;
   function flyTo(x){
     if(x.galaxy !== GALAXY && typeof switchGalaxy === "function"){ switchGalaxy(x.galaxy); document.getElementById("galSel").value = String(x.galaxy); if(typeof syncGalaxyPickInput === "function") syncGalaxyPickInput(); }
@@ -323,7 +355,7 @@
   function checkRankCard(){
     if(!cardQ || cardDone || !T.week) return;
     cardDone = true;
-    var addr = cardQ[1].toUpperCase(), g = cardGalQ ? +cardGalQ[1] : null, hit = null, last = false;
+    var addr = cardQ[1].toUpperCase(), g = cardGalQ ? parseGal(cardGalQ[1]) : null, hit = null, last = false;
     function find(list){ (list || []).forEach(function(x){ if(!hit && x.rank <= 3 && String(x.address).toUpperCase() === addr && (g === null || x.galaxy === g)) hit = x; }); }
     if(T.mode === "week") find(T.thisWeek);
     if(!hit){ find(T.lastWeekTop); last = !!hit; }

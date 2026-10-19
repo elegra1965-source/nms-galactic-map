@@ -356,9 +356,11 @@ type the name once in Edit system there. `?rankdemo=1` (or `2`, `3`) shows the
 popup with sample data.
 
 **Medal picture link.** Anywhere a picture can't be attached (Reddit
-messages, for example), paste `map.nomansskyhub.app/?rankcard=HEX&galaxy=N`
-(N = the galaxy number, Euclid = 0) and the map opens straight on that
-system's medal picture, with **Save picture** and **Fly there** buttons. It
+messages, for example), paste a medal picture link and the map opens straight
+on that system's medal picture. Each top-three system in the 🔥 Trending list
+has a **🔗 Copy medal picture link** button, so anyone can grab one in a tap.
+The link looks like `map.nomansskyhub.app/?rankcard=HEX&galaxy=Eissentam` --
+the galaxy can be its name (spaces left out) or its number (Euclid = 0). It opens the picture with **Save picture** and **Fly there** buttons. It
 works for any system currently in the top three (or last week's top three);
 otherwise it says so and points to the Trending list.
 
