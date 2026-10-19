@@ -63,7 +63,7 @@
     if(!name) return;
     if(!b){ b = el("div"); b.id = "trendBadge"; name.parentNode.insertBefore(b, name.nextSibling); }
     var r = s && !s.privateOnly ? T.rank[s.galaxy + ":" + s.address] : 0;
-    if(r && r <= 3){ b.textContent = MEDAL[r - 1] + " #" + r + (T.mode === "last" ? " last week" : " Trending this week"); b.hidden = false; }
+    if(r && r <= 3){ b.textContent = MEDAL[r - 1] + " #" + r + (T.mode === "last" ? " last week" : " Most viewed this week"); b.hidden = false; }
     else { b.textContent = ""; b.hidden = true; }
   }
 

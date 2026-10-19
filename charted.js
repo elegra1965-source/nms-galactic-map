@@ -71,7 +71,11 @@
       row.type = "button";
       row.setAttribute("data-addr", x.address);
       row.setAttribute("data-galaxy", String(x.galaxy));
-      row.appendChild(el("div", "searchResName", x.name));
+      var nm = el("div", "searchResName", x.name);
+      // 2026-10-19: medal for this week's top 3 most-viewed (trending.js)
+      var T = window.TRENDING, r = T && T.rank && T.rank[x.galaxy + ":" + x.address];
+      if(r && r <= 3) nm.insertBefore(el("span", "trMedalInline", ["\uD83E\uDD47","\uD83E\uDD48","\uD83E\uDD49"][r - 1]), nm.firstChild);
+      row.appendChild(nm);
       var meta = el("div", "searchResMeta");
       meta.appendChild(document.createTextNode((x.who ? "by " + x.who + " · " : "") + ((window.GALAXIES && GALAXIES[x.galaxy]) || ("Galaxy " + (x.galaxy + 1))) + " · " + ago(x.t)));
       row.appendChild(meta);

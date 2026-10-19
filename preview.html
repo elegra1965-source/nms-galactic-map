@@ -5,6 +5,7 @@
 <script>/* the old *.netlify.app address is retired: one family domain so the Traveller ID cookie reaches every app */if(/\.netlify\.app$/.test(location.hostname))location.replace("https://map.nomansskyhub.app"+location.pathname+location.search+location.hash);</script>
 <script>/* visitor stats: GoatCounter (free, no cookies), same dashboard as the Hub; pages are recorded as host/path */(function(){if(!/(^|\.)nomansskyhub\.app$/.test(location.hostname))return;window.goatcounter={path:function(p){return location.host+p}};var s=document.createElement("script");s.async=true;s.src="https://gc.zgo.at/count.js";s.setAttribute("data-goatcounter","https://nomansskyhub.goatcounter.com/count");document.head.appendChild(s);})();</script>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<script src="calm.js?v=2"></script>
 <title>NMS Galactic Map</title>
 <meta name="description" content="NMS Galactic Map — a fan-made 3D No Man's Sky galaxy map and portal address decoder, by elegra1965.">
 <meta property="og:type" content="website">
@@ -639,6 +640,14 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border:none;border-ra
 #trendBadge{margin-top:3px;display:inline-block;padding:2px 8px;border:1px solid rgba(240,165,0,.55);border-radius:999px;
   font-family:'Orbitron',sans-serif;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#f0a500;background:rgba(240,165,0,.08)}
 #trendBadge[hidden]{display:none}
+.kpriv{margin-top:7px;font-size:10.5px;line-height:1.4;color:var(--text-faint);text-align:center}
+.privRow{display:block;width:100%;text-align:left;background:none;border:0;border-top:1px solid var(--border-soft);font:inherit;color:inherit;padding:7px 2px;cursor:pointer}
+.privRow:hover,.privRow:focus-visible{background:rgba(240,165,0,.06);outline:none}
+.trMedalInline{margin-right:4px}
+/* Calm mode on the map (calm.js): no breathing/spinning title, no glow pulses */
+html.calm #title,html.calm #titleIcon,html.calm #titleText,html.calm .btn.beveled{animation:none!important}
+html.calm #titleText{text-shadow:none!important}
+#nmsCalmSlot #nmsCalmBtn{position:static;opacity:1;margin-top:4px}
 .chartedRow{display:block;width:100%;text-align:left;background:none;border:0;border-top:1px solid var(--border-soft);font:inherit;color:inherit}
 .chartedRow:focus-visible{outline:1px solid var(--cyan)}
 .chartedGlyphs img{height:12px;width:12px;vertical-align:-2px;margin-right:1px}
@@ -1275,8 +1284,13 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
      open (confirmed on Tony's S26 -- "missing unless scroll up"). Pulling them to the
      top of the panel's flex order and pinning them there means they're always visible
      the instant you tap a system, and the rest of the detail scrolls underneath. */
-  #prowEnter{order:-1;position:sticky;top:0;z-index:2;background:rgba(11,17,25,.97);
-    margin:0 -14px;padding:10px 14px 8px;border-bottom:1px solid var(--border-soft)}
+  #prowEnter{order:-1;position:sticky;top:0;z-index:2;background:rgb(11,17,25);
+    margin:0 -14px;padding:10px 14px 8px;border-bottom:1px solid var(--border-soft);
+    /* 2026-10-19 (Tony's phone screenshot): the panel's 13px top padding left a strip
+       above this pinned bar where scrolled rows (Economy, Race) showed through, and the
+       .97 background let text ghost through the buttons. Solid fill + a 14px upward
+       "shadow" in the same colour covers both. */
+    box-shadow:0 -14px 0 rgb(11,17,25)}
   /* 2026-09-17, Tony (real-device playtest): "can not click collapse on some
      screens" -- on this mobile layout #panel is a scrolling flex column and
      #prowEnter above is pinned (position:sticky, opaque bg) to its top. .phead
@@ -2048,6 +2062,7 @@ nearby procedural space within a radius.">Search</button>
     <button class="btn" id="kClear">Clear</button>
     <button class="btn" id="kJump">Jump</button>
   </div>
+  <div class="kpriv">&#128274; Looking up a system is private. Nothing is shared unless you press Save in Edit system.</div>
 </div>
 
 <div class="box fold" id="searchPop" role="dialog" aria-label="Search by system name">
@@ -2160,6 +2175,10 @@ nearby procedural space within a radius.">Search</button>
     <button class="pill" type="button" data-filt="tritanopia" disabled title="For blue-yellow colour blindness -- rare, and the correction shift is stronger for this type.">Tritanopia</button>
   </div>
   <label class="chk" style="margin-top:2px" title="Sharpens faint text and thickens panel borders across the map's UI. Can be used together with a colour correction option above."><input type="checkbox" id="a11yHC">High contrast</label>
+  <!-- Calm mode (2026-10-19): the same switch as the "Calm" pill on the other Hub sites
+       (calm.js mounts its button here instead of floating it over the map). On the map it
+       stops the title/glow animations and skips the warp animation; the map stays. -->
+  <div class="fld" style="margin-top:8px"><div class="lb">Calm mode <span style="color:var(--text-faint)">(fewer effects, same as the other Hub sites)</span></div><div id="nmsCalmSlot"></div></div>
   <!-- Rendering tuning (formerly a standalone "Tweak" box docked in the
        bottom-left corner) relocated in here per Tony's own session note --
        these are power-user generation/performance sliders, not narrowly
@@ -2597,6 +2616,9 @@ nearby procedural space within a radius.">Search</button>
     <div class="mfld"><div class="lb">Your private code</div>
       <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap"><b id="privCodeTxt" style="color:#f0a500;letter-spacing:.08em;font-size:13px"></b><button type="button" id="privCopy" class="btn" style="padding:2px 8px;font-size:10.5px">Copy</button></div>
       <div id="privCount" style="font-size:11px;color:var(--text-faint);margin-top:3px"></div>
+    </div>
+    <div class="mfld" id="privListWrap" style="display:none"><div class="lb">My private systems <span style="color:var(--text-faint)">(tap to fly there)</span></div>
+      <div id="privList" style="max-height:190px;overflow-y:auto"></div>
     </div>
     <div class="mfld"><div class="lb">Have a code from another device?</div>
       <div style="display:flex;gap:6px;flex-wrap:wrap"><input type="text" id="privCodeIn" maxlength="20" placeholder="NMS-XXXX-XXXX-XXXX" style="flex:1;min-width:160px;text-transform:uppercase"><button type="button" id="privLoad" class="btn" style="padding:3px 10px">Load</button></div>

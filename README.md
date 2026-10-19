@@ -313,6 +313,40 @@ included.
 
 ![Traveller Discoveries page: systems charted this week, top surveyors, saves per day and photo cards](screenshots/20-traveller-discoveries.jpg)
 
+**🔥 Trending this week.** A weekly leaderboard of the charted systems
+travellers open most. The gold **🔥 Trending ›** link next to the Recently
+charted counter opens the top 10: 🥇🥈🥉 medals for the top three, ▲/▼ arrows
+for movement since that morning (or NEW), view counts, and the portal glyphs
+with the hex address. Tap one to fly there. A top-three system also gets a
+**🥇 #1 Most viewed this week** badge under its name in the info panel, and a
+medal in the Recently charted list, on the Community page and on the Hub. It
+resets every Monday at midnight (UK). Until the new week has three entries, it
+shows last week's final standings instead, so it's never empty. Only public
+charted systems count, never private ones. Each device counts once per system
+per day, and your own systems don't count. `?trending=1` opens the list
+straight away. Handled by `netlify/functions/trending.mjs`.
+
+<img src="screenshots/22-trending-list.jpg" alt="Trending this week on a phone: the top five most-viewed charted systems with medals, rank arrows, view counts and portal glyphs (example view counts)" width="360"> <img src="screenshots/22b-trending-badge.jpg" alt="Info panel of the number one system showing the #1 Most viewed this week badge (example)" width="330">
+
+*(Screenshots use real charted systems with example view counts.)*
+
+**🔒 Private systems.** Looking up a system is always private. Nothing is
+shared unless you press Save in Edit system, and the glyph keypad says so. For
+systems you want to keep to yourself, tick **Keep this system private** in Edit
+system. A private system is hidden from other travellers (only you and the site
+owner can see it) and never goes into the public data or the Recently charted,
+Trending and Community lists. Your first private save gives you a **private
+code** (like `NMS-7KQ2-XM4D-P9TA`). The **🔒 Private code** button on the info
+panel shows it, lists **My private systems** (tap one to fly there), lets you
+load your code on another device, and can export or import a backup file. If
+you lose your code, **Lost your code? Ask for it** sends a private request for
+it (never to GitHub or anywhere public), and the code is sent back to you by
+Reddit chat or email. Contact details are deleted once the request is
+answered. Private systems live in a separate private store
+(`netlify/functions/private-systems.mjs`), not in this public repo.
+
+<img src="screenshots/21b-keep-private.jpg" alt="Edit system with Keep this system private ticked: the Voyager's Haven box greyed out and the Save button reading Save privately" width="360"> <img src="screenshots/21-private-code.jpg" alt="Private code window: the private code with a Copy button, My private systems with glyphs and hex, load a code, export and import, and Lost your code" width="330">
+
 **Import from my save file.** Inside Edit system, an optional button reads a
 real Steam/GOG `.hg` save file entirely in your own browser -- nothing is
 ever uploaded -- and can auto-fill "Your name" plus offer a one-click
@@ -343,7 +377,8 @@ submit-only key on the server and limits each traveller to 5 sends an hour.
 
 **Portal glyph keypad.** Type a hex address or tap the real 16 in-game glyphs
 directly -- both stay in sync, so you can decode a screenshot from your own
-game without knowing the hex first.
+game without knowing the hex first. Looking a system up is private: nothing
+is shared unless you press Save in Edit system.
 
 ![Portal glyph keypad](screenshots/06-glyph-keypad.png)
 
@@ -394,6 +429,9 @@ system.
 **Accessibility.** Four font-size presets, a high-contrast mode, and real
 Daltonization colour-correction (not simulation) for protanopia, deuteranopia,
 and tritanopia -- built into the map itself, not bolted on as an afterthought.
+The same panel has **Calm mode**, the switch shared by every No Man's Sky Hub
+site (`calm.js`): on the map it stops the title and glow animations and skips
+the warp animation, for anyone who finds it busy.
 
 ![Accessibility panel](screenshots/08-accessibility-panel.png)
 
@@ -478,6 +516,8 @@ This repo is the whole client — two files carry it (markup/CSS, and the app's 
 | &nbsp;&nbsp;`flag-dispute.mjs` | "Data looks wrong" submissions from the Report modal — marks a field disputed, best-effort opens a GitHub Issue |
 | &nbsp;&nbsp;`sweep-stale-flags.mjs` | scheduled function, auto-clears any flag >7 days old with no consensus reached; never touches a confirmed dispute |
 | &nbsp;&nbsp;`lib/shared.mjs` | shared GitHub Contents API read/write + GET cache used by the three functions above |
+| &nbsp;&nbsp;`private-systems.mjs` | private systems: private codes, load/save/delete, lost-code requests and the owner's recovery view (Netlify Blobs, never the public repo) |
+| &nbsp;&nbsp;`trending.mjs` | 🔥 Trending this week: counts views of public charted systems, weekly top 10 with rank movement and last week's standings (Netlify Blobs) |
 | &nbsp;&nbsp;`filter.mjs` | the authoritative content filter (profanity, HTML/URL stripping, per-field length + allowlist) — mirrored client-side in preview.html for instant feedback, but this copy is the one that actually decides |
 | `nms-core/` | real decompiled game logic (star type, planet count, black hole/Atlas placement, system/region/planet names, economy/conflict/race/ring odds) — see "What real No Man's Sky data does this use?" below and nms-core/README.md for the full module docs |
 | `nms-core/save-import/` | client-side-only reader for real .hg save files (name + real base list) — see nms-core/save-import/README.md |

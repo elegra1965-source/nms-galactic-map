@@ -1406,7 +1406,43 @@ function renderPrivBox(){
   t.textContent=c||"none yet -- made on your first private save";
   document.getElementById("privCopy").style.display=c?"":"none";
   document.getElementById("privCount").textContent=n?(n+(n===1?" private system":" private systems")+" on this device"):"";
+  renderPrivList();
 }
+/* "My private systems" (2026-10-19): every private system on this device, tap to fly there. */
+function renderPrivList(){
+  var box=document.getElementById("privList"), wrap=document.getElementById("privListWrap"); if(!box) return;
+  var a=privAll(), keys=Object.keys(a);
+  wrap.style.display=keys.length?"":"none";
+  box.textContent="";
+  keys.sort(function(x,y){ return String((a[y]||{}).savedAt).localeCompare(String((a[x]||{}).savedAt)); });
+  keys.forEach(function(k){
+    var p=k.split(":"), g=parseInt(p[0],10), addr=p[1], d=(a[k]&&a[k].data)||{};
+    var b=document.createElement("button"); b.type="button"; b.className="privRow";
+    b.setAttribute("data-addr",addr); b.setAttribute("data-galaxy",String(g));
+    var nm=document.createElement("div"); nm.className="searchResName"; nm.textContent=d.name||"Unnamed system"; b.appendChild(nm);
+    var mt=document.createElement("div"); mt.className="searchResMeta"; mt.textContent=(GALAXIES[g]||("Galaxy "+(g+1))); b.appendChild(mt);
+    var gl=document.createElement("div"); gl.className="searchResMeta chartedGlyphs";
+    for(var i=0;i<addr.length;i++){ var im=document.createElement("img"); im.alt=addr[i]; im.src=glyphSrc(addr[i]); gl.appendChild(im); }
+    gl.appendChild(document.createTextNode(" "+addr)); b.appendChild(gl);
+    box.appendChild(b);
+  });
+}
+(function(){
+  var box=document.getElementById("privList"); if(!box) return;
+  box.addEventListener("click",function(e){
+    var r=e.target.closest?e.target.closest(".privRow"):null; if(!r) return;
+    var addr=r.getAttribute("data-addr"), g=parseInt(r.getAttribute("data-galaxy"),10);
+    closeModal();
+    if(!isNaN(g)&&g!==GALAXY){
+      switchGalaxy(g); document.getElementById("galSel").value=String(g);
+      if(typeof syncGalaxyPickInput==="function") syncGalaxyPickInput();
+      toast("Switched to "+GALAXIES[g]+" -- that's where this system is",3200);
+    }
+    document.getElementById("inAddr").value=addr;
+    if(typeof setKeypad==="function") setKeypad(addr);
+    if(jumpTo(addr)) playWarpTransition("portal");
+  });
+})();
 var privFromEdit=false;
 function openPrivModal(fromEdit, isNew){
   privFromEdit=!!fromEdit;
@@ -7709,6 +7745,7 @@ var _warpFailTimer=null;
 var _warpGen=0;
 function playWarpTransition(kind){
   if(!WARP_ENABLED) return;
+  if(document.documentElement.classList.contains("calm")) return; // Calm mode (calm.js): no warp animation
   var ov=document.getElementById('warp-overlay');
   var vid=document.getElementById('warp-vid');
   if(!ov||!vid) return;
