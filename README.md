@@ -178,6 +178,17 @@ Interface rendered as its own object rather than swapped in for the star.
 
 ![3D system view](screenshots/03-system-3d-view.png)
 
+**Labels in system view.** Every planet, moon, station and point of interest
+gets a small boxed label with a thin line back to it, colour-coded by type:
+gold for the space station, cyan for planets, grey for moons, orange for
+points of interest. Long names wrap onto extra lines instead of running off
+the screen, so a station shows its name and **Alliance** in full. Boxes keep
+clear of each other, of the station photo, of the planets themselves and of
+the system title, and a label whose planet has moved off screen (zoomed in) is
+simply hidden. Local view keeps its plain star-name labels.
+
+<img src="screenshots/23-system-labels.jpg" alt="System view on a phone: boxed labels for planets, a moon and the space station with its alliance, each with a thin line to its object" width="360">
+
 **Filters.** Narrow the local star field by colour, race, economy, or special
 system types (outlaw, black holes, Atlas interfaces, phantom/shadow stars),
 plus a hyperdrive type + range setting that actually gates what you can
@@ -329,6 +340,24 @@ straight away. Handled by `netlify/functions/trending.mjs`.
 <img src="screenshots/22-trending-list.jpg" alt="Trending this week on a phone: the top five most-viewed charted systems with medals, rank arrows, view counts and portal glyphs (example view counts)" width="360"> <img src="screenshots/22b-trending-badge.jpg" alt="Info panel of the number one system showing the #1 Most viewed this week badge (example)" width="330">
 
 *(Screenshots use real charted systems with example view counts.)*
+
+**"You're #1 this week" popup.** When a system you charted makes the top
+three, the map tells you once, in a small popup when you next open it (and
+once more after the week ends if it finished in the top three). It shows the
+medal, the system's portal glyphs and hex address, and three buttons: **Share
+my rank**, **Fly there** and close. **Share my rank** makes a ready-to-post
+picture -- medal, rank, system name, galaxy, who charted it, glyphs, hex
+address and the map's link -- and opens your phone's share sheet (on a
+computer it downloads the picture and copies the link). There's no login:
+the map recognises your systems by the name in Edit system's **Your name**
+box, saved on your device. So it shows on any device where you've used that
+same name -- if you charted on another phone or PC, or cleared your browser,
+type the name once in Edit system there. `?rankdemo=1` (or `2`, `3`) shows the
+popup with sample data.
+
+<img src="screenshots/24-rank-popup.jpg" alt="Popup reading You're number 1 this week, with the system name, view count, portal glyphs and hex address, and Share my rank, Fly there and close buttons" width="360"> <img src="screenshots/24b-rank-share.jpg" alt="Share picture: gold medal, number 1, Most viewed this week, the system name, galaxy and who charted it, 12 portal glyphs, the hex address and map.nomansskyhub.app" width="300">
+
+*(Popup and picture use a real charted system with example view counts.)*
 
 **🔒 Private systems.** Looking up a system is always private. Nothing is
 shared unless you press Save in Edit system, and the glyph keypad says so. For

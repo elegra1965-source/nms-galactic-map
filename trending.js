@@ -297,7 +297,20 @@
       try { navigator.clipboard.writeText(text + " " + url); if(typeof toast === "function") toast("Picture saved and link copied -- paste it with the picture", 4000); } catch(e){}
     }).catch(function(){ btn.disabled = false; btn.textContent = "Share my rank"; });
   }
-  window.showMyRankTest = function(rank){ showRankPop({ x: { rank: rank || 1, name: "Test System", galaxy: GALAXY, address: "105200000000", views: 42, move: 2, editor: myName() || "you", key: "t" }, last: false, id: "test" }); };
+  // Demo / screenshot hook: ?rankdemo=1 (or 2, 3) shows the popup with sample data.
+  window.showMyRankTest = function(x){
+    if(typeof x !== "object" || !x) x = { rank: x || 1, name: "Example System", galaxy: GALAXY, address: "105200000000", views: 42, move: 2, editor: myName() || "Traveller", key: "demo" };
+    showRankPop({ x: x, last: false, id: "demo" });
+  };
+  var demoM = /[?&]rankdemo=([123])\b/.exec(location.search);
+  if(demoM){
+    var dTries = 0;
+    (function demoWhenClear(){
+      var wrap = document.getElementById("modalWrap");
+      if(((wrap && wrap.classList.contains("show")) || (typeof tourActive !== "undefined" && tourActive)) && dTries++ < 40){ setTimeout(demoWhenClear, 1000); return; }
+      window.showMyRankTest(+demoM[1]);
+    })();
+  }
   window.loadTrending = load;
   load();
   setInterval(function(){ if(!document.hidden) load(); }, 300000);
