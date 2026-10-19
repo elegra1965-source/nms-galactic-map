@@ -1403,6 +1403,15 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   /* 2026-10-19: no room for three on one phone row -- Trending gets its own short line underneath */
   #toggleRow{flex-wrap:wrap;row-gap:0}
   #trendLine{order:3;padding:0 2px 4px;text-align:left}
+  /* 2026-10-19 (Tony's phone screenshot): buttons of different widths left ragged,
+     unfinished-looking rows, and ON toggles sat 2px lower than their neighbours. On
+     phones every control grows to fill its row (rows end flush on both sides) and ON
+     buttons keep the pressed-in look without dropping out of line. */
+  #toolbarBody{align-items:center}
+  #toolbarBody>.btn,#toolbarBody>select,#toolbarBody>#addrGrp,#toolbarBody>.addr-row,#toolbarBody>div:not(.sep):not(#favResults){flex:1 1 auto}
+  #top .btn.beveled.on{top:-1px}
+  #galTypeFilter{max-width:none!important}
+  #toolbarBody .btn{text-align:center;justify-content:center}
   /* 2026-08-30, Tony (round 8): "reveal one row at a time smoothly with same
      glow as title but then looses glow... remove one at a time... not too
      quick not too slow" -- round 7's single max-height slide on the whole
