@@ -77689,7 +77689,7 @@
         "collidingSet": [],
         "screenshot": "https://raw.githubusercontent.com/elegra1965-source/nms-galactic-map/main/user-screenshots/9-105200000000-mvbq3ao0-owj19s.jpg",
         "hasStation": true,
-        "stationName": "[PSA-E10] Jura-Tempest Federation",
+        "stationName": "[CORE-E10] Jura-Tempest Federation",
         "allianceName": "Phantom Star Alliance",
         "stationPhoto": "https://raw.githubusercontent.com/elegra1965-source/nms-galactic-map/main/user-screenshots/9-105200000000-station-mvbq3be2-munqra.jpg",
         "signals": [],
@@ -77861,7 +77861,7 @@
           }
         ]
       },
-      "editedAt": "2026-10-20T09:19:47.531Z",
+      "editedAt": "2026-10-20T09:21:12.326Z",
       "editedByIp": "ip_7dc0d70df69a6c98",
       "history": [
         {
@@ -77890,6 +77890,10 @@
         },
         {
           "at": "2026-10-20T09:19:47.531Z",
+          "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-10-20T09:21:12.326Z",
           "text": "edited by a traveller"
         }
       ]
@@ -78513,7 +78517,8 @@
   "reports": [],
   "ipLog": {
     "ip_7dc0d70df69a6c98": [
-      1792487987531
+      1792487987531,
+      1792488072326
     ]
   },
   "flagLog": {},
