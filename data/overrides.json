@@ -77663,7 +77663,7 @@
       "flaggedFields": [],
       "disputedFields": [],
       "data": {
-        "name": "[PSA-E10] Jura-Tempest Federation",
+        "name": "[CORE-E10] Jura-Tempest Federation",
         "race": "Vy'keen",
         "region": "Eissentam Galactic Core",
         "starClass": "F4",
@@ -77861,8 +77861,8 @@
           }
         ]
       },
-      "editedAt": "2026-10-19T13:43:07.852Z",
-      "editedByIp": "ip_9279193ba1812f5c",
+      "editedAt": "2026-10-20T09:19:47.531Z",
+      "editedByIp": "ip_7dc0d70df69a6c98",
       "history": [
         {
           "at": "2026-10-17T01:33:33.593Z",
@@ -77886,6 +77886,10 @@
         },
         {
           "at": "2026-10-19T13:43:07.852Z",
+          "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-10-20T09:19:47.531Z",
           "text": "edited by a traveller"
         }
       ]
@@ -78508,8 +78512,8 @@
   },
   "reports": [],
   "ipLog": {
-    "ip_9279193ba1812f5c": [
-      1792417387852
+    "ip_7dc0d70df69a6c98": [
+      1792487987531
     ]
   },
   "flagLog": {},
