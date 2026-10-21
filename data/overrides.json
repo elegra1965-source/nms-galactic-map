@@ -78659,6 +78659,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:107CCE588C1D": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB27-7C Nimarkis",
+        "race": "Vy'keen",
+        "region": "Mompop Cloud",
+        "starClass": "F1p",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Power Generation",
+        "sell": "44.4",
+        "buy": "-26.3",
+        "econDesc": "★★ (Balanced)",
+        "conflict": "★★ (Medium)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-10-21T23:00:52.894Z",
+      "editedByIp": "ip_9279193ba1812f5c",
+      "history": [
+        {
+          "at": "2026-10-21T23:00:52.894Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -78666,7 +78715,8 @@
     "ip_9279193ba1812f5c": [
       1792623618348,
       1792623630108,
-      1792623641405
+      1792623641405,
+      1792623652894
     ]
   },
   "flagLog": {},
