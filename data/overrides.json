@@ -78610,13 +78610,63 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:107D08555D31": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB21-7D Folintis",
+        "race": "Vy'keen",
+        "region": "Hullah",
+        "starClass": "K5pf",
+        "stars": [
+          "red"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Mining",
+        "sell": "60.4",
+        "buy": "-19.1",
+        "econDesc": "💀 (Black Market)",
+        "conflict": "3 (Pirate Controlled)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-10-21T23:00:41.405Z",
+      "editedByIp": "ip_9279193ba1812f5c",
+      "history": [
+        {
+          "at": "2026-10-21T23:00:41.405Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "ip_9279193ba1812f5c": [
       1792623618348,
-      1792623630108
+      1792623630108,
+      1792623641405
     ]
   },
   "flagLog": {},
