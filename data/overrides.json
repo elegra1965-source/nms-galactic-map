@@ -78512,13 +78512,61 @@
           "text": "Imported from a traveller's real save file (base name/address/discovery data)"
         }
       ]
+    },
+    "0:11B6D0588C1D": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Acungca-Kion XV",
+        "race": "Korvax",
+        "region": "Avnise",
+        "starClass": "K1pf",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Manufacturing",
+        "sell": "44.0",
+        "buy": "-15.2",
+        "econDesc": "💀 (Black Market)",
+        "conflict": "💀 (Pirate Controlled)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-10-21T23:00:18.348Z",
+      "editedByIp": "ip_9279193ba1812f5c",
+      "history": [
+        {
+          "at": "2026-10-21T23:00:18.348Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
-    "ip_7dc0d70df69a6c98": [
-      1792487987531,
-      1792488072326
+    "ip_9279193ba1812f5c": [
+      1792623618348
     ]
   },
   "flagLog": {},
