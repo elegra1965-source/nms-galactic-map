@@ -78561,12 +78561,62 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:109E0A555D31": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB12-9E Tuapsemo",
+        "race": "Vy'keen",
+        "region": "Guyardm Band",
+        "starClass": "F0p",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": true,
+        "giant": false,
+        "econName": "Mining",
+        "sell": "42.0",
+        "buy": "-24.0",
+        "econDesc": "★★★ (Advanced)",
+        "conflict": "3 (At War)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-10-21T23:00:30.108Z",
+      "editedByIp": "ip_9279193ba1812f5c",
+      "history": [
+        {
+          "at": "2026-10-21T23:00:30.108Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "ip_9279193ba1812f5c": [
-      1792623618348
+      1792623618348,
+      1792623630108
     ]
   },
   "flagLog": {},
