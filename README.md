@@ -420,6 +420,21 @@ it's credited to the name you entered. A system already on Haven is sent as an
 update. Handled by `netlify/functions/haven-submit.mjs`, which keeps the Hub's
 submit-only key on the server and limits each traveller to 5 sends an hour.
 
+**Real game data from NMS Almanac.** The system info panel has a
+collapsible **Real game data · NMS Almanac** section. When opened it shows
+what the game itself generates for that address, from
+[NMS Almanac](https://nmsalmanac.com): star and spectral class, race,
+economy, wealth, conflict, sell/buy %, what's in demand, and every planet and
+moon with its picture, real name, type, weather (red when extreme) and
+sentinels; tap a planet for fauna/flora counts and its resources.
+*Fill blanks in Edit system* copies these values into empty fields only, and
+nothing is saved until you press Save. Entering a system's 3D view swaps this
+map's own planet-name guesses for the real names. A traveller's own edit
+always wins over Almanac data. Looked up by `netlify/functions/almanac.mjs`,
+which keeps the Almanac key on the server and caches every answer, so each
+system is only fetched once; if the hourly allowance is used up you're asked
+to try again later.
+
 **Portal glyph keypad.** Type a hex address or tap the real 16 in-game glyphs
 directly -- both stay in sync, so you can decode a screenshot from your own
 game without knowing the hex first. Looking a system up is private: nothing
@@ -796,3 +811,8 @@ Cross-referenced system data comes from **[Voyager's Haven](https://havenmap.onl
 built and run by **[u/IAmThe-Ekimo-1920](https://www.reddit.com/user/IAmThe-Ekimo-1920/)**,
 who offered to link the two maps -- thanks for opening up the Haven API and
 for the work behind it. Haven's data belongs to Haven and its contributors.
+
+Real game data (planet names, weather, sentinels, resources, trade and more)
+comes from **[NMS Almanac](https://nmsalmanac.com)**, built by **Borjomi**
+(u/Fosferus), who kindly gave this map an API key. Thanks for the Almanac and
+for letting it be used here. Almanac data belongs to NMS Almanac.

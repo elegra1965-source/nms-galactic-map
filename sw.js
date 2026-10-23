@@ -13,7 +13,7 @@
 // constant shouldn't need bumping again for a normal content update -- only
 // if this file (sw.js) ITSELF changes again in a way that needs old caches
 // purged.
-const CACHE = 'nms-galmap-v19';
+const CACHE = 'nms-galmap-v20';
 
 /* 2026-09-15, Tony's live-test report: refreshing into Local (or any mode)
    left drag/orbit feeling frozen for a few seconds before "catching up" --
@@ -45,6 +45,7 @@ const CORE_FILES = [
   // and re-parsing the whole ~600KB script too). Listed here for the same
   // reason preview.html itself is -- so the offline app shell has it too.
   '/preview.js',
+  '/almanac.js',
   '/manifest.json',
   '/favicon/icon-192.png',
   '/favicon/icon-512.png',

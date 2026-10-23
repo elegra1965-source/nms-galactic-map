@@ -5609,6 +5609,8 @@ function updatePanel(s){
   closePanelFold("pNoteHead","pNoteBody");
   closePanelFold("pHavenHead","pHavenBody");
   havenReset();
+  closePanelFold("pAlmHead","pAlmBody");
+  if(window.almReset) window.almReset(s);
   document.getElementById("pStars").innerHTML=starSwatches(s);
   document.getElementById("pName").textContent=s.name;
   document.getElementById("pReg").textContent="REGION: "+s.region;
@@ -7523,6 +7525,7 @@ document.getElementById("bEnter").addEventListener("click",function(){
   if(!selected) return;
   if(!canReachColor(selected.type)){ toast(driveNeededMsg(selected.type)); return; }
   buildSystemView(selected); setMode("system"); playWarpTransition("ship");
+  if(window.almNames) window.almNames(selected); // 2026-10-23: real planet names from NMS Almanac
   if(selected.editorName||selected.editorFriendCode){
     var who=selected.editorName?("Documented by "+selected.editorName):"Documented by a traveller";
     toast(who+(selected.editorFriendCode?(" \u00b7 Friend code: "+selected.editorFriendCode):""), 3200);

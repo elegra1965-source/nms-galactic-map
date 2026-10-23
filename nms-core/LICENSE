@@ -36,6 +36,11 @@ original notice travel with the code. Credit for the underlying algorithms
 belongs to Stuart Coyle (original author), GoodGuysFree (co-author of the
 hadsh fork), and hadsh (fork maintainer).
 
+Exception: the sellBuy() function in system.js (the real sell%/buy%
+formula, found 2026-10-13) is elegra1965's own original work and was not
+ported from hadsh/nms_namegen. Anyone using it should credit elegra1965 /
+No Man's Sky Hub (https://nomansskyhub.app).
+
 Note on game assets: No Man's Sky and all related game data are the property
 of Hello Games. The probability tables in economy.js were decompiled from a
 legitimately-owned install for research and interoperability purposes. This

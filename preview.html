@@ -2055,6 +2055,10 @@ nearby procedural space within a radius.">Search</button>
   <!-- 2026-10-02: read-only data from Voyager's Haven (havenmap.online),
        fetched only when this fold is opened -- see haven-lookup.mjs. Kept
        as its own labelled source, never merged into community overrides. -->
+  <!-- 2026-10-23: real game data from NMS Almanac (nmsalmanac.com, by Borjomi),
+       loaded only when opened -- see almanac.js / netlify/functions/almanac.mjs. -->
+  <div class="lb panelFoldHead" id="pAlmHead" role="button" tabindex="0" aria-expanded="false" aria-controls="pAlmBody">&#9656; Real game data &middot; NMS Almanac</div>
+  <div id="pAlmBody" style="display:none;font-size:11px;line-height:1.5;color:var(--text-dim)"></div>
   <div class="lb panelFoldHead" id="pHavenHead" role="button" tabindex="0" aria-expanded="false" aria-controls="pHavenBody">&#9656; Voyager's Haven data</div>
   <div id="pHavenBody" style="display:none;font-size:11px;line-height:1.5;color:var(--text-dim)"></div>
   <div class="lb panelFoldHead" id="pSeqHead" role="button" tabindex="0" aria-expanded="false" aria-controls="pSeqBody">&#9656; Portal sequence &amp; coordinates</div>
@@ -3019,7 +3023,8 @@ loadLetterMap('./nms-core/letter-map').then(function(lm){
 });
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="preview.js"></script>
+<script src="preview.js?v=20261023"></script>
+<script src="almanac.js?v=20261023"></script>
 <script src="share-system.js"></script>
 <script src="charted.js"></script>
 <script src="trending.js"></script>
