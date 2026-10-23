@@ -2209,6 +2209,7 @@ nearby procedural space within a radius.">Search</button>
   <div class="kicker" id="trendKick" style="margin-bottom:2px">&#128293; Trending this week</div>
   <div class="searchResMeta" id="trendSub" style="margin-bottom:6px">The charted systems travellers opened most this week. Resets every Monday at midnight (UK). Tap one to fly there.</div>
   <div id="trendList"></div>
+  <button class="pill" type="button" id="trendAlertBtn" style="width:100%;margin-top:8px;padding:9px 8px;font-size:10px">&#128276; TELL ME WHEN MY SYSTEM TRENDS</button>
 </div>
 
 <div class="box" id="accessPop" role="dialog" aria-label="Accessibility settings">
@@ -3022,6 +3023,20 @@ loadLetterMap('./nms-core/letter-map').then(function(lm){
 <script src="share-system.js"></script>
 <script src="charted.js"></script>
 <script src="trending.js"></script>
+<script src="nms-push.js"></script>
+<script>
+/* 2026-10-23 (Tony): an alert when a system you charted makes this week's top 10 (and each better top-3 place).
+   Matched on your Traveller ID name, the same one trending.js uses for "You're #1". */
+if (window.NMS_PUSH) NMS_PUSH.wire(document.getElementById("trendAlertBtn"), "map", {
+  label: "\uD83D\uDD14 TELL ME WHEN MY SYSTEM TRENDS", onLabel: "\uD83D\uDD14 TREND ALERTS ON",
+  okMsg: "Trend alerts on. You\u2019ll hear when a system you charted makes this week\u2019s top 10.",
+  extra: function(){
+    var n = ""; try { n = typeof loadTravellerId === "function" ? String(loadTravellerId().name || "").trim() : ""; } catch(e){}
+    if(!n){ NMS_PUSH.toast(window.NMS_T ? NMS_T("Set your Traveller name first: your Traveller ID on the Hub, or Your name in Edit system.") : "Set your Traveller name first: your Traveller ID on the Hub, or Your name in Edit system."); return null; }
+    return { name: n };
+  }
+});
+</script>
 <script type="module" src="send-button.js"></script>
 </body>
 </html>

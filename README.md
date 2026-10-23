@@ -335,7 +335,11 @@ resets every Monday at midnight (UK). Until the new week has three entries, it
 shows last week's final standings instead, so it's never empty. Only public
 charted systems count, never private ones. Each device counts once per system
 per day, and your own systems don't count. `?trending=1` opens the list
-straight away. Handled by `netlify/functions/trending.mjs`.
+straight away. Handled by `netlify/functions/trending.mjs`. **🔔 TELL ME WHEN MY
+SYSTEM TRENDS** at the bottom of the list turns on a phone notification when a
+system you charted (matched on your Traveller ID name) makes this week's top 10,
+and again for each better top-three place (`nms-push.js`; sent by the Weather
+station's alert server).
 
 <img src="screenshots/22-trending-list.jpg" alt="Trending this week on a phone: the top five most-viewed charted systems with medals, rank arrows, view counts and portal glyphs (example view counts)" width="360"> <img src="screenshots/22b-trending-badge.jpg" alt="Info panel of the number one system showing the #1 Most viewed this week badge (example)" width="330">
 
