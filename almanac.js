@@ -40,6 +40,21 @@
       });
     return inflight[k];
   }
+  // Pair an Almanac body with the map's own body: by a traveller's typed name first (their
+  // saved order can differ from the game's), then by position if that body has no real name
+  // matching some other Almanac planet.
+  function low(x){ return String(x || "").trim().toLowerCase(); }
+  function mapBodyFor(s, d, a){
+    var mbs = (s && s.bodies) || [], ab = (d && d.bodies) || [], i, b;
+    for(i = 0; i < mbs.length; i++){ b = mbs[i]; if(b.nameOverridden && low(b.name) && low(b.name) === low(a.name)) return b; }
+    for(i = 0; i < mbs.length; i++){
+      b = mbs[i]; if(b.index !== a.p) continue;
+      if(!b.nameOverridden) return b;
+      var other = ab.some(function(x){ return x !== a && low(x.name) === low(b.name); });
+      return other ? null : b;
+    }
+    return null;
+  }
   function byIndex(d, i){ var b = d && d.bodies || []; for(var j=0;j<b.length;j++) if(b[j].p === i) return b[j]; return null; }
 
   // Real names onto the map's own body objects (3D labels read b.name live).
@@ -90,7 +105,7 @@
     if(y.sell != null || y.buy != null) row(body, "Sell / Buy", (pct(y.sell) || "—") + " / " + (pct(y.buy) || "—"));
     row(body, "In demand", y.demand);
     (d.bodies || []).forEach(function(a){
-      var mb = null; (s.bodies || []).forEach(function(b){ if(b.index === a.p) mb = b; });
+      var mb = mapBodyFor(s, d, a);
       // a traveller's own edit wins
       var name = mb && mb.nameOverridden ? mb.name : a.name;
       var desc = mb && mb.biomeOverridden ? (mb.biome + (mb.subtype ? " (" + mb.subtype + ")" : "")) : a.desc;
@@ -154,7 +169,14 @@
     }
     if(typeof editBodies !== "undefined" && editBodies){
       editBodies.forEach(function(eb, i){
-        var a = byIndex(d, i + 1); if(!a) return;
+        var a = null;
+        if(eb.name){ (d.bodies || []).forEach(function(x){ if(!a && low(x.name) === low(eb.name)) a = x; }); }
+        if(!a){
+          var cand = byIndex(d, i + 1);
+          var taken = cand && editBodies.some(function(o){ return o !== eb && low(o.name) && low(o.name) === low(cand.name); });
+          if(cand && !taken && !eb.name) a = cand;
+        }
+        if(!a) return;
         if(!eb.name && a.name){ eb.name = a.name; n++; }
         if(!eb.biome && BIOME[a.biome]){ eb.biome = BIOME[a.biome]; n++; }
         if(!eb.descriptor && a.weather){ eb.descriptor = a.weather; n++; }
