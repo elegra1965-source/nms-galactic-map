@@ -19,7 +19,7 @@ Used by the [NMS Galactic Map](https://nms-galaxy-map.netlify.app) — a free, f
 | `iprng.js` | ported (hadsh) | Threefish/Skein-style 64-bit hash — the game's real seed mixer |
 | `prng.js` | ported (hadsh) | 32-bit multiplicative PRNG, seeded from the hash |
 | `region.js` | ported (hadsh) | Voxel→region seed, region name, voxel attributes — including real black hole/Atlas placement, corrected 2026-08-23 (see Known limitations) |
-| `system.js` | ported (hadsh) | Star type, planet/moon counts, safe-start planet, system name, plus (since 2026-08-23) `economy_type`, `wealth`, `conflict_level`, `dominant_race`, `uncharted`, `abandoned`, `pirate` — the real reverse-engineered algorithm, not a statistical guess. Also `sellBuy()` (2026-10-13, found by elegra1965): the real sell%/buy% — first two draws of the planetSeeds() stream, `buy = -30 + 20*u1`, `sell = 40 + 40*u2`; 93.5% exact on 1,444 player-recorded systems |
+| `system.js` | ported (hadsh), except `sellBuy()`: original (elegra1965) | Star type, planet/moon counts, safe-start planet, system name, plus (since 2026-08-23) `economy_type`, `wealth`, `conflict_level`, `dominant_race`, `uncharted`, `abandoned`, `pirate` — the real reverse-engineered algorithm, not a statistical guess. Also `sellBuy()` (2026-10-13, found by elegra1965): the real sell%/buy% — first two draws of the planetSeeds() stream, `buy = -30 + 20*u1`, `sell = 40 + 40*u2`; 93.5% exact on 1,444 player-recorded systems |
 | `planet.js` | ported (hadsh) | Per-planet name from the system seed |
 | `generator.js` | ported (hadsh) | Weighted-Markov name assembler |
 | `roman.js` | ported (hadsh) | Roman numeral formatter (moon suffixes) |
@@ -199,11 +199,17 @@ The name-generation logic in this module (all files except `economy.js`) is a Ja
 - **GoodGuysFree** — co-author of the hadsh fork
 - **hadsh** — fork maintainer
 
+**Exception:** `sellBuy()` in `system.js` (the real sell%/buy% formula, found 2026-10-13) is elegra1965's own original work, not part of hadsh/nms_namegen, even though it sits in a ported file.
+
 Each ported file carries a "Ported from hadsh/nms_namegen (MIT licensed)" comment with the upstream URL at the top, per MIT's own requirement that the original notice travel with the code.
 
 `economy.js` is original work by elegra1965, licensed MIT separately. Its probability tables are decompiled from a legitimately-owned NMS install; see the file header for detail.
 
 ---
+
+## Using this code?
+
+It's free to use under the MIT licence. If you use any of it in your own project, site, video or post, please credit **elegra1965 / No Man's Sky Hub** with a link to [nomansskyhub.app](https://nomansskyhub.app). That includes the sell%/buy% formula (`sellBuy()` in `system.js`), which is elegra1965's own discovery, not part of hadsh's library. The MIT licence also asks you to keep the copyright notice in `LICENSE` with any copied code, and the hadsh/Stuart Coyle/GoodGuysFree credit for the ported files.
 
 ## License
 

@@ -37,6 +37,7 @@ portal address  ->  12 hex glyphs  ->  signed 3D voxel coordinate
 - [How do I run this locally?](#running-it-locally)
 - [How can I verify the generator's accuracy myself?](#verifying-the-generator-yourself)
 - [Is it accessible?](#is-it-accessible)
+- [Using this code?](#using-this-code)
 - [Credits](#credits)
 
 ## What can this map do?
@@ -773,6 +774,10 @@ browser's own text-to-speech — a play/pause/stop bar plus a small speaker
 icon per section, reading each section's own visible copy live so it can't
 drift out of sync when that copy is edited, or reading straight through all
 of them in order.
+
+## Using this code?
+
+It's free to use under the MIT licence. If you use any of it in your own project, site, video or post, please credit **elegra1965 / No Man's Sky Hub** with a link to [nomansskyhub.app](https://nomansskyhub.app). That includes the sell%/buy% formula (`sellBuy()` in `nms-core/system.js`), which is elegra1965's own discovery, not part of hadsh's library. The MIT licence also asks you to keep the copyright notice in `LICENSE` with any copied code, and the hadsh/Stuart Coyle/GoodGuysFree credit for the ported files.
 
 ## Credits
 
