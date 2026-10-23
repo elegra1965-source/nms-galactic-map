@@ -6,6 +6,7 @@
 <script>/* visitor stats: GoatCounter (free, no cookies), same dashboard as the Hub; pages are recorded as host/path */(function(){if(!/(^|\.)nomansskyhub\.app$/.test(location.hostname))return;window.goatcounter={path:function(p){return location.host+p}};var s=document.createElement("script");s.async=true;s.src="https://gc.zgo.at/count.js";s.setAttribute("data-goatcounter","https://nomansskyhub.goatcounter.com/count");document.head.appendChild(s);})();</script>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <script src="calm.js?v=2"></script>
+<script src="/lang.js?v=1"></script>
 <title>NMS Galactic Map — 3D No Man's Sky Galaxy Map &amp; Portal Address Decoder</title>
 <meta name="description" content="Free 3D No Man's Sky galaxy map: decode portal glyph addresses, find systems travellers have charted, see stations, planets and bases, and plot routes across all 256 galaxies. Fan-made, no sign-up.">
 <meta property="og:type" content="website">
@@ -646,6 +647,8 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border:none;border-ra
 .privRow{display:block;width:100%;text-align:left;background:none;border:0;border-top:1px solid var(--border-soft);font:inherit;color:inherit;padding:7px 2px;cursor:pointer}
 .privRow:hover,.privRow:focus-visible{background:rgba(240,165,0,.06);outline:none}
 .trMedalInline{margin-right:4px}
+/* the long guide is English-only: say so when another language is chosen (lang.js) */
+html[lang="en"] .guide-en-note{display:none}
 /* Calm mode on the map (calm.js): no breathing/spinning title, no glow pulses */
 html.calm #title,html.calm #titleIcon,html.calm #titleText,html.calm .btn.beveled{animation:none!important}
 html.calm #titleText{text-shadow:none!important}
@@ -1784,6 +1787,7 @@ nearby procedural space within a radius.">Search</button>
   <button class="btn beveled" id="bInstall" title="Install this map as an app on your device." style="display:none;animation-delay:-3.5s">&#9672; Install app</button>
   <button class="btn beveled" id="bTour" style="animation-delay:-4s" title="A quick guided tour of what this map can do.">&#9655; Tour</button>
   <button class="btn beveled" id="bAbout" style="animation-delay:-4.5s" title="Fan-made disclaimer and a note on procedural vs. real system data.">&#9432; About</button>
+  <button class="btn beveled" id="bLang" type="button" data-lang-btn style="animation-delay:-5.5s" title="Language" aria-label="Language">&#127760; <span data-lang-code translate="no">EN</span></button>
   <button class="btn beveled" id="bAccess" style="animation-delay:-5s" title="Accessibility settings: font size, colour-blind filters, high contrast." aria-label="Accessibility settings" aria-haspopup="true" aria-expanded="false">&#9881;</button>
   </div>
 </div>
@@ -2752,6 +2756,7 @@ nearby procedural space within a radius.">Search</button>
       </ol>
       <div class="dq-note">Fan-made and unofficial. Not affiliated with Hello Games.</div>
       <button type="button" class="btn" id="discFull" style="width:100%;text-align:center">Full guide &middot; all topics &#9662;</button>
+      <div class="dq-note guide-en-note" style="margin-top:6px">The full guide below is in English for now.</div>
     </div>
     <div id="discReadToggleRow">
       <span id="discReadToggleLabel">Read aloud</span>

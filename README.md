@@ -473,6 +473,17 @@ The same panel has **Calm mode**, the switch shared by every No Man's Sky Hub
 site (`calm.js`): on the map it stops the title and glow animations and skips
 the warp animation, for anyone who finds it busy.
 
+**Your language.** The 🌐 button in the toolbar switches the map between
+English, Español, Deutsch, Nederlands, Polski, Français, Português (Brasil)
+and Italiano, and so does the Traveller Discoveries page. The choice is shared
+by the whole No Man's Sky Hub family: pick it once and every site follows (a
+small cookie on `.nomansskyhub.app`). System, region and galaxy names, glyphs,
+hex addresses and the game's own economy and conflict words stay as they are;
+the long Full guide in About is English for now and says so. It lives in
+`lang.js` (the same file on every site) with packs in `lang/`.
+
+<img src="screenshots/25-languages.jpg" alt="The map on a phone: the language picker (left) and the map in Português (right)" width="560">
+
 ![Accessibility panel](screenshots/08-accessibility-panel.png)
 
 **Draggable panels.** Filters, the system info panel, Course plotted, the
