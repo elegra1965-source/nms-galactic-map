@@ -435,6 +435,8 @@ which keeps the Almanac key on the server and caches every answer, so each
 system is only fetched once; if the hourly allowance is used up you're asked
 to try again later.
 
+<img src="screenshots/26-almanac.jpg" alt="Real game data from NMS Almanac in the info panel: economy, conflict, sell/buy, demand, then planets with their pictures, real names, type, weather and sentinels, one opened to show fauna, flora and resources" width="420">
+
 **Portal glyph keypad.** Type a hex address or tap the real 16 in-game glyphs
 directly -- both stay in sync, so you can decode a screenshot from your own
 game without knowing the hex first. Looking a system up is private: nothing
