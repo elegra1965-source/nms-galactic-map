@@ -125,6 +125,30 @@ async function words(store, path){
   return w || {};
 }
 
+/* One system's Almanac lookup, stored in the cache. Also used by almanac-warm.mjs
+   (2026-10-24, the pre-load of every charted system). Returns { body, cost } where
+   cost = key lookups used (1 + bodies). Throws Busy on a 429. */
+export async function lookupAndCache(store, addr, g){
+  var ck = "sys/" + g + "/0" + addr.slice(1);
+  var cost = 1;
+  var s = await aGet("systems/" + addr + "?galaxy=" + (g + 1));
+  var body;
+  if(!s){ body = { ok:true, found:false }; }
+  else {
+    var w = await words(store, s.words);
+    var bodies = [];
+    for(var i = 0; i < (s.bodies || []).length && i < 8; i++){
+      var p = await aGet("planets/" + s.bodies[i].portal + "?galaxy=" + (g + 1)); cost++;
+      if(p) bodies.push(mapPlanet(p, w));
+    }
+    body = { ok:true, found:true, galaxy:g, system: mapSystem(s, w), bodies: bodies,
+             attribution: "Data: NMS Almanac, https://nmsalmanac.com", link: "https://nmsalmanac.com" };
+  }
+  await store.setJSON(ck, { until: Date.now() + (body.found ? TTL_HIT_MS : TTL_MISS_MS), body: body }).catch(function(){});
+  return { body: body, cost: cost };
+}
+export { Busy, STORE };
+
 async function hourCount(store, who){
   var k = "rl/" + who + "/" + Math.floor(Date.now() / 3600000);
   var n = (await store.get(k, { type: "json" }).catch(function(){ return null; })) || 0;
@@ -151,20 +175,7 @@ export default async (req, context) => {
   await store.setJSON(rl.k, rl.n + 1).catch(function(){});
 
   try {
-    var s = await aGet("systems/" + addr + "?galaxy=" + (g + 1));
-    var body;
-    if(!s){ body = { ok:true, found:false }; }
-    else {
-      var w = await words(store, s.words);
-      var bodies = [];
-      for(var i = 0; i < (s.bodies || []).length && i < 8; i++){
-        var p = await aGet("planets/" + s.bodies[i].portal + "?galaxy=" + (g + 1));
-        if(p) bodies.push(mapPlanet(p, w));
-      }
-      body = { ok:true, found:true, galaxy:g, system: mapSystem(s, w), bodies: bodies,
-               attribution: "Data: NMS Almanac, https://nmsalmanac.com", link: "https://nmsalmanac.com" };
-    }
-    await store.setJSON(ck, { until: Date.now() + (body.found ? TTL_HIT_MS : TTL_MISS_MS), body: body }).catch(function(){});
+    var body = (await lookupAndCache(store, addr, g)).body;
     return json(200, body, { "Cache-Control": "public, max-age=3600" });
   } catch(e){
     if(e instanceof Busy) return json(200, { ok:false, busy:true, retryAfter: e.retryAfter });

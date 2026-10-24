@@ -61,6 +61,7 @@
   function apply(s, d){
     if(!s || !d || !d.found) return false;
     var changed = false;
+    s.almanacCard = d.system && d.system.card || null; // 2026-10-24: star hover card (preview.js)
     (s.bodies || []).forEach(function(b){
       var a = byIndex(d, b.index);
       b.almanac = a || null;

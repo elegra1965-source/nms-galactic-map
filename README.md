@@ -433,7 +433,19 @@ map's own planet-name guesses for the real names. A traveller's own edit
 always wins over Almanac data. Looked up by `netlify/functions/almanac.mjs`,
 which keeps the Almanac key on the server and caches every answer, so each
 system is only fetched once; if the hourly allowance is used up you're asked
-to try again later.
+to try again later. A scheduled function (`netlify/functions/almanac-warm.mjs`,
+every 10 minutes, at most about half the key's hourly allowance) pre-loads
+every system travellers have charted and keeps it fresh, so these open
+instantly. It only fills the cache: no commits, no deploys, and travellers'
+edits are never touched.
+
+**Almanac planet cards on hover.** In the 3D view of a system no traveller
+has edited, hovering a planet or moon shows NMS Almanac's own card picture of
+it (its disc, name, main facts, galaxy and portal glyphs) in place of the
+usual analysis card, and hovering the space station in the middle shows the
+system's own Almanac card. Systems a traveller has edited (or saved privately) are
+left exactly as they are: their planets keep the analysis card with the
+traveller's own data, plus the Almanac's picture of the planet.
 
 <img src="screenshots/26-almanac.jpg" alt="Real game data from NMS Almanac in the info panel: economy, conflict, sell/buy, demand, then planets with their pictures, real names, type, weather and sentinels, one opened to show fauna, flora and resources" width="420">
 

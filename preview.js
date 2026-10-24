@@ -6367,6 +6367,39 @@ function acSystemRows(sy){
   if(sy.outlaw) rows.push(acRow("Status",'<b style="color:var(--gold)">Outlaw system</b>'));
   return rows;
 }
+/* 2026-10-24, Tony: hovering a planet, moon or the star in a system NO traveller has
+   edited shows NMS Almanac's own 1200x630 card picture (the space station in the middle -- or a star, where one is drawn -- shows
+   the system's card) (disc, name, facts,
+   galaxy, glyphs) instead of the analysis card. Edited systems (s.override,
+   private ones included) keep the analysis card with the traveller's data,
+   untouched. The picture is preloaded on first hover; until it has loaded
+   (or if it fails) the normal card shows, then it swaps in by itself.
+   b.almanac is set by almanac.js when the system's 3D view is entered. */
+var _almCardOk={},_almCardTry={},_almLast=null;
+function almHoverCard(pop,ud,cx,cy){
+  var b=ud.body,sy=ud.sys;
+  if(!sy||sy.override) return false;
+  // planet/moon: its own card; star: the system's card (station or star, name, facts, glyphs)
+  var card=b?(b.almanac&&b.almanac.card):((ud.star||ud.stationCard)?sy.almanacCard:null);
+  if(!card) return false;
+  _almLast={ud:ud,cx:cx,cy:cy};
+  if(!_almCardOk[card]){
+    if(!_almCardTry[card]){
+      _almCardTry[card]=1;
+      var im=new Image();
+      im.onload=function(){_almCardOk[card]=1;
+        if(hoverPopVisible&&_almLast&&_almLast.ud===ud) showSystemHoverPop(ud,_almLast.cx,_almLast.cy);};
+      im.src=card;
+    }
+    return false;
+  }
+  pop.className="hoverpop acard almcard";
+  pop.innerHTML='<img src="'+acEsc(card)+'" alt="'+acEsc(((b?b.name:(ud.name||sy.name))||"Planet")+" - NMS Almanac card")+'" width="1200" height="630">'+
+    '<div class="almcardCred">Data: NMS Almanac</div>';
+  placeHoverPop(pop,cx,cy);
+  hoverPopVisible=true;
+  return true;
+}
 function showSystemHoverPop(ud,cx,cy){
   var pop=document.getElementById("hoverPop"),html;
   if(ud.resourceIcon){
@@ -6377,6 +6410,8 @@ function showSystemHoverPop(ud,cx,cy){
     rr.push(acRow("Signal Type",acEsc(ud.signalType)+(/[.!?]$/.test(ud.signalType||"")?"":".")));
     rr.push(acRow("Route recommendation",acEsc(ud.route)));
     html=acCard("signal",ud.name,"Starmap Analysis Report",rr);
+  } else if(ud.feature&&ud.stationCard&&almHoverCard(pop,ud,cx,cy)){
+    return;
   } else if(ud.feature&&ud.stationCard){
     // Space station -- gold card (picture 2).
     var sy=ud.sys||{};
@@ -6388,6 +6423,8 @@ function showSystemHoverPop(ud,cx,cy){
     html=acCard(isBh?"bh":"atlas",isBh?"Black hole":"Atlas Interface","Anomaly",
       isBh?[acRow("Signal Type","Gravitational singularity."),acRow("Route recommendation","Enter to jump toward the galactic core.")]
           :[acRow("Signal Type","Atlas station."),acRow("Route recommendation","Seek the Atlas.")]);
+  } else if(ud.body&&almHoverCard(pop,ud,cx,cy)){
+    return;
   } else if(ud.body){
     /* Planet/moon -- same fields the previous hover showed (biome only
        once a traveller's confirmed it, terrain, water, tags, top 3
@@ -6404,6 +6441,13 @@ function showSystemHoverPop(ud,cx,cy){
     if(b.resUni&&b.resUni.length) br.push(acRow("Resources",acEsc(b.resUni.slice(0,3).join(", "))));
     if(tags.length) br.push(acRow("Notes",acEsc(tags.join(" · "))));
     html=acCard("body",b.name,b.moon?"Moon":"Planet",br);
+    /* 2026-10-24, Tony: the Almanac's picture of the planet on the card too
+       (the traveller's own data stays as it is; only the picture is added). */
+    var disc=b.almanac&&(b.almanac.discSmall||b.almanac.disc);
+    if(disc) html=html.replace('<div class="acBody">','<div class="acBody"><img class="acDisc" src="'+acEsc(disc)+'" alt="" width="80" height="80">')+
+      '<div class="almcardCred">Picture: NMS Almanac</div>';
+  } else if(ud.star&&almHoverCard(pop,ud,cx,cy)){
+    return;
   } else if(ud.star){
     var st=ud.sys||{};
     html=acCard("star",ud.name,"Star"+(st.spectral?" · Class "+st.spectral:""),acSystemRows(st));
