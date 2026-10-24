@@ -10380,6 +10380,10 @@ function tourPosition(){
   var box=document.getElementById("tourBox");
   if(!el){ tourNextStep(); return; } /* target not on screen this session -- skip rather than spotlight nothing */
   var r=el.getBoundingClientRect();
+  /* 2026-10-24: a target inside a hidden toolbar row has a zero-size rect.
+     While the controls are still sliding open for the tour, wait for it
+     (tourRevealTick keeps re-measuring); after that, skip it as before. */
+  if(!r.width&&!r.height){ if(tourRevealing) return; tourNextStep(); return; }
   var pad=6;
   hole.style.top=(r.top-pad)+"px";
   hole.style.left=(r.left-pad)+"px";
@@ -10397,17 +10401,48 @@ function tourPosition(){
   box.style.top=top+"px";
   box.style.left=left+"px";
 }
+/* 2026-10-24, Tony: on mobile the map controls can be hidden ("Show
+   controls"), which left most tour targets invisible. The tour now opens
+   them itself, keeps the spotlight following the buttons while they slide
+   in, and folds them away again when the tour ends -- only if they were
+   hidden to begin with. Desktop never hides its controls, so nothing
+   changes there. The phone's Back button also closes the tour now instead
+   of leaving the site. Steps themselves are unchanged. */
+var tourOpenedCtrls=false, tourRevealing=false, tourRevealTimer=null, tourPushed=false;
+function tourCtrlsCollapsed(){
+  var t=document.getElementById("toolbarToggle");
+  return !!(t&&t.offsetWidth&&document.documentElement.classList.contains("toolbar-collapsed"));
+}
+function tourRevealTick(ms){
+  clearInterval(tourRevealTimer);
+  tourRevealing=true;
+  var end=Date.now()+ms;
+  tourRevealTimer=setInterval(function(){
+    if(!tourActive||Date.now()>end){ clearInterval(tourRevealTimer); tourRevealing=false; if(tourActive) tourPosition(); return; }
+    tourPosition();
+  },80);
+}
 function openTour(){
   closeAllModalBoxes();
   closeModal();
   tourIdx=0; tourActive=true;
+  tourOpenedCtrls=false;
+  if(tourCtrlsCollapsed()){ document.getElementById("toolbarToggle").click(); tourOpenedCtrls=true; }
   document.getElementById("tourOverlay").classList.add("show");
+  if(!tourPushed){ try{ history.pushState({nmsTour:1},""); tourPushed=true; }catch(e){} }
   tourPosition();
+  if(tourOpenedCtrls) tourRevealTick(2000);
 }
-function closeTour(){
+function closeTour(fromPop){
+  if(!tourActive) return;
   tourActive=false;
+  clearInterval(tourRevealTimer); tourRevealing=false;
   document.getElementById("tourOverlay").classList.remove("show");
+  if(tourOpenedCtrls&&!tourCtrlsCollapsed()){ var t=document.getElementById("toolbarToggle"); if(t&&t.offsetWidth) t.click(); }
+  tourOpenedCtrls=false;
+  if(tourPushed){ tourPushed=false; if(fromPop!==true){ try{ history.back(); }catch(e){} } }
 }
+window.addEventListener("popstate",function(){ if(tourActive){ closeTour(true); markTourDone(); } else tourPushed=false; });
 function tourNextStep(){
   if(tourIdx>=TOUR_STEPS.length-1){ closeTour(); markTourDone(); return; }
   tourIdx++; tourPosition();

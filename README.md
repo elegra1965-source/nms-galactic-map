@@ -775,6 +775,12 @@ for the full table and what it doesn't cover.
 
 </details>
 
+## Guided tour
+
+**▷ Tour** in the toolbar (or "Take a quick tour" on the first-visit box) walks through the map in 10 spotlight steps. On phones with the controls hidden, the tour opens them for you, follows the buttons as they slide in, and folds them away again when it ends. The phone's Back button closes it.
+
+<img src="screenshots/27-tour.jpg" alt="Tour step 5 of 10, No address handy?, spotlighting the Glyphs button on a phone" width="300">
+
 ## Is it accessible?
 
 Font size (4 presets), a High Contrast toggle, and colour-blindness support
