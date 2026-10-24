@@ -447,6 +447,18 @@ system's own Almanac card. Systems a traveller has edited (or saved privately) a
 left exactly as they are: their planets keep the analysis card with the
 traveller's own data, plus the Almanac's picture of the planet.
 
+**Planets look like the real game.** When NMS Almanac knows a planet, its 3D
+sphere in the system view is painted in the game's own terrain and water
+colours (frozen worlds get ice caps), and it has a ring only if the real
+planet does, in the real ring colours. This applies to every system, edited
+or not; a traveller's own text (names, biome, weather and so on) is never
+changed. Rings follow the Almanac until a traveller ticks or unticks Rings
+themselves in Edit system, then their choice wins. Almanac planets are matched
+to a traveller's planets by name first, then by order, so a system saved in a
+different order still gets the right data on each planet.
+
+<img src="screenshots/28-real-looks.jpg" alt="Before and after in Sranch Op10079: the map's own made-up colours on the left, the real game colours and rings from NMS Almanac on the right" width="640">
+
 <img src="screenshots/26-almanac.jpg" alt="Real game data from NMS Almanac in the info panel: economy, conflict, sell/buy, demand, then planets with their pictures, real names, type, weather and sentinels, one opened to show fauna, flora and resources" width="420">
 
 **Portal glyph keypad.** Type a hex address or tap the real 16 in-game glyphs

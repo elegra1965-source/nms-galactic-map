@@ -1676,6 +1676,7 @@ function applyOverride(s){
         terrain:o?o.terrain:"Pangean",
         water:!!b.water,
         ring:(!isMoon&&!!b.ring)?(RING_STYLE_BY_BIOME[biome]||"tan"):false,
+        ringSet:!isMoon&&!!b.ringSet, // 2026-10-24: traveller chose Rings themselves (else NMS Almanac's ring is used)
         bodyOverridden:true, // this whole body came from a traveller's Edit system submission (d.bodies) -- water/ring checkboxes included, a real answer either way, not a procedural roll
         // Reuse the procedural body's own size ONLY when this slot's
         // moon/planet role still matches what procedural generation
@@ -2384,6 +2385,81 @@ function makeCloud(seed){
 }
 var CLOUDS=[makeCloud(11),makeCloud(29),makeCloud(47),makeCloud(83)];
 
+/* 2026-10-24, Tony: planets look like the real game. When NMS Almanac has a
+   planet (b.almanac, set by almanac.js) its 3D sphere is repainted in the
+   game's own terrain/water colours and gets a ring only if the real planet
+   has one -- in every system, edited or not (Tony chose "a": the look always
+   follows the game; a traveller's text edits still show in the panel/cards).
+   Rings: a traveller's own Rings choice wins once they've ticked/unticked it
+   (b.ringSet); until then the Almanac's ring is used, and Edit system shows
+   it pre-ticked. forText=true: the text tags/edit default, which (as before)
+   ignore the map's random procedural rings. */
+function effRing(b,forText){
+  if(!b||b.moon) return false;
+  if(b.ringSet) return !!b.ring;
+  if(b.almanac) return !!b.almanac.ringed;
+  return forText?!!(b.bodyOverridden&&b.ring):!!b.ring;
+}
+function almHex(h,f){ // shade a #rrggbb colour by f (-1..1)
+  var n=parseInt(String(h||"#888888").slice(1),16),r=(n>>16)&255,g=(n>>8)&255,bl=n&255;
+  function c(v){ v=f<0?v*(1+f):v+(255-v)*f; return Math.max(0,Math.min(255,Math.round(v))); }
+  return "rgb("+c(r)+","+c(g)+","+c(bl)+")";
+}
+function almPlanetTexture(b){
+  var c=b.almanac.colours,W=256,H=128;
+  var cv=document.createElement("canvas"); cv.width=W; cv.height=H;
+  var g=cv.getContext("2d"), r=mulberry32(b.seed^0x5A1A), i;
+  var wet=!!(c.water&&b.almanac.water&&b.almanac.water!=="none");
+  g.fillStyle=wet?c.water:almHex(c.terrain,-0.15); g.fillRect(0,0,W,H);
+  var land=[almHex(c.terrain,-0.25),almHex(c.terrain,0),almHex(c.terrain,0.18),almHex(c.terrain,0.32)];
+  var blobs=wet?90:160;
+  for(i=0;i<blobs;i++){
+    var x=r()*W, y=r()*H, rad=(4+r()*24)*(0.45+Math.sin(y/H*Math.PI)*0.85);
+    g.fillStyle=land[Math.floor(r()*land.length)]; g.globalAlpha=0.35+r()*0.5;
+    var rx=rad*(0.7+r()*0.9), ry=rad*(0.45+r()*0.5), rot=r()*Math.PI;
+    g.beginPath(); g.ellipse(x,y,rx,ry,rot,0,Math.PI*2); g.fill();
+    if(x<rx){ g.beginPath(); g.ellipse(x+W,y,rx,ry,rot,0,Math.PI*2); g.fill(); }
+    if(x>W-rx){ g.beginPath(); g.ellipse(x-W,y,rx,ry,rot,0,Math.PI*2); g.fill(); }
+  }
+  g.globalAlpha=1;
+  if(String(b.almanac.biome||"").toLowerCase()==="frozen"){ // ice caps like the game's frozen worlds
+    var cg=g.createLinearGradient(0,0,0,H*0.22); cg.addColorStop(0,"rgba(255,255,255,0.9)"); cg.addColorStop(1,"rgba(255,255,255,0)");
+    g.fillStyle=cg; g.fillRect(0,0,W,H*0.22);
+    var cg2=g.createLinearGradient(0,H,0,H*0.78); cg2.addColorStop(0,"rgba(255,255,255,0.9)"); cg2.addColorStop(1,"rgba(255,255,255,0)");
+    g.fillStyle=cg2; g.fillRect(0,H*0.78,W,H*0.22);
+  }
+  var t=new THREE.CanvasTexture(cv); t.needsUpdate=true; return t;
+}
+function almRingTexture(b,hex){
+  var cols=[].concat(hex||"#c8b48a"); // Almanac gives the ring as a list of colours
+  var W=8,H=64,cv=document.createElement("canvas"); cv.width=W; cv.height=H;
+  var g=cv.getContext("2d"), r=mulberry32(b.seed^0x21196E), i;
+  for(i=0;i<H;i++){
+    var v=i/H, edge=Math.min(v,1-v)*2, a=(0.3+r()*0.5)*Math.min(1,edge*3);
+    g.globalAlpha=a; g.fillStyle=almHex(cols[Math.floor(r()*cols.length)],(r()-0.5)*0.5); g.fillRect(0,i,W,1);
+  }
+  var t=new THREE.CanvasTexture(cv); t.needsUpdate=true;
+  t.wrapS=THREE.RepeatWrapping; t.wrapT=THREE.ClampToEdgeWrapping; return t;
+}
+window.almLook=function(s){
+  if(typeof bodyMeshes==="undefined"||!bodyMeshes) return;
+  bodyMeshes.forEach(function(m){
+    var b=m.userData&&m.userData.body;
+    if(!b||m.userData.sys!==s||!b.almanac||!b.almanac.colours) return;
+    var key=b.almanac.portal+"|"+(b.ringSet?"t"+(!!b.ring):"a");
+    if(m.userData.almLook===key) return; m.userData.almLook=key;
+    var old=m.material.map; m.material.map=almPlanetTexture(b);
+    /* the star light is tinted; a little self-light keeps the real colours readable */
+    if(m.material.emissive){ m.material.emissive.setRGB(0.45,0.45,0.45); m.material.emissiveMap=m.material.map; }
+    m.material.needsUpdate=true; if(old) old.dispose();
+    m.children.filter(function(c){ return c.userData&&c.userData.pRing; }).forEach(function(c){ m.remove(c); if(c.material.map) c.material.map.dispose(); c.material.dispose(); c.geometry.dispose(); });
+    if(effRing(b,false)){
+      var ring=new THREE.Mesh(new THREE.RingGeometry(b.size*1.4,b.size*1.7,64),
+        new THREE.MeshBasicMaterial({map:almRingTexture(b,b.almanac.colours.rings||"#c8b48a"),transparent:true,side:THREE.DoubleSide,depthWrite:false}));
+      ring.rotation.x=Math.PI/2; ring.userData.pRing=true; m.add(ring);
+    }
+  });
+};
 function makePlanetTexture(b){
   var W=256,H=128;
   var cv=document.createElement("canvas"); cv.width=W; cv.height=H;
@@ -5317,16 +5393,16 @@ function buildSystemView(s){
         var pRingIn=new THREE.Mesh(new THREE.RingGeometry(b.size*1.4,b.size*1.5,64),
           new THREE.MeshBasicMaterial({map:makeRingTexture(b),transparent:true,
             side:THREE.DoubleSide,depthWrite:false}));
-        pRingIn.rotation.x=Math.PI/2; mesh.add(pRingIn);
+        pRingIn.rotation.x=Math.PI/2; pRingIn.userData.pRing=true; mesh.add(pRingIn);
         var pRingOut=new THREE.Mesh(new THREE.RingGeometry(b.size*1.58,b.size*1.7,64),
           new THREE.MeshBasicMaterial({map:makeRingTexture(b),transparent:true,
             side:THREE.DoubleSide,depthWrite:false}));
-        pRingOut.rotation.x=Math.PI/2; mesh.add(pRingOut);
+        pRingOut.rotation.x=Math.PI/2; pRingOut.userData.pRing=true; mesh.add(pRingOut);
       } else {
         var pRing=new THREE.Mesh(new THREE.RingGeometry(b.size*1.4,b.size*1.7,64),
           new THREE.MeshBasicMaterial({map:makeRingTexture(b),transparent:true,
             side:THREE.DoubleSide,depthWrite:false}));
-        pRing.rotation.x=Math.PI/2; mesh.add(pRing);
+        pRing.rotation.x=Math.PI/2; pRing.userData.pRing=true; mesh.add(pRing);
       }
     }
     // buildResourceIcon() call removed 2026-09-09 (Tony, same day as the
@@ -5827,7 +5903,7 @@ function showBody(b,s){
   // GoodGuysFree, just "rings" if present is all that's needed here (the
   // style name is still shown/used for the actual ring's visual colour on
   // the 3D body itself, just not spelled out in text).
-  if(b.bodyOverridden&&b.ring) t.push(["hot","Rings"]);
+  if(effRing(b,true)) t.push(["hot","Rings"]);
   if(b.autophage) t.push(["hot","Autophage camp"]);
   if(b.base) t.push(["hot",b.baseName?('Base: "'+b.baseName+'"'):"Has base"]);
   var html="",i;
@@ -6432,7 +6508,7 @@ function showSystemHoverPop(ud,cx,cy){
     var b=ud.body;
     var biomeTxt=b.biomeOverridden?(b.biome+(b.subtype?" ("+b.subtype+")":"")):"Unknown";
     var tags=[];
-    if(b.bodyOverridden&&b.ring) tags.push("Ring");
+    if(effRing(b,true)) tags.push("Ring");
     if(b.base) tags.push(b.baseName?('Base: "'+b.baseName+'"'):"Base");
     if(b.ruins) tags.push("Ruins");
     if(b.reliquary) tags.push("Reliquary");
@@ -9539,7 +9615,8 @@ function openEditModal(){
       subtype:b.subtype||"",
       descriptor:b.descriptor||"",
       water:!!b.water,
-      ring:!!b.ring,
+      ring:effRing(b,true),
+      ringSet:!!b.ringSet,
       resources:(b.resUni||[]).join(", "),
       flora:(b.flora||[]).join(", "),
       fauna:(b.fauna||[]).join(", "),
@@ -9747,7 +9824,7 @@ document.getElementById("bodyEditList").addEventListener("change",function(e){
     renderBodyEditList(); // Orbits dropdown only applies to moon rows -- must appear/disappear immediately
   }
   else if(e.target.classList.contains("bfWater")) editBodies[i].water=e.target.checked;
-  else if(e.target.classList.contains("bfRing")) editBodies[i].ring=e.target.checked;
+  else if(e.target.classList.contains("bfRing")){ editBodies[i].ring=e.target.checked; editBodies[i].ringSet=true; }
   else if(e.target.classList.contains("bfBiome")){
     editBodies[i].biome=e.target.value;
     // 2026-09-08: Sub type/Conditions must re-filter to the NEW biome the
@@ -11794,7 +11871,7 @@ document.getElementById("edSubmit").addEventListener("click",function(){
       return {
         name:b.name.trim(), moon:b.moon,
         orbits:(b.moon && b.orbits && uidToPos[b.orbits])?uidToPos[b.orbits]:0,
-        biome:b.biome, subtype:(b.subtype||"").trim(), descriptor:(b.descriptor||"").trim(), water:b.water, ring:!b.moon&&!!b.ring,
+        biome:b.biome, subtype:(b.subtype||"").trim(), descriptor:(b.descriptor||"").trim(), water:b.water, ring:!b.moon&&!!b.ring, ringSet:!b.moon&&!!b.ringSet,
         resources:b.resources.split(",").map(function(x){ return x.trim(); }).filter(Boolean),
         flora:(b.flora||"").split(",").map(function(x){ return x.trim(); }).filter(Boolean),
         fauna:(b.fauna||"").split(",").map(function(x){ return x.trim(); }).filter(Boolean),

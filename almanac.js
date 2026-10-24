@@ -6,7 +6,7 @@
    - Busy (500/hour key used up) -> "please try again later".
    All Almanac text is set with textContent. */
 (function(){
-  var MEM = {}, LS = "nms-alm-cache", busyToastAt = 0;
+  var MEM = {}, LS = "nms-alm-cache2", busyToastAt = 0; // cache2 (2026-10-24): older saved answers have no planet colours
   function lsGet(){ try { return JSON.parse(localStorage.getItem(LS) || "{}"); } catch(e){ return {}; } }
   function lsPut(k, v){
     try {
@@ -63,7 +63,11 @@
     var changed = false;
     s.almanacCard = d.system && d.system.card || null; // 2026-10-24: star hover card (preview.js)
     (s.bodies || []).forEach(function(b){
-      var a = byIndex(d, b.index);
+      // 2026-10-24: a traveller's saved planets can be in a different order from the game's,
+      // so pair by their typed name first (as Fill blanks does), then by position
+      var a = null;
+      if(b.nameOverridden && b.name) (d.bodies || []).forEach(function(x){ if(!a && x.name && String(x.name).trim().toLowerCase() === String(b.name).trim().toLowerCase()) a = x; });
+      if(!a) a = byIndex(d, b.index);
       b.almanac = a || null;
       if(a && a.name && !b.nameOverridden && b.name !== a.name){ b.name = a.name; changed = true; }
     });
@@ -83,6 +87,7 @@
     if(!s) return;
     get(s).then(function(d){
       if(apply(s, d) && typeof selected !== "undefined" && selected === s && !anyFoldOpen() && typeof updatePanel === "function") updatePanel(s);
+      if(typeof window.almLook === "function") window.almLook(s); // 2026-10-24: real colours + rings on the 3D planets
     });
   };
 

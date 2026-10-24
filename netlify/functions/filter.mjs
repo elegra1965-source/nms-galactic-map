@@ -482,6 +482,9 @@ export function filterSystemEdit(payload){
       // client uses in applyOverride() and generateSystem() -- never trust
       // a style string from the client itself, since one was never sent.
       ring: (!isMoon && !!b.ring) ? (RING_STYLE_BY_BIOME[biomeR.cleaned] || "tan") : false,
+      // 2026-10-24: true once the traveller has ticked/unticked Rings themselves; until then
+      // the map shows NMS Almanac's real ring (preview.js effRing())
+      ringSet: !isMoon && !!b.ringSet,
       resources: resOut,
       flora: resArr(b.flora,"Flora"),
       fauna: resArr(b.fauna,"Fauna"),

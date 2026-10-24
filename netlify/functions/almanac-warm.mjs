@@ -22,7 +22,7 @@
 
 import { getStore } from "@netlify/blobs";
 import { githubGetFile, parseCompositeKey, isValidAddress } from "./lib/shared.mjs";
-import { lookupAndCache, Busy, STORE } from "./almanac.mjs";
+import { lookupAndCache, Busy, STORE, CACHE_V } from "./almanac.mjs";
 
 const BUDGET = 40;                    // lookups per run
 const TIME_MS = 20000;                // stop after this long
@@ -35,7 +35,7 @@ export default async () => {
   var st = (await store.get("warm/state", { type: "json" }).catch(function(){ return null; })) || {};
   var now = Date.now();
 
-  if(!st.keys || !st.listAt || now - st.listAt > LIST_MAX_AGE_MS || (st.i >= st.keys.length && now - st.listAt > 24 * 3600 * 1000)){
+  if(!st.keys || !st.listAt || st.v !== CACHE_V || now - st.listAt > LIST_MAX_AGE_MS || (st.i >= st.keys.length && now - st.listAt > 24 * 3600 * 1000)){
     var token = process.env.GITHUB_TOKEN;
     if(!token) return new Response("Skipped: no GITHUB_TOKEN", { status: 200 });
     var cur;
@@ -46,7 +46,7 @@ export default async () => {
       var p = parseCompositeKey(k);
       if(p && isValidAddress(p.address)) keys.push(p.galaxy + ":" + p.address);
     });
-    st = { keys: keys, i: 0, listAt: now, done: 0, used: 0 };
+    st = { keys: keys, i: 0, listAt: now, done: 0, used: 0, v: CACHE_V };
   }
 
   var used = 0, looked = 0, skipped = 0, t0 = Date.now(), why = "budget";
@@ -56,7 +56,7 @@ export default async () => {
     var parts = st.keys[st.i].split(":"), g = parseInt(parts[0], 10), addr = parts[1];
     var ck = "sys/" + g + "/0" + addr.slice(1);
     var c = await store.get(ck, { type: "json" }).catch(function(){ return null; });
-    if(c && c.until - Date.now() > SKIP_IF_LEFT_MS){ st.i++; skipped++; continue; }
+    if(c && c.body && c.body.v === CACHE_V && c.until - Date.now() > SKIP_IF_LEFT_MS){ st.i++; skipped++; continue; }
     try {
       var r = await lookupAndCache(store, addr, g);
       used += r.cost; looked++; st.i++; st.done = (st.done || 0) + 1;

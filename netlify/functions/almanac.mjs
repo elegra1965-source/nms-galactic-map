@@ -28,6 +28,7 @@ const TTL_HIT_MS  = 30 * 24 * 3600 * 1000;
 const TTL_MISS_MS = 24 * 3600 * 1000;
 const PER_IP_HOUR = 40;
 const TIMEOUT_MS = 8000;
+const CACHE_V = 2;   // 2026-10-24: bodies now carry colours/ringed; older cached answers are refetched
 
 class Busy extends Error { constructor(ra){ super("busy"); this.retryAfter = ra; } }
 
@@ -90,7 +91,11 @@ function mapPlanet(p, w){
     resources: (p.resources || []).slice(0, 40).map(function(k){ return item(w, k); }),
     disc: pic.disc ? BASE + pic.disc : null,
     discSmall: pic.disc_small ? BASE + pic.disc_small : null,
-    card: pic.card ? BASE + pic.card : null
+    card: pic.card ? BASE + pic.card : null,
+    // 2026-10-24: real look for the map's 3D planets (terrain/water/sky/ring colours)
+    colours: p.colours ? { terrain: p.colours.terrain || null, water: p.colours.water || null,
+      sky: p.colours.sky && p.colours.sky.day || null, rings: p.colours.rings || null } : null,
+    ringed: !!(p.colours && p.colours.rings)
   };
 }
 
@@ -133,7 +138,7 @@ export async function lookupAndCache(store, addr, g){
   var cost = 1;
   var s = await aGet("systems/" + addr + "?galaxy=" + (g + 1));
   var body;
-  if(!s){ body = { ok:true, found:false }; }
+  if(!s){ body = { ok:true, found:false, v:CACHE_V }; }
   else {
     var w = await words(store, s.words);
     var bodies = [];
@@ -141,13 +146,13 @@ export async function lookupAndCache(store, addr, g){
       var p = await aGet("planets/" + s.bodies[i].portal + "?galaxy=" + (g + 1)); cost++;
       if(p) bodies.push(mapPlanet(p, w));
     }
-    body = { ok:true, found:true, galaxy:g, system: mapSystem(s, w), bodies: bodies,
+    body = { ok:true, found:true, v:CACHE_V, galaxy:g, system: mapSystem(s, w), bodies: bodies,
              attribution: "Data: NMS Almanac, https://nmsalmanac.com", link: "https://nmsalmanac.com" };
   }
   await store.setJSON(ck, { until: Date.now() + (body.found ? TTL_HIT_MS : TTL_MISS_MS), body: body }).catch(function(){});
   return { body: body, cost: cost };
 }
-export { Busy, STORE };
+export { Busy, STORE, CACHE_V };
 
 async function hourCount(store, who){
   var k = "rl/" + who + "/" + Math.floor(Date.now() / 3600000);
@@ -167,7 +172,7 @@ export default async (req, context) => {
   var store = getStore(STORE);
   var ck = "sys/" + g + "/" + sys0;
   var cached = await store.get(ck, { type: "json" }).catch(function(){ return null; });
-  if(cached && cached.until > Date.now()) return json(200, cached.body, { "Cache-Control": "public, max-age=3600" });
+  if(cached && cached.until > Date.now() && cached.body && cached.body.v === CACHE_V) return json(200, cached.body, { "Cache-Control": "public, max-age=3600" });
 
   var who = await ipKey((context && context.ip) || req.headers.get("x-nf-client-connection-ip") || "unknown");
   var rl = await hourCount(store, who);
