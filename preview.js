@@ -6149,7 +6149,7 @@ function endPointer(e){
   if(pointers[e.pointerId]) delete pointers[e.pointerId];
   if(Object.keys(pointers).length<2) pinchD=0;
   if(Object.keys(pointers).length===0){
-    if(drag&&moved<6&&!wasPinch) tryPick(e.clientX,e.clientY);
+    if(drag&&moved<6&&!wasPinch) tryPick(e.clientX,e.clientY,e.pointerType);
     drag=false;
     wasPinch=false;
     canvas.style.cursor="grab"; // back to the resting drag affordance once the gesture ends
@@ -6194,7 +6194,7 @@ function previewSystem(sys){
   if(focusSystem&&sys.address!==focusSystem.address) setCourse(sys,true);
 }
 var ray=new THREE.Raycaster(), ndc=new THREE.Vector2();
-function tryPick(cx,cy){
+function tryPick(cx,cy,ptype){
   var rect=canvas.getBoundingClientRect();
   ndc.x=((cx-rect.left)/rect.width)*2-1;
   ndc.y=-((cy-rect.top)/rect.height)*2+1;
@@ -6213,6 +6213,10 @@ function tryPick(cx,cy){
         hideResourceReport();
         if(ud.star||ud.feature) updatePanel(ud.sys);
         else showBody(ud.body,ud.sys);
+        /* 2026-10-24, Tony: phones have no hover, so a tap on a planet, moon, star or
+           station also shows its hover card (NMS Almanac picture when there is one) at the
+           tap point. Next touch on the map hides it (canvas pointerdown). */
+        if(ptype&&ptype!=="mouse") showSystemHoverPop(ud,cx,cy);
       }
     } else {
       hideResourceReport();
@@ -6665,7 +6669,9 @@ function updatePreviewAnim(dt){
   localGroup.add(previewLine);
 }
 canvas.addEventListener("pointermove",handleHoverRay);
-canvas.addEventListener("pointerleave",function(){ galaxyHovered=false; hideHoverPop(); clearCoursePreview(); });
+canvas.addEventListener("pointerleave",function(e){ galaxyHovered=false;
+  if(e&&e.pointerType&&e.pointerType!=="mouse") return; // 2026-10-24: lifting a finger fires pointerleave -- keep the tapped card up
+  hideHoverPop(); clearCoursePreview(); });
 
 /* ============ labels ============ */
 var labelEls=[], LBL_MAX=28;

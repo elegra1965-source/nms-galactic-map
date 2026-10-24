@@ -445,7 +445,10 @@ it (its disc, name, main facts, galaxy and portal glyphs) in place of the
 usual analysis card, and hovering the space station in the middle shows the
 system's own Almanac card. Systems a traveller has edited (or saved privately) are
 left exactly as they are: their planets keep the analysis card with the
-traveller's own data, plus the Almanac's picture of the planet.
+traveller's own data, plus the Almanac's picture of the planet. On a phone or
+tablet there is no hover, so tap the planet, moon, star or station instead: the
+same card shows where you tapped (the info panel opens as usual), and the next
+touch on the map closes it.
 
 **Planets look like the real game.** When NMS Almanac knows a planet, its 3D
 sphere in the system view is painted in the game's own terrain and water
