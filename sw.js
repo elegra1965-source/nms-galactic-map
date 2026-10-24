@@ -13,7 +13,7 @@
 // constant shouldn't need bumping again for a normal content update -- only
 // if this file (sw.js) ITSELF changes again in a way that needs old caches
 // purged.
-const CACHE = 'nms-galmap-v26';
+const CACHE = 'nms-galmap-v27';
 
 /* 2026-09-15, Tony's live-test report: refreshing into Local (or any mode)
    left drag/orbit feeling frozen for a few seconds before "catching up" --
@@ -148,3 +148,9 @@ self.addEventListener('notificationclick', event => {
     return clients.openWindow ? clients.openWindow(abs.href) : null;
   }));
 });
+
+// test bump 1792859655711
+
+// test bump 1792859708341
+
+// test bump 1792859790632

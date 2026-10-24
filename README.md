@@ -533,6 +533,10 @@ the long Full guide in About is English for now and says so. It lives in
 
 <img src="screenshots/25-languages.jpg" alt="The map on a phone: the language picker (left) and the map in Português (right)" width="560">
 
+**Always the newest version.** An installed app on a phone isn't reloaded when you switch back to it, so it could keep showing an old version until it was closed and reopened. Now, each time you come back to it (and every 30 minutes while it stays open), it checks for a new version. If one is live, a small bar says “New version ready · tap to update”, in your language. One tap reloads in place; × hides it. It never reloads by itself, so nothing you're in the middle of is lost. It lives in `nms-update.js`, the same file on every site.
+
+<img src="screenshots/29-update-bar.jpg" alt="The update bar at the bottom of the page on a phone: New version ready, tap to update, with a close button" width="390">
+
 ![Accessibility panel](screenshots/08-accessibility-panel.png)
 
 **Draggable panels.** Filters, the system info panel, Course plotted, the
