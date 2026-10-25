@@ -1,4 +1,7 @@
 [build]
+  # 2026-10-25: set every <lastmod> in the sitemap to the deploy date so Google
+  # sees the change (IndexNow for Bing runs in netlify/functions/deploy-succeeded.mjs).
+  command = '[ -f sitemap.xml ] && sed -i -E "s#<lastmod>[^<]*</lastmod>#<lastmod>$(date -u +%F)</lastmod>#g" sitemap.xml || true'
   publish = "."
   functions = "netlify/functions"
   # 2026-09-24: wiki-autofill.mjs (tools/wiki-autofill) submits real-data
