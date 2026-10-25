@@ -78826,12 +78826,204 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:108A00ADFC2D": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "[TGC] Nugiell",
+        "race": "Vy'keen",
+        "region": "Haspla Expanse",
+        "starClass": "F4",
+        "stars": [
+          "yellow",
+          "red"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "High Tech",
+        "sell": "56.6",
+        "buy": "-21.4",
+        "econDesc": "Declining",
+        "conflict": "Relaxed",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "The Gray Council Alliance",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "https://raw.githubusercontent.com/elegra1965-source/nms-galactic-map/main/user-screenshots/0-108A00ADFC2D-mvocnebz-nmhpz6.jpg",
+        "hasStation": true,
+        "stationName": "Nugiell Cycler",
+        "allianceName": "The Gray Council",
+        "stationPhoto": "https://raw.githubusercontent.com/elegra1965-source/nms-galactic-map/main/user-screenshots/0-108A00ADFC2D-station-mvocrbx6-xdjgjz.jpg",
+        "signals": [],
+        "editorName": "OldSaltySak",
+        "editorFriendCode": "H0ZJ-YBTF-C5TRR",
+        "genVersion": "1.9.0",
+        "bodies": [
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Toxic",
+            "subtype": "Acrid",
+            "descriptor": "Poison Rain",
+            "water": false,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Cobalt",
+              "Copper"
+            ],
+            "flora": [
+              "Abundant"
+            ],
+            "fauna": [
+              "Regular"
+            ],
+            "minerals": [
+              "Fungal Mould",
+              "Ammonia"
+            ],
+            "salvage": [
+              "Salvageable scrap"
+            ],
+            "fossils": [],
+            "sentinel": "Low Security",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Lush",
+            "subtype": "Paradise",
+            "descriptor": "Light Showers",
+            "water": true,
+            "ring": false,
+            "ringSet": true,
+            "resources": [
+              "Salt",
+              "Copper"
+            ],
+            "flora": [
+              "Bountiful"
+            ],
+            "fauna": [
+              "Rare"
+            ],
+            "minerals": [
+              "Star Bulb",
+              "Paraffinium"
+            ],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Irregular Patrols",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Barren",
+            "subtype": "Abandoned",
+            "descriptor": "Absent",
+            "water": false,
+            "ring": "tan",
+            "ringSet": true,
+            "resources": [
+              "Salt",
+              "Copper"
+            ],
+            "flora": [
+              "Devoid"
+            ],
+            "fauna": [
+              "Not Present"
+            ],
+            "minerals": [
+              "Rusted Metal"
+            ],
+            "salvage": [],
+            "fossils": [
+              "Ancient Bones"
+            ],
+            "sentinel": "Infrequent",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Volcanic",
+            "subtype": "Imminent Core Detonation",
+            "descriptor": "Heated Gas Pockets",
+            "water": false,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Salt",
+              "Copper"
+            ],
+            "flora": [
+              "Sporadic"
+            ],
+            "fauna": [
+              "Full"
+            ],
+            "minerals": [
+              "Salt"
+            ],
+            "salvage": [
+              "Salvageable scrap"
+            ],
+            "fossils": [],
+            "sentinel": "Low",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          }
+        ]
+      },
+      "editedAt": "2026-10-25T21:41:20.787Z",
+      "editedByIp": "ip_8872d1cc90459c24",
+      "history": [
+        {
+          "at": "2026-10-25T21:38:17.164Z",
+          "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-10-25T21:41:20.787Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
-    "ip_102e36bf7710976c": [
-      1792958288133
+    "ip_8872d1cc90459c24": [
+      1792964297164,
+      1792964480787
     ]
   },
   "flagLog": {},
@@ -78876,7 +79068,8 @@
       "Uprooted",
       "Lost",
       "Invasive",
-      "Infrequent"
+      "Infrequent",
+      "Devoid"
     ],
     "fauna": [
       "Devoid",
@@ -78897,7 +79090,9 @@
       "Fair",
       "Sparse",
       "Unusual",
-      "Occasional"
+      "Occasional",
+      "Regular",
+      "Not Present"
     ],
     "minerals": [
       "Magnatised Ferrite",
@@ -78996,7 +79191,11 @@
       "Freezing Night Winds",
       "Migratory Blizzards",
       "Heated Atmosphere",
-      "Infrequent Blizzards"
+      "Infrequent Blizzards",
+      "Poison Rain",
+      "Light Showers",
+      "Absent",
+      "Heated Gas Pockets"
     ],
     "biome": [
       "Radioactive",
@@ -79048,7 +79247,9 @@
       "Infested",
       "Hyperborean",
       "High Temperature",
-      "Icebound"
+      "Icebound",
+      "Acrid",
+      "Imminent Core Detonation"
     ],
     "signalName": [
       "MS Jiokaz XIV",
