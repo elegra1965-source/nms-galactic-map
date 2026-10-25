@@ -464,6 +464,8 @@ different order still gets the right data on each planet.
 and pick which planets collide: they stay joined as they orbit and their
 spheres sink into each other, the way real colliding planets look in game.
 
+<img src="screenshots/30-colliding-planets.jpg" alt="Colliding planets Idetar and Rosa in the system view, the two spheres sunk into each other" width="340">
+
 <img src="screenshots/28-real-looks.jpg" alt="Before and after in Sranch Op10079: the map's own made-up colours on the left, the real game colours and rings from NMS Almanac on the right" width="640">
 
 <img src="screenshots/26-almanac.jpg" alt="Real game data from NMS Almanac in the info panel: economy, conflict, sell/buy, demand, then planets with their pictures, real names, type, weather and sentinels, one opened to show fauna, flora and resources" width="420">
