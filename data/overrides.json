@@ -79212,7 +79212,8 @@
             ],
             "minerals": [
               "Frost Crystal",
-              "Dioxite"
+              "Dioxite",
+              "Storm Crystals"
             ],
             "salvage": [],
             "fossils": [
@@ -79260,11 +79261,15 @@
           }
         ]
       },
-      "editedAt": "2026-10-25T22:24:12.973Z",
+      "editedAt": "2026-10-25T22:44:43.201Z",
       "editedByIp": "ip_8872d1cc90459c24",
       "history": [
         {
           "at": "2026-10-25T22:24:12.973Z",
+          "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-10-25T22:44:43.201Z",
           "text": "edited by a traveller"
         }
       ]
@@ -79273,11 +79278,10 @@
   "reports": [],
   "ipLog": {
     "ip_8872d1cc90459c24": [
-      1792964297164,
-      1792964480787,
       1792966191681,
       1792966367931,
-      1792967052973
+      1792967052973,
+      1792968283201
     ],
     "ip_867ea6c99d7d3e44": [
       1792966827787
@@ -79382,7 +79386,8 @@
       "Cactus Flesh",
       "Gamma Root",
       "Solanium",
-      "Cobalt"
+      "Cobalt",
+      "Storm Crystals"
     ],
     "salvage": [
       "Salvageable scrap",
