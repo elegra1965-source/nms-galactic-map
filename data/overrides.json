@@ -79473,13 +79473,232 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:109200ADFC2D": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "[TGC] Viuqua",
+        "race": "Korvax",
+        "region": "Haspla Expanse",
+        "starClass": "E6f",
+        "stars": [
+          "green"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Mining",
+        "sell": "69.7",
+        "buy": "-17.9",
+        "econDesc": "Medium Supply",
+        "conflict": "Perilous",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "https://raw.githubusercontent.com/elegra1965-source/nms-galactic-map/main/user-screenshots/0-109200ADFC2D-mvogfksk-vv56cz.jpg",
+        "hasStation": true,
+        "stationName": "[TGC] Viuqua Cycler",
+        "allianceName": "The Gray Council",
+        "stationPhoto": "https://raw.githubusercontent.com/elegra1965-source/nms-galactic-map/main/user-screenshots/0-109200ADFC2D-station-mvogflsc-lfmh6u.jpg",
+        "signals": [],
+        "editorName": "OldSaltySak",
+        "editorFriendCode": "H0ZJ-YBTF-C5TRR",
+        "genVersion": "1.9.0",
+        "bodies": [
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Irradiated",
+            "subtype": "Supercritical",
+            "descriptor": "Volatile Windstorms",
+            "water": false,
+            "ring": false,
+            "ringSet": true,
+            "resources": [
+              "Silver"
+            ],
+            "flora": [
+              "Copious"
+            ],
+            "fauna": [
+              "Rich"
+            ],
+            "minerals": [
+              "Gamma Root",
+              "Emeril",
+              "Uranium",
+              "Storm Crystals"
+            ],
+            "salvage": [],
+            "fossils": [
+              "Ancient Bones"
+            ],
+            "sentinel": "Remote",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Dead",
+            "subtype": "Terraforming Catastrophe",
+            "descriptor": "Airless",
+            "water": false,
+            "ring": "ash",
+            "ringSet": true,
+            "resources": [
+              "Sodium"
+            ],
+            "flora": [
+              "Empty"
+            ],
+            "fauna": [
+              "None"
+            ],
+            "minerals": [
+              "Runaway Mould",
+              "Emeril"
+            ],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Limited",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Scorched",
+            "subtype": "Incandescent",
+            "descriptor": "Occasional Ash Storms",
+            "water": false,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Silver"
+            ],
+            "flora": [
+              "Bountiful"
+            ],
+            "fauna": [
+              "Hiigh"
+            ],
+            "minerals": [
+              "Solanium",
+              "Emeril",
+              "Phosphorus"
+            ],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Limited",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Marsh",
+            "subtype": "Cloudy",
+            "descriptor": "Mists of Annihilation",
+            "water": false,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Cobalt",
+              "Sulphurine"
+            ],
+            "flora": [
+              "Copious"
+            ],
+            "fauna": [
+              "Rich"
+            ],
+            "minerals": [
+              "Emeril"
+            ],
+            "salvage": [],
+            "fossils": [
+              "Vile Brood"
+            ],
+            "sentinel": "Minimal",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Lush",
+            "subtype": "Paradise",
+            "descriptor": "Blissful",
+            "water": true,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Cobalt"
+            ],
+            "flora": [
+              "Frequent"
+            ],
+            "fauna": [
+              "Rich"
+            ],
+            "minerals": [
+              "Paraffinium",
+              "Emeril",
+              "Star Bulb"
+            ],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Sparse",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          }
+        ]
+      },
+      "editedAt": "2026-10-25T23:24:10.757Z",
+      "editedByIp": "ip_8872d1cc90459c24",
+      "history": [
+        {
+          "at": "2026-10-25T23:24:10.757Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "ip_8872d1cc90459c24": [
       1792967052973,
-      1792968283201
+      1792968283201,
+      1792970650757
     ],
     "ip_b77e6ffcb3b2975e": [
       1792970428237
@@ -79503,7 +79722,8 @@
       "Rusted Metal",
       "Star Bulb",
       "Frost Crystal",
-      "Gamma Root"
+      "Gamma Root",
+      "Sulphurine"
     ],
     "flora": [
       "Sporadic",
@@ -79528,7 +79748,8 @@
       "Lost",
       "Invasive",
       "Infrequent",
-      "Devoid"
+      "Devoid",
+      "Empty"
     ],
     "fauna": [
       "Devoid",
@@ -79552,7 +79773,8 @@
       "Occasional",
       "Regular",
       "Not Present",
-      "Limited"
+      "Limited",
+      "None"
     ],
     "minerals": [
       "Magnatised Ferrite",
@@ -79585,7 +79807,9 @@
       "Gamma Root",
       "Solanium",
       "Cobalt",
-      "Storm Crystals"
+      "Storm Crystals",
+      "Emeril",
+      "Runaway Mould"
     ],
     "salvage": [
       "Salvageable scrap",
@@ -79657,7 +79881,11 @@
       "Light Showers",
       "Absent",
       "Heated Gas Pockets",
-      "Hazardous Whiteouts"
+      "Hazardous Whiteouts",
+      "Volatile Windstorms",
+      "Occasional Ash Storms",
+      "Mists of Annihilation",
+      "Blissful"
     ],
     "biome": [
       "Radioactive",
@@ -79712,7 +79940,10 @@
       "Icebound",
       "Acrid",
       "Imminent Core Detonation",
-      "Sub-zero"
+      "Sub-zero",
+      "Terraforming Catastrophe",
+      "Incandescent",
+      "Cloudy"
     ],
     "signalName": [
       "MS Jiokaz XIV",
