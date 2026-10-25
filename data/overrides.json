@@ -77697,7 +77697,7 @@
         "screenshot": "https://raw.githubusercontent.com/elegra1965-source/nms-galactic-map/main/user-screenshots/9-105200000000-mvbq3ao0-owj19s.jpg",
         "hasStation": true,
         "stationName": "[CORE-E10] Jura-Tempest Federation",
-        "allianceName": "Phantom Star Alliance",
+        "allianceName": "Galactic Hub Alliance",
         "stationPhoto": "https://raw.githubusercontent.com/elegra1965-source/nms-galactic-map/main/user-screenshots/9-105200000000-station-mvbq3be2-munqra.jpg",
         "signals": [],
         "editorName": "OldSaltySak",
@@ -77713,6 +77713,7 @@
             "descriptor": "Migratory Blizzards",
             "water": true,
             "ring": false,
+            "ringSet": false,
             "resources": [
               "Salt",
               "Copper"
@@ -77747,6 +77748,7 @@
             "descriptor": "Mild Rain",
             "water": true,
             "ring": false,
+            "ringSet": false,
             "resources": [
               "Cobalt",
               "Copper"
@@ -77779,6 +77781,7 @@
             "descriptor": "Infrequent Blizzards",
             "water": true,
             "ring": false,
+            "ringSet": false,
             "resources": [
               "Sodium",
               "Copper"
@@ -77811,6 +77814,7 @@
             "descriptor": "Heated Atmosphere",
             "water": false,
             "ring": false,
+            "ringSet": false,
             "resources": [
               "Cobalt",
               "Copper"
@@ -77843,6 +77847,7 @@
             "descriptor": "Humid",
             "water": true,
             "ring": false,
+            "ringSet": false,
             "resources": [
               "Silver",
               "Copper"
@@ -77868,8 +77873,8 @@
           }
         ]
       },
-      "editedAt": "2026-10-23T07:53:49.551Z",
-      "editedByIp": "ip_2f037fe3c00de778",
+      "editedAt": "2026-10-25T19:58:08.133Z",
+      "editedByIp": "ip_102e36bf7710976c",
       "history": [
         {
           "at": "2026-10-17T01:33:33.593Z",
@@ -77905,6 +77910,10 @@
         },
         {
           "at": "2026-10-23T07:53:49.551Z",
+          "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-10-25T19:58:08.133Z",
           "text": "edited by a traveller"
         }
       ]
@@ -78821,8 +78830,8 @@
   },
   "reports": [],
   "ipLog": {
-    "ip_9279193ba1812f5c": [
-      1792849800992
+    "ip_102e36bf7710976c": [
+      1792958288133
     ]
   },
   "flagLog": {},
