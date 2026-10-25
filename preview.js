@@ -5046,14 +5046,19 @@ function resolvePlanetCollisions(planetEntries,idxList){
     // the scene, and drop its entry from pivots[] so animate() isn't still
     // spinning a pivot nothing renders from any more.
     systemGroup.remove(b.pivot);
-    for(j=pivots.length-1;j>=0;j--){ if(pivots[j].p===b.pivot) pivots.splice(j,1); }
+    // 2026-10-25: keep b's own axial spin from its old pivots[] entry --
+    // planetEntries has no .spin, so b.spin was undefined, rotation.y went
+    // NaN on the first frame and the joined planet's sphere vanished (only
+    // its see-through atmosphere glow was left).
+    var bSpin=0.3;
+    for(j=pivots.length-1;j>=0;j--){ if(pivots[j].p===b.pivot){ if(pivots[j].spin===+pivots[j].spin) bSpin=pivots[j].spin; pivots.splice(j,1); } }
     // b's own orbital pivot is gone, but it should still spin gently on its
     // own axis like every other planet -- give it a throwaway Object3D
     // that's never added to the scene as a harmless stand-in "pivot" (its
     // rotation.y ticks up doing nothing) purely so animate()'s existing
     // per-pivots-entry loop keeps applying b's own axial spin without any
     // special-casing there.
-    pivots.push({p:new THREE.Object3D(),sp:0,mesh:b.mesh,spin:b.spin});
+    pivots.push({p:new THREE.Object3D(),sp:0,mesh:b.mesh,spin:bSpin});
 
     // Fixed offset in A's own local space -- a sideways-and-back diagonal
     // (not pure X) so the pair reads as two spheres genuinely resting
