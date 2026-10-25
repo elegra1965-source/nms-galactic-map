@@ -544,7 +544,9 @@ Warp Manifest, the glyph keypad, Search, Edit system, and Accessibility can
 all be dragged by
 their header to wherever suits your screen -- handy on smaller or rotated
 phones where they'd otherwise overlap, or just to pull a card off the course
-line it's sitting on.
+line it's sitting on. A panel always stays fully on screen: drag it to an
+edge and it stops there, and that edge glows cyan while you're pushing
+against it, so you can't lose a panel off the side of your phone.
 
 ![Course plotted card dragged clear of the jump line](screenshots/09-draggable-panels.jpg)
 

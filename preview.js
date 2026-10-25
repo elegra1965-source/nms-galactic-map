@@ -7930,12 +7930,12 @@ document.getElementById("bEditMin").addEventListener("click",function(e){
 var draggedBoxes=[];
 function makeDraggable(boxEl,handleEl){
   if(!boxEl||!handleEl) return;
-  var sx=0,sy=0,ox=0,oy=0,dragging=false,moved=0,ptrId=null,wasDrag=false;
+  var sx=0,sy=0,ox=0,oy=0,ow=0,oh=0,zf=1,dragging=false,moved=0,ptrId=null,wasDrag=false;
   draggedBoxes.push(boxEl);
   handleEl.addEventListener("pointerdown",function(e){
     if(e.target.closest("button")) return;
     var r=boxEl.getBoundingClientRect();
-    ox=r.left; oy=r.top; sx=e.clientX; sy=e.clientY;
+    ox=r.left; oy=r.top; ow=r.width; oh=r.height; zf=0; sx=e.clientX; sy=e.clientY;
     dragging=true; moved=0; ptrId=e.pointerId;
     handleEl.setPointerCapture(e.pointerId);
   });
@@ -7946,6 +7946,19 @@ function makeDraggable(boxEl,handleEl){
     if(moved<6) return;
     boxEl.style.position="fixed";
     boxEl.style.right="auto"; boxEl.style.bottom="auto"; boxEl.style.transform="none";
+    /* 2026-10-25 (Borjomi on a phone dragged the info panel half off the
+       right edge): the WHOLE box now stays on screen -- it stops dead at
+       each edge (no popup, no snap-back) and that edge glows cyan while
+       it's pressed against it. Width is locked to what it was, because
+       phone CSS sizes #panel with left+right and right:auto squashed it
+       (370px -> ~197px), which made it jump sideways. zf = the box's real
+       on-screen scale (the text-size setting zooms some boxes), measured
+       once per drag so CSS px and screen px line up. */
+    if(!zf){
+      boxEl.style.left="100px";
+      zf=(boxEl.getBoundingClientRect().left/100)||1;
+      boxEl.style.width=(ow/zf)+"px";
+    }
     /* Clamp top to the real toolbar bottom edge, not a flat 4px (Tony,
        2026-08-24: dragging Filters up near the toolbar left it stuck --
        #top is z-index:30, every draggable box here is z-index:25 or
@@ -7958,8 +7971,17 @@ function makeDraggable(boxEl,handleEl){
        into that dead zone, not just Filters. */
     var topEl=document.getElementById("top");
     var minTop=(topEl?topEl.getBoundingClientRect().bottom:0)+4;
-    boxEl.style.left=Math.max(4,Math.min(window.innerWidth-40,ox+ddx))+"px";
-    boxEl.style.top=Math.max(minTop,Math.min(window.innerHeight-40,oy+ddy))+"px";
+    var wantL=ox+ddx, wantT=oy+ddy;
+    var maxL=Math.max(4,window.innerWidth-ow-4), maxT=Math.max(minTop,window.innerHeight-oh-4);
+    var L=Math.max(4,Math.min(maxL,wantL)), T=Math.max(minTop,Math.min(maxT,wantT));
+    boxEl.style.left=(L/zf)+"px";
+    boxEl.style.top=(T/zf)+"px";
+    var g=[];
+    if(wantL<L) g.push("-3px 0 0 0 var(--cyan),-8px 0 16px -4px var(--cyan)");
+    if(wantL>L) g.push("3px 0 0 0 var(--cyan),8px 0 16px -4px var(--cyan)");
+    if(wantT<T) g.push("0 -3px 0 0 var(--cyan),0 -8px 16px -4px var(--cyan)");
+    if(wantT>T) g.push("0 3px 0 0 var(--cyan),0 8px 16px -4px var(--cyan)");
+    boxEl.style.boxShadow=g.join(",");
     /* No explicit Hyperdrive-panel re-anchor call here any more
        (2026-08-24) -- #hyperPanel went back to position:absolute anchored
        to #filt (see its CSS comment), which auto-follows #filt for any
@@ -7970,6 +7992,7 @@ function makeDraggable(boxEl,handleEl){
   function end(e){
     if(!dragging||e.pointerId!==ptrId) return;
     dragging=false;
+    boxEl.style.boxShadow="";
     wasDrag=moved>=6;
     /* 2026-08-25, round-2 honest-review fix: flag that a human actually
        repositioned this box, so callers (currently just Search, see
@@ -8421,7 +8444,7 @@ function resetDraggedBoxes(){
   for(var i=0;i<draggedBoxes.length;i++){
     var el=draggedBoxes[i];
     el.style.position=""; el.style.left=""; el.style.top="";
-    el.style.right=""; el.style.bottom=""; el.style.transform="";
+    el.style.right=""; el.style.bottom=""; el.style.transform=""; el.style.width=""; el.style.boxShadow="";
   }
 }
 window.addEventListener("resize",resetDraggedBoxes);
