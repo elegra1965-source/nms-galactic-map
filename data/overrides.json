@@ -78863,8 +78863,8 @@
         "allianceName": "The Gray Council",
         "stationPhoto": "",
         "signals": [],
-        "editorName": "",
-        "editorFriendCode": "",
+        "editorName": "OldSaltySak",
+        "editorFriendCode": "H0ZJ-YBTF-C5TRR",
         "genVersion": "1.9.0",
         "bodies": [
           {
@@ -79005,7 +79005,7 @@
           }
         ]
       },
-      "editedAt": "2026-10-25T22:09:51.681Z",
+      "editedAt": "2026-10-25T22:12:47.931Z",
       "editedByIp": "ip_8872d1cc90459c24",
       "history": [
         {
@@ -79019,6 +79019,10 @@
         {
           "at": "2026-10-25T22:09:51.681Z",
           "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-10-25T22:12:47.931Z",
+          "text": "edited by a traveller"
         }
       ]
     }
@@ -79028,7 +79032,8 @@
     "ip_8872d1cc90459c24": [
       1792964297164,
       1792964480787,
-      1792966191681
+      1792966191681,
+      1792966367931
     ]
   },
   "flagLog": {},
