@@ -79273,18 +79273,216 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "1:1415FCDD1977": {
+      "galaxy": 1,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Aimitaa-Hoe",
+        "race": "Korvax",
+        "region": "Imizuno",
+        "starClass": "Y4",
+        "stars": [
+          "purple"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Alchemical",
+        "sell": "73.8",
+        "buy": "-29.7",
+        "econDesc": "Satisfactory",
+        "conflict": "Relaxed",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": true,
+        "stationName": "",
+        "allianceName": "The Grey Council",
+        "stationPhoto": "https://raw.githubusercontent.com/elegra1965-source/nms-galactic-map/main/user-screenshots/1-1415FCDD1977-station-mvogat02-a9xlyu.jpg",
+        "signals": [],
+        "editorName": "",
+        "editorFriendCode": "",
+        "genVersion": "1.9.0",
+        "bodies": [
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "",
+            "subtype": "",
+            "descriptor": "",
+            "water": true,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Sodium"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Minimal",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "",
+            "subtype": "",
+            "descriptor": "",
+            "water": false,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Silver"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Isolated",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "",
+            "subtype": "",
+            "descriptor": "",
+            "water": true,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Magnetised Ferrite"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Low",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "",
+            "subtype": "",
+            "descriptor": "",
+            "water": true,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Sodium"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Limited",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": true,
+            "orbits": 4,
+            "biome": "",
+            "subtype": "",
+            "descriptor": "",
+            "water": false,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Cobalt"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Few",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "",
+            "subtype": "",
+            "descriptor": "",
+            "water": true,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Sodium"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Low Security",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          }
+        ]
+      },
+      "editedAt": "2026-10-25T23:20:28.237Z",
+      "editedByIp": "ip_b77e6ffcb3b2975e",
+      "history": [
+        {
+          "at": "2026-10-25T23:20:28.237Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "ip_8872d1cc90459c24": [
-      1792966191681,
-      1792966367931,
       1792967052973,
       1792968283201
     ],
-    "ip_867ea6c99d7d3e44": [
-      1792966827787
+    "ip_b77e6ffcb3b2975e": [
+      1792970428237
     ]
   },
   "flagLog": {},
@@ -79545,7 +79743,15 @@
       "Messenger of Atlas"
     ]
   },
-  "alliances": {},
+  "alliances": {
+    "the grey council": {
+      "name": "The Grey Council",
+      "badgeUrl": "https://raw.githubusercontent.com/elegra1965-source/nms-galactic-map/main/user-screenshots/1-1415FCDD1977-alliance-mvogatx0-34gidg.jpg",
+      "updatedAt": 1792970428237,
+      "editorName": "",
+      "fieldVotes": []
+    }
+  },
   "bulkImportLog": {
     "ip_11d5b9bff02f646f": [
       1792438151476
