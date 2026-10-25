@@ -79150,6 +79150,124 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:10A400ADFC2D": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "[TGC] Uhmani",
+        "race": "Gek",
+        "region": "Haspla Expanse",
+        "starClass": "F0pf",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Mercantile",
+        "sell": "42.6",
+        "buy": "-26.8",
+        "econDesc": "Fledgling",
+        "conflict": "Low",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "https://raw.githubusercontent.com/elegra1965-source/nms-galactic-map/main/user-screenshots/0-10A400ADFC2D-mvoeagmf-eqgkas.jpg",
+        "hasStation": true,
+        "stationName": "[TGC] Uhmani Cycler",
+        "allianceName": "The Gray Council Alliance",
+        "stationPhoto": "https://raw.githubusercontent.com/elegra1965-source/nms-galactic-map/main/user-screenshots/0-10A400ADFC2D-station-mvoeahmv-ovwc2p.jpg",
+        "signals": [],
+        "editorName": "OldSaltySak",
+        "editorFriendCode": "H0ZJ-YBTF-C5TRR",
+        "genVersion": "1.9.0",
+        "bodies": [
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Frozen",
+            "subtype": "Sub-zero",
+            "descriptor": "Hazardous Whiteouts",
+            "water": false,
+            "ring": "icy",
+            "ringSet": true,
+            "resources": [
+              "Activated Copper",
+              "Salt"
+            ],
+            "flora": [
+              "Abundant"
+            ],
+            "fauna": [
+              "Limited"
+            ],
+            "minerals": [
+              "Frost Crystal",
+              "Dioxite"
+            ],
+            "salvage": [],
+            "fossils": [
+              "Ancient Bones"
+            ],
+            "sentinel": "Limited",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Lush",
+            "subtype": "Paradise",
+            "descriptor": "Mellow",
+            "water": true,
+            "ring": false,
+            "ringSet": true,
+            "resources": [
+              "Sodium",
+              "Copper"
+            ],
+            "flora": [
+              "Abundant"
+            ],
+            "fauna": [
+              "Rare"
+            ],
+            "minerals": [
+              "Star Bulb",
+              "Paraffinium"
+            ],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Infrequent",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          }
+        ]
+      },
+      "editedAt": "2026-10-25T22:24:12.973Z",
+      "editedByIp": "ip_8872d1cc90459c24",
+      "history": [
+        {
+          "at": "2026-10-25T22:24:12.973Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -79158,7 +79276,8 @@
       1792964297164,
       1792964480787,
       1792966191681,
-      1792966367931
+      1792966367931,
+      1792967052973
     ],
     "ip_867ea6c99d7d3e44": [
       1792966827787
@@ -79230,7 +79349,8 @@
       "Unusual",
       "Occasional",
       "Regular",
-      "Not Present"
+      "Not Present",
+      "Limited"
     ],
     "minerals": [
       "Magnatised Ferrite",
@@ -79333,7 +79453,8 @@
       "Poison Rain",
       "Light Showers",
       "Absent",
-      "Heated Gas Pockets"
+      "Heated Gas Pockets",
+      "Hazardous Whiteouts"
     ],
     "biome": [
       "Radioactive",
@@ -79387,7 +79508,8 @@
       "High Temperature",
       "Icebound",
       "Acrid",
-      "Imminent Core Detonation"
+      "Imminent Core Detonation",
+      "Sub-zero"
     ],
     "signalName": [
       "MS Jiokaz XIV",
