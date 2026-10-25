@@ -79025,6 +79025,131 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "7:11B804005FFB": {
+      "galaxy": 7,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Utonggai",
+        "race": "Gek",
+        "region": "Tellri Band",
+        "starClass": "G2pf",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Ore Processing",
+        "sell": "46.0",
+        "buy": "-14.5",
+        "econDesc": "Promising",
+        "conflict": "Untroubled",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": true,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "BR_Wartins",
+        "editorFriendCode": "",
+        "genVersion": "1.9.0",
+        "bodies": [
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "",
+            "subtype": "",
+            "descriptor": "",
+            "water": false,
+            "ring": "tan",
+            "ringSet": false,
+            "resources": [
+              "Silver"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Spread Thin",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "",
+            "subtype": "",
+            "descriptor": "",
+            "water": true,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Silver"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Intermittent",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "",
+            "subtype": "",
+            "descriptor": "",
+            "water": false,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Gold"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Few",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          }
+        ]
+      },
+      "editedAt": "2026-10-25T22:20:27.787Z",
+      "editedByIp": "ip_867ea6c99d7d3e44",
+      "history": [
+        {
+          "at": "2026-10-25T22:20:27.787Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -79034,6 +79159,9 @@
       1792964480787,
       1792966191681,
       1792966367931
+    ],
+    "ip_867ea6c99d7d3e44": [
+      1792966827787
     ]
   },
   "flagLog": {},
