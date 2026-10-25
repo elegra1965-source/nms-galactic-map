@@ -460,6 +460,10 @@ themselves in Edit system, then their choice wins. Almanac planets are matched
 to a traveller's planets by name first, then by order, so a system saved in a
 different order still gets the right data on each planet.
 
+**Colliding planets touch.** Tick "Colliding planets present" in Edit system
+and pick which planets collide: they stay joined as they orbit and their
+spheres sink into each other, the way real colliding planets look in game.
+
 <img src="screenshots/28-real-looks.jpg" alt="Before and after in Sranch Op10079: the map's own made-up colours on the left, the real game colours and rings from NMS Almanac on the right" width="640">
 
 <img src="screenshots/26-almanac.jpg" alt="Real game data from NMS Almanac in the info panel: economy, conflict, sell/buy, demand, then planets with their pictures, real names, type, weather and sentinels, one opened to show fauna, flora and resources" width="420">

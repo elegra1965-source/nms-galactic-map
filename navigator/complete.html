@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<script>/* visitor stats: GoatCounter (free, no cookies), same dashboard as the Hub; recorded as host/path WITHOUT the query (the journey route lives in the URL, so each journey would otherwise be its own row) */(function(){if(!/(^|\.)nomansskyhub\.app$/.test(location.hostname))return;window.goatcounter={path:function(){return location.host+location.pathname}};var s=document.createElement("script");s.async=true;s.src="https://gc.zgo.at/count.js";s.setAttribute("data-goatcounter","https://nomansskyhub.goatcounter.com/count");document.head.appendChild(s);})();</script>
 <title>Journey Complete</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
@@ -769,5 +770,9 @@ body.no-fx .orb{display:none}
   };
 })();
 </script>
+<script>/* 2026-10-25 (Tony: "good to know someone found it"): GoatCounter events for the Journey Snapshot easter egg -- journey/snapshot-open, -save, -share. Waits up to 10 s for count.js. */
+(function(){function ev(n){var t=0;(function go(){var g=window.goatcounter;if(g&&g.count){g.count({path:"journey/"+n,title:"Journey snapshot "+n.replace("snapshot-",""),event:true});}else if(t++<20)setTimeout(go,500);})();}
+var m={openSnap:"snapshot-open",saveImage:"snapshot-save",shareImage:"snapshot-share"};
+Object.keys(m).forEach(function(id){var b=document.getElementById(id);if(b)b.addEventListener("click",function(){ev(m[id]);});});})();</script>
 </body>
 </html>

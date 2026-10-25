@@ -5063,7 +5063,10 @@ function resolvePlanetCollisions(planetEntries,idxList){
     // rotates that same direction further around A by the golden angle so
     // a 3rd/4th/etc planet gets its own spot instead of overlapping the
     // ones already placed.
-    var dist=a.size+b.size+0.4;
+    // 2026-10-25 (Tony, in-game Idetar-Rosa screenshot): real colliding
+    // planets sink INTO each other, so the spheres now overlap by ~14% of
+    // their combined radius instead of sitting with a small gap.
+    var dist=(a.size+b.size)*0.86;
     var dir=baseDir.clone().applyAxisAngle(yAxis,GOLDEN_ANGLE*(i-1));
     var newPos=a.mesh.position.clone().addScaledVector(dir,dist);
 
