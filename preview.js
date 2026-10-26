@@ -6182,7 +6182,12 @@ function endPointer(e){
   if(pointers[e.pointerId]) delete pointers[e.pointerId];
   if(Object.keys(pointers).length<2) pinchD=0;
   if(Object.keys(pointers).length===0){
-    if(drag&&moved<6&&!wasPinch) tryPick(e.clientX,e.clientY,e.pointerType);
+    if(drag&&moved<6&&!wasPinch){
+      // 2026-10-26, Tony: a tap on the map tucks the phone controls away (not while Filters is open)
+      var fo=document.getElementById("filt");
+      if(window.autoHideControls&&!(fo&&!fo.classList.contains("min")&&fo.offsetParent)) window.autoHideControls(false);
+      tryPick(e.clientX,e.clientY,e.pointerType);
+    }
     drag=false;
     wasPinch=false;
     canvas.style.cursor="grab"; // back to the resting drag affordance once the gesture ends
@@ -7893,7 +7898,11 @@ function positionTweakPanel(){
 }
 document.getElementById("fHead").addEventListener("click",function(){ toggleFold("filt","fHeadLabel","Filters","bFiltMin"); });
 document.getElementById("telHead").addEventListener("click",function(){ toggleFold("tel","telHead","Telemetry"); });
-document.getElementById("bFiltToggle").addEventListener("click",function(){ toggleFold("filt","fHeadLabel","Filters","bFiltMin"); });
+document.getElementById("bFiltToggle").addEventListener("click",function(){
+  toggleFold("filt","fHeadLabel","Filters","bFiltMin");
+  // 2026-10-26: on phones, opening Filters tucks the controls away so it has room above the info panel
+  var f=document.getElementById("filt"); if(f&&!f.classList.contains("min")&&window.autoHideControls) window.autoHideControls(false);
+});
 /* Dedicated collapse button for Filters (2026-08-24, Tony: "filter its not
    collapsible like others so have to always click filter button next to
    search to collapse"). Real root cause: #fHead doubles as makeDraggable's
@@ -8105,6 +8114,9 @@ var _SCIFI_LOGS=[
 var _warpFailTimer=null;
 var _warpGen=0;
 function playWarpTransition(kind){
+  // 2026-10-26, Tony: every jump / Random / search or favourite pick / Enter system goes
+  // through here, so this is where the phone controls (and the glyph keypad) tuck away
+  if(window.autoHideControls) window.autoHideControls(true);
   if(!WARP_ENABLED) return;
   if(document.documentElement.classList.contains("calm")) return; // Calm mode (calm.js): no warp animation
   var ov=document.getElementById('warp-overlay');
@@ -12931,7 +12943,25 @@ var LAST_POS=ARRIVAL||loadLastPosition();
    than 1. The map works per system (its addresses always use planet 1), so say so instead of
    leaving the traveller wondering why the first glyph changed. */
 if(ARRIVAL&&ARRIVAL.address.charAt(0).toUpperCase()!=="1"){
-  setTimeout(function(){ toast("The first glyph picks the planet. The map shows the whole system, so it starts at planet 1 -- dial "+ARRIVAL.address.toUpperCase().replace(/[^0-9A-F]/g,"")+" in game to land on that planet.",9000); },4500);
+  setTimeout(function(){
+    var hx=ARRIVAL.address.toUpperCase().replace(/[^0-9A-F]/g,""), pi=parseInt(hx.charAt(0),16);
+    function generic(){ toast("The first glyph picks the planet. The map shows the whole system, so it starts at planet 1 -- dial "+hx+" in game to land on that planet.",9000); }
+    /* 2026-10-26, Tony: now NMS Almanac knows each planet's position, name the planet the
+       first glyph picks (a traveller's own name for it wins) and open it in the system view */
+    var s=selected;
+    if(!s||!window.almGet||("0"+String(s.address).toUpperCase().slice(1))!==("0"+hx.slice(1))) return generic();
+    window.almGet(s).then(function(d){
+      var a=d&&d.found&&(d.bodies||[]).filter(function(x){ return x.p===pi; })[0];
+      if(!a) return generic();
+      if(window.almApply) window.almApply(s,d);
+      var mb=(s.bodies||[]).filter(function(x){ return x.almanac===a; })[0];
+      var nm=(mb&&mb.nameOverridden&&mb.name)?mb.name:(a.name||("planet "+pi));
+      window.ARRIVAL_PLANET={galaxy:s.galaxy,sys:"0"+hx.slice(1),p:pi};
+      toast("This address lands on "+(a.moonOf?"moon ":"planet ")+pi+": "+nm+". Enter the system to see it -- dial "+hx+" in game to land there.",9000);
+      if(selected===s&&mode!=="system"&&typeof updatePanel==="function") updatePanel(s); // real economy/trade in the panel too
+      if(mode==="system"&&mb&&typeof showBody==="function"){ window.ARRIVAL_PLANET=null; showBody(mb,s); }
+    },generic);
+  },4500);
 }
 if(LAST_POS){
   GALAXY=LAST_POS.galaxy;
@@ -13272,6 +13302,21 @@ if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){
   document.documentElement.classList.toggle('toolbar-collapsed',initial);
   setLabel(initial);
   syncOverlays();
+  /* 2026-10-26, Tony: on phones the controls hide again by themselves once an action is
+     done (jump, Random, search/favourite pick, Enter system, a tap on the map), so "Show
+     controls" is a one-tap open and never needs closing by hand. withKeypad also closes
+     the glyph keypad (after its Jump). Not saved as the remembered state. */
+  window.autoHideControls=function(withKeypad){
+    if(withKeypad){
+      var k=document.getElementById('keys'), bk=document.getElementById('bKeys');
+      if(k&&k.classList.contains('show')&&btn.offsetParent){ k.classList.remove('show'); if(bk) bk.classList.remove('on'); }
+    }
+    if(!btn.offsetParent) return; // desktop: the toggle isn't shown, nothing to hide
+    if(document.documentElement.classList.contains('toolbar-collapsed')) return;
+    document.documentElement.classList.add('toolbar-collapsed');
+    setLabel(true);
+    hideAll();
+  };
   btn.addEventListener('click',function(){
     var collapsing=!document.documentElement.classList.contains('toolbar-collapsed');
     document.documentElement.classList.toggle('toolbar-collapsed',collapsing);

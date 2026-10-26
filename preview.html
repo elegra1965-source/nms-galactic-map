@@ -1380,6 +1380,14 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
      (now a sibling of .fbody, not a descendant) is never clipped by it
      again -- see the #hyperPanel CSS comment above for the full story. */
   #filt .fbody{max-height:calc(100vh - var(--top-h,150px) - 150px);overflow-y:auto;overflow-x:hidden}
+  /* 2026-10-26, Tony's phone screenshot: syncFiltBoundary() caps #filt's height above the info
+     panel, but .fbody didn't shrink with it, so the dropdowns spilled out below the box onto the
+     panel. A flex column lets .fbody take only what's left and scroll inside. */
+  #filt:not(.min){display:flex;flex-direction:column}
+  #filt .fhead{flex:0 0 auto}
+  #filt .fbody{flex:1 1 auto;min-height:0}
+  /* 2026-10-26: with the phone controls open the system banner landed on the info panel -- hide it until they close */
+  html:not(.toolbar-collapsed) #sysBanner{visibility:hidden}
   #keys{bottom:auto;top:calc(var(--top-h,150px) + 140px);width:calc(100vw - 20px)}
   #flyhint{display:none!important}
   input[type=text]{width:100%}
@@ -3032,8 +3040,8 @@ loadLetterMap('./nms-core/letter-map').then(function(lm){
 });
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="preview.js?v=20261026b"></script>
-<script src="almanac.js?v=20261026b"></script>
+<script src="preview.js?v=20261026c"></script>
+<script src="almanac.js?v=20261026c"></script>
 <script src="share-system.js"></script>
 <script src="charted.js"></script>
 <script src="trending.js"></script>

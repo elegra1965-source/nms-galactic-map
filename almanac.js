@@ -121,6 +121,18 @@
     almFor = null;
     var d = s && cached(s); if(d) apply(s, d);
   };
+  window.almGet = get; // 2026-10-26: preview.js arrival popup names the planet the first glyph picks
+  window.almApply = apply;
+  // 2026-10-26: the planet an arrival link's first glyph picked (set by preview.js) is opened
+  // in the system view once, so the traveller sees which one it is
+  function arrivalPlanet(s){
+    var ap = window.ARRIVAL_PLANET;
+    if(!ap || !s || ap.galaxy !== s.galaxy || ap.sys !== ("0" + String(s.address).toUpperCase().slice(1))) return;
+    var b = (s.bodies || []).filter(function(x){ return x.almanac && x.almanac.p === ap.p; })[0];
+    if(!b || typeof showBody !== "function" || typeof mode === "undefined" || mode !== "system") return;
+    window.ARRIVAL_PLANET = null;
+    showBody(b, s);
+  }
   // called when a system's 3D view is entered
   window.almNames = function(s){
     if(!s) return;
@@ -129,6 +141,7 @@
       if(ch && typeof selected !== "undefined" && selected === s && typeof setSysBanner === "function"){ try { setSysBanner(s); } catch(e){} } // 2026-10-26: player-given system name on the banner
       if(ch && typeof selected !== "undefined" && selected === s && !anyFoldOpen() && typeof updatePanel === "function") updatePanel(s);
       if(typeof window.almLook === "function") window.almLook(s); // 2026-10-24: real colours + rings on the 3D planets
+      arrivalPlanet(s);
     });
   };
 

@@ -480,6 +480,18 @@ figures were a best guess. Trade is shown the game's way, "Buy: −28.6% //
 Sell: +79.9%" (the Almanac writes it from the station's side, so its two
 numbers are swapped into place).
 
+**Which planet the first glyph picks.** A link with a planet glyph other than 1
+(from the Hub dialer or the Translator) now says which planet or moon it lands
+on, by name, when NMS Almanac knows the system ("This address lands on planet 5:
+Iiha 86/X9"), and that planet opens when you enter the system.
+
+**Phone controls tidy themselves away.** On a phone, "Show controls" only needs
+one tap: the controls (and the glyph keypad) hide again by themselves after a
+jump, Random, a search or favourite pick, Enter system, opening Filters, or a tap
+on the map. Toggles like Labels, Grid and Orbit leave them open. While they're
+open the system banner steps aside so it doesn't sit on the info panel, and
+Filters always scrolls inside its own box above the info panel.
+
 **Links to NMS Almanac.** Every planet in the Almanac section and in the planet
 details has a link to its own page on NMS Almanac, and the section has a link to
 the system's page (`nmsalmanac.com/system/<galaxy>/<portal hex>`), as Borjomi
