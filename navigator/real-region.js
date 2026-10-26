@@ -120,7 +120,9 @@ function realRegionCandidates(originVx, originVy, originVz, galaxy) {
     var pickedIdx = {}, attempts = 0, picks = 6;
     while (Object.keys(pickedIdx).length < picks && attempts < 60) {
       attempts++;
-      var idx = Math.floor(vr() * 4096);
+      // 2026-10-26: only 0x001-0x078 (the region's guide stars), which always
+      // exist in game -- NMS Almanac showed most numbers past ~0x200 don't.
+      var idx = 1 + Math.floor(vr() * 0x78);
       var jitter = Math.round(vr() * 350); // spread within a region, ~one region's own span
       if (idx > 0xFFE || idx === anomaly.bh || idx === anomaly.atlas || pickedIdx[idx]) continue;
       pickedIdx[idx] = true;
@@ -166,3 +168,27 @@ function realRegionCandidates(originVx, originVy, originVz, galaxy) {
 }
 
 window.realRegionCandidates = realRegionCandidates;
+
+/* 2026-10-26: one specific system as a Navigator hop object (same fields as
+   above), used by "Check route" to swap a stop NMS Almanac can't find for a
+   guide star in the same region. Returns null if nms-core isn't loaded. */
+function realSystemAt(vx, vy, vz, idx, galaxy) {
+  if (!window.NMSCore || !window.nmsLetterMap) return null;
+  var address = formatAddressLocal(1, idx, vx, vy, vz);
+  var pc, attrs, name = null, region = null, flavor = null;
+  try { pc = BigInt("0x" + address); attrs = window.NMSCore.systemAttributes(pc, galaxy); } catch (e) { return null; }
+  try { name = window.NMSCore.systemName(pc, galaxy, window.nmsLetterMap); } catch (e) {}
+  try { region = window.NMSCore.regionName(pc, galaxy, window.nmsLetterMap); } catch (e) {}
+  if (!name || !attrs) return null;
+  if (window.NMSEconomy && window.NMSEconomy.rollSystemFlavorFromAttrs) {
+    try { flavor = window.NMSEconomy.rollSystemFlavorFromAttrs(mulberry32Local(gseedLocal(galaxy, vx, vy, vz, idx)), attrs); } catch (e) {}
+  }
+  return {
+    address: address, systemName: name, region: region || "",
+    starType: STAR_TYPE_BY_INDEX[attrs.star_type] || "yellow",
+    race: flavor ? flavor.race : "", economy: flavor ? flavor.econType : "", econType: flavor ? flavor.econType : "",
+    econTier: flavor ? flavor.econTier : null, conflict: flavor ? flavor.conflict : "", conTier: flavor ? flavor.conTier : null,
+    outlaw: flavor ? !!flavor.outlaw : false, coords: { x: vx, y: vy, z: vz }
+  };
+}
+window.realSystemAt = realSystemAt;

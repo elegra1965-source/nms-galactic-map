@@ -157,6 +157,20 @@ fixed sample cluster unrelated to your actual route.
 
 ![Galactic Navigator page showing a plotted route](screenshots/12-galactic-navigator.jpg)
 
+**Real stars only, checked with NMS Almanac (2026-10-26).** Tested against
+[NMS Almanac](https://nmsalmanac.com): a region's real systems only use some
+of the 4,096 possible system numbers, so the map used to plan stops (and
+draw stars) that aren't in the game. Now every star on the map and every
+route stop is one that always exists -- the region's guide stars, black hole
+and Atlas Interface, plus its purple stars. Each hop is planned to at most
+85% of your hyperdrive range, because a star's exact spot inside its 400 LY
+region isn't known, so distances are shown as approximate. In the Navigator,
+**✓ CHECK ROUTE WITH NMS ALMANAC** asks the Almanac about every stop: a ✓
+means it's a real system; a stop it can't find is swapped for a real star in
+the same region your drive can reach (marked SWAPPED). Data: NMS Almanac.
+
+![Navigator after Check route: every stop ticked, one swapped](screenshots/31-route-check.jpg)
+
 **Saved & shareable routes.** Once a course is plotted, the Course plotted
 card gets two more buttons below Jump to / Clear. **Save Route** stores
 that exact route into **My Routes** (the Routes button in the toolbar) so

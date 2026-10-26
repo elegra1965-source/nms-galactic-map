@@ -145,6 +145,14 @@ main{min-height:calc(100vh - 60px - 26px);display:grid;grid-template-columns:290
 .panel-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .linkBtn{background:none;border:0;color:var(--cyan-dim);font-size:9px;letter-spacing:.08em;font-family:'Orbitron',sans-serif;font-weight:700;padding:4px 0;text-decoration:underline;text-underline-offset:3px}
 .linkBtn:hover{color:var(--cyan)}
+/* 2026-10-26: Check route with NMS Almanac + approximate-distance note */
+.routeCheck{display:flex;flex-wrap:wrap;align-items:center;gap:2px 10px;margin-top:8px}
+.routeCheck .linkBtn{font-size:10px;padding:6px 0}
+.routeCheck .linkBtn[disabled]{opacity:.55;text-decoration:none}
+.routeCheckMsg{display:block;width:100%;font-size:11px;line-height:1.35;color:var(--text-faint)}
+.routeCheckMsg a{color:var(--cyan-dim)}
+.chk{font-family:'Orbitron',sans-serif;font-size:10px;margin-left:6px;font-weight:700}
+.chkOk{color:#6bffa8}.chkNo{color:#ff5a4a}.chkSwap{color:var(--gold)}
 
 details.pickerFold{margin-bottom:10px;border:1px solid var(--border-soft);border-radius:var(--r);background:var(--bg2)}
 details.pickerFold>summary{list-style:none;cursor:pointer;padding:9px 11px;font-size:9px;letter-spacing:.12em;color:var(--text-dim);font-family:'Orbitron',sans-serif;font-weight:700;display:flex;align-items:center;justify-content:space-between}
@@ -625,6 +633,10 @@ window.nmsCoreReady = new Promise(function (res) { window.__nmsCoreResolve = res
         <div class="summary">
           <div><small>DISTANCE REMAINING</small><strong id="distanceRemaining">&mdash;</strong></div>
           <div><small>TOTAL JUMPS</small><strong id="jumpCount">&mdash;</strong></div>
+        </div>
+        <div class="routeCheck">
+          <button class="linkBtn" id="checkRoute" type="button" title="Asks NMS Almanac whether every stop on this route is a real system in the game">&#10003; CHECK ROUTE WITH NMS ALMANAC</button>
+          <small class="routeCheckMsg" id="routeCheckMsg">Distances are approximate &mdash; check each jump is in range on your in-game galaxy map.</small>
         </div>
 
         <div class="warpRange" id="warpRangeBox">
@@ -2524,7 +2536,7 @@ window.MOCK_JOURNEYS = [
       return '<div class="jumpRow' + (expanded ? " expanded" : "") + '">' +
         '<div class="' + cls + '" data-index="' + i + '">' +
         "<b>" + mark + "</b>" +
-        '<div class="info" data-detail="' + i + '"><strong>' + j.systemName + "</strong>" +
+        '<div class="info" data-detail="' + i + '"><strong>' + j.systemName + chkBadge(j) + "</strong>" +
         "<small>" + starDot(j.starType) + distHtml + " — " + tag + "</small></div>" +
         '<button class="jumpToggle' + (expanded ? " open" : "") + '" data-toggle="' + i + '" aria-label="' +
           (expanded ? "Hide details" : "Show details") + '" title="' + (expanded ? "Hide details" : "Show details") + '">&#9662;</button>' +
@@ -2705,6 +2717,103 @@ window.MOCK_JOURNEYS = [
       "</p>";
     $("routePanelBody").appendChild(div);
   }
+
+  /* ---- 2026-10-26: Check route with NMS Almanac ------------------------
+     Tony: travellers waste time if a planned stop isn't a real star. Asks
+     the map's own almanac function (exists=1: one cheap lookup per stop,
+     cached 30 days) about every stop. Results ride on session.almCheck
+     (keyed by address) so they survive a refresh. A stop the Almanac can't
+     find is swapped for a guide star (0x001-0x078, always real) in the same
+     region that the current drive can reach, checked again, and marked
+     SWAPPED. Data credit sits next to the result, as the Almanac asks. */
+  var DRIVE_REACH = ["yellow", "red", "green", "blue", "purple"];
+  function driveReaches(col) {
+    var t = 0; for (var i = 0; i < HYPER_DRIVES.length; i++) if (HYPER_DRIVES[i].k === currentDriveKey) t = i;
+    var k = DRIVE_REACH.indexOf(col || "yellow"); return k < 0 || k <= t;
+  }
+  function chkBadge(j) {
+    var c = session.almCheck && session.almCheck[j.address];
+    if (!c) return "";
+    if (c === "ok") return ' <span class="chk chkOk" title="Real system, confirmed by NMS Almanac">&#10003;</span>';
+    if (c === "swap") return ' <span class="chk chkSwap" title="Swapped for a real system in the same region (NMS Almanac)">&#10003; SWAPPED</span>';
+    if (c === "no") return ' <span class="chk chkNo" title="NMS Almanac can\'t find this system">&#10007; NOT FOUND</span>';
+    return "";
+  }
+  function almExists(addr) {
+    return fetch("/.netlify/functions/almanac?exists=1&galaxy=" + currentGalaxyNum() + "&addr=" + encodeURIComponent(addr))
+      .then(function (r) { return r.json(); });
+  }
+  var routeChecking = false;
+  function checkRouteMsg(html) { $("routeCheckMsg").innerHTML = html; }
+  function checkRoute() {
+    if (routeChecking) return;
+    var jl = jumps();
+    if (!jl || !jl.length) return;
+    routeChecking = true;
+    session.almCheck = session.almCheck || {};
+    var btn = $("checkRoute"); btn.disabled = true;
+    var credit = ' &middot; Data: <a href="https://nmsalmanac.com" target="_blank" rel="noopener">NMS Almanac</a>';
+    var i = 0, ok = 0, swapped = 0, missing = 0, stopped = false;
+    function done(extra) {
+      routeChecking = false; btn.disabled = false;
+      persist(); renderManifest(); renderRoutePanel();
+      var total = jl.length;
+      var msg = ok + swapped + " of " + total + " stops are real systems" +
+        (swapped ? " (" + swapped + " swapped for a real star in the same region)" : "") +
+        (missing ? " &middot; <span class=\"chkNo\">" + missing + " not found</span>" : "") +
+        (extra || "") + credit + ". Distances are still approximate.";
+      checkRouteMsg(msg);
+    }
+    function trySwap(j, idx) {
+      // guide stars in the same region, starting from a spot seeded by the
+      // old address so the same route always swaps to the same star
+      var tries = 0, start = (parseInt(j.address.slice(1, 4), 16) % 0x78) + 1;
+      function next() {
+        while (tries < 12) {
+          var n = ((start - 1 + tries * 7) % 0x78) + 1; tries++;
+          var c = window.realSystemAt && window.realSystemAt(j.coords.x, j.coords.y, j.coords.z, n, currentGalaxyNum());
+          if (!c || !driveReaches(c.starType)) continue;
+          return almExists(c.address).then(function (r) {
+            if (r && r.busy) { stopped = true; return false; }
+            if (r && r.found) {
+              if (r.name) c.systemName = r.name;
+              var keep = { index: j.index, distance: j.distance, detour: j.detour, isBlackHole: false, isAtlas: false, abandoned: false, uncharted: false };
+              for (var k in c) keep[k] = c[k];
+              jl[idx] = keep;
+              session.almCheck[keep.address] = "swap";
+              return true;
+            }
+            return next();
+          });
+        }
+        return Promise.resolve(false);
+      }
+      return next();
+    }
+    function step() {
+      if (stopped || i >= jl.length) return done(stopped ? " &middot; NMS Almanac is busy, try again later" : "");
+      var idx = i++, j = jl[idx];
+      checkRouteMsg("Checking stop " + (idx + 1) + " of " + jl.length + "&hellip;" + credit);
+      var prev = session.almCheck[j.address];
+      if (prev === "ok" || prev === "swap") { if (prev === "ok") ok++; else swapped++; return step(); }
+      almExists(j.address).then(function (r) {
+        if (!r || r.busy || r.ok === false) { stopped = true; return step(); }
+        if (r.found) {
+          session.almCheck[j.address] = "ok"; ok++;
+          if (r.name && r.name !== j.systemName) j.systemName = r.name;
+          return step();
+        }
+        // first and last stops are the traveller's own picks -- flag, don't swap
+        if (idx === 0 || idx === jl.length - 1 || j.isBlackHole) { session.almCheck[j.address] = "no"; missing++; return step(); }
+        return trySwap(j, idx).then(function (sw) {
+          if (sw) swapped++; else if (!stopped) { session.almCheck[j.address] = "no"; missing++; }
+          return step();
+        });
+      }).catch(function () { stopped = true; step(); });
+    }
+    step();
+  }
+  $("checkRoute").addEventListener("click", checkRoute);
 
   function renderAll() {
     renderPicker();

@@ -27,6 +27,7 @@ const STORE = "nms-galmap-almanac";
 const TTL_HIT_MS  = 30 * 24 * 3600 * 1000;
 const TTL_MISS_MS = 24 * 3600 * 1000;
 const PER_IP_HOUR = 40;
+const PER_IP_HOUR_EXISTS = 80;   // 2026-10-26: Navigator's "Check route" (1 key lookup each, see exists=1)
 const TIMEOUT_MS = 8000;
 const CACHE_V = 3;   // 2026-10-24 v2: colours/ringed. 2026-10-26 v3: player-given names + station picture; older cached answers are refetched
 
@@ -178,6 +179,33 @@ export default async (req, context) => {
   var store = getStore(STORE);
   var ck = "sys/" + g + "/" + sys0;
   var cached = await store.get(ck, { type: "json" }).catch(function(){ return null; });
+
+  /* 2026-10-26: ?exists=1 -- the Galactic Navigator's "Check route" button only
+     needs to know a stop is a real system (and its name). One /systems call (1 key
+     lookup, no planets), cached 30 days (misses 1 day), its own per-visitor cap. */
+  if(u.searchParams.get("exists") === "1"){
+    if(cached && cached.until > Date.now() && cached.body && cached.body.ok){
+      var cb = cached.body;
+      return json(200, { ok:true, found: !!cb.found, name: cb.found && cb.system ? cb.system.name : null }, { "Cache-Control": "public, max-age=3600" });
+    }
+    var ek = "ex/" + g + "/" + sys0;
+    var ec = await store.get(ek, { type: "json" }).catch(function(){ return null; });
+    if(ec && ec.until > Date.now() && ec.body) return json(200, ec.body, { "Cache-Control": "public, max-age=3600" });
+    var whoE = await ipKey((context && context.ip) || req.headers.get("x-nf-client-connection-ip") || "unknown");
+    var rlE = await hourCount(store, "ex/" + whoE);
+    if(rlE.n >= PER_IP_HOUR_EXISTS) return json(200, { ok:false, busy:true, reason:"visitor-hour" });
+    await store.setJSON(rlE.k, rlE.n + 1).catch(function(){});
+    try {
+      var es = await aGet("systems/" + addr + "?galaxy=" + (g + 1));
+      var eb = { ok:true, found: !!es, name: es && es.names ? String(es.names.given || es.names.game || "").slice(0, 80) || null : null };
+      await store.setJSON(ek, { until: Date.now() + (eb.found ? TTL_HIT_MS : TTL_MISS_MS), body: eb }).catch(function(){});
+      return json(200, eb, { "Cache-Control": "public, max-age=3600" });
+    } catch(e){
+      if(e instanceof Busy) return json(200, { ok:false, busy:true, retryAfter: e.retryAfter });
+      return json(200, { ok:false, error: "Couldn't reach NMS Almanac" });
+    }
+  }
+
   if(cached && cached.until > Date.now() && cached.body && cached.body.v === CACHE_V) return json(200, cached.body, { "Cache-Control": "public, max-age=3600" });
 
   var who = await ipKey((context && context.ip) || req.headers.get("x-nf-client-connection-ip") || "unknown");

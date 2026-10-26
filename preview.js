@@ -896,7 +896,35 @@ function regionName(vx,vy,vz){
    Node sweep with this fix: ~29% of regions now contain >=1 purple system
    and ~4% a gas giant at the default 22-per-region density -- both
    filters are reliably findable now instead of structurally impossible. */
-function regionCount(vx,vy,vz){ return 4096; }
+function regionCount(vx,vy,vz){ return regionIdxPool(vx,vy,vz).length; }
+/* 2026-10-26 (Tony: test Plan Journey against NMS Almanac). The 4096 above was
+   wrong: checked against the Almanac, a region's real systems are only
+   0x001..N (N differs per region, ~0x200-0x27F in one checked) plus the purple
+   band 0x3E9-0x429 -- 0x000 never exists and nothing past N does, so ~4 in 5
+   route stops and map stars were systems that aren't in the game. This pool
+   only holds numbers that always exist: the 0x78 guide stars + black hole +
+   Atlas (0x001-0x07A, from nms-core voxelAttributes; none in the dead core)
+   and the purple band (present in every region checked). Almanac checked
+   0x07A, 0x0C0 and 0x3E9 in 5/5 regions. Map stars, route stops, Find and
+   Random all draw from this, still with the same seeds (deterministic). */
+var _idxPoolCache={}, _idxPoolN=0;
+function regionIdxPool(vx,vy,vz){
+  var k=vx+","+vy+","+vz;
+  if(_idxPoolCache[k]) return _idxPoolCache[k];
+  var n=0x7A;
+  if(window.NMSCore){
+    try{
+      var va=window.NMSCore.voxelAttributes(portalCodeBig(1,0,vx,vy,vz));
+      n=va.guide_star_count+va.black_hole_count+va.atlas_station_count;
+    }catch(e){}
+  }
+  var pool=[],i;
+  for(i=1;i<=n;i++) pool.push(i);
+  if(n>0) for(i=0x3E9;i<=0x429;i++) pool.push(i);
+  if(++_idxPoolN>4000){ _idxPoolCache={}; _idxPoolN=0; }
+  _idxPoolCache[k]=pool;
+  return pool;
+}
 function weightedStar(r){
   var tot=0,i;
   for(i=0;i<STAR_TYPES.length;i++) tot+=STAR_TYPES[i].w;
@@ -3290,7 +3318,7 @@ function generateSlice(focusIdx){
   var dx,dy,dz,i;
   for(dx=-R;dx<=R;dx++) for(dy=-R;dy<=R;dy++) for(dz=-R;dz<=R;dz++){
     var vx=focus.x+dx, vy=focus.y+dy, vz=focus.z+dz;
-    var count=regionCount(vx,vy,vz);
+    var pool=regionIdxPool(vx,vy,vz);
     var vr=mulberry32(gseed(vx,vy,vz,0xF00D));
     /* real per-region black-hole/Atlas indices (0, 1, or 2 entries -- see
        regionAnomalyIdx()), replacing the old blanket [0x079,0x07A] which
@@ -3304,8 +3332,8 @@ function generateSlice(focusIdx){
        always be in the slice -- see markedRegionIdx() above for why. */
     var _mk=_marked[vx+","+vy+","+vz];
     if(_mk){ for(var _mj=0;_mj<_mk.length;_mj++){ if(idxs.indexOf(_mk[_mj])<0) idxs.push(_mk[_mj]); } }
-    for(i=0;i<per;i++){
-      var pick=Math.floor(vr()*count);
+    for(i=0;i<per&&pool.length;i++){
+      var pick=pool[Math.floor(vr()*pool.length)];
       if(idxs.indexOf(pick)<0) idxs.push(pick);
     }
     for(i=0;i<idxs.length;i++){
@@ -3574,8 +3602,7 @@ var ROUTE_MAX_HOPS=40; /* a real long-haul NMS trip can be hundreds of jumps -- 
    are computed relative to the CURRENT `focus` origin, same formula generateSlice
    uses, so they land in the same coordinate space as focusSystem/courseTarget. */
 function regionCandidates(vx,vy,vz){
-  var count=regionCount(vx,vy,vz);
-  var vr=mulberry32(gseed(vx,vy,vz,0xF00D));
+  var pool=regionIdxPool(vx,vy,vz);
   /* Route-finding only, not the visible local-slice density (#sPer) -- verified
      against the NMS wiki that a hyperdrive can only ever warp to a real charted
      star system, never empty space, so route candidates need to be dense enough
@@ -3593,15 +3620,16 @@ function regionCandidates(vx,vy,vz){
      to ~2.6x before -- the one-time cost is a couple of extra seconds of
      findRoute() compute on a long trip, which the existing showRouteLoader()
      screen already covers. */
-  var per=Math.min(1000,count);
+  /* 2026-10-26: now the region's whole real pool (see regionIdxPool), every
+     stop a system that exists in the game -- fewer candidates than the old
+     1000 draws, but all of them real, and faster. */
   /* real per-region black-hole/Atlas indices, same fix as generateSlice() --
      see regionAnomalyIdx(). */
   var _an=regionAnomalyIdx(vx,vy,vz);
   var idxs=[]; if(_an.bh>=0) idxs.push(_an.bh); if(_an.atlas>=0) idxs.push(_an.atlas);
   var i;
-  for(i=0;i<per;i++){
-    var pick=Math.floor(vr()*count);
-    if(idxs.indexOf(pick)<0) idxs.push(pick);
+  for(i=0;i<pool.length;i++){
+    if(idxs.indexOf(pool[i])<0) idxs.push(pool[i]);
   }
   var out=[], dx=vx-focus.x, dy=vy-focus.y, dz=vz-focus.z;
   for(i=0;i<idxs.length;i++){
@@ -3702,8 +3730,13 @@ function _routeHop(cur,to,rangeW,visited,driveGateRoute){
   }
   return best||fallback||null; /* null: no charted, unvisited system in range at all */
 }
+/* 2026-10-26: plan each hop to at most 85% of the drive's range (aiming ~80%).
+   A star's spot inside its 400 LY region is the map's own guess (the game's
+   real one isn't known), so a hop planned right at full range can turn out
+   out of reach in game. */
+var ROUTE_SAFE=0.85;
 function findRoute(from,to,rangeLY,driveGateRoute){
-  var rangeW=rangeLY/VOX_LY;
+  var rangeW=rangeLY/VOX_LY*ROUTE_SAFE;
   var path=[{px:from.px,py:from.py,pz:from.pz,name:from.name,address:from.address,real:true}];
   /* Every address ever pushed onto the path is excluded from future candidacy --
      verified via a headless test that without this, the route can genuinely
@@ -3762,7 +3795,7 @@ function findRoute(from,to,rangeLY,driveGateRoute){
    any chance of clobbering the newer one's result, and the explicit Abort
    button bumps that same counter to cancel whatever's currently running. */
 function findRouteAsync(from,to,rangeLY,driveGateRoute,onHop,onDone,isCancelled){
-  var rangeW=rangeLY/VOX_LY;
+  var rangeW=rangeLY/VOX_LY*ROUTE_SAFE;
   var path=[{px:from.px,py:from.py,pz:from.pz,name:from.name,address:from.address,real:true}];
   var visited={}; if(from.address) visited[from.address]=true;
   var cur=path[0], truncated=false;
@@ -4090,7 +4123,7 @@ function setCourse(s,silent){
      now that nothing is blocking the click from reaching the canvas. */
   var _s=s,_ly=ly,_range=range,_dvx=dvx,_dvy=dvy,_dvz=dvz;
   /* world-unit jump range for A* */
-  var _rangeW=_range/VOX_LY;
+  var _rangeW=_range/VOX_LY*ROUTE_SAFE;
   /* star database for A*: map current slice to {address,x,y,z}. Real bug
      fixed 2026-08-16: this never filtered by the selected hyperdrive's
      reachable colours at all, so on the rare occasion A* did find a
@@ -7667,7 +7700,7 @@ document.getElementById("inAddr").addEventListener("keydown",function(e){
 });
 document.getElementById("bRand").addEventListener("click",function(){
   var r=mulberry32((Math.random()*4294967296)>>>0);
-  var a=hex(1,1)+hex(Math.floor(r()*0x2FF),3)+hex(Math.floor(r()*0x100),2)+
+  var a=hex(1,1)+hex(1+Math.floor(r()*0x7A),3)+hex(Math.floor(r()*0x100),2)+ /* 2026-10-26: 001-07A always exist (see regionIdxPool) */
         hex(Math.floor(r()*0x1000),3)+hex(Math.floor(r()*0x1000),3);
   setKeypad(a); if(jumpTo(a)) playWarpTransition("portal");
 });
@@ -11340,7 +11373,7 @@ function runFindScan(mode){
   for(dx=-halfwidth;dx<=halfwidth;dx++) for(dy=-halfwidth;dy<=halfwidth;dy++) for(dz=-halfwidth;dz<=halfwidth;dz++){
     if(Math.abs(dx)<=localR && Math.abs(dy)<=localR && Math.abs(dz)<=localR) continue; // already covered above
     var vx2=focus.x+dx, vy2=focus.y+dy, vz2=focus.z+dz;
-    var count=regionCount(vx2,vy2,vz2);
+    var pool2=regionIdxPool(vx2,vy2,vz2);
     var vr=mulberry32(gseed(vx2,vy2,vz2,0xF00D));
     // Cheap colour-only pre-check (starTypeForIdx(), see its own comment
     // above -- verified byte-identical to generateSystem()'s own first
@@ -11349,9 +11382,9 @@ function runFindScan(mode){
     // exactly the trait Tony's own example leaned on hardest.
     var wantCol=(mode==="trait"&&tr.col)?tr.col:null;
     var tries=0, hits=0, maxTries=per*6;
-    while(hits<per && tries<maxTries){
+    while(hits<per && tries<maxTries && pool2.length){
       tries++;
-      var pick=Math.floor(vr()*count);
+      var pick=pool2[Math.floor(vr()*pool2.length)];
       if(wantCol && starTypeForIdx(vx2,vy2,vz2,pick).k!==wantCol) continue;
       hits++;
       tryMatch(genAt(vx2,vy2,vz2,pick),false,"sample");
