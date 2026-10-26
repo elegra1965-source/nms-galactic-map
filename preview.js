@@ -2443,6 +2443,7 @@ function almRingTexture(b,hex){
 }
 window.almLook=function(s){
   if(typeof bodyMeshes==="undefined"||!bodyMeshes) return;
+  almStation(s);
   bodyMeshes.forEach(function(m){
     var b=m.userData&&m.userData.body;
     if(!b||m.userData.sys!==s||!b.almanac||!b.almanac.colours) return;
@@ -2460,6 +2461,28 @@ window.almLook=function(s){
     }
   });
 };
+/* 2026-10-26, Tony + Borjomi: the system's real space station picture from NMS
+   Almanac replaces the default station icon at the centre of the System view.
+   A traveller's own station photo always wins (players can rebuild their
+   station in game since Cosmos), so this only runs while there is none. */
+function almStation(s){
+  if(!s||s.stationPhoto||!s.almanacStation||!stationSpinSpr) return;
+  var old=stationSpinSpr;
+  if(!old.userData||old.userData.sys!==s||old.userData.almStation) return;
+  new THREE.TextureLoader().setCrossOrigin("anonymous").load(s.almanacStation,function(tex){
+    if(stationSpinSpr!==old||old.parent!==systemGroup) { tex.dispose(); return; } // view changed meanwhile
+    tex.minFilter=THREE.LinearFilter;
+    var spr=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,transparent:true,depthWrite:false}));
+    spr.scale.set(3.4,3.4,1);
+    spr.position.copy(old.position);
+    spr.userData=Object.assign({},old.userData,{almStation:true});
+    systemGroup.remove(old);
+    var fi=featureMeshes.indexOf(old); if(fi>=0) featureMeshes[fi]=spr; else featureMeshes.push(spr);
+    old.material.dispose();
+    systemGroup.add(spr);
+    stationSpinSpr=null; // a real picture doesn't spin
+  });
+}
 function makePlanetTexture(b){
   var W=256,H=128;
   var cv=document.createElement("canvas"); cv.width=W; cv.height=H;
@@ -5916,6 +5939,8 @@ function showBody(b,s){
   if(b.base) t.push(["hot",b.baseName?('Base: "'+b.baseName+'"'):"Has base"]);
   var html="",i;
   for(i=0;i<t.length;i++) html+='<span class="tag '+t[i][0]+'">'+t[i][1]+'</span>';
+  // 2026-10-26, Borjomi: link the planet's own page on NMS Almanac
+  if(b.almanac&&b.almanac.portal&&window.almPlanetUrl) html+='<a class="tag" href="'+acEsc(window.almPlanetUrl(s.galaxy,b.almanac.portal))+'" target="_blank" rel="noopener" style="color:var(--cyan);text-decoration:none">NMS Almanac &#8599;</a>';
   document.getElementById("bTags").innerHTML=html;
   document.getElementById("icSent").innerHTML=svg(IC_SENTINEL,sentinelColor(b.sentinel));
   // Same invented-flavour distinction as rings (see the .bb/tags comment

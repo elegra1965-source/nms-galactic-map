@@ -1,4 +1,4 @@
-/* NMS Galactic Map -- NMS Almanac (nmsalmanac.com, by Borjomi / u/Fosferus), 2026-10-23.
+/* NMS Galactic Map -- NMS Almanac (nmsalmanac.com, by Borjomi / u/imurashka), 2026-10-23.
    Real game data for a system, from netlify/functions/almanac.mjs (key stays on the server).
    - Info panel fold "Real game data · NMS Almanac": loaded only when opened.
    - Entering a system's 3D view swaps procedural planet names for the real ones.
@@ -6,7 +6,7 @@
    - Busy (500/hour key used up) -> "please try again later".
    All Almanac text is set with textContent. */
 (function(){
-  var MEM = {}, LS = "nms-alm-cache2", busyToastAt = 0; // cache2 (2026-10-24): older saved answers have no planet colours
+  var MEM = {}, LS = "nms-alm-cache3", busyToastAt = 0; // cache3 (2026-10-26): player-given names + station picture
   function lsGet(){ try { return JSON.parse(localStorage.getItem(LS) || "{}"); } catch(e){ return {}; } }
   function lsPut(k, v){
     try {
@@ -44,17 +44,26 @@
   // saved order can differ from the game's), then by position if that body has no real name
   // matching some other Almanac planet.
   function low(x){ return String(x || "").trim().toLowerCase(); }
+  // 2026-10-26: an Almanac planet answers to its player-given name or its game name
+  function nameIs(a, n){ n = low(n); return !!n && !!a && (low(a.name) === n || low(a.gameName) === n); }
   function mapBodyFor(s, d, a){
     var mbs = (s && s.bodies) || [], ab = (d && d.bodies) || [], i, b;
-    for(i = 0; i < mbs.length; i++){ b = mbs[i]; if(b.nameOverridden && low(b.name) && low(b.name) === low(a.name)) return b; }
+    for(i = 0; i < mbs.length; i++){ b = mbs[i]; if(b.nameOverridden && nameIs(a, b.name)) return b; }
     for(i = 0; i < mbs.length; i++){
       b = mbs[i]; if(b.index !== a.p) continue;
       if(!b.nameOverridden) return b;
-      var other = ab.some(function(x){ return x !== a && low(x.name) === low(b.name); });
+      var other = ab.some(function(x){ return x !== a && nameIs(x, b.name); });
       return other ? null : b;
     }
     return null;
   }
+  // 2026-10-26, Borjomi's wish: link to the Almanac's own system / planet page wherever we show one.
+  // Galaxy = its name in lower case with "-" for spaces and apostrophes; hex = the portal address.
+  function galSlug(g){ var n = (typeof GALAXIES !== "undefined" && GALAXIES[g]) || "Euclid"; return String(n).toLowerCase().replace(/[\s'’]+/g, "-"); }
+  function sysUrl(g, addr){ return "https://nmsalmanac.com/system/" + galSlug(g) + "/0" + String(addr).toUpperCase().slice(1); }
+  function planetUrl(g, portal){ return "https://nmsalmanac.com/planet/" + galSlug(g) + "/" + String(portal).toUpperCase(); }
+  window.almSysUrl = sysUrl; window.almPlanetUrl = planetUrl;
+  var BIOME_W = { lush:"Lush", barren:"Barren", dead:"Dead", exotic:"Exotic", "mega-exotic":"Mega Exotic", scorched:"Scorched", frozen:"Frozen", toxic:"Toxic", irradiated:"Radioactive", swamp:"Marsh", volcanic:"Volcanic", waterworld:"Water World", "gas-giant":"Gas Giant" };
   function byIndex(d, i){ var b = d && d.bodies || []; for(var j=0;j<b.length;j++) if(b[j].p === i) return b[j]; return null; }
 
   // Real names onto the map's own body objects (3D labels read b.name live).
@@ -62,14 +71,27 @@
     if(!s || !d || !d.found) return false;
     var changed = false;
     s.almanacCard = d.system && d.system.card || null; // 2026-10-24: star hover card (preview.js)
+    s.almanacStation = d.system && d.system.station || null; // 2026-10-26: real station picture (preview.js almLook), a traveller's own photo wins
+    // 2026-10-26: name a player gave the system in game (else its game name), unless a traveller saved one
+    if(!s.override && d.system && d.system.name && s.name !== d.system.name){ s.name = d.system.name; changed = true; }
     (s.bodies || []).forEach(function(b){
       // 2026-10-24: a traveller's saved planets can be in a different order from the game's,
       // so pair by their typed name first (as Fill blanks does), then by position
       var a = null;
-      if(b.nameOverridden && b.name) (d.bodies || []).forEach(function(x){ if(!a && x.name && String(x.name).trim().toLowerCase() === String(b.name).trim().toLowerCase()) a = x; });
+      if(b.nameOverridden && b.name) (d.bodies || []).forEach(function(x){ if(!a && nameIs(x, b.name)) a = x; });
       if(!a) a = byIndex(d, b.index);
       b.almanac = a || null;
       if(a && a.name && !b.nameOverridden && b.name !== a.name){ b.name = a.name; changed = true; }
+      // 2026-10-26, Tony: what a planet IS can't be changed in game (type, water, weather, sentinels),
+      // so the real game data wins over a traveller's typed text for those; names stay the traveller's.
+      if(a){
+        var bw = BIOME_W[a.biome];
+        if(bw && (b.biome !== bw || !b.biomeOverridden)){ if(b.biome !== bw) b.subtype = ""; b.biome = bw; b.biomeOverridden = true; changed = true; }
+        var wet = !!(a.water && a.water !== "none");
+        if(b.water !== wet || !b.bodyOverridden){ b.water = wet; b.bodyOverridden = true; changed = true; }
+        if(a.weather && b.descriptor !== a.weather){ b.descriptor = a.weather; changed = true; }
+        if(a.sentinels && typeof SENTINEL_ALL_WORDS !== "undefined" && SENTINEL_ALL_WORDS.indexOf(a.sentinels) >= 1 && (b.sentinel !== a.sentinels || !b.sentinelOverridden)){ b.sentinel = a.sentinels; b.sentinelOverridden = true; changed = true; }
+      }
     });
     return changed;
   }
@@ -86,7 +108,9 @@
   window.almNames = function(s){
     if(!s) return;
     get(s).then(function(d){
-      if(apply(s, d) && typeof selected !== "undefined" && selected === s && !anyFoldOpen() && typeof updatePanel === "function") updatePanel(s);
+      var ch = apply(s, d);
+      if(ch && typeof selected !== "undefined" && selected === s && typeof setSysBanner === "function"){ try { setSysBanner(s); } catch(e){} } // 2026-10-26: player-given system name on the banner
+      if(ch && typeof selected !== "undefined" && selected === s && !anyFoldOpen() && typeof updatePanel === "function") updatePanel(s);
       if(typeof window.almLook === "function") window.almLook(s); // 2026-10-24: real colours + rings on the 3D planets
     });
   };
@@ -104,6 +128,7 @@
     if(!d.found){ body.appendChild(el("div", "NMS Almanac has no system at this address.")); return; }
     var y = d.system || {};
     row(body, "Name", y.name);
+    if(y.gameName && y.name && y.gameName !== y.name) row(body, "Game name", y.gameName);
     row(body, "Star", [y.star, y.spectral, y.suns > 1 ? y.suns + " suns" : null].filter(Boolean).join(" · "));
     row(body, "Race", y.race);
     row(body, "Economy", [y.economyType, y.economy, y.wealth].filter(Boolean).join(" · "));
@@ -114,21 +139,22 @@
       var mb = mapBodyFor(s, d, a);
       // a traveller's own edit wins
       var name = mb && mb.nameOverridden ? mb.name : a.name;
-      var desc = mb && mb.biomeOverridden ? (mb.biome + (mb.subtype ? " (" + mb.subtype + ")" : "")) : a.desc;
-      var weather = mb && mb.bodyOverridden && mb.descriptor ? mb.descriptor : a.weather;
-      var sent = mb && mb.sentinelOverridden ? mb.sentinel : a.sentinels;
+      // 2026-10-26: type / weather / sentinels can't change in game, so always the Almanac's
+      var desc = a.desc, weather = a.weather, sent = a.sentinels;
       var wrap = el("div", null, "display:grid;grid-template-columns:40px 1fr;gap:8px;padding:6px 0;border-top:1px solid rgba(255,255,255,.06);cursor:pointer");
       var img = el("img", null, "width:40px;height:40px"); img.alt = ""; img.loading = "lazy"; if(a.discSmall) img.src = a.discSmall;
       wrap.appendChild(img);
       var t = el("div");
       t.appendChild(el("div", (a.moonOf ? "☾ " : "") + (name || "Unnamed"), "font-family:Orbitron,monospace;font-size:10.5px;color:var(--text,#fff);letter-spacing:.04em"));
       var l2 = el("div"); l2.appendChild(document.createTextNode(desc || ""));
-      if(weather){ l2.appendChild(document.createTextNode(" · ")); l2.appendChild(el("span", weather, (a.extreme && !(mb && mb.bodyOverridden && mb.descriptor)) ? "color:#ff5a4a" : "")); }
+      if(weather){ l2.appendChild(document.createTextNode(" · ")); l2.appendChild(el("span", weather, a.extreme ? "color:#ff5a4a" : "")); }
       t.appendChild(l2);
       if(sent) t.appendChild(el("div", "Sentinels: " + sent));
       var more = el("div", null, "display:none;color:var(--text-faint);margin-top:3px");
       more.appendChild(el("div", "Fauna " + (a.fauna != null ? a.fauna : "?") + (a.faunaW ? " (" + a.faunaW + ")" : "") + " · Flora " + (a.flora != null ? a.flora : "?") + (a.floraW ? " (" + a.floraW + ")" : "")));
       if(a.resources && a.resources.length) more.appendChild(el("div", a.resources.join(", ")));
+      if(a.portal){ var pl = el("a", "Planet page on NMS Almanac ↗", "color:var(--cyan)"); pl.href = planetUrl(s.galaxy, a.portal); pl.target = "_blank"; pl.rel = "noopener";
+        pl.addEventListener("click", function(e){ e.stopPropagation(); }); var pd = el("div", null, "margin-top:3px"); pd.appendChild(pl); more.appendChild(pd); }
       t.appendChild(more);
       wrap.appendChild(t);
       wrap.addEventListener("click", function(){ more.style.display = more.style.display === "none" ? "" : "none"; });
@@ -137,7 +163,10 @@
     var foot = el("div", null, "margin-top:8px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;font-size:10px;color:var(--text-faint)");
     var c = el("span"); c.appendChild(document.createTextNode("Data: "));
     var a = el("a", "NMS Almanac", "color:var(--cyan)"); a.href = "https://nmsalmanac.com"; a.target = "_blank"; a.rel = "noopener";
-    c.appendChild(a); foot.appendChild(c);
+    c.appendChild(a);
+    c.appendChild(document.createTextNode(" · "));
+    var sl = el("a", "System page ↗", "color:var(--cyan)"); sl.href = sysUrl(s.galaxy, s.address); sl.target = "_blank"; sl.rel = "noopener";
+    c.appendChild(sl); foot.appendChild(c);
     var fb = el("button", "Fill blanks in Edit system"); fb.type = "button"; fb.className = "btn beveled"; fb.style.cssText = "font-size:10px;padding:5px 8px";
     fb.addEventListener("click", function(){ fillBlanks(s, d); });
     foot.appendChild(fb);
@@ -176,10 +205,10 @@
     if(typeof editBodies !== "undefined" && editBodies){
       editBodies.forEach(function(eb, i){
         var a = null;
-        if(eb.name){ (d.bodies || []).forEach(function(x){ if(!a && low(x.name) === low(eb.name)) a = x; }); }
+        if(eb.name){ (d.bodies || []).forEach(function(x){ if(!a && nameIs(x, eb.name)) a = x; }); }
         if(!a){
           var cand = byIndex(d, i + 1);
-          var taken = cand && editBodies.some(function(o){ return o !== eb && low(o.name) && low(o.name) === low(cand.name); });
+          var taken = cand && editBodies.some(function(o){ return o !== eb && nameIs(cand, o.name); });
           if(cand && !taken && !eb.name) a = cand;
         }
         if(!a) return;

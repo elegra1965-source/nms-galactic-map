@@ -430,7 +430,7 @@ sentinels; tap a planet for fauna/flora counts and its resources.
 *Fill blanks in Edit system* copies these values into empty fields only, and
 nothing is saved until you press Save. Entering a system's 3D view swaps this
 map's own planet-name guesses for the real names. A traveller's own edit
-always wins over Almanac data. Looked up by `netlify/functions/almanac.mjs`,
+always wins over Almanac data for names. Looked up by `netlify/functions/almanac.mjs`,
 which keeps the Almanac key on the server and caches every answer, so each
 system is only fetched once; if the hourly allowance is used up you're asked
 to try again later. A scheduled function (`netlify/functions/almanac-warm.mjs`,
@@ -454,11 +454,29 @@ touch on the map closes it.
 sphere in the system view is painted in the game's own terrain and water
 colours (frozen worlds get ice caps), and it has a ring only if the real
 planet does, in the real ring colours. This applies to every system, edited
-or not; a traveller's own text (names, biome, weather and so on) is never
-changed. Rings follow the Almanac until a traveller ticks or unticks Rings
+or not. Rings follow the Almanac until a traveller ticks or unticks Rings
 themselves in Edit system, then their choice wins. Almanac planets are matched
 to a traveller's planets by name first, then by order, so a system saved in a
 different order still gets the right data on each planet.
+
+**What a planet is comes from the game; names stay yours.** A planet's type
+(Lush, Frozen...), whether it has water, its weather and its sentinels can't be
+changed in game, so wherever NMS Almanac knows the planet those always show the
+game's values, even in a system a traveller has edited. Names can be changed in
+game, so a traveller's own planet, system and station names always win. Where
+nobody has saved a name here, the map shows the name a player gave it in game
+(else the game's own name), as NMS Almanac reports it. The moon/planet layout a
+traveller saved is kept.
+
+**Real space station picture.** The space station in the middle of the system
+view is the system's own station from NMS Almanac, in its real colours. A
+traveller's own station photo always wins, since players can rename and build
+on their station in game since the Cosmos update.
+
+**Links to NMS Almanac.** Every planet in the Almanac section and in the planet
+details has a link to its own page on NMS Almanac, and the section has a link to
+the system's page (`nmsalmanac.com/system/<galaxy>/<portal hex>`), as Borjomi
+asked.
 
 **Colliding planets touch.** Tick "Colliding planets present" in Edit system
 and pick which planets collide: they stay joined as they orbit and their
@@ -861,5 +879,5 @@ for the work behind it. Haven's data belongs to Haven and its contributors.
 
 Real game data (planet names, weather, sentinels, resources, trade and more)
 comes from **[NMS Almanac](https://nmsalmanac.com)**, built by **Borjomi**
-(u/Fosferus), who kindly gave this map an API key. Thanks for the Almanac and
+(u/imurashka), who kindly gave this map an API key. Thanks for the Almanac and
 for letting it be used here. Almanac data belongs to NMS Almanac.

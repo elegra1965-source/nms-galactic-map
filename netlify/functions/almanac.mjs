@@ -1,7 +1,7 @@
 /* ============================================================
    NMS Galactic Map -- NMS Almanac lookup (2026-10-23)
 
-   Read-only bridge to NMS Almanac (nmsalmanac.com) by Borjomi (u/Fosferus),
+   Read-only bridge to NMS Almanac (nmsalmanac.com) by Borjomi (u/imurashka),
    who gave this site an API key on 2026-10-23: 500 planet/system lookups an
    hour, key server-side only, and "Data: NMS Almanac" shown next to the data.
 
@@ -28,7 +28,7 @@ const TTL_HIT_MS  = 30 * 24 * 3600 * 1000;
 const TTL_MISS_MS = 24 * 3600 * 1000;
 const PER_IP_HOUR = 40;
 const TIMEOUT_MS = 8000;
-const CACHE_V = 2;   // 2026-10-24: bodies now carry colours/ringed; older cached answers are refetched
+const CACHE_V = 3;   // 2026-10-24 v2: colours/ringed. 2026-10-26 v3: player-given names + station picture; older cached answers are refetched
 
 class Busy extends Error { constructor(ra){ super("busy"); this.retryAfter = ra; } }
 
@@ -77,7 +77,9 @@ function mapPlanet(p, w){
     p: parseInt(String(p.portal).charAt(0), 16),
     portal: p.portal,
     moonOf: p.body && p.body.moon_of ? p.body.moon_of : null,
-    name: p.names && p.names.game ? String(p.names.game).slice(0, 80) : null,
+    // 2026-10-26: the Almanac now also sends the name a player gave the planet (names.given) -- that is the name the game shows
+    name: p.names && (p.names.given || p.names.game) ? String(p.names.given || p.names.game).slice(0, 80) : null,
+    gameName: p.names && p.names.game ? String(p.names.game).slice(0, 80) : null,
     desc: d,
     biome: p.biome || null,
     size: p.size || null,
@@ -103,7 +105,8 @@ function mapSystem(s, w){
   var tr = s.trade || {};
   return {
     portal: s.portal,
-    name: s.names && s.names.game ? String(s.names.game).slice(0, 80) : null,
+    name: s.names && (s.names.given || s.names.game) ? String(s.names.given || s.names.game).slice(0, 80) : null,
+    gameName: s.names && s.names.game ? String(s.names.game).slice(0, 80) : null,
     region: s.region || null,
     star: word(w, "star", s.star),
     spectral: s.spectral_class || null,
@@ -117,7 +120,10 @@ function mapSystem(s, w){
     sell: typeof tr.sell_percent === "number" ? Math.round(tr.sell_percent * 10) / 10 : null,
     buy: typeof tr.buy_percent === "number" ? Math.round(tr.buy_percent * 10) / 10 : null,
     demand: tr.demand ? (function(){ try { var v = w.trade.demand[tr.demand]; if(typeof v === "string") return v; if(v && v.name) return v.name; } catch(e){} return pretty(tr.demand); })() : null,
-    card: s.pictures && s.pictures.card ? BASE + s.pictures.card : null
+    card: s.pictures && s.pictures.card ? BASE + s.pictures.card : null,
+    // 2026-10-26: the system's own space station picture (512x512, transparent), absent where it has none
+    station: s.pictures && s.pictures.station ? BASE + s.pictures.station : null,
+    stationSmall: s.pictures && s.pictures.station_small ? BASE + s.pictures.station_small : null
   };
 }
 
