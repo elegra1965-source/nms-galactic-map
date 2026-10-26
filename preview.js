@@ -12957,7 +12957,10 @@ if(ARRIVAL&&ARRIVAL.address.charAt(0).toUpperCase()!=="1"){
       var mb=(s.bodies||[]).filter(function(x){ return x.almanac===a; })[0];
       var nm=(mb&&mb.nameOverridden&&mb.name)?mb.name:(a.name||("planet "+pi));
       window.ARRIVAL_PLANET={galaxy:s.galaxy,sys:"0"+hx.slice(1),p:pi};
-      toast("This address lands on "+(a.moonOf?"moon ":"planet ")+pi+": "+nm+". Enter the system to see it -- dial "+hx+" in game to land there.",9000);
+      // 2026-10-26, Tony: 9 s was too quick to read -- 20 s now, and a tap on it closes it
+      toast("This address lands on "+(a.moonOf?"moon ":"planet ")+pi+": "+acEsc(nm)+". Enter the system to see it -- dial "+hx+" in game to land there.",20000);
+      var tEl=document.getElementById("toast");
+      if(tEl) tEl.onclick=function(){ tEl.style.display="none"; tEl.onclick=null; };
       if(selected===s&&mode!=="system"&&typeof updatePanel==="function") updatePanel(s); // real economy/trade in the panel too
       if(mode==="system"&&mb&&typeof showBody==="function"){ window.ARRIVAL_PLANET=null; showBody(mb,s); }
     },generic);
