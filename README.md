@@ -469,9 +469,16 @@ nobody has saved a name here, the map shows the name a player gave it in game
 traveller saved is kept.
 
 **Real space station picture.** The space station in the middle of the system
-view is the system's own station from NMS Almanac, in its real colours. A
-traveller's own station photo always wins, since players can rename and build
+view is the system's own station from NMS Almanac, in its real colours, and
+its hover/tap card shows the same picture. A traveller's own station photo
+always wins (across the top of the card), since players can rename and build
 on their station in game since the Cosmos update.
+
+**Economy from the game.** Race, economy, wealth, conflict and trade % come
+from NMS Almanac first, for every system it knows, edited or not; the map's own
+figures were a best guess. Trade is shown the game's way, "Buy: −28.6% //
+Sell: +79.9%" (the Almanac writes it from the station's side, so its two
+numbers are swapped into place).
 
 **Links to NMS Almanac.** Every planet in the Almanac section and in the planet
 details has a link to its own page on NMS Almanac, and the section has a link to

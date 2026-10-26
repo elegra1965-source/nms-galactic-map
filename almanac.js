@@ -74,6 +74,23 @@
     s.almanacStation = d.system && d.system.station || null; // 2026-10-26: real station picture (preview.js almLook), a traveller's own photo wins
     // 2026-10-26: name a player gave the system in game (else its game name), unless a traveller saved one
     if(!s.override && d.system && d.system.name && s.name !== d.system.name){ s.name = d.system.name; changed = true; }
+    // 2026-10-26, Tony: economy, wealth, conflict and race come from the game (NMS Almanac) first,
+    // for every system, edited or not -- the map's own figures were a best guess
+    var y = d.system || {};
+    if(!y.abandoned){
+      var race = String(y.race || "").replace("\u2019", "'");
+      if(["Gek","Vy'keen","Korvax"].indexOf(race) >= 0){ if(s.race !== race){ s.race = race; changed = true; } s.raceVerified = true; }
+      if(y.economy){
+        if(typeof ECON !== "undefined" && y.economyType){ ECON.forEach(function(e){ if(e[0].toLowerCase() === String(y.economyType).toLowerCase()) s.econType = e[0]; }); }
+        if(s.econName !== y.economy || s.uncharted){ s.econName = y.economy; s.uncharted = false; changed = true; }
+        s.econVerified = true;
+      }
+      if(y.wealth && s.econDesc !== y.wealth){ s.econDesc = y.wealth; var et = typeof tierFromWord === "function" ? tierFromWord(y.wealth, ECON_S) : null; if(et !== null) s.econTier = et; changed = true; }
+      // The Almanac writes trade from the station's side: its sell_percent is the game's "Buy" (negative)
+      // and its buy_percent the game's "Sell" (positive), so they swap into the map's Sell / Buy
+      if(y.sell != null && y.buy != null){ var sl = Number(y.buy).toFixed(1), by = Number(y.sell).toFixed(1); if(s.sell !== sl || s.buy !== by){ s.sell = sl; s.buy = by; changed = true; } s.econVerified = true; }
+      if(y.conflict && s.conflict !== y.conflict){ s.conflict = y.conflict; var ct = typeof tierFromWord === "function" ? tierFromWord(y.conflict, CONFLICT) : null; if(ct !== null) s.conTier = ct; s.conflictVerified = true; changed = true; }
+    }
     (s.bodies || []).forEach(function(b){
       // 2026-10-24: a traveller's saved planets can be in a different order from the game's,
       // so pair by their typed name first (as Fill blanks does), then by position
@@ -133,7 +150,7 @@
     row(body, "Race", y.race);
     row(body, "Economy", [y.economyType, y.economy, y.wealth].filter(Boolean).join(" · "));
     row(body, "Conflict", y.conflict);
-    if(y.sell != null || y.buy != null) row(body, "Sell / Buy", (pct(y.sell) || "—") + " / " + (pct(y.buy) || "—"));
+    if(y.sell != null || y.buy != null) row(body, "Trade", "Buy: " + (pct(y.sell) || "—") + " // Sell: " + (pct(y.buy) || "—")); // game's format; the Almanac's numbers are from the station's side, see apply()
     row(body, "In demand", y.demand);
     (d.bodies || []).forEach(function(a){
       var mb = mapBodyFor(s, d, a);
@@ -198,7 +215,7 @@
       if(["Gek","Vy'keen","Korvax"].indexOf(race) >= 0) set("edRace", race);
       if(y.abandoned){ var ab = document.getElementById("edAbandoned"); if(ab) ab.checked = true; }
       set("edEcon", y.economy); set("edEconStr", y.wealth); set("edConflict", y.conflict);
-      set("edSell", y.sell); set("edBuy", y.buy);
+      set("edSell", y.buy); set("edBuy", y.sell); // swapped: see apply()
     } else {
       n += setIfBlank("edRegion", y.region) + setIfBlank("edStarClass", y.spectral) + setIfBlank("edEcon", y.economy) + setIfBlank("edEconStr", y.wealth) + setIfBlank("edConflict", y.conflict);
     }

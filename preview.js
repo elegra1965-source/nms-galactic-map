@@ -5742,7 +5742,7 @@ function updatePanel(s){
   document.getElementById("pRace").innerHTML=escAttr(s.race)+(s.abandoned?' <span style="color:var(--gold)">(Abandoned)</span>':"");
   document.getElementById("pEco").textContent=s.uncharted?"—":s.econName;
   document.getElementById("pEcoSub").textContent=s.uncharted?"Uncharted system":
-    (s.econName+" // Sell: "+s.sell+"% Buy: "+s.buy+"% // "+s.econDesc);
+    (s.econName+" // "+tradeTxt(s)+" // "+s.econDesc);
   document.getElementById("pEcoStars").innerHTML=s.uncharted?"":ecoStars(s.econTier);
   // "Not Available" (2026-09-02): hides the whole Conflict row, matching
   // Tony's own in-game screenshot of an abandoned system that showed no
@@ -6425,7 +6425,7 @@ function showHoverPop(s,cx,cy){
     html+='<div class="hpDetail">'+
       '<div class="hpRow">'+raceIcon(s.race)+'<span class="hpLbl">'+acEsc(s.race)+'</span></div>'+
       '<div class="hpRow">'+econIcon(s.econType)+'<span class="hpLbl">'+(s.uncharted?"Uncharted":acEsc(s.econName))+'</span></div>'+
-      (s.uncharted?'':'<div class="hpSub">Sell: '+s.sell+'% Buy: '+s.buy+'% // '+acEsc(s.econDesc)+'</div>')+
+      (s.uncharted?'':'<div class="hpSub">'+tradeTxt(s)+' // '+acEsc(s.econDesc)+'</div>')+
       (s.conflict==="Not Available"?'':'<div class="hpRow">'+svg(IC_CONFLICT,CONFLICT_COL[s.conTier])+conBadge(s)+'<span class="hpLbl">'+acEsc(s.conflict)+'</span></div>')+
       '</div>';
   }
@@ -6461,6 +6461,11 @@ function hideHoverPop(){
    through acEsc() before it hits innerHTML. */
 function acEsc(t){return String(t==null?"":t).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c];});}
 function acRow(lbl,valHtml){return '<div class="acRow"><span class="acLbl">'+lbl+':</span> <span class="acVal">'+valHtml+'</span></div>';}
+/* 2026-10-26, Tony: trade in the game's own format -- "Buy: -28.6% // Sell: +79.9%" */
+function tradeTxt(s){
+  function sg(v){ var n=parseFloat(v); return isNaN(n)?String(v):((n>0?"+":"")+n.toFixed(1)); }
+  return "Buy: "+sg(s.buy)+"% // Sell: "+sg(s.sell)+"%";
+}
 function acCard(kind,title,sub,rows){
   return '<div class="acHead ac-'+kind+'"><div class="acTitle">'+acEsc(title).toUpperCase()+'</div>'+
     (sub?'<div class="acSub">'+acEsc(sub)+'</div>':'')+'</div>'+
@@ -6531,6 +6536,11 @@ function showSystemHoverPop(ud,cx,cy){
     var title=sy.stationName?sy.stationName:"Space station";
     var sub="Space Station"+(sy.allianceName?" · Alliance: "+sy.allianceName:"");
     html=acCard("station",title,sub,acSystemRows(sy));
+    /* 2026-10-26, Tony: the station's picture on its card -- a traveller's own
+       station photo wins (wide, across the top), else the real one from NMS Almanac. */
+    if(sy.stationPhoto) html=html.replace('<div class="acBody">','<img class="acStPhoto" src="'+acEsc(sy.stationPhoto)+'" alt=""><div class="acBody">');
+    else if(sy.almanacStation) html=html.replace('<div class="acBody">','<div class="acBody"><img class="acDisc acStIc" src="'+acEsc(sy.almanacStation)+'" alt="" width="72" height="72">')+
+      '<div class="almcardCred">Picture: NMS Almanac</div>';
   } else if(ud.feature){
     var isBh=ud.name==="Black hole";
     html=acCard(isBh?"bh":"atlas",isBh?"Black hole":"Atlas Interface","Anomaly",
