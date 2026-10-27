@@ -192,6 +192,14 @@ Each star is the right system, but where it sits *inside* its region is
 approximate -- neither source gives a star's exact spot -- so the dots won't
 line up one-for-one with the in-game map.
 
+**Zoom in, still see names.** Star names go to the stars actually on your
+screen, so zooming right in keeps up to 28 names visible. The you-are-here
+and selected rings keep the same size on screen at any zoom instead of
+ballooning, and while a course is plotted, the next stop and the destination
+get a small arrow chip at the screen edge when they're out of view. The
+first time you visit a region, a short "Charting nearby systems" note shows
+while its real systems are fetched (it never shows again for that region).
+
 **Phones: popups don't fight the controls.** Opening Search, Favourites or
 My Routes on a phone hides the controls by itself and docks the box full
 width just under the top row, so results have room to scroll. Show / Hide

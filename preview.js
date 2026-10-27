@@ -3416,8 +3416,9 @@ function loadHavenRegion(vx,vy,vz,gen){
   if(key in _havenReg||_havenAsked[key]) return;
   _havenAsked[key]=1;
   var gname=GALAXIES[GALAXY]||""; if(!gname) return;
+  chartNote(1);
   fetch("/.netlify/functions/haven-lookup?region="+key.split(":")[1]+"&gname="+encodeURIComponent(gname))
-    .then(function(r){ return r.json(); })
+    .then(function(r){ chartNote(-1); return r.json(); }, function(e){ chartNote(-1); throw e; })
     .then(function(d){
       if(!d||!d.ok) return;
       _havenReg[key]=(d.systems||[]).filter(function(h){ return h&&h.idx>=1&&h.idx<=0xFFF; });
@@ -3430,6 +3431,32 @@ function loadHavenRegion(vx,vy,vz,gen){
    then add the extra real systems to the map. Quietly does nothing if the
    Almanac is busy; it's asked again on a later visit. */
 var _probeTimer=null, _probeAsked={};
+/* 2026-10-27 (Tony): while the map is fetching a region it hasn't seen before
+   (Almanac size / Haven systems), a small NMS-style note at the bottom says so,
+   with an x. Only after 400 ms, so a fast answer never flashes it; closes by
+   itself when the fetches finish. A region already known never shows it. */
+var _chartN=0, _chartT=null, _chartClosed=false;
+function chartNote(d){
+  _chartN=Math.max(0,_chartN+d);
+  var el=document.getElementById("chartNote");
+  if(!el){
+    el=document.createElement("div"); el.id="chartNote"; el.setAttribute("role","status");
+    el.innerHTML='<span class="cnTxt"></span><button type="button" class="cnX" aria-label="Close">&times;</button>';
+    document.body.appendChild(el);
+    el.querySelector(".cnX").addEventListener("click",function(){ _chartClosed=true; el.classList.remove("show"); });
+  }
+  if(_chartN>0){
+    if(!_chartT&&!el.classList.contains("show")&&!_chartClosed) _chartT=setTimeout(function(){
+      _chartT=null; if(_chartN<=0) return;
+      var txt="Charting nearby systems\u2026 first visit to this region only, a few seconds required.";
+      el.querySelector(".cnTxt").textContent=(window.NMS_T?window.NMS_T(txt):txt);
+      el.classList.add("show");
+    },400);
+  } else {
+    if(_chartT){ clearTimeout(_chartT); _chartT=null; }
+    el.classList.remove("show"); _chartClosed=false;
+  }
+}
 function scheduleRegionProbe(gen){
   if(_probeTimer){ clearTimeout(_probeTimer); _probeTimer=null; }
   _probeTimer=setTimeout(function(){
@@ -3441,18 +3468,21 @@ function scheduleRegionProbe(gen){
     var base=regionIdxPool(vx,vy,vz); if(!base.length) return;
     var top=0; for(var i=0;i<base.length;i++){ if(base[i]<0x3E9&&base[i]>top) top=base[i]; }
     _probeAsked[key]=1;
-    var addr=formatAddress(1,top,vx,vy,vz), tries=0, g=GALAXY;
+    var addr=formatAddress(1,top,vx,vy,vz), tries=0, g=GALAXY, _cn=true;
+    chartNote(1);
+    function _cnDone(){ if(_cn){ _cn=false; chartNote(-1); } }
     (function ask(){
-      if(++tries>5) return;
+      if(++tries>5){ _cnDone(); return; }
       fetch("/.netlify/functions/almanac?regionmax=1&galaxy="+g+"&addr="+addr+"&lo="+top.toString(16))
         .then(function(r){ return r.json(); })
         .then(function(d){
-          if(!d||!d.ok) return; /* busy / error: try on a later visit */
+          if(!d||!d.ok){ _cnDone(); return; } /* busy / error: try on a later visit */
           if(!d.done){ setTimeout(ask,700); return; }
+          _cnDone();
           _rmax[key]=d.n|0;
           try{ localStorage.setItem("nms-rmax1",JSON.stringify(_rmax)); }catch(e){}
           if(g===GALAXY && d.n>top) addRegionExtras(vx,vy,vz);
-        }).catch(function(){});
+        }).catch(function(){ _cnDone(); });
     })();
   },1500);
 }
@@ -7046,9 +7076,46 @@ function updateAtlasOverlay(){
   for(;badgeI<ATLAS_BADGE_MAX;badgeI++) atlasBadgeEls[badgeI].style.display="none";
 }
 var _v=new THREE.Vector3(), _w=new THREE.Vector3();
+/* 2026-10-27 (Tony: off-screen names when zoomed in, without cluttering a
+   phone): only the NEXT route stop and the DESTINATION get a small chip pinned
+   to the screen edge, pointing the way, when they're off-screen. Ordinary stars
+   never do. */
+function ringScreenSize(r){
+  if(!r||!r.visible) return;
+  var k=Math.min(3,Math.max(0.06,r.position.distanceTo(camera.position)/50));
+  r.scale.setScalar(k);
+}
+function updateEdgeArrows(off){
+  var box=document.getElementById("edgeArrows");
+  if(!box){ box=document.createElement("div"); box.id="edgeArrows"; box.setAttribute("aria-hidden","true"); (document.getElementById("labels")||document.body).appendChild(box); }
+  var pick=[], i;
+  if(off.length){
+    off.sort(function(a,b){ return a.d-b.d; });
+    pick.push(off[0]);
+    for(i=1;i<off.length;i++) if(off[i].t.charAt(0)==="\u25CE"){ pick.push(off[i]); break; }
+  }
+  while(box.children.length<2){ var c=document.createElement("div"); c.className="edgeArrow"; box.appendChild(c); }
+  var w=window.innerWidth, h=window.innerHeight, top=(parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--top-h"))||60)+14;
+  for(i=0;i<2;i++){
+    var el=box.children[i], c2=pick[i];
+    if(!c2){ el.style.display="none"; continue; }
+    _v.set(c2.x,c2.y,c2.z).project(camera);
+    var x=_v.x, y=_v.y; if(_v.z>1){ x=-x; y=-y; }
+    var m=Math.max(Math.abs(x),Math.abs(y))||1; x/=m; y/=m;
+    var px=(x*0.5+0.5)*w, py=(-y*0.5+0.5)*h;
+    px=Math.min(Math.max(px,70),w-70); py=Math.min(Math.max(py,top),h-110-(i*0));
+    if(i===1&&pick[0]){ var p0=box.children[0]; if(Math.abs(parseFloat(p0.style.top)-py)<26&&Math.abs(parseFloat(p0.style.left)-px)<140) py+=(py>h/2?-26:26); }
+    var ang=Math.atan2(-y,x)*180/Math.PI;
+    el.innerHTML='<span class="eaArr" style="transform:rotate('+ang.toFixed(0)+'deg)">&#10148;</span> ';
+    el.appendChild(document.createTextNode(c2.t));
+    el.style.display="block";
+    var hw=el.offsetWidth/2+6; px=Math.min(Math.max(px,hw),w-hw);
+    el.style.left=px+"px"; el.style.top=py+"px";
+  }
+}
 function updateLabels(){
-  if(!labelsOn||mode==="galaxy"){ hideLabels(); return; }
-  if(mode!=="local"){ updateSystemLabels(); return; }
+  if(!labelsOn||mode==="galaxy"){ hideLabels(); updateEdgeArrows([]); return; }
+  if(mode!=="local"){ updateEdgeArrows([]); updateSystemLabels(); return; }
   hideLblLines();
   for(var r=0;r<labelEls.length;r++){ if(labelEls[r]._bx){ labelEls[r].className="lbl"; labelEls[r]._bx=false; labelEls[r]._key=""; } }
   var cands=[],i;
@@ -7091,6 +7158,22 @@ function updateLabels(){
   }
   cands.sort(function(a,b){ return a.d-b.d; });
   var w=window.innerWidth,h=window.innerHeight;
+  /* 2026-10-27 (Tony: zoomed in, hardly any star names): the 28 label slots used
+     to go to the 28 stars nearest the camera, and any of those off-screen or
+     behind it were then just hidden -- zoomed in, that was most of them. Now
+     only stars actually on screen compete for the slots. Route stops that are
+     off-screen are handed to updateEdgeArrows() instead. */
+  if(mode==="local"){
+    var _vis=[], _off=[];
+    for(var _ci=0;_ci<cands.length;_ci++){
+      var _c=cands[_ci];
+      _v.set(_c.x,_c.y,_c.z).project(camera);
+      if(_v.z>1||_v.x<-1||_v.x>1||_v.y<-1||_v.y>1){ if(_c.d<-1e11) _off.push(_c); continue; }
+      _vis.push(_c); if(_vis.length>=LBL_MAX*2) break;
+    }
+    cands=_vis;
+    updateEdgeArrows(_off);
+  } else updateEdgeArrows([]);
   /* A moon (or any two bodies close in-frame) projects to nearly the same
      screen point as its parent planet, so two independently-placed labels can
      land right on top of each other and read as one run-together mess (seen
@@ -13025,6 +13108,10 @@ function animate(){
     if(mode==="local"){
       if(selRing.visible) selRing.quaternion.copy(camera.quaternion);
       if(focusRing.visible) focusRing.quaternion.copy(camera.quaternion);
+      /* 2026-10-27 (Tony: zoomed right in, the rings swallow the screen): rings
+         keep the size they have at Local's normal zoom (camera 50 away) on
+         screen, so zooming in shrinks them round the star instead of ballooning. */
+      ringScreenSize(selRing); ringScreenSize(focusRing); ringScreenSize(hoverRing);
     }
     /* camera.matrixWorldInverse is only refreshed as a side effect of renderer.render(),
        which runs AFTER this point -- so without this, updateLabels() below always projects

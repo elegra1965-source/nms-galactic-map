@@ -578,6 +578,20 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border:none;border-ra
    #searchPop was the one box built without it, which is why it was the
    only one showing the bar. */
 #searchPop.show{display:block}
+/* 2026-10-27: "Charting nearby systems" note + route edge chips (see chartNote / updateEdgeArrows) */
+#chartNote{position:fixed;left:12px;right:12px;margin:0 auto;width:fit-content;bottom:calc(env(safe-area-inset-bottom,0px) + 128px);z-index:39;
+  display:none;align-items:center;gap:10px;max-width:440px;box-sizing:border-box;padding:8px 10px 8px 14px;
+  background:rgba(6,14,22,.92);border:1px solid rgba(0,229,255,.45);border-radius:6px;
+  color:#bff6ff;font:12px/1.35 Rajdhani,Chakra Petch,system-ui,sans-serif;letter-spacing:.04em;box-shadow:0 0 14px rgba(0,229,255,.18)}
+#chartNote.show{display:flex;animation:cnIn .35s ease-out}
+#chartNote .cnTxt::before{content:"\25C8  ";color:#f0a500}
+#chartNote .cnX{flex:none;background:none;border:1px solid rgba(0,229,255,.35);color:#bff6ff;border-radius:4px;padding:0 7px;font-size:14px;line-height:20px;cursor:pointer}
+@keyframes cnIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){#chartNote.show{animation:none}}
+#edgeArrows .edgeArrow{position:fixed;display:none;transform:translate(-50%,-50%);pointer-events:none;white-space:nowrap;
+  max-width:46vw;overflow:hidden;text-overflow:ellipsis;padding:2px 7px;border-radius:4px;background:rgba(6,14,22,.85);
+  border:1px solid rgba(240,165,0,.55);color:#ffd37a;font:11px/1.3 Rajdhani,Chakra Petch,system-ui,sans-serif;letter-spacing:.04em}
+#edgeArrows .eaArr{display:inline-block;color:#f0a500}
 /* 2026-10-27: phones -- Search/Favourites docked under the top row, see dockOnPhone() */
 #searchPop.docked,#favPop.docked,#routesPop.docked{left:8px!important;right:8px!important;width:auto!important;
   top:calc(var(--top-h,60px) + 8px)!important;bottom:auto!important;
@@ -3050,7 +3064,7 @@ loadLetterMap('./nms-core/letter-map').then(function(lm){
 });
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="preview.js?v=20261027a"></script>
+<script src="preview.js?v=20261027b"></script>
 <script src="almanac.js?v=20261026c"></script>
 <script src="share-system.js"></script>
 <script src="charted.js"></script>
