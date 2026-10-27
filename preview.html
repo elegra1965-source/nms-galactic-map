@@ -578,6 +578,10 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border:none;border-ra
    #searchPop was the one box built without it, which is why it was the
    only one showing the bar. */
 #searchPop.show{display:block}
+/* 2026-10-27: phones -- Search/Favourites docked under the top row, see dockOnPhone() */
+#searchPop.docked,#favPop.docked,#routesPop.docked{left:8px!important;right:8px!important;width:auto!important;
+  top:calc(var(--top-h,60px) + 8px)!important;bottom:auto!important;
+  max-height:calc(100dvh - var(--top-h,60px) - 16px)!important;overflow-y:auto!important;transition:top .15s}
 /* #searchPop.scroll: only added once real overflow is measured in JS, same
    fix as #hyperPanel/#tweak/hyperdriveModal -- overflow-y:auto by default
    shows a themed (very visible) scrollbar even when content visibly fits,
@@ -2194,7 +2198,10 @@ nearby procedural space within a radius.">Search</button>
      opening a ?route=... link directly does the exact same thing on boot,
      see readSharedRoute()/receiveSharedRoute(). -->
 <div class="box fold" id="routesPop" role="dialog" aria-label="Saved routes">
-  <div class="kicker fhead" id="routesHead" style="margin-bottom:8px">&#9662; My Routes</div>
+  <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
+    <div class="kicker fhead" id="routesHead" style="flex:1">&#9662; My Routes</div>
+    <button class="btn popX" id="bRoutesClose" type="button" title="Close this popup." style="flex:none;padding:2px 9px;font-size:13px;line-height:1.2">&times;</button>
+  </div>
   <div class="fbody" id="routesBody">
     <div class="prow" style="margin-bottom:8px">
       <input type="text" id="inRouteLink" placeholder="PASTE ROUTE LINK" spellcheck="false" style="flex:1;min-width:0">
@@ -2213,7 +2220,10 @@ nearby procedural space within a radius.">Search</button>
      is structurally the same "list of saved things, click to jump, remove
      button per row" shape Routes already established -- no new CSS needed. -->
 <div class="box fold" id="favPop" role="dialog" aria-label="Favourites">
-  <div class="kicker fhead" id="favHead" style="margin-bottom:8px">&#9733; Favourites</div>
+  <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">
+    <div class="kicker fhead" id="favHead" style="flex:1">&#9733; Favourites</div>
+    <button class="btn popX" id="bFavClose" type="button" title="Close this popup." style="flex:none;padding:2px 9px;font-size:13px;line-height:1.2">&times;</button>
+  </div>
   <div class="fbody" id="favBody">
     <div id="favResults"></div>
   </div>
@@ -3040,7 +3050,7 @@ loadLetterMap('./nms-core/letter-map').then(function(lm){
 });
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="preview.js?v=20261026e"></script>
+<script src="preview.js?v=20261027a"></script>
 <script src="almanac.js?v=20261026c"></script>
 <script src="share-system.js"></script>
 <script src="charted.js"></script>

@@ -925,6 +925,25 @@ function regionIdxPool(vx,vy,vz){
   _idxPoolCache[k]=pool;
   return pool;
 }
+/* 2026-10-27: a region's true top system number, found from NMS Almanac by the
+   almanac function's ?regionmax=1 (a halving search over "does this system
+   exist", stored for good in the site's shared store, so each region is only
+   ever looked up once for everybody). Known values live in _rmax and this
+   device's localStorage. Used for the stars drawn near you only (displayPool);
+   routes keep regionIdxPool, the numbers that always exist. */
+var _rmax={};
+try{ _rmax=JSON.parse(localStorage.getItem("nms-rmax1")||"{}")||{}; }catch(e){ _rmax={}; }
+function regionKeyG(vx,vy,vz){ return GALAXY+":"+vx+","+vy+","+vz; }
+function regionMaxKnown(vx,vy,vz){ var n=_rmax[regionKeyG(vx,vy,vz)]; return (typeof n==="number")?n:0; }
+function displayPool(vx,vy,vz){
+  var base=regionIdxPool(vx,vy,vz);
+  var n=regionMaxKnown(vx,vy,vz);
+  var top=0; for(var i=0;i<base.length;i++){ if(base[i]<0x3E9&&base[i]>top) top=base[i]; }
+  if(!base.length||n<=top) return base;
+  var out=base.slice();
+  for(var j=top+1;j<=n&&j<0x3E9;j++) out.push(j);
+  return out;
+}
 function weightedStar(r){
   var tot=0,i;
   for(i=0;i<STAR_TYPES.length;i++) tot+=STAR_TYPES[i].w;
@@ -3315,7 +3334,8 @@ function generateSlice(focusIdx){
   var per=parseInt(document.getElementById("sPer").value,10);
   allSystems=[];
   var _marked=markedRegionIdx();
-  var dx,dy,dz,i;
+  var dx,dy,dz,i, _fillLater=[], _gen=++_sliceGen;
+  if(_fillTimer){ clearTimeout(_fillTimer); _fillTimer=null; }
   for(dx=-R;dx<=R;dx++) for(dy=-R;dy<=R;dy++) for(dz=-R;dz<=R;dz++){
     var vx=focus.x+dx, vy=focus.y+dy, vz=focus.z+dz;
     var pool=regionIdxPool(vx,vy,vz);
@@ -3332,9 +3352,22 @@ function generateSlice(focusIdx){
        always be in the slice -- see markedRegionIdx() above for why. */
     var _mk=_marked[vx+","+vy+","+vz];
     if(_mk){ for(var _mj=0;_mj<_mk.length;_mj++){ if(idxs.indexOf(_mk[_mj])<0) idxs.push(_mk[_mj]); } }
+    /* 2026-10-27 (Tony: "on Local only a few stars, even zoomed in"): the region
+       you're in and its 6 side-by-side neighbours now show EVERY real system we
+       know of (displayPool: the always-real pool, plus the region's true size
+       from NMS Almanac once known -- see regionMaxKnown), not a 22-star sample.
+       Regions further out keep the density slider's sample. The sample still
+       draws first everywhere; the rest of a full region is filled in a moment
+       later (fillFullRegions) so a jump on a phone isn't any slower. */
+    var _full=(Math.abs(dx)+Math.abs(dy)+Math.abs(dz))<=1;
     for(i=0;i<per&&pool.length;i++){
       var pick=pool[Math.floor(vr()*pool.length)];
       if(idxs.indexOf(pick)<0) idxs.push(pick);
+    }
+    if(_full){
+      var _dp=displayPool(vx,vy,vz), _have={};
+      for(i=0;i<idxs.length;i++) _have[idxs[i]]=1;
+      for(i=0;i<_dp.length;i++) if(!_have[_dp[i]]){ _fillLater.push([vx,vy,vz,dx,dy,dz,_dp[i]]); _have[_dp[i]]=1; }
     }
     for(i=0;i<idxs.length;i++){
       var idx=idxs[i];
@@ -3346,6 +3379,107 @@ function generateSlice(focusIdx){
   }
   buildVoxelGrid();
   if(allSystems.length>45000) toast("Heavy: "+allSystems.length.toLocaleString()+" systems");
+  applyFilter();
+  if(_fillLater.length) _fillTimer=setTimeout(function(){ fillFullRegions(_fillLater,_gen); },60);
+  scheduleRegionProbe(_gen);
+  setTimeout(function(){ applyHavenRegions(_gen); },120);
+}
+/* 2026-10-27: systems travellers have logged on Voyager's Haven in the region
+   you're in and its 6 neighbours are always drawn and labelled with their Haven
+   name (haven-lookup ?region=, stored server-side for a day, and here for the
+   visit). The focus region is asked for once you've stayed a moment. */
+var _havenReg={}, _havenAsked={};
+function havenRegKey(vx,vy,vz){ return GALAXY+":"+formatAddress(1,1,vx,vy,vz).slice(4); }
+function applyHavenRegions(gen){
+  if(gen!==_sliceGen||mode!=="local") return;
+  var add=[], dx,dy,dz,i;
+  for(dx=-1;dx<=1;dx++) for(dy=-1;dy<=1;dy++) for(dz=-1;dz<=1;dz++){
+    if(Math.abs(dx)+Math.abs(dy)+Math.abs(dz)>1) continue;
+    var vx=focus.x+dx, vy=focus.y+dy, vz=focus.z+dz, list=_havenReg[havenRegKey(vx,vy,vz)];
+    if(!list||!list.length) continue;
+    var have={};
+    for(i=0;i<allSystems.length;i++){ var a=allSystems[i]; if(a.vx===vx&&a.vy===vy&&a.vz===vz) have[a.idx]=a; }
+    list.forEach(function(h){
+      if(have[h.idx]){ if(h.name) have[h.idx].havenName=h.name; return; }
+      var jr=mulberry32(gseed(vx,vy,vz,h.idx^0x9999));
+      var sy=generateSystem(vx,vy,vz,h.idx);
+      sy.px=(dx+jr()-0.5)*VOX_U; sy.py=(dy+jr()-0.5)*VOX_U; sy.pz=(dz+jr()-0.5)*VOX_U;
+      if(h.name) sy.havenName=h.name;
+      add.push(sy); have[h.idx]=sy;
+    });
+  }
+  if(add.length){ for(i=0;i<add.length;i++) allSystems.push(add[i]); applyFilter(); }
+  else if(typeof updateLabels==="function") updateLabels();
+}
+function loadHavenRegion(vx,vy,vz,gen){
+  var key=havenRegKey(vx,vy,vz);
+  if(key in _havenReg||_havenAsked[key]) return;
+  _havenAsked[key]=1;
+  var gname=GALAXIES[GALAXY]||""; if(!gname) return;
+  fetch("/.netlify/functions/haven-lookup?region="+key.split(":")[1]+"&gname="+encodeURIComponent(gname))
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if(!d||!d.ok) return;
+      _havenReg[key]=(d.systems||[]).filter(function(h){ return h&&h.idx>=1&&h.idx<=0xFFF; });
+      if(gen===_sliceGen) applyHavenRegions(gen);
+    }).catch(function(){});
+}
+/* 2026-10-27: once you've stayed in Local view for a moment, ask the almanac
+   function for this region's true size (once per region for everybody -- the
+   answer is stored for good server-side and in this device's localStorage),
+   then add the extra real systems to the map. Quietly does nothing if the
+   Almanac is busy; it's asked again on a later visit. */
+var _probeTimer=null, _probeAsked={};
+function scheduleRegionProbe(gen){
+  if(_probeTimer){ clearTimeout(_probeTimer); _probeTimer=null; }
+  _probeTimer=setTimeout(function(){
+    _probeTimer=null;
+    if(gen!==_sliceGen||mode!=="local") return;
+    loadHavenRegion(focus.x,focus.y,focus.z,gen);
+    var vx=focus.x, vy=focus.y, vz=focus.z, key=regionKeyG(vx,vy,vz);
+    if(key in _rmax || _probeAsked[key]) return;
+    var base=regionIdxPool(vx,vy,vz); if(!base.length) return;
+    var top=0; for(var i=0;i<base.length;i++){ if(base[i]<0x3E9&&base[i]>top) top=base[i]; }
+    _probeAsked[key]=1;
+    var addr=formatAddress(1,top,vx,vy,vz), tries=0, g=GALAXY;
+    (function ask(){
+      if(++tries>5) return;
+      fetch("/.netlify/functions/almanac?regionmax=1&galaxy="+g+"&addr="+addr+"&lo="+top.toString(16))
+        .then(function(r){ return r.json(); })
+        .then(function(d){
+          if(!d||!d.ok) return; /* busy / error: try on a later visit */
+          if(!d.done){ setTimeout(ask,700); return; }
+          _rmax[key]=d.n|0;
+          try{ localStorage.setItem("nms-rmax1",JSON.stringify(_rmax)); }catch(e){}
+          if(g===GALAXY && d.n>top) addRegionExtras(vx,vy,vz);
+        }).catch(function(){});
+    })();
+  },1500);
+}
+function addRegionExtras(vx,vy,vz){
+  var dx=vx-focus.x, dy=vy-focus.y, dz=vz-focus.z;
+  if(Math.abs(dx)+Math.abs(dy)+Math.abs(dz)>1) return; /* moved away -- next slice uses it */
+  if(_fillTimer){ setTimeout(function(){ addRegionExtras(vx,vy,vz); },200); return; }
+  var have={}, i;
+  for(i=0;i<allSystems.length;i++){ var a=allSystems[i]; if(a.vx===vx&&a.vy===vy&&a.vz===vz) have[a.idx]=1; }
+  var dp=displayPool(vx,vy,vz), list=[];
+  for(i=0;i<dp.length;i++) if(!have[dp[i]]) list.push([vx,vy,vz,dx,dy,dz,dp[i]]);
+  if(list.length) fillFullRegions(list,_sliceGen);
+}
+/* 2026-10-27: adds the rest of the real systems in the region you're in and its
+   6 neighbours (see generateSlice), a moment after the jump has drawn. Skipped if
+   another slice has been built since. Same positions/seeds as generateSlice. */
+var _sliceGen=0, _fillTimer=null;
+function fillFullRegions(list,gen){
+  _fillTimer=null;
+  if(gen!==_sliceGen) return;
+  for(var i=0;i<list.length;i++){
+    var it=list[i], vx=it[0],vy=it[1],vz=it[2], idx=it[6];
+    var jr=mulberry32(gseed(vx,vy,vz,idx^0x9999));
+    var s=generateSystem(vx,vy,vz,idx);
+    s.px=(it[3]+jr()-0.5)*VOX_U; s.py=(it[4]+jr()-0.5)*VOX_U; s.pz=(it[5]+jr()-0.5)*VOX_U;
+    allSystems.push(s);
+  }
   applyFilter();
 }
 /* "Visited" and "Systems edited by traveller" checkboxes removed 2026-08-27
@@ -4496,6 +4630,45 @@ function renderRoutesList(){
    Decodes each saved "galaxy:address" key back into a real system via
    generateSystem() to get its current name, same technique buildSearchIndex()
    above already uses for the exact same store.marks/waypoints/visited keys. */
+/* 2026-10-27 (Tony: picking a destination by tapping a tiny star is guesswork on a
+   phone): "Route here" on every Search and Favourites row plots the course from
+   where you are (the system you last jumped to) straight to that system, the
+   same as tapping its star -- Warp Manifest, then PLAN JOURNEY. Works for any
+   system in this galaxy, near or far (setCourse already handles targets outside
+   the stars drawn around you). */
+/* 2026-10-27 (Tony: on a phone, Search opened under all the controls so its
+   results couldn't be seen/scrolled, and "Hide controls" closed it): on phones
+   Search and Favourites now hide the controls themselves and sit docked full
+   width just under the top row (CSS .docked), scrolling inside; the box's X
+   closes it, and Show/Hide controls leaves it open (it slides with the row). */
+function isToolbarToggle(el){ var t=document.getElementById("toolbarToggle"); return !!(t&&el&&(el===t||t.contains(el))); }
+function dockOnPhone(pop){
+  var t=document.getElementById("toolbarToggle");
+  if(!(t&&t.offsetParent)){ pop.classList.remove("docked"); return false; }
+  pop.classList.add("docked");
+  if(window.autoHideControls) window.autoHideControls(false);
+  return true;
+}
+function routeHereBtnHtml(gal,inRow){
+  var b='<button type="button" class="routeActBtn routeHere" data-act="route" title="Plot a course from where you are to this system">&#10140; Route here</button>';
+  return inRow?b:'<div class="routeRowActions">'+b+'</div>';
+}
+function routeHereTo(addr,gal){
+  if(!isNaN(gal)&&gal!==GALAXY){ toast("Routes stay inside one galaxy -- this one is in "+(GALAXIES[gal]||"another galaxy")+". Switch to it and jump to where you are first.",6000); return false; }
+  if(!focusSystem){ toast("Jump to where you are first (Search it, or tap GLYPHS and enter its address), then tap Route here.",6000); return false; }
+  var a=parseAddress(addr); if(!a) return false;
+  if(focusSystem.vx===a.x&&focusSystem.vy===a.y&&focusSystem.vz===a.z&&focusSystem.idx===a.idx){ toast("That is where you are -- pick another system"); return false; }
+  if(mode!=="local"){ var ml=document.getElementById("mLoc"); if(ml) ml.click(); }
+  var t=null,i;
+  for(i=0;i<allSystems.length;i++){ var o=allSystems[i]; if(o.idx===a.idx&&o.vx===a.x&&o.vy===a.y&&o.vz===a.z){ t=o; break; } }
+  if(!t){
+    t=generateSystem(a.x,a.y,a.z,a.idx);
+    var jr=mulberry32(gseed(a.x,a.y,a.z,a.idx^0x9999));
+    t.px=(a.x-focus.x+jr()-0.5)*VOX_U; t.py=(a.y-focus.y+jr()-0.5)*VOX_U; t.pz=(a.z-focus.z+jr()-0.5)*VOX_U;
+  }
+  setCourse(t);
+  return true;
+}
 function buildFavouritesIndex(){
   var keys=Object.keys(store.marks), idx=[];
   for(var k=0;k<keys.length;k++){
@@ -4535,12 +4708,18 @@ function renderFavouritesList(){
     html+='<div class="searchRes favRes" data-addr="'+f.address+'" data-galaxy="'+f.galaxy+'" data-key="'+escAttr(f.key)+'">'+
       '<div class="searchResName">'+f.name+'</div>'+
       '<div class="searchResMeta">'+glyphHtml+' '+f.address+' &middot; '+(GALAXIES[f.galaxy]||("Galaxy #"+(f.galaxy+1)))+'</div>'+
-      '<div class="routeRowActions"><button type="button" class="routeActBtn danger" data-act="unfav">Remove</button></div>'+
+      '<div class="routeRowActions">'+routeHereBtnHtml(f.galaxy,true)+'<button type="button" class="routeActBtn danger" data-act="unfav">Remove</button></div>'+
     '</div>';
   });
   box.innerHTML=html;
 }
 document.getElementById("favResults").addEventListener("click",function(e){
+  var rtBtn=e.target.closest?e.target.closest('.routeActBtn[data-act="route"]'):null;
+  if(rtBtn){
+    var rrow=rtBtn.closest(".favRes");
+    if(rrow && routeHereTo(rrow.getAttribute("data-addr"),parseInt(rrow.getAttribute("data-galaxy"),10)) && typeof closeFavPop==="function") closeFavPop();
+    return;
+  }
   var unfavBtn=e.target.closest?e.target.closest('.routeActBtn[data-act="unfav"]'):null;
   if(unfavBtn){
     var row=unfavBtn.closest(".favRes");
@@ -6874,11 +7053,26 @@ function updateLabels(){
   for(var r=0;r<labelEls.length;r++){ if(labelEls[r]._bx){ labelEls[r].className="lbl"; labelEls[r]._bx=false; labelEls[r]._key=""; } }
   var cands=[],i;
   if(mode==="local"){
+    /* 2026-10-27 (Tony: following a route, which dot is the next stop?): every
+       stop on a plotted course is always labelled first, numbered, ahead of the
+       nearest-star labels, so the route reads stop by stop. */
+    var _onRoute={};
+    if(courseWaypoints&&courseWaypoints.length>1){
+      var _last=courseWaypoints.length-1;
+      for(i=1;i<=_last;i++){
+        if(i>8&&i!==_last) continue; /* long routes: the next 8 stops + the destination */
+        var wp=courseWaypoints[i]; if(!wp||wp.px==null) continue;
+        _onRoute[wp.address]=1;
+        cands.push({x:wp.px,y:wp.py,z:wp.pz,d:-1e12+i,
+          t:(i===courseWaypoints.length-1?"◎ ":"➜ "+i+". ")+(wp.name||wp.address)});
+      }
+    }
     for(i=0;i<shown.length;i++){
       var s=shown[i];
+      if(_onRoute[s.address]) continue;
       var dx=s.px-camera.position.x, dy=s.py-camera.position.y, dz=s.pz-camera.position.z;
       cands.push({x:s.px,y:s.py,z:s.pz,d:dx*dx+dy*dy+dz*dz,
-        t:(s.blackHole?"◉ ":(s.atlas?"◈ ":(s.phantom==="shadow"?"◇ ":(s.phantom==="phantom"?"◌ ":""))))+s.name});
+        t:(s.blackHole?"◉ ":(s.atlas?"◈ ":(s.phantom==="shadow"?"◇ ":(s.phantom==="phantom"?"◌ ":""))))+(s.havenName||s.name)});
     }
   } else {
     for(i=0;i<starMeshes.length;i++){
@@ -7175,6 +7369,7 @@ function setMode(m){
        Local<->System/Galaxy switch is not a concern. */
     if(showTw) twSized();
   }
+  if(m==="local"&&typeof scheduleRegionProbe==="function") scheduleRegionProbe(_sliceGen);
   galaxyGroup.visible=(m==="galaxy");
   localGroup.visible=(m==="local");
   systemGroup.visible=(m==="system");
@@ -11024,6 +11219,14 @@ function runSearch(query){
     return;
   }
   var starts=[];
+  /* 2026-10-27: a typed or pasted 12-digit portal address shows that system as
+     the first result (any system, not only documented ones), so it can be
+     jumped to or used with Route here. */
+  var _ha=cleanHex(query), _pa=(_ha.length===12&&/^[0-9a-f:\s-]+$/i.test(query.trim()))?parseAddress(_ha):null;
+  if(_pa){
+    var _hs=generateSystem(_pa.x,_pa.y,_pa.z,_pa.idx);
+    starts.push({name:_hs.name,address:_ha,hint:"Portal address",galaxy:GALAXY});
+  }
   for(i=0;i<idx.length;i++){
     if(idx[i].name.toLowerCase().indexOf(q)===0) starts.push(idx[i]);
   }
@@ -11083,7 +11286,8 @@ function renderMatches(matches,emptyMsg){
       glyphHtml+='<img alt="'+m.address[_gi]+'" src="'+glyphSrc(m.address[_gi])+'" style="height:10px;width:10px;vertical-align:-1px;margin-right:1px">';
     return '<div class="searchRes" data-addr="'+m.address+'" data-galaxy="'+m.galaxy+'"'+bodyAttr+'>'+
       '<div class="searchResName">'+m.name+'</div>'+
-      '<div class="searchResMeta">'+glyphHtml+' '+m.address+' &middot; '+m.hint+galNote+'</div></div>';
+      '<div class="searchResMeta">'+glyphHtml+' '+m.address+' &middot; '+m.hint+galNote+'</div>'+
+      routeHereBtnHtml(m.galaxy)+'</div>';
   }
   for(g=0;g<allianceOrder.length && used<CAP;g++){
     var allianceName=allianceOrder[g], group=allianceGroups[allianceName], j;
@@ -11144,7 +11348,7 @@ function renderMatches(matches,emptyMsg){
   function openSearch(){
     pop.classList.add("show");
     btn.classList.add("on");
-    if(!pop.dataset.userMoved) positionUnderSearchBtn();
+    if(!dockOnPhone(pop) && !pop.dataset.userMoved) positionUnderSearchBtn();
     runSearch(inp.value);
     remeasureScroll();
     inp.focus();
@@ -11159,7 +11363,7 @@ function renderMatches(matches,emptyMsg){
     if(pop.classList.contains("show")) closeSearch(); else openSearch();
   });
   document.addEventListener("click",function(e){
-    if(pop.classList.contains("show") && !pop.contains(e.target) && e.target!==btn){
+    if(pop.classList.contains("show") && !pop.contains(e.target) && e.target!==btn && !isToolbarToggle(e.target)){
       closeSearch();
       e.stopPropagation(); // swallow the click so it doesn't ALSO pick whatever's underneath (Tony: "defeats the object")
     }
@@ -11173,6 +11377,12 @@ function renderMatches(matches,emptyMsg){
     }
     if(e.target.closest&&e.target.closest(".histHintReopen")){
       toast(e.target.closest(".histHintReopen").getAttribute("data-full"),6000);
+      return;
+    }
+    var rtBtn=e.target.closest?e.target.closest('.routeActBtn[data-act="route"]'):null;
+    if(rtBtn){
+      var rrow=rtBtn.closest(".searchRes");
+      if(rrow && routeHereTo(rrow.getAttribute("data-addr"),parseInt(rrow.getAttribute("data-galaxy"),10))) closeSearch();
       return;
     }
     var row=e.target.closest?e.target.closest(".searchRes"):null;
@@ -11557,18 +11767,19 @@ function renderFindMatches(results,radius,capped,thinned,mode,q){
   function openRoutes(){
     pop.classList.add("show");
     btn.classList.add("on");
-    positionUnderRoutesBtn();
+    if(!dockOnPhone(pop)) positionUnderRoutesBtn();
     renderRoutesList();
     remeasureScroll();
   }
   function closeRoutes(){ pop.classList.remove("show"); btn.classList.remove("on"); }
   window.closeRoutesPop=closeRoutes;
+  document.getElementById("bRoutesClose").addEventListener("click",function(e){ e.stopPropagation(); closeRoutes(); });
   btn.addEventListener("click",function(e){
     e.stopPropagation();
     if(pop.classList.contains("show")) closeRoutes(); else openRoutes();
   });
   document.addEventListener("click",function(e){
-    if(pop.classList.contains("show") && !pop.contains(e.target) && e.target!==btn) closeRoutes();
+    if(pop.classList.contains("show") && !pop.contains(e.target) && e.target!==btn && !isToolbarToggle(e.target)) closeRoutes();
   });
 })();
 
@@ -11605,18 +11816,19 @@ function renderFindMatches(results,radius,capped,thinned,mode,q){
   function openFav(){
     pop.classList.add("show");
     btn.classList.add("on");
-    positionUnderFavBtn();
+    if(!dockOnPhone(pop)) positionUnderFavBtn();
     renderFavouritesList();
     remeasureScroll();
   }
   function closeFav(){ pop.classList.remove("show"); btn.classList.remove("on"); }
   window.closeFavPop=closeFav;
+  document.getElementById("bFavClose").addEventListener("click",function(e){ e.stopPropagation(); closeFav(); });
   btn.addEventListener("click",function(e){
     e.stopPropagation();
     if(pop.classList.contains("show")) closeFav(); else openFav();
   });
   document.addEventListener("click",function(e){
-    if(pop.classList.contains("show") && !pop.contains(e.target) && e.target!==btn) closeFav();
+    if(pop.classList.contains("show") && !pop.contains(e.target) && e.target!==btn && !isToolbarToggle(e.target)) closeFav();
   });
 })();
 

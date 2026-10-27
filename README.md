@@ -171,6 +171,34 @@ the same region your drive can reach (marked SWAPPED). Data: NMS Almanac.
 
 ![Navigator after Check route: every stop ticked, one swapped](screenshots/31-route-check.jpg)
 
+**Route here, no star-tapping needed.** Picking a destination by tapping a
+tiny star on a phone is guesswork, so every row in **Search** and
+**Favourites** now has a **➜ Route here** button: it plots the course from
+the system you're in straight to that one (any system in the galaxy, near or
+far), then PLAN JOURNEY as usual. Search also takes a pasted 12-digit portal
+address, so a destination someone shares on Discord or Reddit is one paste
+and one tap away. While a course is plotted, its next 8 stops and the
+destination are labelled on the map by number and name, so you can see which
+dot is which.
+
+**More real stars near you.** The region you're in and the six next to it
+now show every system known to be real, not a 22-star sample: the region's
+guide stars and purple band, plus its true size from
+[NMS Almanac](https://nmsalmanac.com) (looked up once per region for
+everybody and kept, so it doesn't eat into the Almanac's limits), plus any
+systems travellers have logged there on
+[Voyager's Haven](https://havenmap.online), labelled with their Haven name.
+Each star is the right system, but where it sits *inside* its region is
+approximate -- neither source gives a star's exact spot -- so the dots won't
+line up one-for-one with the in-game map.
+
+**Phones: popups don't fight the controls.** Opening Search, Favourites or
+My Routes on a phone hides the controls by itself and docks the box full
+width just under the top row, so results have room to scroll. Show / Hide
+controls leaves it open; its × closes it.
+
+![Search with a pasted portal address and Route here, then the plotted course](screenshots/32-route-here.jpg)
+
 **Saved & shareable routes.** Once a course is plotted, the Course plotted
 card gets two more buttons below Jump to / Clear. **Save Route** stores
 that exact route into **My Routes** (the Routes button in the toolbar) so

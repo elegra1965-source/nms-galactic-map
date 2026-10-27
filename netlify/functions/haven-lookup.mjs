@@ -91,6 +91,48 @@ export default async (req) => {
   var u = new URL(req.url);
   var addr = (u.searchParams.get("addr") || "").toUpperCase();
   var gname = (u.searchParams.get("gname") || "").trim();
+
+  /* 2026-10-27 (Tony: use Almanac + Haven so Local shows real systems):
+     ?region=<8 hex, the YYZZZXXX end of an address>&gname=<galaxy> lists the
+     systems travellers have logged on Haven in that region (Haven's search
+     matches the glyph code's end), as [{name, idx}]. Stored in the shared
+     store (24 h, empty answers 6 h) so each region costs Haven one call a day
+     at most, however many travellers look at it. */
+  var region = (u.searchParams.get("region") || "").toUpperCase();
+  if(region){
+    if(!/^[0-9A-F]{8}$/.test(region)) return json(400, { ok: false, error: "bad region" });
+    if(!gname || gname.length > 40 || !/^[A-Za-z0-9 '\-]+$/.test(gname)) return json(400, { ok: false, error: "bad gname" });
+    var rKey = "region:" + gname.toLowerCase().replace(/\s+/g, "_") + ":" + region;
+    var rStore = null, rNow = Date.now();
+    try { rStore = getStore(STORE); } catch(e){ rStore = null; }
+    if(rStore){
+      try {
+        var rc = await rStore.get(rKey, { type: "json" });
+        if(rc && (rNow - rc.at) < (rc.list.length ? 24 * 3600000 : 6 * 3600000))
+          return json(200, { ok: true, systems: rc.list, cached: true }, { "Cache-Control": "public, max-age=600" });
+      } catch(e){}
+    }
+    try {
+      var rr = await havenGet("/api/search?q=" + region + "&limit=200");
+      var seen = {}, list = [];
+      (rr.systems || []).forEach(function(sy){
+        if(!sy || typeof sy.glyph_code !== "string") return;
+        var gc = sy.glyph_code.toUpperCase();
+        if(gc.length !== 12 || gc.slice(4) !== region) return;
+        if(String(sy.galaxy || "").toLowerCase() !== gname.toLowerCase()) return;
+        if(sy.reality && sy.reality !== "Normal") return;
+        var idx = parseInt(gc.slice(1, 4), 16);
+        if(!(idx >= 1 && idx <= 0xFFF) || seen[idx]) return;
+        seen[idx] = 1;
+        list.push({ name: clean(sy.name), idx: idx });
+      });
+      list = list.slice(0, 150);
+      if(rStore){ try { await rStore.setJSON(rKey, { at: rNow, list: list }); } catch(e){} }
+      return json(200, { ok: true, systems: list }, { "Cache-Control": "public, max-age=600" });
+    } catch(e){
+      return json(200, { ok: false, error: "Haven unavailable" });
+    }
+  }
   if(!isValidAddress(addr)) return json(400, { ok: false, error: "bad addr" });
   if(!gname || gname.length > 40 || !/^[A-Za-z0-9 '\-]+$/.test(gname)) return json(400, { ok: false, error: "bad gname" });
 

@@ -161,6 +161,23 @@ export async function lookupAndCache(store, addr, g){
 }
 export { Busy, STORE, CACHE_V };
 
+const RMAX_BUDGET_HOUR = 100;   // 2026-10-27: region-size searches, all visitors together
+
+/* Does this system exist? Reads the full or exists cache first (free); else one
+   /systems call, stored in the exists cache (30 days, misses 1 day). */
+async function existsCached(store, addr, g){
+  var sys0 = "0" + addr.slice(1);
+  var c = await store.get("sys/" + g + "/" + sys0, { type: "json" }).catch(function(){ return null; });
+  if(c && c.until > Date.now() && c.body && c.body.ok) return { found: !!c.body.found, cost: 0 };
+  var ek = "ex/" + g + "/" + sys0;
+  var ec = await store.get(ek, { type: "json" }).catch(function(){ return null; });
+  if(ec && ec.until > Date.now() && ec.body) return { found: !!ec.body.found, cost: 0 };
+  var es = await aGet("systems/" + addr + "?galaxy=" + (g + 1));
+  var eb = { ok:true, found: !!es, name: es && es.names ? String(es.names.given || es.names.game || "").slice(0, 80) || null : null };
+  await store.setJSON(ek, { until: Date.now() + (eb.found ? TTL_HIT_MS : TTL_MISS_MS), body: eb }).catch(function(){});
+  return { found: eb.found, cost: 1 };
+}
+
 async function hourCount(store, who){
   var k = "rl/" + who + "/" + Math.floor(Date.now() / 3600000);
   var n = (await store.get(k, { type: "json" }).catch(function(){ return null; })) || 0;
@@ -204,6 +221,56 @@ export default async (req, context) => {
       if(e instanceof Busy) return json(200, { ok:false, busy:true, retryAfter: e.retryAfter });
       return json(200, { ok:false, error: "Couldn't reach NMS Almanac" });
     }
+  }
+
+  /* 2026-10-27: ?regionmax=1&addr=<any address in the region>&lo=<hex top number
+     known to exist> -- a region's true top system number, for the stars the map
+     draws near you. Halving search between lo and 0x3E8 over "does this system
+     exist" (each check 1 key lookup, reusing/filling the same exists cache),
+     at most 4 checks per call so the function stays quick; the page calls
+     again until done. The result is stored for good (rmax/<galaxy>/<region>),
+     so every region is only ever searched once, for everybody. Its own budget
+     of 100 lookups an hour across all visitors keeps the key free for the rest. */
+  if(u.searchParams.get("regionmax") === "1"){
+    var region = addr.slice(4);
+    var rk = "rmax/" + g + "/" + region;
+    var st = await store.get(rk, { type: "json" }).catch(function(){ return null; });
+    if(st && st.done) return json(200, { ok:true, done:true, n: st.n }, { "Cache-Control": "public, max-age=86400" });
+    var lo0 = parseInt(u.searchParams.get("lo") || "7A", 16);
+    if(!(lo0 >= 1 && lo0 < 0x3E8)) return json(400, { ok:false, error:"lo must be 1-3E7 hex" });
+    if(!st || st.v !== 1) st = { v:1, lo: lo0, hi: 0x3E9, checkedLo: false, done:false };
+    var bk = "rmaxb/" + Math.floor(Date.now() / 3600000);
+    var used = (await store.get(bk, { type: "json" }).catch(function(){ return null; })) || 0;
+    if(used >= RMAX_BUDGET_HOUR) return json(200, { ok:false, busy:true, reason:"budget" });
+    var whoR = await ipKey((context && context.ip) || req.headers.get("x-nf-client-connection-ip") || "unknown");
+    var rlR = await hourCount(store, "ex/" + whoR);
+    if(rlR.n >= PER_IP_HOUR_EXISTS) return json(200, { ok:false, busy:true, reason:"visitor-hour" });
+    var spent = 0;
+    try {
+      for(var step = 0; step < 4 && !st.done; step++){
+        var probe = st.checkedLo ? Math.floor((st.lo + st.hi) / 2) : st.lo;
+        var pa = "1" + probe.toString(16).toUpperCase().padStart(3, "0") + region;
+        var r = await existsCached(store, pa, g);
+        spent += r.cost;
+        if(!st.checkedLo){
+          st.checkedLo = true;
+          if(!r.found){ st.done = true; st.n = 0; }   // the known-good number isn't there: leave this region alone
+        } else if(r.found) st.lo = probe; else st.hi = probe;
+        if(!st.done && st.checkedLo && st.hi - st.lo <= 1){ st.done = true; st.n = st.lo; }
+      }
+    } catch(e){
+      if(spent) await store.setJSON(bk, used + spent).catch(function(){});
+      await store.setJSON(rk, st).catch(function(){});
+      if(e instanceof Busy) return json(200, { ok:false, busy:true, retryAfter: e.retryAfter });
+      return json(200, { ok:false, error: "Couldn't reach NMS Almanac" });
+    }
+    if(spent){
+      await store.setJSON(bk, used + spent).catch(function(){});
+      await store.setJSON(rlR.k, rlR.n + spent).catch(function(){});
+    }
+    if(st.done) st.at = Date.now();
+    await store.setJSON(rk, st).catch(function(){});
+    return json(200, st.done ? { ok:true, done:true, n: st.n } : { ok:true, done:false });
   }
 
   if(cached && cached.until > Date.now() && cached.body && cached.body.v === CACHE_V) return json(200, cached.body, { "Cache-Control": "public, max-age=3600" });
