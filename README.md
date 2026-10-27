@@ -628,6 +628,12 @@ the long Full guide in About is English for now and says so. It lives in
 
 **Always the newest version.** An installed app on a phone isn't reloaded when you switch back to it, so it could keep showing an old version until it was closed and reopened. Now, each time you come back to it (and every 30 minutes while it stays open), it checks for a new version. If one is live, a small bar says “New version ready · tap to update”, in your language. One tap reloads in place; × hides it. It never reloads by itself, so nothing you're in the middle of is lost. It lives in `nms-update.js`, the same file on every site.
 
+**⟳ Refresh.** In the installed app there's no browser reload button (and pull-to-refresh doesn't work everywhere), so a small ⟳ button sits on the Hide controls row under the title. Tap it and it checks for a new version and reloads in place, on the same view. It only shows in the installed app. After a big batch of updates, the first open on that day says “✓ Updated · that's the last update today”, so nobody wonders if more pop-ups are coming. The old nms-galaxy-map.netlify.app address now sends search engines here with a permanent (301) redirect.
+
+**Share on Discord.** In About, the share row is X, Reddit and Discord. Discord has no share link, so the button copies a short message with the link, says “Copied — paste it in any server or DM” and opens Discord so you pick where to post it.
+
+**Route arrows in star colours.** When your next stop or destination is off-screen, the arrow at the screen edge now takes that star's colour (yellow, red, green, blue or purple, the same colours as the star dots), so you can see its class at a glance. The “Charting nearby systems” note stays at least 4 seconds and then fades out instead of vanishing.
+
 <img src="screenshots/29-update-bar.jpg" alt="The update bar at the bottom of the page on a phone: New version ready, tap to update, with a close button" width="390">
 
 ![Accessibility panel](screenshots/08-accessibility-panel.png)

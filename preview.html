@@ -8,9 +8,9 @@
 <meta name="robots" content="max-image-preview:large">
 <script src="calm.js?v=2"></script>
 <script src="/lang.js?v=2"></script>
-<script src="/nms-update.js?v=1" defer></script>
+<script src="/nms-update.js?v=2" defer></script>
 <title>NMS Galactic Map — 3D Galaxy Map &amp; Portal Address Decoder</title>
-<meta name="description" content="Free 3D No Man's Sky galaxy map: decode portal glyph addresses, find systems travellers have charted, see stations, planets and bases, and plot routes across all 256 galaxies. Fan-made, no sign-up.">
+<meta name="description" content="Free 3D No Man's Sky galaxy map: decode portal glyph addresses, find systems travellers have charted and plot routes across all 256 galaxies. No sign-up.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="NMS Galactic Map">
 <meta property="og:title" content="NMS Galactic Map">
@@ -584,6 +584,10 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border:none;border-ra
   background:rgba(6,14,22,.92);border:1px solid rgba(0,229,255,.45);border-radius:6px;
   color:#bff6ff;font:12px/1.35 Rajdhani,Chakra Petch,system-ui,sans-serif;letter-spacing:.04em;box-shadow:0 0 14px rgba(0,229,255,.18)}
 #chartNote.show{display:flex;animation:cnIn .35s ease-out}
+#chartNote{transition:opacity .6s ease}#chartNote.fade{opacity:0}
+/* 2026-10-27: ⟳ refresh (installed app only, from nms-update.js) sits on the Hide controls row */
+#nmsRefresh{background:rgba(6,14,22,.6)!important;border:1px solid rgba(0,229,255,.45)!important;color:var(--cyan)!important;border-radius:4px!important;padding:0 8px!important;min-height:26px!important;min-width:32px!important;font-size:15px!important;line-height:24px!important;align-self:center}
+#toggleRow #nmsRefresh{order:2}
 #chartNote .cnTxt::before{content:"\25C8  ";color:#f0a500}
 #chartNote .cnX{flex:none;background:none;border:1px solid rgba(0,229,255,.35);color:#bff6ff;border-radius:4px;padding:0 7px;font-size:14px;line-height:20px;cursor:pointer}
 @keyframes cnIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
@@ -1779,6 +1783,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   <button type="button" id="chartedLine" hidden aria-haspopup="dialog" aria-expanded="false" title="Systems other travellers have charted this week">&#9672; charted</button>
   <button type="button" id="trendLine" hidden aria-haspopup="dialog" aria-expanded="false" title="The most-viewed charted systems this week">&#128293; Trending &rsaquo;</button>
   <button type="button" id="toolbarToggle" aria-expanded="true" title="Hide or show the map controls below the title.">&#9650; Hide controls</button>
+  <span data-nms-refresh-slot style="display:contents"></span>
   </div>
   <div id="toolbarBody">
   <select id="galSel"></select>
@@ -2860,7 +2865,7 @@ nearby procedural space within a radius.">Search</button>
     </div>
     <div class="mfld">
       <div class="lb">Plotting a hyperdrive course</div>
-      <div style="font-size:12px;color:var(--text-dim);line-height:1.55"><b>Plotted course</b> / <b>Lock navigation target</b> plots a real multi-jump route to that system for your current hyperdrive type and range (set in Filters), and opens the Warp Manifest showing the full jump-by-jump itinerary -- click it again on the same target to close the manifest without re-plotting. Every jump always lands on a real charted star, never empty space -- same as the real game -- so the reported jump count is usually a bit above the straight-line distance-divided-by-range number, sometimes noticeably so in sparser patches of space. That's not a bug: a real star is rarely sitting exactly on your bearing at exactly your max range, so routes drift slightly to reach one, and that adds up over a long trip. No Man's Sky itself has no multi-hop route planner at all -- you'd normally do this same star-by-star checking manually, this just does it for you and shows the whole path at once. The line itself matches the real game's own convention: <b>solid</b> means a single jump is enough, <b>dashed</b> means it needs multiple hops, and <b>red-dashed</b> means your current drive can't reach that star's colour at all. Clicking any star while browsing automatically replots the line to it, replacing whatever was there before. If a route's hop count is well above the naive distance-divided-by-range figure, a short reminder appears right on the Course Plotted card itself, not just here -- researched this against real player reports too: NMS's own displayed hyperdrive range has long been known to overstate the actual effective jump distance (a leftover from a past galaxy-distance rescale), so needing noticeably more real hops than the raw numbers suggest is genuinely how the real game behaves, not something unique to this map.</div>
+      <div style="font-size:12px;color:var(--text-dim);line-height:1.55"><b>Plotted course</b> / <b>Lock navigation target</b> plots a real multi-jump route to that system for your current hyperdrive type and range (set in Filters), and opens the Warp Manifest showing the full jump-by-jump itinerary -- click it again on the same target to close the manifest without re-plotting. Every jump always lands on a real charted star, never empty space -- same as the real game -- so the reported jump count is usually a bit above the straight-line distance-divided-by-range number, sometimes noticeably so in sparser patches of space. That's not a bug: a real star is rarely sitting exactly on your bearing at exactly your max range, so routes drift slightly to reach one, and that adds up over a long trip. No Man's Sky itself has no multi-hop route planner at all -- you'd normally do this same star-by-star checking manually, this just does it for you and shows the whole path at once. The line itself matches the real game's own convention: <b>solid</b> means a single jump is enough, <b>dashed</b> means it needs multiple hops, and <b>red-dashed</b> means your current drive can't reach that star's colour at all. Clicking any star while browsing automatically replots the line to it, replacing whatever was there before. If a route's hop count is well above the naive distance-divided-by-range figure, a short reminder appears right on the Course Plotted card itself, not just here -- researched this against real player reports too: NMS's own displayed hyperdrive range has long been known to overstate the actual effective jump distance (a leftover from a past galaxy-distance rescale), so needing noticeably more real hops than the raw numbers suggest is genuinely how the real game behaves, not something unique to this map. <span>The arrow at the screen edge points to your next stop or destination when it's off-screen, coloured by that star's class (already checked against your drive type and max jump).</span></div>
     </div>
     <div class="mfld">
       <div class="lb">Galactic Navigator</div>
@@ -2898,12 +2903,12 @@ nearby procedural space within a radius.">Search</button>
       <div style="font-size:12px;color:var(--text-dim);line-height:1.55;margin-bottom:6px">Opens a GitHub Issue elegra1965 can see -- no account or email needed.</div>
       <button class="btn" id="discFeedback" style="width:100%;text-align:center">Send feedback</button>
     </div>
-    <div class="mfld" data-narrate="Buttons to share this map on X, on Reddit, or copy a link.">
+    <div class="mfld" data-narrate="Buttons to share this map on X, on Reddit, or on Discord.">
       <div class="lb">Share this map</div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
         <button class="btn" onclick="return shareTo('x')" style="flex:1;text-align:center">Share on X</button>
         <button class="btn" onclick="return shareTo('reddit')" style="flex:1;text-align:center">Reddit</button>
-        <button class="btn" onclick="return shareTo('copy')" style="flex:1;text-align:center">Copy link</button>
+        <button class="btn" onclick="return shareTo('discord')" style="flex:1;text-align:center">Discord</button>
       </div>
     </div>
     <div style="margin-top:2px;font-size:9px;letter-spacing:.1em;color:var(--text-faint);text-align:center">BUILT BY ELEGRA1965</div>
@@ -3064,7 +3069,7 @@ loadLetterMap('./nms-core/letter-map').then(function(lm){
 });
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="preview.js?v=20261027b"></script>
+<script src="preview.js?v=20261027c"></script>
 <script src="almanac.js?v=20261026c"></script>
 <script src="share-system.js"></script>
 <script src="charted.js"></script>

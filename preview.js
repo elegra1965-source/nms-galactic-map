@@ -2287,6 +2287,13 @@ function shareTo(t){
   if(t==="x") window.open("https://twitter.com/intent/tweet?text="+encodeURIComponent(txt)+"&url="+encodeURIComponent(url),"_blank");
   else if(t==="reddit") window.open("https://www.reddit.com/submit?url="+encodeURIComponent(url)+"&title="+encodeURIComponent("NMS Galactic Map"),"_blank");
   else if(t==="copy"){ navigator.clipboard.writeText(url).then(function(){ toast("Link copied"); },function(){ toast(url); }); }
+  /* 2026-10-27 (Tony): Discord has no share link -- copy the message + link, then open Discord so they
+     pick the server / DM (same as the Hub). Opened straight away so pop-up blockers don't stop it. */
+  else if(t==="discord"){
+    var _dm=(window.NMS_TR||String)("\u2713 COPIED \u2014 PASTE IT IN ANY SERVER OR DM");
+    try{ navigator.clipboard.writeText(txt+" "+url).then(function(){ toast(_dm,4500); },function(){ toast(_dm,4500); }); }catch(e){ toast(_dm,4500); }
+    window.open("https://discord.com/app","_blank");
+  }
   return false;
 }
 
@@ -3435,7 +3442,8 @@ var _probeTimer=null, _probeAsked={};
    (Almanac size / Haven systems), a small NMS-style note at the bottom says so,
    with an x. Only after 400 ms, so a fast answer never flashes it; closes by
    itself when the fetches finish. A region already known never shows it. */
-var _chartN=0, _chartT=null, _chartClosed=false;
+var _chartN=0, _chartT=null, _chartClosed=false, _chartAt=0, _chartHideT=null;
+/* 2026-10-27 (Tony: 'closes a bit too quick'): once shown it stays at least 4 s, then fades out over 0.6 s. */
 function chartNote(d){
   _chartN=Math.max(0,_chartN+d);
   var el=document.getElementById("chartNote");
@@ -3443,18 +3451,27 @@ function chartNote(d){
     el=document.createElement("div"); el.id="chartNote"; el.setAttribute("role","status");
     el.innerHTML='<span class="cnTxt"></span><button type="button" class="cnX" aria-label="Close">&times;</button>';
     document.body.appendChild(el);
-    el.querySelector(".cnX").addEventListener("click",function(){ _chartClosed=true; el.classList.remove("show"); });
+    el.querySelector(".cnX").addEventListener("click",function(){ _chartClosed=true; clearTimeout(_chartHideT); el.classList.remove("show","fade"); });
   }
   if(_chartN>0){
+    if(el.classList.contains("fade")){ clearTimeout(_chartHideT); el.classList.remove("fade"); }
     if(!_chartT&&!el.classList.contains("show")&&!_chartClosed) _chartT=setTimeout(function(){
       _chartT=null; if(_chartN<=0) return;
       var txt="Charting nearby systems\u2026 first visit to this region only, a few seconds required.";
       el.querySelector(".cnTxt").textContent=(window.NMS_T?window.NMS_T(txt):txt);
-      el.classList.add("show");
+      el.classList.remove("fade"); el.classList.add("show"); _chartAt=Date.now();
     },400);
   } else {
     if(_chartT){ clearTimeout(_chartT); _chartT=null; }
-    el.classList.remove("show"); _chartClosed=false;
+    _chartClosed=false;
+    if(!el.classList.contains("show")) return;
+    clearTimeout(_chartHideT);
+    _chartHideT=setTimeout(function(){
+      if(_chartN>0) return;
+      if(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches){ el.classList.remove("show"); return; }
+      el.classList.add("fade");
+      _chartHideT=setTimeout(function(){ if(_chartN>0){ el.classList.remove("fade"); return; } el.classList.remove("show","fade"); },600);
+    },Math.max(0,4000-(Date.now()-_chartAt)));
   }
 }
 function scheduleRegionProbe(gen){
@@ -7085,6 +7102,17 @@ function ringScreenSize(r){
   var k=Math.min(3,Math.max(0.06,r.position.distanceTo(camera.position)/50));
   r.scale.setScalar(k);
 }
+/* 2026-10-27 (Tony): the edge arrow takes that stop's star colour, same colours as the map's
+   star dots (looked up by address; falls back to the CSS orange). Cached per address. */
+var _edgeCol={};
+function edgeStarCol(c){
+  if(!c.a) return "";
+  if(c.a in _edgeCol) return _edgeCol[c.a];
+  var col=null, k;
+  for(k=0;k<allSystems.length;k++) if(allSystems[k].address===c.a){ col=allSystems[k].color; break; }
+  if(col==null&&c.ty) col=starTypeByKey(c.ty).col;
+  return (_edgeCol[c.a]=(col==null?"":"#"+("00000"+col.toString(16)).slice(-6)));
+}
 function updateEdgeArrows(off){
   var box=document.getElementById("edgeArrows");
   if(!box){ box=document.createElement("div"); box.id="edgeArrows"; box.setAttribute("aria-hidden","true"); (document.getElementById("labels")||document.body).appendChild(box); }
@@ -7106,7 +7134,8 @@ function updateEdgeArrows(off){
     px=Math.min(Math.max(px,70),w-70); py=Math.min(Math.max(py,top),h-110-(i*0));
     if(i===1&&pick[0]){ var p0=box.children[0]; if(Math.abs(parseFloat(p0.style.top)-py)<26&&Math.abs(parseFloat(p0.style.left)-px)<140) py+=(py>h/2?-26:26); }
     var ang=Math.atan2(-y,x)*180/Math.PI;
-    el.innerHTML='<span class="eaArr" style="transform:rotate('+ang.toFixed(0)+'deg)">&#10148;</span> ';
+    var _ec=edgeStarCol(c2);
+    el.innerHTML='<span class="eaArr" style="transform:rotate('+ang.toFixed(0)+'deg)'+(_ec?';color:'+_ec:'')+'">&#10148;</span> ';
     el.appendChild(document.createTextNode(c2.t));
     el.style.display="block";
     var hw=el.offsetWidth/2+6; px=Math.min(Math.max(px,hw),w-hw);
@@ -7130,7 +7159,7 @@ function updateLabels(){
         if(i>8&&i!==_last) continue; /* long routes: the next 8 stops + the destination */
         var wp=courseWaypoints[i]; if(!wp||wp.px==null) continue;
         _onRoute[wp.address]=1;
-        cands.push({x:wp.px,y:wp.py,z:wp.pz,d:-1e12+i,
+        cands.push({x:wp.px,y:wp.py,z:wp.pz,d:-1e12+i,a:wp.address,ty:wp.type,
           t:(i===courseWaypoints.length-1?"◎ ":"➜ "+i+". ")+(wp.name||wp.address)});
       }
     }

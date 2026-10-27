@@ -56,7 +56,7 @@ async function tryOpenGithubIssue(token, address, fields, note, systemName){
     var body = "System: "+(systemName||"(unnamed)")+" ("+address+")\n"+
       "Flagged fields: "+fields.join(", ")+"\n\n"+
       "Reporter note: "+(note||"none")+"\n\n"+
-      "View: https://nms-galaxy-map.netlify.app/?addr="+address;
+      "View: https://map.nomansskyhub.app/?addr="+address;
     var res = await fetch("https://api.github.com/repos/"+GITHUB_OWNER+"/"+GITHUB_REPO+"/issues", {
       method: "POST",
       headers: {
