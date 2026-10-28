@@ -79868,15 +79868,15 @@
         "ruins": true,
         "outlaw": false,
         "abandoned": false,
-        "phantom": "",
+        "phantom": "phantom",
         "notes": "",
         "colliding": false,
         "collidingSet": [],
-        "screenshot": "",
+        "screenshot": "https://raw.githubusercontent.com/elegra1965-source/nms-galactic-map/main/user-screenshots/9-103700000000-mvrx2v2m-k5l5be.jpg",
         "hasStation": true,
         "stationName": "Richer-Quka Cycler",
         "allianceName": "The Gray Council",
-        "stationPhoto": "",
+        "stationPhoto": "https://raw.githubusercontent.com/elegra1965-source/nms-galactic-map/main/user-screenshots/9-103700000000-station-mvrx2wan-78wwk5.jpg",
         "signals": [],
         "editorName": "OldSaltySak",
         "editorFriendCode": "H0ZJ-YBTF-C5TRR",
@@ -80083,11 +80083,15 @@
           }
         ]
       },
-      "editedAt": "2026-10-28T09:22:30.294Z",
+      "editedAt": "2026-10-28T09:33:29.524Z",
       "editedByIp": "ip_64a9415962d14c6d",
       "history": [
         {
           "at": "2026-10-28T09:22:30.294Z",
+          "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-10-28T09:33:29.524Z",
           "text": "edited by a traveller"
         }
       ]
@@ -80096,7 +80100,8 @@
   "reports": [],
   "ipLog": {
     "ip_64a9415962d14c6d": [
-      1793179350294
+      1793179350294,
+      1793180009524
     ]
   },
   "flagLog": {},
