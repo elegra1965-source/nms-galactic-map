@@ -35,6 +35,8 @@ real planet data from NMS Almanac and Voyager's Haven.
 
 New here? Hit **▷ Tour** in the map's toolbar for an 11-step guided walk-through.
 
+The last two tour steps are **Your language** (🌐) and **Accessibility**. The Traveller Discoveries, Navigator and other scrolling pages have the same teal ⇧ back-to-top arrow as every Hub site.
+
 <details>
 <summary><strong>🧩 How it fits together</strong> — the pipeline from portal address to shared edits</summary>
 
@@ -638,8 +640,13 @@ answered. Private systems live in a separate private store
 **Share this system.** Pick any system and hit **Share system** in its info
 panel: the map draws a picture card (system name, star, lifeform, economy,
 conflict, features, the 12 portal glyphs and the hex) sized for Reddit,
-Discord and X, and opens your phone's share sheet with a fly-there link.
-On a desktop it saves the picture and copies the link.
+Discord and X. A preview of the card opens first, so you see exactly what
+you're sending, with a **Send to** dropdown underneath: *Share to an app*
+(your phone's share menu, picture + fly-there link), *Copy picture* (paste it
+straight into Discord, Reddit or WhatsApp), *Discord*, *Reddit*, *X*,
+*WhatsApp*, *Save picture* or *Copy link only*. A line under the dropdown says
+what each choice will do. Phones start on Share to an app; computers start on
+Copy picture, because the Windows share menu often sends nothing to apps.
 
 <img src="screenshots/16-share-system-card.jpg" alt="Share system card: Galactic Hub Capitol with star, facts, portal glyphs and hex" width="360">
 

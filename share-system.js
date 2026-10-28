@@ -130,7 +130,7 @@
   function canCopyImg() { return !!(navigator.clipboard && navigator.clipboard.write && window.ClipboardItem); }
   function T(k) { try { return (window.NMS_T ? NMS_T(k) : k); } catch (e) { return k; } }
   var OPTS = [
-    ["native", "📱 Share… (pick an app)", "Opens your device's share menu with the picture and the fly-there link."],
+    ["native", "📱 Share to an app", "Opens your device's share menu with the picture and the fly-there link."],
     ["copyimg", "📋 Copy picture", "Copies the picture. Paste it (Ctrl+V or long-press) into Discord, Reddit, WhatsApp or anywhere. The portal glyphs and hex are on the picture."],
     ["discord", "Discord", "Copies the picture and opens Discord: paste it in any server or DM. If your browser can't copy pictures, it saves it and copies the message instead."],
     ["reddit", "Reddit", "Saves the picture and opens a new Reddit post with the title and link filled in. Add the picture to the post."],
@@ -152,7 +152,7 @@
       "#shSys .shwait{display:flex;align-items:center;justify-content:center;height:220px;color:#7fdcff;font:600 12px Orbitron,monospace;letter-spacing:2px}" +
       "#shSys label{display:block;margin:12px 0 4px;font:700 10px Orbitron,monospace;letter-spacing:2px;color:#f0a500}" +
       "#shSys .shrow{display:flex;gap:8px}" +
-      "#shSys select{flex:1 1 auto;min-width:0;height:42px;background:#0a1824;color:#eaf6ff;border:1px solid rgba(0,229,255,.45);border-radius:6px;padding:0 8px;font:600 15px Rajdhani,system-ui,sans-serif}" +
+      "#shSys select{flex:1 1 auto;min-width:0;height:42px;text-overflow:ellipsis;background:#0a1824;color:#eaf6ff;border:1px solid rgba(0,229,255,.45);border-radius:6px;padding:0 8px;font:600 15px Rajdhani,system-ui,sans-serif}" +
       "#shSys .shgo{flex:0 0 auto;height:42px;padding:0 16px;border:0;border-radius:6px;background:linear-gradient(135deg,#00e5ff,#0090ff);color:#021018;font:700 12px Orbitron,monospace;letter-spacing:1.5px;cursor:pointer}" +
       "#shSys .shgo:disabled{opacity:.5;cursor:default}" +
       "#shSys .shnote{margin:8px 0 0;color:rgba(207,224,240,.75);font-size:13.5px;min-height:2.9em}" +
