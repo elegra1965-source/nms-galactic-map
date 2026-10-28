@@ -79848,7 +79848,7 @@
       "flaggedFields": [],
       "disputedFields": [],
       "data": {
-        "name": "Tichero-Quka",
+        "name": "[TGC] Tichero-Quka",
         "race": "Gek",
         "region": "Sea of Mugabune",
         "starClass": "G4",
@@ -80083,7 +80083,7 @@
           }
         ]
       },
-      "editedAt": "2026-10-28T09:33:29.524Z",
+      "editedAt": "2026-10-28T09:35:45.113Z",
       "editedByIp": "ip_64a9415962d14c6d",
       "history": [
         {
@@ -80093,6 +80093,10 @@
         {
           "at": "2026-10-28T09:33:29.524Z",
           "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-10-28T09:35:45.113Z",
+          "text": "edited by a traveller"
         }
       ]
     }
@@ -80101,7 +80105,8 @@
   "ipLog": {
     "ip_64a9415962d14c6d": [
       1793179350294,
-      1793180009524
+      1793180009524,
+      1793180145113
     ]
   },
   "flagLog": {},
