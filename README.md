@@ -1,16 +1,42 @@
 # NMS Galactic Map
 
-A fan-made *No Man's Sky* tool built on one fact the game never spells out: a
-12-glyph portal address is not an opaque code, it's a 3D coordinate. Decode
-it and you're not reading a string — you're pointing at an exact voxel in a
-4096 x 256 x 4096 grid that spans the whole galaxy. So the portal decoder and
-the galaxy map are the same tool: type or tap an address, and you fly
-straight to that point, in three dimensions, in a browser.
+A free, fan-made 3D map of all 256 *No Man's Sky* galaxies. A 12-glyph portal
+address is really a 3D coordinate, so type or tap one and you fly straight to
+that system — then plan hyperdrive routes, chart and edit systems, and see
+real planet data from NMS Almanac and Voyager's Haven.
 
-**Live site:** [nms-galaxy-map.netlify.app](https://nms-galaxy-map.netlify.app)
+**Live site:** [map.nomansskyhub.app](https://map.nomansskyhub.app) · part of the [No Man's Sky Hub](https://nomansskyhub.app)
 
 > Fan-made, built on public wiki data and reverse-engineered address maths.
 > Not affiliated with, sponsored by, or endorsed by Hello Games.
+
+**At a glance**
+
+- 🌌 Fly through every galaxy in 3D, down to each system's planets and moons
+- 🚀 Plan routes for your hyperdrive, checked against the real game
+- ✏️ Chart a system and every visitor sees your edits
+- 📡 Real planet types, colours and stations from NMS Almanac
+- 🔥 Weekly Trending list and Traveller Discoveries page
+- 📱 Installable app, 8 languages, accessibility options
+
+**Contents** — every section below is folded; tap a heading to open it.
+
+- [What can this map do?](#what-can-this-map-do)
+- [How does a portal address become a 3D location?](#the-address-decoded)
+- [What files make up this repo, and what's deliberately not in here?](#whats-in-here-and-whats-not)
+- [What real No Man's Sky data does this use?](#real-game-data-nms-core)
+- [Can I import my own save file, and is it uploaded anywhere?](#importing-your-own-save-optional-client-side-only)
+- [How do shared community edits get submitted and accepted?](#shared-community-edits-and-how-a-submission-actually-gets-in)
+- [How do I run this locally?](#running-it-locally)
+- [How can I verify the generator's accuracy myself?](#verifying-the-generator-yourself)
+- [Guided tour](#guided-tour) · [Is it accessible?](#is-it-accessible) · [Using this code?](#using-this-code) · [Credits](#credits)
+
+## What can this map do?
+
+New here? Hit **▷ Tour** in the map's toolbar for a 10-step guided walk-through.
+
+<details>
+<summary><strong>🧩 How it fits together</strong> — the pipeline from portal address to shared edits</summary>
 
 ```
 portal address  ->  12 hex glyphs  ->  signed 3D voxel coordinate
@@ -26,37 +52,10 @@ portal address  ->  12 hex glyphs  ->  signed 3D voxel coordinate
                                           data/overrides.json (lives only on GitHub, see below)
 ```
 
-**Contents**
+</details>
 
-- [What can this map do?](#what-can-this-map-do)
-- [How does a portal address become a 3D location?](#the-address-decoded)
-- [What files make up this repo, and what's deliberately not in here?](#whats-in-here-and-whats-not)
-- [What real No Man's Sky data does this use?](#real-game-data-nms-core)
-- [Can I import my own save file, and is it uploaded anywhere?](#importing-your-own-save-optional-client-side-only)
-- [How do shared community edits get submitted and accepted?](#shared-community-edits-and-how-a-submission-actually-gets-in)
-- [How do I run this locally?](#running-it-locally)
-- [How can I verify the generator's accuracy myself?](#verifying-the-generator-yourself)
-- [Is it accessible?](#is-it-accessible)
-- [Using this code?](#using-this-code)
-- [Credits](#credits)
-
-## What can this map do?
-
-Screenshots from the live site, in the order you'd actually hit them. The
-site itself also has a live version of this same walkthrough -- hit **Tour**
-in the toolbar (or "Take a quick tour" on the first-visit disclaimer) for a
-9-step guided spotlight over the real UI instead of static images.
-On a first visit the disclaimer now shows three quick tips with the full
-guide one tap away (About always opens the full guide), and if you saved a
-Traveller ID on the Hub the map opens in your home galaxy.
-
-**Share this system.** Pick any system and hit **Share system** in its info
-panel: the map draws a picture card (system name, star, lifeform, economy,
-conflict, features, the 12 portal glyphs and the hex) sized for Reddit,
-Discord and X, and opens your phone's share sheet with a fly-there link.
-On a desktop it saves the picture and copies the link.
-
-<img src="screenshots/16-share-system-card.jpg" alt="Share system card: Galactic Hub Capitol with star, facts, portal glyphs and hex" width="360">
+<details>
+<summary><strong>🌌 Exploring the galaxy</strong> — Galaxy view, local star field, real stars, Atlas overlay, star names</summary>
 
 **Galaxy view.** Every one of the 256 real galaxies rendered as a proper 3D
 spiral, colour-matched to its actual type (Normal / Harsh / Empty / Lush) --
@@ -113,6 +112,76 @@ plotted before.
 
 ![Local view with a system selected](screenshots/02-local-view-select.jpg)
 
+**More real stars near you.** The region you're in and the six next to it
+now show every system known to be real, not a 22-star sample: the region's
+guide stars and purple band, plus its true size from
+[NMS Almanac](https://nmsalmanac.com) (looked up once per region for
+everybody and kept, so it doesn't eat into the Almanac's limits), plus any
+systems travellers have logged there on
+[Voyager's Haven](https://havenmap.online), labelled with their Haven name.
+Each star is the right system, but where it sits *inside* its region is
+approximate -- neither source gives a star's exact spot -- so the dots won't
+line up one-for-one with the in-game map.
+
+**Zoom in, still see names.** Star names go to the stars actually on your
+screen, so zooming right in keeps up to 28 names visible. The you-are-here
+and selected rings keep the same size on screen at any zoom instead of
+ballooning, and while a course is plotted, the next stop and the destination
+get a small arrow chip at the screen edge when they're out of view. The
+first time you visit a region, a short "Charting nearby systems" note shows
+while its real systems are fetched (it never shows again for that region).
+
+**Honest about its limits.** The About modal spells out exactly what's
+generated accurately (star type, system/region names, planet count) versus
+an unverified guess (individual planet names, and why) -- rather than
+presenting a guess as fact. **Biome, Category type, Conditions, rings, and
+water go a step further than that** (added 2026-09-08, extended 2026-09-09):
+unlike planet names and Sentinel activity -- which show a plausible
+generated value, tagged as a guess -- nobody has reverse-engineered any of
+these five, so this project doesn't display a guess for them at all. They
+simply don't appear until a traveller reports the real answer via Edit
+system.
+
+![About modal](screenshots/07-about-modal.jpg)
+
+</details>
+
+<details>
+<summary><strong>🪐 Inside a system</strong> — 3D system view, labels, colliding planets</summary>
+
+**Enter system.** Fly into any system for a true 3D orbital view -- binary
+and ternary stars, planets and moons on real orbits with rings where the
+generator rolled them, and (where the region has one) a black hole or Atlas
+Interface rendered as its own object rather than swapped in for the star.
+
+![3D system view](screenshots/03-system-3d-view.png)
+
+**Labels in system view.** Every planet, moon, station and point of interest
+gets a small boxed label with a thin line back to it, colour-coded by type:
+gold for the space station, cyan for planets, grey for moons, orange for
+points of interest. Long names wrap onto extra lines instead of running off
+the screen, so a station shows its name and **Alliance** in full. Boxes keep
+clear of each other, of the station photo, of the planets themselves and of
+the system title, and a label whose planet has moved off screen (zoomed in) is
+simply hidden. Local view keeps its plain star-name labels.
+
+<img src="screenshots/23-system-labels.jpg" alt="System view on a phone: boxed labels for planets, a moon and the space station with its alliance, each with a thin line to its object" width="360">
+
+**Colliding planets touch.** Tick "Colliding planets present" in Edit system
+and pick which planets collide: they stay joined as they orbit and their
+spheres sink into each other, the way real colliding planets look in game.
+
+<img src="screenshots/30-colliding-planets.jpg" alt="Colliding planets Idetar and Rosa in the system view, the two spheres sunk into each other" width="340">
+
+<img src="screenshots/28-real-looks.jpg" alt="Before and after in Sranch Op10079: the map's own made-up colours on the left, the real game colours and rings from NMS Almanac on the right" width="640">
+
+<img src="screenshots/26-almanac.jpg" alt="Real game data from NMS Almanac in the info panel: economy, conflict, sell/buy, demand, then planets with their pictures, real names, type, weather and sentinels, one opened to show fauna, flora and resources" width="420">
+
+</details>
+
+<details>
+<summary><strong>🚀 Routes & journeys</strong> — Course lines, Warp Manifest, Navigator, Route here, saved routes, Almanac route check</summary>
+
 **Course lines, styled like the real game.** Solid means one jump gets you
 there, dashed means it's a multi-hop route, red-dashed means your current
 hyperdrive can't reach that star's colour at all. Just hovering any star
@@ -165,6 +234,7 @@ route stop is one that always exists -- the region's guide stars, black hole
 and Atlas Interface, plus its purple stars. Each hop is planned to at most
 85% of your hyperdrive range, because a star's exact spot inside its 400 LY
 region isn't known, so distances are shown as approximate. In the Navigator,
+
 **✓ CHECK ROUTE WITH NMS ALMANAC** asks the Almanac about every stop: a ✓
 means it's a real system; a stop it can't find is swapped for a real star in
 the same region your drive can reach (marked SWAPPED). Data: NMS Almanac.
@@ -181,32 +251,6 @@ and one tap away. While a course is plotted, its next 8 stops and the
 destination are labelled on the map by number and name, so you can see which
 dot is which.
 
-**More real stars near you.** The region you're in and the six next to it
-now show every system known to be real, not a 22-star sample: the region's
-guide stars and purple band, plus its true size from
-[NMS Almanac](https://nmsalmanac.com) (looked up once per region for
-everybody and kept, so it doesn't eat into the Almanac's limits), plus any
-systems travellers have logged there on
-[Voyager's Haven](https://havenmap.online), labelled with their Haven name.
-Each star is the right system, but where it sits *inside* its region is
-approximate -- neither source gives a star's exact spot -- so the dots won't
-line up one-for-one with the in-game map.
-
-**Zoom in, still see names.** Star names go to the stars actually on your
-screen, so zooming right in keeps up to 28 names visible. The you-are-here
-and selected rings keep the same size on screen at any zoom instead of
-ballooning, and while a course is plotted, the next stop and the destination
-get a small arrow chip at the screen edge when they're out of view. The
-first time you visit a region, a short "Charting nearby systems" note shows
-while its real systems are fetched (it never shows again for that region).
-
-**Phones: popups don't fight the controls.** Opening Search, Favourites or
-My Routes on a phone hides the controls by itself and docks the box full
-width just under the top row, so results have room to scroll. Show / Hide
-controls leaves it open; its × closes it.
-
-![Search with a pasted portal address and Route here, then the plotted course](screenshots/32-route-here.jpg)
-
 **Saved & shareable routes.** Once a course is plotted, the Course plotted
 card gets two more buttons below Jump to / Clear. **Save Route** stores
 that exact route into **My Routes** (the Routes button in the toolbar) so
@@ -222,23 +266,16 @@ logs the same way bookmarks and waypoints do.
 
 ![My Routes popover listing a saved route, with a paste-a-link box at the top](screenshots/15-my-routes-popover.jpg)
 
-**Enter system.** Fly into any system for a true 3D orbital view -- binary
-and ternary stars, planets and moons on real orbits with rings where the
-generator rolled them, and (where the region has one) a black hole or Atlas
-Interface rendered as its own object rather than swapped in for the star.
+**Route arrows in star colours.** When your next stop or destination is off-screen, the arrow at the screen edge now takes that star's colour (yellow, red, green, blue or purple, the same colours as the star dots), so you can see its class at a glance. The “Charting nearby systems” note stays at least 4 seconds and then fades out instead of vanishing.
 
-![3D system view](screenshots/03-system-3d-view.png)
+<img src="screenshots/29-update-bar.jpg" alt="The update bar at the bottom of the page on a phone: New version ready, tap to update, with a close button" width="390">
 
-**Labels in system view.** Every planet, moon, station and point of interest
-gets a small boxed label with a thin line back to it, colour-coded by type:
-gold for the space station, cyan for planets, grey for moons, orange for
-points of interest. Long names wrap onto extra lines instead of running off
-the screen, so a station shows its name and **Alliance** in full. Boxes keep
-clear of each other, of the station photo, of the planets themselves and of
-the system title, and a label whose planet has moved off screen (zoomed in) is
-simply hidden. Local view keeps its plain star-name labels.
+![Accessibility panel](screenshots/08-accessibility-panel.png)
 
-<img src="screenshots/23-system-labels.jpg" alt="System view on a phone: boxed labels for planets, a moon and the space station with its alliance, each with a thin line to its object" width="360">
+</details>
+
+<details>
+<summary><strong>🔎 Search, filters & glyph keypad</strong> — Find systems by name, traits or address</summary>
 
 **Filters.** Narrow the local star field by colour, race, economy, or special
 system types (outlaw, black holes, Atlas interfaces, phantom/shadow stars),
@@ -253,6 +290,49 @@ you currently are, use Search with an empty query instead (see "Search by
 name" below) -- that's the actual way back to it.
 
 ![Filters panel](screenshots/04-filters-panel.png)
+
+**Portal glyph keypad.** Type a hex address or tap the real 16 in-game glyphs
+directly -- both stay in sync, so you can decode a screenshot from your own
+game without knowing the hex first. Looking a system up is private: nothing
+is shared unless you press Save in Edit system.
+
+![Portal glyph keypad](screenshots/06-glyph-keypad.png)
+
+**Search & Scan.** No reverse index exists across the whole procedural
+galaxy -- names are generated *from* the address, not the other way round --
+so the Search popup covers this two ways, split across a **By Name** and a
+**By Traits** tab (added 2026-09-12). By Name still starts with anything
+this browser already knows a real name for: community-documented systems,
+plus your own bookmarks, waypoints, and visited history. Results are
+galaxy-aware -- each one is tagged with the real galaxy it belongs to, since
+the same address means something different in each of the 256 -- and
+picking one switches you to that galaxy automatically before jumping there.
+Leave the search box empty and it instead lists everywhere you've
+bookmarked, waypointed, or visited, plus any system you personally have
+edited or bulk-imported from your save (added 2026-08-27, tagged
+"Documented (you)" -- other travellers' edits stay out), sorted
+alphabetically -- a way to get back to somewhere you've been without needing
+to remember its address or portal glyphs.
+
+Either tab can also run a real **Scan** of nearby space, out to a radius
+that starts synced to your current Hyperdrive's jump range (Filters) and
+stays synced automatically until you type your own value into the radius
+box. A scan checks every system it can reach against your query or trait
+filters -- including individual planet and moon names, not just system
+names, with the result telling you exactly which name matched -- plus every
+real black hole and Atlas Interface in range for By Traits. With no name
+typed and no trait filter set, Scan instead just lists whatever's nearby,
+nearest first, for casually browsing the neighbourhood rather than looking
+for something specific. Clicking any result opens its info panel and
+silently plots a course to it without navigating away, so browsing results
+never costs you whatever route you already had plotted.
+
+![Search & Scan panel showing matching results](screenshots/13-search-panel.jpg)
+
+</details>
+
+<details>
+<summary><strong>✏️ Charting & editing systems</strong> — Edit system, station photos, signal markers, save-file import</summary>
 
 **Edit system.** Every system starts as a plausible procedural guess. Edit
 system lets you overwrite that with what you actually see in-game -- stars,
@@ -346,6 +426,114 @@ titled sections, so it's obvious which is which even when only one of them
 has been filled in.
 
 ![System info panel showing Community notes text and a submitted screenshot as two separate titled sections](screenshots/17-public-screenshot-notes.jpg)
+
+**Import from my save file.** Inside Edit system, an optional button reads a
+real Steam/GOG `.hg` save file entirely in your own browser -- nothing is
+ever uploaded -- and can auto-fill "Your name" plus offer a one-click
+bulk-import of your real base names/addresses into the shared map. Discovery
+records don't store player-given planet names at all, only base names do
+(confirmed against a real save file), so that's the one thing this can
+recover automatically; everything else still needs typing in by hand.
+
+</details>
+
+<details>
+<summary><strong>📡 Real game data (NMS Almanac + Voyager's Haven)</strong> — Real planet types, colours, stations, economy, links</summary>
+
+**Voyager's Haven data.** The system info panel has a collapsible
+**Voyager's Haven data** section that, when opened, looks the same portal
+address up in [Voyager's Haven](https://havenmap.online) -- a separate,
+community-run NMS database with tens of thousands of player-charted systems
+-- and shows what travellers have recorded there (star, lifeform, economy,
+conflict, discoverer, and each planet's biome, weather, sentinels, fauna,
+flora and resources). It's read-only and clearly labelled as Haven's data:
+it's never merged into this map's own community edits. Looked up by a small
+Netlify Function (`netlify/functions/haven-lookup.mjs`) that caches results,
+and only when you actually open the section.
+
+**Send to Voyager's Haven.** Edit System has an opt-in tick box, *Also send
+to Voyager's Haven*. After your edit saves here, the system (name, galaxy, star
+colour, economy, conflict, race, and each planet's biome, weather and
+sentinels) is sent to Haven under the No Man's Sky Hub community tag
+(NMSHUB). Haven checks every submission before it goes live, and once approved
+it's credited to the name you entered. A system already on Haven is sent as an
+update. Handled by `netlify/functions/haven-submit.mjs`, which keeps the Hub's
+submit-only key on the server and limits each traveller to 5 sends an hour.
+
+**Real game data from NMS Almanac.** The system info panel has a
+collapsible **Real game data · NMS Almanac** section. When opened it shows
+what the game itself generates for that address, from
+[NMS Almanac](https://nmsalmanac.com): star and spectral class, race,
+economy, wealth, conflict, sell/buy %, what's in demand, and every planet and
+moon with its picture, real name, type, weather (red when extreme) and
+sentinels; tap a planet for fauna/flora counts and its resources.
+*Fill blanks in Edit system* copies these values into empty fields only, and
+nothing is saved until you press Save. Entering a system's 3D view swaps this
+map's own planet-name guesses for the real names. A traveller's own edit
+always wins over Almanac data for names. Looked up by `netlify/functions/almanac.mjs`,
+which keeps the Almanac key on the server and caches every answer, so each
+system is only fetched once; if the hourly allowance is used up you're asked
+to try again later. A scheduled function (`netlify/functions/almanac-warm.mjs`,
+every 10 minutes, at most about half the key's hourly allowance) pre-loads
+every system travellers have charted and keeps it fresh, so these open
+instantly. It only fills the cache: no commits, no deploys, and travellers'
+edits are never touched.
+
+**Almanac planet cards on hover.** In the 3D view of a system no traveller
+has edited, hovering a planet or moon shows NMS Almanac's own card picture of
+it (its disc, name, main facts, galaxy and portal glyphs) in place of the
+usual analysis card, and hovering the space station in the middle shows the
+system's own Almanac card. Systems a traveller has edited (or saved privately) are
+left exactly as they are: their planets keep the analysis card with the
+traveller's own data, plus the Almanac's picture of the planet. On a phone or
+tablet there is no hover, so tap the planet, moon, star or station instead: the
+same card shows where you tapped (the info panel opens as usual), and the next
+touch on the map closes it.
+
+**Planets look like the real game.** When NMS Almanac knows a planet, its 3D
+sphere in the system view is painted in the game's own terrain and water
+colours (frozen worlds get ice caps), and it has a ring only if the real
+planet does, in the real ring colours. This applies to every system, edited
+or not. Rings follow the Almanac until a traveller ticks or unticks Rings
+themselves in Edit system, then their choice wins. Almanac planets are matched
+to a traveller's planets by name first, then by order, so a system saved in a
+different order still gets the right data on each planet.
+
+**What a planet is comes from the game; names stay yours.** A planet's type
+(Lush, Frozen...), whether it has water, its weather and its sentinels can't be
+changed in game, so wherever NMS Almanac knows the planet those always show the
+game's values, even in a system a traveller has edited. Names can be changed in
+game, so a traveller's own planet, system and station names always win. Where
+nobody has saved a name here, the map shows the name a player gave it in game
+(else the game's own name), as NMS Almanac reports it. The moon/planet layout a
+traveller saved is kept.
+
+**Real space station picture.** The space station in the middle of the system
+view is the system's own station from NMS Almanac, in its real colours, and
+its hover/tap card shows the same picture. A traveller's own station photo
+always wins (across the top of the card), since players can rename and build
+on their station in game since the Cosmos update.
+
+**Economy from the game.** Race, economy, wealth, conflict and trade % come
+from NMS Almanac first, for every system it knows, edited or not; the map's own
+figures were a best guess. Trade is shown the game's way, "Buy: −28.6% //
+Sell: +79.9%" (the Almanac writes it from the station's side, so its two
+numbers are swapped into place).
+
+**Which planet the first glyph picks.** A link with a planet glyph other than 1
+(from the Hub dialer or the Translator) now says which planet or moon it lands
+on, by name, when NMS Almanac knows the system ("This address lands on planet 5:
+Iiha 86/X9"), and that planet opens when you enter the system.
+
+**Links to NMS Almanac.** Every planet in the Almanac section and in the planet
+details has a link to its own page on NMS Almanac, and the section has a link to
+the system's page (`nmsalmanac.com/system/<galaxy>/<portal hex>`), as Borjomi
+asked.
+
+</details>
+
+<details>
+<summary><strong>👥 Community: discoveries, trending, privacy</strong> — Recently charted, Discoveries page, Trending, private systems</summary>
 
 **Recently charted.** Beside *Show controls* at the top, a small counter
 (for example *◈ 4 systems charted today ›*) shows how many systems travellers have
@@ -442,98 +630,32 @@ answered. Private systems live in a separate private store
 
 <img src="screenshots/21b-keep-private.jpg" alt="Edit system with Keep this system private ticked: the Voyager's Haven box greyed out and the Save button reading Save privately" width="360"> <img src="screenshots/21-private-code.jpg" alt="Private code window: the private code with a Copy button, My private systems with glyphs and hex, load a code, export and import, and Lost your code" width="330">
 
-**Import from my save file.** Inside Edit system, an optional button reads a
-real Steam/GOG `.hg` save file entirely in your own browser -- nothing is
-ever uploaded -- and can auto-fill "Your name" plus offer a one-click
-bulk-import of your real base names/addresses into the shared map. Discovery
-records don't store player-given planet names at all, only base names do
-(confirmed against a real save file), so that's the one thing this can
-recover automatically; everything else still needs typing in by hand.
+</details>
 
-**Voyager's Haven data.** The system info panel has a collapsible
-**Voyager's Haven data** section that, when opened, looks the same portal
-address up in [Voyager's Haven](https://havenmap.online) -- a separate,
-community-run NMS database with tens of thousands of player-charted systems
--- and shows what travellers have recorded there (star, lifeform, economy,
-conflict, discoverer, and each planet's biome, weather, sentinels, fauna,
-flora and resources). It's read-only and clearly labelled as Haven's data:
-it's never merged into this map's own community edits. Looked up by a small
-Netlify Function (`netlify/functions/haven-lookup.mjs`) that caches results,
-and only when you actually open the section.
+<details>
+<summary><strong>📤 Sharing</strong> — Share cards, Discord</summary>
 
-**Send to Voyager's Haven.** Edit System has an opt-in tick box, *Also send
-to Voyager's Haven*. After your edit saves here, the system (name, galaxy, star
-colour, economy, conflict, race, and each planet's biome, weather and
-sentinels) is sent to Haven under the No Man's Sky Hub community tag
-(NMSHUB). Haven checks every submission before it goes live, and once approved
-it's credited to the name you entered. A system already on Haven is sent as an
-update. Handled by `netlify/functions/haven-submit.mjs`, which keeps the Hub's
-submit-only key on the server and limits each traveller to 5 sends an hour.
+**Share this system.** Pick any system and hit **Share system** in its info
+panel: the map draws a picture card (system name, star, lifeform, economy,
+conflict, features, the 12 portal glyphs and the hex) sized for Reddit,
+Discord and X, and opens your phone's share sheet with a fly-there link.
+On a desktop it saves the picture and copies the link.
 
-**Real game data from NMS Almanac.** The system info panel has a
-collapsible **Real game data · NMS Almanac** section. When opened it shows
-what the game itself generates for that address, from
-[NMS Almanac](https://nmsalmanac.com): star and spectral class, race,
-economy, wealth, conflict, sell/buy %, what's in demand, and every planet and
-moon with its picture, real name, type, weather (red when extreme) and
-sentinels; tap a planet for fauna/flora counts and its resources.
-*Fill blanks in Edit system* copies these values into empty fields only, and
-nothing is saved until you press Save. Entering a system's 3D view swaps this
-map's own planet-name guesses for the real names. A traveller's own edit
-always wins over Almanac data for names. Looked up by `netlify/functions/almanac.mjs`,
-which keeps the Almanac key on the server and caches every answer, so each
-system is only fetched once; if the hourly allowance is used up you're asked
-to try again later. A scheduled function (`netlify/functions/almanac-warm.mjs`,
-every 10 minutes, at most about half the key's hourly allowance) pre-loads
-every system travellers have charted and keeps it fresh, so these open
-instantly. It only fills the cache: no commits, no deploys, and travellers'
-edits are never touched.
+<img src="screenshots/16-share-system-card.jpg" alt="Share system card: Galactic Hub Capitol with star, facts, portal glyphs and hex" width="360">
 
-**Almanac planet cards on hover.** In the 3D view of a system no traveller
-has edited, hovering a planet or moon shows NMS Almanac's own card picture of
-it (its disc, name, main facts, galaxy and portal glyphs) in place of the
-usual analysis card, and hovering the space station in the middle shows the
-system's own Almanac card. Systems a traveller has edited (or saved privately) are
-left exactly as they are: their planets keep the analysis card with the
-traveller's own data, plus the Almanac's picture of the planet. On a phone or
-tablet there is no hover, so tap the planet, moon, star or station instead: the
-same card shows where you tapped (the info panel opens as usual), and the next
-touch on the map closes it.
+**Share on Discord.** In About, the share row is X, Reddit and Discord. Discord has no share link, so the button copies a short message with the link, says “Copied — paste it in any server or DM” and opens Discord so you pick where to post it.
 
-**Planets look like the real game.** When NMS Almanac knows a planet, its 3D
-sphere in the system view is painted in the game's own terrain and water
-colours (frozen worlds get ice caps), and it has a ring only if the real
-planet does, in the real ring colours. This applies to every system, edited
-or not. Rings follow the Almanac until a traveller ticks or unticks Rings
-themselves in Edit system, then their choice wins. Almanac planets are matched
-to a traveller's planets by name first, then by order, so a system saved in a
-different order still gets the right data on each planet.
+</details>
 
-**What a planet is comes from the game; names stay yours.** A planet's type
-(Lush, Frozen...), whether it has water, its weather and its sentinels can't be
-changed in game, so wherever NMS Almanac knows the planet those always show the
-game's values, even in a system a traveller has edited. Names can be changed in
-game, so a traveller's own planet, system and station names always win. Where
-nobody has saved a name here, the map shows the name a player gave it in game
-(else the game's own name), as NMS Almanac reports it. The moon/planet layout a
-traveller saved is kept.
+<details>
+<summary><strong>📱 Phones, app, languages & accessibility</strong> — Installed app, updates, refresh, 8 languages, draggable panels, 404 page</summary>
 
-**Real space station picture.** The space station in the middle of the system
-view is the system's own station from NMS Almanac, in its real colours, and
-its hover/tap card shows the same picture. A traveller's own station photo
-always wins (across the top of the card), since players can rename and build
-on their station in game since the Cosmos update.
+**Phones: popups don't fight the controls.** Opening Search, Favourites or
+My Routes on a phone hides the controls by itself and docks the box full
+width just under the top row, so results have room to scroll. Show / Hide
+controls leaves it open; its × closes it.
 
-**Economy from the game.** Race, economy, wealth, conflict and trade % come
-from NMS Almanac first, for every system it knows, edited or not; the map's own
-figures were a best guess. Trade is shown the game's way, "Buy: −28.6% //
-Sell: +79.9%" (the Almanac writes it from the station's side, so its two
-numbers are swapped into place).
-
-**Which planet the first glyph picks.** A link with a planet glyph other than 1
-(from the Hub dialer or the Translator) now says which planet or moon it lands
-on, by name, when NMS Almanac knows the system ("This address lands on planet 5:
-Iiha 86/X9"), and that planet opens when you enter the system.
+![Search with a pasted portal address and Route here, then the plotted course](screenshots/32-route-here.jpg)
 
 **Phone controls tidy themselves away.** On a phone, "Show controls" only needs
 one tap: the controls (and the glyph keypad) hide again by themselves after a
@@ -541,72 +663,6 @@ jump, Random, a search or favourite pick, Enter system, opening Filters, or a ta
 on the map. Toggles like Labels, Grid and Orbit leave them open. While they're
 open the system banner steps aside so it doesn't sit on the info panel, and
 Filters always scrolls inside its own box above the info panel.
-
-**Links to NMS Almanac.** Every planet in the Almanac section and in the planet
-details has a link to its own page on NMS Almanac, and the section has a link to
-the system's page (`nmsalmanac.com/system/<galaxy>/<portal hex>`), as Borjomi
-asked.
-
-**Colliding planets touch.** Tick "Colliding planets present" in Edit system
-and pick which planets collide: they stay joined as they orbit and their
-spheres sink into each other, the way real colliding planets look in game.
-
-<img src="screenshots/30-colliding-planets.jpg" alt="Colliding planets Idetar and Rosa in the system view, the two spheres sunk into each other" width="340">
-
-<img src="screenshots/28-real-looks.jpg" alt="Before and after in Sranch Op10079: the map's own made-up colours on the left, the real game colours and rings from NMS Almanac on the right" width="640">
-
-<img src="screenshots/26-almanac.jpg" alt="Real game data from NMS Almanac in the info panel: economy, conflict, sell/buy, demand, then planets with their pictures, real names, type, weather and sentinels, one opened to show fauna, flora and resources" width="420">
-
-**Portal glyph keypad.** Type a hex address or tap the real 16 in-game glyphs
-directly -- both stay in sync, so you can decode a screenshot from your own
-game without knowing the hex first. Looking a system up is private: nothing
-is shared unless you press Save in Edit system.
-
-![Portal glyph keypad](screenshots/06-glyph-keypad.png)
-
-**Search & Scan.** No reverse index exists across the whole procedural
-galaxy -- names are generated *from* the address, not the other way round --
-so the Search popup covers this two ways, split across a **By Name** and a
-**By Traits** tab (added 2026-09-12). By Name still starts with anything
-this browser already knows a real name for: community-documented systems,
-plus your own bookmarks, waypoints, and visited history. Results are
-galaxy-aware -- each one is tagged with the real galaxy it belongs to, since
-the same address means something different in each of the 256 -- and
-picking one switches you to that galaxy automatically before jumping there.
-Leave the search box empty and it instead lists everywhere you've
-bookmarked, waypointed, or visited, plus any system you personally have
-edited or bulk-imported from your save (added 2026-08-27, tagged
-"Documented (you)" -- other travellers' edits stay out), sorted
-alphabetically -- a way to get back to somewhere you've been without needing
-to remember its address or portal glyphs.
-
-Either tab can also run a real **Scan** of nearby space, out to a radius
-that starts synced to your current Hyperdrive's jump range (Filters) and
-stays synced automatically until you type your own value into the radius
-box. A scan checks every system it can reach against your query or trait
-filters -- including individual planet and moon names, not just system
-names, with the result telling you exactly which name matched -- plus every
-real black hole and Atlas Interface in range for By Traits. With no name
-typed and no trait filter set, Scan instead just lists whatever's nearby,
-nearest first, for casually browsing the neighbourhood rather than looking
-for something specific. Clicking any result opens its info panel and
-silently plots a course to it without navigating away, so browsing results
-never costs you whatever route you already had plotted.
-
-![Search & Scan panel showing matching results](screenshots/13-search-panel.jpg)
-
-**Honest about its limits.** The About modal spells out exactly what's
-generated accurately (star type, system/region names, planet count) versus
-an unverified guess (individual planet names, and why) -- rather than
-presenting a guess as fact. **Biome, Category type, Conditions, rings, and
-water go a step further than that** (added 2026-09-08, extended 2026-09-09):
-unlike planet names and Sentinel activity -- which show a plausible
-generated value, tagged as a guess -- nobody has reverse-engineered any of
-these five, so this project doesn't display a guess for them at all. They
-simply don't appear until a traveller reports the real answer via Edit
-system.
-
-![About modal](screenshots/07-about-modal.jpg)
 
 **Accessibility.** Four font-size presets, a high-contrast mode, and real
 Daltonization colour-correction (not simulation) for protanopia, deuteranopia,
@@ -629,14 +685,6 @@ the long Full guide in About is English for now and says so. It lives in
 **Always the newest version.** An installed app on a phone isn't reloaded when you switch back to it, so it could keep showing an old version until it was closed and reopened. Now, each time you come back to it (and every 30 minutes while it stays open), it checks for a new version. If one is live, a small bar says “New version ready · tap to update”, in your language. One tap reloads in place; × hides it. It never reloads by itself, so nothing you're in the middle of is lost. It lives in `nms-update.js`, the same file on every site.
 
 **⟳ Refresh.** In the installed app there's no browser reload button (and pull-to-refresh doesn't work everywhere), so a small ⟳ button sits on the Hide controls row under the title. Tap it and it checks for a new version and reloads in place, on the same view. It only shows in the installed app. After a big batch of updates, the first open on that day says “✓ Updated · that's the last update today”, so nobody wonders if more pop-ups are coming. The old nms-galaxy-map.netlify.app address now sends search engines here with a permanent (301) redirect.
-
-**Share on Discord.** In About, the share row is X, Reddit and Discord. Discord has no share link, so the button copies a short message with the link, says “Copied — paste it in any server or DM” and opens Discord so you pick where to post it.
-
-**Route arrows in star colours.** When your next stop or destination is off-screen, the arrow at the screen edge now takes that star's colour (yellow, red, green, blue or purple, the same colours as the star dots), so you can see its class at a glance. The “Charting nearby systems” note stays at least 4 seconds and then fades out instead of vanishing.
-
-<img src="screenshots/29-update-bar.jpg" alt="The update bar at the bottom of the page on a phone: New version ready, tap to update, with a close button" width="390">
-
-![Accessibility panel](screenshots/08-accessibility-panel.png)
 
 **Draggable panels.** Filters, the system info panel, Course plotted, the
 Warp Manifest, the glyph keypad, Search, Edit system, and Accessibility can
@@ -661,6 +709,8 @@ as hex and players who read them as glyphs. When there's no address to
 recover, it says so plainly instead of guessing.
 
 ![Custom 404 page: a Hyperdrive Fault screen reading "Jump failed -- no system at this address", showing the recovered hex address 1CF0EE90BFFA next to its 12-glyph strip](screenshots/16-404-jump-failed.jpg)
+
+</details>
 
 <details id="the-address-decoded">
 <summary><strong>How does a portal address become a 3D location?</strong></summary>
