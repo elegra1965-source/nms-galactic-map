@@ -957,13 +957,17 @@ for the full table and what it doesn't cover.
 
 </details>
 
-## Guided tour
+<details id="guided-tour">
+<summary><strong>Guided tour</strong></summary>
 
 **▷ Tour** in the toolbar (or "Take a quick tour" on the first-visit box) walks through the map in 10 spotlight steps. On phones with the controls hidden, the tour opens them for you, follows the buttons as they slide in, and folds them away again when it ends. The phone's Back button closes it.
 
 <img src="screenshots/27-tour.jpg" alt="Tour step 5 of 10, No address handy?, spotlighting the Glyphs button on a phone" width="300">
 
-## Is it accessible?
+</details>
+
+<details id="is-it-accessible">
+<summary><strong>Is it accessible?</strong></summary>
 
 Font size (4 presets), a High Contrast toggle, and colour-blindness support
 for protanopia/deuteranopia/tritanopia — built as real Daltonization
@@ -979,6 +983,8 @@ browser's own text-to-speech — a play/pause/stop bar plus a small speaker
 icon per section, reading each section's own visible copy live so it can't
 drift out of sync when that copy is edited, or reading straight through all
 of them in order.
+
+</details>
 
 ## Using this code?
 
