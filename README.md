@@ -33,7 +33,7 @@ real planet data from NMS Almanac and Voyager's Haven.
 
 ## What can this map do?
 
-New here? Hit **▷ Tour** in the map's toolbar for a 10-step guided walk-through.
+New here? Hit **▷ Tour** in the map's toolbar for an 11-step guided walk-through.
 
 <details>
 <summary><strong>🧩 How it fits together</strong> — the pipeline from portal address to shared edits</summary>
@@ -960,7 +960,7 @@ for the full table and what it doesn't cover.
 <details id="guided-tour">
 <summary><strong>Guided tour</strong></summary>
 
-**▷ Tour** in the toolbar (or "Take a quick tour" on the first-visit box) walks through the map in 10 spotlight steps. On phones with the controls hidden, the tour opens them for you, follows the buttons as they slide in, and folds them away again when it ends. The phone's Back button closes it.
+**▷ Tour** in the toolbar (or "Take a quick tour" on the first-visit box) walks through the map in 11 spotlight steps (the last two: your language and accessibility). On phones with the controls hidden, the tour opens them for you, follows the buttons as they slide in, and folds them away again when it ends. The phone's Back button closes it.
 
 <img src="screenshots/27-tour.jpg" alt="Tour step 5 of 10, No address handy?, spotlighting the Glyphs button on a phone" width="300">
 

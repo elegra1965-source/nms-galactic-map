@@ -10912,6 +10912,8 @@ var TOUR_STEPS=[
     body:"In Galaxy view, Atlas overlays the real points of interest from Hello Games' own Galactic Atlas website (Euclid only) as diamond markers -- click one to open its real Atlas page. Nearby ones collapse into a numbered marker until you zoom in close enough to tell them apart, same as the official site does."},
   {sel:"#bAbout",title:"Worth a read",
     body:"About explains exactly what's generated accurately versus a plausible guess -- and what's still an unverified guess, like individual planet names. It's also where Feedback lives if you spot a bug or have an idea -- no account needed to send one."},
+  {sel:"#bLang",title:"Your language",
+    body:"Pick your language once and every site in the family follows."},
   {sel:"#bAccess",title:"Accessibility",
     body:"Four font-size presets, a high-contrast mode, and real colour-correction (not just simulation) for protanopia, deuteranopia and tritanopia -- built into the map itself."}
 ];

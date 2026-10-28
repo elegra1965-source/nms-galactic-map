@@ -121,24 +121,151 @@
     return new Promise(function (res) { c.toBlob(res, "image/png"); });
   }
 
+  /* 2026-10-28: Share system now opens a preview first (Tony: "nothing got sent and no preview").
+     The card picture is drawn straight away and shown, with a dropdown of where to send it and a
+     line saying exactly what will happen. Every option works without the OS share sheet, so
+     desktop users always get something (picture copied/saved + link copied). */
+  var SH = null, CUR = null;
+  function isPhone() { return (window.matchMedia && matchMedia("(pointer:coarse)").matches) || /Android|iPhone|iPad/i.test(navigator.userAgent); }
+  function canCopyImg() { return !!(navigator.clipboard && navigator.clipboard.write && window.ClipboardItem); }
+  function T(k) { try { return (window.NMS_T ? NMS_T(k) : k); } catch (e) { return k; } }
+  var OPTS = [
+    ["native", "📱 Share… (pick an app)", "Opens your device's share menu with the picture and the fly-there link."],
+    ["copyimg", "📋 Copy picture", "Copies the picture. Paste it (Ctrl+V or long-press) into Discord, Reddit, WhatsApp or anywhere. The portal glyphs and hex are on the picture."],
+    ["discord", "Discord", "Copies the picture and opens Discord: paste it in any server or DM. If your browser can't copy pictures, it saves it and copies the message instead."],
+    ["reddit", "Reddit", "Saves the picture and opens a new Reddit post with the title and link filled in. Add the picture to the post."],
+    ["x", "X", "Saves the picture and opens a new post on X with the text and link. Add the picture to the post."],
+    ["whatsapp", "WhatsApp", "Opens WhatsApp with the message and link. On a phone, use Share… to send the picture too."],
+    ["save", "⬇ Save picture", "Saves the picture to your device and copies the fly-there link."],
+    ["link", "🔗 Copy link only", "Copies the fly-there link, no picture."]
+  ];
+  function css() {
+    if (document.getElementById("shSysCss")) return;
+    var st = document.createElement("style"); st.id = "shSysCss";
+    st.textContent =
+      "#shSys{position:fixed;inset:0;z-index:2147481000;display:flex;align-items:center;justify-content:center;background:rgba(2,6,12,.8);padding:12px;box-sizing:border-box}" +
+      "#shSys[hidden]{display:none}" +
+      "#shSys .shbox{position:relative;width:min(440px,100%);max-height:calc(100dvh - 24px);overflow:auto;background:#06121c;border:1px solid rgba(0,229,255,.45);border-radius:10px;padding:14px;box-sizing:border-box;color:#cfe0f0;font:14px/1.45 Rajdhani,system-ui,sans-serif;box-shadow:0 10px 40px rgba(0,0,0,.7)}" +
+      "#shSys h3{margin:0 34px 10px 0;font:700 13px/1.3 Orbitron,monospace;letter-spacing:2px;color:#00e5ff}" +
+      "#shSys .shx{position:absolute;top:8px;right:8px;width:32px;height:32px;border:1px solid rgba(0,229,255,.35);border-radius:6px;background:none;color:#cfe0f0;font-size:18px;cursor:pointer}" +
+      "#shSys .shimg{display:block;width:100%;max-height:min(52vh,540px);object-fit:contain;border-radius:6px;background:#04070c;border:1px solid rgba(0,229,255,.2)}" +
+      "#shSys .shwait{display:flex;align-items:center;justify-content:center;height:220px;color:#7fdcff;font:600 12px Orbitron,monospace;letter-spacing:2px}" +
+      "#shSys label{display:block;margin:12px 0 4px;font:700 10px Orbitron,monospace;letter-spacing:2px;color:#f0a500}" +
+      "#shSys .shrow{display:flex;gap:8px}" +
+      "#shSys select{flex:1 1 auto;min-width:0;height:42px;background:#0a1824;color:#eaf6ff;border:1px solid rgba(0,229,255,.45);border-radius:6px;padding:0 8px;font:600 15px Rajdhani,system-ui,sans-serif}" +
+      "#shSys .shgo{flex:0 0 auto;height:42px;padding:0 16px;border:0;border-radius:6px;background:linear-gradient(135deg,#00e5ff,#0090ff);color:#021018;font:700 12px Orbitron,monospace;letter-spacing:1.5px;cursor:pointer}" +
+      "#shSys .shgo:disabled{opacity:.5;cursor:default}" +
+      "#shSys .shnote{margin:8px 0 0;color:rgba(207,224,240,.75);font-size:13.5px;min-height:2.9em}" +
+      "#shSys .shmsg{margin:8px 0 0;color:#4cff9a;font:600 12px Orbitron,monospace;letter-spacing:1px;min-height:1.3em}";
+    document.head.appendChild(st);
+  }
+  function build() {
+    css();
+    var d = document.createElement("div"); d.id = "shSys"; d.hidden = true;
+    d.setAttribute("role", "dialog"); d.setAttribute("aria-modal", "true"); d.setAttribute("aria-labelledby", "shSysT");
+    d.innerHTML = '<div class="shbox"><button class="shx" type="button" aria-label="Close" title="Close">×</button>' +
+      '<h3 id="shSysT">SHARE THIS SYSTEM</h3><div class="shpic"></div>' +
+      '<label for="shSysSel">SEND TO</label><div class="shrow"><select id="shSysSel"></select><button class="shgo" type="button">SEND</button></div>' +
+      '<p class="shnote"></p><p class="shmsg" role="status" aria-live="polite"></p></div>';
+    document.body.appendChild(d);
+    var sel = d.querySelector("select");
+    OPTS.forEach(function (o) {
+      if (o[0] === "native" && !(navigator.canShare)) return;
+      if (o[0] === "copyimg" && !canCopyImg()) return;
+      var op = document.createElement("option"); op.value = o[0]; op.textContent = o[1]; sel.appendChild(op);
+    });
+    sel.addEventListener("change", note);
+    d.querySelector(".shx").addEventListener("click", close);
+    d.addEventListener("click", function (e) { if (e.target === d) close(); });
+    d.addEventListener("keydown", function (e) { if (e.key === "Escape") close(); });
+    d.querySelector(".shgo").addEventListener("click", go);
+    SH = d;
+  }
+  function note() {
+    var v = SH.querySelector("select").value;
+    OPTS.forEach(function (o) { if (o[0] === v) SH.querySelector(".shnote").textContent = T(o[2]); });
+    SH.querySelector(".shmsg").textContent = "";
+  }
+  function msg(t) { SH.querySelector(".shmsg").textContent = t; if (window.toast) toast(t); }
+  function close() {
+    if (!SH || SH.hidden) return;
+    SH.hidden = true;
+    if (CUR && CUR.img) URL.revokeObjectURL(CUR.img);
+    CUR = null;
+    var b = document.getElementById("bShareSys"); if (b) try { b.focus(); } catch (e) {}
+  }
+  function save() {
+    var a = document.createElement("a"); a.href = CUR.img; a.download = CUR.fname; document.body.appendChild(a); a.click();
+    setTimeout(function () { a.remove(); }, 1000);
+  }
+  async function copyText(t) { try { await navigator.clipboard.writeText(t); return true; } catch (e) { return false; } }
+  async function copyImg() { try { await navigator.clipboard.write([new ClipboardItem({ "image/png": CUR.blob })]); return true; } catch (e) { return false; } }
+  async function go() {
+    if (!CUR) return;
+    var v = SH.querySelector("select").value, c = CUR, ok;
+    var enc = encodeURIComponent;
+    try {
+      if (v === "native") {
+        var file = new File([c.blob], c.fname, { type: "image/png" });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file], title: c.title, text: c.text });
+        } else if (navigator.share) {
+          await navigator.share({ title: c.title, text: c.text, url: c.url });
+        }
+        msg(T("✓ Sent to your share menu"));
+      } else if (v === "copyimg") {
+        ok = await copyImg();
+        if (ok) msg(T("✓ Picture copied — paste it anywhere"));
+        else { save(); await copyText(c.text); msg(T("✓ Picture saved · link copied")); }
+      } else if (v === "discord") {
+        ok = await copyImg();
+        if (!ok) { save(); await copyText(c.text); }
+        var w = window.open("https://discord.com/app", "_blank", "noopener");
+        msg(ok ? T("✓ Picture copied — paste it in any server or DM") : T("✓ Picture saved · message copied — paste it in any server or DM"));
+      } else if (v === "reddit") {
+        window.open("https://www.reddit.com/submit?url=" + enc(c.url) + "&title=" + enc(c.title + " · " + c.gname + " · portal " + c.addr), "_blank", "noopener");
+        save(); msg(T("✓ Picture saved · add it to your post"));
+      } else if (v === "x") {
+        window.open("https://x.com/intent/post?text=" + enc(c.short) + "&url=" + enc(c.url), "_blank", "noopener");
+        save(); msg(T("✓ Picture saved · add it to your post"));
+      } else if (v === "whatsapp") {
+        window.open("https://wa.me/?text=" + enc(c.text), "_blank", "noopener");
+        msg(T("✓ Opening WhatsApp"));
+      } else if (v === "save") {
+        save(); await copyText(c.text); msg(T("✓ Picture saved · link copied"));
+      } else if (v === "link") {
+        ok = await copyText(c.url); msg(ok ? T("✓ Link copied") : c.url);
+      }
+    } catch (e) { if (!(e && e.name === "AbortError")) msg(T("Couldn't send it — try Save picture")); }
+  }
   async function share() {
     var s = sys(); if (!s || !s.address) return;
-    var btn = document.getElementById("bShareSys"); if (btn) btn.disabled = true;
+    if (!SH) build();
+    SH.querySelector(".shpic").innerHTML = '<div class="shwait">MAKING THE CARD…</div>';
+    SH.querySelector(".shmsg").textContent = "";
+    var go_ = SH.querySelector(".shgo"); go_.disabled = true;
+    var sel = SH.querySelector("select");
+    sel.value = (isPhone() && navigator.canShare) ? "native" : (canCopyImg() ? "copyimg" : "save");
+    note();
+    SH.hidden = false;
+    try { SH.querySelector(".shx").focus(); } catch (e) {}
     try {
       var blob = await draw(s); if (!blob) throw new Error("no image");
-      var fname = (s.name || "nms-system").replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "").toLowerCase() + ".png";
-      var file = new File([blob], fname, { type: "image/png" }), url = link(s);
-      var text = s.name + " (" + ((window.GALAXIES && GALAXIES[s.galaxy || 0]) || "Euclid") + ") \u00b7 portal address " + s.address + " \u25c8 fly there: " + url;
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({ files: [file], title: s.name, text: text });
-      } else {
-        var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = fname; document.body.appendChild(a); a.click();
-        setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
-        try { await navigator.clipboard.writeText(text); } catch (e) {}
-        if (window.toast) toast("System card saved \u00b7 link copied, paste it with the picture");
-      }
-    } catch (e) { if (e && e.name !== "AbortError" && window.toast) toast("Couldn't make the card, try again"); }
-    if (btn) btn.disabled = false;
+      if (SH.hidden) return;
+      var gname = (window.GALAXIES && GALAXIES[s.galaxy || 0]) || "Euclid";
+      var url = link(s);
+      CUR = {
+        blob: blob, img: URL.createObjectURL(blob), url: url, gname: gname, addr: s.address, title: s.name || "NMS system",
+        fname: (s.name || "nms-system").replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "").toLowerCase() + ".png",
+        text: (s.name || "NMS system") + " (" + gname + ") · portal address " + s.address + " ◈ fly there: " + url,
+        short: (s.name || "NMS system") + " (" + gname + ") · portal address " + s.address + " #NoMansSky"
+      };
+      var im = new Image(); im.className = "shimg"; im.alt = "Picture card for " + CUR.title + ": star, facts, portal glyphs and hex address"; im.src = CUR.img;
+      var pic = SH.querySelector(".shpic"); pic.innerHTML = ""; pic.appendChild(im);
+      go_.disabled = false;
+    } catch (e) {
+      SH.querySelector(".shpic").innerHTML = '<div class="shwait">' + T("Couldn't make the card, try again") + '</div>';
+    }
   }
 
   function run() {
@@ -149,6 +276,6 @@
     b.addEventListener("click", share);
     wp.parentNode.appendChild(b);
   }
-  window.NMSShareSystem = { draw: draw, share: share };
+  window.NMSShareSystem = { draw: draw, share: share, close: close };
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", run); else run();
 })();
