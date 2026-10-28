@@ -79842,12 +79842,261 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:103700000000": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Tichero-Quka",
+        "race": "Gek",
+        "region": "Sea of Mugabune",
+        "starClass": "G4",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Trading",
+        "sell": "77.1",
+        "buy": "-22.7",
+        "econDesc": "Unpromising",
+        "conflict": "At War",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": true,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": true,
+        "stationName": "Richer-Quka Cycler",
+        "allianceName": "The Gray Council",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "OldSaltySak",
+        "editorFriendCode": "H0ZJ-YBTF-C5TRR",
+        "genVersion": "1.9.0",
+        "bodies": [
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Toxic",
+            "subtype": "Corrosive",
+            "descriptor": "Toxic Outbreaks",
+            "water": true,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Cobalt",
+              "Copper"
+            ],
+            "flora": [
+              "Limited"
+            ],
+            "fauna": [
+              "Generous"
+            ],
+            "minerals": [
+              "Fungal Mould",
+              "Ammonia"
+            ],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Low Security",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Volcanic",
+            "subtype": "Violent",
+            "descriptor": "",
+            "water": false,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Silver",
+              "Copper"
+            ],
+            "flora": [
+              "Uncommon"
+            ],
+            "fauna": [
+              "Ample"
+            ],
+            "minerals": [
+              "Salt"
+            ],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Few",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Lush",
+            "subtype": "Paradise",
+            "descriptor": "Refreshing Breeze",
+            "water": true,
+            "ring": "tan",
+            "ringSet": true,
+            "resources": [
+              "Salt",
+              "Copper"
+            ],
+            "flora": [
+              "Frequent"
+            ],
+            "fauna": [
+              "Medium"
+            ],
+            "minerals": [
+              "Star Bulb",
+              "Paraffinium"
+            ],
+            "salvage": [
+              "Salvageable scrap"
+            ],
+            "fossils": [],
+            "sentinel": "Low Security",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Marsh",
+            "subtype": "Foggy",
+            "descriptor": "Alkaline Cloudbursts",
+            "water": true,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Sodium",
+              "Copper"
+            ],
+            "flora": [
+              "Abundant"
+            ],
+            "fauna": [
+              "Bountiful"
+            ],
+            "minerals": [
+              "Paraffinium"
+            ],
+            "salvage": [],
+            "fossils": [
+              "Vile Brood"
+            ],
+            "sentinel": "Remote",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Toxic",
+            "subtype": "Blighted",
+            "descriptor": "Stinging Atmosphere",
+            "water": true,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Magnetised Ferrite",
+              "Copper"
+            ],
+            "flora": [
+              "Intermittent"
+            ],
+            "fauna": [
+              "Generous"
+            ],
+            "minerals": [
+              "Ammonia"
+            ],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Low Security",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "Ajordogo Omega",
+            "moon": true,
+            "orbits": 3,
+            "biome": "Toxic",
+            "subtype": "Corrosive",
+            "descriptor": "Passing Toxic Fronts",
+            "water": false,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Sodium",
+              "Copper"
+            ],
+            "flora": [
+              "Bountiful"
+            ],
+            "fauna": [
+              "Frequent"
+            ],
+            "minerals": [
+              "Fungal Mould",
+              "Ammonia"
+            ],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Infrequent",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          }
+        ]
+      },
+      "editedAt": "2026-10-28T09:22:30.294Z",
+      "editedByIp": "ip_64a9415962d14c6d",
+      "history": [
+        {
+          "at": "2026-10-28T09:22:30.294Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
-    "ip_8872d1cc90459c24": [
-      1792976101023
+    "ip_64a9415962d14c6d": [
+      1793179350294
     ]
   },
   "flagLog": {},
@@ -79895,7 +80144,10 @@
       "Invasive",
       "Infrequent",
       "Devoid",
-      "Empty"
+      "Empty",
+      "Limited",
+      "Uncommon",
+      "Intermittent"
     ],
     "fauna": [
       "Devoid",
@@ -79920,7 +80172,8 @@
       "Regular",
       "Not Present",
       "Limited",
-      "None"
+      "None",
+      "Medium"
     ],
     "minerals": [
       "Magnatised Ferrite",
@@ -80034,7 +80287,11 @@
       "Mists of Annihilation",
       "Blissful",
       "Unstable Atmosphere",
-      "Oppressive"
+      "Oppressive",
+      "Toxic Outbreaks",
+      "Alkaline Cloudbursts",
+      "Stinging Atmosphere",
+      "Passing Toxic Fronts"
     ],
     "biome": [
       "Radioactive",
@@ -80094,7 +80351,10 @@
       "Incandescent",
       "Cloudy",
       "Contaminated",
-      "Swamp"
+      "Swamp",
+      "Corrosive",
+      "Violent",
+      "Foggy"
     ],
     "signalName": [
       "MS Jiokaz XIV",
