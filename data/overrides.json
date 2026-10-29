@@ -80246,6 +80246,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:101209557D2F": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB7-12 Slontta",
+        "race": "Vy'keen",
+        "region": "Lugalus Fringe",
+        "starClass": "F9p",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "High Tech",
+        "sell": "76.1",
+        "buy": "-29.2",
+        "econDesc": "★★★ (Wealthy)",
+        "conflict": "nn (Descriptor)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-10-29T02:00:47.334Z",
+      "editedByIp": "ip_9279193ba1812f5c",
+      "history": [
+        {
+          "at": "2026-10-29T02:00:47.334Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -80253,7 +80302,8 @@
     "ip_9279193ba1812f5c": [
       1793239213682,
       1793239224930,
-      1793239236198
+      1793239236198,
+      1793239247334
     ]
   },
   "flagLog": {},
