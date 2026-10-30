@@ -80295,15 +80295,137 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:13EAFB5BAC41": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Das \"Zaifur XI\"-System",
+        "race": "Gek",
+        "region": "Uuguug Nebula",
+        "starClass": "X3",
+        "stars": [
+          "purple"
+        ],
+        "water": false,
+        "dissonant": true,
+        "giant": false,
+        "econName": "Prospecting",
+        "sell": "68.3",
+        "buy": "-28.0",
+        "econDesc": "Adequate",
+        "conflict": "Tranquil",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "kuemp09 (Cosmos Chaos Club)",
+        "editorFriendCode": "MWYV-Y6C4-7K1TE",
+        "genVersion": "1.9.0",
+        "bodies": [
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "",
+            "subtype": "",
+            "descriptor": "",
+            "water": false,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Cobalt"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Spread Thin",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "",
+            "subtype": "",
+            "descriptor": "",
+            "water": false,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Silver"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Intermittent",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": true,
+            "orbits": 2,
+            "biome": "",
+            "subtype": "",
+            "descriptor": "",
+            "water": false,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Gold"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Limited",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          }
+        ]
+      },
+      "editedAt": "2026-10-30T02:35:11.769Z",
+      "editedByIp": "ip_ae97f3bc612b4680",
+      "history": [
+        {
+          "at": "2026-10-30T02:35:11.769Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
-    "ip_9279193ba1812f5c": [
-      1793239213682,
-      1793239224930,
-      1793239236198,
-      1793239247334
+    "ip_ae97f3bc612b4680": [
+      1793327711769
     ]
   },
   "flagLog": {},
