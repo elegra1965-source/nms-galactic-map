@@ -1902,6 +1902,7 @@ var TRAVELLER_K="nms-galmap-traveller"; // remembers "your name"/"friend code"/"
    it's its own thing with an id of its own. Same personal, local-only
    mechanism otherwise, and rides along in Export/Import exactly like the
    rest of store (see saveRoutesMerge() near bImport's handler). */
+var HYPER_SAVE_D="nms-galmap-drive", HYPER_SAVE_R="nms-galmap-range";
 var store={notes:{},noteImgs:{},marks:{},waypoints:{},visited:{},routes:[]};
 function skey(s){ return s.galaxy+":"+s.address; }
 function loadStore(){
@@ -7917,6 +7918,7 @@ document.getElementById("hyperDriveRow").addEventListener("click",function(e){
   document.querySelectorAll("#hyperDriveRow .pill").forEach(function(p){ p.classList.remove("on"); });
   b.classList.add("on");
   document.getElementById("fHyperDrive").value=b.getAttribute("data-drive");
+  try { localStorage.setItem(HYPER_SAVE_D, b.getAttribute("data-drive")); } catch(err){}
   document.getElementById("fHyperDrive").dispatchEvent(new Event("change"));
   updateHyperSummary();
 });
@@ -7925,9 +7927,24 @@ document.getElementById("hyperRangeRow").addEventListener("click",function(e){
   document.querySelectorAll("#hyperRangeRow .pill").forEach(function(p){ p.classList.remove("on"); });
   b.classList.add("on");
   document.getElementById("fHyper").value=b.getAttribute("data-range");
+  try { localStorage.setItem(HYPER_SAVE_R, b.getAttribute("data-range")); } catch(err){}
   document.getElementById("fHyper").dispatchEvent(new Event("change"));
   updateHyperSummary();
 });
+/* 2026-10-30 (Tony: "changed drive in the filter, went to another system /
+   page and it rolled back"): your drive type and jump range are part of your
+   ship, so they're remembered on this device (localStorage only, like
+   bookmarks) and put back when the map opens. Only a pill tap saves them; a
+   saved route that brings its own drive/range doesn't overwrite your choice. */
+(function restoreHyper(){
+  var d="", r="";
+  try { d=localStorage.getItem(HYPER_SAVE_D)||""; r=localStorage.getItem(HYPER_SAVE_R)||""; } catch(err){}
+  var dp=d && document.querySelector('#hyperDriveRow .pill[data-drive="'+d+'"]');
+  if(dp){ document.querySelectorAll("#hyperDriveRow .pill").forEach(function(p){ p.classList.remove("on"); }); dp.classList.add("on"); document.getElementById("fHyperDrive").value=d; }
+  var rp=r && document.querySelector('#hyperRangeRow .pill[data-range="'+r+'"]');
+  if(rp){ document.querySelectorAll("#hyperRangeRow .pill").forEach(function(p){ p.classList.remove("on"); }); rp.classList.add("on"); document.getElementById("fHyper").value=r; }
+  if(dp||rp){ try { updateHyperSummary(); } catch(err){} }
+})();
 document.getElementById("bWaypoint").addEventListener("click",function(){
   if(!selected) return;
   var k=skey(selected);
