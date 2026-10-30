@@ -1,7 +1,10 @@
 [build]
   # 2026-10-25: set every <lastmod> in the sitemap to the deploy date so Google
   # sees the change (IndexNow for Bing runs in netlify/functions/deploy-succeeded.mjs).
-  command = '[ -f sitemap.xml ] && sed -i -E "s#<lastmod>[^<]*</lastmod>#<lastmod>$(date -u +%F)</lastmod>#g" sitemap.xml || true'
+  # 2026-10-30: /sitemap.xml is now served by netlify/functions/sitemap.mjs (date = newer of last
+  # traveller edit / this deploy); the build only records the deploy day for it. The static
+  # sitemap.xml stays as a backup copy with the same sed.
+  command = 'D=$(date -u +%F); echo "export default \"$D\";" > netlify/functions/lib/deploy-date.mjs; [ -f sitemap.xml ] && sed -i -E "s#<lastmod>[^<]*</lastmod>#<lastmod>$D</lastmod>#g" sitemap.xml || true'
   publish = "."
   functions = "netlify/functions"
   # 2026-09-24: wiki-autofill.mjs (tools/wiki-autofill) submits real-data
@@ -21,7 +24,10 @@
   # updates -- text or pictures -- never cost a deploy. The live site never
   # needs them (only the og:image share preview uses 10-atlas-overlay.jpg --
   # if that one is ever replaced, bundle it with a real code change).
-  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- . ':(exclude)data/overrides.json' ':(exclude)*.md' ':(exclude)screenshots/**'"
+  # 2026-10-30: traveller station photos (user-screenshots/, added by the site itself) excluded too --
+  # the site loads them from raw.githubusercontent.com, never from the build, and each one was
+  # costing a full deploy (e.g. 30 Oct 08:29).
+  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- . ':(exclude)data/overrides.json' ':(exclude)*.md' ':(exclude)screenshots/**' ':(exclude)user-screenshots/**'"
 
 # Serve preview.html at the site root without renaming it to index.html.
 [[redirects]]
