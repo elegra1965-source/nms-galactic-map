@@ -9788,14 +9788,122 @@ document.getElementById("edStationPhotoFile").addEventListener("change",function
   if(!/^image\//.test(f.type)){ toast("Please choose an image file"); return; }
   var hint=document.getElementById("edStationPhotoHint");
   hint.textContent="Compressing...";
-  compressImageToJpeg(f,1100,260000).then(function(dataUrl){
+  // 2026-10-30 (Tony): a collage (several pictures with plain lines between them)
+  // gets a "tap the picture of your station" picker first; a normal photo goes straight through
+  stationCollagePick(f).then(function(pic){
+    return compressImageToJpeg(pic,1100,260000);
+  }).then(function(dataUrl){
     hint.textContent="";
     edStationPhotoNew=dataUrl; renderEdStationPhotoPreview();
   }).catch(function(err){
     hint.textContent="";
+    if(err&&err.cancel) return;
     toast(err&&err.message?err.message:"Couldn't read that image");
   });
 });
+
+/* ============ Station photo collage picker (2026-10-30, Tony) ============
+   kuemp09 uploaded a 3-picture collage as his station photo, so the map's
+   station card showed all three. When the picked station photo looks like a
+   collage -- 2+ pictures split by plain white/black lines -- show the parts and
+   let the traveller tap the one that's the station (or keep the whole picture).
+   It all runs in the browser before Save; nothing is guessed or sent. */
+function collageParts(img){
+  var S=480, W=img.naturalWidth, H=img.naturalHeight, k=Math.min(1,S/Math.max(W,H));
+  var w=Math.max(1,Math.round(W*k)), h=Math.max(1,Math.round(H*k));
+  var c=document.createElement("canvas"); c.width=w; c.height=h;
+  var x=c.getContext("2d"); x.drawImage(img,0,0,w,h);
+  var d; try { d=x.getImageData(0,0,w,h).data; } catch(e){ return []; }
+  function plain(i,j){ var o=(j*w+i)*4, r=d[o], g=d[o+1], b=d[o+2];
+    return (r>228&&g>228&&b>228)||(r<18&&g<18&&b<18); }
+  function lineFlags(r,horiz){ var out=[], L=horiz?r.h:r.w, M=horiz?r.w:r.h;
+    for(var a=0;a<L;a++){ var n=0, t=0;
+      for(var b=0;b<M;b+=2){ t++; if(horiz?plain(r.x+b,r.y+a):plain(r.x+a,r.y+b)) n++; }
+      out.push(n/t>=0.96); }
+    return out; }
+  function segs(f,min){ var s=[], st=-1;
+    for(var i=0;i<=f.length;i++){ var on=i<f.length&&!f[i];
+      if(on&&st<0) st=i; if(!on&&st>=0){ if(i-st>=min) s.push([st,i]); st=-1; } }
+    return s; }
+  function split(r,depth){
+    if(depth>3) return [r];
+    for(var pass=0;pass<2;pass++){ var horiz=pass===0, L=horiz?r.h:r.w;
+      var sg=segs(lineFlags(r,horiz),Math.max(12,L*0.12));
+      if(sg.length>=2){ var all=[];
+        sg.forEach(function(q){ all=all.concat(split(horiz?{x:r.x,y:r.y+q[0],w:r.w,h:q[1]-q[0]}:{x:r.x+q[0],y:r.y,w:q[1]-q[0],h:r.h},depth+1)); });
+        return all; }
+      if(sg.length===1){ var q=sg[0]; r=horiz?{x:r.x,y:r.y+q[0],w:r.w,h:q[1]-q[0]}:{x:r.x+q[0],y:r.y,w:q[1]-q[0],h:r.h}; } // trim plain edges
+    }
+    return [r];
+  }
+  return split({x:0,y:0,w:w,h:h},0)
+    .filter(function(p){ return p.w>w*0.15&&p.h>h*0.15; })
+    .map(function(p){ return {x:p.x/k,y:p.y/k,w:p.w/k,h:p.h/k}; });
+}
+function stationCollagePick(file){
+  return new Promise(function(resolve,reject){
+    var url=URL.createObjectURL(file), img=new Image();
+    img.onerror=function(){ URL.revokeObjectURL(url); resolve(file); };
+    img.onload=function(){
+      var parts=collageParts(img);
+      if(parts.length<2){ URL.revokeObjectURL(url); resolve(file); return; }
+      if(!document.getElementById("stcpCss")){
+        var st=document.createElement("style"); st.id="stcpCss";
+        st.textContent="#stcpBack{position:fixed;inset:0;z-index:2147482600;background:rgba(2,6,12,.78);display:flex;align-items:center;justify-content:center;padding:14px}"+
+          "#stcp{position:relative;width:min(520px,100%);max-height:calc(100vh - 28px);overflow:auto;background:linear-gradient(180deg,rgba(15,22,32,.98),rgba(7,11,17,.98));border:1px solid rgba(0,229,255,.35);box-shadow:0 0 40px rgba(0,229,255,.15);padding:18px;color:#cfe0f0;font-family:Rajdhani,sans-serif}"+
+          "#stcp .k{font:12px 'Share Tech Mono',monospace;color:#f0a500;letter-spacing:.12em}#stcp h3{margin:4px 30px 2px 0;font:700 17px Orbitron,sans-serif;color:#eaf6ff;letter-spacing:.05em}"+
+          "#stcp p{margin:0 0 12px;font-size:15px;line-height:1.3}#stcp .g{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}"+
+          "#stcp .t{position:relative;padding:0;border:1px solid rgba(0,229,255,.25);background:#000;cursor:pointer;aspect-ratio:3/2;overflow:hidden}#stcp .t canvas{width:100%;height:100%;object-fit:contain;display:block}"+
+          "#stcp .t:hover,#stcp .t.sel,#stcp .t:focus-visible{border-color:#00e5ff;box-shadow:0 0 0 2px #00e5ff,0 0 18px rgba(0,229,255,.4);outline:none}"+
+          "#stcp .n{position:absolute;left:6px;top:5px;font:700 11px Orbitron,sans-serif;color:#00e5ff;background:rgba(0,0,0,.6);padding:2px 6px;letter-spacing:.1em}"+
+          "#stcp .r{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}#stcp .r button{flex:1 1 180px;padding:10px;font:700 12px Orbitron,sans-serif;letter-spacing:.12em;cursor:pointer}"+
+          "#stcp .ok{background:rgba(0,229,255,.1);border:1px solid #00e5ff;color:#00e5ff}#stcp .ok:disabled{opacity:.4;cursor:default}#stcp .all{background:none;border:1px dashed rgba(207,224,240,.35);color:#cfe0f0}"+
+          "#stcp .x{position:absolute;top:6px;right:8px;background:none;border:0;color:#00e5ff;font:700 18px Orbitron,sans-serif;cursor:pointer;padding:6px 8px}";
+        document.head.appendChild(st);
+      }
+      var back=document.createElement("div"); back.id="stcpBack";
+      back.innerHTML='<div id="stcp" role="dialog" aria-modal="true" aria-labelledby="stcpT"><button class="x" type="button" aria-label="Close">\u2715</button>'+
+        '<div class="k">\u25c8 STATION PHOTO</div><h3 id="stcpT">LOOKS LIKE A COLLAGE</h3>'+
+        '<p>Tap the picture of your station. Only that part replaces the station on the map.</p><div class="g"></div>'+
+        '<div class="r"><button class="ok" type="button" disabled>USE THIS PICTURE</button><button class="all" type="button">USE THE WHOLE PICTURE</button></div></div>';
+      document.body.appendChild(back);
+      var pick=-1, grid=back.querySelector(".g"), ok=back.querySelector(".ok");
+      parts.forEach(function(p,i){
+        var b=document.createElement("button"); b.type="button"; b.className="t"; b.setAttribute("aria-label","Picture "+(i+1));
+        var cv=document.createElement("canvas"), sc=Math.min(1,420/p.w);
+        cv.width=Math.max(1,Math.round(p.w*sc)); cv.height=Math.max(1,Math.round(p.h*sc));
+        cv.getContext("2d").drawImage(img,p.x,p.y,p.w,p.h,0,0,cv.width,cv.height);
+        b.appendChild(cv); var n=document.createElement("span"); n.className="n"; n.textContent=String(i+1); b.appendChild(n);
+        b.addEventListener("click",function(){ pick=i; grid.querySelectorAll(".t").forEach(function(t,j){ t.classList.toggle("sel",j===i); }); ok.disabled=false; ok.focus(); });
+        grid.appendChild(b);
+      });
+      function done(){ document.removeEventListener("keydown",onKey,true); back.remove(); URL.revokeObjectURL(url); }
+      function onKey(e){ if(e.key==="Escape"){ e.stopPropagation(); done(); reject({cancel:true}); } }
+      document.addEventListener("keydown",onKey,true);
+      back.querySelector(".x").addEventListener("click",function(){ done(); reject({cancel:true}); });
+      back.addEventListener("click",function(e){ if(e.target===back){ done(); reject({cancel:true}); } });
+      back.querySelector(".all").addEventListener("click",function(){ done(); resolve(file); });
+      ok.addEventListener("click",function(){
+        if(pick<0) return; var p=parts[pick], cv=document.createElement("canvas");
+        cv.width=Math.round(p.w); cv.height=Math.round(p.h);
+        var cx=cv.getContext("2d"); cx.drawImage(img,p.x,p.y,p.w,p.h,0,0,cv.width,cv.height);
+        // trim any thin plain border the small-scale scan left (full resolution)
+        try {
+          var D=cx.getImageData(0,0,cv.width,cv.height).data, CW=cv.width, CH=cv.height;
+          var pl=function(i,j){ var o=(j*CW+i)*4; return (D[o]>228&&D[o+1]>228&&D[o+2]>228)||(D[o]<18&&D[o+1]<18&&D[o+2]<18); };
+          var rowP=function(j,a,b){ var n=0,t=0; for(var i=a;i<b;i+=2){ t++; if(pl(i,j)) n++; } return n/t>=0.96; };
+          var colP=function(i,a,b){ var n=0,t=0; for(var j=a;j<b;j+=2){ t++; if(pl(i,j)) n++; } return n/t>=0.96; };
+          var T0=0,B0=CH,L0=0,R0=CW, lim=Math.round(Math.min(CW,CH)*0.06);
+          while(T0<lim&&rowP(T0,L0,R0)) T0++; while(CH-B0<lim&&rowP(B0-1,L0,R0)) B0--;
+          while(L0<lim&&colP(L0,T0,B0)) L0++; while(CW-R0<lim&&colP(R0-1,T0,B0)) R0--;
+          if(T0||L0||B0<CH||R0<CW){ var c2=document.createElement("canvas"); c2.width=R0-L0; c2.height=B0-T0; c2.getContext("2d").drawImage(cv,L0,T0,c2.width,c2.height,0,0,c2.width,c2.height); cv=c2; }
+        } catch(e){}
+        cv.toBlob(function(bl){ done(); if(bl) resolve(bl); else resolve(file); },"image/jpeg",0.92);
+      });
+    };
+    img.src=url;
+  });
+}
 
 /* Alliance badge (2026-09-10) -- see the HTML comment above
    edAllianceBadgeFile for why this is deliberately NOT a baseline/new pair

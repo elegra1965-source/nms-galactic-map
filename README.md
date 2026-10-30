@@ -184,6 +184,8 @@ spheres sink into each other, the way real colliding planets look in game.
 <details>
 <summary><strong>🚀 Routes & journeys</strong> — Course lines, Warp Manifest, Navigator, Route here, saved routes, Almanac route check</summary>
 
+**Your drive is remembered.** The Hyperdrive drive type and jump range you pick in Filters are saved on your device and come back next time you open the map. The filter ticks (black holes, outlaws and so on) start clear each visit so you only see what you ask for.
+
 **Course lines, styled like the real game.** Solid means one jump gets you
 there, dashed means it's a multi-hop route, red-dashed means your current
 hyperdrive can't reach that star's colour at all. Just hovering any star
@@ -394,6 +396,8 @@ with the photo held, so you can fill in anything else, then press Save once
 and everything goes up together in one upload. Your photo then replaces the
 generic icon for every visitor, shown as a framed card with the station's
 name.
+
+**One picture, not a collage.** The station photo should be just your station from outside. There's also a **Station photo** button next to Add screenshot on the Surveyor log step. If the picture you pick is a collage (several pictures with plain lines between them), the map shows the parts and asks you to tap the one that's your station, or keep the whole picture. This all happens on your device before you press Save.
 
 <img src="screenshots/19-add-station-photo.jpg" alt="Edit system, Special Features: a station photo picked, with the box saying it is added but not uploaded yet and a Done button" width="360"> <img src="screenshots/19b-station-card.jpg" alt="The player's station photo shown as a framed card with the station's name in system view" width="300">
 
