@@ -80458,7 +80458,7 @@
         "notes": "",
         "colliding": false,
         "collidingSet": [],
-        "screenshot": "",
+        "screenshot": "https://raw.githubusercontent.com/elegra1965-source/nms-galactic-map/main/user-screenshots/0-1428FB5BBC41-mvupo5po-hzumbj.jpg",
         "hasStation": true,
         "stationName": "Histlandip Primus",
         "allianceName": "",
@@ -80473,8 +80473,8 @@
             "planet": 0
           }
         ],
-        "editorName": "",
-        "editorFriendCode": "",
+        "editorName": "kuemp09",
+        "editorFriendCode": "MWYV-Y6C4-7K1TE",
         "genVersion": "1.9.0",
         "bodies": [
           {
@@ -80554,11 +80554,15 @@
           }
         ]
       },
-      "editedAt": "2026-10-30T05:26:19.511Z",
+      "editedAt": "2026-10-30T08:29:24.738Z",
       "editedByIp": "ip_ae97f3bc612b4680",
       "history": [
         {
           "at": "2026-10-30T05:26:19.511Z",
+          "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-10-30T08:29:24.738Z",
           "text": "edited by a traveller"
         }
       ]
@@ -80767,7 +80771,8 @@
   "reports": [],
   "ipLog": {
     "ip_ae97f3bc612b4680": [
-      1793348132696
+      1793348132696,
+      1793348964738
     ]
   },
   "flagLog": {},
