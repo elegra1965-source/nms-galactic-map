@@ -12200,6 +12200,8 @@ function submitEditPayload(address, galaxy, payload){
   var iconWrap=document.getElementById("editIconWrap"), iconImg=document.getElementById("editIconImg");
   if(document.getElementById("edPrivate").checked){ savePrivateEdit(address, galaxy, payload); return; }
   lastEditAttempt={address:address,galaxy:galaxy,payload:payload};
+  // 2026-10-30 medals: was this system already on the public map before this save?
+  var wasNew=!(OVERRIDES&&OVERRIDES.systems&&(OVERRIDES.systems[galaxy+":"+address]||(galaxy===0&&OVERRIDES.systems[address])));
   retryBtn.style.display="none";
   spin.style.display="flex"; btn.disabled=true;
   var stopWait=startAtlasWait(spinTxt, iconWrap, iconImg);
@@ -12221,6 +12223,8 @@ function submitEditPayload(address, galaxy, payload){
     privDel(galaxy+":"+address); // went public, so the private copy is no longer needed
     closeModal(); toast("System saved -- visible to everyone"); loadOverrides();
     if(sendHaven) sendToHaven(address, galaxy, payload);
+    // streak medals (nms-medals.js): only a NEW public system counts, once the NMS Almanac confirms it exists
+    if(wasNew&&window.NMSMedals) setTimeout(function(){ NMSMedals.charted({galaxy:galaxy,address:address,name:payload.name||(selected&&selected.name)||"",editor:(loadTravellerId().name||"")}); },2600);
   }).catch(function(){
     stopWait(); spin.style.display="none"; btn.disabled=false;
     showStatusIcon(iconWrap,iconImg,"grave");

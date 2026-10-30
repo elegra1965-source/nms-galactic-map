@@ -29,7 +29,11 @@
 
   /* ---------- 1. counting ---------- */
   function myName(){
-    try { return (typeof loadTravellerId === "function" ? String(loadTravellerId().name || "") : "").trim().toLowerCase(); } catch(e){ return ""; }
+    try {
+      var n = (typeof loadTravellerId === "function" ? String(loadTravellerId().name || "") : "").trim();
+      if(!n && window.NMSMedals) n = NMSMedals.me(); // 2026-10-30: Hub Traveller ID name too
+      return n.toLowerCase();
+    } catch(e){ return ""; }
   }
   function noteView(s){
     if(!s || !s.override || s.privateOnly || !s.address) return;
@@ -99,7 +103,8 @@
     r.type = "button";
     r.setAttribute("data-addr", x.address); r.setAttribute("data-galaxy", String(x.galaxy));
     var top = el("div", "trTop");
-    top.appendChild(el("span", "trPos" + (x.rank <= 3 ? " medal" : ""), x.rank <= 3 ? MEDAL[x.rank - 1] : "#" + x.rank));
+    if(x.rank <= 3 && window.NMSMedals){ var pm = el("span", "trPos medal"); pm.appendChild(NMSMedals.mini(x.rank)); top.appendChild(pm); }
+    else top.appendChild(el("span", "trPos" + (x.rank <= 3 ? " medal" : ""), x.rank <= 3 ? MEDAL[x.rank - 1] : "#" + x.rank));
     top.appendChild(el("span", "searchResName trName", plain(x.name) || "Unnamed system"));
     if(T.mode !== "last") top.appendChild(moveEl(x.move));
     r.appendChild(top);
@@ -158,12 +163,14 @@
       if(typeof clampPopoverTop === "function") clampPopoverTop(pop);
     }
     function open(){
+      streakBtn();
       if(typeof window.closeFavPop === "function") window.closeFavPop();
       var cp = document.getElementById("chartedPop"); if(cp) cp.classList.remove("show");
       fill(); pop.classList.add("show"); openedAt = Date.now(); line.setAttribute("aria-expanded", "true"); position();
       pop.classList.toggle("scroll", pop.scrollHeight > pop.clientHeight + 3);
     }
     var openedAt = 0;
+    window.openTrending = function(){ if(!pop.classList.contains("show")) open(); };
     function close(){ pop.classList.remove("show"); line.setAttribute("aria-expanded", "false"); }
     line.addEventListener("click", function(e){ e.stopPropagation(); pop.classList.contains("show") ? close() : open(); });
     document.addEventListener("click", function(e){ if(pop.classList.contains("show") && !pop.contains(e.target) && e.target !== line && Date.now() - openedAt > 1500) close(); });
@@ -205,6 +212,18 @@
     }
   }
 
+  /* ---------- 2b. streak medals line at the bottom of the Trending box (2026-10-30) ---------- */
+  function streakBtn(){
+    var b = document.getElementById("streakBtn");
+    if(!b || !window.NMSMedals) return;
+    var st = NMSMedals.stats();
+    b.textContent = st.any && st.cur
+      ? "\uD83D\uDD25 " + (window.NMS_T ? NMS_T(st.cur === 1 ? "Your streak: {n} day · view medals ›" : "Your streak: {n} days · view medals ›", { n: st.cur }) : "Your streak: " + st.cur + " days · view medals ›")
+      : "\uD83C\uDFC5 " + (window.NMS_T ? NMS_T("Streak medals: chart a new system every day ›") : "Streak medals: chart a new system every day ›");
+    b.hidden = false;
+    if(!b._w){ b._w = 1; b.addEventListener("click", function(e){ e.stopPropagation(); if(pop) pop.classList.remove("show"); NMSMedals.panel(); }); }
+  }
+
   /* ---------- 4. "You're #1" popup + share picture (2026-10-19, Tony) ----------
      Shown once (per week, per rank) to whoever charted a top-3 system, when they
      open the map. "Whoever charted it" = the system's editor name matches the
@@ -232,7 +251,38 @@
       showRankPop(pick);
     })();
   }
+  function T2(s, v){ return window.NMS_T ? NMS_T(s, v) : s.replace(/\{(\w+)\}/g, function(m, k){ return v && v[k] != null ? v[k] : m; }); }
+  function weekLabel(){
+    try { var d = new Date((T.week || "") + "T12:00:00Z"); if(isNaN(d)) return ""; return window.NMS_DATE ? NMS_DATE(d, { day: "numeric", month: "short", timeZone: "UTC" }) : d.toLocaleDateString(undefined, { day: "numeric", month: "short", timeZone: "UTC" }); } catch(e){ return ""; }
+  }
+  // 2026-10-30: one medal set -- the #1-3 card (gold Exotic / silver Fighter / bronze Shuttle)
+  function medalCard(x, last, o){
+    o = o || {};
+    var wl = weekLabel(), metal = NMSMedals.rankMetal(x.rank);
+    return NMSMedals.card({
+      metal: metal, label: "#" + x.rank, reveal: !!o.reveal,
+      kick: "◈ " + (last ? T2("Trending · last week") : (wl ? T2("Trending · week of {date}", { date: wl }) : T2("Trending this week"))),
+      title: T2("Most viewed #{n}", { n: x.rank }),
+      big: T2(x.views === 1 ? "{n} VIEW" : "{n} VIEWS", { n: x.views }),
+      sub: T2(last ? "Last week · {galaxy}" : "This week · {galaxy}", { galaxy: gal(x.galaxy) }),
+      lab: T2("System"), sys: cardName(x), hex: x.address,
+      meta: gal(x.galaxy) + (x.editor ? " · " + T2("Charted by {name}", { name: plain(x.editor) }) : ""),
+      next: T2("A new list starts every Monday (UK)"),
+      file: "nms-trending-" + x.rank + "-" + x.address,
+      shareText: (MEDAL[x.rank - 1] || "") + " " + cardName(x) + " is #" + x.rank + " most viewed on the NMS Galactic Map " + (last ? "last week" : "this week") + "! Portal: " + String(x.address).toUpperCase(),
+      shareUrl: mapLink(x),
+      wide: o.fly ? { label: "✈ " + T2("Fly there"), run: function(){ NMSMedals.close(); flyTo(x); } }
+                  : { label: "▤ " + T2("View Trending list"), run: function(){ NMSMedals.close(); if(window.openTrending) window.openTrending(); } }
+    });
+  }
   function showRankPop(pick){
+    if(window.NMSMedals){
+      var sn = rankSeen(); sn[pick.id] = 1;
+      for(var kk in sn) if(kk.indexOf(T.week) < 0) delete sn[kk];
+      try { localStorage.setItem(RANK_SEEN_K, JSON.stringify(sn)); } catch(e){}
+      medalCard(pick.x, pick.last, { reveal: true });
+      return;
+    }
     var x = pick.x, name = plain(x.name) || "Your system";
     var seen = rankSeen(); seen[pick.id] = 1;
     for(var k in seen) if(k.indexOf(T.week) < 0) delete seen[k];
@@ -366,6 +416,7 @@
     (function whenClear(){
       var wrap = document.getElementById("modalWrap");
       if(((wrap && wrap.classList.contains("show")) || (typeof tourActive !== "undefined" && tourActive)) && tries++ < 40){ setTimeout(whenClear, 1000); return; }
+      if(window.NMSMedals){ medalCard(hit, last, { fly: true }); return; }
       rankCardBlob(hit, last).then(function(blob){
         if(!blob) return;
         var url = URL.createObjectURL(blob);

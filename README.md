@@ -605,7 +605,7 @@ messages, for example), paste a medal picture link and the map opens straight
 on that system's medal picture. Each top-three system in the 🔥 Trending list
 has a **🔗 Copy medal picture link** button, so anyone can grab one in a tap.
 The link looks like `map.nomansskyhub.app/?rankcard=HEX&galaxy=Eissentam` --
-the galaxy can be its name (spaces left out) or its number (Euclid = 0). It opens the picture with **Save picture** and **Fly there** buttons. It
+the galaxy can be its name (spaces left out) or its number (Euclid = 0). It opens the system's medal card with **Download**, **Share** and **Fly there** buttons. It
 works for any system on this week's (or last week's) Trending list -- so a
 link sent while a system was #3 still works if it slips to #4 -- otherwise it
 says so and points to the Trending list. The Community page and the Hub's
@@ -614,6 +614,40 @@ Trending board have the same copy button.
 <img src="screenshots/24-rank-popup.jpg" alt="Popup reading You're number 1 this week, with the system name, view count, portal glyphs and hex address, and Share my rank, Fly there and close buttons" width="360"> <img src="screenshots/24b-rank-share.jpg" alt="Share picture: gold medal, number 1, Most viewed this week, the system name, galaxy and who charted it, 12 portal glyphs, the hex address and map.nomansskyhub.app" width="300">
 
 *(Popup and picture use a real charted system with example view counts.)*
+
+**🏅 Medals and streaks.** One medal set for the whole family: a metal disc
+with laurels and an NMS ship flying in -- **gold Exotic** for #1, **silver
+Fighter** for #2, **bronze Shuttle** for #3. The top 3 in 🔥 Trending (here and
+on the Hub) and the Hub's Top Surveyors get them, and when *your* system makes
+the top 3 the "You're #1" popup is now that medal card, with a colour reveal
+(grey disc and black ship turn to colour, the trail draws in from the rim
+star, ~1.5 s; tap skips it, reduced motion shows it at once).
+
+Personal **streaks**: chart a **new** system (one nobody has saved on the map
+yet) and, once the NMS Almanac confirms the system really exists, that day
+counts. Medals at **3 / 7 / 14 / 30 days in a row** (bronze, bronze, silver,
+gold), a **weekly** medal for 3 new systems in a Monday-Sunday week and a
+**monthly** medal for 10 in a month. One missed day a week doesn't break a
+streak. No login: the streak is saved on your device (a small cookie on
+.nomansskyhub.app so the Hub can show it too) and "you" is the name in Edit
+system's *Your name* box (or your Hub Traveller ID). Each system counts once,
+ever; re-saving it or editing an already-charted one doesn't count. Every
+medal card has **Download** (a 1080x1350 picture with the medal, glyphs and
+hex) and **Share** (the share sheet on phones; on computers the picture is
+copied for pasting with Ctrl+V). See your streak any time from the bottom of
+the 🔥 Trending box: **View streak** shows days in a row, longest streak, this
+week and this month, and the daily medals (locked ones as grey silhouettes),
+with weekly + monthly folded away. **Total unlocked**: when you earn a streak medal, *only which medal
+it was* (for example "7 days") goes to `netlify/functions/medal-count.mjs`, which keeps one total per
+medal, so cards and the panel can say *Unlocked by 12 travellers so far*. No name, system,
+streak or device id is sent; your streak itself never leaves your device. Everything is in `nms-medals.js` (the same
+file on the Hub) with the ship pictures in `medals/`. `?medaldemo=bronze`
+(`silver`, `gold`, `week`, `month`) shows a sample earned card, `?streak=1`
+opens the streak panel.
+
+<img src="screenshots/33-medal-earned.jpg" alt="Medal card on a phone: Milestone reached, Daily discovery, a bronze medal with a shuttle and a 3 DAYS ribbon, the system that kept the streak going with its portal glyphs and hex, Next medal 7 days, and Download, Share and View streak buttons" width="300"> <img src="screenshots/33b-streak-panel.jpg" alt="Your streak panel on a phone: 7 days in a row, longest streak, this week 3 of 3, this month 8 of 10, daily medals 3 and 7 days earned, 14 and 30 days locked as grey silhouettes" width="300"> <img src="screenshots/33c-medal-picture.jpg" alt="Downloaded medal picture: Trending week of 26 Oct, Most viewed number 1, gold medal with an Exotic ship and a #1 ribbon, 7 views, the system name, glyphs and hex" width="300">
+
+*(Example data.)*
 
 **🔒 Private systems.** Looking up a system is always private. Nothing is
 shared unless you press Save in Edit system, and the glyph keypad says so. For
@@ -776,6 +810,7 @@ This repo is the whole client — two files carry it (markup/CSS, and the app's 
 |---|---|
 | `preview.html` | markup + CSS + the Three.js r128 `<script>` tag (cdnjs); loads `preview.js` for the app itself |
 | `preview.js` | the entire app's JS -- generation, all UI, Search/Find -- split out of preview.html 2026-09-12 so the browser can cache it separately from the markup |
+| `nms-medals.js` + `medals/` | 🏅 medals + streaks (same file as the Hub): the medal pictures, medal cards with Download/Share, streak counting and the View streak panel; `medals/` holds the three ship pictures |
 | `atlas-pois.json` | Galactic Atlas overlay data — ~50 real points of interest from galacticatlas.nomanssky.com, hand-entered (name, address, url); fetched by preview.html's Atlas toggle |
 | `netlify.toml` | serves preview.html at "/", points Netlify at netlify/functions |
 | `netlify/functions/` |  |
@@ -784,6 +819,7 @@ This repo is the whole client — two files carry it (markup/CSS, and the app's 
 | &nbsp;&nbsp;`sweep-stale-flags.mjs` | scheduled function, auto-clears any flag >7 days old with no consensus reached; never touches a confirmed dispute |
 | &nbsp;&nbsp;`lib/shared.mjs` | shared GitHub Contents API read/write + GET cache used by the three functions above |
 | &nbsp;&nbsp;`private-systems.mjs` | private systems: private codes, load/save/delete, lost-code requests and the owner's recovery view (Netlify Blobs, never the public repo) |
+| &nbsp;&nbsp;`medal-count.mjs` | 🏅 Total unlocked: one anonymous total per streak medal (+1 when someone earns it, nothing else sent), read by the Map and Hub medal cards (Netlify Blobs) |
 | &nbsp;&nbsp;`trending.mjs` | 🔥 Trending this week: counts views of public charted systems, weekly top 10 with rank movement and last week's standings (Netlify Blobs) |
 | &nbsp;&nbsp;`filter.mjs` | the authoritative content filter (profanity, HTML/URL stripping, per-field length + allowlist) — mirrored client-side in preview.html for instant feedback, but this copy is the one that actually decides |
 | `nms-core/` | real decompiled game logic (star type, planet count, black hole/Atlas placement, system/region/planet names, economy/conflict/race/ring odds) — see "What real No Man's Sky data does this use?" below and nms-core/README.md for the full module docs |
