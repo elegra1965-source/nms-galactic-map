@@ -80326,13 +80326,13 @@
         "colliding": false,
         "collidingSet": [],
         "screenshot": "",
-        "hasStation": false,
+        "hasStation": true,
         "stationName": "",
         "allianceName": "",
-        "stationPhoto": "",
+        "stationPhoto": "https://raw.githubusercontent.com/elegra1965-source/nms-galactic-map/main/user-screenshots/0-13EAFB5BAC41-station-mvuh6ok4-zju7yg.jpg",
         "signals": [],
-        "editorName": "kuemp09 (Cosmos Chaos Club)",
-        "editorFriendCode": "MWYV-Y6C4-7K1TE",
+        "editorName": "",
+        "editorFriendCode": "",
         "genVersion": "1.9.0",
         "bodies": [
           {
@@ -80412,7 +80412,7 @@
           }
         ]
       },
-      "editedAt": "2026-10-30T02:40:15.356Z",
+      "editedAt": "2026-10-30T04:31:52.464Z",
       "editedByIp": "ip_ae97f3bc612b4680",
       "history": [
         {
@@ -80422,6 +80422,10 @@
         {
           "at": "2026-10-30T02:40:15.356Z",
           "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-10-30T04:31:52.464Z",
+          "text": "edited by a traveller"
         }
       ]
     }
@@ -80429,8 +80433,7 @@
   "reports": [],
   "ipLog": {
     "ip_ae97f3bc612b4680": [
-      1793327711769,
-      1793328015356
+      1793334712464
     ]
   },
   "flagLog": {},
