@@ -730,6 +730,10 @@ the long Full guide in About is English for now and says so. It lives in
 
 **Always the newest version.** An installed app on a phone isn't reloaded when you switch back to it, so it could keep showing an old version until it was closed and reopened. Now, each time you come back to it (and every 30 minutes while it stays open), it checks for a new version. If one is live, a small bar says “New version ready · tap to update”, in your language. One tap reloads in place; × hides it. It never reloads by itself, so nothing you're in the middle of is lost. It lives in `nms-update.js`, the same file on every site.
 
+**Patch notes after a big update.** After you tap the update bar (or the first time you open a new version) a short pop-up says what changed, with NEW / IMPROVED / FIXED tags: a scan line sweeps down the screen and the panel appears behind it. It shows once per version, in your language, and only the newest notes if you skipped a version.
+
+<img src="screenshots/34-patch-notes.jpg" alt="The patch notes pop-up on a phone: System update received, Patch notes with the version, and the list of changes with NEW and IMPROVED tags" width="390">
+
 **⟳ Refresh.** In the installed app there's no browser reload button (and pull-to-refresh doesn't work everywhere), so a small ⟳ button sits on the Hide controls row under the title. Tap it and it checks for a new version and reloads in place, on the same view. It only shows in the installed app. After a big batch of updates, the first open on that day says “✓ Updated · that's the last update today”, so nobody wonders if more pop-ups are coming. The old nms-galaxy-map.netlify.app address now sends search engines here with a permanent (301) redirect.
 
 **Draggable panels.** Filters, the system info panel, Course plotted, the
