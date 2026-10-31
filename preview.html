@@ -1280,6 +1280,8 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 .starSwatch{width:14px;height:14px;border-radius:50%;flex:0 0 auto;border:1px solid rgba(255,255,255,.3)}
 #starEditList{margin-bottom:8px}
 .modalBtns{display:flex;gap:6px;margin-top:12px}
+/* 2026-10-31: About's 1-2-3 button pyramid -- each row the same width, long translations wrap inside the button instead of pushing it out */
+#disclaimerModal .modalBtns .btn{min-width:0;white-space:normal;flex:1 1 auto;line-height:1.3;overflow-wrap:anywhere}
 .modalBtns .btn{flex:1;text-align:center}
 .modalBtns .btn.primary{border-color:var(--gold);color:var(--gold)}
 #editSpin,#reportSpin,#feedbackSpin{display:none;align-items:center;justify-content:center;gap:8px;
@@ -1594,8 +1596,15 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   #bWarpToggle{order:34} #bRoutes{order:35}
   #bFiltToggle{order:40} #bLbl{order:41} #bGrid{order:42} #bAtlas{order:43}
   #cOrb{order:50} #cFly{order:51}
-  #bInstall{order:60} #bTour{order:61} #bAbout{order:62} #bAccess{order:63}
+  #bInstall{order:60} #bTour{order:61} #bAbout{order:62} #bFeedback{order:63} #bAccess{order:64}
 }
+/* 2026-10-31 (Tony): Feedback = the crystal star on its own (title/aria say what it is), next to About.
+   Tour/About/Feedback/Install/Lang/gear get slimmer side padding so the extra button doesn't add a row. */
+#bFeedback{padding-left:9px;padding-right:9px}
+#bFeedback .nms-fb-ico{margin:-5px 0;width:19px;height:19px}
+#bInstall,#bTour,#bAbout,#bLang,#bAccess{padding-left:8px;padding-right:8px}
+@media(max-width:480px){#bInstall,#bTour,#bAbout,#bAccess{letter-spacing:.06em;padding-left:6px;padding-right:6px}#bFeedback{padding-left:7px;padding-right:7px}}
+@media(min-width:901px){#top .btn.beveled{padding-left:8px;padding-right:8px}}
 @media(max-width:900px) and (orientation:landscape){
   /* Short landscape screens don't have room to stack the toolbar, the left-side
      Tweak/Filters/Telemetry boxes AND a bottom-docked panel without them overlapping
@@ -1827,6 +1836,7 @@ nearby procedural space within a radius.">Search</button>
   <button class="btn beveled" id="bInstall" title="Install this map as an app on your device." style="display:none;animation-delay:-3.5s">&#9672; Install app</button>
   <button class="btn beveled" id="bTour" style="animation-delay:-4s" title="A quick guided tour of what this map can do.">&#9655; Tour</button>
   <button class="btn beveled" id="bAbout" style="animation-delay:-4.5s" title="Fan-made disclaimer and a note on procedural vs. real system data.">&#9432; About</button>
+  <button class="btn beveled nms-fb-btn" id="bFeedback" type="button" data-nms-feedback aria-haspopup="dialog" style="animation-delay:-4.75s" title="Reviews & feedback" aria-label="Reviews & feedback"><img class="nms-fb-ico" src="/nms-feedback/fb-ico-review.webp" srcset="/nms-feedback/fb-ico-review@2x.webp 2x" alt="" width="20" height="20"></button>
   <button class="btn beveled" id="bLang" type="button" data-lang-btn style="animation-delay:-5.5s" title="Language" aria-label="Language">&#127760; <span data-lang-code translate="no">EN</span></button>
   <button class="btn beveled" id="bAccess" style="animation-delay:-5s" title="Accessibility settings: font size, colour-blind filters, high contrast." aria-label="Accessibility settings" aria-haspopup="true" aria-expanded="false">&#9881;</button>
   </div>
@@ -2861,22 +2871,19 @@ nearby procedural space within a radius.">Search</button>
       <div class="lb">Say hi in-game</div>
       <div style="font-size:12px;color:var(--text-dim);line-height:1.55">Traveller T672B774 &middot; Friend code MGD8-C6PP-XKFGT</div>
     </div>
-    <div class="mfld">
-      <div class="lb">Feedback / found a bug?</div>
-<button type="button" class="btn nms-fb-btn" id="discFeedback" data-nms-feedback aria-haspopup="dialog" style="width:100%;justify-content:center;display:inline-flex;align-items:center"><img class="nms-fb-ico" src="/nms-feedback/fb-ico-review.webp" srcset="/nms-feedback/fb-ico-review@2x.webp 2x" alt="" width="20" height="20"><span data-fbt="REVIEWS &amp; FEEDBACK">REVIEWS &amp; FEEDBACK</span></button>
-    </div>
-    <div class="mfld" data-narrate="Buttons to share this map on X, on Reddit, or on Discord.">
-      <div class="lb">Share this map</div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap">
-        <button class="btn" onclick="return shareTo('x')" style="flex:1;text-align:center">Share on X</button>
-        <button class="btn" onclick="return shareTo('reddit')" style="flex:1;text-align:center">Reddit</button>
-        <button class="btn" onclick="return shareTo('discord')" style="flex:1;text-align:center">Discord</button>
-      </div>
-    </div>
     <div style="margin-top:2px;font-size:9px;letter-spacing:.1em;color:var(--text-faint);text-align:center">BUILT BY ELEGRA1965</div>
-    <div class="modalBtns">
-      <button class="btn" id="discTour" title="A quick guided tour of what this map can do.">Take a quick tour</button>
-      <button class="btn primary" id="discOk">Got it</button>
+    <!-- 2026-10-31 (Tony): pyramid 1-2-3, every row the same width: Got it / Tour + Share this map / X, Reddit, Discord -->
+    <div class="modalBtns" style="flex-direction:column">
+      <button class="btn primary" id="discOk" style="width:100%;text-align:center">Got it</button>
+      <div style="display:flex;gap:6px">
+        <button class="btn" id="discTour" style="flex:1;text-align:center" title="A quick guided tour of what this map can do.">Take a quick tour</button>
+        <button class="btn" id="discShareBtn" type="button" onclick="return shareTo('app')" style="flex:1;text-align:center" title="Share this map with your phone's share menu, or copy its link">Share this map</button>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="btn" onclick="return shareTo('x')" style="flex:1 1 0;text-align:center" aria-label="Share on X">X</button>
+        <button class="btn" onclick="return shareTo('reddit')" style="flex:1 1 0;text-align:center">Reddit</button>
+        <button class="btn" onclick="return shareTo('discord')" style="flex:1 1 0;text-align:center">Discord</button>
+      </div>
     </div>
   </div>
 

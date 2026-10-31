@@ -2287,6 +2287,8 @@ function shareTo(t){
       txt="NMS Galactic Map \u2014 a fan-made 3D No Man's Sky galaxy map and portal address decoder, by elegra1965.";
   if(t==="x") window.open("https://twitter.com/intent/tweet?text="+encodeURIComponent(txt)+"&url="+encodeURIComponent(url),"_blank");
   else if(t==="reddit") window.open("https://www.reddit.com/submit?url="+encodeURIComponent(url)+"&title="+encodeURIComponent("NMS Galactic Map"),"_blank");
+  /* 2026-10-31: About's "Share this map" button -- phone/OS share menu where there is one, else copy the link */
+  else if(t==="app"){ if(navigator.share){ navigator.share({title:"NMS Galactic Map",text:txt,url:url}).catch(function(){}); } else shareTo("copy"); }
   else if(t==="copy"){ navigator.clipboard.writeText(url).then(function(){ toast("Link copied"); },function(){ toast(url); }); }
   /* 2026-10-27 (Tony): Discord has no share link -- copy the message + link, then open Discord so they
      pick the server / DM (same as the Hub). Opened straight away so pop-up blockers don't stop it. */
@@ -10927,7 +10929,9 @@ var TOUR_STEPS=[
   {sel:"#bAtlas",title:"Hello Games' own Atlas",
     body:"In Galaxy view, Atlas overlays the real points of interest from Hello Games' own Galactic Atlas website (Euclid only) as diamond markers -- click one to open its real Atlas page. Nearby ones collapse into a numbered marker until you zoom in close enough to tell them apart, same as the official site does."},
   {sel:"#bAbout",title:"Worth a read",
-    body:"About explains exactly what's generated accurately versus a plausible guess -- and what's still an unverified guess, like individual planet names. It's also where Feedback lives if you spot a bug or have an idea -- no account needed to send one."},
+    body:"About explains exactly what's generated accurately versus a plausible guess -- and what's still an unverified guess, like individual planet names."},
+  {sel:"#bFeedback",title:"Reviews & feedback",
+    body:"Tell us what you think, report a bug or ask for something new."},
   {sel:"#bLang",title:"Your language",
     body:"Pick your language once and every site in the family follows."},
   {sel:"#bAccess",title:"Accessibility",

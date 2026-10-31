@@ -718,7 +718,7 @@ recover, it says so plainly instead of guessing.
 ![Custom 404 page: a Hyperdrive Fault screen reading "Jump failed -- no system at this address", showing the recovered hex address 1CF0EE90BFFA next to its 12-glyph strip](screenshots/16-404-jump-failed.jpg)
 
 
-- **★ Reviews & feedback.** About → "Feedback / found a bug?" → REVIEWS & FEEDBACK (it replaces the old GitHub-issue form; Report this system is unchanged) opens the same pop-up as the Hub: leave a review (stars, and an "OK to show" switch), report a bug (your device type and browser are added so it can be fixed faster) or ask for something new. This site is ticked for you. Everything goes to elegra1965 through the Hub, and nothing shows on the site without his OK. In all 8 languages; the question at the top now reads "What's it about, traveller?".
+- **★ Reviews & feedback.** The crystal ★ button on the toolbar, between About and ⚙ (it replaces the old GitHub-issue form in About; Report this system is unchanged; the tour has a step for it), opens the same pop-up as the Hub: leave a review (stars, and an "OK to show" switch), report a bug (your device type and browser are added so it can be fixed faster) or ask for something new. This site is ticked for you. Everything goes to elegra1965 through the Hub, and nothing shows on the site without his OK. In all 8 languages; the question at the top now reads "What's it about, traveller?". About now ends with a 1-2-3 button pyramid, every row the same width: **Got it**, then **Take a quick tour** + **Share this map** (your phone's share menu, or copies the link), then **X · Reddit · Discord**.
 
   <img src="screenshots/33-reviews-feedback.jpg" alt="About with the Reviews and feedback button, and the pop-up it opens, on a phone" width="560">
 
