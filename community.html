@@ -73,6 +73,8 @@ button:hover,button:focus-visible{border-color:var(--cyan);outline:none}
 .col.today .b{background:linear-gradient(to top,rgba(240,165,0,.4),var(--gold))}
 .col .v{font-family:var(--disp);font-size:10px;letter-spacing:.08em;color:var(--text);font-variant-numeric:tabular-nums}
 .col .d{font-size:11px;color:var(--faint)}
+.col.today .d{margin-left:-48px;text-align:right;white-space:nowrap}
+@media (max-width:420px){.col:nth-child(even):not(.today) .d,.col:has(+ .col.today) .d{visibility:hidden}}
 
 .feedHead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
 .feed{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
