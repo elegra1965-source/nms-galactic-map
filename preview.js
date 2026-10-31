@@ -10134,7 +10134,6 @@ function closeAllModalBoxes(){
   document.getElementById("reportModal").style.display="none";
   document.getElementById("disclaimerModal").style.display="none";
   document.getElementById("hyperdriveModal").style.display="none";
-  document.getElementById("feedbackModal").style.display="none";
   document.getElementById("saveImportModal").style.display="none";
   document.getElementById("termConfirmModal").style.display="none";
   document.getElementById("privModal").style.display="none";
@@ -12720,108 +12719,10 @@ document.getElementById("repSubmit").addEventListener("click",function(){
   submitReportPayload(selected.address, selected.galaxy, reason);
 });
 
-/* ============ general site feedback (2026-08-16) ============
-   Not tied to any address, unlike Report above -- so it doesn't need
-   `selected` at all. Reuses the exact same describeSaveError/startAtlasWait/
-   showStatusIcon/setErrText machinery as edit/report/flag; "feedbackIconWrap"
-   -> "feedbackErr" already matches pairedErrEl()'s naming convention with no
-   extra wiring needed. */
-function openFeedbackModal(){
-  closeAllModalBoxes();
-  document.getElementById("fbCategory").value="Bug/glitch";
-  document.getElementById("fbMessage").value="";
-  document.getElementById("fbRepro").value="";
-  // Best-effort device/browser prefill -- still a plain editable text input,
-  // not read-only, since a visitor might want to add/replace this themselves.
-  try{ document.getElementById("fbDevice").value=navigator.userAgent.slice(0,100); }
-  catch(e){ /* navigator unavailable for some reason -- leave it blank, not required */ }
-  document.getElementById("fbContact").value="";
-  document.getElementById("feedbackErr").style.display="none";
-  document.getElementById("feedbackErr").classList.remove("scanning");
-  document.getElementById("fbRetry").style.display="none";
-  hideStatusIcon(document.getElementById("feedbackIconWrap"));
-  document.getElementById("fbSubmit").reset();
-  lastFeedbackAttempt=null;
-  var fm=document.getElementById("feedbackModal");
-  document.getElementById("modalWrap").classList.add("show");
-  fm.style.display="";
-  fm.classList.remove("scroll");
-  /* Same measure-don't-guess fix as openHyperNotice() -- only opt into a
-     real scrollbar once actual overflow is confirmed after layout. */
-  if(fm.scrollHeight>fm.clientHeight+1) fm.classList.add("scroll");
-}
-document.getElementById("discFeedback").addEventListener("click",openFeedbackModal);
-document.getElementById("fbCancel").addEventListener("click",closeModal);
-var lastFeedbackAttempt=null; // {category,message,repro,device,contact} of the most recent failed send, so Retry resubmits without retyping
-function submitFeedbackPayload(payload){
-  var errEl=document.getElementById("feedbackErr"), retryBtn=document.getElementById("fbRetry");
-  var spin=document.getElementById("feedbackSpin"), spinTxt=document.getElementById("feedbackSpinTxt"), btn=document.getElementById("fbSubmit");
-  var iconWrap=document.getElementById("feedbackIconWrap"), iconImg=document.getElementById("feedbackIconImg");
-  lastFeedbackAttempt=payload;
-  retryBtn.style.display="none";
-  spin.style.display="flex"; btn.disabled=true;
-  btn.playSending();
-  var sendStartedAt=Date.now(); // send-button.js's own playSending() holds at "Feedback sent"
-    // for exactly SEND_ANIM_MS internally before it's fully settled -- on success below
-    // we wait out whatever's left of that window (rather than closing the instant the
-    // network responds, which on a fast connection was cutting the ship-flies-off
-    // animation short) plus SEND_HOLD_MS so there's always a moment to actually read
-    // "Feedback sent" before the modal closes, regardless of how fast the request was.
-  var SEND_ANIM_MS=4000, SEND_HOLD_MS=700, RETURN_ANIM_MS=1100;
-    // RETURN_ANIM_MS covers playReturn()'s own warp-in (a 140ms delay then a
-    // .38s flash-and-fade -- ~520ms total) plus a hold on top, same idea as
-    // SEND_HOLD_MS above: the warp-in itself is a quick flash by design, so
-    // without an explicit hold the modal closed the instant it finished and
-    // it read as a blink-and-you-miss-it flicker rather than something seen.
-  var stopWait=startAtlasWait(spinTxt, iconWrap, iconImg);
-  fetch(FEEDBACK_URL,{method:"POST",headers:{"Content-Type":"application/json"},
-    body:JSON.stringify(payload)
-  }).then(function(r){ return r.json().then(function(j){ return {status:r.status,body:j}; }); })
-  .then(function(res){
-    stopWait(); spin.style.display="none"; btn.disabled=false;
-    if(!res.body.ok){
-      var d=describeSaveError(res.status,res.body,true);
-      showStatusIcon(iconWrap,iconImg,d.icon);
-      setErrText(errEl,d.message); errEl.style.display="block"; errEl.scrollIntoView({block:"nearest"});
-      retryBtn.style.display=d.retryable?"inline-block":"none";
-      btn.playReturn();
-      return;
-    }
-    hideStatusIcon(iconWrap);
-    var elapsed=Date.now()-sendStartedAt;
-    var wait=Math.max(0,SEND_ANIM_MS-elapsed)+SEND_HOLD_MS;
-    setTimeout(function(){
-      btn.playReturn();
-      setTimeout(function(){
-        closeModal();
-        toast(res.body.issueUrl?"Feedback sent -- thank you":"Feedback sent -- thanks");
-      },RETURN_ANIM_MS);
-    },wait);
-  }).catch(function(){
-    stopWait(); spin.style.display="none"; btn.disabled=false;
-    showStatusIcon(iconWrap,iconImg,"grave");
-    setErrText(errEl,"Couldn't reach the server -- check your connection. Your feedback was NOT sent.");
-    errEl.style.display="block"; errEl.scrollIntoView({block:"nearest"});
-    retryBtn.style.display="inline-block";
-    btn.playReturn();
-  });
-}
-document.getElementById("fbRetry").addEventListener("click",function(){
-  if(lastFeedbackAttempt) submitFeedbackPayload(lastFeedbackAttempt);
-});
-document.getElementById("fbSubmit").addEventListener("click",function(){
-  var errEl=document.getElementById("feedbackErr"), retryBtn=document.getElementById("fbRetry");
-  var message=document.getElementById("fbMessage").value.trim();
-  if(!message){ setErrText(errEl,"Please describe what happened or what you'd like."); errEl.style.display="block"; retryBtn.style.display="none"; errEl.classList.remove("scanning"); errEl.scrollIntoView({block:"nearest"}); return; }
-  errEl.style.display="none"; retryBtn.style.display="none";
-  submitFeedbackPayload({
-    category: document.getElementById("fbCategory").value,
-    message: message,
-    repro: document.getElementById("fbRepro").value.trim(),
-    device: document.getElementById("fbDevice").value.trim(),
-    contact: document.getElementById("fbContact").value.trim()
-  });
-});
+/* ============ general site feedback ============
+   2026-10-31: the old GitHub-issue form is gone. About's "Send feedback" button
+   (#discFeedback, data-nms-feedback) opens the family-wide Reviews & feedback
+   pop-up from /nms-feedback/nms-feedback.js, which sends to the Hub. */
 
 /* ============ install as app ============ */
 var deferredInstallPrompt=null;

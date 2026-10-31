@@ -2742,43 +2742,6 @@ nearby procedural space within a radius.">Search</button>
     <div class="modalBtns"><button class="btn" id="privClose">Close</button></div>
   </div>
 
-  <!-- General site feedback (2026-08-16, Tony's ask) -- distinct from the
-       Report modal above, which is always about a SPECIFIC system. This one
-       isn't tied to any address at all, so it lives separately even though
-       it reuses the exact same error/spinner/retry machinery. -->
-  <div class="box modal" id="feedbackModal" style="max-width:340px;display:none">
-    <h3>Feedback / found a bug?</h3>
-    <div class="msub">Opens a GitHub Issue elegra1965 can see -- no account needed to send one.</div>
-    <div class="mfld"><div class="lb">What's this about?</div>
-      <select id="fbCategory">
-        <option>Bug/glitch</option>
-        <option>Feature idea</option>
-        <option>Something looks wrong</option>
-        <option>Other</option>
-      </select>
-    </div>
-    <div class="mfld"><div class="lb">What happened? What would you like adding, etc.?</div>
-      <textarea id="fbMessage" maxlength="800" placeholder="Be as specific as you can"></textarea>
-    </div>
-    <div class="mfld"><div class="lb">Steps to reproduce (if it's a bug, optional)</div>
-      <textarea id="fbRepro" maxlength="500" placeholder="e.g. Click Local, click any star, click Enter system"></textarea>
-    </div>
-    <div class="mfld"><div class="lb">Device/browser</div>
-      <input type="text" id="fbDevice" maxlength="100">
-    </div>
-    <div class="mfld"><div class="lb">Want a reply? Leave a contact (optional)</div>
-      <input type="text" id="fbContact" maxlength="100" placeholder="Discord/email/etc -- entirely optional">
-    </div>
-    <div class="merr" id="feedbackErr"><span class="errTxt"></span><span class="errScan"></span></div>
-    <button class="btn" id="fbRetry" type="button" style="display:none;margin:-4px 0 10px">Retry send</button>
-    <div class="iconWrap" id="feedbackIconWrap"><img id="feedbackIconImg" src="" alt=""><span class="driftBeam"></span></div>
-    <div id="feedbackSpin"><span id="feedbackSpinTxt">Atlas is working on it...</span></div>
-    <div class="modalBtns">
-      <send-button id="fbSubmit" class="btn primary" sent-label="Feedback sent">Send feedback</send-button>
-      <button class="btn" id="fbCancel">Cancel</button>
-    </div>
-  </div>
-
   <!-- New-vocabulary confirm (2026-09-02, Tony: "auto correct whats known
        but flag back anything else asking if correct before saving") --
        shown only when Edit System is about to save a Resources/Uncommon
@@ -2900,8 +2863,7 @@ nearby procedural space within a radius.">Search</button>
     </div>
     <div class="mfld">
       <div class="lb">Feedback / found a bug?</div>
-      <div style="font-size:12px;color:var(--text-dim);line-height:1.55;margin-bottom:6px">Opens a GitHub Issue elegra1965 can see -- no account or email needed.</div>
-      <button class="btn" id="discFeedback" style="width:100%;text-align:center">Send feedback</button>
+<button type="button" class="btn nms-fb-btn" id="discFeedback" data-nms-feedback aria-haspopup="dialog" style="width:100%;justify-content:center;display:inline-flex;align-items:center"><img class="nms-fb-ico" src="/nms-feedback/fb-ico-review.webp" srcset="/nms-feedback/fb-ico-review@2x.webp 2x" alt="" width="20" height="20"><span data-fbt="REVIEWS &amp; FEEDBACK">REVIEWS &amp; FEEDBACK</span></button>
     </div>
     <div class="mfld" data-narrate="Buttons to share this map on X, on Reddit, or on Discord.">
       <div class="lb">Share this map</div>
@@ -3088,7 +3050,7 @@ if (window.NMS_PUSH) NMS_PUSH.wire(document.getElementById("trendAlertBtn"), "ma
   }
 });
 </script>
-<script type="module" src="send-button.js"></script>
 <script src="/nms-totop.js?v=2" defer></script>
+<script src="/nms-feedback/nms-feedback.js?v=20261031" data-tool="map" defer></script>
 </body>
 </html>
