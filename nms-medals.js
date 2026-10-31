@@ -54,8 +54,8 @@
   };
   // Tony's final settings (positioner v6). Ships deliberately poke out past the rim.
   var SHIP = {
-    bronze:{ img:'ship-shuttle.webp', iw:260, ih:145, x:283, y:214, w:328, rot:-10, ex:405, ey:222 },
-    silver:{ img:'ship-fighter.webp', iw:242, ih:171, x:262, y:220, w:332, rot:-17, ex:451, ey:240 },
+    bronze:{ img:'ship-shuttle.webp', iw:600, ih:342, x:285, y:220, w:340, rot:-10, ex:405, ey:222 },  /* 2026-10-31 Tony's own Shuttle + Fighter shots */
+    silver:{ img:'ship-fighter.webp', iw:600, ih:295, x:305, y:228, w:340, rot:-17, ex:270, ey:253 },
     gold:  { img:'ship-exotic-topdown.webp', iw:500, ih:332, x:309, y:197, w:342, rot:-4, ex:420, ey:259 }
   };
   var C = window.NMSMedals_CONFIG || {};

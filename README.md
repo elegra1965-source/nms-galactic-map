@@ -417,7 +417,8 @@ that shows each option's real icon image next to its name rather than
 plain text. Seven of the ten now use real in-game icon images (isolated
 from reference photos and background-removed); the remaining three
 (Flora Growth, Tech Anomaly, Hazard / Danger) still use a hand-drawn
-placeholder glyph until a real image is available. Each marker also
+placeholder glyph until a real image is available. **Deep Space Anomaly**
+(added 2026-10-31, the purple in-game marker, real icon) joins the list too. Each marker also
 carries a free-text name, category,
 signal type, and route note -- type what your own report actually said,
 same as everything else in this section.
