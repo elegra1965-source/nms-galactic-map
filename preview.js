@@ -720,7 +720,10 @@ var RES_ICON_CAT={
   habitableasteroid:{icon:null,color:"#7ec9a3",label:"Habitable Asteroid"},
   spacehulk:{icon:null,color:"#6b6f76",label:"Space Hulk"},
   asteroidbelt:{icon:null,color:"#a89a7a",label:"Asteroid Belt"},
-  extraterrestrialrock:{icon:null,color:"#4fd1c5",label:"Extraterrestrial Rock"}
+  extraterrestrialrock:{icon:null,color:"#4fd1c5",label:"Extraterrestrial Rock"},
+  // Added 2026-10-30 from Tony's in-game icon (purple marker in a black diamond):
+  // manual-only like the others, real picture icons-web/signal-deepspaceanomaly.png
+  deepspaceanomaly:{icon:null,color:"#c9a9f5",label:"Deep Space Anomaly"}
 };
 /* Single shared source of truth for "every valid signal-marker icon
    category" -- added 2026-09-17 alongside the 5 new categories above,
@@ -754,7 +757,8 @@ var REAL_ICON_URL={
   creature:"icons-web/signal-creature.png",
   cargo:"icons-web/signal-cargo.png",
   atlasstation:"icons-web/signal-atlasstation.png",
-  base:"icons-web/signal-base.png"
+  base:"icons-web/signal-base.png",
+  deepspaceanomaly:"icons-web/signal-deepspaceanomaly.png"
 };
 var RES_ICON_BIOME_CAT={
   "Lush":"flora","Toxic":"flora","Marsh":"flora","Water World":"flora",

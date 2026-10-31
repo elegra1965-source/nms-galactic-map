@@ -589,7 +589,7 @@ export function filterSystemEdit(payload){
   // rock) -- kept as a plain literal array here (this file has no access to
   // preview.js's RES_ICON_CAT), so it must be kept in sync by hand if more
   // categories are ever added client-side.
-  var SIGNAL_ICONS = ["mineral","flora","frozen","tech","outpost","creature","hazard","cargo","atlasstation","base","infectedoutpost","habitableasteroid","spacehulk","asteroidbelt","extraterrestrialrock"];
+  var SIGNAL_ICONS = ["mineral","flora","frozen","tech","outpost","creature","hazard","cargo","atlasstation","base","infectedoutpost","habitableasteroid","spacehulk","asteroidbelt","extraterrestrialrock","deepspaceanomaly"];
   for(var sgI=0; sgI<Math.min(signals.length,10); sgI++){
     var sg = signals[sgI] || {};
     var sgNameR = filterText(sg.name, {maxLen:40, fieldName:"Signal marker name"});
