@@ -128,7 +128,7 @@
   var SH = null, CUR = null;
   function isPhone() { return (window.matchMedia && matchMedia("(pointer:coarse)").matches) || /Android|iPhone|iPad/i.test(navigator.userAgent); }
   function canCopyImg() { return !!(navigator.clipboard && navigator.clipboard.write && window.ClipboardItem); }
-  function T(k) { try { return (window.NMS_T ? NMS_T(k) : k); } catch (e) { return k; } }
+  function T(k, v) { try { return (window.NMS_T ? NMS_T(k, v) : k.replace(/\{(\w+)\}/g, function (m, n) { return v && v[n] != null ? v[n] : m; })); } catch (e) { return k; } }
   var OPTS = [
     ["native", "📱 Share to an app", "Opens your device's share menu with the picture and the fly-there link."],
     ["copyimg", "📋 Copy picture", "Copies the picture. Paste it (Ctrl+V or long-press) into Discord, Reddit, WhatsApp or anywhere. The portal glyphs and hex are on the picture."],
@@ -187,6 +187,13 @@
     SH.querySelector(".shmsg").textContent = "";
   }
   function msg(t) { SH.querySelector(".shmsg").textContent = t; if (window.toast) toast(t); }
+  /* 2026-10-30 (Tony): after 'Copy picture' say how to paste it -- Ctrl+V / Cmd+V on computers, long-press on phones */
+  function pasteHint() {
+    var touch = window.matchMedia && matchMedia("(pointer: coarse)").matches;
+    if (touch) return T("✓ Picture copied — long-press the message box and tap Paste");
+    var mac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
+    return T("✓ Picture copied — click the message box and press {k} (or right-click → Paste)", { k: mac ? "⌘V" : "Ctrl+V" });
+  }
   function close() {
     if (!SH || SH.hidden) return;
     SH.hidden = true;
@@ -215,13 +222,13 @@
         msg(T("✓ Sent to your share menu"));
       } else if (v === "copyimg") {
         ok = await copyImg();
-        if (ok) msg(T("✓ Picture copied — paste it anywhere"));
+        if (ok) msg(pasteHint());
         else { save(); await copyText(c.text); msg(T("✓ Picture saved · link copied")); }
       } else if (v === "discord") {
         ok = await copyImg();
         if (!ok) { save(); await copyText(c.text); }
         var w = window.open("https://discord.com/app", "_blank", "noopener");
-        msg(ok ? T("✓ Picture copied — paste it in any server or DM") : T("✓ Picture saved · message copied — paste it in any server or DM"));
+        msg(ok ? pasteHint() : T("✓ Picture saved · message copied — paste it in any server or DM"));
       } else if (v === "reddit") {
         window.open("https://www.reddit.com/submit?url=" + enc(c.url) + "&title=" + enc(c.title + " · " + c.gname + " · portal " + c.addr), "_blank", "noopener");
         save(); msg(T("✓ Picture saved · add it to your post"));
