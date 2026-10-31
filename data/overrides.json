@@ -80800,7 +80800,7 @@
         "hasStation": true,
         "stationName": "[THC] Amarino Station",
         "allianceName": "The Gray Council",
-        "stationPhoto": "https://raw.githubusercontent.com/elegra1965-source/nms-galactic-map/main/user-screenshots/255-126100000000-station-mvw22iiz-3bfgp1.jpg",
+        "stationPhoto": "https://raw.githubusercontent.com/elegra1965-source/nms-galactic-map/main/user-screenshots/255-126100000000-station-mvw23ai8-16ymgi.jpg",
         "signals": [],
         "editorName": "OldSaltySak",
         "editorFriendCode": "H0ZJ-YBTF-C5TRR",
@@ -80877,7 +80877,7 @@
           }
         ]
       },
-      "editedAt": "2026-10-31T07:04:16.197Z",
+      "editedAt": "2026-10-31T07:04:52.418Z",
       "editedByIp": "ip_ccb0c5b18693a005",
       "history": [
         {
@@ -80899,6 +80899,10 @@
         {
           "at": "2026-10-31T07:04:16.197Z",
           "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-10-31T07:04:52.418Z",
+          "text": "edited by a traveller"
         }
       ]
     }
@@ -80910,7 +80914,8 @@
       1793429141061,
       1793429173942,
       1793430214554,
-      1793430256197
+      1793430256197,
+      1793430292418
     ]
   },
   "flagLog": {},
