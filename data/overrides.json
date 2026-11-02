@@ -81105,12 +81105,272 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:140F08557D2F": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "[HUB26-40F] Xainron (Dissonant System)",
+        "race": "Vy'keen",
+        "region": "Zodonib Void",
+        "starClass": "X0pf",
+        "stars": [
+          "purple"
+        ],
+        "water": false,
+        "dissonant": true,
+        "giant": false,
+        "econName": "Alchemical",
+        "sell": "43.8",
+        "buy": "-20.2",
+        "econDesc": "Opulent",
+        "conflict": "Pirate Controlled",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": true,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "https://raw.githubusercontent.com/elegra1965-source/nms-galactic-map/main/user-screenshots/9-140F08557D2F-mvyv171q-sfva9t.jpg",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "OldSaltySak",
+        "editorFriendCode": "H0ZJ-YBTF-C5TRR",
+        "genVersion": "1.9.0",
+        "bodies": [
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Mega Exotic",
+            "subtype": "Vile Anomaly",
+            "descriptor": "Invisible Jade Winds",
+            "water": true,
+            "ring": false,
+            "ringSet": true,
+            "resources": [
+              "Sodium"
+            ],
+            "flora": [
+              "Fill"
+            ],
+            "fauna": [
+              "Copious"
+            ],
+            "minerals": [
+              "Quartzite",
+              "Ammonia"
+            ],
+            "salvage": [
+              "Salvageable scrap"
+            ],
+            "fossils": [
+              "Swarm Debris",
+              "Dissonance Detected"
+            ],
+            "sentinel": "Limited",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Barren",
+            "subtype": "Abandoned",
+            "descriptor": "Silent",
+            "water": false,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Cobalt"
+            ],
+            "flora": [
+              "Not Present"
+            ],
+            "fauna": [
+              "Undetected"
+            ],
+            "minerals": [
+              "Quartzite",
+              "Rusted Metal"
+            ],
+            "salvage": [],
+            "fossils": [
+              "Ancient Bones",
+              "Dissonance Detected"
+            ],
+            "sentinel": "Irregular Patrols",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Toxic",
+            "subtype": "Acrid",
+            "descriptor": "Occasional Acid Storms",
+            "water": false,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Salt"
+            ],
+            "flora": [
+              "Copious"
+            ],
+            "fauna": [
+              "Full"
+            ],
+            "minerals": [
+              "Fungal Mould",
+              "Ammonia",
+              "Qu"
+            ],
+            "salvage": [],
+            "fossils": [
+              "Ancient Bones"
+            ],
+            "sentinel": "Limited",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Frozen",
+            "subtype": "Arctic",
+            "descriptor": "Ice Storms",
+            "water": true,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Cobalt"
+            ],
+            "flora": [
+              "Full"
+            ],
+            "fauna": [
+              "Generous"
+            ],
+            "minerals": [
+              "Frost Crystal",
+              "Dioxite",
+              "Quartzite"
+            ],
+            "salvage": [
+              "Salvageable scrap"
+            ],
+            "fossils": [],
+            "sentinel": "Intermittent",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Mega Exotic",
+            "subtype": "Harsh Blue Globe",
+            "descriptor": "Electric Rain",
+            "water": true,
+            "ring": false,
+            "ringSet": true,
+            "resources": [
+              "Silver"
+            ],
+            "flora": [
+              "Bountiful"
+            ],
+            "fauna": [
+              "Frequent"
+            ],
+            "minerals": [
+              "Dioxite",
+              "Quartzite"
+            ],
+            "salvage": [],
+            "fossils": [
+              "Ancient Bones"
+            ],
+            "sentinel": "Minimal",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Barren",
+            "subtype": "Wind-swept",
+            "descriptor": "Atmospheric Heat Instabilities",
+            "water": false,
+            "ring": false,
+            "ringSet": true,
+            "resources": [
+              "Cobalt"
+            ],
+            "flora": [
+              "Ample"
+            ],
+            "fauna": [
+              "Abundant"
+            ],
+            "minerals": [
+              "Pyrite",
+              "Quartzite",
+              "Cactus Flesh"
+            ],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Isolated",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          }
+        ]
+      },
+      "editedAt": "2026-11-02T06:10:35.781Z",
+      "editedByIp": "ip_6e2268263f437c22",
+      "history": [
+        {
+          "at": "2026-11-02T06:10:35.781Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "ip_6e2268263f437c22": [
-      1793596561135
+      1793596561135,
+      1793599835781
     ]
   },
   "flagLog": {},
@@ -81162,7 +81422,9 @@
       "Limited",
       "Uncommon",
       "Intermittent",
-      "Few"
+      "Few",
+      "Fill",
+      "Not Present"
     ],
     "fauna": [
       "Devoid",
@@ -81188,7 +81450,8 @@
       "Not Present",
       "Limited",
       "None",
-      "Medium"
+      "Medium",
+      "Undetected"
     ],
     "minerals": [
       "Magnatised Ferrite",
@@ -81224,7 +81487,8 @@
       "Storm Crystals",
       "Emeril",
       "Runaway Mould",
-      "Faecium"
+      "Faecium",
+      "Qu"
     ],
     "salvage": [
       "Salvageable scrap",
@@ -81307,7 +81571,12 @@
       "Alkaline Cloudbursts",
       "Stinging Atmosphere",
       "Passing Toxic Fronts",
-      "Permafrost"
+      "Permafrost",
+      "Invisible Jade Winds",
+      "Silent",
+      "Occasional Acid Storms",
+      "Ice Storms",
+      "Electric Rain"
     ],
     "biome": [
       "Radioactive",
@@ -81323,7 +81592,8 @@
       "Toxic",
       "Usually Mild",
       "Exotic",
-      "Marsh"
+      "Marsh",
+      "Mega Exotic"
     ],
     "subtype": [
       "Viridescent",
@@ -81371,7 +81641,11 @@
       "Corrosive",
       "Violent",
       "Foggy",
-      "Flame-Ruptured"
+      "Flame-Ruptured",
+      "Vile Anomaly",
+      "Arctic",
+      "Harsh Blue Globe",
+      "Wind-swept"
     ],
     "signalName": [
       "MS Jiokaz XIV",
