@@ -80776,7 +80776,7 @@
       "flaggedFields": [],
       "disputedFields": [],
       "data": {
-        "name": "[THC] Amarino",
+        "name": "[TGC] Amarino",
         "race": "Korvax",
         "region": "Muxali Terminus",
         "starClass": "F8",
@@ -80881,8 +80881,8 @@
           }
         ]
       },
-      "editedAt": "2026-10-31T07:04:52.418Z",
-      "editedByIp": "ip_ccb0c5b18693a005",
+      "editedAt": "2026-11-02T07:42:58.406Z",
+      "editedByIp": "ip_6e2268263f437c22",
       "history": [
         {
           "at": "2026-10-31T06:45:08.179Z",
@@ -80906,6 +80906,10 @@
         },
         {
           "at": "2026-10-31T07:04:52.418Z",
+          "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-11-02T07:42:58.406Z",
           "text": "edited by a traveller"
         }
       ]
@@ -81377,7 +81381,8 @@
   "reports": [],
   "ipLog": {
     "ip_6e2268263f437c22": [
-      1793604194782
+      1793604194782,
+      1793605378406
     ]
   },
   "flagLog": {},
