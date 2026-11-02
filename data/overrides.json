@@ -81111,7 +81111,7 @@
       "flaggedFields": [],
       "disputedFields": [],
       "data": {
-        "name": "[HUB26-40F] Xainron (Dissonant System)",
+        "name": "[HUB26-40F] Xainron - Dissonant System",
         "race": "Vy'keen",
         "region": "Zodonib Void",
         "starClass": "X0pf",
@@ -81356,11 +81356,15 @@
           }
         ]
       },
-      "editedAt": "2026-11-02T06:10:35.781Z",
+      "editedAt": "2026-11-02T06:11:41.162Z",
       "editedByIp": "ip_6e2268263f437c22",
       "history": [
         {
           "at": "2026-11-02T06:10:35.781Z",
+          "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-11-02T06:11:41.162Z",
           "text": "edited by a traveller"
         }
       ]
@@ -81370,7 +81374,8 @@
   "ipLog": {
     "ip_6e2268263f437c22": [
       1793596561135,
-      1793599835781
+      1793599835781,
+      1793599901162
     ]
   },
   "flagLog": {},
