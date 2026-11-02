@@ -79848,7 +79848,7 @@
       "flaggedFields": [],
       "disputedFields": [],
       "data": {
-        "name": "[TGC] Tichero-Quka",
+        "name": "[TGC] Tichero-Quka. (Phantom Star)",
         "race": "Gek",
         "region": "Sea of Mugabune",
         "starClass": "G4",
@@ -80083,8 +80083,8 @@
           }
         ]
       },
-      "editedAt": "2026-10-28T09:35:45.113Z",
-      "editedByIp": "ip_64a9415962d14c6d",
+      "editedAt": "2026-11-02T07:23:14.782Z",
+      "editedByIp": "ip_6e2268263f437c22",
       "history": [
         {
           "at": "2026-10-28T09:22:30.294Z",
@@ -80096,6 +80096,10 @@
         },
         {
           "at": "2026-10-28T09:35:45.113Z",
+          "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-11-02T07:23:14.782Z",
           "text": "edited by a traveller"
         }
       ]
@@ -81373,9 +81377,7 @@
   "reports": [],
   "ipLog": {
     "ip_6e2268263f437c22": [
-      1793596561135,
-      1793599835781,
-      1793599901162
+      1793604194782
     ]
   },
   "flagLog": {},
