@@ -81376,13 +81376,163 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:13FAFC5ADC38": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Husfad",
+        "race": "Korvax",
+        "region": "Oneikkoly",
+        "starClass": "Y4p",
+        "stars": [
+          "purple",
+          "red"
+        ],
+        "water": true,
+        "dissonant": true,
+        "giant": false,
+        "econName": "Mining",
+        "sell": "-25.3",
+        "buy": "77.2",
+        "econDesc": "Prosperous",
+        "conflict": "Medium",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "https://raw.githubusercontent.com/elegra1965-source/nms-galactic-map/main/user-screenshots/0-13FAFC5ADC38-mw1016w5-n918f0.jpg",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "",
+        "editorFriendCode": "",
+        "genVersion": "1.9.0",
+        "bodies": [
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Radioactive",
+            "subtype": "",
+            "descriptor": "Reactive Rain",
+            "water": true,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Salt"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Irregular Patrols",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Lush",
+            "subtype": "",
+            "descriptor": "Blistering Damp",
+            "water": true,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Gold"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Rebellious",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Mega Exotic",
+            "subtype": "",
+            "descriptor": "Bilious Storms",
+            "water": true,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Cobalt"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Ever-present",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Water World",
+            "subtype": "",
+            "descriptor": "Coastal Storms",
+            "water": true,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Silver"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Require Obedience",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          }
+        ]
+      },
+      "editedAt": "2026-11-03T18:06:05.947Z",
+      "editedByIp": "ip_180e5c269f8e03fc",
+      "history": [
+        {
+          "at": "2026-11-03T18:06:05.947Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
-    "ip_6e2268263f437c22": [
-      1793604194782,
-      1793605378406
+    "ip_180e5c269f8e03fc": [
+      1793729165947
     ]
   },
   "flagLog": {},
@@ -81588,7 +81738,9 @@
       "Silent",
       "Occasional Acid Storms",
       "Ice Storms",
-      "Electric Rain"
+      "Electric Rain",
+      "Bilious Storms",
+      "Coastal Storms"
     ],
     "biome": [
       "Radioactive",
@@ -81605,7 +81757,8 @@
       "Usually Mild",
       "Exotic",
       "Marsh",
-      "Mega Exotic"
+      "Mega Exotic",
+      "Water World"
     ],
     "subtype": [
       "Viridescent",
