@@ -81727,12 +81727,259 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "249:15930201DA21": {
+      "galaxy": 249,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Chlagal-Ulenq",
+        "race": "Vy'keen",
+        "region": "Nodlithip Mass",
+        "starClass": "F8p",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Power Generation",
+        "sell": "75.3",
+        "buy": "-11.0",
+        "econDesc": "Adequate",
+        "conflict": "Intermittent",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Star Wolf SwimSIR MOGLEY",
+        "editorFriendCode": "",
+        "genVersion": "1.9.0",
+        "bodies": [
+          {
+            "name": "Dwich III",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Lush",
+            "subtype": "Bountiful",
+            "descriptor": "Boiling Superstorms",
+            "water": false,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Activated Copper",
+              "Star Bulb",
+              "Sodium"
+            ],
+            "flora": [
+              "Scarce"
+            ],
+            "fauna": [
+              "Sparse"
+            ],
+            "minerals": [
+              "Paraffinium"
+            ],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Threatening",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "Ewickhil XVI",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Exotic",
+            "subtype": "Hexagonal",
+            "descriptor": "Internal Rain",
+            "water": true,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Magnetised Ferrite",
+              "Gold",
+              "Copper"
+            ],
+            "flora": [
+              "Lost"
+            ],
+            "fauna": [
+              "uprooted"
+            ],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Infrequent",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "Table",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Barren",
+            "subtype": "Dusty",
+            "descriptor": "Dry Gusts",
+            "water": false,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Salt",
+              "Copper"
+            ],
+            "flora": [
+              "Ample"
+            ],
+            "fauna": [
+              "Full"
+            ],
+            "minerals": [
+              "Cactus Flesh",
+              "Pyrite"
+            ],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Minimal",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "Moch V",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Barren",
+            "subtype": "",
+            "descriptor": "Infrequent Dust Storms",
+            "water": true,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Salt",
+              "Copper"
+            ],
+            "flora": [
+              "Limited"
+            ],
+            "fauna": [
+              "Generous"
+            ],
+            "minerals": [
+              "Cactus Flesh",
+              "Pyrite"
+            ],
+            "salvage": [
+              "Salvageable scrap"
+            ],
+            "fossils": [],
+            "sentinel": "Intermittent",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "Hostu G41",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Lush",
+            "subtype": "Paradise",
+            "descriptor": "Mild Rain",
+            "water": false,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Copper"
+            ],
+            "flora": [
+              "Frequent"
+            ],
+            "fauna": [
+              "moderate"
+            ],
+            "minerals": [
+              "Star Bulb",
+              "Silver",
+              "Paraffinium"
+            ],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Infrequent",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "Uwaj 82/K5",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Lush",
+            "subtype": "Bountiful",
+            "descriptor": "Painfully Hot Rain",
+            "water": true,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Silver",
+              "Copper"
+            ],
+            "flora": [
+              "Frequent"
+            ],
+            "fauna": [
+              "Bountiful"
+            ],
+            "minerals": [
+              "Star Bulb"
+            ],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Minimal",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          }
+        ]
+      },
+      "editedAt": "2026-11-04T01:05:45.346Z",
+      "editedByIp": "ip_d566fe76d781cc2b",
+      "history": [
+        {
+          "at": "2026-11-04T01:05:45.346Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
-    "ip_af9e92280cec12b7": [
-      1793748563213
+    "ip_d566fe76d781cc2b": [
+      1793754345346
     ]
   },
   "flagLog": {},
@@ -81813,7 +82060,9 @@
       "Limited",
       "None",
       "Medium",
-      "Undetected"
+      "Undetected",
+      "uprooted",
+      "moderate"
     ],
     "minerals": [
       "Magnatised Ferrite",
@@ -81943,7 +82192,12 @@
       "Coastal Storms",
       "Radioactive Damp",
       "Lethal Humidity Outbreaks",
-      "Boiling Puddles"
+      "Boiling Puddles",
+      "Boiling Superstorms",
+      "Internal Rain",
+      "Dry Gusts",
+      "Infrequent Dust Storms",
+      "Painfully Hot Rain"
     ],
     "biome": [
       "Radioactive",
@@ -82013,7 +82267,10 @@
       "Vile Anomaly",
       "Arctic",
       "Harsh Blue Globe",
-      "Wind-swept"
+      "Wind-swept",
+      "Bountiful",
+      "Hexagonal",
+      "Dusty"
     ],
     "signalName": [
       "MS Jiokaz XIV",
