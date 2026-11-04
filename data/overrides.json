@@ -81924,7 +81924,9 @@
               "Paraffinium"
             ],
             "salvage": [],
-            "fossils": [],
+            "fossils": [
+              "floating islands"
+            ],
             "sentinel": "Infrequent",
             "autophage": false,
             "reliquary": false,
@@ -81966,7 +81968,7 @@
           }
         ]
       },
-      "editedAt": "2026-11-04T01:15:23.231Z",
+      "editedAt": "2026-11-04T01:32:08.333Z",
       "editedByIp": "ip_d566fe76d781cc2b",
       "history": [
         {
@@ -81976,6 +81978,10 @@
         {
           "at": "2026-11-04T01:15:23.231Z",
           "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-11-04T01:32:08.333Z",
+          "text": "edited by a traveller"
         }
       ]
     }
@@ -81984,7 +81990,8 @@
   "ipLog": {
     "ip_d566fe76d781cc2b": [
       1793754345346,
-      1793754923231
+      1793754923231,
+      1793755928333
     ]
   },
   "flagLog": {},
@@ -82118,7 +82125,8 @@
       "Ancient Bones",
       "Vile Brood",
       "Dissonance Detected",
-      "Swarm Debris"
+      "Swarm Debris",
+      "floating islands"
     ],
     "descriptor": [
       "Eternal Cyclones",
