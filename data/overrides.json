@@ -82705,14 +82705,225 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "249:19A234CD5433": {
+      "galaxy": 249,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Wumainin XVII",
+        "race": "Korvax",
+        "region": "Avdeyevis Conflux",
+        "starClass": "O8",
+        "stars": [
+          "blue",
+          "purple"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Material Fusion",
+        "sell": "79.7",
+        "buy": "-26.2",
+        "econDesc": "Adequate",
+        "conflict": "Formidable",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Star Wolf SwimSIR MOGLEY",
+        "editorFriendCode": "",
+        "genVersion": "1.9.0",
+        "bodies": [
+          {
+            "name": "Satt Omega",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Barren",
+            "subtype": "Desolate",
+            "descriptor": "Infrequent Heat Storms",
+            "water": true,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Cobalt",
+              "Copper"
+            ],
+            "flora": [
+              "High"
+            ],
+            "fauna": [
+              "high"
+            ],
+            "minerals": [
+              "Pyrite",
+              "Cactus Flesh"
+            ],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Limited",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "Agginit",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Exotic",
+            "subtype": "Petrified",
+            "descriptor": "Redacted",
+            "water": false,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Copper",
+              "Gold",
+              "Magnetised Ferrite"
+            ],
+            "flora": [
+              "from Elsewhere"
+            ],
+            "fauna": [
+              "uprooted"
+            ],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Infrequent",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "Amumbor Gamma",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Lush",
+            "subtype": "Grassy",
+            "descriptor": "Broiling Humidity",
+            "water": false,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Sodium",
+              "Activated Copper"
+            ],
+            "flora": [
+              "Sporadic"
+            ],
+            "fauna": [
+              "Abundant"
+            ],
+            "minerals": [
+              "Paraffinium"
+            ],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Remote",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "Nugkongh",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Barren",
+            "subtype": "",
+            "descriptor": "Dust-Choked Winds",
+            "water": false,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Silver",
+              "Copper"
+            ],
+            "flora": [
+              "Full"
+            ],
+            "fauna": [
+              "Bountiful"
+            ],
+            "minerals": [
+              "Cactus Flesh",
+              "Pyrite"
+            ],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Isolated",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "Sahik 58/Z8",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Lush",
+            "subtype": "Paradise",
+            "descriptor": "Light Showers",
+            "water": false,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Sodium",
+              "Copper"
+            ],
+            "flora": [
+              "Abundant"
+            ],
+            "fauna": [
+              "Typical"
+            ],
+            "minerals": [
+              "Paraffinium",
+              "Star Bulb"
+            ],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Low Security",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          }
+        ]
+      },
+      "editedAt": "2026-11-04T22:48:06.477Z",
+      "editedByIp": "ip_d566fe76d781cc2b",
+      "history": [
+        {
+          "at": "2026-11-04T22:48:06.477Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
-    "ip_b60c27451dcfb473": [
-      1793812103736,
-      1793812133814,
-      1793812323438
+    "ip_d566fe76d781cc2b": [
+      1793832486477
     ]
   },
   "flagLog": {},
@@ -82766,7 +82977,8 @@
       "Intermittent",
       "Few",
       "Fill",
-      "Not Present"
+      "Not Present",
+      "from Elsewhere"
     ],
     "fauna": [
       "Devoid",
@@ -82795,7 +83007,8 @@
       "Medium",
       "Undetected",
       "uprooted",
-      "moderate"
+      "moderate",
+      "high"
     ],
     "minerals": [
       "Magnatised Ferrite",
@@ -82945,7 +83158,8 @@
       "Billowing Dust Storms",
       "Choking Humidity",
       "Pleasant",
-      "Direct Sunlight"
+      "Direct Sunlight",
+      "Dust-Choked Winds"
     ],
     "biome": [
       "Radioactive",
@@ -83019,7 +83233,9 @@
       "Bountiful",
       "Hexagonal",
       "Dusty",
-      "Fragmented Giant"
+      "Fragmented Giant",
+      "Desolate",
+      "Petrified"
     ],
     "signalName": [
       "MS Jiokaz XIV",
