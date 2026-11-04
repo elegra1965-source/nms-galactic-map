@@ -33,7 +33,7 @@ real planet data from NMS Almanac and Voyager's Haven.
 
 ## What can this map do?
 
-New here? Hit **▷ Tour** in the map's toolbar for an 11-step guided walk-through.
+New here? Hit **▷ Tour** in the map's toolbar (on a phone it's under **… More**) for an 11-step guided walk-through (12 on a phone).
 
 The last two tour steps are **Your language** (🌐) and **Accessibility**. The Traveller Discoveries, Navigator and other scrolling pages have the same teal ⇧ back-to-top arrow as every Hub site.
 
@@ -542,7 +542,8 @@ asked.
 <details>
 <summary><strong>👥 Community: discoveries, trending, privacy</strong> — Recently charted, Discoveries page, Trending, private systems</summary>
 
-**Recently charted.** Beside *Show controls* at the top, a small counter
+**Recently charted.** Under the title, a small counter (on a phone a flip-card that
+turns between today's count, this week's count and the latest system; it holds still while pressed)
 (for example *◈ 4 systems charted today ›*) shows how many systems travellers have
 documented today. Tap it for the list of everything charted in the last 7
 days: system name, who charted it, galaxy, how long ago, and the portal
@@ -553,7 +554,7 @@ people. The Hub's ticker links here with `?recent=1`, which opens the list
 straight away. A small feed for other sites lives at
 `/.netlify/functions/system-edit?recent=1`.
 
-<img src="screenshots/18-recently-charted.jpg" alt="Recently charted list on a phone: the 4 systems charted today counter beside Hide controls, and systems with who charted them, galaxy, time and portal glyphs" width="360">
+<img src="screenshots/18-recently-charted.jpg" alt="Recently charted list on a phone: the 4 systems charted today counter under the title, and systems with who charted them, galaxy, time and portal glyphs" width="360">
 
 **Traveller Discoveries page.** [map.nomansskyhub.app/community](https://map.nomansskyhub.app/community)
 is the public showcase of what players have charted: systems, travellers and
@@ -697,18 +698,22 @@ Copy picture, because the Windows share menu often sends nothing to apps.
 <summary><strong>📱 Phones, app, languages & accessibility</strong> — Installed app, updates, refresh, 8 languages, draggable panels, 404 page</summary>
 
 **Phones: popups don't fight the controls.** Opening Search, Favourites or
-My Routes on a phone hides the controls by itself and docks the box full
-width just under the top row, so results have room to scroll. Show / Hide
-controls leaves it open; its × closes it.
+My Routes on a phone closes the More panel by itself and puts the box just under the controls,
+so results have room to scroll. Its × closes it.
 
 ![Search with a pasted portal address and Route here, then the plotted course](screenshots/32-route-here.jpg)
 
-**Phone controls tidy themselves away.** On a phone, "Show controls" only needs
-one tap: the controls (and the glyph keypad) hide again by themselves after a
-jump, Random, a search or favourite pick, Enter system, opening Filters, or a tap
-on the map. Toggles like Labels, Grid and Orbit leave them open. While they're
-open the system banner steps aside so it doesn't sit on the info panel, and
-Filters always scrolls inside its own box above the info panel.
+**Phone controls, tidied.** On a phone the controls are four short rows (title, language and
+settings; the charted flip-card and Trending; galaxy, type and Galaxy | Local; Random, the hex
+address and Clear), then Glyphs, Search, Jump, Routes, Filters and **… More**. More opens a
+panel over the map with Navigation (Favourites, Warp FX, a *Traveller discoveries* link that asks
+before opening the Hub in a new tab), Map display (Labels, Grid, Orbit, Camera, **Galactic Atlas**,
+the Hello Games points-of-interest overlay) and Exploration (Tour, About, Install app, Reviews &
+feedback). More closes by itself after Favourites, Tour, About or Feedback, after a jump or
+search, and with a tap on the map; Labels, Grid and Orbit leave it open. The bar is about
+half as tall as before, so far more of the map shows. Wider screens keep the one-row toolbar.
+
+<img src="screenshots/35-phone-controls.jpg" alt="The map on a phone: the four short control rows with the charted flip-card and Trending (left), and the More panel open over the map with Navigation, Map display and Exploration (right)" width="560">
 
 **Accessibility.** Four font-size presets, a high-contrast mode, and real
 Daltonization colour-correction (not simulation) for protanopia, deuteranopia,
@@ -734,7 +739,7 @@ the long Full guide in About is English for now and says so. It lives in
 
 <img src="screenshots/34-patch-notes.jpg" alt="The patch notes pop-up on a phone: System update received, Patch notes with the version, and the list of changes with NEW and IMPROVED tags" width="390">
 
-**⟳ Refresh.** In the installed app there's no browser reload button (and pull-to-refresh doesn't work everywhere), so a small ⟳ button sits on the Hide controls row under the title. Tap it and it checks for a new version and reloads in place, on the same view. It only shows in the installed app. After a big batch of updates, the first open on that day says “✓ Updated · that's the last update today”, so nobody wonders if more pop-ups are coming. The old nms-galaxy-map.netlify.app address now sends search engines here with a permanent (301) redirect.
+**⟳ Refresh.** In the installed app there's no browser reload button (and pull-to-refresh doesn't work everywhere), so a small ⟳ button sits in the top row beside the language button. Tap it and it checks for a new version and reloads in place, on the same view. It only shows in the installed app. After a big batch of updates, the first open on that day says “✓ Updated · that's the last update today”, so nobody wonders if more pop-ups are coming. The old nms-galaxy-map.netlify.app address now sends search engines here with a permanent (301) redirect.
 
 **Draggable panels.** Filters, the system info panel, Course plotted, the
 Warp Manifest, the glyph keypad, Search, Edit system, and Accessibility can
@@ -761,7 +766,7 @@ recover, it says so plainly instead of guessing.
 ![Custom 404 page: a Hyperdrive Fault screen reading "Jump failed -- no system at this address", showing the recovered hex address 1CF0EE90BFFA next to its 12-glyph strip](screenshots/16-404-jump-failed.jpg)
 
 
-- **★ Reviews & feedback.** The crystal ★ button on the toolbar, between About and ⚙ (it replaces the old GitHub-issue form in About; Report this system is unchanged; the tour has a step for it), opens the same pop-up as the Hub: leave a review (stars, and an "OK to show" switch), report a bug (your device type and browser are added so it can be fixed faster) or ask for something new. This site is ticked for you. Everything goes to elegra1965 through the Hub, and nothing shows on the site without his OK. In all 8 languages; the question at the top now reads "What's it about, traveller?". About now ends with a 1-2-3 button pyramid, every row the same width: **Got it**, then **Take a quick tour** + **Share this map** (your phone's share menu, or copies the link), then **X · Reddit · Discord**.
+- **★ Reviews & feedback.** The crystal ★ button on the toolbar (on a phone, the bottom of the More panel) (it replaces the old GitHub-issue form in About; Report this system is unchanged; the tour has a step for it), opens the same pop-up as the Hub: leave a review (stars, and an "OK to show" switch), report a bug (your device type and browser are added so it can be fixed faster) or ask for something new. This site is ticked for you. Everything goes to elegra1965 through the Hub, and nothing shows on the site without his OK. In all 8 languages; the question at the top now reads "What's it about, traveller?". About now ends with a 1-2-3 button pyramid, every row the same width: **Got it**, then **Take a quick tour** + **Share this map** (your phone's share menu, or copies the link), then **X · Reddit · Discord**.
 
   <img src="screenshots/33-reviews-feedback.jpg" alt="About with the Reviews and feedback button, and the pop-up it opens, on a phone" width="560">
 
@@ -1017,7 +1022,7 @@ for the full table and what it doesn't cover.
 <details id="guided-tour">
 <summary><strong>Guided tour</strong></summary>
 
-**▷ Tour** in the toolbar (or "Take a quick tour" on the first-visit box) walks through the map in 11 spotlight steps (the last two: your language and accessibility). On phones with the controls hidden, the tour opens them for you, follows the buttons as they slide in, and folds them away again when it ends. The phone's Back button closes it.
+**▷ Tour** in the toolbar (or "Take a quick tour" on the first-visit box) walks through the map in 11 spotlight steps (the last two: your language and accessibility). On a phone one extra step points at **… More**, and the steps for buttons inside it open the panel for you and close it again when the tour ends. The phone's Back button closes it.
 
 <img src="screenshots/27-tour.jpg" alt="Tour step 5 of 10, No address handy?, spotlighting the Glyphs button on a phone" width="300">
 

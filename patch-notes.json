@@ -18,6 +18,19 @@
    }
   },
   {
+   "tag": "improved",
+   "text": {
+    "en": "Phone controls tidied: four short rows plus a More panel, so the map fills much more of your screen",
+    "es": "Controles del móvil reorganizados: cuatro filas cortas y un panel Más, para que el mapa ocupe mucho más de la pantalla",
+    "de": "Steuerung am Handy aufgeräumt: vier kurze Zeilen plus ein „Mehr“-Panel, die Karte nimmt viel mehr vom Bildschirm ein",
+    "nl": "Bediening op telefoon opgeruimd: vier korte rijen plus een Meer-paneel, zodat de kaart veel meer scherm krijgt",
+    "pl": "Uporządkowane sterowanie na telefonie: cztery krótkie rzędy i panel Więcej, dzięki czemu mapa zajmuje dużo więcej ekranu",
+    "fr": "Commandes du téléphone remises en ordre : quatre lignes courtes et un panneau Plus, pour que la carte occupe bien plus d'écran",
+    "pt-BR": "Controles do celular organizados: quatro linhas curtas e um painel Mais, para o mapa ocupar bem mais da tela",
+    "it": "Controlli del telefono riordinati: quattro righe corte e un pannello Altro, così la mappa occupa molto più schermo"
+   }
+  },
+  {
    "tag": "new",
    "text": {
     "en": "Trending and Top surveyors #1–3 now win medals. Open yours to download or share it",

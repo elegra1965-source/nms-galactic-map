@@ -56,6 +56,12 @@
     if(!items.length){ line.hidden = true; return; }
     var sys = function(v){ return v === 1 ? " system" : " systems"; };
     line.textContent = "◈ " + (today ? today + sys(today) + " charted today" : items.length + sys(items.length) + " charted this week") + " ›";
+    /* B7 (2026-11-04): the phone flip-card (phone-controls.js) turns between these faces */
+    var faces = [line.textContent];
+    if(today && items.length > today) faces.push("◈ " + items.length + sys(items.length) + " charted this week ›");
+    faces.push("◈ Latest: " + items[0].name + " ›");
+    window.NMS_CHARTED_FACES = faces;
+    document.dispatchEvent(new CustomEvent("nms-charted-faces"));
     line.setAttribute("aria-label", today + " systems charted today, " + items.length + " this week. Show the list.");
     line.hidden = false;
     if(sub) sub.textContent = "Systems travellers documented on this map: " + today + " today · " + items.length + " this week. Tap one to fly there.";
