@@ -413,7 +413,7 @@ button:hover,button:focus-visible{border-color:var(--cyan);outline:none}
     owners.forEach(function(o){
       var keys = Object.keys(o.systems || {});
       var hit = !q || o.code.indexOf(q) >= 0 || String(o.name).toUpperCase().indexOf(q) >= 0 ||
-        keys.some(function(k){ return k.indexOf(q) >= 0 || String(o.systems[k].name).toUpperCase().indexOf(q) >= 0; });
+        keys.some(function(k){ return k.indexOf(q) >= 0 || String(o.systems[k].name).toUpperCase().indexOf(q) >= 0 || String(o.systems[k].editorName).toUpperCase().indexOf(q) >= 0; });
       if(!hit) return;
       shown++;
       var c = el("article","card"); c.style.gridTemplateRows = "auto";
@@ -421,7 +421,9 @@ button:hover,button:focus-visible{border-color:var(--cyan);outline:none}
       var head = el("div","cn"); head.appendChild(el("span", null, o.code)); head.style.color = "var(--gold, #f0a500)"; head.style.letterSpacing = ".08em";
       b.appendChild(head);
       var meta = el("div","meta");
-      meta.appendChild(el("span", null, o.name ? "Traveller: " + o.name : "No name given"));
+      var who = o.name || "";
+      if(!who) keys.some(function(k){ who = (o.systems[k].editorName || "").trim(); return !!who; });
+      meta.appendChild(el("span", null, who ? "Traveller: " + who : "No name given"));
       meta.appendChild(el("span", null, keys.length + (keys.length === 1 ? " system" : " systems")));
       meta.appendChild(el("span", null, "Updated " + String(o.updatedAt || "").slice(0,16).replace("T"," ")));
       b.appendChild(meta);
@@ -431,6 +433,8 @@ button:hover,button:focus-visible{border-color:var(--cyan);outline:none}
         var m2 = el("div","meta");
         m2.appendChild(el("b", null, s.name || "Unnamed system"));
         m2.appendChild(el("span", null, GAL[g] || ("Galaxy " + (g+1))));
+        if(s.editorName) m2.appendChild(el("span", null, "Documented by " + s.editorName));
+        if(s.savedAt) m2.appendChild(el("span", null, "Saved " + String(s.savedAt).slice(0,16).replace("T"," ")));
         if(s.photos) m2.appendChild(el("span","chip gold", s.photos + (s.photos === 1 ? " photo" : " photos")));
         row.appendChild(m2);
         var gl = el("div","glyphs"); gl.setAttribute("aria-label","Portal address " + addr);
