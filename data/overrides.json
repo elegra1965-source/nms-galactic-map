@@ -82517,13 +82517,188 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:106103665D27": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "[Disc1-61] Discovery Capital",
+        "race": "Vy'keen",
+        "region": "Vumbarn Conflux",
+        "starClass": "G5",
+        "stars": [
+          "yellow",
+          "purple"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Metal Processing",
+        "sell": "-17.9",
+        "buy": "77.9",
+        "econDesc": "Booming",
+        "conflict": "Perilous",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "",
+        "editorFriendCode": "",
+        "genVersion": "1.9.0",
+        "bodies": [
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Barren",
+            "subtype": "",
+            "descriptor": "Billowing Dust Storms",
+            "water": false,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Magnetised Ferrite"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Enforcing",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Radioactive",
+            "subtype": "",
+            "descriptor": "Unstable Atmosphere",
+            "water": true,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Gold"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Minimal",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Lush",
+            "subtype": "",
+            "descriptor": "Choking Humidity",
+            "water": true,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Sodium"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Intermittent",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Lush",
+            "subtype": "",
+            "descriptor": "Pleasant",
+            "water": false,
+            "ring": "tan",
+            "ringSet": false,
+            "resources": [
+              "Magnetised Ferrite"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Low Security",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Scorched",
+            "subtype": "",
+            "descriptor": "Direct Sunlight",
+            "water": false,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Silver"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Sparse",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          }
+        ]
+      },
+      "editedAt": "2026-11-04T10:02:37.721Z",
+      "editedByIp": "ip_b60c27451dcfb473",
+      "history": [
+        {
+          "at": "2026-11-04T10:02:37.721Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
-    "ip_180e5c269f8e03fc": [
-      1793774001398,
-      1793774623272
+    "ip_b60c27451dcfb473": [
+      1793786557721
     ]
   },
   "flagLog": {},
@@ -82752,7 +82927,11 @@
       "Indetectable Burning",
       "Invisible Mist",
       "Deadly Pressure Variations",
-      "Unfathomable Storms"
+      "Unfathomable Storms",
+      "Billowing Dust Storms",
+      "Choking Humidity",
+      "Pleasant",
+      "Direct Sunlight"
     ],
     "biome": [
       "Radioactive",
