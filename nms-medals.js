@@ -54,9 +54,9 @@
   };
   // Tony's final settings (positioner v6). Ships deliberately poke out past the rim.
   var SHIP = {
-    bronze:{ img:'ship-shuttle.webp', iw:600, ih:342, x:285, y:220, w:340, rot:-10, ex:405, ey:222 },  /* 2026-10-31 Tony's own Shuttle + Fighter shots */
-    silver:{ img:'ship-fighter.webp', iw:600, ih:295, x:305, y:228, w:340, rot:-17, ex:270, ey:253 },
-    gold:  { img:'ship-exotic-topdown.webp', iw:500, ih:332, x:309, y:197, w:342, rot:-4, ex:420, ey:259 }
+    bronze:{ img:'ship-shuttle.webp', iw:600, ih:342, x:285, y:220, w:340, rot:-10 },  /* 2026-10-31 Tony's own Shuttle + Fighter shots */
+    silver:{ img:'ship-fighter.webp', iw:600, ih:295, x:305, y:228, w:340, rot:-17 },
+    gold:  { img:'ship-exotic-topdown.webp', iw:500, ih:332, x:309, y:197, w:342, rot:-4 }
   };
   var C = window.NMSMedals_CONFIG || {};
   var cfg = {
@@ -88,6 +88,19 @@
     return el('path', a, p);
   }
   function rnd(seed){ return function(){ seed = (seed * 16807) % 2147483647; return seed / 2147483647; }; }
+
+  /* star trail geometry (Tony's Lab settings, FLY[metal]): from the corner star to the ship's engine tip.
+     end = the engine point (engX/engY in the ship's frame) + (tx,ty); tilts 0 = tangent straight down. */
+  function engineEnd(m){
+    var S = SHIP[m], P = FLY[m], r = S.rot * Math.PI / 180;
+    return { x: S.x + P.engX * Math.cos(r) - P.engY * Math.sin(r) + P.tx, y: S.y + P.engX * Math.sin(r) + P.engY * Math.cos(r) + P.ty };
+  }
+  function trailD(P, wx, wy){
+    var dx = wx - P.sx, dy = wy - P.sy, len = Math.sqrt(dx * dx + dy * dy) || 1, nx = -dy / len, ny = dx / len, k = len * P.str;
+    var ta = (90 + P.t1) * Math.PI / 180, tb = (90 + P.t2) * Math.PI / 180;
+    return 'M' + P.sx + ' ' + P.sy + ' C ' + (P.sx + Math.cos(ta) * k + nx * P.bend).toFixed(1) + ' ' + (P.sy + Math.sin(ta) * k + ny * P.bend).toFixed(1) + ', ' +
+           (wx - Math.cos(tb) * k + nx * P.bend).toFixed(1) + ' ' + (wy - Math.sin(tb) * k + ny * P.bend).toFixed(1) + ', ' + wx.toFixed(1) + ' ' + wy.toFixed(1);
+  }
   var uidN = 0;
 
   /* ---------- the medal ---------- */
@@ -97,11 +110,12 @@
   function svg(metal, label, o){
     o = o || {};
     var M = METALS[metal] || METALS.gold, S = SHIP[metal] || SHIP.gold, id = 'nm' + (++uidN) + '_';
-    var s = el('svg', { viewBox:'0 0 560 560', role:'img', 'class':'nmsm-svg' + (o.locked ? ' lk' : '') + (o.reveal ? ' rv' : ''), 'aria-label': (o.locked ? T('Locked') + ' · ' : '') + T(metal === 'gold' ? 'Gold medal' : metal === 'silver' ? 'Silver medal' : 'Bronze medal') + (label ? ' · ' + label : '') });
+    var s = el('svg', { viewBox:'0 0 560 560', 'data-metal':metal, role:'img', 'class':'nmsm-svg' + (o.locked ? ' lk' : '') + (o.reveal ? ' rv' : ''), 'aria-label': (o.locked ? T('Locked') + ' · ' : '') + T(metal === 'gold' ? 'Gold medal' : metal === 'silver' ? 'Silver medal' : 'Bronze medal') + (label ? ' · ' + label : '') });
     if(o.size){ s.setAttribute('width', o.size); s.setAttribute('height', o.size); }
+    var FP = FLY[metal] || FLY.gold, SX = FP.sx, SY = FP.sy, EE = engineEnd(FLY[metal] ? metal : 'gold'); // corner star + trail end: Tony's Lab settings
     var d = el('defs', {}, s);
     grad(id + 'disc', M.d, d, true); grad(id + 'face', M.f, d, true); grad(id + 'rim', M.rim, d); grad(id + 'rib', M.rib, d, false, true);
-    var tg = el('linearGradient', { id:id + 'tr', gradientUnits:'userSpaceOnUse', x1:150, y1:105, x2:300, y2:330 }, d);
+    var tg = el('linearGradient', { id:id + 'tr', gradientUnits:'userSpaceOnUse', x1:SX, y1:SY, x2:EE.x, y2:EE.y }, d);
     [[0,'#fff8de',.9],[.25,'#9ff4ff',.25],[.7,'#7fe9ff',.6],[1,'#ffffff',.95]].forEach(function(t){ el('stop', { offset:t[0], 'stop-color':t[1], 'stop-opacity':t[2] }, tg); });
     var f = el('filter', { id:id + 'gl', x:'-50%', y:'-50%', width:'200%', height:'200%' }, d); el('feGaussianBlur', { stdDeviation:6 }, f);
     var sh = el('filter', { id:id + 'sh', x:'-30%', y:'-30%', width:'160%', height:'160%' }, d); el('feDropShadow', { dx:0, dy:10, stdDeviation:10, 'flood-color':'#000', 'flood-opacity':.6 }, sh);
@@ -117,10 +131,10 @@
     for(var i = 0; i < 26; i++){ var a = R() * 6.283, r = Math.sqrt(R()) * 160; el('circle', { cx:280 + Math.cos(a) * r, cy:250 + Math.sin(a) * r, r:.6 + R() * 1.3, fill:'#fff6dc', opacity:.35 + R() * .55 }, sf); }
     [[218,148,.16],[372,170,.12],[336,372,.14],[205,338,.1],[402,268,.09],[262,128,.08]].forEach(function(t, k){ var p = star4(sf, t[0], t[1], t[2], '#fff6dc', .85, 'nmsm-tw'); p.style.animationDelay = (k * .19) + 's'; });
     if(!o.locked){
-      var tp = 'M150 105 C 140 175, ' + (S.ex - 90) + ' ' + (S.ey + 30) + ', ' + S.ex + ' ' + S.ey;
+      var tp = trailD(FP, EE.x, EE.y);
       var tgp = el('g', { 'clip-path':'url(#' + id + 'fc)', 'class':'nmsm-trail' }, all);
-      el('path', { d:tp, fill:'none', stroke:'url(#' + id + 'tr)', 'stroke-width':10, 'stroke-linecap':'round', filter:'url(#' + id + 'gl)', opacity:.8, pathLength:1 }, tgp);
-      el('path', { d:tp, fill:'none', stroke:'url(#' + id + 'tr)', 'stroke-width':3, 'stroke-linecap':'round', pathLength:1 }, tgp);
+      el('path', { d:tp, fill:'none', stroke:'url(#' + id + 'tr)', 'stroke-width':FP.gw, 'stroke-linecap':'round', filter:'url(#' + id + 'gl)', opacity:.8, pathLength:1 }, tgp);
+      el('path', { d:tp, fill:'none', stroke:'url(#' + id + 'tr)', 'stroke-width':FP.tw, 'stroke-linecap':'round', pathLength:1 }, tgp);
     }
     var g = el('g', {}, all), rr = 152;
     [-1, 1].forEach(function(sg){
@@ -137,7 +151,7 @@
     if(!o.locked) el('image', { href:href, x:-W / 2, y:-H / 2, width:W, height:H, filter:'url(#' + id + 'sh)', 'class':'nmsm-ship' }, shipG);
     // black silhouette: the locked look, and the starting point of the reveal (fades out)
     if(o.locked || o.reveal) el('image', { href:href, x:-W / 2, y:-H / 2, width:W, height:H, filter:'url(#' + id + 'bk)', 'class':'nmsm-sil' }, shipG);
-    var sgp = el('g', { transform:'translate(150 105)' }, all);
+    var sgp = el('g', { transform:'translate(' + SX + ' ' + SY + ')' }, all);
     el('path', { d:'M0 -34 L6 -6 L34 0 L6 6 L0 34 L-6 6 L-34 0 L-6 -6Z', fill:'#fff8de', filter:'url(#' + id + 'gl)', opacity:.9, 'class':'nmsm-tw' }, sgp);
     star4(sgp, 0, 0, 1, '#fffbea', 1);
     star4(all, 430, 368, .45, '#fff3c8', .8, 'nmsm-tw').style.animationDelay = '.5s';
@@ -152,10 +166,131 @@
     }
     return s;
   }
+
+  /* ---------- fly-in reveal (2026-11-04, Tony tuned it in the Medal Fly-in Lab) ----------
+     The ship arrives nose first from behind, brakes onto its signed-off spot while the badge
+     goes grey -> colour; an engine glow + wake follow it; on landing: flash, ring (centred,
+     ends at the inner circle), sparkles, a little shake, rim pulse; then the star trail
+     draws. Everything is a function of time t. Tap = jump to the finished badge.
+     Reduced motion = instant (handled in play()). */
+  var FLY = {"gold":{"delay":0.35,"dur":2.8,"dist":520,"arc":-55,"sScale":0.3,"bank":12,"ease":"inOutCubic","back":1.2,"fade":0.12,"thrust":1,"flame":70,"wake":1.05,"wakeW":10,"flash":0.8,"ring":0.9,"ringSize":170,"shake":3.5,"spark":16,"pulse":0.9,"trail":"follow","colour":"flight","angle":-151,"engX":-106,"engY":-25,"flameA":-165,"sx":143,"sy":113,"tx":2,"ty":9,"bend":4,"t1":-34,"t2":-71,"str":0.55,"tw":3,"gw":10,"mark":0,"tlead":0.15},"silver":{"delay":0.35,"dur":2.4,"angle":-155,"dist":520,"arc":-40,"sScale":0.3,"bank":4,"ease":"inOutCubic","back":1.2,"fade":0.12,"thrust":1,"flame":80,"wake":0.7,"wakeW":10,"flash":0.5,"ring":0.6,"ringSize":170,"shake":2,"spark":9,"pulse":0.6,"trail":"follow","colour":"flight","engX":-108,"engY":-80,"flameA":-135,"sx":122,"sy":95,"tx":18,"ty":11,"bend":8,"t1":-41,"t2":-117,"str":0.55,"tw":3,"gw":10,"mark":0,"tlead":0},"bronze":{"delay":0.35,"dur":2,"angle":-150,"dist":520,"arc":45,"sScale":0.3,"bank":15,"ease":"inOutCubic","back":1.2,"fade":0.12,"thrust":1,"flame":88,"wake":1.1,"wakeW":10.5,"flash":0.3,"ring":0.35,"ringSize":170,"shake":1,"spark":4,"pulse":0.4,"trail":"follow","colour":"flight","engX":-118,"engY":-56,"flameA":-148,"sx":150,"sy":105,"tx":0,"ty":0,"bend":0,"t1":0,"t2":0,"str":0.55,"tw":3,"gw":17,"mark":0,"tlead":0}};
+  function fclamp(x){ return x < 0 ? 0 : x > 1 ? 1 : x; }
+  function fsmooth(x){ x = fclamp(x); return x * x * (3 - 2 * x); }
+  function fease(n, p, back){
+    p = fclamp(p);
+    if(n === 'outCubic') return 1 - Math.pow(1 - p, 3);
+    if(n === 'outExpo') return p >= 1 ? 1 : 1 - Math.pow(2, -10 * p);
+    if(n === 'outBack'){ var c1 = back, c3 = c1 + 1; return 1 + c3 * Math.pow(p - 1, 3) + c1 * Math.pow(p - 1, 2); }
+    if(n === 'inOutCubic') return p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+    return 1 - Math.pow(1 - p, 4);
+  }
+  var SPK = (function(){ var q = 11, a = []; for(var i = 0; i < 28; i++){ q = (q * 16807) % 2147483647; var an = q / 2147483647 * 6.2832; q = (q * 16807) % 2147483647; var d = .45 + q / 2147483647 * .55; q = (q * 16807) % 2147483647; a.push({ a:an, d:d, z:.6 + q / 2147483647 * .7 }); } return a; })();
+  function fly(s, m){
+    var P = FLY[m], S = SHIP[m];
+    var all = s.querySelector('.nmsm-all'), shipImg = s.querySelector('.nmsm-ship'), defs = s.querySelector('defs');
+    if(!P || !S || !all || !shipImg || !defs) return false;
+    var shipG = shipImg.parentNode, orig = shipG.getAttribute('transform');
+    var kids = Array.prototype.slice.call(all.children), i = kids.indexOf(shipG), halo = kids[0];
+    if(i < 1) return false;
+    var A = el('g', {}), B = el('g', {});
+    all.insertBefore(A, kids[0]); all.insertBefore(B, shipG.nextSibling);
+    kids.slice(0, i).forEach(function(k){ A.appendChild(k); });
+    kids.slice(i + 1).forEach(function(k){ B.appendChild(k); });
+    var gid = 'fl' + (++uidN) + '_';
+    var rg = el('radialGradient', { id:gid }, defs);
+    [[0,'#ffffff',1],[.35,'#9ff4ff',.8],[1,'#00e5ff',0]].forEach(function(t){ el('stop', { offset:t[0], 'stop-color':t[1], 'stop-opacity':t[2] }, rg); });
+    var fl = el('ellipse', { cx:0, cy:0, rx:30, ry:12, fill:'url(#' + gid + ')', opacity:0 }, shipG);
+    var wake = el('g', { 'pointer-events':'none' }); all.insertBefore(wake, B);
+    var segs = []; for(var q = 0; q < 28; q++) segs.push(el('line', { 'stroke-linecap':'round', stroke:'#bff8ff', opacity:0 }, wake));
+    var fx = el('g', { 'pointer-events':'none' }, all);
+    var fg = el('radialGradient', { id:gid + 'f' }, defs);
+    [[0,'#ffffff',1],[.4,'#fff3c8',.55],[1,'#f2b84b',0]].forEach(function(t){ el('stop', { offset:t[0], 'stop-color':t[1], 'stop-opacity':t[2] }, fg); });
+    var fcp = el('clipPath', { id:gid + 'c' }, defs); el('circle', { cx:280, cy:250, r:172 }, fcp);
+    var fxc = el('g', { 'clip-path':'url(#' + gid + 'c)' }, fx);
+    var flash = el('circle', { cx:280, cy:250, r:170, fill:'url(#' + gid + 'f)', opacity:0 }, fxc);
+    var ring = el('circle', { cx:280, cy:250, r:20, fill:'none', stroke:'#ffffff', opacity:0 }, fxc);
+    var sparks = []; for(var k = 0; k < 28; k++) sparks.push(el('path', { d:'M0 -34 L5 -5 L34 0 L5 5 L0 34 L-5 5 L-34 0 L-5 -5Z', fill:'#fff3c8', opacity:0 }, fx));
+    var trail = s.querySelectorAll('.nmsm-trail path'), trailG = trail.length ? trail[0].parentNode : null, tg = s.querySelector('linearGradient[id$="tr"]'), fin = trail.length ? trail[0].getAttribute('d') : '';
+    var follow = P.trail === 'follow' && trailG, tEnter = 0;
+    if(follow){ var best = 1e9; for(var z = 0; z <= 60; z++){ var tz = P.delay + P.dur * z / 60, sz = state(tz), dz = Math.hypot(sz.x - P.sx, sz.y - P.sy); if(dz < best){ best = dz; tEnter = tz; } } tEnter += P.tlead || 0; }
+    s.classList.add('fly');
+    var sil = s.querySelector('.nmsm-sil'); if(sil) sil.style.display = 'none';
+    var land = P.delay + P.dur, total = P.delay + P.dur + 1.5, gone = false, raf = 0, t0 = 0, glow = false;
+    function state(t){
+      var pr = fclamp((t - P.delay) / P.dur), e = fease(P.ease, pr, P.back), a = P.angle * Math.PI / 180;
+      var x0 = S.x + Math.cos(a) * P.dist, y0 = S.y + Math.sin(a) * P.dist, dx = S.x - x0, dy = S.y - y0, len = Math.sqrt(dx * dx + dy * dy) || 1;
+      var bend = P.arc * Math.sin(Math.PI * pr);
+      return { x:x0 + dx * e + (-dy / len) * bend, y:y0 + dy * e + (dx / len) * bend, rot:S.rot + P.bank * (1 - e), sc:P.sScale + (1 - P.sScale) * e, pr:pr };
+    }
+    function eng(tt){ var s2 = state(tt), r = s2.rot * Math.PI / 180; return { x:s2.x + (P.engX * Math.cos(r) - P.engY * Math.sin(r)) * s2.sc, y:s2.y + (P.engX * Math.sin(r) + P.engY * Math.cos(r)) * s2.sc, ok:tt >= P.delay }; }
+    function render(t){
+      var st = state(t), started = t >= P.delay;
+      shipG.setAttribute('transform', 'translate(' + st.x.toFixed(2) + ' ' + st.y.toFixed(2) + ') rotate(' + st.rot.toFixed(2) + ') scale(' + st.sc.toFixed(3) + ')');
+      shipG.style.opacity = started ? fclamp(st.pr / Math.max(.001, P.fade || .001)) : 0;
+      var L = P.flame, ux = Math.cos(P.flameA * Math.PI / 180), uy = Math.sin(P.flameA * Math.PI / 180), cx = (P.engX + ux * L * .6).toFixed(1), cy = (P.engY + uy * L * .6).toFixed(1);
+      fl.setAttribute('rx', Math.max(1, L)); fl.setAttribute('ry', Math.max(1, L * .38)); fl.setAttribute('cx', cx); fl.setAttribute('cy', cy);
+      fl.setAttribute('transform', 'rotate(' + P.flameA + ' ' + cx + ' ' + cy + ')');
+      fl.setAttribute('opacity', (P.thrust * Math.pow(1 - fclamp(st.pr), .7) * (started ? 1 : 0)).toFixed(3));
+      var prev = eng(t);
+      for(var n = 0; n < segs.length; n++){
+        var tt = t - (n + 1) / segs.length * P.wake, cu = eng(tt), ln = segs[n], f = 1 - n / segs.length;
+        if(P.wake <= 0 || !prev.ok || !cu.ok || !started){ ln.setAttribute('opacity', 0); prev = cu; continue; }
+        ln.setAttribute('x1', prev.x.toFixed(1)); ln.setAttribute('y1', prev.y.toFixed(1)); ln.setAttribute('x2', cu.x.toFixed(1)); ln.setAttribute('y2', cu.y.toFixed(1));
+        ln.setAttribute('stroke-width', Math.max(.4, P.wakeW * f * st.sc).toFixed(2)); ln.setAttribute('opacity', (f * .8).toFixed(3)); prev = cu;
+      }
+      var g = P.colour === 'none' ? 0 : P.colour === 'landing' ? 1 - fsmooth((t - land) / .5) : 1 - fsmooth((t - P.delay) / (P.dur * .9));
+      var flt = g < .005 ? 'none' : 'grayscale(' + g.toFixed(3) + ') brightness(' + (1 - .5 * g).toFixed(3) + ')';
+      A.style.filter = flt; B.style.filter = flt;
+      var d = P.trail === 'off' ? 0 : follow ? 1 : P.trail === 'during' ? fsmooth(st.pr) : fsmooth((t - land) / .8);
+      if(follow){   // the line stays tied to the star and its end rides the ship's engine
+        var e0 = eng(t), wx = e0.x + P.tx * st.sc, wy = e0.y + P.ty * st.sc, dd = trailD(P, wx, wy);
+        for(var y = 0; y < trail.length; y++) trail[y].setAttribute('d', dd);
+        if(tg){ tg.setAttribute('x2', wx); tg.setAttribute('y2', wy); }
+        trailG.style.opacity = fsmooth((t - tEnter) / .35);
+      }
+      for(var j = 0; j < trail.length; j++) trail[j].style.strokeDashoffset = (1 - d).toFixed(4);
+      var qq = fclamp((t - land) / .9), q2 = fclamp((t - land) / .4), on = t >= land;
+      if(on && !glow){ glow = true; s.classList.add('go'); }
+      flash.setAttribute('opacity', on ? (P.flash * Math.pow(1 - qq, 2)).toFixed(3) : 0);
+      ring.setAttribute('r', (20 + (P.ringSize - 20) * (1 - Math.pow(1 - qq, 3))).toFixed(1));
+      ring.setAttribute('stroke-width', (1 + 5 * (1 - qq)).toFixed(2));
+      ring.setAttribute('opacity', on ? (P.ring * (1 - qq)).toFixed(3) : 0);
+      for(var u = 0; u < sparks.length; u++){
+        var sp = sparks[u]; if(!on || u >= P.spark){ sp.setAttribute('opacity', 0); continue; }
+        var c = SPK[u], dist = (50 + 130 * c.d) * (1 - Math.pow(1 - qq, 2.2)), sc = .24 * c.z * (1 - qq * .8);
+        sp.setAttribute('transform', 'translate(' + (280 + Math.cos(c.a) * dist).toFixed(1) + ' ' + (250 + Math.sin(c.a) * dist).toFixed(1) + ') scale(' + sc.toFixed(3) + ')');
+        sp.setAttribute('opacity', (1 - qq).toFixed(3));
+      }
+      var sh = on ? P.shake * (1 - q2) * Math.sin(q2 * 38) : 0;
+      s.style.transform = sh ? 'translate(' + sh.toFixed(2) + 'px,' + (sh * .6).toFixed(2) + 'px)' : '';
+      halo.setAttribute('opacity', (.12 + (on ? P.pulse * .5 * Math.exp(-qq * 3.2) : 0)).toFixed(3));
+    }
+    function finish(){
+      if(gone) return; gone = true; if(raf) cancelAnimationFrame(raf);
+      if(orig != null) shipG.setAttribute('transform', orig); shipG.style.opacity = '';
+      [fl, wake, fx].forEach(function(n){ if(n.parentNode) n.parentNode.removeChild(n); });
+      A.style.filter = ''; B.style.filter = ''; s.style.transform = ''; halo.setAttribute('opacity', .12);
+      for(var j = 0; j < trail.length; j++){ trail[j].style.strokeDashoffset = '0'; if(follow) trail[j].setAttribute('d', fin); }
+      if(follow){ trailG.style.opacity = ''; if(tg){ var ee = engineEnd(m); tg.setAttribute('x2', ee.x); tg.setAttribute('y2', ee.y); } }
+      s.classList.add('done');
+    }
+    function loop(ts){
+      if(gone) return;
+      if(!s.isConnected){ finish(); return; }
+      if(!t0) t0 = ts;
+      var t = (ts - t0) / 1000;
+      if(t >= total){ finish(); return; }
+      render(t); raf = requestAnimationFrame(loop);
+    }
+    render(0); raf = requestAnimationFrame(loop);
+    s.addEventListener('click', finish, { once:true });
+    return true;
+  }
   // play the earned reveal on an svg built with {reveal:true}
   function play(s){
     if(!s) return;
     if(RM){ s.classList.add('done'); return; }
+    if(fly(s, s.getAttribute('data-metal'))) return;
     s.getBoundingClientRect();
     requestAnimationFrame(function(){ s.classList.add('go'); });
     setTimeout(function(){ s.classList.add('done'); }, 2600);
@@ -173,6 +308,7 @@
       '.nmsm-svg.rv .nmsm-sil{transition:opacity 1.1s ease .2s}',
       '.nmsm-svg.rv .nmsm-trail path{stroke-dasharray:1 1;stroke-dashoffset:1;transition:stroke-dashoffset 1.3s ease .25s}',
       '.nmsm-svg.rv.go,.nmsm-svg.rv.done{filter:none}',
+      '.nmsm-svg.rv.fly,.nmsm-svg.rv.fly *{transition:none!important}.nmsm-svg.rv.fly{filter:none}',
       '.nmsm-svg.rv.go .nmsm-sil,.nmsm-svg.rv.done .nmsm-sil{opacity:0}',
       '.nmsm-svg.rv.go .nmsm-trail path,.nmsm-svg.rv.done .nmsm-trail path{stroke-dashoffset:0}',
       '.nmsm-svg.rv.go .nmsm-tw{animation:nmsmTw .75s ease-in-out 2 alternate}',
