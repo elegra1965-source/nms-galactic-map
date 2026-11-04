@@ -110,6 +110,8 @@
     r.appendChild(top);
     r.appendChild(el("div", "searchResMeta", (x.editor ? "by " + plain(x.editor) + " · " : "") + gal(x.galaxy) + " · " + x.views + (x.views === 1 ? " view" : " views")));
     r.appendChild(glyphs(x.address));
+    // 2026-11-04 (Tony): a top-3 system nobody has put a name on gets a nudge -- the medal is waiting for whoever charted it
+    if(x.rank <= 3 && !plain(x.editor).trim()) r.appendChild(el("div", "trClaim", window.NMS_T ? NMS_T("Add your name to claim this medal") : "Add your name to claim this medal"));
     return r;
   }
   function fill(){
