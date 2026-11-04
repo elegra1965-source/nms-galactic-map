@@ -82015,10 +82015,10 @@
         "colliding": false,
         "collidingSet": [],
         "screenshot": "",
-        "hasStation": false,
+        "hasStation": true,
         "stationName": "",
         "allianceName": "",
-        "stationPhoto": "",
+        "stationPhoto": "https://raw.githubusercontent.com/elegra1965-source/nms-galactic-map/main/user-screenshots/0-1426880AEA5D-station-mw1ob1pz-tvkzgy.jpg",
         "signals": [],
         "editorName": "kuemp09",
         "editorFriendCode": "",
@@ -82104,11 +82104,15 @@
           }
         ]
       },
-      "editedAt": "2026-11-04T05:24:39.845Z",
-      "editedByIp": "ip_180e5c269f8e03fc",
+      "editedAt": "2026-11-04T05:25:36.724Z",
+      "editedByIp": "ip_c3411194a902a296",
       "history": [
         {
           "at": "2026-11-04T05:24:39.845Z",
+          "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-11-04T05:25:36.724Z",
           "text": "edited by a traveller"
         }
       ]
@@ -82118,6 +82122,9 @@
   "ipLog": {
     "ip_180e5c269f8e03fc": [
       1793769879845
+    ],
+    "ip_c3411194a902a296": [
+      1793769936724
     ]
   },
   "flagLog": {},
