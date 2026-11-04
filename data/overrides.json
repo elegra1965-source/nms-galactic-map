@@ -81984,14 +81984,140 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1426880AEA5D": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Icrobea III",
+        "race": "Gek",
+        "region": "Eograss Conflux",
+        "starClass": "Y7",
+        "stars": [
+          "purple"
+        ],
+        "water": false,
+        "dissonant": true,
+        "giant": false,
+        "econName": "High Tech",
+        "sell": "-27.9",
+        "buy": "79.1",
+        "econDesc": "Wealthy",
+        "conflict": "Peaceful",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "kuemp09",
+        "editorFriendCode": "",
+        "genVersion": "1.9.0",
+        "bodies": [
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Exotic",
+            "subtype": "Fragmented Giant",
+            "descriptor": "Thirsty Clouds",
+            "water": false,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Sodium",
+              "Gold"
+            ],
+            "flora": [
+              "Not Present"
+            ],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Zealous",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": true,
+            "orbits": 1,
+            "biome": "Toxic",
+            "subtype": "",
+            "descriptor": "Corrosive Damp",
+            "water": true,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Silver"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Rebellious",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": true,
+            "orbits": 1,
+            "biome": "Dead",
+            "subtype": "",
+            "descriptor": "Clear",
+            "water": false,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Salt"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Regular Patrols",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          }
+        ]
+      },
+      "editedAt": "2026-11-04T05:24:39.845Z",
+      "editedByIp": "ip_180e5c269f8e03fc",
+      "history": [
+        {
+          "at": "2026-11-04T05:24:39.845Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
-    "ip_d566fe76d781cc2b": [
-      1793754345346,
-      1793754923231,
-      1793755928333
+    "ip_180e5c269f8e03fc": [
+      1793769879845
     ]
   },
   "flagLog": {},
@@ -82210,7 +82336,10 @@
       "Internal Rain",
       "Dry Gusts",
       "Infrequent Dust Storms",
-      "Painfully Hot Rain"
+      "Painfully Hot Rain",
+      "Thirsty Clouds",
+      "Corrosive Damp",
+      "Clear"
     ],
     "biome": [
       "Radioactive",
@@ -82283,7 +82412,8 @@
       "Wind-swept",
       "Bountiful",
       "Hexagonal",
-      "Dusty"
+      "Dusty",
+      "Fragmented Giant"
     ],
     "signalName": [
       "MS Jiokaz XIV",
