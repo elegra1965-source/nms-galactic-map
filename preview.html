@@ -836,6 +836,9 @@ html.hc-on .btn{border-width:2px}
 .seq img{width:100%;filter:drop-shadow(0 0 4px rgba(0,229,255,.5))}
 #pAddr{font-family:'Orbitron',monospace;font-size:10px;color:var(--cyan);letter-spacing:.14em;
   text-align:center;margin-top:6px}
+.pRead{display:block;text-align:center;margin-top:5px;font-family:'Rajdhani',sans-serif;font-size:11.5px;letter-spacing:.04em;color:var(--text-dim);text-decoration:none}
+.pRead:hover,.pRead:focus-visible{color:var(--cyan)}
+.pRead::after{content:' \203A'}
 .seqbox .lb.pCoordsLb{margin-top:8px;margin-bottom:3px}
 #pCoords{font-family:'Orbitron',monospace;font-size:10px;color:var(--text-dim);letter-spacing:.1em;
   text-align:center}
@@ -2117,6 +2120,7 @@ nearby procedural space within a radius.">Search</button>
     <div class="lb">Portal sequence</div>
     <div class="seq" id="pSeq"></div>
     <div id="pAddr">—</div>
+    <a id="pRead" class="pRead" href="https://translator.nomansskyhub.app/" target="_blank" rel="noopener" title="Open the Alphabet Translator with this portal address filled in.">Read these glyphs</a>
     <div class="lb pCoordsLb">Matrix vector points</div>
     <div id="pCoords">X: — | Y: — | Z: —</div>
   </div>

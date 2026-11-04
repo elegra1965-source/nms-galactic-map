@@ -5816,6 +5816,12 @@ function buildSystemView(s){
 }
 
 /* ============ panel ============ */
+/* 2026-11-04 (S1): "Read these glyphs" opens the Alphabet Translator with this address filled in (it reads ?a=<12 hex>&g=<galaxy>) */
+function setReadLink(addr,g){
+  var a=document.getElementById("pRead"); if(!a) return;
+  var hx=String(addr||"").replace(/[^0-9A-Fa-f]/g,"").toUpperCase();
+  a.href="https://translator.nomansskyhub.app/"+(hx.length===12?"?a="+hx+(typeof g==="number"&&g>=0?"&g="+g:"")+"#portal":"");
+}
 function renderSeq(el,addr){
   var html="",i;
   for(i=0;i<addr.length;i++) html+='<img alt="'+addr[i]+'" src="'+glyphSrc(addr[i])+'">';
@@ -6148,6 +6154,7 @@ function updatePanel(s){
 
   renderSeq(document.getElementById("pSeq"),s.address);
   document.getElementById("pAddr").textContent=s.address;
+  setReadLink(s.address, s.galaxy!=null?s.galaxy:GALAXY);
   document.getElementById("pCoords").textContent="X: "+s.vx+" | Y: "+s.vy+" | Z: "+s.vz;
   document.getElementById("pNote").value=store.notes[skey(s)]||"";
   renderPNoteImg();
@@ -6253,6 +6260,7 @@ function showBody(b,s){
   var ba=formatAddress(b.index,s.idx,s.vx,s.vy,s.vz);
   renderSeq(document.getElementById("pSeq"),ba);
   document.getElementById("pAddr").textContent=ba;
+  setReadLink(ba, GALAXY);
   setKeypad(ba);
 }
 
