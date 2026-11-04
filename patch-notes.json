@@ -72,6 +72,32 @@
   {
    "tag": "new",
    "text": {
+    "en": "Earn a medal and a ship flies in and lands on the badge: shuttle for bronze, fighter for silver, exotic for gold. Tap to skip",
+    "es": "Si ganas una medalla, una nave llega volando y aterriza en la insignia: lanzadera para el bronce, caza para la plata, exótica para el oro. Toca para saltar",
+    "de": "Verdienst du eine Medaille, fliegt ein Schiff herein und landet auf dem Abzeichen: Shuttle für Bronze, Jäger für Silber, Exot für Gold. Zum Überspringen tippen",
+    "fr": "Quand tu gagnes une médaille, un vaisseau arrive en volant et se pose sur l'insigne : navette pour le bronze, chasseur pour l'argent, exotique pour l'or. Touche pour passer",
+    "it": "Quando ottieni una medaglia, una nave arriva in volo e atterra sul distintivo: navetta per il bronzo, caccia per l'argento, esotica per l'oro. Tocca per saltare",
+    "nl": "Verdien je een medaille, dan vliegt er een schip binnen en landt op de badge: shuttle voor brons, jager voor zilver, exotisch voor goud. Tik om over te slaan",
+    "pl": "Gdy zdobędziesz medal, przylatuje statek i ląduje na odznace: prom za brąz, myśliwiec za srebro, egzotyczny za złoto. Dotknij, aby pominąć",
+    "pt-BR": "Ao ganhar uma medalha, uma nave chega voando e pousa no emblema: transporte para o bronze, caça para a prata, exótica para o ouro. Toque para pular"
+   }
+  },
+  {
+   "tag": "new",
+   "text": {
+    "en": "Read these glyphs: a link under a portal address opens it in the Alphabet Translator",
+    "es": "Leer estos glifos: un enlace bajo la dirección del portal la abre en el Traductor de alfabeto",
+    "de": "Glyphen entziffern: Ein Link unter der Portaladresse öffnet sie im Alphabet-Übersetzer",
+    "fr": "Lire ces glyphes : un lien sous l'adresse du portail l'ouvre dans le Traducteur d'alphabet",
+    "it": "Leggi questi glifi: un link sotto l'indirizzo del portale lo apre nel Traduttore dell'alfabeto",
+    "nl": "Lees deze glyphen: een link onder het portaaladres opent het in de Alfabetvertaler",
+    "pl": "Odczytaj te glify: link pod adresem portalu otwiera go w Tłumaczu alfabetu",
+    "pt-BR": "Ler estes glifos: um link sob o endereço do portal abre-o no Tradutor de alfabeto"
+   }
+  },
+  {
+   "tag": "new",
+   "text": {
     "en": "Patch notes like these after each big update",
     "es": "Notas como estas después de cada gran actualización",
     "de": "Patch-Notes wie diese nach jedem großen Update",
