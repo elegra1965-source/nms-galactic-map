@@ -81869,11 +81869,11 @@
             "moon": false,
             "orbits": 0,
             "biome": "Barren",
-            "subtype": "",
+            "subtype": "Rocky",
             "descriptor": "Infrequent Dust Storms",
             "water": true,
-            "ring": false,
-            "ringSet": false,
+            "ring": "tan",
+            "ringSet": true,
             "resources": [
               "Salt",
               "Copper"
@@ -81966,11 +81966,15 @@
           }
         ]
       },
-      "editedAt": "2026-11-04T01:05:45.346Z",
+      "editedAt": "2026-11-04T01:15:23.231Z",
       "editedByIp": "ip_d566fe76d781cc2b",
       "history": [
         {
           "at": "2026-11-04T01:05:45.346Z",
+          "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-11-04T01:15:23.231Z",
           "text": "edited by a traveller"
         }
       ]
@@ -81979,7 +81983,8 @@
   "reports": [],
   "ipLog": {
     "ip_d566fe76d781cc2b": [
-      1793754345346
+      1793754345346,
+      1793754923231
     ]
   },
   "flagLog": {},
