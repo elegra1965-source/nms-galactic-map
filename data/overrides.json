@@ -82523,7 +82523,7 @@
       "flaggedFields": [],
       "disputedFields": [],
       "data": {
-        "name": "[Disc1-61] Discovery Capital",
+        "name": "[D9201-61] Discovery Capital",
         "race": "Vy'keen",
         "region": "Vumbarn Conflux",
         "starClass": "G5",
@@ -82685,11 +82685,15 @@
           }
         ]
       },
-      "editedAt": "2026-11-04T10:02:37.721Z",
+      "editedAt": "2026-11-04T17:08:23.736Z",
       "editedByIp": "ip_b60c27451dcfb473",
       "history": [
         {
           "at": "2026-11-04T10:02:37.721Z",
+          "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-11-04T17:08:23.736Z",
           "text": "edited by a traveller"
         }
       ]
@@ -82698,7 +82702,7 @@
   "reports": [],
   "ipLog": {
     "ip_b60c27451dcfb473": [
-      1793786557721
+      1793812103736
     ]
   },
   "flagLog": {},
