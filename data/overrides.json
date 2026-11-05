@@ -84151,19 +84151,193 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1020032CB993": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "(N0VA) Rimedium Prime",
+        "race": "Korvax",
+        "region": "Davardovic Expanse",
+        "starClass": "F0pf",
+        "stars": [
+          "yellow",
+          "blue",
+          "red"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Construction",
+        "sell": "-16.7",
+        "buy": "49.4",
+        "econDesc": "Satisfactory",
+        "conflict": "Alarming",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": true,
+        "stationName": "Nova Prime Starbase",
+        "allianceName": "Nova Coalition",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Redstone",
+        "editorFriendCode": "",
+        "genVersion": "1.9.0",
+        "bodies": [
+          {
+            "name": "Rimedium Capitol",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Lush",
+            "subtype": "",
+            "descriptor": "Mellow",
+            "water": true,
+            "ring": "tan",
+            "ringSet": false,
+            "resources": [
+              "Star Bulb",
+              "Copper",
+              "Magnetised Ferrite"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [
+              "Paraffinium"
+            ],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Infrequent",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "Chardi Delta",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Scorched",
+            "subtype": "",
+            "descriptor": "Direct Sunlight",
+            "water": true,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Salt"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Spread Thin",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "Shardus Gamma",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Exotic",
+            "subtype": "Fragmented",
+            "descriptor": "Thirsty Clouds",
+            "water": false,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Magnetised Ferrite"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Unwavering",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "Nucleis Minor",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Radioactive",
+            "subtype": "",
+            "descriptor": "Irradiated Winds",
+            "water": false,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Salt"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Minimal",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "Arida Major",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Scorched",
+            "subtype": "",
+            "descriptor": "Burning Air",
+            "water": false,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Gold"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Frequent",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          }
+        ]
+      },
+      "editedAt": "2026-11-05T12:42:01.588Z",
+      "editedByIp": "ip_4e59f91f046518f0",
+      "history": [
+        {
+          "at": "2026-11-05T12:42:01.588Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
-    "ip_b60c27451dcfb473": [
-      1793874122440,
-      1793874727385,
-      1793875271378,
-      1793875998630,
-      1793876221415,
-      1793876544060,
-      1793877022102,
-      1793877048629
+    "ip_4e59f91f046518f0": [
+      1793882521588
     ]
   },
   "flagLog": {},
@@ -84410,7 +84584,8 @@
       "Choking Sandstorms",
       "Ceaseless Drought",
       "Howling Blizzards",
-      "Sterile"
+      "Sterile",
+      "Burning Air"
     ],
     "biome": [
       "Radioactive",
@@ -84486,7 +84661,8 @@
       "Dusty",
       "Fragmented Giant",
       "Desolate",
-      "Petrified"
+      "Petrified",
+      "Fragmented"
     ],
     "signalName": [
       "MS Jiokaz XIV",
