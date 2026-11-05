@@ -83951,7 +83951,7 @@
       "flaggedFields": [],
       "disputedFields": [],
       "data": {
-        "name": "[D920-2-6A]Adomag",
+        "name": "[D920-2-6A]Adomag III",
         "race": "Vy'keen",
         "region": "Fevener Conflux",
         "starClass": "F3",
@@ -84139,11 +84139,15 @@
           }
         ]
       },
-      "editedAt": "2026-11-05T11:10:22.102Z",
+      "editedAt": "2026-11-05T11:10:48.629Z",
       "editedByIp": "ip_b60c27451dcfb473",
       "history": [
         {
           "at": "2026-11-05T11:10:22.102Z",
+          "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-11-05T11:10:48.629Z",
           "text": "edited by a traveller"
         }
       ]
@@ -84158,7 +84162,8 @@
       1793875998630,
       1793876221415,
       1793876544060,
-      1793877022102
+      1793877022102,
+      1793877048629
     ]
   },
   "flagLog": {},
