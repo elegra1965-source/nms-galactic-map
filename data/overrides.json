@@ -83945,6 +83945,208 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:106A03664D27": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "[D920-2-6A]Adomag",
+        "race": "Vy'keen",
+        "region": "Fevener Conflux",
+        "starClass": "F3",
+        "stars": [
+          "yellow",
+          "purple",
+          "blue"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Mercantile",
+        "sell": "-26.3",
+        "buy": "77.5",
+        "econDesc": "Prosperous",
+        "conflict": "Low",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "",
+        "editorFriendCode": "",
+        "genVersion": "1.9.0",
+        "bodies": [
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Barren",
+            "subtype": "",
+            "descriptor": "Choking Sandstorms",
+            "water": true,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Cobalt"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Few",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Marsh",
+            "subtype": "",
+            "descriptor": "Stinging Atmosphere",
+            "water": false,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Magnetised Ferrite"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Low Security",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": true,
+            "orbits": 2,
+            "biome": "Barren",
+            "subtype": "",
+            "descriptor": "Ceaseless Drought",
+            "water": false,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Silver"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Low Security",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Radioactive",
+            "subtype": "",
+            "descriptor": "Occasional Radiation Outbursts",
+            "water": true,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Silver"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Aggressive",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Frozen",
+            "subtype": "",
+            "descriptor": "Howling Blizzards",
+            "water": false,
+            "ring": "icy",
+            "ringSet": false,
+            "resources": [
+              "Magnetised Ferrite"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Spread Thin",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Barren",
+            "subtype": "",
+            "descriptor": "Sterile",
+            "water": false,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Gold"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Attentive",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          }
+        ]
+      },
+      "editedAt": "2026-11-05T11:10:22.102Z",
+      "editedByIp": "ip_b60c27451dcfb473",
+      "history": [
+        {
+          "at": "2026-11-05T11:10:22.102Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -83955,7 +84157,8 @@
       1793875271378,
       1793875998630,
       1793876221415,
-      1793876544060
+      1793876544060,
+      1793877022102
     ]
   },
   "flagLog": {},
@@ -84198,7 +84401,11 @@
       "Occasional Sandstorms",
       "Sweaty Drizzle",
       "Scalding Heat",
-      "Haunted Frost"
+      "Haunted Frost",
+      "Choking Sandstorms",
+      "Ceaseless Drought",
+      "Howling Blizzards",
+      "Sterile"
     ],
     "biome": [
       "Radioactive",
