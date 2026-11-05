@@ -83419,6 +83419,182 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:103B03664D27": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "[D920-2-3B]Yodaito V",
+        "race": "Vy'keen",
+        "region": "Fevener Conflux",
+        "starClass": "G0p",
+        "stars": [
+          "yellow",
+          "red"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "High Voltage",
+        "sell": "-14.2",
+        "buy": "52.1",
+        "econDesc": "High Supply",
+        "conflict": "Untroubled",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "",
+        "editorFriendCode": "",
+        "genVersion": "1.9.0",
+        "bodies": [
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Lush",
+            "subtype": "",
+            "descriptor": "Beautiful",
+            "water": false,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Gold"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Ever-present",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": true,
+            "orbits": 1,
+            "biome": "Barren",
+            "subtype": "",
+            "descriptor": "Firestorms",
+            "water": false,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Magnetised Ferrite"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Limited",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Radioactive",
+            "subtype": "",
+            "descriptor": "Contaminated Squalls",
+            "water": false,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Sodium"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Zealous",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Scorched",
+            "subtype": "",
+            "descriptor": "Direct Sunlight",
+            "water": false,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Salt"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Few",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Lush",
+            "subtype": "",
+            "descriptor": "Sweltering Damp",
+            "water": true,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Magnetised Ferrite"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Attentive",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          }
+        ]
+      },
+      "editedAt": "2026-11-05T10:53:18.630Z",
+      "editedByIp": "ip_b60c27451dcfb473",
+      "history": [
+        {
+          "at": "2026-11-05T10:53:18.630Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -83426,7 +83602,8 @@
     "ip_b60c27451dcfb473": [
       1793874122440,
       1793874727385,
-      1793875271378
+      1793875271378,
+      1793875998630
     ]
   },
   "flagLog": {},
@@ -83663,7 +83840,9 @@
       "Pleasant",
       "Direct Sunlight",
       "Dust-Choked Winds",
-      "Rare Firestorms"
+      "Rare Firestorms",
+      "Contaminated Squalls",
+      "Sweltering Damp"
     ],
     "biome": [
       "Radioactive",
