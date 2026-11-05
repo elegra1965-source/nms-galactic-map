@@ -83745,6 +83745,206 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:103D03664D27": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "[D920-2-3D]Amagash",
+        "race": "Gek",
+        "region": "Fevener Conflux",
+        "starClass": "F9f",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Mining",
+        "sell": "-26.8",
+        "buy": "60.2",
+        "econDesc": "Balanced",
+        "conflict": "Dangerous",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "",
+        "editorFriendCode": "",
+        "genVersion": "1.9.0",
+        "bodies": [
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Lush",
+            "subtype": "",
+            "descriptor": "Mellow",
+            "water": true,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Cobalt"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Regular Patrols",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Marsh",
+            "subtype": "",
+            "descriptor": "Sweaty Drizzle",
+            "water": false,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Gold"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Low",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Scorched",
+            "subtype": "",
+            "descriptor": "Scalding Heat",
+            "water": false,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Cobalt"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Intermittent",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Lush",
+            "subtype": "",
+            "descriptor": "Pleasant",
+            "water": true,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Sodium"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Frequent",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Exotic",
+            "subtype": "",
+            "descriptor": "Haunted Frost",
+            "water": false,
+            "ring": "split",
+            "ringSet": false,
+            "resources": [
+              "Sodium"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Infrequent",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Scorched",
+            "subtype": "",
+            "descriptor": "Direct Sunlight",
+            "water": false,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Silver"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Observant",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          }
+        ]
+      },
+      "editedAt": "2026-11-05T11:02:24.060Z",
+      "editedByIp": "ip_b60c27451dcfb473",
+      "history": [
+        {
+          "at": "2026-11-05T11:02:24.060Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -83754,7 +83954,8 @@
       1793874727385,
       1793875271378,
       1793875998630,
-      1793876221415
+      1793876221415,
+      1793876544060
     ]
   },
   "flagLog": {},
@@ -83994,7 +84195,10 @@
       "Rare Firestorms",
       "Contaminated Squalls",
       "Sweltering Damp",
-      "Occasional Sandstorms"
+      "Occasional Sandstorms",
+      "Sweaty Drizzle",
+      "Scalding Heat",
+      "Haunted Frost"
     ],
     "biome": [
       "Radioactive",
