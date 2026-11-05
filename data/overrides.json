@@ -82918,12 +82918,61 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:101DCF589C1E": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB1-1D TopOfTheTree4",
+        "race": "Vy'keen",
+        "region": "Sea of Xionahui",
+        "starClass": "F2f",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Minerals",
+        "sell": "50.4",
+        "buy": "-20.8",
+        "econDesc": "★★ (Developing)",
+        "conflict": "★ (Relaxed)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-11-05T04:00:14.495Z",
+      "editedByIp": "ip_9279193ba1812f5c",
+      "history": [
+        {
+          "at": "2026-11-05T04:00:14.495Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
-    "ip_d566fe76d781cc2b": [
-      1793832486477
+    "ip_9279193ba1812f5c": [
+      1793851214495
     ]
   },
   "flagLog": {},
