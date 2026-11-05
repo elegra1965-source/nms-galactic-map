@@ -82523,7 +82523,7 @@
       "flaggedFields": [],
       "disputedFields": [],
       "data": {
-        "name": "[D920-1-61] Discovery Capital",
+        "name": "[D920-1-61] Citadel Prime",
         "race": "Vy'keen",
         "region": "Vumbarn Conflux",
         "starClass": "G5",
@@ -82685,7 +82685,7 @@
           }
         ]
       },
-      "editedAt": "2026-11-04T17:12:03.438Z",
+      "editedAt": "2026-11-05T10:22:02.440Z",
       "editedByIp": "ip_b60c27451dcfb473",
       "history": [
         {
@@ -82702,6 +82702,10 @@
         },
         {
           "at": "2026-11-04T17:12:03.438Z",
+          "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-11-05T10:22:02.440Z",
           "text": "edited by a traveller"
         }
       ]
@@ -83069,10 +83073,8 @@
   },
   "reports": [],
   "ipLog": {
-    "ip_9279193ba1812f5c": [
-      1793851214495,
-      1793851225984,
-      1793851237023
+    "ip_b60c27451dcfb473": [
+      1793874122440
     ]
   },
   "flagLog": {},
