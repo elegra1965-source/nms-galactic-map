@@ -231,7 +231,7 @@
      open the map. "Whoever charted it" = the system's editor name matches the
      traveller name saved on this device (the "Your name" from Edit system), so
      it needs no login and stores nothing new. A popup, not another tile. */
-  var RANK_SEEN_K = "nms-rank-seen";
+  var RANK_SEEN_K = "nms-rank-seen2"; /* 2026-11-06: new key so this week's top 3 see the new medal card once more */
   function rankSeen(){ try { return JSON.parse(localStorage.getItem(RANK_SEEN_K) || "{}") || {}; } catch(e){ return {}; } }
   function mapLink(x){ return "https://map.nomansskyhub.app/?arrival=1&galaxy=" + x.galaxy + "&addr=" + x.address; }
   function mine(x){ var n = myName(); return !!n && plain(x.editor || "").trim().toLowerCase() === n; }
