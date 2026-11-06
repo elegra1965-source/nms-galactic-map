@@ -19,6 +19,7 @@
   var pop = document.getElementById("trendPop");
   var list = document.getElementById("trendList");
   var queue = [];
+  var trOpen = false; // 2026-11-06 (Tony): places 6-10 stay folded until asked; kept across the 5-minute refresh
   var T = { top: [], lastWeek: null, rank: {}, mode: "week" };
   window.TRENDING = T;
 
@@ -121,17 +122,31 @@
       ? "A new week has started. These were last week's winners until this week's list fills up. Tap one to fly there."
       : "The charted systems travellers opened most this week. Resets every Monday at midnight (UK). Tap one to fly there.";
     list.textContent = "";
+    var more = null, moreBtn = null;
+    if(T.top.length > 5){
+      more = el("div"); more.id = "trMore";
+      moreBtn = el("button", "trMoreBtn"); moreBtn.type = "button"; moreBtn.setAttribute("aria-controls", "trMore");
+      var setOpen = function(o){
+        trOpen = o; more.hidden = !o; moreBtn.setAttribute("aria-expanded", o ? "true" : "false");
+        moreBtn.textContent = o ? T2("Show top 5 only ▴") : T2("Show places 6–{n} ▾", { n: T.top[T.top.length - 1].rank });
+        setTimeout(function(){ pop.classList.toggle("scroll", pop.scrollHeight > pop.clientHeight + 3); }, 0);
+      };
+      moreBtn.addEventListener("click", function(e){ e.stopPropagation(); setOpen(more.hidden); });
+      setOpen(trOpen);
+    }
     if(!T.top.length) list.appendChild(el("div", "searchEmpty", "Nothing trending yet this week. Open some charted systems and check back!"));
     T.top.forEach(function(x){
-      list.appendChild(row(x));
+      var box = (more && x.rank > 5) ? more : list;
+      box.appendChild(row(x));
       // 2026-10-19 (Tony): top 3 get a one-tap link to their medal picture, for
       // pasting anywhere a picture can't be attached (Reddit messages etc.).
       if(x.rank <= 10){
         var cp = el("button", "trCopy", x.rank <= 3 ? "🔗 Copy medal picture link" : "🔗 Copy picture link");
         cp.type = "button"; cp.setAttribute("data-link", cardLink(x));
-        list.appendChild(cp);
+        box.appendChild(cp);
       }
     });
+    if(more){ list.appendChild(more); list.appendChild(moreBtn); }
     if(T.lastWeek && T.mode !== "last"){
       var lw = el("div", "trLast");
       lw.appendChild(el("span", null, "Last week's 🥇 #1: "));
