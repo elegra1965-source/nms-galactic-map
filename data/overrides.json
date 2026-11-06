@@ -9254,19 +9254,21 @@
     },
     "0:101CFF968224": {
       "data": {
-        "name": "",
-        "race": "",
-        "region": "",
-        "starClass": "",
-        "stars": [],
+        "name": "Mimaba",
+        "race": "Vy'keen",
+        "region": "Isienek Anomaly",
+        "starClass": "G3pf",
+        "stars": [
+          "yellow"
+        ],
         "water": false,
         "dissonant": false,
         "giant": false,
-        "econName": "",
-        "sell": "",
-        "buy": "",
-        "econDesc": "",
-        "conflict": "",
+        "econName": "Industrial",
+        "sell": "79.4",
+        "buy": "-22.0",
+        "econDesc": "Low Supply",
+        "conflict": "Low",
         "blackHole": false,
         "atlas": false,
         "ruins": false,
@@ -9277,24 +9279,30 @@
         "collidingA": 0,
         "collidingB": 0,
         "editorName": "elegra1965",
-        "editorFriendCode": "MGD8-C6PP-XKFGT",
+        "editorFriendCode": "",
         "bodies": [
           {
             "name": "",
             "moon": false,
             "orbits": 0,
             "biome": "",
+            "subtype": "",
             "descriptor": "",
             "water": false,
             "ring": false,
-            "resources": [],
+            "ringSet": false,
+            "resources": [
+              "Cobalt"
+            ],
             "flora": [],
             "fauna": [],
             "minerals": [],
             "salvage": [],
             "fossils": [],
-            "sentinel": "None",
+            "sentinel": "Spread Thin",
             "autophage": false,
+            "reliquary": false,
+            "ruins": false,
             "base": false,
             "baseName": ""
           },
@@ -9303,17 +9311,23 @@
             "moon": false,
             "orbits": 0,
             "biome": "",
+            "subtype": "",
             "descriptor": "",
             "water": false,
             "ring": false,
-            "resources": [],
+            "ringSet": false,
+            "resources": [
+              "Silver"
+            ],
             "flora": [],
             "fauna": [],
             "minerals": [],
             "salvage": [],
             "fossils": [],
-            "sentinel": "None",
+            "sentinel": "Low Security",
             "autophage": false,
+            "reliquary": false,
+            "ruins": false,
             "base": false,
             "baseName": ""
           },
@@ -9322,17 +9336,23 @@
             "moon": false,
             "orbits": 0,
             "biome": "",
+            "subtype": "",
             "descriptor": "",
             "water": false,
             "ring": false,
-            "resources": [],
+            "ringSet": false,
+            "resources": [
+              "Cobalt"
+            ],
             "flora": [],
             "fauna": [],
             "minerals": [],
             "salvage": [],
             "fossils": [],
-            "sentinel": "None",
+            "sentinel": "Zealous",
             "autophage": false,
+            "reliquary": false,
+            "ruins": false,
             "base": false,
             "baseName": ""
           },
@@ -9341,17 +9361,23 @@
             "moon": false,
             "orbits": 0,
             "biome": "",
+            "subtype": "",
             "descriptor": "",
             "water": false,
             "ring": false,
-            "resources": [],
+            "ringSet": false,
+            "resources": [
+              "Silver"
+            ],
             "flora": [],
             "fauna": [],
             "minerals": [],
             "salvage": [],
             "fossils": [],
-            "sentinel": "None",
+            "sentinel": "Intermittent",
             "autophage": false,
+            "reliquary": false,
+            "ruins": false,
             "base": false,
             "baseName": ""
           },
@@ -9360,17 +9386,23 @@
             "moon": false,
             "orbits": 0,
             "biome": "",
+            "subtype": "",
             "descriptor": "",
             "water": false,
             "ring": false,
-            "resources": [],
+            "ringSet": false,
+            "resources": [
+              "Gold"
+            ],
             "flora": [],
             "fauna": [],
             "minerals": [],
             "salvage": [],
             "fossils": [],
-            "sentinel": "None",
+            "sentinel": "Isolated",
             "autophage": false,
+            "reliquary": false,
+            "ruins": false,
             "base": false,
             "baseName": ""
           },
@@ -9379,24 +9411,39 @@
             "moon": false,
             "orbits": 0,
             "biome": "",
+            "subtype": "",
             "descriptor": "",
             "water": false,
             "ring": false,
-            "resources": [],
+            "ringSet": false,
+            "resources": [
+              "Magnetised Ferrite"
+            ],
             "flora": [],
             "fauna": [],
             "minerals": [],
             "salvage": [],
             "fossils": [],
-            "sentinel": "None",
+            "sentinel": "High Security",
             "autophage": false,
+            "reliquary": false,
+            "ruins": false,
             "base": false,
             "baseName": ""
           }
-        ]
+        ],
+        "abandoned": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "genVersion": "1.9.0"
       },
-      "editedAt": "2026-08-21T17:53:16.000Z",
-      "editedByIp": "save-import",
+      "editedAt": "2026-11-06T18:31:19.694Z",
+      "editedByIp": "ip_26feb95eb58006c7",
       "flaggedFields": [],
       "disputedFields": [],
       "history": [
@@ -9411,6 +9458,10 @@
         {
           "at": "2026-08-22T00:00:00.000Z",
           "text": "Merged 1 duplicate record(s) with a wrong leading address digit (pre-existing bug from an earlier session's base-import/save-import work) into this canonical address"
+        },
+        {
+          "at": "2026-11-06T18:31:19.694Z",
+          "text": "edited by a traveller"
         }
       ],
       "galaxy": 0
@@ -84336,8 +84387,8 @@
   },
   "reports": [],
   "ipLog": {
-    "ip_4e59f91f046518f0": [
-      1793882521588
+    "ip_26feb95eb58006c7": [
+      1793989879694
     ]
   },
   "flagLog": {},
