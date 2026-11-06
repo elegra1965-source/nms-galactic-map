@@ -298,7 +298,7 @@ name" below) -- that's the actual way back to it.
 **Portal glyph keypad.** Type a hex address or tap the real 16 in-game glyphs
 directly -- both stay in sync, so you can decode a screenshot from your own
 game without knowing the hex first. Looking a system up is private: nothing
-is shared unless you press Save in Edit system.
+is shared unless you press Save in Edit system. In the system panel, under **Portal sequence & coordinates**, **Read these glyphs** opens the Alphabet Translator with that address already filled in.
 
 ![Portal glyph keypad](screenshots/06-glyph-keypad.png)
 
@@ -579,7 +579,7 @@ with the hex address. Tap one to fly there. A top-three system also gets a
 **🥇 #1 Most viewed this week** badge under its name in the info panel, and a
 medal in the Recently charted list, on the Community page and on the Hub. It
 resets every Monday at midnight (UK). Until the new week has three entries, it
-shows last week's final standings instead, so it's never empty. Only public
+shows last week's final standings instead, so it's never empty. The list opens with the top 5; a **Show places 6–10** button (kept in view as you scroll) opens the rest and **Show top 5 only** folds it back. Only public
 charted systems count, never private ones. Each device counts once per system
 per day, and your own systems don't count. `?trending=1` opens the list
 straight away. Handled by `netlify/functions/trending.mjs`. **🔔 TELL ME WHEN MY
@@ -589,6 +589,8 @@ and again for each better top-three place (`nms-push.js`; sent by the Weather
 station's alert server).
 
 <img src="screenshots/22-trending-list.jpg" alt="Trending this week on a phone: the top five most-viewed charted systems with medals, rank arrows, view counts and portal glyphs (example view counts)" width="360"> <img src="screenshots/22b-trending-badge.jpg" alt="Info panel of the number one system showing the #1 Most viewed this week badge (example)" width="330">
+
+<img src="screenshots/36-trending-top5-fold.jpg" alt="The Trending pop-up on a phone showing the top five systems and the Show places 6-10 button (example data)" width="360">
 
 *(Screenshots use real charted systems with example view counts.)*
 
@@ -735,7 +737,7 @@ the long Full guide in About is English for now and says so. It lives in
 
 **Always the newest version.** An installed app on a phone isn't reloaded when you switch back to it, so it could keep showing an old version until it was closed and reopened. Now, each time you come back to it (and every 30 minutes while it stays open), it checks for a new version. If one is live, a small bar says “New version ready · tap to update”, in your language. One tap reloads in place; × hides it. It never reloads by itself, so nothing you're in the middle of is lost. It lives in `nms-update.js`, the same file on every site.
 
-**Patch notes after a big update.** After you tap the update bar (or the first time you open a new version) a short pop-up says what changed, with NEW / IMPROVED / FIXED tags: a scan line sweeps down the screen and the panel appears behind it. It shows once per version, in your language, and only the newest notes if you skipped a version.
+**Patch notes after a big update.** After you tap the update bar (or the first time you open a new version) a short pop-up says what changed, with NEW / IMPROVED / FIXED tags: a scan line sweeps down the screen and the panel appears behind it. It shows once per version, in your language, and only the newest notes if you skipped a version. The "already seen" mark is a small cookie, `nms_pn`, shared by all six sites for 7 days and holding only the release date (like the language cookie), so Hub -> Map -> Theme doesn't repeat the same pop-up.
 
 <img src="screenshots/34-patch-notes.jpg" alt="The patch notes pop-up on a phone: System update received, Patch notes with the version, and the list of changes with NEW and IMPROVED tags" width="390">
 
@@ -766,9 +768,11 @@ recover, it says so plainly instead of guessing.
 ![Custom 404 page: a Hyperdrive Fault screen reading "Jump failed -- no system at this address", showing the recovered hex address 1CF0EE90BFFA next to its 12-glyph strip](screenshots/16-404-jump-failed.jpg)
 
 
-- **★ Reviews & feedback.** The crystal ★ button on the toolbar (on a phone, the bottom of the More panel) (it replaces the old GitHub-issue form in About; Report this system is unchanged; the tour has a step for it), opens the same pop-up as the Hub: leave a review (stars, and an "OK to show" switch), report a bug (your device type and browser are added so it can be fixed faster) or ask for something new. This site is ticked for you. Everything goes to elegra1965 through the Hub, and nothing shows on the site without his OK. In all 8 languages; the question at the top now reads "What's it about, traveller?". About now ends with a 1-2-3 button pyramid, every row the same width: **Got it**, then **Take a quick tour** + **Share this map** (your phone's share menu, or copies the link), then **X · Reddit · Discord**.
+- **★ Reviews & feedback.** The crystal ★ button on the toolbar (on a phone, the bottom of the More panel) (it replaces the old GitHub-issue form in About; Report this system is unchanged; the tour has a step for it), opens the same pop-up as the Hub: leave a review (stars, and an "OK to show" switch), report a bug (your device type and browser are added so it can be fixed faster) ask for something new, or choose **Other** for a plain question. Add an email address if you'd like a reply (used only as the email's reply-to, so a press of Reply reaches you; never saved). This site is ticked for you. Everything goes to elegra1965 through the Hub, and nothing shows on the site without his OK. In all 8 languages; the question at the top now reads "What's it about, traveller?". About now ends with a 1-2-3 button pyramid, every row the same width: **Got it**, then **Take a quick tour** + **Share this map** (your phone's share menu, or copies the link), then **X · Reddit · Discord**.
 
   <img src="screenshots/33-reviews-feedback.jpg" alt="About with the Reviews and feedback button, and the pop-up it opens, on a phone" width="560">
+
+  <img src="screenshots/37-feedback-other-reply-email.jpg" alt="The feedback pop-up on a phone with the four chips (Review, Bug, Idea / request, Other), the tool picker and the optional reply email (example text)" width="360">
 
 </details>
 
