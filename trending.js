@@ -106,7 +106,7 @@
     var top = el("div", "trTop");
     if(x.rank <= 3 && window.NMSMedals){ var pm = el("span", "trPos medal"); pm.appendChild(NMSMedals.mini(x.rank)); top.appendChild(pm); }
     else top.appendChild(el("span", "trPos" + (x.rank <= 3 ? " medal" : ""), x.rank <= 3 ? MEDAL[x.rank - 1] : "#" + x.rank));
-    top.appendChild(el("span", "searchResName trName", plain(x.name) || "Unnamed system"));
+    top.appendChild(el("span", "searchResName trName", cardName(x)));
     if(T.mode !== "last") top.appendChild(moveEl(x.move));
     r.appendChild(top);
     r.appendChild(el("div", "searchResMeta", (x.editor ? "by " + plain(x.editor) + " · " : "") + gal(x.galaxy) + " · " + x.views + (x.views === 1 ? " view" : " views")));
@@ -150,7 +150,7 @@
     if(T.lastWeek && T.mode !== "last"){
       var lw = el("div", "trLast");
       lw.appendChild(el("span", null, "Last week's 🥇 #1: "));
-      var b = el("button", "trLastBtn", plain(T.lastWeek.name) || "Unnamed system");
+      var b = el("button", "trLastBtn", cardName(T.lastWeek));
       b.type = "button"; b.className += " chartedRow";
       b.setAttribute("data-addr", T.lastWeek.address); b.setAttribute("data-galaxy", String(T.lastWeek.galaxy));
       lw.appendChild(b);
