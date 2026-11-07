@@ -34799,14 +34799,14 @@
           2,
           3
         ],
-        "screenshot": "https://raw.githubusercontent.com/elegra1965-source/nms-galactic-map/main/user-screenshots/0-106500630D1C-mw6monsl-17m7sp.jpg",
+        "screenshot": "https://raw.githubusercontent.com/elegra1965-source/nms-galactic-map/main/user-screenshots/0-106500630D1C-mw6msz7o-7j740x.jpg",
         "hasStation": false,
         "stationName": "",
         "allianceName": "",
         "stationPhoto": "",
         "signals": []
       },
-      "editedAt": "2026-11-07T16:39:03.389Z",
+      "editedAt": "2026-11-07T16:42:24.992Z",
       "editedByIp": "ip_9279193ba1812f5c",
       "history": [
         {
@@ -34819,6 +34819,10 @@
         },
         {
           "at": "2026-11-07T16:39:03.389Z",
+          "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-11-07T16:42:24.992Z",
           "text": "edited by a traveller"
         }
       ]
@@ -84823,7 +84827,8 @@
   "reports": [],
   "ipLog": {
     "ip_9279193ba1812f5c": [
-      1794069543389
+      1794069543389,
+      1794069744992
     ]
   },
   "flagLog": {},
