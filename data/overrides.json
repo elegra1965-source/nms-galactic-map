@@ -34645,11 +34645,11 @@
         "water": false,
         "dissonant": true,
         "giant": false,
-        "econName": "Engineering",
-        "sell": "63.5",
-        "buy": "-29.2",
-        "econDesc": "Sustainable",
-        "conflict": "Unthreatening",
+        "econName": "High Tech",
+        "sell": "79.9",
+        "buy": "-28.6",
+        "econDesc": "Comfortable",
+        "conflict": "Peaceful",
         "blackHole": false,
         "atlas": false,
         "ruins": false,
@@ -34659,18 +34659,20 @@
         "colliding": true,
         "collidingA": 2,
         "collidingB": 3,
-        "editorName": "",
+        "editorName": "elegra1965",
         "editorFriendCode": "",
-        "genVersion": "1.1.0",
+        "genVersion": "1.9.0",
         "bodies": [
           {
             "name": "Liwelly Q16",
             "moon": false,
             "orbits": 0,
-            "biome": "Marsh",
-            "descriptor": "",
-            "water": true,
-            "ring": false,
+            "biome": "Barren",
+            "subtype": "",
+            "descriptor": "Freezing Night Winds",
+            "water": false,
+            "ring": "tan",
+            "ringSet": false,
             "resources": [
               "Sodium",
               "Cobalt"
@@ -34680,8 +34682,10 @@
             "minerals": [],
             "salvage": [],
             "fossils": [],
-            "sentinel": "None",
+            "sentinel": "Intermittent",
             "autophage": false,
+            "reliquary": false,
+            "ruins": false,
             "base": false,
             "baseName": ""
           },
@@ -34689,10 +34693,12 @@
             "name": "Idetar",
             "moon": false,
             "orbits": 0,
-            "biome": "Lush",
-            "descriptor": "",
-            "water": true,
+            "biome": "Frozen",
+            "subtype": "",
+            "descriptor": "Freezing",
+            "water": false,
             "ring": false,
+            "ringSet": false,
             "resources": [
               "Magnetised Ferrite",
               "Sodium"
@@ -34702,8 +34708,10 @@
             "minerals": [],
             "salvage": [],
             "fossils": [],
-            "sentinel": "None",
+            "sentinel": "Ever-present",
             "autophage": false,
+            "reliquary": false,
+            "ruins": false,
             "base": false,
             "baseName": ""
           },
@@ -34711,10 +34719,12 @@
             "name": "Rosa",
             "moon": false,
             "orbits": 0,
-            "biome": "Radioactive",
-            "descriptor": "",
+            "biome": "Exotic",
+            "subtype": "",
+            "descriptor": "Invisible Jade Winds",
             "water": false,
             "ring": false,
+            "ringSet": false,
             "resources": [
               "Magnetised Ferrite",
               "Sodium"
@@ -34724,8 +34734,10 @@
             "minerals": [],
             "salvage": [],
             "fossils": [],
-            "sentinel": "None",
+            "sentinel": "Attentive",
             "autophage": false,
+            "reliquary": false,
+            "ruins": false,
             "base": false,
             "baseName": ""
           },
@@ -34733,10 +34745,12 @@
             "name": "Jessidau",
             "moon": false,
             "orbits": 0,
-            "biome": "Dead",
-            "descriptor": "",
-            "water": false,
+            "biome": "Lush",
+            "subtype": "",
+            "descriptor": "Occasional Scalding Cloudbursts",
+            "water": true,
             "ring": false,
+            "ringSet": false,
             "resources": [
               "Cobalt",
               "Gold"
@@ -34746,8 +34760,10 @@
             "minerals": [],
             "salvage": [],
             "fossils": [],
-            "sentinel": "None",
+            "sentinel": "Require Orthodoxy",
             "autophage": false,
+            "reliquary": false,
+            "ruins": false,
             "base": false,
             "baseName": ""
           },
@@ -34755,10 +34771,12 @@
             "name": "Iiha 86/X9",
             "moon": true,
             "orbits": 4,
-            "biome": "Marsh",
-            "descriptor": "",
-            "water": false,
+            "biome": "Lush",
+            "subtype": "",
+            "descriptor": "Torrential Heat",
+            "water": true,
             "ring": false,
+            "ringSet": false,
             "resources": [
               "Gold",
               "Magnetised Ferrite"
@@ -34768,15 +34786,28 @@
             "minerals": [],
             "salvage": [],
             "fossils": [],
-            "sentinel": "None",
+            "sentinel": "Sparse",
             "autophage": false,
+            "reliquary": false,
+            "ruins": false,
             "base": false,
             "baseName": ""
           }
-        ]
+        ],
+        "abandoned": false,
+        "collidingSet": [
+          2,
+          3
+        ],
+        "screenshot": "https://raw.githubusercontent.com/elegra1965-source/nms-galactic-map/main/user-screenshots/0-106500630D1C-mw6monsl-17m7sp.jpg",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": []
       },
-      "editedAt": "2026-08-23T18:02:29.561Z",
-      "editedByIp": "redacted",
+      "editedAt": "2026-11-07T16:39:03.389Z",
+      "editedByIp": "ip_9279193ba1812f5c",
       "history": [
         {
           "at": "2026-08-23T18:00:21.829Z",
@@ -34784,6 +34815,10 @@
         },
         {
           "at": "2026-08-23T18:02:29.561Z",
+          "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-11-07T16:39:03.389Z",
           "text": "edited by a traveller"
         }
       ]
@@ -84787,9 +84822,8 @@
   },
   "reports": [],
   "ipLog": {
-    "ip_eef595d6db4131a6": [
-      1794045289290,
-      1794045732728
+    "ip_9279193ba1812f5c": [
+      1794069543389
     ]
   },
   "flagLog": {},
@@ -85043,7 +85077,9 @@
       "No Atmosphere",
       "Toxic Superstorms",
       "Wintry",
-      "Peaceful"
+      "Peaceful",
+      "Occasional Scalding Cloudbursts",
+      "Torrential Heat"
     ],
     "biome": [
       "Radioactive",
