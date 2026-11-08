@@ -84826,14 +84826,212 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:118ED8F2B000": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Adpisemia V",
+        "race": "Vy'keen",
+        "region": "Zucairu Fringe",
+        "starClass": "E0",
+        "stars": [
+          "green"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Mass Production",
+        "sell": "-12.5",
+        "buy": "72.5",
+        "econDesc": "Unsuccessful",
+        "conflict": "Trivial",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "https://raw.githubusercontent.com/elegra1965-source/nms-galactic-map/main/user-screenshots/0-118ED8F2B000-mw7db2hm-fgei52.jpg",
+        "hasStation": true,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "https://raw.githubusercontent.com/elegra1965-source/nms-galactic-map/main/user-screenshots/0-118ED8F2B000-station-mw7db3k0-hjvguv.jpg",
+        "signals": [],
+        "editorName": "kuemp09",
+        "editorFriendCode": "",
+        "genVersion": "1.9.0",
+        "bodies": [
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Barren",
+            "subtype": "",
+            "descriptor": "Rare Firestorms",
+            "water": true,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Sodium"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Frequent",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Frozen",
+            "subtype": "",
+            "descriptor": "Harsh, Icy Winds",
+            "water": true,
+            "ring": "icy",
+            "ringSet": false,
+            "resources": [
+              "Sodium"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Ever-present",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Mega Exotic",
+            "subtype": "",
+            "descriptor": "Deadly Pressure Variations",
+            "water": true,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Magnetised Ferrite"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Frequent",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Frozen",
+            "subtype": "",
+            "descriptor": "Occasional Snowfall",
+            "water": false,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Silver"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Observant",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Barren",
+            "subtype": "",
+            "descriptor": "Dry Gusts",
+            "water": false,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Sodium"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Infrequent",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Mega Exotic",
+            "subtype": "",
+            "descriptor": "Harsh Toxic Wind",
+            "water": true,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Silver"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Enforcing",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          }
+        ]
+      },
+      "editedAt": "2026-11-08T05:04:18.883Z",
+      "editedByIp": "ip_c3411194a902a296",
+      "history": [
+        {
+          "at": "2026-11-08T05:04:18.883Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
-    "ip_9279193ba1812f5c": [
-      1794069543389,
-      1794069744992,
-      1794072926137
+    "ip_c3411194a902a296": [
+      1794114258883
     ]
   },
   "flagLog": {},
@@ -85089,7 +85287,10 @@
       "Wintry",
       "Peaceful",
       "Occasional Scalding Cloudbursts",
-      "Torrential Heat"
+      "Torrential Heat",
+      "Harsh, Icy Winds",
+      "Occasional Snowfall",
+      "Harsh Toxic Wind"
     ],
     "biome": [
       "Radioactive",
