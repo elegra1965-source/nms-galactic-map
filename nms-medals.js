@@ -368,6 +368,10 @@
       '.nmsm-rules{font-size:13.5px;color:#8fb4bf;text-align:center;margin:10px 0 0}',
       '.nmsm-mini{display:inline-block;width:30px;height:30px;vertical-align:middle;flex:0 0 30px}',
       '.nmsm-mini .nmsm-svg{width:30px;height:30px}',
+      '.nmsm-row{display:inline-flex;gap:1px;vertical-align:middle;margin-right:6px}',
+      '.nmsm-row .nmsm-mini,.nmsm-cnt .nmsm-mini,.c .nmsm-mini{width:22px;height:22px;flex-basis:22px}',
+      '.nmsm-row .nmsm-svg,.nmsm-cnt .nmsm-svg,.c .nmsm-svg{width:22px;height:22px}',
+      '.nmsm-cnt .nmsm-mini,.c .nmsm-mini{margin-right:5px}',
       'html.nmsm-open{overflow:hidden}',
       '@media (max-width:600px){.nmsm-stats{grid-template-columns:repeat(2,1fr)}.nmsm-ms{grid-template-columns:repeat(2,1fr)}.nmsm-st .n{font-size:22px}}',
       '@media (max-width:340px){.nmsm-card{padding:20px 12px 14px}.nmsm-gl img{width:20px;height:20px}.nmsm-hex{letter-spacing:.14em}.nmsm-btn{font-size:9.5px;letter-spacing:.08em}}'
@@ -455,9 +459,9 @@
         // no file sharing here (most computers): copy the picture, else save it
         if(navigator.clipboard && window.ClipboardItem){
           navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]).then(function(){
-            msg.textContent = T('✓ Picture copied — click the message box and press Ctrl+V (Cmd+V on Mac) to paste it');
-          }, function(){ download(blob, file); msg.textContent = T('Picture saved — attach it to your post'); });
-        } else { download(blob, file); msg.textContent = T('Picture saved — attach it to your post'); }
+            msg.textContent = T('✓ Picture copied. Click the message box and press Ctrl+V (Cmd+V on Mac) to paste it');
+          }, function(){ download(blob, file); msg.textContent = T('Picture saved. Attach it to your post'); });
+        } else { download(blob, file); msg.textContent = T('Picture saved. Attach it to your post'); }
       }).catch(function(){ busy(sh, false, t0); msg.textContent = T("Couldn't make the picture"); });
     });
     var ov = overlay(c, o.title);
@@ -647,7 +651,9 @@
     counts().then(function(c){
       var n = c && c[medalId(m)];
       if(!n) return;
-      el.textContent = '🏅 ' + (short ? T('{n} unlocked', { n:n }) : m.kind === 'day' ? T(n === 1 ? 'Unlocked by {n} traveller so far' : 'Unlocked by {n} travellers so far', { n:n }) : T(n === 1 ? 'Unlocked {n} time so far' : 'Unlocked {n} times so far', { n:n }));
+      var mt = m.metal || (m.kind === 'day' ? DAILY[m.n] : m.kind === 'week' ? 'silver' : 'gold');
+      el.textContent = (short ? T('{n} unlocked', { n:n }) : m.kind === 'day' ? T(n === 1 ? 'Unlocked by {n} traveller so far' : 'Unlocked by {n} travellers so far', { n:n }) : T(n === 1 ? 'Unlocked {n} time so far' : 'Unlocked {n} times so far', { n:n }));
+      el.insertBefore(metalMini(mt), el.firstChild);
       el.hidden = false;
     });
   }
@@ -687,7 +693,7 @@
       .then(function(r){ return r.json(); }).then(function(j){
         if(!j || !j.ok){ pend('add', info); return; }            // busy / unreachable: try again later
         pend('del', info);
-        if(!j.found){ if(!quiet) toast(T("Not counted for your streak — NMS Almanac can't find this system yet"), 5000); return; }
+        if(!j.found){ if(!quiet) toast(T("Not counted for your streak: NMS Almanac can't find this system yet"), 5000); return; }
         done = counted(); if(done[key]) return;
         done[key] = ukDay(); try { localStorage.setItem(LSK, JSON.stringify(done)); } catch(e){}
         var r = record(info);
@@ -715,7 +721,7 @@
     if(m.kind === 'day'){
       o.title = T('Daily discovery'); o.label = T('{n} DAYS', { n:m.n }); o.big = T('{n} DAYS', { n:m.n }); o.sub = T('In a row');
       var nx = null; TARGETS.daily.forEach(function(t){ if(nx === null && t > m.n) nx = t; });
-      o.next = nx ? T('Next medal: {n} days · {left} to go', { n:nx, left: nx - st.cur }) : T('Top daily medal — keep the streak going!');
+      o.next = nx ? T('Next medal: {n} days · {left} to go', { n:nx, left: nx - st.cur }) : T('Top daily medal. Keep the streak going!');
       o.shareText = '🔥 {n}-day discovery streak on the NMS Galactic Map!'.replace('{n}', m.n); // share messages stay English, like X / Reddit
     } else if(m.kind === 'week'){
       o.title = T('Weekly surveyor'); o.label = T('WEEKLY'); o.big = T('{n} SYSTEMS', { n: Math.max(st.week, TARGETS.week) }); o.sub = T('This week');
@@ -791,13 +797,16 @@
   /* ---------- rank medals (Trending / Top surveyors) ---------- */
   var RANK = ['gold', 'silver', 'bronze'];
   function rankMetal(r){ return RANK[r - 1] || null; }
+  function metalMini(metal){ var w = hel('span', 'nmsm-mini'); css(); w.appendChild(svg(metal, '', { noText:true })); w.setAttribute('aria-hidden', 'true'); return w; }
+  // 2026-11-08 (Tony): bronze, silver, gold in a row, replaces the old medal emoji in text lines
+  function row(){ var w = hel('span', 'nmsm-row'); ['bronze', 'silver', 'gold'].forEach(function(k){ w.appendChild(metalMini(k)); }); return w; }
   function mini(r){ var w = hel('span', 'nmsm-mini'); css(); w.appendChild(svg(rankMetal(r), '#' + r)); w.setAttribute('aria-label', '#' + r); return w; }
 
   window.NMSMedals = {
     svg: function(metal, label, o){ css(); return svg(metal, label, o); },
     play: play, card: function(o){ return card(o); }, cardBlob: cardBlob, close: closeOv,
     charted: charted, record: record, stats: function(){ return stats(); }, panel: panel,
-    streakLine: streakLine, earnedCard: earnedCard, me: me, mini: mini, rankMetal: rankMetal,
+    streakLine: streakLine, earnedCard: earnedCard, me: me, mini: mini, metalMini: metalMini, row: row, rankMetal: rankMetal,
     ukDay: ukDay, TARGETS: TARGETS, config: cfg, _unpack: unpack, _pack: pack, _runEnding: runEnding
   };
 

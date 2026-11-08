@@ -156,7 +156,7 @@ body.no-fx .orb{display:none}
     <div><small>TOTAL DISTANCE</small><strong id="statDist">&mdash;</strong></div>
     <div><small>TIME TAKEN</small><strong id="statTime">&mdash;</strong></div>
   </div>
-  <div id="replanBox" style="display:none" class="replan"><b style="color:var(--magenta)">OFF PLANNED ROUTE</b> — this journey included an unconfirmed black-hole emergence, so the real Navigator would have recalculated the route partway through.</div>
+  <div id="replanBox" style="display:none" class="replan"><b style="color:var(--magenta)">OFF PLANNED ROUTE</b>. This journey included an unconfirmed black-hole emergence, so the real Navigator would have recalculated the route partway through.</div>
   <div class="actions">
     <button id="viewMap">VIEW ON GALACTIC MAP</button>
     <button onclick="location.href='./index.html'">PLAN ANOTHER JOURNEY</button>
@@ -169,7 +169,7 @@ body.no-fx .orb{display:none}
     <button class="closeModal" id="closeSnap">&times;</button>
     <span class="eyebrow">JOURNEY SNAPSHOT</span>
     <h2>Capture your journey</h2>
-    <p class="hint">A shareable image generated from this journey's own route data — nothing invented, no black-hole exit guessed.</p>
+    <p class="hint">A shareable image generated from this journey's own route data. Nothing invented, no black-hole exit guessed.</p>
 
     <div class="polaroidFrame" id="polaroidFrame">
       <div class="snapPreview" id="snapPreview">
@@ -187,8 +187,8 @@ body.no-fx .orb{display:none}
           <div class="snapStatBar">
             <span id="snapJumps">&mdash;</span><span>&bull;</span><span id="snapDist">&mdash;</span><span id="snapTimeSep">&bull;</span><span id="snapTime"></span>
           </div>
-          <div class="snapBhNote" id="snapBhNote" style="display:none">Includes an unpredictable black-hole exit — route shown as planned, not guaranteed.</div>
-          <div class="snapWatermark">NMS GALACTIC MAP — GALACTIC NAVIGATOR</div>
+          <div class="snapBhNote" id="snapBhNote" style="display:none">Includes an unpredictable black-hole exit. Route shown as planned, not guaranteed.</div>
+          <div class="snapWatermark">NMS GALACTIC MAP · GALACTIC NAVIGATOR</div>
         </div>
       </div>
       <div class="polaroidCaption">Snapshot of Your NMS Journey</div>
@@ -556,7 +556,7 @@ body.no-fx .orb{display:none}
 
   if (raw) {
     document.getElementById("destTitle").textContent = raw.destination.systemName + " Reached";
-    document.getElementById("summarySub").textContent = raw.label + " — from " + raw.origin.systemName + " to " + raw.destination.systemName + ".";
+    document.getElementById("summarySub").textContent = raw.label + " · from " + raw.origin.systemName + " to " + raw.destination.systemName + ".";
     document.getElementById("statJumps").textContent = raw.totalJumps;
     var distText = (raw.totalDistance === 0 ? "< 1 region" : raw.totalDistance.toLocaleString() + " LY");
     document.getElementById("statDist").textContent = distText;
@@ -763,7 +763,7 @@ body.no-fx .orb{display:none}
           a.download = "nms-journey-snapshot.png";
           a.href = canvas.toDataURL("image/png");
           a.click();
-          toast("Sharing isn't available in this browser — image downloaded instead.");
+          toast("Sharing isn't available in this browser. Image downloaded instead.");
         }
       });
     });

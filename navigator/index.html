@@ -6,17 +6,17 @@
 <script>/* the old *.netlify.app address is retired: one family domain so the Traveller ID cookie reaches every app */if(/\.netlify\.app$/.test(location.hostname))location.replace("https://map.nomansskyhub.app"+location.pathname+location.search+location.hash);</script>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="format-detection" content="telephone=no">
-  <title>Galactic Navigator — No Man's Sky Route Planner</title>
+  <title>Galactic Navigator | No Man's Sky Route Planner</title>
   <meta name="robots" content="max-image-preview:large">
   <meta name="description" content="Plan a No Man's Sky hyperdrive route: real multi-jump stops for your drive type and range across the NMS Galactic Map. Free, no sign-up.">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="NMS Galactic Map">
-  <meta property="og:title" content="Galactic Navigator — NMS Galactic Map">
+  <meta property="og:title" content="Galactic Navigator | NMS Galactic Map">
   <meta property="og:description" content="Plot a real hyperdrive-aware multi-hop route across the NMS Galactic Map's procedural galaxy, by elegra1965.">
   <meta property="og:image" content="https://map.nomansskyhub.app/screenshots/12-galactic-navigator.jpg">
   <meta property="og:url" content="https://map.nomansskyhub.app/navigator/index.html">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Galactic Navigator — NMS Galactic Map">
+  <meta name="twitter:title" content="Galactic Navigator | NMS Galactic Map">
   <meta name="twitter:description" content="Plot a real hyperdrive-aware multi-hop route across the NMS Galactic Map's procedural galaxy, by elegra1965.">
   <meta name="twitter:image" content="https://map.nomansskyhub.app/screenshots/12-galactic-navigator.jpg">
   <link rel="canonical" href="https://map.nomansskyhub.app/navigator/index.html">
@@ -618,7 +618,7 @@ window.nmsCoreReady = new Promise(function (res) { window.__nmsCoreResolve = res
         </div>
         <div class="panelBody" id="routePanelBody">
         <details class="pickerFold">
-          <summary>SAMPLE JOURNEY — TAP TO SWITCH</summary>
+          <summary>SAMPLE JOURNEY · TAP TO SWITCH</summary>
           <div class="journeyPicker" id="journeyPicker"></div>
         </details>
 
@@ -637,7 +637,7 @@ window.nmsCoreReady = new Promise(function (res) { window.__nmsCoreResolve = res
         </div>
         <div class="routeCheck">
           <button class="linkBtn" id="checkRoute" type="button" title="Asks NMS Almanac whether every stop on this route is a real system in the game">&#10003; CHECK ROUTE WITH NMS ALMANAC</button>
-          <small class="routeCheckMsg" id="routeCheckMsg">Distances are approximate &mdash; check each jump is in range on your in-game galaxy map.</small>
+          <small class="routeCheckMsg" id="routeCheckMsg">Distances are approximate. Check each jump is in range on your in-game galaxy map.</small>
         </div>
 
         <div class="warpRange" id="warpRangeBox">
@@ -663,12 +663,12 @@ window.nmsCoreReady = new Promise(function (res) { window.__nmsCoreResolve = res
         </div>
 
         <details class="pickerFold">
-          <summary>WARP RANGE &amp; BLACK HOLES &mdash; TAP FOR INFO</summary>
+          <summary>WARP RANGE &amp; BLACK HOLES · TAP FOR INFO</summary>
           <div class="infoFoldBody">
             <p id="warpRangeHint">Jumps beyond your current warp range are flagged in the manifest as needing a multi-warp hop.</p>
             <div class="warning">
               <b>BLACK HOLES</b>
-              <p>Black-hole exits are random. This journey never treats one as a guaranteed final destination — you'll be asked to confirm where you actually emerged.</p>
+              <p>Black-hole exits are random. This journey never treats one as a guaranteed final destination. You'll be asked to confirm where you actually emerged.</p>
             </div>
           </div>
         </details>
@@ -771,7 +771,7 @@ window.nmsCoreReady = new Promise(function (res) { window.__nmsCoreResolve = res
   <div class="modalOverlay" id="fullManifestOverlay">
     <div class="modal" style="max-width:780px">
       <button class="closeModal" data-close="fullManifestOverlay">&times;</button>
-      <span class="eyebrow">WARP MANIFEST — FULL</span>
+      <span class="eyebrow">WARP MANIFEST · FULL</span>
       <h2 id="fmTitle">&mdash;</h2>
       <p class="modalSub" id="fmSub">&mdash;</p>
       <table>
@@ -791,7 +791,7 @@ window.nmsCoreReady = new Promise(function (res) { window.__nmsCoreResolve = res
       </video>
       <span class="eyebrow">BLACK HOLE ENCOUNTER</span>
       <h2 class="magentaText">BLACK HOLE AHEAD</h2>
-      <p class="modalSub">Entering this black hole will result in an unpredictable exit. It could land you far off your planned route in either direction &mdash; sometimes thousands of LY out of the way, occasionally closer than planned. The Navigator cannot guarantee it, so it is never treated as a confirmed shortcut.</p>
+      <p class="modalSub">Entering this black hole will result in an unpredictable exit. It could land you far off your planned route in either direction. Sometimes thousands of LY out of the way, occasionally closer than planned. The Navigator cannot guarantee it, so it is never treated as a confirmed shortcut.</p>
       <p class="modalSub">What would you like to do?</p>
       <div class="stackActions">
         <button class="bhUse" id="bhUse">USE BLACK HOLE</button>
@@ -813,7 +813,7 @@ window.nmsCoreReady = new Promise(function (res) { window.__nmsCoreResolve = res
       <p class="modalSub" id="emergeSub">You have emerged from the black hole. Your new location is unknown to the Navigator.</p>
       <p class="modalSub">Please confirm your current location to recalculate the route.</p>
       <div class="stackActions" id="emergeMainActions">
-        <button class="emergeConfirm" id="emergePlannedBtn">I AM HERE &mdash; AS PLANNED</button>
+        <button class="emergeConfirm" id="emergePlannedBtn">I AM HERE · AS PLANNED</button>
         <button class="emergeElsewhere" id="emergeElsewhereBtn">I actually emerged somewhere else</button>
         <button class="ghostCancel" data-close="emergeOverlay">CANCEL</button>
       </div>
@@ -836,7 +836,7 @@ window.MOCK_JOURNEYS = [
   {
     "version": 1,
     "id": "local-hop",
-    "label": "Local Hop — 3 jumps, no black hole",
+    "label": "Local Hop · 3 jumps, no black hole",
     "galaxy": 0,
     "origin": {
       "address": "1058E1434753",
@@ -968,7 +968,7 @@ window.MOCK_JOURNEYS = [
   {
     "version": 1,
     "id": "black-hole-shortcut",
-    "label": "Black Hole Crossing — 4 jumps, ends at an unpredictable black-hole exit",
+    "label": "Black Hole Crossing · 4 jumps, ends at an unpredictable black-hole exit",
     "galaxy": 0,
     "origin": {
       "address": "1058E1434753",
@@ -1124,7 +1124,7 @@ window.MOCK_JOURNEYS = [
   {
     "version": 1,
     "id": "extended-survey-run",
-    "label": "Extended Survey Run — 6 jumps, longer manifest",
+    "label": "Extended Survey Run · 6 jumps, longer manifest",
     "galaxy": 0,
     "origin": {
       "address": "1058E1434753",
@@ -1345,7 +1345,7 @@ window.MOCK_JOURNEYS = [
   var STORAGE_KEY = "nms-navigator-mock-journey"; // deliberately NOT "nms-v5-journey" — this must never be mistaken for real hand-off data
   var journeys = (window.MOCK_JOURNEYS || []).map(cloneJourney);
   if (!journeys.length) {
-    document.body.innerHTML = "<p style='color:#fff;padding:40px;font-family:sans-serif'>sample-journeys.js failed to load — run generate-sample-journeys.mjs first.</p>";
+    document.body.innerHTML = "<p style='color:#fff;padding:40px;font-family:sans-serif'>sample-journeys.js failed to load. Run generate-sample-journeys.mjs first.</p>";
     return;
   }
 
@@ -2435,7 +2435,7 @@ window.MOCK_JOURNEYS = [
     renderRouteVisual();
 
     var cur = jl[currentIndex()];
-    $("jumpLabel").textContent = "JUMP " + currentIndex() + " OF " + (jl.length - 1) + " — " + cur.systemName;
+    $("jumpLabel").textContent = "JUMP " + currentIndex() + " OF " + (jl.length - 1) + " · " + cur.systemName;
 
     var track = $("jumpTrack");
     track.innerHTML = jl.map(function (j, i) {
@@ -2456,10 +2456,10 @@ window.MOCK_JOURNEYS = [
   function jumpExpandHtml(j) {
     var inner;
     if (j.isBlackHole) {
-      inner = '<div class="jumpExpandInner"><p class="jeNote">Black hole — exit is unpredictable, not a guaranteed shortcut.</p></div>';
+      inner = '<div class="jumpExpandInner"><p class="jeNote">Black hole. Exit is unpredictable, not a guaranteed shortcut.</p></div>';
     } else if (j.detour) {
       inner = '<div class="jumpExpandInner">' +
-        '<p class="jeNote">Unplanned stop — added because you emerged from the black hole somewhere other than expected. A real charted system, just not part of the original route.</p>' +
+        '<p class="jeNote">Unplanned stop. Added because you emerged from the black hole somewhere other than expected. A real charted system, just not part of the original route.</p>' +
         '<div class="jeField"><span class="jeLabel">STAR TYPE</span><span class="jeVal">' + starDot(j.starType) + (j.starType || "—").toUpperCase() + '</span></div>' +
         '<div class="jeField"><span class="jeLabel">LIFEFORM</span><span class="jeVal">' + raceBadge(j.race) + " " + (j.race || "Uninhabited") + '</span></div>' +
         '<div class="jeField"><span class="jeLabel">ECONOMY</span><span class="jeVal">' + econIcon(j.econType) + " " + (j.economy || "—") + " " + wealthStars(j.econTier) + '</span></div>' +
@@ -2538,7 +2538,7 @@ window.MOCK_JOURNEYS = [
         '<div class="' + cls + '" data-index="' + i + '">' +
         "<b>" + mark + "</b>" +
         '<div class="info" data-detail="' + i + '"><strong>' + j.systemName + chkBadge(j) + "</strong>" +
-        "<small>" + starDot(j.starType) + distHtml + " — " + tag + "</small></div>" +
+        "<small>" + starDot(j.starType) + distHtml + " · " + tag + "</small></div>" +
         '<button class="jumpToggle' + (expanded ? " open" : "") + '" data-toggle="' + i + '" aria-label="' +
           (expanded ? "Hide details" : "Show details") + '" title="' + (expanded ? "Hide details" : "Show details") + '">&#9662;</button>' +
         '<button class="warpHere" data-warp="' + i + '" title="Jump to this point (dev aid)">&rarr;</button>' +
@@ -2570,7 +2570,7 @@ window.MOCK_JOURNEYS = [
     // Awaiting confirmation of where the player actually emerged, after
     // choosing USE BLACK HOLE.
     if (session.bh && session.bh.stage === "awaiting-emerge") {
-      $("emergeSub").textContent = "You have emerged from the black hole. Your new location is unknown to the Navigator until you confirm it — the planned next stop was " + next.systemName + ".";
+      $("emergeSub").textContent = "You have emerged from the black hole. Your new location is unknown to the Navigator until you confirm it. The planned next stop was " + next.systemName + ".";
 
       function resetEmergeSearch() {
         $("emergeSearchBlock").hidden = true;
@@ -2586,7 +2586,7 @@ window.MOCK_JOURNEYS = [
         session.lastDetourCount = insertSpecificDetour(ni, sys);
         closeModal("emergeOverlay");
         persist(); renderAll();
-        showToast("Got it — " + (sys.systemName || sys.name) + " added to your manifest as where you actually emerged.", 4200);
+        showToast("Got it · " + (sys.systemName || sys.name) + " added to your manifest as where you actually emerged.", 4200);
       }
 
       $("emergePlannedBtn").onclick = function () {
@@ -2594,7 +2594,7 @@ window.MOCK_JOURNEYS = [
         session.bh = null;
         closeModal("emergeOverlay");
         persist(); renderAll();
-        showToast("Marked as visited — continuing your planned route.");
+        showToast("Marked as visited. Continuing your planned route.");
       };
       // Reveal a real search instead of silently re-guessing — this is the
       // fix for "how does the user know [their real exit]": the player
@@ -2617,7 +2617,7 @@ window.MOCK_JOURNEYS = [
         results.innerHTML = pool.map(function (s, idx) {
           return '<button type="button" class="emergeResultRow" data-emerge-pick="' + idx + '">' +
             (s.systemName || s.name) + '<small>' + (s.region || "") +
-            (s.distanceFromHome != null ? " — " + formatLY(s.distanceFromHome) + " from home" : "") + '</small></button>';
+            (s.distanceFromHome != null ? " · " + formatLY(s.distanceFromHome) + " from home" : "") + '</small></button>';
         }).join("");
         Array.prototype.forEach.call(results.querySelectorAll("[data-emerge-pick]"), function (btn) {
           btn.onclick = function () { confirmActualSystem(pool[+btn.dataset.emergePick]); };
@@ -2631,8 +2631,8 @@ window.MOCK_JOURNEYS = [
         closeModal("emergeOverlay");
         persist(); renderAll();
         showToast(session.lastDetourCount
-          ? (session.lastDetourCount + " extra real jump" + (session.lastDetourCount === 1 ? "" : "s") + " added to your manifest — that's the black hole's unpredictability catching up with you.")
-          : "This is exactly where the real Navigator would recalculate your route — this mock doesn't re-run findRoute().", 4200);
+          ? (session.lastDetourCount + " extra real jump" + (session.lastDetourCount === 1 ? "" : "s") + " added to your manifest. That's the black hole's unpredictability catching up with you.")
+          : "This is exactly where the real Navigator would recalculate your route. This mock doesn't re-run findRoute().", 4200);
       };
       if (autoOpenedEmerge !== ni) { autoOpenedEmerge = ni; resetEmergeSearch(); openModal("emergeOverlay"); }
       area.innerHTML = '<button class="emergeReopenBtn" id="emergeReopen">&#10022; CONFIRM WHERE YOU EMERGED</button>';
@@ -2652,16 +2652,16 @@ window.MOCK_JOURNEYS = [
         session.currentJump = Math.min(ni + 1, jl.length - 1);
         closeModal("bhOverlay");
         persist(); renderAll();
-        showToast("Black hole bypassed — continuing on the charted route.");
+        showToast("Black hole bypassed. Continuing on the charted route.");
       };
       if (autoOpenedBH !== ni) { autoOpenedBH = ni; openModal("bhOverlay"); }
-      area.innerHTML = '<button class="bhReopenBtn" id="bhReopen">&#9888; BLACK HOLE AHEAD — VIEW OPTIONS</button>';
+      area.innerHTML = '<button class="bhReopenBtn" id="bhReopen">&#9888; BLACK HOLE AHEAD · VIEW OPTIONS</button>';
       $("bhReopen").onclick = function () { openModal("bhOverlay"); };
       return;
     }
 
     // Normal jump.
-    var label = isLast(ni) ? "I AM HERE — COMPLETE JOURNEY" : "I AM HERE";
+    var label = isLast(ni) ? "I AM HERE · COMPLETE JOURNEY" : "I AM HERE";
     area.innerHTML = '<button class="primary" id="hereBtn">' + label + "</button>";
     $("hereBtn").onclick = function () {
       var btn = this;
@@ -2714,7 +2714,7 @@ window.MOCK_JOURNEYS = [
     div.innerHTML = "<b style='color:var(--magenta)'>OFF PLANNED ROUTE</b><p>You emerged somewhere other than expected." +
       (session.lastDetourCount
         ? " " + session.lastDetourCount + " extra real jump" + (session.lastDetourCount === 1 ? "" : "s") + " (marked DETOUR below) " + (session.lastDetourCount === 1 ? "was" : "were") + " added to get you back on course."
-        : " The real Navigator would recalculate from here — this mock leaves the rest of the manifest as originally planned.") +
+        : " The real Navigator would recalculate from here. This mock leaves the rest of the manifest as originally planned.") +
       "</p>";
     $("routePanelBody").appendChild(div);
   }
@@ -2863,14 +2863,14 @@ window.MOCK_JOURNEYS = [
 
     $("jdName").textContent = j.systemName;
     $("jdSub").textContent = "JUMP " + index + " OF " + (jl.length - 1) +
-      (j.isBlackHole ? " — BLACK HOLE" : "") + (j.isAtlas ? " — ATLAS INTERFACE" : "");
+      (j.isBlackHole ? " · BLACK HOLE" : "") + (j.isAtlas ? " · ATLAS INTERFACE" : "");
 
     var fromRow = $("jdFromRow");
     if (prev) {
       fromRow.style.display = "";
       $("jdFromIcon").className = "jdIcon " + (prev.starType || "yellow");
       $("jdFromName").textContent = prev.systemName;
-      $("jdFromSub").textContent = prev.region + " — " + (prev.economy || "—");
+      $("jdFromSub").textContent = prev.region + " · " + (prev.economy || "—");
       var cum = 0;
       for (var k = 1; k < index; k++) cum += jl[k].distance;
       $("jdFromDist").innerHTML = formatLY(cum);
@@ -2885,7 +2885,7 @@ window.MOCK_JOURNEYS = [
     }
     $("jdToIcon").className = "jdIcon " + (j.starType || "yellow");
     $("jdToName").textContent = j.systemName;
-    $("jdToSub").textContent = j.region + " — " + (j.economy || "—");
+    $("jdToSub").textContent = j.region + " · " + (j.economy || "—");
 
     $("jdGlyphStrip").innerHTML = glyphStrip(j.address);
     $("jdStarType").innerHTML = starDot(j.starType) + (j.starType || "—").toUpperCase();
@@ -2901,7 +2901,7 @@ window.MOCK_JOURNEYS = [
     $("jdNext").disabled = index >= jl.length - 1;
 
     $("jdViewMap").onclick = function () {
-      showToast("This opens the system on the real Galactic Map once V5 is switched on — not wired up in this mock.", 3600);
+      showToast("This opens the system on the real Galactic Map once V5 is switched on. Not wired up in this mock.", 3600);
     };
     openModal("jumpDetailOverlay");
   }
@@ -2951,7 +2951,7 @@ window.MOCK_JOURNEYS = [
     var ci = currentIndex();
     $("fmTitle").textContent = sessionLabel();
     $("fmSub").textContent = session.origin.systemName + " → " + session.destination.systemName +
-      " — " + jl.length + " systems, " + formatLYPlain(session.route.totalDistance);
+      " · " + jl.length + " systems, " + formatLYPlain(session.route.totalDistance);
     $("fmBody").innerHTML = jl.map(function (j, i) {
       if (i === 0) return "";
       var prev = jl[i - 1];
@@ -3271,7 +3271,7 @@ window.MOCK_JOURNEYS = [
       if (!banner) return;
       banner.innerHTML = "Requested from Galaxy Map: <b>" + fromName + "</b> &rarr; <b>" + toName + "</b>" +
         (jumps ? " &middot; " + jumps + " jumps" : "") + (dist ? " &middot; " + dist : "") +
-        (session.isLivePlot ? " &mdash; showing your real plotted route" : " &mdash; showing a sample journey below");
+        (session.isLivePlot ? " · showing your real plotted route" : " · showing a sample journey below");
       banner.classList.add("show");
 
       // dataStatus (top-right header pill) is the one place that still
@@ -3316,7 +3316,7 @@ window.MOCK_JOURNEYS = [
   // without this, silently picking up mid-route with no explanation could
   // easily read as a bug ("didn't I start over?") rather than the feature
   // it is.
-  if (resumedFromStorage) showToast("Welcome back — resuming your in-progress trip.", 3200);
+  if (resumedFromStorage) showToast("Welcome back. Resuming your in-progress trip.", 3200);
 
   // 2026-08-31: suggest landscape on a narrow/portrait phone instead of the
   // route/manifest panels squeezing into the mobile bottom-sheet. Deliberately

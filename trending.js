@@ -15,6 +15,8 @@
   var URL_T = "/.netlify/functions/trending";
   var SEEN_K = "nms-trend-seen";
   var MEDAL = ["🥇", "🥈", "🥉"];
+  // 2026-11-08 (Tony): the drawn medal instead of the emoji (emoji only if the medal script has not loaded)
+  function medalIcon(r){ return window.NMSMedals ? NMSMedals.mini(r) : document.createTextNode(MEDAL[r - 1] + " "); }
   var line = document.getElementById("trendLine");
   var pop = document.getElementById("trendPop");
   var list = document.getElementById("trendList");
@@ -68,7 +70,7 @@
     if(!name) return;
     if(!b){ b = el("div"); b.id = "trendBadge"; name.parentNode.insertBefore(b, name.nextSibling); }
     var r = s && !s.privateOnly ? T.rank[s.galaxy + ":" + s.address] : 0;
-    if(r && r <= 3){ b.textContent = MEDAL[r - 1] + " #" + r + (T.mode === "last" ? " last week" : " Most viewed this week"); b.hidden = false; }
+    if(r && r <= 3){ b.textContent = ""; b.appendChild(medalIcon(r)); b.appendChild(document.createTextNode(" #" + r + (T.mode === "last" ? " last week" : " Most viewed this week"))); b.hidden = false; }
     else { b.textContent = ""; b.hidden = true; }
   }
 
@@ -149,7 +151,7 @@
     if(more){ list.appendChild(more); list.appendChild(moreBtn); }
     if(T.lastWeek && T.mode !== "last"){
       var lw = el("div", "trLast");
-      lw.appendChild(el("span", null, "Last week's 🥇 #1: "));
+      lw.appendChild(medalIcon(1)); lw.appendChild(el("span", null, " Last week's #1: "));
       var b = el("button", "trLastBtn", cardName(T.lastWeek));
       b.type = "button"; b.className += " chartedRow";
       b.setAttribute("data-addr", T.lastWeek.address); b.setAttribute("data-galaxy", String(T.lastWeek.galaxy));
@@ -234,9 +236,11 @@
     var b = document.getElementById("streakBtn");
     if(!b || !window.NMSMedals) return;
     var st = NMSMedals.stats();
-    b.textContent = st.any && st.cur
+    b.textContent = "";
+    if(!(st.any && st.cur)) b.appendChild(NMSMedals.row());
+    b.appendChild(document.createTextNode(st.any && st.cur
       ? "\uD83D\uDD25 " + (window.NMS_T ? NMS_T(st.cur === 1 ? "Your streak: {n} day · view medals ›" : "Your streak: {n} days · view medals ›", { n: st.cur }) : "Your streak: " + st.cur + " days · view medals ›")
-      : "\uD83C\uDFC5 " + (window.NMS_T ? NMS_T("Streak medals: chart a new system every day ›") : "Streak medals: chart a new system every day ›");
+      : (window.NMS_T ? NMS_T("Streak medals: chart a new system every day ›") : "Streak medals: chart a new system every day ›")));
     b.hidden = false;
     if(!b._w){ b._w = 1; b.addEventListener("click", function(e){ e.stopPropagation(); if(pop) pop.classList.remove("show"); NMSMedals.panel(); }); }
   }
@@ -305,7 +309,7 @@
     for(var k in seen) if(k.indexOf(T.week) < 0) delete seen[k];
     try { localStorage.setItem(RANK_SEEN_K, JSON.stringify(seen)); } catch(e){}
     var pop = el("div"); pop.id = "rankPop"; pop.setAttribute("role", "dialog"); pop.setAttribute("aria-label", "Your system's rank");
-    pop.appendChild(el("div", "rpKick", MEDAL[x.rank - 1] + (pick.last ? " You finished #" + x.rank + " last week" : " You're #" + x.rank + " this week")));
+    var kick = el("div", "rpKick"); kick.appendChild(medalIcon(x.rank)); kick.appendChild(document.createTextNode(pick.last ? " You finished #" + x.rank + " last week" : " You're #" + x.rank + " this week")); pop.appendChild(kick);
     pop.appendChild(el("div", "rpName", name));
     var moveTxt = (!pick.last && typeof x.move === "number" && x.move > 0) ? " · up " + x.move + (x.move === 1 ? " place" : " places") : "";
     pop.appendChild(el("div", "rpSub", "Most viewed charted systems · " + gal(x.galaxy) + " · " + x.views + (x.views === 1 ? " view" : " views") + moveTxt));

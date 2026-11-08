@@ -2288,7 +2288,7 @@ function toast(msg,ms){
 }
 function shareTo(t){
   var url="https://map.nomansskyhub.app",
-      txt="NMS Galactic Map \u2014 a fan-made 3D No Man's Sky galaxy map and portal address decoder, by elegra1965.";
+      txt="NMS Galactic Map. A fan-made 3D No Man's Sky galaxy map and portal address decoder, by elegra1965.";
   if(t==="x") window.open("https://twitter.com/intent/tweet?text="+encodeURIComponent(txt)+"&url="+encodeURIComponent(url),"_blank");
   else if(t==="reddit") window.open("https://www.reddit.com/submit?url="+encodeURIComponent(url)+"&title="+encodeURIComponent("NMS Galactic Map"),"_blank");
   /* 2026-10-31: About's "Share this map" button -- phone/OS share menu where there is one, else copy the link */
@@ -2297,7 +2297,7 @@ function shareTo(t){
   /* 2026-10-27 (Tony): Discord has no share link -- copy the message + link, then open Discord so they
      pick the server / DM (same as the Hub). Opened straight away so pop-up blockers don't stop it. */
   else if(t==="discord"){
-    var _dm=(window.NMS_TR||String)("\u2713 COPIED \u2014 PASTE IT IN ANY SERVER OR DM");
+    var _dm=(window.NMS_TR||String)("\u2713 COPIED · PASTE IT IN ANY SERVER OR DM");
     try{ navigator.clipboard.writeText(txt+" "+url).then(function(){ toast(_dm,4500); },function(){ toast(_dm,4500); }); }catch(e){ toast(_dm,4500); }
     window.open("https://discord.com/app","_blank");
   }
@@ -4273,7 +4273,7 @@ function mergeWaypointsIntoSlice(){
    time, so there's no canonical "how the real game shows this" to copy. */
 function setCourse(s,silent){
   if(!focusSystem){ toast("Jump somewhere first"); return; }
-  if(s.address===focusSystem.address){ toast("That is where you are — pick another star"); return; }
+  if(s.address===focusSystem.address){ toast("That is where you are. Pick another star"); return; }
   maybeShowHyperNotice();
   courseTarget=s;
   var dvx=s.vx-focusSystem.vx, dvy=s.vy-focusSystem.vy, dvz=s.vz-focusSystem.vz;
@@ -6189,7 +6189,7 @@ function showBody(b,s){
   // 2026-09-08: Sub type shown alongside Biome (e.g. "Radioactive
   // (Nuclear)") when a traveller has reported one -- Conditions/descriptor
   // still appends after, same as before.
-  document.getElementById("bBiome").textContent=(b.biomeOverridden?(b.biome+(b.subtype?" ("+b.subtype+")":"")):"Unknown")+(b.descriptor?" \u2014 "+b.descriptor:"");
+  document.getElementById("bBiome").textContent=(b.biomeOverridden?(b.biome+(b.subtype?" ("+b.subtype+")":"")):"Unknown")+(b.descriptor?" · "+b.descriptor:"");
   document.getElementById("bTerr").textContent=b.terrain+(b.water?" · has water":" · no water");
   var t=[["",b.moon?"Moon":(s.giant?"Giant":"Planet")]];
   if(!biomePal(b.biome).atmo) t.push(["","No atmosphere"]);
@@ -6240,7 +6240,7 @@ function showBody(b,s){
   if(b.resUni) for(i=0;i<b.resUni.length;i++) rlist.push(b.resUni[i]);
   var rhtml="";
   for(i=0;i<rlist.length;i++) rhtml+='<span class="tag">'+rlist[i]+'</span>';
-  document.getElementById("bRes").innerHTML=rhtml||'<span class="tag">Varies &mdash; unconfirmed</span>';
+  document.getElementById("bRes").innerHTML=rhtml||'<span class="tag">Varies. Unconfirmed</span>';
   /* the 4 player-submitted resource groups only take up space once someone
      has actually reported something in them -- most bodies won't have any
      of this yet, so each row hides itself rather than showing empty */
@@ -6584,7 +6584,7 @@ document.getElementById("rrClose").addEventListener("click",hideResourceReport);
 // gameplay mechanic.
 document.getElementById("rrMarker").addEventListener("click",function(){
   var ud=document.getElementById("resReport")._ud;
-  toast(ud?("Marker set \u2014 "+ud.name.toUpperCase()):"Marker set");
+  toast(ud?("Marker set · "+ud.name.toUpperCase()):"Marker set");
 });
 
 /* ============ hover popup + course preview (Session 38) ============
@@ -7701,8 +7701,8 @@ function updateGalaxyInfo(){
 function galInfoHTML(){
   var gt=galaxyType(GALAXY);
   var typeLabel=gt.k==="Unknown"?"TYPE UNKNOWN":gt.k==="Norm"?"NORMAL":gt.k.toUpperCase();
-  return GALAXIES[GALAXY].toUpperCase()+" \u2014 GALAXY #"+(GALAXY+1)+" OF "+GALAXIES.length+
-    " \u2014 <span style=\"color:"+gt.c+"\">"+typeLabel+"</span>";
+  return GALAXIES[GALAXY].toUpperCase()+" · GALAXY #"+(GALAXY+1)+" OF "+GALAXIES.length+
+    " · <span style=\"color:"+gt.c+"\">"+typeLabel+"</span>";
 }
 function updateGalInfoBadge(){
   var el=document.getElementById("galInfo");
@@ -8163,7 +8163,7 @@ function havenRender(body,d){
   var foot=havenEl("div",null,"margin-top:6px;font-size:10px;color:var(--text-faint)");
   foot.appendChild(document.createTextNode("Data via "));
   var a=havenEl("a","Voyager's Haven","color:var(--cyan)"); a.href=h.url; a.target="_blank"; a.rel="noopener";
-  foot.appendChild(a); foot.appendChild(document.createTextNode(" — community-submitted, separate from this map's own data."));
+  foot.appendChild(a); foot.appendChild(document.createTextNode(" · community-submitted, separate from this map's own data."));
   body.appendChild(foot);
 }
 function havenLoad(){
@@ -8246,7 +8246,7 @@ document.getElementById("fFile").addEventListener("change",function(e){
           .sort(function(a,b){ return (b.savedAt||0)-(a.savedAt||0); });
       }
       saveStore(); applyFilter(); buildGalaxyMarks(); renderRoutesList(); toast("Logs imported");
-    }catch(err){ toast("Import failed — bad file"); }
+    }catch(err){ toast("Import failed: bad file"); }
   };
   rd.readAsText(f);
 });
@@ -9438,7 +9438,7 @@ function renderCollidingSelectors(){
     for(var p=0;p<planets.length;p++){
       var pIdx=editBodies.indexOf(planets[p])+1;
       html+='<option value="'+planets[p].uid+'"'+(String(selectedUid)===String(planets[p].uid)?" selected":"")+
-        '>'+(isGiantSys?"Giant":("Planet #"+pIdx))+' — '+escAttr(planets[p].name||"(unnamed)")+'</option>';
+        '>'+(isGiantSys?"Giant":("Planet #"+pIdx))+' · '+escAttr(planets[p].name||"(unnamed)")+'</option>';
     }
     return html;
   }
@@ -9489,7 +9489,7 @@ function renderBodyEditList(){
     var summary=escAttr(b.name||b.nameGuess||"(unnamed)");
     html+='<div class="bodyEdit'+(b.open?" open":"")+'" data-i="'+i+'">'+
       '<div class="bhead">'+
-        '<span class="bhLabel">'+(b.moon?"Moon":(isGiantSys?"Giant":"Planet"))+' #'+(i+1)+' &mdash; '+summary+'</span>'+
+        '<span class="bhLabel">'+(b.moon?"Moon":(isGiantSys?"Giant":"Planet"))+' #'+(i+1)+' · '+summary+'</span>'+
         '<span class="bhBtns"><span class="bchev">'+(b.open?"&#9662;":"&#9656;")+'</span>'+
           '<span class="bx" data-remove="'+i+'" title="Remove">&times;</span></span>'+
       '</div>';
@@ -9553,7 +9553,7 @@ function renderBodyEditList(){
         for(var p=0;p<editBodies.length;p++){
           if(p===i || editBodies[p].moon) continue;
           orbOpts+='<option value="'+editBodies[p].uid+'"'+(String(b.orbits)===String(editBodies[p].uid)?" selected":"")+
-            '>'+(isGiantSys?"Giant":("Planet #"+(p+1)))+' — '+escAttr(editBodies[p].name||editBodies[p].nameGuess||"(unnamed)")+'</option>';
+            '>'+(isGiantSys?"Giant":("Planet #"+(p+1)))+' · '+escAttr(editBodies[p].name||editBodies[p].nameGuess||"(unnamed)")+'</option>';
         }
         html+='<div class="mfld" style="margin-bottom:0"><div class="lb">Orbits</div><select class="bfOrbits" data-i="'+i+'">'+orbOpts+'</select></div>';
       }
@@ -10075,7 +10075,7 @@ function edUpdateWizNav(){
   var kids=document.getElementById("edScanbar").children;
   for(var i=0;i<kids.length;i++) kids[i].className = i<edWizStep?"done":(i===edWizStep?"now":"");
   document.getElementById("edScanlabel").innerHTML =
-    "Compiling survey log &mdash; step "+(edWizStep+1)+" of "+EDSEC_ORDER.length+": <b>"+EDSEC_META[EDSEC_ORDER[edWizStep]].title+"</b>";
+    "Compiling survey log. Step "+(edWizStep+1)+" of "+EDSEC_ORDER.length+": <b>"+EDSEC_META[EDSEC_ORDER[edWizStep]].title+"</b>";
   var last=edWizStep===EDSEC_ORDER.length-1;
   document.getElementById("edWizBack").style.visibility = edWizStep===0?"hidden":"visible";
   document.getElementById("edWizNext").style.display = last?"none":"";
@@ -10506,7 +10506,7 @@ function renderSignalEditList(){
     var summary=escAttr(g.name||"(unnamed signal)");
     html+='<div class="bodyEdit'+(g.open?" open":"")+'" data-si="'+i+'">'+
       '<div class="bhead">'+
-        '<span class="bhLabel">Signal #'+(i+1)+' &mdash; '+summary+'</span>'+
+        '<span class="bhLabel">Signal #'+(i+1)+' · '+summary+'</span>'+
         '<span class="bhBtns"><span class="bchev">'+(g.open?"&#9662;":"&#9656;")+'</span>'+
           '<span class="bx" data-sigremove="'+i+'" title="Remove">&times;</span></span>'+
       '</div>';
@@ -10560,7 +10560,7 @@ function renderSignalEditList(){
         '<div class="mfld" style="margin-bottom:0"><div class="lb">Near which planet/moon</div><select class="sgPlanet" data-si="'+i+'"><option value="">Not linked (floating)</option>';
       for(var pj=0;pj<editBodies.length;pj++){
         html+='<option value="'+editBodies[pj].uid+'"'+(String(g.planetUid)===String(editBodies[pj].uid)?" selected":"")+
-          '>'+(editBodies[pj].moon?"Moon":"Planet")+' #'+(pj+1)+' \u2014 '+escAttr(editBodies[pj].name||editBodies[pj].nameGuess||"(unnamed)")+'</option>';
+          '>'+(editBodies[pj].moon?"Moon":"Planet")+' #'+(pj+1)+' · '+escAttr(editBodies[pj].name||editBodies[pj].nameGuess||"(unnamed)")+'</option>';
       }
       html+='</select></div>';
     }

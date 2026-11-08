@@ -9,7 +9,7 @@
 <script src="calm.js?v=2"></script>
 <script src="/lang.js?v=2"></script>
 <script src="/nms-update.js?v=4" defer></script>
-<title>NMS Galactic Map — 3D Galaxy Map &amp; Portal Address Decoder</title>
+<title>NMS Galactic Map | 3D Galaxy Map &amp; Portal Address Decoder</title>
 <meta name="description" content="Free 3D No Man's Sky galaxy map: decode portal glyph addresses, find systems travellers have charted and plot routes across all 256 galaxies. No sign-up.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="NMS Galactic Map">
@@ -670,6 +670,10 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border:none;border-ra
 #trendBadge{margin-top:3px;display:inline-block;padding:2px 8px;border:1px solid rgba(240,165,0,.55);border-radius:999px;
   font-family:'Orbitron',sans-serif;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#f0a500;background:rgba(240,165,0,.08)}
 #trendBadge[hidden]{display:none}
+#trendBadge .nmsm-mini,.trLast .nmsm-mini,#rankPop .rpKick .nmsm-mini{width:20px;height:20px;flex-basis:20px;margin-right:3px}
+#trendBadge .nmsm-svg,.trLast .nmsm-svg,#rankPop .rpKick .nmsm-svg{width:20px;height:20px}
+#streakBtn .nmsm-row .nmsm-mini{width:20px;height:20px;flex-basis:20px}
+#streakBtn .nmsm-row .nmsm-svg{width:20px;height:20px}
 .kpriv{margin-top:7px;font-size:10.5px;line-height:1.4;color:var(--text-faint);text-align:center}
 .privRow{display:block;width:100%;text-align:left;background:none;border:0;border-top:1px solid var(--border-soft);font:inherit;color:inherit;padding:7px 2px;cursor:pointer}
 .privRow:hover,.privRow:focus-visible{background:rgba(240,165,0,.06);outline:none}
@@ -1853,7 +1857,7 @@ nearby procedural space within a radius.">Search</button>
   <div id="filt" class="box fold min">
     <div class="kicker fhead" id="fHead"><span id="fHeadLabel">▸ Filters</span><button class="btn" id="bFiltMin" type="button" title="Collapse or expand the filters panel.">&#9656;</button></div>
     <div class="fbody">
-      <div style="font-size:10.5px;color:var(--text-faint);line-height:1.35;margin-bottom:7px">Applies to Local view — that is where the real systems are. These dim/hide stars on THIS map; to browse and jump straight back to everywhere you've bookmarked, waypointed, visited, or edited, open Search and leave the box empty.</div>
+      <div style="font-size:10.5px;color:var(--text-faint);line-height:1.35;margin-bottom:7px">Applies to Local view, where the real systems are. These dim/hide stars on THIS map; to browse and jump straight back to everywhere you've bookmarked, waypointed, visited, or edited, open Search and leave the box empty.</div>
       <div class="fld"><div class="lb">Star colour</div>
         <select id="fCol"><option value="">Any</option><option>yellow</option><option>red</option>
         <option>green</option><option>blue</option><option>purple</option></select></div>
@@ -1889,13 +1893,13 @@ nearby procedural space within a radius.">Search</button>
           title="Set your hyperdrive class and jump range. Drives are backwards-compatible -- an Indium Drive also reaches yellow/red/green, not just blue. Used for reachability warnings and course plotting.">
           <span id="hyperSummary">Standard // 101 LY</span></button>
         <select id="fHyper" style="display:none">
-          <option value="101" selected>101 LY — Basic (default)</option>
+          <option value="101" selected>101 LY · Basic (default)</option>
           <option value="500">500 LY</option>
           <option value="1000">1000 LY</option>
           <option value="1500">1500 LY</option>
-          <option value="2200">2200 LY — S upgrades</option>
-          <option value="3000">3000 LY — S explorer</option>
-          <option value="6000">6000 LY — freighter</option>
+          <option value="2200">2200 LY · S upgrades</option>
+          <option value="3000">3000 LY · S explorer</option>
+          <option value="6000">6000 LY · freighter</option>
         </select>
         <select id="fHyperDrive" style="display:none">
           <option value="standard" selected>Standard Hyperdrive</option>
@@ -2277,7 +2281,7 @@ nearby procedural space within a radius.">Search</button>
   <div class="searchResMeta" id="trendSub" style="margin-bottom:6px">The charted systems travellers opened most this week. Resets every Monday at midnight (UK). Tap one to fly there.</div>
   <div id="trendList"></div>
   <button class="pill" type="button" id="trendAlertBtn" style="width:100%;margin-top:8px;padding:9px 8px;font-size:10px">&#128276; TELL ME WHEN MY SYSTEM TRENDS</button>
-  <button class="pill" type="button" id="streakBtn" hidden style="width:100%;margin-top:6px;padding:9px 8px;font-size:10px;border-style:dashed">&#127941; Streak medals: chart a new system every day &rsaquo;</button>
+  <button class="pill" type="button" id="streakBtn" hidden style="width:100%;margin-top:6px;padding:9px 8px;font-size:10px;border-style:dashed">Streak medals: chart a new system every day &rsaquo;</button>
 </div>
 
 <div class="box" id="accessPop" role="dialog" aria-label="Accessibility settings">
@@ -2588,7 +2592,7 @@ nearby procedural space within a radius.">Search</button>
                press Save ONCE (one upload, one commit, no "already edited" on a second save). -->
           <div id="edStationPhotoReady" style="display:none;margin-top:6px;padding:7px 9px;border:1px solid rgba(91,227,143,.45);border-radius:var(--r-sm);background:rgba(91,227,143,.07)">
             <div style="font-size:11px;color:var(--text);line-height:1.4">&#10003; Photo added to this edit. Nothing is uploaded yet: press <b>Done</b>, fill in anything else you know, then press <b>Save</b> once at the end and it all goes up together.</div>
-            <button class="btn primary" id="edStationPhotoDone" type="button" style="margin-top:6px;width:100%;padding:5px 10px;font-size:11px">&#10003; Done &mdash; back to the rest of the edit</button>
+            <button class="btn primary" id="edStationPhotoDone" type="button" style="margin-top:6px;width:100%;padding:5px 10px;font-size:11px">&#10003; Done. Back to the rest of the edit</button>
           </div>
         </div>
       </div>
@@ -3070,7 +3074,7 @@ loadLetterMap('./nms-core/letter-map').then(function(lm){
 <script src="charted.js?v=20261104"></script>
 <script src="phone-controls.js?v=20261106"></script>
 <script>/* medals + streaks (nms-medals.js, same file as the Hub) */window.NMSMedals_CONFIG={glyph:function(ch){return "glyphs/glyph-mask-"+ch+".png";},mapUrl:"https://map.nomansskyhub.app",countUrl:"/.netlify/functions/medal-count",counts:true};</script>
-<script src="/nms-medals.js?v=2"></script>
+<script src="/nms-medals.js?v=3"></script>
 <script src="trending.js?v=20261106"></script>
 <script src="nms-push.js"></script>
 <script>

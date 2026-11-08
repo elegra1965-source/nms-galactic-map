@@ -23,7 +23,7 @@
   }
   function busyToast(){
     if(Date.now() - busyToastAt < 600000) return; busyToastAt = Date.now();
-    if(typeof toast === "function") toast("NMS Almanac is busy right now — please try again later.", 4000);
+    if(typeof toast === "function") toast("NMS Almanac is busy right now. Please try again later.", 4000);
   }
   var inflight = {};
   function get(s){
@@ -152,7 +152,7 @@
   function render(body, s, d){
     body.textContent = "";
     if(!d || !d.ok){
-      body.appendChild(el("div", d && d.busy ? "NMS Almanac is busy right now — please try again later." : "Couldn't reach NMS Almanac right now. Try again later."));
+      body.appendChild(el("div", d && d.busy ? "NMS Almanac is busy right now. Please try again later." : "Couldn't reach NMS Almanac right now. Try again later."));
       return;
     }
     if(!d.found){ body.appendChild(el("div", "NMS Almanac has no system at this address.")); return; }
@@ -250,7 +250,7 @@
       });
       if(typeof renderBodyEditList === "function") renderBodyEditList();
     }
-    if(typeof toast === "function") toast(n ? ("Filled " + n + " fields from NMS Almanac — check them, then Save.") : "Nothing blank to fill.", 3600);
+    if(typeof toast === "function") toast(n ? ("Filled " + n + " fields from NMS Almanac. Check them, then Save.") : "Nothing blank to fill.", 3600);
   }
 
   var head = document.getElementById("pAlmHead");

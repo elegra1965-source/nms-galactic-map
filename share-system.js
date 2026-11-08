@@ -190,9 +190,9 @@
   /* 2026-10-30 (Tony): after 'Copy picture' say how to paste it -- Ctrl+V / Cmd+V on computers, long-press on phones */
   function pasteHint() {
     var touch = window.matchMedia && matchMedia("(pointer: coarse)").matches;
-    if (touch) return T("✓ Picture copied — long-press the message box and tap Paste");
+    if (touch) return T("✓ Picture copied. Long-press the message box and tap Paste");
     var mac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
-    return T("✓ Picture copied — click the message box and press {k} (or right-click → Paste)", { k: mac ? "⌘V" : "Ctrl+V" });
+    return T("✓ Picture copied. Click the message box and press {k} (or right-click → Paste)", { k: mac ? "⌘V" : "Ctrl+V" });
   }
   function close() {
     if (!SH || SH.hidden) return;
@@ -228,7 +228,7 @@
         ok = await copyImg();
         if (!ok) { save(); await copyText(c.text); }
         var w = window.open("https://discord.com/app", "_blank", "noopener");
-        msg(ok ? pasteHint() : T("✓ Picture saved · message copied — paste it in any server or DM"));
+        msg(ok ? pasteHint() : T("✓ Picture saved · message copied. Paste it in any server or DM"));
       } else if (v === "reddit") {
         window.open("https://www.reddit.com/submit?url=" + enc(c.url) + "&title=" + enc(c.title + " · " + c.gname + " · portal " + c.addr), "_blank", "noopener");
         save(); msg(T("✓ Picture saved · add it to your post"));
@@ -243,7 +243,7 @@
       } else if (v === "link") {
         ok = await copyText(c.url); msg(ok ? T("✓ Link copied") : c.url);
       }
-    } catch (e) { if (!(e && e.name === "AbortError")) msg(T("Couldn't send it — try Save picture")); }
+    } catch (e) { if (!(e && e.name === "AbortError")) msg(T("Couldn't send it. Try Save picture")); }
   }
   async function share() {
     var s = sys(); if (!s || !s.address) return;
