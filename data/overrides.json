@@ -85026,12 +85026,190 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:104ADAF2BFFF": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Ogmain",
+        "race": "Gek",
+        "region": "Melbak Expanse",
+        "starClass": "B2",
+        "stars": [
+          "blue"
+        ],
+        "water": false,
+        "dissonant": true,
+        "giant": false,
+        "econName": "Mining",
+        "sell": "-28.3",
+        "buy": "43.1",
+        "econDesc": "Comfortable",
+        "conflict": "Intermittent",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "https://raw.githubusercontent.com/elegra1965-source/nms-galactic-map/main/user-screenshots/0-104ADAF2BFFF-mw7doipn-66g38g.jpg",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "kuemp09",
+        "editorFriendCode": "",
+        "genVersion": "1.9.0",
+        "bodies": [
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Toxic",
+            "subtype": "",
+            "descriptor": "Frequent Toxic Floods",
+            "water": false,
+            "ring": "ash",
+            "ringSet": false,
+            "resources": [
+              "Magnetised Ferrite"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Limited",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Radioactive",
+            "subtype": "",
+            "descriptor": "Nuclidic Atmosphere",
+            "water": false,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Magnetised Ferrite"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Regular Patrols",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Scorched",
+            "subtype": "",
+            "descriptor": "Heated Atmosphere",
+            "water": false,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Silver"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Threatening",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Barren",
+            "subtype": "",
+            "descriptor": "Inferno Winds",
+            "water": false,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Silver"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Answer To None",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Mega Exotic",
+            "subtype": "",
+            "descriptor": "Extreme Low Pressure",
+            "water": true,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Cobalt"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Spread Thin",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          }
+        ]
+      },
+      "editedAt": "2026-11-08T05:14:46.440Z",
+      "editedByIp": "ip_a60587a5fa26a0fb",
+      "history": [
+        {
+          "at": "2026-11-08T05:14:46.440Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "ip_c3411194a902a296": [
       1794114258883
+    ],
+    "ip_a60587a5fa26a0fb": [
+      1794114886440
     ]
   },
   "flagLog": {},
@@ -85290,7 +85468,10 @@
       "Torrential Heat",
       "Harsh, Icy Winds",
       "Occasional Snowfall",
-      "Harsh Toxic Wind"
+      "Harsh Toxic Wind",
+      "Frequent Toxic Floods",
+      "Inferno Winds",
+      "Extreme Low Pressure"
     ],
     "biome": [
       "Radioactive",
