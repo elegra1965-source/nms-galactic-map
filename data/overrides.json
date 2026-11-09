@@ -34816,13 +34816,13 @@
           3
         ],
         "screenshot": "https://raw.githubusercontent.com/elegra1965-source/nms-galactic-map/main/user-screenshots/0-106500630D1C-mw6op5y6-89sl2o.jpg",
-        "hasStation": false,
-        "stationName": "",
+        "hasStation": true,
+        "stationName": "Idetar-Rosa Terminus",
         "allianceName": "",
-        "stationPhoto": "",
+        "stationPhoto": "https://raw.githubusercontent.com/elegra1965-source/nms-galactic-map/main/user-screenshots/0-106500630D1C-station-mw98gn4j-6aiv2u.jpg",
         "signals": []
       },
-      "editedAt": "2026-11-09T12:13:45.751Z",
+      "editedAt": "2026-11-09T12:24:13.142Z",
       "editedByIp": "ip_9279193ba1812f5c",
       "history": [
         {
@@ -34851,6 +34851,10 @@
         },
         {
           "at": "2026-11-09T12:13:45.751Z",
+          "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-11-09T12:24:13.142Z",
           "text": "edited by a traveller"
         }
       ]
@@ -85231,7 +85235,8 @@
   "ipLog": {
     "ip_9279193ba1812f5c": [
       1794225745622,
-      1794226425751
+      1794226425751,
+      1794227053142
     ]
   },
   "flagLog": {},
