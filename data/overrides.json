@@ -34668,20 +34668,26 @@
             "moon": false,
             "orbits": 0,
             "biome": "Barren",
-            "subtype": "",
+            "subtype": "Abandoned",
             "descriptor": "Freezing Night Winds",
             "water": false,
             "ring": "tan",
             "ringSet": false,
             "resources": [
+              "Copper",
               "Sodium",
-              "Cobalt"
+              "Cactus Flesh"
             ],
             "flora": [],
             "fauna": [],
-            "minerals": [],
+            "minerals": [
+              "Pyrite"
+            ],
             "salvage": [],
-            "fossils": [],
+            "fossils": [
+              "Ancient Bones",
+              "Vile Brood"
+            ],
             "sentinel": "Intermittent",
             "autophage": false,
             "reliquary": false,
@@ -34690,11 +34696,11 @@
             "baseName": ""
           },
           {
-            "name": "Jessidau",
+            "name": "Nash 41/C9",
             "moon": false,
             "orbits": 0,
             "biome": "Frozen",
-            "subtype": "",
+            "subtype": "Icebound",
             "descriptor": "Freezing",
             "water": false,
             "ring": false,
@@ -34751,19 +34757,22 @@
             "name": "Jessidau",
             "moon": false,
             "orbits": 0,
-            "biome": "Lush",
-            "subtype": "",
+            "biome": "Marsh",
+            "subtype": "Tropical",
             "descriptor": "Occasional Scalding Cloudbursts",
             "water": true,
             "ring": false,
             "ringSet": false,
             "resources": [
-              "Cobalt",
-              "Gold"
+              "Copper",
+              "Star Bulb",
+              "Paraffinium"
             ],
             "flora": [],
             "fauna": [],
-            "minerals": [],
+            "minerals": [
+              "Magnetised Ferrite"
+            ],
             "salvage": [],
             "fossils": [],
             "sentinel": "Require Orthodoxy",
@@ -34779,13 +34788,14 @@
             "orbits": 4,
             "biome": "Lush",
             "subtype": "",
-            "descriptor": "Torrential Heat",
+            "descriptor": "Frothing Moon",
             "water": true,
             "ring": false,
             "ringSet": false,
             "resources": [
+              "Copper",
               "Gold",
-              "Magnetised Ferrite"
+              "Sodium"
             ],
             "flora": [],
             "fauna": [],
@@ -34812,7 +34822,7 @@
         "stationPhoto": "",
         "signals": []
       },
-      "editedAt": "2026-11-09T12:02:25.622Z",
+      "editedAt": "2026-11-09T12:13:45.751Z",
       "editedByIp": "ip_9279193ba1812f5c",
       "history": [
         {
@@ -34837,6 +34847,10 @@
         },
         {
           "at": "2026-11-09T12:02:25.622Z",
+          "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-11-09T12:13:45.751Z",
           "text": "edited by a traveller"
         }
       ]
@@ -85216,7 +85230,8 @@
   "reports": [],
   "ipLog": {
     "ip_9279193ba1812f5c": [
-      1794225745622
+      1794225745622,
+      1794226425751
     ]
   },
   "flagLog": {},
@@ -85239,7 +85254,8 @@
       "Frost Crystal",
       "Gamma Root",
       "Sulphurine",
-      "Paraffinium"
+      "Paraffinium",
+      "Cactus Flesh"
     ],
     "flora": [
       "Sporadic",
@@ -85479,7 +85495,8 @@
       "Harsh Toxic Wind",
       "Frequent Toxic Floods",
       "Inferno Winds",
-      "Extreme Low Pressure"
+      "Extreme Low Pressure",
+      "Frothing Moon"
     ],
     "biome": [
       "Radioactive",
