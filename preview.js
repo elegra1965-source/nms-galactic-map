@@ -9771,7 +9771,9 @@ function renderEdStationPhotoPreview(){
   if(ready) ready.style.display=(!edStationPhotoFromLog && typeof edStationPhotoNew==="string" && edStationPhotoNew.indexOf("data:")===0)?"block":"none";
   // same photo mirrored on the Surveyor log step (2026-10-30)
   var lw=document.getElementById("edLogStationPreviewWrap"), li=document.getElementById("edLogStationPreview"), lt=document.getElementById("edLogStationBtnTxt");
+  var lr=document.getElementById("edLogStationRemoveBtn");
   if(lw){ if(v){ li.src=v; lw.style.display="block"; lt.textContent="Replace station photo"; } else { li.src=""; lw.style.display="none"; lt.textContent="Add station photo"; } }
+  if(lr) lr.style.display=v?"inline-block":"none";
 }
 /* 2026-10-30: second door to the station photo, on the Surveyor log step next to
    Screenshot. Ticks "Space station" (the photo only shows on the map with it) and
@@ -9793,7 +9795,11 @@ document.getElementById("edStationPhotoDone").addEventListener("click",function(
 });
 document.getElementById("edStationPhotoBtn").addEventListener("click",function(){ edStationPhotoFromLog=false; document.getElementById("edStationPhotoFile").click(); });
 document.getElementById("edStationPhotoPreview").addEventListener("click",function(){ openScreenshotLightbox(this.src); });
-document.getElementById("edStationPhotoRemoveBtn").addEventListener("click",function(){ edStationPhotoNew=""; renderEdStationPhotoPreview(); });
+/* 2026-11-09 (Tony): Remove photo drops the traveller's picture so the map goes back to the
+   generated station. Offered on both doors (Special features + Surveyor log). */
+function edRemoveStationPhoto(){ edStationPhotoNew=""; renderEdStationPhotoPreview(); toast("Photo removed. Save to go back to the generated station",3200); }
+document.getElementById("edStationPhotoRemoveBtn").addEventListener("click",edRemoveStationPhoto);
+document.getElementById("edLogStationRemoveBtn").addEventListener("click",edRemoveStationPhoto);
 document.getElementById("edStationPhotoFile").addEventListener("change",function(e){
   var f=e.target.files[0]; e.target.value="";
   if(!f) return;

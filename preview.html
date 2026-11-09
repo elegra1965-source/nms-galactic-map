@@ -2583,7 +2583,7 @@ nearby procedural space within a radius.">Search</button>
           </div>
           <div style="display:flex;gap:6px;flex-wrap:wrap">
             <button class="btn" id="edStationPhotoBtn" type="button" style="flex:1;padding:4px 10px;font-size:11px;text-align:center" title="Pick a photo of your space station to attach to this system, visible to every visitor. Resized and compressed automatically."><span id="edStationPhotoBtnTxt">Add station photo</span></button>
-            <button class="btn" id="edStationPhotoRemoveBtn" type="button" style="flex:1;padding:4px 10px;font-size:11px;text-align:center;display:none" title="Remove this system's station photo.">Remove photo</button>
+            <button class="btn" id="edStationPhotoRemoveBtn" type="button" style="flex:1;padding:4px 10px;font-size:11px;text-align:center;display:none" title="Remove your station photo. The map goes back to the generated station.">Remove photo</button>
           </div>
           <div id="edStationPhotoHint" style="font-size:10.5px;color:var(--text-faint);margin-top:4px"></div>
           <div style="font-size:10.5px;color:var(--text-faint);margin-top:2px">One picture of your station from outside, not a collage. It replaces the generated station on the map. Anything else goes in Screenshot.</div>
@@ -2643,7 +2643,10 @@ nearby procedural space within a radius.">Search</button>
         <img id="edLogStationPreview" alt="Station photo preview" title="Click to enlarge"
           style="max-width:100%;max-height:160px;border-radius:var(--r-sm);border:1px solid var(--border-soft);cursor:zoom-in;display:block">
       </div>
-      <button class="btn" id="edLogStationBtn" type="button" style="width:100%;padding:4px 10px;font-size:11px;text-align:center" title="Pick one picture of just your space station. It replaces the generated station on the map for every visitor."><span id="edLogStationBtnTxt">Add station photo</span></button>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn" id="edLogStationBtn" type="button" style="flex:1;padding:4px 10px;font-size:11px;text-align:center" title="Pick one picture of just your space station. It replaces the generated station on the map for every visitor."><span id="edLogStationBtnTxt">Add station photo</span></button>
+        <button class="btn" id="edLogStationRemoveBtn" type="button" style="flex:1;padding:4px 10px;font-size:11px;text-align:center;display:none" title="Remove your station photo. The map goes back to the generated station.">Remove photo</button>
+      </div>
       <div style="font-size:10.5px;color:var(--text-faint);margin-top:4px">One picture of your station from outside, not a collage. It replaces the generated station on the map. Anything else goes in Screenshot.</div>
     </div>
     <div class="mfld" style="display:flex;gap:8px">
@@ -3068,7 +3071,7 @@ loadLetterMap('./nms-core/letter-map').then(function(lm){
 });
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="preview.js?v=20261106a"></script>
+<script src="preview.js?v=20261109a"></script>
 <script src="almanac.js?v=20261026c"></script>
 <script src="share-system.js?v=20261031"></script>
 <script src="charted.js?v=20261104"></script>
