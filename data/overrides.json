@@ -34690,7 +34690,7 @@
             "baseName": ""
           },
           {
-            "name": "Idetar",
+            "name": "Jessidau",
             "moon": false,
             "orbits": 0,
             "biome": "Frozen",
@@ -34700,12 +34700,15 @@
             "ring": false,
             "ringSet": false,
             "resources": [
-              "Magnetised Ferrite",
-              "Sodium"
+              "Copper",
+              "Star Bulb"
             ],
             "flora": [],
             "fauna": [],
-            "minerals": [],
+            "minerals": [
+              "Magnetised Ferrite",
+              "Paraffinium"
+            ],
             "salvage": [],
             "fossils": [],
             "sentinel": "Ever-present",
@@ -34716,22 +34719,25 @@
             "baseName": ""
           },
           {
-            "name": "Rosa",
+            "name": "Gizshdunk'nflunkt",
             "moon": false,
             "orbits": 0,
-            "biome": "Exotic",
-            "subtype": "",
+            "biome": "Lush",
+            "subtype": "Viridescent",
             "descriptor": "Invisible Jade Winds",
             "water": false,
             "ring": false,
             "ringSet": false,
             "resources": [
-              "Magnetised Ferrite",
-              "Sodium"
+              "Sodium",
+              "Paraffinium",
+              "Star Bulb"
             ],
             "flora": [],
             "fauna": [],
-            "minerals": [],
+            "minerals": [
+              "Activated Copper"
+            ],
             "salvage": [],
             "fossils": [],
             "sentinel": "Attentive",
@@ -34806,7 +34812,7 @@
         "stationPhoto": "",
         "signals": []
       },
-      "editedAt": "2026-11-07T17:35:26.137Z",
+      "editedAt": "2026-11-09T12:02:25.622Z",
       "editedByIp": "ip_9279193ba1812f5c",
       "history": [
         {
@@ -34827,6 +34833,10 @@
         },
         {
           "at": "2026-11-07T17:35:26.137Z",
+          "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-11-09T12:02:25.622Z",
           "text": "edited by a traveller"
         }
       ]
@@ -85205,11 +85215,8 @@
   },
   "reports": [],
   "ipLog": {
-    "ip_c3411194a902a296": [
-      1794114258883
-    ],
-    "ip_a60587a5fa26a0fb": [
-      1794114886440
+    "ip_9279193ba1812f5c": [
+      1794225745622
     ]
   },
   "flagLog": {},
@@ -85231,7 +85238,8 @@
       "Star Bulb",
       "Frost Crystal",
       "Gamma Root",
-      "Sulphurine"
+      "Sulphurine",
+      "Paraffinium"
     ],
     "flora": [
       "Sporadic",
