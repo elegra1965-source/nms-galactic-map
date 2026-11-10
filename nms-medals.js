@@ -440,7 +440,7 @@
     var dl = hel('button', 'nmsm-btn prim', '⬇ ' + T('Download')); dl.type = 'button';
     var sh = hel('button', 'nmsm-btn', '⇪ ' + T('Share')); sh.type = 'button';
     bt.appendChild(dl); bt.appendChild(sh);
-    if(o.wide){ var w = hel('button', 'nmsm-btn wide', o.wide.label); w.type = 'button'; w.addEventListener('click', function(){ o.wide.run(); }); bt.appendChild(w); }
+    if(o.wide){ var w = hel('button', 'nmsm-btn wide', o.wide.label); w.type = 'button'; if(o.wide.flame){ var wf = document.createElement('i'); wf.className = 'nmsfl'; wf.setAttribute('aria-hidden', 'true'); w.insertBefore(wf, w.firstChild); } w.addEventListener('click', function(){ o.wide.run(); }); bt.appendChild(w); }
     c.appendChild(bt);
     var msg = hel('p', 'nmsm-msg'); msg.setAttribute('aria-live', 'polite'); c.appendChild(msg);
     var file = (o.file || 'nms-medal') + '.png';
@@ -705,7 +705,7 @@
   function nextQueued(){ var q = queue.shift(); if(q) earnedCard(q[0], q[1]); }
   function retryPending(){ pend('').forEach(function(x){ charted(x, true); }); }
   function streakLine(st){
-    var t = '🔥 ' + T(st.cur === 1 ? 'Streak: {n} day' : 'Streak: {n} days', { n: st.cur });
+    var t = T(st.cur === 1 ? 'Streak: {n} day' : 'Streak: {n} days', { n: st.cur });
     if(st.next) t += ' · ' + T('next medal at {n} days', { n: st.next });
     return t;
   }
@@ -716,7 +716,7 @@
   function earnedCard(m, st, demo){
     st = st || stats();
     var o = { metal:m.metal, reveal:true, kick:'◈ ' + T('Milestone reached'), lab:T('System that kept it going'), file:'nms-streak-medal',
-              shareUrl: cfg.mapUrl, wide:{ label:'🔥 ' + T('View streak'), run: panel } };
+              shareUrl: cfg.mapUrl, wide:{ label:T('View streak'), flame:true, run: panel } };
     var ls = lastSys(st); o.sys = ls.sys; o.hex = ls.hex; o.meta = ls.meta;
     if(m.kind === 'day'){
       o.title = T('Daily discovery'); o.label = T('{n} DAYS', { n:m.n }); o.big = T('{n} DAYS', { n:m.n }); o.sub = T('In a row');

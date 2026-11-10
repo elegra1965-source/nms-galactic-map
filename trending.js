@@ -120,6 +120,7 @@
   function fill(){
     var kick = document.getElementById("trendKick"), sub = document.getElementById("trendSub");
     if(kick) kick.textContent = T.mode === "last" ? "\uD83D\uDD25 Last week's final standings" : "\uD83D\uDD25 Trending this week";
+    if(kick){ var kt = kick.textContent.replace(/^[^A-Za-z]+ /, ""), fi = document.createElement("i"); fi.className = "nmsfl"; fi.setAttribute("aria-hidden", "true"); kick.textContent = ""; kick.appendChild(fi); kick.appendChild(document.createTextNode(kt)); } // crystal flame instead of the emoji (2026-11-10)
     if(sub) sub.textContent = T.mode === "last"
       ? "A new week has started. These were last week's winners until this week's list fills up. Tap one to fly there."
       : "The charted systems travellers opened most this week. Resets every Monday at midnight (UK). Tap one to fly there.";
@@ -241,6 +242,8 @@
     b.appendChild(document.createTextNode(st.any && st.cur
       ? "\uD83D\uDD25 " + (window.NMS_T ? NMS_T(st.cur === 1 ? "Your streak: {n} day · view medals ›" : "Your streak: {n} days · view medals ›", { n: st.cur }) : "Your streak: " + st.cur + " days · view medals ›")
       : (window.NMS_T ? NMS_T("Streak medals: chart a new system every day ›") : "Streak medals: chart a new system every day ›")));
+    var sn = b.lastChild; if(sn && sn.nodeType === 3) sn.nodeValue = sn.nodeValue.replace(/^[^A-Za-z]+ /, ""); // flame icon instead of the emoji (2026-11-10)
+    if(st.any && st.cur){ var sf = document.createElement("i"); sf.className = "nmsfl"; sf.setAttribute("aria-hidden", "true"); b.insertBefore(sf, sn); }
     b.hidden = false;
     if(!b._w){ b._w = 1; b.addEventListener("click", function(e){ e.stopPropagation(); if(pop) pop.classList.remove("show"); NMSMedals.panel(); }); }
   }
@@ -432,7 +435,7 @@
     function find(list){ (list || []).forEach(function(x){ if(!hit && String(x.address).toUpperCase() === addr && (g === null || x.galaxy === g)) hit = x; }); }
     if(T.mode === "week") find(T.thisWeek);
     if(!hit){ find(T.lastWeekTop); last = !!hit; }
-    if(!hit){ if(typeof toast === "function") toast("That system isn't on this week's Trending list right now -- open 🔥 Trending to see this week's list", 5000); return; }
+    if(!hit){ if(typeof toast === "function") toast("That system isn't on this week's Trending list right now -- open Trending to see this week's list", 5000); return; }
     var tries = 0;
     (function whenClear(){
       var wrap = document.getElementById("modalWrap");
