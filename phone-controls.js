@@ -56,6 +56,14 @@
 '#b7ask p{font-size:12px;color:var(--text-dim);margin:8px 0 12px;font-family:inherit;line-height:1.45}' +
 '#b7ask .r{display:flex;gap:6px}#b7ask .btn{flex:1;padding:9px}' +
 '@media(max-width:360px){#b7 #galSel{flex-grow:1.1!important}#b7 #galTypeFilter{flex-grow:1.2!important}#b7 #titleIcon,#b7 #annivBadge{display:none}#b7 #titleText{font-size:13px!important}#b7 .r5>.btn{font-size:8px!important;padding-left:1px!important;padding-right:1px!important}#b7 .r>.btn{letter-spacing:0!important}#b7 .r1>.btn{padding:8px 7px!important}#b7 #chartedLine{font-size:8px}}' +
+/* 2026-11-11 phone readability (site review): text 11px minimum, tap targets 40px, quick row wraps on narrow phones */
+'#b7 .r>.btn,#b7 .r>select,#b7 .r>input{font-size:11px!important;letter-spacing:.01em!important;padding:8px 2px!important;min-height:38px!important;box-sizing:border-box}' +
+'#b7 #galSel,#b7 #galTypeFilter{font:11px Orbitron,sans-serif!important}' +
+'#b7 .r1>.btn{font-size:11px!important;min-width:40px!important;min-height:38px!important}' +
+'#b7 #chartedLine{font-size:10px;height:38px}#b7 #trendLine{font-size:11px;height:38px}' +
+'#b7 .r3,#b7 .r4,#b7 .r5{flex-wrap:wrap}#b7 .r3>.btn,#b7 .r3>select,#b7 .r4>.btn,#b7 .r5>.btn{flex:1 0 auto!important}#b7 #inAddr{flex:2 0 124px!important}#b7 #mLoc,#b7 #mGal{flex:1 0 auto!important}' +
+'#b7p h4{font-size:11px}#b7p .g>.btn{font-size:11px!important;min-height:40px!important;padding:10px 4px!important}' +
+'@media(max-width:360px){#b7 #inAddr{letter-spacing:.04em!important}#b7 #mGal{font-size:11px!important}#b7 #chartedLine{font-size:10px}#b7 .r5>.btn,#b7 .r>.btn{font-size:11px!important}}' +
 '@media(prefers-reduced-motion:reduce){#b7 #chartedLine{transition:none}}';
   document.head.appendChild(css);
 
@@ -232,4 +240,16 @@
   });
   if(mq.addEventListener) mq.addEventListener('change', apply); else if(mq.addListener) mq.addListener(apply);
   apply();
+  /* 2026-11-11: the system panel used to cover ~half the screen the moment a system opened.
+     On phones it now opens folded to its name row the first time; the arrow unfolds it and
+     the choice then stays for the visit. */
+  (function(){
+    var pn = $('panel'); if(!pn || !window.MutationObserver) return;
+    var done = false;
+    new MutationObserver(function(){
+      if(done || !mq.matches || !pn.classList.contains('show')) return;
+      done = true; pn.classList.add('panel-min');
+      var b = $('bPanelMin'); if(b) b.innerHTML = '&#9656;';
+    }).observe(pn, { attributes:true, attributeFilter:['class'] });
+  })();
 })();

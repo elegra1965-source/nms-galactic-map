@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="robots" content="max-image-preview:large">
 <script src="calm.js?v=2"></script>
-<script src="/lang.js?v=3"></script>
+<script src="/lang.js?v=4"></script>
 <script src="/nms-update.js?v=4" defer></script>
 <title>NMS Galactic Map | 3D Galaxy Map &amp; Portal Address Decoder</title>
 <meta name="description" content="Free 3D No Man's Sky galaxy map: decode portal glyph addresses, find systems travellers have charted and plot routes across all 256 galaxies. No sign-up.">
@@ -1709,6 +1709,21 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   gap:14px;padding:24px;cursor:zoom-out}
 .lightboxOverlay img{max-width:min(92vw,1100px);max-height:80vh;border-radius:var(--r-sm);
   box-shadow:0 20px 60px rgba(0,0,0,.6);cursor:default}
+/* 2026-11-11 site review (quiet): crystal icons, flat controls, readable text and bigger tap targets on phones */
+.ci{width:20px;height:20px;flex:none;object-fit:contain;vertical-align:middle}
+.btn .ci{margin-right:5px;margin-top:-2px;margin-bottom:-2px}#bLang .ci{margin-right:4px}#bAccess .ci{margin:-2px 0}
+.btn,.btn.beveled,select{text-shadow:none!important}
+.box{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+@media (max-width:900px){
+  #panel .btn{font-size:11px;min-height:38px;padding-top:9px;padding-bottom:9px}
+  #panel .lb,#panel #pCore{font-size:11px}
+  #bPanelMin{min-width:40px}
+  #panel .panelFoldHead{padding:11px 0;font-size:11px}
+  #hyperdriveModal .btn{font-size:11px;min-height:40px}
+  .lbl{font-size:calc(11px * var(--ui-zoom,1))}
+  #chartNote.show{animation:cnIn .35s ease-out,cnAuto .5s ease 6s forwards}
+}
+@keyframes cnAuto{to{opacity:0;visibility:hidden}}
 </style>
 </head>
 <body>
@@ -1835,7 +1850,7 @@ Bookmarked/visited/documented systems
 always show up. Scan also searches
 nearby procedural space within a radius.">Search</button>
   <button class="btn beveled" id="bWarpToggle" style="animation-delay:-3.5s" title="Play a warp-jump animation when entering system view. Same setting as Filters -> Warp animation, just easier to reach. Click to turn on/off.">&#9889; Warp FX</button>
-  <button class="btn beveled" id="bRoutes" style="animation-delay:0s" title="Save the route you've plotted so you can pick it back up later, share it with a link, or load one someone sent you.">&#9776; Routes</button>
+  <button class="btn beveled" id="bRoutes" style="animation-delay:0s" title="Save the route you've plotted so you can pick it back up later, share it with a link, or load one someone sent you.">Routes</button>
   <button class="btn beveled" id="bFav" style="animation-delay:-.5s" title="Every system you've bookmarked (the Bookmark button on a system's info panel), in one always-reachable list -- click one to jump straight there.">&#9733; Favourites</button>
   <div class="sep" id="sepC"></div>
   <button class="btn beveled" id="bFiltToggle" style="animation-delay:-.5s" title="Show or hide the system filters.">Filters</button>
@@ -1850,8 +1865,8 @@ nearby procedural space within a radius.">Search</button>
   <button class="btn beveled" id="bTour" style="animation-delay:-4s" title="A quick guided tour of what this map can do.">&#9655; Tour</button>
   <button class="btn beveled" id="bAbout" style="animation-delay:-4.5s" title="Fan-made disclaimer and a note on procedural vs. real system data.">&#9432; About</button>
   <button class="btn beveled nms-fb-btn" id="bFeedback" type="button" data-nms-feedback aria-haspopup="dialog" style="animation-delay:-4.75s" title="Reviews & feedback" aria-label="Reviews & feedback"><img class="nms-fb-ico" src="/nms-feedback/fb-ico-review.webp" srcset="/nms-feedback/fb-ico-review@2x.webp 2x" alt="" width="20" height="20"></button>
-  <button class="btn beveled" id="bLang" type="button" data-lang-btn style="animation-delay:-5.5s" title="Language" aria-label="Language">&#127760; <span data-lang-code translate="no">EN</span></button>
-  <button class="btn beveled" id="bAccess" style="animation-delay:-5s" title="Accessibility settings: font size, colour-blind filters, high contrast." aria-label="Accessibility settings" aria-haspopup="true" aria-expanded="false">&#9881;</button>
+  <button class="btn beveled" id="bLang" type="button" data-lang-btn style="animation-delay:-5.5s" title="Language" aria-label="Language"><img class="ci" src="crystal/ci-globe.webp" alt="" width="20" height="20"> <span data-lang-code translate="no">EN</span></button>
+  <button class="btn beveled" id="bAccess" style="animation-delay:-5s" title="Accessibility settings: font size, colour-blind filters, high contrast." aria-label="Accessibility settings" aria-haspopup="true" aria-expanded="false"><img class="ci" src="crystal/ci-gear.webp" alt="" width="20" height="20"></button>
   </div>
 </div>
 
@@ -2071,11 +2086,11 @@ nearby procedural space within a radius.">Search</button>
          swapping the generic station icon for their own photo one tap away instead
          of buried in Edit system. Hidden once the system already has a photo
          (2026-10-18: moved beside Edit system to save a row). -->
-    <button class="btn" id="bStationPhoto" type="button" title="Swap the generic station icon for a photo of your own customised station. Opens Edit system with the photo picker ready; your photo shows for every visitor once you Save.">&#128247; Add station photo</button>
+    <button class="btn" id="bStationPhoto" type="button" title="Swap the generic station icon for a photo of your own customised station. Opens Edit system with the photo picker ready; your photo shows for every visitor once you Save."><img class="ci" src="crystal/ci-camera.webp" alt="" width="20" height="20"> Add station photo</button>
   </div>
   <div class="prow">
     <button class="btn" id="bReport" title="Flag this system's data as wrong or inappropriate so it can be reviewed.">Report</button>
-    <button class="btn" id="bPrivCode" type="button" title="Your private code: load your private systems on another device, back them up, or ask for a lost code.">&#128274; Private code</button>
+    <button class="btn" id="bPrivCode" type="button" title="Your private code: load your private systems on another device, back them up, or ask for a lost code."><img class="ci" src="crystal/ci-lock.webp" alt="" width="20" height="20"> Private code</button>
   </div>
   <div id="pubNoteBox" style="display:none">
     <div class="lb" style="font-size:9px;letter-spacing:.12em;color:var(--text-faint);text-transform:uppercase;margin:8px 0 3px">Community notes</div>
@@ -2916,9 +2931,9 @@ nearby procedural space within a radius.">Search</button>
         <button class="btn" id="discShareBtn" type="button" onclick="return shareTo('app')" style="flex:1;text-align:center" title="Share this map with your phone's share menu, or copy its link">Share this map</button>
       </div>
       <div style="display:flex;gap:6px">
-        <button class="btn" onclick="return shareTo('x')" style="flex:1 1 0;text-align:center" aria-label="Share on X">X</button>
-        <button class="btn" onclick="return shareTo('reddit')" style="flex:1 1 0;text-align:center">Reddit</button>
-        <button class="btn" onclick="return shareTo('discord')" style="flex:1 1 0;text-align:center">Discord</button>
+        <button class="btn" onclick="return shareTo('x')" style="flex:1 1 0;text-align:center" aria-label="Share on X"><img class="ci" src="crystal/ci-x.webp" alt="" width="20" height="20"> X</button>
+        <button class="btn" onclick="return shareTo('reddit')" style="flex:1 1 0;text-align:center"><img class="ci" src="crystal/ci-reddit.webp" alt="" width="20" height="20"> Reddit</button>
+        <button class="btn" onclick="return shareTo('discord')" style="flex:1 1 0;text-align:center"><img class="ci" src="crystal/ci-discord.webp" alt="" width="20" height="20"> Discord</button>
       </div>
     </div>
   </div>
@@ -3078,7 +3093,7 @@ loadLetterMap('./nms-core/letter-map').then(function(lm){
 <script src="almanac.js?v=20261026c"></script>
 <script src="share-system.js?v=20261031"></script>
 <script src="charted.js?v=20261104"></script>
-<script src="phone-controls.js?v=20261106"></script>
+<script src="phone-controls.js?v=20261111"></script>
 <script>/* medals + streaks (nms-medals.js, same file as the Hub) */window.NMSMedals_CONFIG={glyph:function(ch){return "glyphs/glyph-mask-"+ch+".png";},mapUrl:"https://map.nomansskyhub.app",countUrl:"/.netlify/functions/medal-count",counts:true};</script>
 <script src="/nms-medals.js?v=4"></script>
 <script src="trending.js?v=20261110"></script>
