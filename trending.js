@@ -144,7 +144,7 @@
       // 2026-10-19 (Tony): top 3 get a one-tap link to their medal picture, for
       // pasting anywhere a picture can't be attached (Reddit messages etc.).
       if(x.rank <= 10){
-        var cp = el("button", "trCopy", x.rank <= 3 ? "🔗 Copy medal picture link" : "🔗 Copy picture link");
+        var cp = el("button", "trCopy", x.rank <= 3 ? "Copy medal picture link" : "Copy picture link");
         cp.type = "button"; cp.setAttribute("data-link", cardLink(x));
         box.appendChild(cp);
       }

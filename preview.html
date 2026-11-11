@@ -8,7 +8,7 @@
 <meta name="robots" content="max-image-preview:large">
 <script src="calm.js?v=2"></script>
 <script src="/lang.js?v=4"></script>
-<script src="/nms-update.js?v=4" defer></script>
+<script src="/nms-update.js?v=5" defer></script>
 <title>NMS Galactic Map | 3D Galaxy Map &amp; Portal Address Decoder</title>
 <meta name="description" content="Free 3D No Man's Sky galaxy map: decode portal glyph addresses, find systems travellers have charted and plot routes across all 256 galaxies. No sign-up.">
 <meta property="og:type" content="website">
@@ -664,6 +664,7 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border:none;border-ra
 .trCopy{display:block;width:100%;margin:-2px 0 8px;padding:6px 8px;border:1px dashed rgba(242,184,75,.55);border-radius:4px;background:transparent;color:#f2b84b;font-family:'Orbitron',sans-serif;font-size:10px;letter-spacing:.08em;text-align:left;cursor:pointer}
 .trClaim{margin-top:3px;font-family:'Rajdhani',sans-serif;font-size:11.5px;letter-spacing:.03em;color:#f2b84b;line-height:1.2}
 .trCopy:hover,.trCopy:focus-visible{background:rgba(242,184,75,.1)}
+.trCopy::before{content:"";display:inline-block;width:16px;height:16px;margin-right:6px;vertical-align:-3px;background:url(/nms-ci/ci-link.webp?v=20261111) center/contain no-repeat}
 .trMove{flex:none;font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:.08em;color:var(--text-faint)}
 .trMove.up{color:#00ff88}.trMove.dn{color:#ff8c00}.trMove.new{color:var(--cyan)}
 .trLast{margin-top:8px;padding-top:8px;border-top:1px solid var(--border-soft);font-size:11px;color:var(--text-dim)}
@@ -1864,7 +1865,7 @@ nearby procedural space within a radius.">Search</button>
   <button class="btn beveled" id="bInstall" title="Install this map as an app on your device." style="display:none;animation-delay:-3.5s">&#9672; Install app</button>
   <button class="btn beveled" id="bTour" style="animation-delay:-4s" title="A quick guided tour of what this map can do.">&#9655; Tour</button>
   <button class="btn beveled" id="bAbout" style="animation-delay:-4.5s" title="Fan-made disclaimer and a note on procedural vs. real system data.">&#9432; About</button>
-  <button class="btn beveled nms-fb-btn" id="bFeedback" type="button" data-nms-feedback aria-haspopup="dialog" style="animation-delay:-4.75s" title="Reviews & feedback" aria-label="Reviews & feedback"><img class="nms-fb-ico" src="/nms-feedback/fb-ico-review.webp" srcset="/nms-feedback/fb-ico-review@2x.webp 2x" alt="" width="20" height="20"></button>
+  <button class="btn beveled nms-fb-btn" id="bFeedback" type="button" data-nms-feedback aria-haspopup="dialog" style="animation-delay:-4.75s" title="Reviews & feedback" aria-label="Reviews & feedback"><img class="nms-fb-ico" src="/nms-feedback/fb-ico-review.webp?v=20261111" srcset="/nms-feedback/fb-ico-review@2x.webp?v=20261111 2x" alt="" width="20" height="20"></button>
   <button class="btn beveled" id="bLang" type="button" data-lang-btn style="animation-delay:-5.5s" title="Language" aria-label="Language"><img class="ci" src="crystal/ci-globe.webp" alt="" width="20" height="20"> <span data-lang-code translate="no">EN</span></button>
   <button class="btn beveled" id="bAccess" style="animation-delay:-5s" title="Accessibility settings: font size, colour-blind filters, high contrast." aria-label="Accessibility settings" aria-haspopup="true" aria-expanded="false"><img class="ci" src="crystal/ci-gear.webp" alt="" width="20" height="20"></button>
   </div>
@@ -3095,8 +3096,8 @@ loadLetterMap('./nms-core/letter-map').then(function(lm){
 <script src="charted.js?v=20261104"></script>
 <script src="phone-controls.js?v=20261111"></script>
 <script>/* medals + streaks (nms-medals.js, same file as the Hub) */window.NMSMedals_CONFIG={glyph:function(ch){return "glyphs/glyph-mask-"+ch+".png";},mapUrl:"https://map.nomansskyhub.app",countUrl:"/.netlify/functions/medal-count",counts:true};</script>
-<script src="/nms-medals.js?v=4"></script>
-<script src="trending.js?v=20261110"></script>
+<script src="/nms-medals.js?v=5"></script>
+<script src="trending.js?v=20261111"></script>
 <script src="nms-push.js"></script>
 <script>
 /* 2026-10-23 (Tony): an alert when a system you charted makes this week's top 10 (and each better top-3 place).
@@ -3112,6 +3113,6 @@ if (window.NMS_PUSH) NMS_PUSH.wire(document.getElementById("trendAlertBtn"), "ma
 });
 </script>
 <script src="/nms-totop.js?v=2" defer></script>
-<script src="/nms-feedback/nms-feedback.js?v=20261104" data-tool="map" defer></script>
+<script src="/nms-feedback/nms-feedback.js?v=20261111" data-tool="map" defer></script>
 </body>
 </html>
