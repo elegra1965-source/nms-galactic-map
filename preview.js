@@ -1345,7 +1345,7 @@ function allianceKey(name){ return String(name||"").trim().toLowerCase(); }
 function allianceBadgeTagHtml(name){
   var a=ALLIANCES[allianceKey(name)];
   if(!a||!a.badgeUrl) return "";
-  return ' <img src="'+a.badgeUrl+'" alt="" style="width:13px;height:13px;object-fit:cover;border-radius:3px;vertical-align:-2px;border:1px solid rgba(255,255,255,.25)">';
+  return ' <img src="'+a.badgeUrl+'" alt="Alliance badge" style="width:13px;height:13px;object-fit:cover;border-radius:3px;vertical-align:-2px;border:1px solid rgba(255,255,255,.25)">';
 }
 /* The 12 whole-row flag categories a visitor can flag/dispute (see
    FLAG_FIELDS in netlify/functions/_shared.mjs -- kept in sync by hand,
@@ -6817,8 +6817,8 @@ function showSystemHoverPop(ud,cx,cy){
     html=acCard("station",title,sub,acSystemRows(sy));
     /* 2026-10-26, Tony: the station's picture on its card -- a traveller's own
        station photo wins (wide, across the top), else the real one from NMS Almanac. */
-    if(sy.stationPhoto) html=html.replace('<div class="acBody">','<img class="acStPhoto" src="'+acEsc(sy.stationPhoto)+'" alt=""><div class="acBody">');
-    else if(sy.almanacStation) html=html.replace('<div class="acBody">','<div class="acBody"><img class="acDisc acStIc" src="'+acEsc(sy.almanacStation)+'" alt="" width="72" height="72">')+
+    if(sy.stationPhoto) html=html.replace('<div class="acBody">','<img class="acStPhoto" src="'+acEsc(sy.stationPhoto)+'" alt="Station photo"><div class="acBody">');
+    else if(sy.almanacStation) html=html.replace('<div class="acBody">','<div class="acBody"><img class="acDisc acStIc" src="'+acEsc(sy.almanacStation)+'" alt="Space station" width="72" height="72">')+
       '<div class="almcardCred">Picture: NMS Almanac</div>';
   } else if(ud.feature){
     var isBh=ud.name==="Black hole";
@@ -6846,7 +6846,7 @@ function showSystemHoverPop(ud,cx,cy){
     /* 2026-10-24, Tony: the Almanac's picture of the planet on the card too
        (the traveller's own data stays as it is; only the picture is added). */
     var disc=b.almanac&&(b.almanac.discSmall||b.almanac.disc);
-    if(disc) html=html.replace('<div class="acBody">','<div class="acBody"><img class="acDisc" src="'+acEsc(disc)+'" alt="" width="80" height="80">')+
+    if(disc) html=html.replace('<div class="acBody">','<div class="acBody"><img class="acDisc" src="'+acEsc(disc)+'" alt="Planet" width="80" height="80">')+
       '<div class="almcardCred">Picture: NMS Almanac</div>';
   } else if(ud.star&&almHoverCard(pop,ud,cx,cy)){
     return;
@@ -10058,8 +10058,8 @@ function edBuildSwitchRow(){
     sw.className="edSwitch"; sw.dataset.key=key;
     sw.innerHTML=
       '<div class="edSwInner">'+
-        '<div class="edSwFace edSwFront"><img src="'+EDSEC_META[key].icon+'" alt=""><span>'+EDSEC_META[key].title+'</span></div>'+
-        '<div class="edSwFace edSwBack"><img src="icons-web/status-atlas.png" alt=""></div>'+
+        '<div class="edSwFace edSwFront"><img src="'+EDSEC_META[key].icon+'" alt="Section icon"><span>'+EDSEC_META[key].title+'</span></div>'+
+        '<div class="edSwFace edSwBack"><img src="icons-web/status-atlas.png" alt="Atlas status"></div>'+
       '</div>';
     sw.addEventListener("click",function(){ edGoTo(key); });
     row.appendChild(sw);
@@ -10522,7 +10522,7 @@ function renderSignalEditList(){
           '<div class="mfld" style="margin-bottom:0"><div class="lb">Icon type</div>'+
             '<div class="iconPick" data-si="'+i+'">'+
               '<button type="button" class="iconPickBtn" data-si="'+i+'">'+
-                '<img class="iconPickImg" src="'+iconSwatchDataURL(g.icon)+'" alt="">'+
+                '<img class="iconPickImg" src="'+iconSwatchDataURL(g.icon)+'" alt="System icon">'+
                 '<span class="iconPickLbl">'+RES_ICON_CAT[g.icon].label+'</span>'+
                 '<span class="iconPickCaret">&#9662;</span>'+
               '</button>'+
@@ -10532,7 +10532,7 @@ function renderSignalEditList(){
                   for(var oi=0;oi<ICON_SWATCH_CATS.length;oi++){
                     var ocat=ICON_SWATCH_CATS[oi];
                     oh+='<div class="iconPickOpt'+(ocat===g.icon?" on":"")+'" data-si="'+i+'" data-icon="'+ocat+'">'+
-                      '<img class="iconPickImg" src="'+iconSwatchDataURL(ocat)+'" alt="">'+
+                      '<img class="iconPickImg" src="'+iconSwatchDataURL(ocat)+'" alt="System icon">'+
                       '<span>'+RES_ICON_CAT[ocat].label+'</span></div>';
                   }
                   return oh;

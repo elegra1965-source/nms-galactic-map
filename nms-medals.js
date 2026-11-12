@@ -337,7 +337,7 @@
       '.nmsm-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}',
       '.nmsm-btn{font-family:Orbitron,sans-serif;font-size:10.5px;letter-spacing:.12em;min-height:44px;padding:4px 6px;border-radius:2px;cursor:pointer;background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.45);color:#00e5ff;text-transform:uppercase}',
       '.nmsm-btn.ic-install::before,.nmsm-btn.ic-share::before,.nmsm-btn.ic-route::before,.nmsm-btn.ic-menu::before{content:"";display:inline-block;width:18px;height:18px;margin-right:6px;vertical-align:-4px;background:center/contain no-repeat}',
-      '.nmsm-btn.ic-install::before{background-image:url(/nms-ci/ci-install.webp?v=20261111)}.nmsm-btn.ic-share::before{background-image:url(/nms-ci/ci-share.webp?v=20261111)}.nmsm-btn.ic-route::before{background-image:url(/nms-ci/ci-route.webp?v=20261111)}.nmsm-btn.ic-menu::before{background-image:url(/nms-ci/ci-menu.webp?v=20261111)}',
+      '.nmsm-btn.ic-install::before{background-image:url(/nms-ci/ci-install.webp?v=20261112)}.nmsm-btn.ic-share::before{background-image:url(/nms-ci/ci-share.webp?v=20261112)}.nmsm-btn.ic-route::before{background-image:url(/nms-ci/ci-route.webp?v=20261112)}.nmsm-btn.ic-menu::before{background-image:url(/nms-ci/ci-menu.webp?v=20261112)}',
       '.nmsm-btn:hover,.nmsm-btn:focus-visible{background:rgba(0,229,255,.16);outline:none}',
       '.nmsm-btn.prim{background:linear-gradient(180deg,#f2b84b,#c98a1e);color:#1a1205;border-color:#f2b84b;font-weight:700}',
       '.nmsm-btn.wide{grid-column:1/-1;background:none;border:1px dashed rgba(0,229,255,.6);color:#e8f4f8}',
