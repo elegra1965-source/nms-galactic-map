@@ -1,47 +1,47 @@
 {
- "version": "v42",
- "date": "2026-11-27",
- "site": "NMS GALACTIC MAP",
- "lastToday": false,
- "items": [
-  {
-   "tag": "new",
-   "text": {
-    "en": "New control card on desktop: the same tidy layout as the phone, with More beside it so your pop-ups stay clear",
-    "es": "Nueva tarjeta de controles en ordenador: el mismo diseño ordenado que en el móvil, con Más al lado para que tus ventanas queden libres",
-    "de": "Neue Steuerkarte am Computer: dasselbe aufgeräumte Layout wie am Handy, mit „Mehr“ daneben, damit deine Fenster frei bleiben",
-    "nl": "Nieuwe bedieningskaart op de computer: dezelfde nette indeling als op de telefoon, met Meer ernaast zodat je vensters vrij blijven",
-    "pl": "Nowa karta sterowania na komputerze: ten sam porządek co na telefonie, z panelem Więcej obok, żeby okna były wolne",
-    "fr": "Nouvelle carte de commandes sur ordinateur : la même présentation soignée que sur téléphone, avec Plus à côté pour garder tes fenêtres dégagées",
-    "pt-BR": "Novo cartão de controles no computador: o mesmo layout organizado do celular, com Mais ao lado para suas janelas ficarem livres",
-    "it": "Nuova scheda dei controlli sul computer: lo stesso layout ordinato del telefono, con Altro accanto così le tue finestre restano libere"
-   }
-  },
-  {
-   "tag": "improved",
-   "text": {
-    "en": "Crystal icons on Warp FX, Tour, About, Install, Favourites, Traveller discoveries and the settings gear, and framed icons in the feedback pop-up",
-    "es": "Iconos de cristal en Efecto salto, Tour, Acerca de, Instalar, Favoritos, Descubrimientos de viajeros y el engranaje de ajustes, e iconos con marco en la ventana de comentarios",
-    "de": "Kristall-Symbole bei Warp-Effekt, Tour, Über, Installieren, Favoriten, Entdeckungen der Reisenden und dem Einstellungs-Zahnrad, plus gerahmte Symbole im Feedback-Fenster",
-    "nl": "Kristallen pictogrammen bij Warp-effect, Tour, Info, Installeren, Favorieten, Ontdekkingen van reizigers en het tandwiel voor instellingen, plus ingelijste pictogrammen in het feedbackvenster",
-    "pl": "Kryształowe ikony przy Efekcie warpu, Wycieczce, Informacjach, Instalacji, Ulubionych, Odkryciach podróżników i kółku ustawień oraz ikony w ramkach w oknie opinii",
-    "fr": "Icônes cristal sur Effet de saut, Visite, À propos, Installer, Favoris, Découvertes des voyageurs et la roue des réglages, plus des icônes encadrées dans la fenêtre d'avis",
-    "pt-BR": "Ícones de cristal em Efeito de salto, Tour, Sobre, Instalar, Favoritos, Descobertas dos viajantes e na engrenagem de ajustes, e ícones com moldura na janela de feedback",
-    "it": "Icone di cristallo su Effetto salto, Tour, Informazioni, Installa, Preferiti, Scoperte dei viaggiatori e sull'ingranaggio delle impostazioni, più icone con cornice nella finestra dei commenti"
-   }
-  },
-  {
-   "tag": "improved",
-   "text": {
-    "en": "Galaxy and type pickers no longer cut off long names on phones, and the Filters window is easier to read",
-    "es": "Los selectores de galaxia y tipo ya no cortan los nombres largos en el móvil, y la ventana de filtros se lee mejor",
-    "de": "Galaxie- und Typauswahl schneiden lange Namen am Handy nicht mehr ab, und das Filterfenster ist besser lesbar",
-    "nl": "De keuzelijsten voor sterrenstelsel en type knippen lange namen op telefoons niet meer af, en het filtervenster leest prettiger",
-    "pl": "Listy galaktyk i typów nie ucinają już długich nazw na telefonie, a okno filtrów jest czytelniejsze",
-    "fr": "Les listes de galaxie et de type ne coupent plus les noms longs sur téléphone, et la fenêtre des filtres se lit mieux",
-    "pt-BR": "Os seletores de galáxia e tipo não cortam mais nomes longos no celular, e a janela de filtros ficou mais legível",
-    "it": "I selettori di galassia e tipo non tagliano più i nomi lunghi sul telefono e la finestra dei filtri è più leggibile"
-   }
-  }
- ]
+  "version": "v42",
+  "date": "2026-11-27",
+  "site": "NMS GALACTIC MAP",
+  "lastToday": false,
+  "items": [
+    {
+      "tag": "new",
+      "text": {
+        "en": "New control card on desktop: the same tidy layout as the phone, with More beside it so your pop-ups stay clear",
+        "es": "Nueva tarjeta de controles en ordenador: el mismo diseño ordenado que en el móvil, con Más al lado para que tus ventanas queden libres",
+        "de": "Neue Steuerkarte am Computer: dasselbe aufgeräumte Layout wie am Handy, mit „Mehr“ daneben, damit deine Fenster frei bleiben",
+        "nl": "Nieuwe bedieningskaart op de computer: dezelfde nette indeling als op de telefoon, met Meer ernaast zodat je vensters vrij blijven",
+        "pl": "Nowa karta sterowania na komputerze: ten sam porządek co na telefonie, z panelem Więcej obok, żeby okna były wolne",
+        "fr": "Nouvelle carte de commandes sur ordinateur : la même présentation soignée que sur téléphone, avec Plus à côté pour garder tes fenêtres dégagées",
+        "pt-BR": "Novo cartão de controles no computador: o mesmo layout organizado do celular, com Mais ao lado para suas janelas ficarem livres",
+        "it": "Nuova scheda dei controlli sul computer: lo stesso layout ordinato del telefono, con Altro accanto così le tue finestre restano libere"
+      }
+    },
+    {
+      "tag": "improved",
+      "text": {
+        "en": "All icons redesigned: a new crystal style across buttons, menus and pop-ups, with a text description on every picture for screen readers",
+        "es": "Todos los iconos rediseñados: un nuevo estilo de cristal en botones, menús y ventanas, con una descripción de texto en cada imagen para lectores de pantalla",
+        "de": "Alle Icons neu gestaltet: ein neuer Kristallstil für Buttons, Menüs und Pop-ups, mit Textbeschreibung für jedes Bild für Screenreader",
+        "nl": "Alle iconen opnieuw ontworpen: een nieuwe kristalstijl voor knoppen, menu's en pop-ups, met een tekstbeschrijving bij elke afbeelding voor schermlezers",
+        "pl": "Wszystkie ikony przeprojektowane: nowy kryształowy styl przycisków, menu i okien, z opisem tekstowym przy każdym obrazku dla czytników ekranu",
+        "fr": "Toutes les icônes repensées : un nouveau style cristal pour les boutons, menus et fenêtres, avec une description textuelle sur chaque image pour les lecteurs d'écran",
+        "pt-BR": "Todos os ícones redesenhados: um novo estilo de cristal em botões, menus e janelas, com descrição em texto em cada imagem para leitores de tela",
+        "it": "Tutte le icone ridisegnate: un nuovo stile cristallo per pulsanti, menu e finestre, con una descrizione testuale su ogni immagine per gli screen reader"
+      }
+    },
+    {
+      "tag": "improved",
+      "text": {
+        "en": "Galaxy and type pickers no longer cut off long names on phones, and the Filters window is easier to read",
+        "es": "Los selectores de galaxia y tipo ya no cortan los nombres largos en el móvil, y la ventana de filtros se lee mejor",
+        "de": "Galaxie- und Typauswahl schneiden lange Namen am Handy nicht mehr ab, und das Filterfenster ist besser lesbar",
+        "nl": "De keuzelijsten voor sterrenstelsel en type knippen lange namen op telefoons niet meer af, en het filtervenster leest prettiger",
+        "pl": "Listy galaktyk i typów nie ucinają już długich nazw na telefonie, a okno filtrów jest czytelniejsze",
+        "fr": "Les listes de galaxie et de type ne coupent plus les noms longs sur téléphone, et la fenêtre des filtres se lit mieux",
+        "pt-BR": "Os seletores de galáxia e tipo não cortam mais nomes longos no celular, e a janela de filtros ficou mais legível",
+        "it": "I selettori di galassia e tipo non tagliano più i nomi lunghi sul telefono e la finestra dei filtri è più leggibile"
+      }
+    }
+  ]
 }
