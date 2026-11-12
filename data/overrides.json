@@ -85427,13 +85427,63 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:11D308555D2F": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB27-1D3 Qukang",
+        "race": "Vy'keen",
+        "region": "Ewkini Adjunct",
+        "starClass": "F2pf",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "High Tech",
+        "sell": "49.3",
+        "buy": "-14.9",
+        "econDesc": "★★★ (High Supply)",
+        "conflict": "1 (Untroubled)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-11-12T11:00:46.052Z",
+      "editedByIp": "ip_9279193ba1812f5c",
+      "history": [
+        {
+          "at": "2026-11-12T11:00:46.052Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "ip_9279193ba1812f5c": [
       1794481213895,
-      1794481232922
+      1794481232922,
+      1794481246052
     ]
   },
   "flagLog": {},
