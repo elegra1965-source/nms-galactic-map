@@ -33,7 +33,7 @@ real planet data from NMS Almanac and Voyager's Haven.
 
 ## What can this map do?
 
-New here? Hit **▷ Tour** in the map's toolbar (on a phone it's under **… More**) for an 11-step guided walk-through (12 on a phone).
+New here? Hit **Tour** in the map's control card (it's under **… More**) for a 13-step guided walk-through.
 
 The last two tour steps are **Your language** (🌐) and **Accessibility**. The Traveller Discoveries, Navigator and other scrolling pages have the same teal ⇧ back-to-top arrow as every Hub site.
 
@@ -713,7 +713,9 @@ before opening the Hub in a new tab), Map display (Labels, Grid, Orbit, Camera, 
 the Hello Games points-of-interest overlay) and Exploration (Tour, About, Install app, Reviews &
 feedback). More closes by itself after Favourites, Tour, About or Feedback, after a jump or
 search, and with a tap on the map; Labels, Grid and Orbit leave it open. The bar is about
-half as tall as before, so far more of the map shows. Wider screens keep the one-row toolbar.
+half as tall as before, so far more of the map shows. On desktop the same card sits top left with **More** opening beside it, so pop-ups such as Filters never land on top of the controls. The buttons now use the crystal icon family (framed gear, Warp FX bolt, Tour, About, Install, Favourites, Traveller discoveries, Routes, and the space station label), and the feedback pop-up chips are framed to match.
+
+<img src="screenshots/38-desktop-control-card.jpg" alt="The map on desktop: the compact control card top left with the More panel open beside it showing Navigation, Map display and Exploration" width="720">
 
 <img src="screenshots/35-phone-controls.jpg" alt="The map on a phone: the four short control rows with the charted flip-card and Trending (left), and the More panel open over the map with Navigation, Map display and Exploration (right)" width="560">
 

@@ -1,9 +1,9 @@
 /* ============================================================
    Phone controls tidy (Tony, 2026-11-04; his "New mobile and desktop GUI concept").
-   Phones only (width <= 900px). The toolbar used to be six stacked rows over half the
+   Phones AND desktop (desktop: a 440px card top-left, More opens beside it, 2026-11-11). The toolbar used to be six stacked rows over half the
    screen. Same buttons, same handlers -- they are only MOVED into 4 short rows plus a
    quick row and a "More" panel (the map stays visible behind it). Wider screens keep
-   the old toolbar untouched (elements are put back if the window grows).
+   it was wide and crowded on desktop (about 20 buttons in two rows).
      Row 1  title . language . settings
      Row 2  flip-card (charted today / this week / latest system) . Trending
      Row 3  galaxy . type . Galaxy|Local
@@ -18,7 +18,8 @@
   'use strict';
   var top = document.getElementById('top');
   if(!top || !window.matchMedia) return;
-  var mq = window.matchMedia('(max-width:900px)');
+  var mq = window.matchMedia('(min-width:0px)'); /* 2026-11-11: desktop uses the same card, phone rules below still key on max-width:900 */
+  var phone = window.matchMedia('(max-width:900px)');
   var $ = function(i){ return document.getElementById(i); };
   var T = function(s, v){ return window.NMS_T ? window.NMS_T(s, v) : s; };
   var HUB_URL = 'https://nomansskyhub.app/#discoveries';
@@ -64,6 +65,15 @@
 '#b7 .r3,#b7 .r4,#b7 .r5{flex-wrap:wrap}#b7 .r3>.btn,#b7 .r3>select,#b7 .r4>.btn,#b7 .r5>.btn{flex:1 0 auto!important}#b7 #inAddr{flex:2 0 124px!important}#b7 #mLoc,#b7 #mGal{flex:1 0 auto!important}' +
 '#b7p h4{font-size:11px}#b7p .g>.btn{font-size:11px!important;min-height:40px!important;padding:10px 4px!important}' +
 '@media(max-width:360px){#b7 #inAddr{letter-spacing:.04em!important}#b7 #mGal{font-size:11px!important}#b7 #chartedLine{font-size:10px}#b7 .r5>.btn,#b7 .r>.btn{font-size:11px!important}}' +
+/* 2026-11-11 site review: galaxy/type dropdowns were clipped ("Euclic", "Any !"): fixed column widths, small phones wrap to two rows */
+'#b7 .r3{display:grid;grid-template-columns:90px 98px minmax(0,1.65fr) minmax(0,.95fr);gap:6px}#b7 .r3>*{flex:none!important;width:auto!important;min-width:0!important}#b7 #galSel,#b7 #galTypeFilter{padding-left:8px!important;padding-right:18px!important;text-overflow:clip}#b7 #mLoc,#b7 #mGal{padding-left:19px!important;padding-right:3px!important;font-size:9.5px!important;letter-spacing:.02em!important}#b7 #galTypeFilter{font-size:10.5px!important;padding-left:6px!important;padding-right:16px!important}' +
+'@media(max-width:380px){#b7 .r3{grid-template-columns:1fr 1fr}}' +
+/* desktop: compact card top-left (same layout as the phone), More opens beside it */
+'@media(min-width:901px){html.b7 #top{width:440px!important;max-width:440px!important;right:auto!important;left:12px!important;top:12px!important;padding:8px!important;border:1px solid rgba(0,216,240,.35)!important;border-radius:6px!important;background:rgba(8,14,20,.94)!important;backdrop-filter:none!important;box-shadow:none!important}html.b7 #b7p{left:calc(100% + 20px);right:auto;top:-4px;margin-top:0;width:310px}}' +
+/* More panel scrolls instead of running off short screens */
+'#b7p{max-height:calc(100vh - var(--top-h,200px) - 20px);overflow-y:auto}#b7p #bWarpToggle{padding-left:19px!important;padding-right:4px!important;letter-spacing:.03em}#b7p #bWarpToggle .ci{margin-right:3px}@media(min-width:901px){html.b7 #b7p{max-height:calc(100vh - 40px)}}' +
+/* Filters panel: solid so the map labels do not show through it */
+'#leftcol #filt{background:#0a1118!important;backdrop-filter:none!important}' +
 '@media(prefers-reduced-motion:reduce){#b7 #chartedLine{transition:none}}';
   document.head.appendChild(css);
 
@@ -153,7 +163,7 @@
     moreBtn = mk('button', { type:'button', 'class':'btn beveled', id:'b7More', 'aria-expanded':'false', 'aria-controls':'b7p', 'aria-label':T('More controls') }, '&hellip; More');
     r5.appendChild(moreBtn);
     panel = mk('div', { id:'b7p' }); root.appendChild(panel);
-    var disc = mk('button', { type:'button', 'class':'btn beveled', id:'b7Disc', title:'nomansskyhub.app' }, '&#9670; Traveller discoveries &#8599;');
+    var disc = mk('button', { type:'button', 'class':'btn beveled', id:'b7Disc', title:'nomansskyhub.app' }, '<img class="ci" src="crystal/ci-compass.webp?v=20261112" alt="Traveller discoveries" width="20" height="20"> Traveller discoveries &#8599;');
     disc.addEventListener('click', openHubAsk);
     var g1 = group('Navigation', ['bFav', 'bWarpToggle', disc], ['b7Disc']);
     group('Map display', ['bLbl', 'bGrid', 'cOrb', 'cFly', 'bAtlas']);
@@ -247,9 +257,26 @@
     var pn = $('panel'); if(!pn || !window.MutationObserver) return;
     var done = false;
     new MutationObserver(function(){
-      if(done || !mq.matches || !pn.classList.contains('show')) return;
+      if(done || !phone.matches || !pn.classList.contains('show')) return;
       done = true; pn.classList.add('panel-min');
       var b = $('bPanelMin'); if(b) b.innerHTML = '&#9656;';
     }).observe(pn, { attributes:true, attributeFilter:['class'] });
   })();
+})();
+
+/* Fit long Galaxy labels (Sterrenstelsel, Galaktyka...) inside their button */
+(function(){
+  function fit(){ ['mGal','mLoc'].forEach(fitOne); }
+  function fitOne(id){
+    var b=document.getElementById(id); if(!b||!b.offsetParent) return;
+    b.style.removeProperty('font-size');
+    var fs=parseFloat(getComputedStyle(b).fontSize)||9.5, n=0;
+    while(b.scrollWidth>b.clientWidth+1 && fs>7.5 && n++<20){ fs-=.5; b.style.setProperty('font-size',fs+'px','important'); }
+  }
+  function go(){ fit(); setTimeout(fit,600); setTimeout(fit,2000); }
+  window.addEventListener('resize',function(){ setTimeout(fit,100); });
+  window.addEventListener('load',go);
+  var t=document.getElementById('mGal');
+  if(t&&window.MutationObserver) new MutationObserver(function(){ setTimeout(fit,50); }).observe(t,{childList:true,characterData:true,subtree:true});
+  else document.addEventListener('DOMContentLoaded',go);
 })();

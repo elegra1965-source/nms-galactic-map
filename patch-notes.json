@@ -1,124 +1,46 @@
 {
- "version": "v41",
- "date": "2026-11-06",
+ "version": "v42",
+ "date": "2026-11-27",
  "site": "NMS GALACTIC MAP",
  "lastToday": false,
  "items": [
   {
    "tag": "new",
    "text": {
-    "en": "Medals and streaks: chart a new system the NMS Almanac confirms to build a daily, weekly and monthly streak",
-    "es": "Medallas y rachas: cartografía un sistema nuevo que confirme NMS Almanac y crea una racha diaria, semanal y mensual",
-    "de": "Medaillen und Serien: Kartiere ein neues System, das NMS Almanac bestätigt, und baue eine tägliche, wöchentliche und monatliche Serie auf",
-    "nl": "Medailles en reeksen: breng een nieuw systeem in kaart dat NMS Almanac bevestigt en bouw een dagelijkse, wekelijkse en maandelijkse reeks op",
-    "pl": "Medale i serie: oznacz na mapie nowy układ potwierdzony przez NMS Almanac i buduj serię dzienną, tygodniową i miesięczną",
-    "fr": "Médailles et séries : cartographie un nouveau système confirmé par NMS Almanac pour construire une série quotidienne, hebdomadaire et mensuelle",
-    "pt-BR": "Medalhas e sequências: mapeie um sistema novo confirmado pelo NMS Almanac e monte uma sequência diária, semanal e mensal",
-    "it": "Medaglie e serie: mappa un nuovo sistema confermato da NMS Almanac e costruisci una serie giornaliera, settimanale e mensile"
+    "en": "New control card on desktop: the same tidy layout as the phone, with More beside it so your pop-ups stay clear",
+    "es": "Nueva tarjeta de controles en ordenador: el mismo diseño ordenado que en el móvil, con Más al lado para que tus ventanas queden libres",
+    "de": "Neue Steuerkarte am Computer: dasselbe aufgeräumte Layout wie am Handy, mit „Mehr“ daneben, damit deine Fenster frei bleiben",
+    "nl": "Nieuwe bedieningskaart op de computer: dezelfde nette indeling als op de telefoon, met Meer ernaast zodat je vensters vrij blijven",
+    "pl": "Nowa karta sterowania na komputerze: ten sam porządek co na telefonie, z panelem Więcej obok, żeby okna były wolne",
+    "fr": "Nouvelle carte de commandes sur ordinateur : la même présentation soignée que sur téléphone, avec Plus à côté pour garder tes fenêtres dégagées",
+    "pt-BR": "Novo cartão de controles no computador: o mesmo layout organizado do celular, com Mais ao lado para suas janelas ficarem livres",
+    "it": "Nuova scheda dei controlli sul computer: lo stesso layout ordinato del telefono, con Altro accanto così le tue finestre restano libere"
    }
   },
   {
    "tag": "improved",
    "text": {
-    "en": "Phone controls tidied: four short rows plus a More panel, so the map fills much more of your screen",
-    "es": "Controles del móvil reorganizados: cuatro filas cortas y un panel Más, para que el mapa ocupe mucho más de la pantalla",
-    "de": "Steuerung am Handy aufgeräumt: vier kurze Zeilen plus ein „Mehr“-Panel, die Karte nimmt viel mehr vom Bildschirm ein",
-    "nl": "Bediening op telefoon opgeruimd: vier korte rijen plus een Meer-paneel, zodat de kaart veel meer scherm krijgt",
-    "pl": "Uporządkowane sterowanie na telefonie: cztery krótkie rzędy i panel Więcej, dzięki czemu mapa zajmuje dużo więcej ekranu",
-    "fr": "Commandes du téléphone remises en ordre : quatre lignes courtes et un panneau Plus, pour que la carte occupe bien plus d'écran",
-    "pt-BR": "Controles do celular organizados: quatro linhas curtas e um painel Mais, para o mapa ocupar bem mais da tela",
-    "it": "Controlli del telefono riordinati: quattro righe corte e un pannello Altro, così la mappa occupa molto più schermo"
-   }
-  },
-  {
-   "tag": "new",
-   "text": {
-    "en": "Trending and Top surveyors #1–3 now win medals. Open yours to download or share it",
-    "es": "Los puestos 1–3 de Tendencias y de Mejores exploradores ganan medallas. Abre la tuya para descargarla o compartirla",
-    "de": "Platz 1–3 in den Trends und bei den Top-Vermessern gewinnt jetzt Medaillen. Öffne deine, um sie herunterzuladen oder zu teilen",
-    "nl": "De nummers 1–3 van Trending en Topverkenners winnen nu medailles. Open de jouwe om hem te downloaden of te delen",
-    "pl": "Miejsca 1–3 w sekcjach Na topie i Najlepsi zwiadowcy zdobywają medale. Otwórz swój, aby go pobrać lub udostępnić",
-    "fr": "Les 3 premiers des Tendances et des Meilleurs explorateurs gagnent des médailles. Ouvre la tienne pour la télécharger ou la partager",
-    "pt-BR": "Os 3 primeiros de Em alta e de Melhores exploradores ganham medalhas. Abra a sua para baixar ou compartilhar",
-    "it": "I primi 3 di Di tendenza e Migliori esploratori vincono medaglie. Apri la tua per scaricarla o condividerla"
-   }
-  },
-  {
-   "tag": "new",
-   "text": {
-    "en": "Station photo button on the Surveyor log step",
-    "es": "Botón Foto de la estación en el paso Diario del explorador",
-    "de": "Stationsfoto-Knopf im Schritt Vermessungslog",
-    "nl": "Knop Stationsfoto bij de stap Verkenningslogboek",
-    "pl": "Przycisk Zdjęcie stacji w kroku Dziennik zwiadowcy",
-    "fr": "Bouton Photo de la station à l'étape Journal d'exploration",
-    "pt-BR": "Botão Foto da estação na etapa Diário de exploração",
-    "it": "Pulsante Foto della stazione nel passo Diario di esplorazione"
+    "en": "Crystal icons on Warp FX, Tour, About, Install, Favourites, Traveller discoveries and the settings gear, and framed icons in the feedback pop-up",
+    "es": "Iconos de cristal en Efecto salto, Tour, Acerca de, Instalar, Favoritos, Descubrimientos de viajeros y el engranaje de ajustes, e iconos con marco en la ventana de comentarios",
+    "de": "Kristall-Symbole bei Warp-Effekt, Tour, Über, Installieren, Favoriten, Entdeckungen der Reisenden und dem Einstellungs-Zahnrad, plus gerahmte Symbole im Feedback-Fenster",
+    "nl": "Kristallen pictogrammen bij Warp-effect, Tour, Info, Installeren, Favorieten, Ontdekkingen van reizigers en het tandwiel voor instellingen, plus ingelijste pictogrammen in het feedbackvenster",
+    "pl": "Kryształowe ikony przy Efekcie warpu, Wycieczce, Informacjach, Instalacji, Ulubionych, Odkryciach podróżników i kółku ustawień oraz ikony w ramkach w oknie opinii",
+    "fr": "Icônes cristal sur Effet de saut, Visite, À propos, Installer, Favoris, Découvertes des voyageurs et la roue des réglages, plus des icônes encadrées dans la fenêtre d'avis",
+    "pt-BR": "Ícones de cristal em Efeito de salto, Tour, Sobre, Instalar, Favoritos, Descobertas dos viajantes e na engrenagem de ajustes, e ícones com moldura na janela de feedback",
+    "it": "Icone di cristallo su Effetto salto, Tour, Informazioni, Installa, Preferiti, Scoperte dei viaggiatori e sull'ingranaggio delle impostazioni, più icone con cornice nella finestra dei commenti"
    }
   },
   {
    "tag": "improved",
    "text": {
-    "en": "Picked a collage as your station photo? Tap the part that shows your station. Bug reports are always welcome. Use the Feedback button.",
-    "es": "¿Elegiste un collage como foto de la estación? Toca la parte donde sale tu estación. Los reportes de errores siempre son bienvenidos. Usa el botón de comentarios.",
-    "de": "Eine Collage als Stationsfoto gewählt? Tippe auf den Teil, der deine Station zeigt. Fehlermeldungen sind immer willkommen. Nutze die Feedback-Schaltfläche.",
-    "nl": "Een collage als stationsfoto gekozen? Tik op het deel met je station. Bugmeldingen zijn altijd welkom. Gebruik de feedbackknop.",
-    "pl": "Wybrano kolaż jako zdjęcie stacji? Dotknij części, na której jest twoja stacja. Zgłoszenia błędów są zawsze mile widziane. Użyj przycisku opinii.",
-    "fr": "Tu as choisi un collage comme photo de station ? Touche la partie qui montre ta station. Les signalements de bugs sont toujours bienvenus. Utilise le bouton d'avis.",
-    "pt-BR": "Escolheu uma colagem como foto da estação? Toque na parte que mostra a sua estação. Relatos de bugs são sempre bem-vindos. Use o botão de feedback.",
-    "it": "Hai scelto un collage come foto della stazione? Tocca la parte che mostra la tua stazione. Le segnalazioni di bug sono sempre benvenute. Usa il pulsante del feedback."
-   }
-  },
-  {
-   "tag": "new",
-   "text": {
-    "en": "New Deep Space Anomaly signal marker",
-    "es": "Nuevo marcador de señal Deep Space Anomaly",
-    "de": "Neue Signalmarkierung „Deep Space Anomaly“",
-    "nl": "Nieuwe signaalmarkering Deep Space Anomaly",
-    "pl": "Nowy znacznik sygnału Deep Space Anomaly",
-    "fr": "Nouveau marqueur de signal Deep Space Anomaly",
-    "pt-BR": "Novo marcador de sinal Deep Space Anomaly",
-    "it": "Nuovo indicatore di segnale Deep Space Anomaly"
-   }
-  },
-  {
-   "tag": "new",
-   "text": {
-    "en": "Earn a medal and a ship flies in and lands on the badge: shuttle for bronze, fighter for silver, exotic for gold. Tap to skip",
-    "es": "Si ganas una medalla, una nave llega volando y aterriza en la insignia: lanzadera para el bronce, caza para la plata, exótica para el oro. Toca para saltar",
-    "de": "Verdienst du eine Medaille, fliegt ein Schiff herein und landet auf dem Abzeichen: Shuttle für Bronze, Jäger für Silber, Exot für Gold. Zum Überspringen tippen",
-    "fr": "Quand tu gagnes une médaille, un vaisseau arrive en volant et se pose sur l'insigne : navette pour le bronze, chasseur pour l'argent, exotique pour l'or. Touche pour passer",
-    "it": "Quando ottieni una medaglia, una nave arriva in volo e atterra sul distintivo: navetta per il bronzo, caccia per l'argento, esotica per l'oro. Tocca per saltare",
-    "nl": "Verdien je een medaille, dan vliegt er een schip binnen en landt op de badge: shuttle voor brons, jager voor zilver, exotisch voor goud. Tik om over te slaan",
-    "pl": "Gdy zdobędziesz medal, przylatuje statek i ląduje na odznace: prom za brąz, myśliwiec za srebro, egzotyczny za złoto. Dotknij, aby pominąć",
-    "pt-BR": "Ao ganhar uma medalha, uma nave chega voando e pousa no emblema: transporte para o bronze, caça para a prata, exótica para o ouro. Toque para pular"
-   }
-  },
-  {
-   "tag": "new",
-   "text": {
-    "en": "Read these glyphs: a link under a portal address opens it in the Alphabet Translator",
-    "es": "Leer estos glifos: un enlace bajo la dirección del portal la abre en el Traductor de alfabeto",
-    "de": "Glyphen entziffern: Ein Link unter der Portaladresse öffnet sie im Alphabet-Übersetzer",
-    "fr": "Lire ces glyphes : un lien sous l'adresse du portail l'ouvre dans le Traducteur d'alphabet",
-    "it": "Leggi questi glifi: un link sotto l'indirizzo del portale lo apre nel Traduttore dell'alfabeto",
-    "nl": "Lees deze glyphen: een link onder het portaaladres opent het in de Alfabetvertaler",
-    "pl": "Odczytaj te glify: link pod adresem portalu otwiera go w Tłumaczu alfabetu",
-    "pt-BR": "Ler estes glifos: um link sob o endereço do portal abre-o no Tradutor de alfabeto"
-   }
-  },
-  {
-   "tag": "new",
-   "text": {
-    "en": "Patch notes like these after each big update",
-    "es": "Notas como estas después de cada gran actualización",
-    "de": "Patch-Notes wie diese nach jedem großen Update",
-    "nl": "Patchnotes zoals deze na elke grote update",
-    "pl": "Takie informacje o zmianach po każdej dużej aktualizacji",
-    "fr": "Des notes comme celles-ci après chaque grosse mise à jour",
-    "pt-BR": "Notas como estas depois de cada grande atualização",
-    "it": "Note come queste dopo ogni grande aggiornamento"
+    "en": "Galaxy and type pickers no longer cut off long names on phones, and the Filters window is easier to read",
+    "es": "Los selectores de galaxia y tipo ya no cortan los nombres largos en el móvil, y la ventana de filtros se lee mejor",
+    "de": "Galaxie- und Typauswahl schneiden lange Namen am Handy nicht mehr ab, und das Filterfenster ist besser lesbar",
+    "nl": "De keuzelijsten voor sterrenstelsel en type knippen lange namen op telefoons niet meer af, en het filtervenster leest prettiger",
+    "pl": "Listy galaktyk i typów nie ucinają już długich nazw na telefonie, a okno filtrów jest czytelniejsze",
+    "fr": "Les listes de galaxie et de type ne coupent plus les noms longs sur téléphone, et la fenêtre des filtres se lit mieux",
+    "pt-BR": "Os seletores de galáxia e tipo não cortam mais nomes longos no celular, e a janela de filtros ficou mais legível",
+    "it": "I selettori di galassia e tipo non tagliano più i nomi lunghi sul telefono e la finestra dei filtri è più leggibile"
    }
   }
  ]

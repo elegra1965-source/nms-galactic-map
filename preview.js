@@ -7151,7 +7151,7 @@ function updateEdgeArrows(off){
     var ang=Math.atan2(-y,x)*180/Math.PI;
     var _ec=edgeStarCol(c2);
     el.innerHTML='<span class="eaArr" style="transform:rotate('+ang.toFixed(0)+'deg)'+(_ec?';color:'+_ec:'')+'">&#10148;</span> ';
-    el.appendChild(document.createTextNode(c2.t));
+    if(c2.t.indexOf("\u26f6 ")===0){ el.appendChild(stIcon()); el.appendChild(document.createTextNode(c2.t.slice(2))); } else el.appendChild(document.createTextNode(c2.t));
     el.style.display="block";
     var hw=el.offsetWidth/2+6; px=Math.min(Math.max(px,hw),w-hw);
     el.style.left=px+"px"; el.style.top=py+"px";
@@ -7307,12 +7307,13 @@ function lblScreenR(wp,worldR,w,h){
   _sv2.copy(wp).addScaledVector(_camUp,worldR).project(camera);
   return Math.hypot((_sv2.x-_sv1.x)*0.5*w,(_sv2.y-_sv1.y)*0.5*h);
 }
+function stIcon(){ var i=document.createElement("img"); i.className="ci stIc"; i.src="crystal/ci-fullscreen.webp?v=20261112"; i.alt="Space station"; i.width=14; i.height=14; return i; }
 function fillLblBox(el,key,kind,title,sub,top){
   if(el._key===key) return;
   el._key=key; el._bx=true;
   el.className="lbl bx bx-"+kind;
   el.textContent="";
-  if(top){ var t=document.createElement("small"); t.textContent=top; el.appendChild(t); }
+  if(top){ var t=document.createElement("small"); if(top.indexOf("\u26f6 ")===0){ t.appendChild(stIcon()); t.appendChild(document.createTextNode(top.slice(2))); } else t.textContent=top; el.appendChild(t); }
   var n=document.createElement("span"); n.textContent=title; el.appendChild(n);
   if(sub){ var u=document.createElement("small"); u.textContent=sub; el.appendChild(u); }
   el.style.display="block";
