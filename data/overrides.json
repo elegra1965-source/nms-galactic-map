@@ -85476,6 +85476,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:107809557D2F": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB7-78 Reglin",
+        "race": "Gek",
+        "region": "Lugalus Fringe",
+        "starClass": "F0p",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "High Tech",
+        "sell": "40.0",
+        "buy": "-27.9",
+        "econDesc": "★★★ (Wealthy)",
+        "conflict": "2 (Intermittent)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-11-12T11:00:58.989Z",
+      "editedByIp": "ip_9279193ba1812f5c",
+      "history": [
+        {
+          "at": "2026-11-12T11:00:58.989Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -85483,7 +85532,8 @@
     "ip_9279193ba1812f5c": [
       1794481213895,
       1794481232922,
-      1794481246052
+      1794481246052,
+      1794481258989
     ]
   },
   "flagLog": {},
