@@ -54,6 +54,10 @@ portal address  ->  12 hex glyphs  ->  signed 3D voxel coordinate
                                           data/overrides.json (lives only on GitHub, see below)
 ```
 
+- **New crystal icons.** Every icon on the map has been redrawn in one faceted crystal style, so all six sites match, and every picture has a text description for screen readers. The icons are toned down a little so they don't shout over the content.
+
+  <img src="screenshots/icons-crystal.jpg" alt="The new crystal icons on the map: the desktop control card with Galaxy and Local, Routes and More buttons drawn as faceted cyan crystals with amber accents" width="520">
+
 </details>
 
 <details>
