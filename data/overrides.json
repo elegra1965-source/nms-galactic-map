@@ -85378,12 +85378,62 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:10BC08557D31": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB23-BC Yinsen",
+        "race": "Gek",
+        "region": "Dejigaha",
+        "starClass": "G5f",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Manufacturing",
+        "sell": "64.0",
+        "buy": "-19.4",
+        "econDesc": "★★★ (Booming)",
+        "conflict": "1 (Gentle)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-11-12T11:00:32.922Z",
+      "editedByIp": "ip_9279193ba1812f5c",
+      "history": [
+        {
+          "at": "2026-11-12T11:00:32.922Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "ip_9279193ba1812f5c": [
-      1794481213895
+      1794481213895,
+      1794481232922
     ]
   },
   "flagLog": {},
