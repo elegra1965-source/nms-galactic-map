@@ -9440,7 +9440,7 @@ function renderCollidingSelectors(){
     for(var p=0;p<planets.length;p++){
       var pIdx=editBodies.indexOf(planets[p])+1;
       html+='<option value="'+planets[p].uid+'"'+(String(selectedUid)===String(planets[p].uid)?" selected":"")+
-        '>'+(isGiantSys?"Giant":("Planet #"+pIdx))+' · '+escAttr(planets[p].name||"(unnamed)")+'</option>';
+        '>'+(isGiantSys?"Giant":("Planet #"+pIdx))+' · '+escAttr(planets[p].name||planets[p].nameGuess||"(unnamed)")+'</option>';
     }
     return html;
   }
