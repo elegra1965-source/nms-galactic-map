@@ -65,7 +65,7 @@
 '#b7p h4{font-size:11px}#b7p .g>.btn{font-size:11px!important;min-height:40px!important;padding:10px 4px!important}' +
 '@media(max-width:360px){#b7 #inAddr{letter-spacing:.04em!important}#b7 #mGal{font-size:11px!important}#b7 #chartedLine{font-size:10px}#b7 .r5>.btn,#b7 .r>.btn{font-size:11px!important}}' +
 '@media(prefers-reduced-motion:reduce){#b7 #chartedLine{transition:none}}' +
-'#b7 .r3{display:grid;grid-template-columns:84px minmax(0,1fr) minmax(0,1.15fr) minmax(0,.8fr);gap:6px}#b7 .r3>*{flex:none!important;width:auto!important;min-width:0!important}#b7 #galSel,#b7 #galTypeFilter{padding-left:8px!important;padding-right:18px!important;text-overflow:clip}#b7 #mLoc,#b7 #mGal{padding-left:15px!important;padding-right:3px!important;letter-spacing:.02em!important}' +
+'#b7 .r3{display:grid;grid-template-columns:40px minmax(0,1fr) minmax(0,1fr) auto;gap:6px}#b7 .r3>*{flex:none!important;width:auto!important;min-width:0!important}#b7 #galSel,#b7 #galTypeFilter{padding-left:8px!important;padding-right:18px!important;text-overflow:clip}#b7 #mLoc,#b7 #mGal{padding-left:11px!important;padding-right:11px!important;letter-spacing:.02em!important;text-align:center}#b7 #mLoc::before,#b7 #mGal::before{display:none!important}#b7 #mGal{width:40px!important;padding:0!important;font-size:0!important;color:transparent!important;background:url(favicon/galaxy-spiral.png) center/28px 28px no-repeat,rgba(10,18,30,.9)!important}#b7 #mGal.on{box-shadow:0 0 0 1px #f0a500 inset}#b7 #mGal.pulse{animation:galPulse 1.1s ease-in-out 3}@keyframes galPulse{0%,100%{box-shadow:0 0 0 0 rgba(0,216,240,0)}50%{box-shadow:0 0 0 5px rgba(0,216,240,.55)}}' +
 '@media(max-width:380px){#b7 .r3{grid-template-columns:1fr 1fr}}';
   document.head.appendChild(css);
 
@@ -149,7 +149,7 @@
       if(nw > 20) tt.style.minWidth = Math.ceil(nw) + 'px';
     }
     var r2 = row('r2'); mv(r2, 'chartedLine'); mv(r2, 'trendLine');
-    var r3 = row('r3'); mv(r3, 'galSel'); mv(r3, 'galTypeFilter'); mv(r3, 'mGal'); mv(r3, 'mLoc');
+    var r3 = row('r3'); mv(r3, 'mGal'); mv(r3, 'galSel'); mv(r3, 'galTypeFilter'); mv(r3, 'mLoc');
     var r4 = row('r4'); mv(r4, 'bRand'); mv(r4, 'inAddr'); mv(r4, 'bAddrReset');
     var r5 = row('r5'); ['bKeys','bSearch','bJump','bRoutes','bFiltToggle'].forEach(function(i){ mv(r5, i); });
     moreBtn = mk('button', { type:'button', 'class':'btn beveled', id:'b7More', 'aria-expanded':'false', 'aria-controls':'b7p', 'aria-label':T('More controls') }, '&hellip; More');
@@ -285,4 +285,24 @@
   document.addEventListener('change',function(e){ if(e.target&&(e.target.id==='galSel'||e.target.id==='galTypeFilter')) setTimeout(fit,30); });
   var t=document.getElementById('mGal');
   if(t&&window.MutationObserver) new MutationObserver(function(){ setTimeout(fit,50); }).observe(t,{childList:true,characterData:true,subtree:true});
+})();
+
+/* 2026-11-13: Galaxy button = the logo spiral. Label + tooltip in 8 languages, pulses 3 times on a first visit */
+(function(){
+  var T={en:'See the 3D galaxy',es:'Ver la galaxia en 3D',de:'Die 3D-Galaxie ansehen',nl:'Bekijk het 3D-sterrenstelsel',pl:'Zobacz galaktyke 3D',fr:'Voir la galaxie en 3D',
+    'pt-BR':'Ver a galaxia em 3D',it:'Guarda la galassia in 3D'};
+  T.pl='Zobacz galaktyk\u0119 3D'; T['pt-BR']='Ver a gal\u00e1xia em 3D'; T.es='Ver la galaxia en 3D';
+  function lab(){ var b=document.getElementById('mGal'); if(!b) return; var l=(window.NMS_LANG&&window.NMS_LANG())||'en'; var t=T[l]||T.en; b.setAttribute('aria-label',t); b.title=t; }
+  function go(){
+    lab(); var b=document.getElementById('mGal'); if(!b) return;
+    var seen=false; try{ seen=localStorage.getItem('nms_galbtn_seen')==='1'; }catch(e){}
+    if(!seen && window.matchMedia && matchMedia('(max-width:900px)').matches && !matchMedia('(prefers-reduced-motion:reduce)').matches){
+      b.classList.add('pulse');
+      b.addEventListener('animationend',function(){ b.classList.remove('pulse'); try{localStorage.setItem('nms_galbtn_seen','1');}catch(e){} },{once:true});
+    }
+    b.addEventListener('click',function(){ b.classList.remove('pulse'); try{localStorage.setItem('nms_galbtn_seen','1');}catch(e){} });
+    var obs=window.MutationObserver&&new MutationObserver(lab); if(obs) obs.observe(b,{childList:true,characterData:true,subtree:true});
+  }
+  window.addEventListener('load',function(){ setTimeout(go,300); });
+  document.addEventListener('nms-lang-change',lab);
 })();
