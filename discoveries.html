@@ -112,8 +112,13 @@ button:hover,button:focus-visible{border-color:var(--cyan);outline:none}
       <div class="stat"><span class="n" id="pPeople">0</span><span class="l">Private codes active · 7 days</span></div>
       <div class="stat"><span class="n" id="pTotal">0</span><span class="l">Private systems in all</span></div>
     </div>
-    <ul class="who" id="pLatest"></ul>
-    <button type="button" id="pMore" hidden style="justify-self:start">Show more</button>
+    <details id="pDet" style="border:1px solid var(--line);border-radius:6px;background:var(--panel)">
+      <summary id="pSum" style="cursor:pointer;padding:12px 14px;font-family:var(--disp);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--text)">Latest private saves</summary>
+      <div style="padding:0 14px 14px;display:grid;gap:10px">
+        <ul class="who" id="pLatest"></ul>
+        <button type="button" id="pMore" hidden style="justify-self:start">Show more</button>
+      </div>
+    </details>
     <p class="note" style="margin:0">Counted from each private system's last save, so a system saved twice counts once, on its latest day. Today = your local day.</p>
   </section>
 
@@ -491,6 +496,7 @@ button:hover,button:focus-visible{border-color:var(--cyan);outline:none}
       more.onclick = function(){ shown += 10; draw(); };
       draw();
     }
+    $("pSum").textContent = "Latest private saves (" + all.length + ")";
     $("privStats").hidden = false;
   }
   function load(){
