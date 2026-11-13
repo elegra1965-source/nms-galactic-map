@@ -46,6 +46,7 @@ button:hover,button:focus-visible{border-color:var(--cyan);outline:none}
 .who li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;align-items:center}
 .who .nm{font-weight:600;font-size:17px;overflow-wrap:anywhere}
 .who .ct{font-family:var(--disp);font-size:14px;letter-spacing:.1em;color:#fff;font-variant-numeric:tabular-nums}
+#privStats[hidden]{display:none}.who li .glyphs{grid-column:1/-1}
 .who .track{grid-column:1/-1;height:4px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden}
 .who .track i{display:block;height:100%;background:var(--cyan)}
 .who .new{font-size:11px;font-family:var(--disp);letter-spacing:.14em;color:var(--ok);margin-left:6px}
@@ -101,6 +102,19 @@ button:hover,button:focus-visible{border-color:var(--cyan);outline:none}
     <div class="stat"><span class="n" id="sPeople">—</span><span class="l">Travellers today</span></div>
     <div class="stat"><span class="n" id="sShots">—</span><span class="l">Photos today</span></div>
     <div class="stat"><span class="n" id="sWeek">—</span><span class="l">Edits · 7 days</span></div>
+  </section>
+
+  <section id="privStats" hidden style="display:grid;gap:12px">
+    <h2 class="kicker" style="margin:0;font-size:12px">Private saves (owner only, from the private store)</h2>
+    <div class="stats" aria-label="Private saves">
+      <div class="stat hero"><span class="n" id="pToday">0</span><span class="l">Private saves today</span></div>
+      <div class="stat"><span class="n" id="pWeek">0</span><span class="l">Private saves · 7 days</span></div>
+      <div class="stat"><span class="n" id="pPeople">0</span><span class="l">Private codes active · 7 days</span></div>
+      <div class="stat"><span class="n" id="pTotal">0</span><span class="l">Private systems in all</span></div>
+    </div>
+    <ul class="who" id="pLatest"></ul>
+    <button type="button" id="pMore" hidden style="justify-self:start">Show more</button>
+    <p class="note" style="margin:0">Counted from each private system's last save, so a system saved twice counts once, on its latest day. Today = your local day.</p>
   </section>
 
   <section class="two">
@@ -447,6 +461,38 @@ button:hover,button:focus-visible{border-color:var(--cyan);outline:none}
     });
     $("privStatus").textContent = owners.length ? (shown + " of " + owners.length + " private codes") : "";
   }
+  function renderPrivStats(){
+    var now = new Date(), day0 = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime(), wk0 = day0 - 6 * 86400000;
+    var all = [], today = 0, week = 0, people = {};
+    owners.forEach(function(o){
+      Object.keys(o.systems || {}).forEach(function(k){
+        var s = o.systems[k], t = Date.parse(s.savedAt || "");
+        all.push({ t: isNaN(t) ? 0 : t, k: k, s: s, code: o.code });
+        if(!isNaN(t)){ if(t >= day0) today++; if(t >= wk0){ week++; people[o.code] = 1; } }
+      });
+    });
+    $("pToday").textContent = String(today); $("pWeek").textContent = String(week);
+    $("pPeople").textContent = String(Object.keys(people).length); $("pTotal").textContent = String(all.length);
+    all.sort(function(a, b){ return b.t - a.t; });
+    var ul = $("pLatest"), more = $("pMore"); ul.textContent = "";
+    function row(x){
+      var li = el("li"), g = parseInt(x.k.split(":")[0], 10), addr = x.k.split(":")[1];
+      var nm = el("span", "nm", (x.s.name || "Unnamed system") + " · " + (GAL[g] || ("Galaxy " + (g + 1))));
+      li.appendChild(nm);
+      var who = x.s.editorName ? "by " + x.s.editorName + " · " : "";
+      li.appendChild(el("span", "ct", who + (x.t ? new Date(x.t).toLocaleString([], { dateStyle:"medium", timeStyle:"short" }) : "no date")));
+      li.appendChild(glyphRow(addr));
+      return li;
+    }
+    if(!all.length){ ul.appendChild(el("li", "empty", "No private saves yet.")); more.hidden = true; }
+    else {
+      var shown = 5;
+      var draw = function(){ ul.textContent = ""; all.slice(0, shown).forEach(function(x){ ul.appendChild(row(x)); }); more.hidden = all.length <= shown; more.textContent = "Show more (" + Math.min(10, all.length - shown) + ")"; };
+      more.onclick = function(){ shown += 10; draw(); };
+      draw();
+    }
+    $("privStats").hidden = false;
+  }
   function load(){
     var tok = $("privTok").value.trim(); if(!tok){ $("privStatus").textContent = "Enter your admin token"; return; }
     try { localStorage.setItem("disc_admin_token", tok); } catch(e){}
@@ -455,7 +501,7 @@ button:hover,button:focus-visible{border-color:var(--cyan);outline:none}
       .then(function(r){ return r.json(); })
       .then(function(j){
         if(!j.ok){ $("privStatus").textContent = j.error === "forbidden" ? "Wrong admin token" : "Couldn't load"; return; }
-        owners = j.owners || []; requests = j.requests || []; renderReqs(); render();
+        owners = j.owners || []; requests = j.requests || []; renderReqs(); render(); renderPrivStats();
         if(!owners.length) $("privStatus").textContent = "No private systems yet";
       })
       .catch(function(){ $("privStatus").textContent = "Couldn't reach the private store"; });
