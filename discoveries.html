@@ -378,10 +378,15 @@ button:hover,button:focus-visible{border-color:var(--cyan);outline:none}
   var owners = [], requests = [];
   try { $("privTok").value = localStorage.getItem("disc_admin_token") || ""; } catch(e){}
   function el(tag, cls, text){ var e = document.createElement(tag); if(cls) e.className = cls; if(text != null) e.textContent = text; return e; }
-  function glyphRow(addr){
+  function mapLink(addr, g){
+    var a = el("a","go","Open on the map \u2192"); a.href = (SITE || "") + "/?arrival=1&addr=" + addr + "&galaxy=" + g;
+    a.target = "_blank"; a.rel = "noopener"; a.style.cssText = "margin-left:auto;padding:5px 9px;font-size:10px"; return a;
+  }
+  function glyphRow(addr, g){
     var gl = el("div","glyphs"); gl.setAttribute("aria-label","Portal address " + addr);
     addr.split("").forEach(function(ch){ var im = el("img"); im.src = (SITE ? SITE + "/" : "") + "glyphs/glyph-mask-" + ch + ".png"; im.alt = ch; gl.appendChild(im); });
     gl.appendChild(el("span","hex", addr));
+    if(typeof g === "number" && !isNaN(g)) gl.appendChild(mapLink(addr, g));
     return gl;
   }
   function renderReqs(){
@@ -398,7 +403,7 @@ button:hover,button:focus-visible{border-color:var(--cyan);outline:none}
       m.appendChild(el("span", null, String(r.at).slice(0,16).replace("T"," ")));
       b.appendChild(m);
       var m2 = el("div","meta"); m2.appendChild(el("span", null, GAL[g] || ("Galaxy " + (g+1)))); b.appendChild(m2);
-      b.appendChild(glyphRow(addr));
+      b.appendChild(glyphRow(addr, g));
       var res = el("div","meta");
       if(r.matches && r.matches.length) r.matches.forEach(function(code){ res.appendChild(el("span","chip gold", code)); });
       else res.appendChild(el("span","chip","No private code holds this system -- ask them to check the address and galaxy"));
@@ -459,6 +464,7 @@ button:hover,button:focus-visible{border-color:var(--cyan);outline:none}
         var gl = el("div","glyphs"); gl.setAttribute("aria-label","Portal address " + addr);
         addr.split("").forEach(function(ch){ var im = el("img"); im.src = (SITE ? SITE + "/" : "") + "glyphs/glyph-mask-" + ch + ".png"; im.alt = ch; gl.appendChild(im); });
         gl.appendChild(el("span","hex", addr));
+        gl.appendChild(mapLink(addr, g));
         row.appendChild(gl);
         b.appendChild(row);
       });
@@ -486,7 +492,7 @@ button:hover,button:focus-visible{border-color:var(--cyan);outline:none}
       li.appendChild(nm);
       var who = x.s.editorName ? "by " + x.s.editorName + " · " : "";
       li.appendChild(el("span", "ct", who + (x.t ? new Date(x.t).toLocaleString([], { dateStyle:"medium", timeStyle:"short" }) : "no date")));
-      li.appendChild(glyphRow(addr));
+      li.appendChild(glyphRow(addr, g));
       return li;
     }
     if(!all.length){ ul.appendChild(el("li", "empty", "No private saves yet.")); more.hidden = true; }
