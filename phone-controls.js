@@ -64,7 +64,9 @@
 '#b7 .r3,#b7 .r4,#b7 .r5{flex-wrap:wrap}#b7 .r3>.btn,#b7 .r3>select,#b7 .r4>.btn,#b7 .r5>.btn{flex:1 0 auto!important}#b7 #inAddr{flex:2 0 124px!important}#b7 #mLoc,#b7 #mGal{flex:1 0 auto!important}' +
 '#b7p h4{font-size:11px}#b7p .g>.btn{font-size:11px!important;min-height:40px!important;padding:10px 4px!important}' +
 '@media(max-width:360px){#b7 #inAddr{letter-spacing:.04em!important}#b7 #mGal{font-size:11px!important}#b7 #chartedLine{font-size:10px}#b7 .r5>.btn,#b7 .r>.btn{font-size:11px!important}}' +
-'@media(prefers-reduced-motion:reduce){#b7 #chartedLine{transition:none}}';
+'@media(prefers-reduced-motion:reduce){#b7 #chartedLine{transition:none}}' +
+'#b7 .r3{display:grid;grid-template-columns:84px minmax(0,1fr) minmax(0,1.15fr) minmax(0,.8fr);gap:6px}#b7 .r3>*{flex:none!important;width:auto!important;min-width:0!important}#b7 #galSel,#b7 #galTypeFilter{padding-left:8px!important;padding-right:18px!important;text-overflow:clip}#b7 #mLoc,#b7 #mGal{padding-left:15px!important;padding-right:3px!important;letter-spacing:.02em!important}' +
+'@media(max-width:380px){#b7 .r3{grid-template-columns:1fr 1fr}}';
   document.head.appendChild(css);
 
   function mk(tag, attrs, html){
@@ -252,4 +254,35 @@
       var b = $('bPanelMin'); if(b) b.innerHTML = '&#9656;';
     }).observe(pn, { attributes:true, attributeFilter:['class'] });
   })();
+})();
+
+/* 2026-11-13: shrink long labels (Sterrenstelsel, Beliebiger Typ, long galaxy names) to fit their box instead of clipping */
+(function(){
+  var cv=document.createElement('canvas').getContext('2d');
+  function fitBtn(b){
+    b.style.removeProperty('font-size');
+    var fs=parseFloat(getComputedStyle(b).fontSize)||11, n=0;
+    while(b.scrollWidth>b.clientWidth+1 && fs>8.5 && n++<20){ fs-=.5; b.style.setProperty('font-size',fs+'px','important'); }
+  }
+  function fitSel(sel){
+    sel.style.removeProperty('font-size');
+    var cs=getComputedStyle(sel), fs=parseFloat(cs.fontSize)||11;
+    var o=sel.options[sel.selectedIndex]; if(!o) return;
+    var avail=sel.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight), n=0;
+    while(n++<20 && fs>7.5){
+      cv.font=cs.fontStyle+' '+cs.fontWeight+' '+fs+'px '+cs.fontFamily;
+      if(cv.measureText(o.text).width<=avail) break;
+      fs-=.5; sel.style.setProperty('font-size',fs+'px','important');
+    }
+  }
+  function fit(){
+    ['mGal','mLoc'].forEach(function(id){ var b=document.getElementById(id); if(b&&b.offsetParent) fitBtn(b); });
+    ['galSel','galTypeFilter'].forEach(function(id){ var s=document.getElementById(id); if(s&&s.offsetParent) fitSel(s); });
+  }
+  function go(){ fit(); setTimeout(fit,600); setTimeout(fit,2000); }
+  window.addEventListener('resize',function(){ setTimeout(fit,100); });
+  window.addEventListener('load',go);
+  document.addEventListener('change',function(e){ if(e.target&&(e.target.id==='galSel'||e.target.id==='galTypeFilter')) setTimeout(fit,30); });
+  var t=document.getElementById('mGal');
+  if(t&&window.MutationObserver) new MutationObserver(function(){ setTimeout(fit,50); }).observe(t,{childList:true,characterData:true,subtree:true});
 })();
