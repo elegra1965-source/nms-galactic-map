@@ -8488,6 +8488,8 @@ var _warpGen=0;
 function playWarpTransition(kind){
   // 2026-10-26, Tony: every jump / Random / search or favourite pick / Enter system goes
   // through here, so this is where the phone controls (and the glyph keypad) tuck away
+  // 2026-11-13: close the glyph keypad after Jump on every layout (the phone controls card has no Hide button, so the old check never closed it)
+  (function(){ var k=document.getElementById('keys'), bk=document.getElementById('bKeys'); if(k&&k.classList.contains('show')){ k.classList.remove('show'); if(bk) bk.classList.remove('on'); } })();
   if(window.autoHideControls) window.autoHideControls(true);
   if(!WARP_ENABLED) return;
   if(document.documentElement.classList.contains("calm")) return; // Calm mode (calm.js): no warp animation
@@ -9428,7 +9430,7 @@ function renderCollidingSelectors(){
   // Drop any pick whose planet row no longer exists (removed from the
   // system since it was picked), same reasoning as bfOrbits' own cleanup.
   collidingUids=collidingUids.filter(function(uid){
-    return planets.some(function(p){ return String(p.uid)===String(uid); });
+    return uid==="" || planets.some(function(p){ return String(p.uid)===String(uid); });
   });
   // A freshly-ticked checkbox (or one left with fewer than 2 valid picks
   // after the cleanup above) always starts at 2 empty rows -- the real-game
@@ -9439,7 +9441,7 @@ function renderCollidingSelectors(){
     for(var p=0;p<planets.length;p++){
       var pIdx=editBodies.indexOf(planets[p])+1;
       html+='<option value="'+planets[p].uid+'"'+(String(selectedUid)===String(planets[p].uid)?" selected":"")+
-        '>'+(isGiantSys?"Giant":("Planet #"+pIdx))+' · '+escAttr(planets[p].name||"(unnamed)")+'</option>';
+        '>'+(isGiantSys?"Giant":("Planet #"+pIdx))+' · '+escAttr(planets[p].name||planets[p].nameGuess||"(unnamed)")+'</option>';
     }
     return html;
   }
@@ -9470,7 +9472,13 @@ document.getElementById("collidingEditList").addEventListener("click",function(e
 });
 document.getElementById("edAddColliding").addEventListener("click",function(){
   var planetCount=editBodies.filter(function(b){ return !b.moon; }).length;
-  if(collidingUids.length>=planetCount){ toast("Every planet in this system is already in the colliding list."); return; }
+  if(collidingUids.length>=planetCount){
+    // 2026-11-13: every planet row is already in the list, so add a NEW planet row for the traveller instead of a dead end
+    if(editBodies.length>=6){ toast("6 is the limit -- No Man's Sky systems can have at most 6 planets and moons combined."); return; }
+    var need=collidingUids.length+1-planetCount; // enough planet rows that every colliding row can pick a different planet
+    while(need-->0 && editBodies.length<6) document.getElementById("edAddBody").click();
+    toast("Added new planet rows. Fill in their details under Planets.");
+  }
   collidingUids.push("");
   renderCollidingSelectors();
 });
@@ -12367,7 +12375,9 @@ function submitEditPayload(address, galaxy, payload){
     closeModal(); toast("System saved -- visible to everyone"); loadOverrides();
     if(sendHaven) sendToHaven(address, galaxy, payload);
     // streak medals (nms-medals.js): only a NEW public system counts, once the NMS Almanac confirms it exists
-    if(wasNew&&window.NMSMedals) setTimeout(function(){ NMSMedals.charted({galaxy:galaxy,address:address,name:payload.name||(selected&&selected.name)||"",editor:(loadTravellerId().name||"")}); },2600);
+    var cardShown=false;
+    try{ var scK="nms_savecard_"+galaxy+":"+address, scDone=false; try{ scDone=!!localStorage.getItem(scK); if(wasNew&&!scDone) localStorage.setItem(scK,"1"); }catch(e){} if(window.NMSSaveCard&&wasNew&&!scDone) cardShown=NMSSaveCard.show({address:address,galaxy:galaxy,name:payload.name||(selected&&selected.name)||"",wasNew:!!wasNew,editor:(loadTravellerId().name||"")}); }catch(e){}
+    if(wasNew&&window.NMSMedals) setTimeout(function(){ NMSMedals.charted({galaxy:galaxy,address:address,name:payload.name||(selected&&selected.name)||"",editor:(loadTravellerId().name||"")}); },cardShown?9000:2600);
   }).catch(function(){
     stopWait(); spin.style.display="none"; btn.disabled=false;
     showStatusIcon(iconWrap,iconImg,"grave");

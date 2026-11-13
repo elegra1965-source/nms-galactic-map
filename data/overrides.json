@@ -85329,12 +85329,633 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "0:1199D0589C1E": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Hub10-199 Numenor",
+        "race": "Vy'keen",
+        "region": "Davikto Sector",
+        "starClass": "G8f",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Power Generation",
+        "sell": "74.6",
+        "buy": "15.2",
+        "econDesc": "★ (Destitute)",
+        "conflict": "1 (Stable)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-11-12T11:00:13.895Z",
+      "editedByIp": "ip_9279193ba1812f5c",
+      "history": [
+        {
+          "at": "2026-11-12T11:00:13.895Z",
+          "text": "edited by a traveller"
+        }
+      ]
+    },
+    "9:10BC08557D31": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB23-BC Yinsen",
+        "race": "Gek",
+        "region": "Dejigaha",
+        "starClass": "G5f",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Manufacturing",
+        "sell": "64.0",
+        "buy": "-19.4",
+        "econDesc": "★★★ (Booming)",
+        "conflict": "1 (Gentle)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-11-12T11:00:32.922Z",
+      "editedByIp": "ip_9279193ba1812f5c",
+      "history": [
+        {
+          "at": "2026-11-12T11:00:32.922Z",
+          "text": "edited by a traveller"
+        }
+      ]
+    },
+    "9:11D308555D2F": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB27-1D3 Qukang",
+        "race": "Vy'keen",
+        "region": "Ewkini Adjunct",
+        "starClass": "F2pf",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "High Tech",
+        "sell": "49.3",
+        "buy": "-14.9",
+        "econDesc": "★★★ (High Supply)",
+        "conflict": "1 (Untroubled)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-11-12T11:00:46.052Z",
+      "editedByIp": "ip_9279193ba1812f5c",
+      "history": [
+        {
+          "at": "2026-11-12T11:00:46.052Z",
+          "text": "edited by a traveller"
+        }
+      ]
+    },
+    "9:107809557D2F": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB7-78 Reglin",
+        "race": "Gek",
+        "region": "Lugalus Fringe",
+        "starClass": "F0p",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "High Tech",
+        "sell": "40.0",
+        "buy": "-27.9",
+        "econDesc": "★★★ (Wealthy)",
+        "conflict": "2 (Intermittent)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-11-12T11:00:58.989Z",
+      "editedByIp": "ip_9279193ba1812f5c",
+      "history": [
+        {
+          "at": "2026-11-12T11:00:58.989Z",
+          "text": "edited by a traveller"
+        }
+      ]
+    },
+    "98:141F1A62E10B": {
+      "galaxy": 98,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "[TGC] Nolighed",
+        "race": "Gek",
+        "region": "Dozumei",
+        "starClass": "X4p",
+        "stars": [
+          "purple"
+        ],
+        "water": false,
+        "dissonant": true,
+        "giant": true,
+        "econName": "Mathematical",
+        "sell": "59.4",
+        "buy": "-12.1",
+        "econDesc": "Adequate",
+        "conflict": "Trivial",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "https://raw.githubusercontent.com/elegra1965-source/nms-galactic-map/main/user-screenshots/98-141F1A62E10B-mwet1rcf-8ybfgf.jpg",
+        "hasStation": true,
+        "stationName": "[TGC] Nolighed Rendezvous",
+        "allianceName": "",
+        "stationPhoto": "https://raw.githubusercontent.com/elegra1965-source/nms-galactic-map/main/user-screenshots/98-141F1A62E10B-station-mwet1tiz-mrbd6v.jpg",
+        "signals": [],
+        "editorName": "OldSaltySak",
+        "editorFriendCode": "H0ZJ-YBTF-C5TRR",
+        "genVersion": "1.9.0",
+        "bodies": [
+          {
+            "name": "Ossagier Gojo",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Lush",
+            "subtype": "Overgrown Giant",
+            "descriptor": "Boiling Puddles",
+            "water": true,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Cobalt"
+            ],
+            "flora": [
+              "Frequent"
+            ],
+            "fauna": [
+              "Rich"
+            ],
+            "minerals": [
+              "Star Bulb",
+              "Quartzite",
+              "Paraffinium"
+            ],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Low",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": true,
+            "orbits": 1,
+            "biome": "Barren",
+            "subtype": "Parched",
+            "descriptor": "Sand Blizzards",
+            "water": false,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Cobalt"
+            ],
+            "flora": [
+              "Rich"
+            ],
+            "fauna": [
+              "Rare"
+            ],
+            "minerals": [
+              "Cactus Flesh",
+              "Pyrite",
+              "Activated Quartzite"
+            ],
+            "salvage": [],
+            "fossils": [
+              "Dissonance Detected"
+            ],
+            "sentinel": "Low Security",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": true,
+            "orbits": 1,
+            "biome": "Mega Exotic",
+            "subtype": "Lost Red",
+            "descriptor": "Red Mist",
+            "water": true,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Sodium"
+            ],
+            "flora": [
+              "Full"
+            ],
+            "fauna": [
+              "Rich"
+            ],
+            "minerals": [
+              "Phosphorus",
+              "Activated Quartzite"
+            ],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Spread Thin",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": true,
+            "orbits": 1,
+            "biome": "Exotic",
+            "subtype": "Spined",
+            "descriptor": "Internal Rain",
+            "water": false,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Salt",
+              "Gold"
+            ],
+            "flora": [
+              "Between Worlds"
+            ],
+            "fauna": [
+              "Displaced"
+            ],
+            "minerals": [
+              "Quartzite"
+            ],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Isolated",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": true,
+            "orbits": 1,
+            "biome": "Barren",
+            "subtype": "Abandoned Paradise",
+            "descriptor": "Broiling Humidity",
+            "water": true,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Salt"
+            ],
+            "flora": [
+              "High"
+            ],
+            "fauna": [
+              "Abundant"
+            ],
+            "minerals": [
+              "Star Bulb",
+              "Paraffinium",
+              "Activated Quartzite"
+            ],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Low",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          }
+        ]
+      },
+      "editedAt": "2026-11-13T09:59:21.623Z",
+      "editedByIp": "ip_c2ba77fe022754b2",
+      "history": [
+        {
+          "at": "2026-11-13T09:59:21.623Z",
+          "text": "edited by a traveller"
+        }
+      ]
+    },
+    "0:14187485F655": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Quad Collision System",
+        "race": "Korvax",
+        "region": "Atmarc",
+        "starClass": "X3",
+        "stars": [
+          "purple"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Mining",
+        "sell": "-29.2",
+        "buy": "52.7",
+        "econDesc": "Struggling",
+        "conflict": "Intermittent",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "",
+        "colliding": true,
+        "collidingSet": [
+          3,
+          4,
+          5,
+          6
+        ],
+        "screenshot": "https://raw.githubusercontent.com/elegra1965-source/nms-galactic-map/main/user-screenshots/0-14187485F655-mwfjnk08-a2ck1t.jpg",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "elegra1965",
+        "editorFriendCode": "",
+        "genVersion": "1.9.0",
+        "bodies": [
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Scorched",
+            "subtype": "",
+            "descriptor": "Burning Air",
+            "water": false,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Gold"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Spread Thin",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Barren",
+            "subtype": "",
+            "descriptor": "Infrequent Heat Storms",
+            "water": false,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Gold"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Sharded from the Atlas",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Barren",
+            "subtype": "",
+            "descriptor": "Inferno Winds",
+            "water": true,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Salt"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Isolated",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Lush",
+            "subtype": "",
+            "descriptor": "Torrential Heat",
+            "water": true,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Magnetised Ferrite"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Infrequent",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Lush",
+            "subtype": "",
+            "descriptor": "Boiling Monsoons",
+            "water": true,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Cobalt"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Sparse",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Water World",
+            "subtype": "",
+            "descriptor": "Coastal Storms",
+            "water": true,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Gold"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Attentive",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          }
+        ]
+      },
+      "editedAt": "2026-11-13T22:24:08.704Z",
+      "editedByIp": "ip_9279193ba1812f5c",
+      "history": [
+        {
+          "at": "2026-11-13T22:22:31.154Z",
+          "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-11-13T22:24:08.704Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
-    "ip_b60c27451dcfb473": [
-      1794411285193
+    "ip_9279193ba1812f5c": [
+      1794608551154,
+      1794608648704
     ]
   },
   "flagLog": {},
@@ -85391,7 +86012,8 @@
       "Few",
       "Fill",
       "Not Present",
-      "from Elsewhere"
+      "from Elsewhere",
+      "Between Worlds"
     ],
     "fauna": [
       "Devoid",
@@ -85421,7 +86043,8 @@
       "Undetected",
       "uprooted",
       "moderate",
-      "high"
+      "high",
+      "Displaced"
     ],
     "minerals": [
       "Magnatised Ferrite",
@@ -85600,7 +86223,8 @@
       "Inferno Winds",
       "Extreme Low Pressure",
       "Frothing Moon",
-      "Acidic Dust Pockets"
+      "Acidic Dust Pockets",
+      "Red Mist"
     ],
     "biome": [
       "Radioactive",
@@ -85677,7 +86301,11 @@
       "Fragmented Giant",
       "Desolate",
       "Petrified",
-      "Fragmented"
+      "Fragmented",
+      "Overgrown Giant",
+      "Lost Red",
+      "Spined",
+      "Abandoned Paradise"
     ],
     "signalName": [
       "MS Jiokaz XIV",

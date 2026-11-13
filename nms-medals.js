@@ -804,10 +804,21 @@
   function row(){ var w = hel('span', 'nmsm-row'); ['bronze', 'silver', 'gold'].forEach(function(k){ w.appendChild(metalMini(k)); }); return w; }
   function mini(r){ var w = hel('span', 'nmsm-mini'); css(); w.appendChild(svg(rankMetal(r), '#' + r)); w.setAttribute('aria-label', '#' + r); return w; }
 
+  // 2026-11-13: how many more NEW charted systems until the next weekly (else monthly) medal, for the save card
+  function progress(info){
+    try{
+      if(!info || !/^[0-9A-Fa-f]{12}$/.test(String(info.address || ''))) return null;
+      if(counted()[sysKey(info.galaxy, info.address)]) return null;
+      var st = stats(), w = TARGETS.week - st.week - 1, mo = TARGETS.month - st.month - 1;
+      if(w > 0) return { left:w, kind:'week' };
+      if(mo > 0) return { left:mo, kind:'month' };
+    } catch(e){}
+    return null;
+  }
   window.NMSMedals = {
     svg: function(metal, label, o){ css(); return svg(metal, label, o); },
     play: play, card: function(o){ return card(o); }, cardBlob: cardBlob, close: closeOv,
-    charted: charted, record: record, stats: function(){ return stats(); }, panel: panel,
+    progress: progress, charted: charted, record: record, stats: function(){ return stats(); }, panel: panel,
     streakLine: streakLine, earnedCard: earnedCard, me: me, mini: mini, metalMini: metalMini, row: row, rankMetal: rankMetal,
     ukDay: ukDay, TARGETS: TARGETS, config: cfg, _unpack: unpack, _pack: pack, _runEnding: runEnding
   };
