@@ -12375,7 +12375,7 @@ function submitEditPayload(address, galaxy, payload){
     if(sendHaven) sendToHaven(address, galaxy, payload);
     // streak medals (nms-medals.js): only a NEW public system counts, once the NMS Almanac confirms it exists
     var cardShown=false;
-    try{ if(window.NMSSaveCard) cardShown=NMSSaveCard.show({address:address,galaxy:galaxy,name:payload.name||(selected&&selected.name)||"",wasNew:!!wasNew,editor:(loadTravellerId().name||"")}); }catch(e){}
+    try{ var scK="nms_savecard_"+galaxy+":"+address, scDone=false; try{ scDone=!!localStorage.getItem(scK); if(wasNew&&!scDone) localStorage.setItem(scK,"1"); }catch(e){} if(window.NMSSaveCard&&wasNew&&!scDone) cardShown=NMSSaveCard.show({address:address,galaxy:galaxy,name:payload.name||(selected&&selected.name)||"",wasNew:!!wasNew,editor:(loadTravellerId().name||"")}); }catch(e){}
     if(wasNew&&window.NMSMedals) setTimeout(function(){ NMSMedals.charted({galaxy:galaxy,address:address,name:payload.name||(selected&&selected.name)||"",editor:(loadTravellerId().name||"")}); },cardShown?9000:2600);
   }).catch(function(){
     stopWait(); spin.style.display="none"; btn.disabled=false;
