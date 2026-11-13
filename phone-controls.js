@@ -66,7 +66,7 @@
 '#b7p h4{font-size:11px}#b7p .g>.btn{font-size:11px!important;min-height:40px!important;padding:10px 4px!important}' +
 '@media(max-width:360px){#b7 #inAddr{letter-spacing:.04em!important}#b7 #mGal{font-size:11px!important}#b7 #chartedLine{font-size:10px}#b7 .r5>.btn,#b7 .r>.btn{font-size:11px!important}}' +
 /* 2026-11-11 site review: galaxy/type dropdowns were clipped ("Euclic", "Any !"): fixed column widths, small phones wrap to two rows */
-'#b7 .r3{display:grid;grid-template-columns:90px 98px minmax(0,1.65fr) minmax(0,.95fr);gap:6px}#b7 .r3>*{flex:none!important;width:auto!important;min-width:0!important}#b7 #galSel,#b7 #galTypeFilter{padding-left:8px!important;padding-right:18px!important;text-overflow:clip}#b7 #mLoc,#b7 #mGal{padding-left:19px!important;padding-right:3px!important;font-size:9.5px!important;letter-spacing:.02em!important}#b7 #galTypeFilter{font-size:10.5px!important;padding-left:6px!important;padding-right:16px!important}' +
+'#b7 .r3{display:grid;grid-template-columns:84px minmax(0,1fr) minmax(0,1.15fr) minmax(0,.8fr);gap:6px}#b7 .r3>*{flex:none!important;width:auto!important;min-width:0!important}#b7 #galSel,#b7 #galTypeFilter{padding-left:8px!important;padding-right:18px!important;text-overflow:clip}#b7 #mLoc,#b7 #mGal{padding-left:15px!important;padding-right:3px!important;letter-spacing:.02em!important}' +
 '@media(max-width:380px){#b7 .r3{grid-template-columns:1fr 1fr}}' +
 /* desktop: compact card top-left (same layout as the phone), More opens beside it */
 '@media(min-width:901px){html.b7 #top{width:440px!important;max-width:440px!important;right:auto!important;left:12px!important;top:12px!important;padding:8px!important;border:1px solid rgba(0,216,240,.35)!important;border-radius:6px!important;background:rgba(8,14,20,.94)!important;backdrop-filter:none!important;box-shadow:none!important}html.b7 #b7p{left:calc(100% + 20px);right:auto;top:-4px;margin-top:0;width:310px}}' +
@@ -264,19 +264,33 @@
   })();
 })();
 
-/* Fit long Galaxy labels (Sterrenstelsel, Galaktyka...) inside their button */
+/* 2026-11-13: shrink long labels (Sterrenstelsel, Beliebiger Typ, long galaxy names) to fit their box instead of clipping */
 (function(){
-  function fit(){ ['mGal','mLoc'].forEach(fitOne); }
-  function fitOne(id){
-    var b=document.getElementById(id); if(!b||!b.offsetParent) return;
+  var cv=document.createElement('canvas').getContext('2d');
+  function fitBtn(b){
     b.style.removeProperty('font-size');
-    var fs=parseFloat(getComputedStyle(b).fontSize)||9.5, n=0;
-    while(b.scrollWidth>b.clientWidth+1 && fs>7.5 && n++<20){ fs-=.5; b.style.setProperty('font-size',fs+'px','important'); }
+    var fs=parseFloat(getComputedStyle(b).fontSize)||11, n=0;
+    while(b.scrollWidth>b.clientWidth+1 && fs>8.5 && n++<20){ fs-=.5; b.style.setProperty('font-size',fs+'px','important'); }
+  }
+  function fitSel(sel){
+    sel.style.removeProperty('font-size');
+    var cs=getComputedStyle(sel), fs=parseFloat(cs.fontSize)||11;
+    var o=sel.options[sel.selectedIndex]; if(!o) return;
+    var avail=sel.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight), n=0;
+    while(n++<20 && fs>7.5){
+      cv.font=cs.fontStyle+' '+cs.fontWeight+' '+fs+'px '+cs.fontFamily;
+      if(cv.measureText(o.text).width<=avail) break;
+      fs-=.5; sel.style.setProperty('font-size',fs+'px','important');
+    }
+  }
+  function fit(){
+    ['mGal','mLoc'].forEach(function(id){ var b=document.getElementById(id); if(b&&b.offsetParent) fitBtn(b); });
+    ['galSel','galTypeFilter'].forEach(function(id){ var s=document.getElementById(id); if(s&&s.offsetParent) fitSel(s); });
   }
   function go(){ fit(); setTimeout(fit,600); setTimeout(fit,2000); }
   window.addEventListener('resize',function(){ setTimeout(fit,100); });
   window.addEventListener('load',go);
+  document.addEventListener('change',function(e){ if(e.target&&(e.target.id==='galSel'||e.target.id==='galTypeFilter')) setTimeout(fit,30); });
   var t=document.getElementById('mGal');
   if(t&&window.MutationObserver) new MutationObserver(function(){ setTimeout(fit,50); }).observe(t,{childList:true,characterData:true,subtree:true});
-  else document.addEventListener('DOMContentLoaded',go);
 })();
