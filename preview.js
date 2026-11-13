@@ -8487,6 +8487,8 @@ var _warpGen=0;
 function playWarpTransition(kind){
   // 2026-10-26, Tony: every jump / Random / search or favourite pick / Enter system goes
   // through here, so this is where the phone controls (and the glyph keypad) tuck away
+  // 2026-11-13: close the glyph keypad after Jump on every layout (the phone controls card has no Hide button, so the old check never closed it)
+  (function(){ var k=document.getElementById('keys'), bk=document.getElementById('bKeys'); if(k&&k.classList.contains('show')){ k.classList.remove('show'); if(bk) bk.classList.remove('on'); } })();
   if(window.autoHideControls) window.autoHideControls(true);
   if(!WARP_ENABLED) return;
   if(document.documentElement.classList.contains("calm")) return; // Calm mode (calm.js): no warp animation
@@ -9427,7 +9429,7 @@ function renderCollidingSelectors(){
   // Drop any pick whose planet row no longer exists (removed from the
   // system since it was picked), same reasoning as bfOrbits' own cleanup.
   collidingUids=collidingUids.filter(function(uid){
-    return planets.some(function(p){ return String(p.uid)===String(uid); });
+    return uid==="" || planets.some(function(p){ return String(p.uid)===String(uid); });
   });
   // A freshly-ticked checkbox (or one left with fewer than 2 valid picks
   // after the cleanup above) always starts at 2 empty rows -- the real-game
@@ -9469,7 +9471,13 @@ document.getElementById("collidingEditList").addEventListener("click",function(e
 });
 document.getElementById("edAddColliding").addEventListener("click",function(){
   var planetCount=editBodies.filter(function(b){ return !b.moon; }).length;
-  if(collidingUids.length>=planetCount){ toast("Every planet in this system is already in the colliding list."); return; }
+  if(collidingUids.length>=planetCount){
+    // 2026-11-13: every planet row is already in the list, so add a NEW planet row for the traveller instead of a dead end
+    if(editBodies.length>=6){ toast("6 is the limit -- No Man's Sky systems can have at most 6 planets and moons combined."); return; }
+    var need=collidingUids.length+1-planetCount; // enough planet rows that every colliding row can pick a different planet
+    while(need-->0 && editBodies.length<6) document.getElementById("edAddBody").click();
+    toast("Added new planet rows. Fill in their details under Planets.");
+  }
   collidingUids.push("");
   renderCollidingSelectors();
 });
