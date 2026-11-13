@@ -15,6 +15,10 @@
      in Netlify Blobs for 30 days (misses 1 day). Nothing goes in the repo.
    - Busy (Almanac 429 / key hour used up) -> { ok:false, busy:true } so the
      page can say "try again later". Not cached.
+   - 2026-11-13: after an Almanac 429 every call (visitors, Check route, the
+     warm-up) stays quiet until its Retry-After has passed. The wait is kept in
+     the blob store (state/benched). The Almanac turns a client that calls early
+     away for 5 minutes on everything, so we must not keep knocking.
    - 40 uncached systems per hour per visitor (hashed IP), so nobody can use
      the whole hour's key allowance on their own. Cached answers are free.
    ============================================================ */
@@ -33,14 +37,29 @@ const CACHE_V = 3;   // 2026-10-24 v2: colours/ringed. 2026-10-26 v3: player-giv
 
 class Busy extends Error { constructor(ra){ super("busy"); this.retryAfter = ra; } }
 
+const BENCH_KEY = "state/benched";
+async function benchLeft(){
+  try {
+    var b = await getStore(STORE).get(BENCH_KEY, { type: "json" });
+    if(b && b.until > Date.now()) return Math.ceil((b.until - Date.now()) / 1000);
+  } catch(e){}
+  return 0;
+}
+
 async function aGet(path){
+  var left = await benchLeft();
+  if(left > 0) throw new Busy(left);
   var ctl = new AbortController();
   var t = setTimeout(function(){ ctl.abort(); }, TIMEOUT_MS);
   var h = { "Accept": "application/json", "User-Agent": "map.nomansskyhub.app (almanac)" };
   if(process.env.ALMANAC_API_KEY) h["Authorization"] = "Bearer " + process.env.ALMANAC_API_KEY;
   try {
     var r = await fetch(BASE + path, { headers: h, signal: ctl.signal });
-    if(r.status === 429) throw new Busy(parseInt(r.headers.get("Retry-After") || "0", 10) || 600);
+    if(r.status === 429){
+      var ra = Math.min(parseInt(r.headers.get("Retry-After") || "0", 10) || 600, 3600);
+      await getStore(STORE).setJSON(BENCH_KEY, { until: Date.now() + ra * 1000 + 1000 }).catch(function(){});
+      throw new Busy(ra);
+    }
     if(r.status === 404) return null;
     if(!r.ok) throw new Error("Almanac HTTP " + r.status);
     return await r.json();
