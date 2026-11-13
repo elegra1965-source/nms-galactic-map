@@ -460,6 +460,7 @@ button:hover,button:focus-visible{border-color:var(--cyan);outline:none}
         if(s.editorName) m2.appendChild(el("span", null, "Documented by " + s.editorName));
         if(s.savedAt) m2.appendChild(el("span", null, "Saved " + String(s.savedAt).slice(0,16).replace("T"," ")));
         if(s.photos) m2.appendChild(el("span","chip gold", s.photos + (s.photos === 1 ? " photo" : " photos")));
+        if(s.flag){ var fl = el("span","chip", "Check wording: " + s.flag); fl.style.cssText = "color:#ff6b6b;border-color:#ff6b6b"; m2.appendChild(fl); row.style.borderTopColor = "#ff6b6b"; }
         row.appendChild(m2);
         var gl = el("div","glyphs"); gl.setAttribute("aria-label","Portal address " + addr);
         addr.split("").forEach(function(ch){ var im = el("img"); im.src = (SITE ? SITE + "/" : "") + "glyphs/glyph-mask-" + ch + ".png"; im.alt = ch; gl.appendChild(im); });
@@ -492,6 +493,7 @@ button:hover,button:focus-visible{border-color:var(--cyan);outline:none}
       li.appendChild(nm);
       var who = x.s.editorName ? "by " + x.s.editorName + " · " : "";
       li.appendChild(el("span", "ct", who + (x.t ? new Date(x.t).toLocaleString([], { dateStyle:"medium", timeStyle:"short" }) : "no date")));
+      if(x.s.flag){ var fl = el("span","ct","Check wording: " + x.s.flag); fl.style.color = "#ff6b6b"; li.appendChild(fl); nm.style.color = "#ff6b6b"; }
       li.appendChild(glyphRow(addr, g));
       return li;
     }
@@ -502,7 +504,10 @@ button:hover,button:focus-visible{border-color:var(--cyan);outline:none}
       more.onclick = function(){ shown += 10; draw(); };
       draw();
     }
-    $("pSum").textContent = "Latest private saves (" + all.length + ")";
+    var nFlag = all.filter(function(x){ return x.s.flag; }).length;
+    $("pSum").textContent = "Latest private saves (" + all.length + ")" + (nFlag ? " · " + nFlag + " to check" : "");
+    $("pSum").style.color = nFlag ? "#ff6b6b" : "";
+    if(nFlag) $("pDet").open = true;
     $("privStats").hidden = false;
   }
   function load(){
