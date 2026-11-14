@@ -85753,16 +85753,16 @@
         "name": "Quad Collision System",
         "race": "Korvax",
         "region": "Atmarc",
-        "starClass": "X3",
+        "starClass": "X3pf",
         "stars": [
           "purple"
         ],
         "water": false,
-        "dissonant": false,
+        "dissonant": true,
         "giant": false,
         "econName": "Mining",
-        "sell": "-29.2",
-        "buy": "52.7",
+        "sell": "52.7",
+        "buy": "-29.2",
         "econDesc": "Struggling",
         "conflict": "Intermittent",
         "blackHole": false,
@@ -85780,31 +85780,92 @@
           6
         ],
         "screenshot": "https://raw.githubusercontent.com/elegra1965-source/nms-galactic-map/main/user-screenshots/0-14187485F655-mwfjnk08-a2ck1t.jpg",
-        "hasStation": false,
-        "stationName": "",
+        "hasStation": true,
+        "stationName": "Quad collision system-planet service bot",
         "allianceName": "",
-        "stationPhoto": "",
-        "signals": [],
+        "stationPhoto": "https://raw.githubusercontent.com/elegra1965-source/nms-galactic-map/main/user-screenshots/0-14187485F655-station-mwgvew6h-tt7ao1.jpg",
+        "signals": [
+          {
+            "name": "MV WAMIS X",
+            "category": "minor wreck",
+            "icon": "cargo",
+            "signalType": "Fragmented Technologies",
+            "route": "",
+            "planet": 0
+          },
+          {
+            "name": "TUPINO-LUMUND CLUSTER VI",
+            "category": "",
+            "icon": "asteroidbelt",
+            "signalType": "Fragmented Rock",
+            "route": "",
+            "planet": 0
+          },
+          {
+            "name": "TUPINO-LUMUND,S LOST MOON",
+            "category": "Ice field",
+            "icon": "frozen",
+            "signalType": "Frozen ore field",
+            "route": "",
+            "planet": 0
+          },
+          {
+            "name": "PLANETOID ONBET XVI",
+            "category": "Habital asteroid",
+            "icon": "mineral",
+            "signalType": "Extraterrestrial rock",
+            "route": "",
+            "planet": 0
+          },
+          {
+            "name": "PLANETOID HOBAM XIX",
+            "category": "Habital asteroid",
+            "icon": "mineral",
+            "signalType": "stable rock shelf",
+            "route": "",
+            "planet": 0
+          },
+          {
+            "name": "tupino-lumund fuel depot",
+            "category": "Deep space outpost",
+            "icon": "outpost",
+            "signalType": "off-planet outpost",
+            "route": "",
+            "planet": 0
+          },
+          {
+            "name": "THE SPAROSEIU",
+            "category": "ice field",
+            "icon": "frozen",
+            "signalType": "Sub- zero debris field",
+            "route": "",
+            "planet": 0
+          }
+        ],
         "editorName": "elegra1965",
         "editorFriendCode": "",
         "genVersion": "1.9.0",
         "bodies": [
           {
-            "name": "",
+            "name": "Red 1",
             "moon": false,
             "orbits": 0,
             "biome": "Scorched",
-            "subtype": "",
+            "subtype": "High Temperature",
             "descriptor": "Burning Air",
             "water": false,
             "ring": false,
             "ringSet": false,
             "resources": [
-              "Gold"
+              "Solanium"
             ],
             "flora": [],
             "fauna": [],
-            "minerals": [],
+            "minerals": [
+              "Magnetised Ferrite",
+              "Phosphorus",
+              "Quartzite"
+            ],
             "salvage": [],
             "fossils": [],
             "sentinel": "Spread Thin",
@@ -85815,7 +85876,7 @@
             "baseName": ""
           },
           {
-            "name": "",
+            "name": "Tuwaitna VIII",
             "moon": false,
             "orbits": 0,
             "biome": "Barren",
@@ -85840,7 +85901,7 @@
             "baseName": ""
           },
           {
-            "name": "",
+            "name": "Quad Collision 4",
             "moon": false,
             "orbits": 0,
             "biome": "Barren",
@@ -85865,7 +85926,7 @@
             "baseName": ""
           },
           {
-            "name": "",
+            "name": "Quad Collision Lush 2",
             "moon": false,
             "orbits": 0,
             "biome": "Lush",
@@ -85890,7 +85951,7 @@
             "baseName": ""
           },
           {
-            "name": "",
+            "name": "quad collision lush",
             "moon": false,
             "orbits": 0,
             "biome": "Lush",
@@ -85915,7 +85976,7 @@
             "baseName": ""
           },
           {
-            "name": "",
+            "name": "quad collision Water world",
             "moon": false,
             "orbits": 0,
             "biome": "Water World",
@@ -85941,7 +86002,7 @@
           }
         ]
       },
-      "editedAt": "2026-11-13T22:24:08.704Z",
+      "editedAt": "2026-11-14T20:41:05.485Z",
       "editedByIp": "ip_9279193ba1812f5c",
       "history": [
         {
@@ -85951,14 +86012,220 @@
         {
           "at": "2026-11-13T22:24:08.704Z",
           "text": "edited by a traveller"
+        },
+        {
+          "at": "2026-11-14T20:41:05.485Z",
+          "text": "edited by a traveller"
+        }
+      ]
+    },
+    "0:103D2CAB44EC": {
+      "galaxy": 0,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "Mamotsu-Bollt XVII",
+        "race": "Korvax",
+        "region": "Yewillio Spur",
+        "starClass": "F5f",
+        "stars": [
+          "yellow",
+          "red"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Trading",
+        "sell": "53.0",
+        "buy": "-23.8",
+        "econDesc": "Promising",
+        "conflict": "Tranquil",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "elegra1965",
+        "editorFriendCode": "",
+        "genVersion": "1.9.0",
+        "bodies": [
+          {
+            "name": "Digwate",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Toxic",
+            "subtype": "",
+            "descriptor": "Toxic Outbreaks",
+            "water": true,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Silver"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Regular Patrols",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Volcanic",
+            "subtype": "",
+            "descriptor": "Ashen Winds",
+            "water": false,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Cobalt"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Minimal",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": true,
+            "orbits": 2,
+            "biome": "Dead",
+            "subtype": "",
+            "descriptor": "Perfectly Clear",
+            "water": false,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Gold"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Irregular Patrols",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Lush",
+            "subtype": "",
+            "descriptor": "Blistering Damp",
+            "water": false,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Sodium"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Limited",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Scorched",
+            "subtype": "",
+            "descriptor": "Inferno Winds",
+            "water": true,
+            "ring": false,
+            "ringSet": false,
+            "resources": [
+              "Silver"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Low",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          },
+          {
+            "name": "Agnesbu X",
+            "moon": false,
+            "orbits": 0,
+            "biome": "Frozen",
+            "subtype": "",
+            "descriptor": "Frozen Clouds",
+            "water": false,
+            "ring": "icy",
+            "ringSet": false,
+            "resources": [
+              "Sodium"
+            ],
+            "flora": [],
+            "fauna": [],
+            "minerals": [],
+            "salvage": [],
+            "fossils": [],
+            "sentinel": "Few",
+            "autophage": false,
+            "reliquary": false,
+            "ruins": false,
+            "base": false,
+            "baseName": ""
+          }
+        ]
+      },
+      "editedAt": "2026-11-14T20:51:39.533Z",
+      "editedByIp": "ip_9279193ba1812f5c",
+      "history": [
+        {
+          "at": "2026-11-14T20:51:39.533Z",
+          "text": "edited by a traveller"
         }
       ]
     }
   },
   "reports": [],
   "ipLog": {
-    "ip_c2ba77fe022754b2": [
-      1794638738750
+    "ip_9279193ba1812f5c": [
+      1794688865485,
+      1794689499533
     ]
   },
   "flagLog": {},
@@ -86227,7 +86494,10 @@
       "Extreme Low Pressure",
       "Frothing Moon",
       "Acidic Dust Pockets",
-      "Red Mist"
+      "Red Mist",
+      "Ashen Winds",
+      "Perfectly Clear",
+      "Frozen Clouds"
     ],
     "biome": [
       "Radioactive",
@@ -86336,7 +86606,29 @@
       "SV Zawac XVI",
       "Downha’s Calmity",
       "Bonnai-Amze Accrection",
-      "Messenger of Atlas"
+      "Messenger of Atlas",
+      "MV WAMIS X",
+      "TUPINO-LUMUND CLUSTER VI",
+      "TUPINO-LUMUND,S LOST MOON",
+      "PLANETOID ONBET XVI",
+      "PLANETOID HOBAM XIX",
+      "tupino-lumund fuel depot",
+      "THE SPAROSEIU"
+    ],
+    "signalCat": [
+      "minor wreck",
+      "Ice field",
+      "Habital asteroid",
+      "Deep space outpost"
+    ],
+    "signalType": [
+      "Fragmented Technologies",
+      "Fragmented Rock",
+      "Frozen ore field",
+      "Extraterrestrial rock",
+      "stable rock shelf",
+      "off-planet outpost",
+      "Sub- zero debris field"
     ]
   },
   "alliances": {
