@@ -5814,11 +5814,11 @@ function buildSystemView(s){
            orbit ring actually drawn (or just outside it), never drift away.
            outerRingR mirrors the ring radius formula above (8+idx*3.7, at
            least MIN_ORBIT_RINGS rings); markers fan out on 2 lanes at
-           ~55% and ~85% of it, flat in the orbit plane (tiny y lift). */
+           ~55% and ~85% of it, raised 2.6-3.8 above the orbit plane so they read clearly. */
         var outerRingR=8+(Math.max(planetIdx,MIN_ORBIT_RINGS)-1)*3.7;
         var fAng=freeIdx*(Math.PI*2/6)+0.4+Math.floor(freeIdx/6)*0.5;
         var fR=outerRingR*(Math.floor(freeIdx/6)%2?0.85:0.55);
-        var worldPos=new THREE.Vector3(Math.cos(fAng)*fR,(freeIdx%2?0.6:-0.6),Math.sin(fAng)*fR);
+        var worldPos=new THREE.Vector3(Math.cos(fAng)*fR,(2.6+(freeIdx%2)*1.2),Math.sin(fAng)*fR);
         buildManualSignalIcon(s,sig,null,worldPos);
         freeIdx++;
       }
