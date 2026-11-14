@@ -5267,6 +5267,22 @@ function buildManualSignalIcon(s,sig,parent,pos){
     route:(sig.route&&sig.route.trim())?sig.route:"No further details reported."};
   if(parent) parent.add(spr); else systemGroup.add(spr);
   resourceMeshes.push(spr);
+  /* 2026-11-14 (Tony, in-game Starmap reference): every marker hangs on a thin
+     stem from a small white anchor diamond sitting on the orbit plane, so
+     you can see exactly where in the system it is. Stem + anchor are plain
+     children of the same parent (not pickable, not in resourceMeshes). */
+  if(pos.y>0.4){
+    var stemGeo=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(pos.x,0,pos.z),new THREE.Vector3(pos.x,pos.y-0.55,pos.z)]);
+    var stem=new THREE.Line(stemGeo,new THREE.LineBasicMaterial({color:0xcfe9f2,transparent:true,opacity:0.6,depthWrite:false}));
+    var ac=document.createElement("canvas"); ac.width=ac.height=32;
+    var actx=ac.getContext("2d"); actx.translate(16,16);
+    actx.beginPath(); actx.moveTo(0,-11); actx.lineTo(8,0); actx.lineTo(0,11); actx.lineTo(-8,0); actx.closePath();
+    actx.fillStyle="#fff"; actx.shadowColor="#bfefff"; actx.shadowBlur=6; actx.fill();
+    var anchor=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(ac),transparent:true,depthWrite:false}));
+    anchor.scale.set(0.45,0.45,1); anchor.position.set(pos.x,0,pos.z);
+    anchor.userData.signalAnchor=true;
+    if(parent){ parent.add(stem); parent.add(anchor); } else { systemGroup.add(stem); systemGroup.add(anchor); }
+  }
   return spr;
 }
 /* Display-only fix for the "Colliding planets present" edit flag. Which
