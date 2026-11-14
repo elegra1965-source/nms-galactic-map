@@ -1612,6 +1612,8 @@ function applyOverride(s){
   if(d.econName){ s.econName=d.econName; s.econVerified=true; }
   if(d.sell){ s.sell=d.sell; s.econVerified=true; }
   if(d.buy){ s.buy=d.buy; s.econVerified=true; }
+  // Sell is never negative and Buy never positive in the game: if a saved override has them the wrong way round, swap back
+  if(parseFloat(s.sell)<0 && parseFloat(s.buy)>0){ var _t=s.sell; s.sell=s.buy; s.buy=_t; }
   if(d.econDesc){ s.econDesc=d.econDesc; var et=tierFromWord(d.econDesc,ECON_S); if(et!==null) s.econTier=et; s.econVerified=true; }
   if(d.conflict){ s.conflict=d.conflict; var ct=tierFromWord(d.conflict,CONFLICT); if(ct!==null) s.conTier=ct; s.conflictVerified=true; }
   if(d.blackHole!==undefined) s.blackHole=!!d.blackHole;
@@ -9503,7 +9505,8 @@ function renderBodyEditList(){
       '</div>';
     if(b.open){
       html+='<div class="brow2">'+
-          '<div class="mfld" style="margin-bottom:0"><div class="lb">Name</div><input type="text" class="bfName" data-i="'+i+'" maxlength="30" placeholder="'+(b.nameGuess?escAttr("Guess: "+b.nameGuess):"")+'" value="'+escAttr(b.name)+'"></div>'+
+          '<div class="mfld" style="margin-bottom:0"><div class="lb">Name</div><div class="nameWrap"><input type="text" class="bfName" data-i="'+i+'" maxlength="30" placeholder="'+(b.nameGuess?escAttr("Guess: "+b.nameGuess+" \u00b7 tap the bolt to use"):"")+'" value="'+escAttr(b.name)+'">'+
+            (b.nameGuess?'<button type="button" class="useGuess" data-i="'+i+'" title="Use the guessed name" aria-label="Use the guessed name"'+(b.name?' hidden':'')+'><img src="crystal/ci-useguess.webp" alt="Use guess icon" width="34" height="34"></button>':"")+'</div></div>'+
           '<label class="chk2"><input type="checkbox" class="bfMoon" data-i="'+i+'"'+(b.moon?" checked":"")+'> Moon</label>'+
         '</div>'+
         '<div class="brow2">'+
@@ -10395,7 +10398,10 @@ function checkItemLenWarn(el){
 }
 document.getElementById("bodyEditList").addEventListener("input",function(e){
   var iAttr=e.target.getAttribute("data-i"); if(iAttr===null) return; var i=+iAttr;
-  if(e.target.classList.contains("bfName")) editBodies[i].name=e.target.value;
+  if(e.target.classList.contains("bfName")){
+    editBodies[i].name=e.target.value;
+    var ug=e.target.parentNode&&e.target.parentNode.querySelector(".useGuess"); if(ug) ug.hidden=!!e.target.value; // bolt only while the name is empty
+  }
   else if(e.target.classList.contains("bfRes")) editBodies[i].resources=e.target.value;
   // bfDesc's old "input"-event capture removed (2026-09-08) -- Conditions
   // is now an icombo (bfConditions), committed on "change" like Biome/
@@ -10436,6 +10442,16 @@ document.getElementById("bodyEditList").addEventListener("change",function(e){
   else if(e.target.classList.contains("bfOrbits")) editBodies[i].orbits=e.target.value;
 });
 document.getElementById("bodyEditList").addEventListener("click",function(e){
+  var ugb=e.target.closest?e.target.closest(".useGuess"):null;
+  if(ugb){ // one tap: accept the guessed planet name
+    var gi=+ugb.getAttribute("data-i");
+    if(editBodies[gi]&&editBodies[gi].nameGuess){
+      editBodies[gi].name=editBodies[gi].nameGuess;
+      var gin=ugb.parentNode.querySelector(".bfName"); if(gin) gin.value=editBodies[gi].name;
+      ugb.hidden=true;
+    }
+    return;
+  }
   var rm=e.target.getAttribute("data-remove");
   if(rm!==null){ editBodies.splice(+rm,1); renderBodyEditList(); return; }
   var row=e.target.closest?e.target.closest(".bodyEdit"):null;

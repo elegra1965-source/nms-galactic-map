@@ -1258,6 +1258,14 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 .bodyEdit .bx{cursor:pointer;color:var(--text-faint);font-size:14px;line-height:1;padding:2px 6px}
 .bodyEdit .bx:hover{color:#ff8080}
 .bodyEdit .brow2{display:flex;gap:6px;margin-bottom:6px}
+/* "use guess" bolt: flush against the right edge of the Name field (2026-11-14) */
+.bodyEdit .nameWrap{display:flex;align-items:stretch}
+.bodyEdit .nameWrap input{flex:1 1 auto;min-width:0}
+.bodyEdit .nameWrap:has(.useGuess:not([hidden])) input{border-top-right-radius:0;border-bottom-right-radius:0}
+.bodyEdit .useGuess{flex:none;padding:0;margin:0;border:0;background:none;cursor:pointer;display:flex;align-items:center;line-height:0}
+.bodyEdit .useGuess[hidden]{display:none}
+.bodyEdit .useGuess img{height:100%;width:auto;aspect-ratio:1;max-height:34px;filter:saturate(.8) brightness(.88)}
+.bodyEdit .useGuess:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
 .bodyEdit .brow2>div{flex:1}
 /* Icon-type picker for signal markers (2026-09-09, Tony: "add the icons in
    front of names" -- a native <select><option> can't reliably show an image
@@ -3091,8 +3099,8 @@ loadLetterMap('./nms-core/letter-map').then(function(lm){
 });
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="preview.min.js?v=20261113c"></script>
-<script src="almanac.js?v=20261026c"></script>
+<script src="preview.min.js?v=20261114b"></script>
+<script src="almanac.js?v=20261114a"></script>
 <script src="share-system.js?v=20261031"></script>
 <script src="charted.js?v=20261104"></script>
 <script src="phone-controls.js?v=20261113d"></script>
