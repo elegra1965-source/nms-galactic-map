@@ -2554,6 +2554,7 @@ nearby procedural space within a radius.">Search</button>
       <label class="chk"><input type="checkbox" id="edBH"> Black hole present</label>
       <label class="chk"><input type="checkbox" id="edAtlas"> Atlas station present</label>
       <label class="chk" title="Added 2026-09-09 for the real &quot;Cosmos&quot; 10th-anniversary update (Update 7.0): players can now become director of a system's space station and personalise it. Manual-only, same as the other special features here -- only you can know this from actually seeing it in-game. This is a foundation pass, more station detail may be added later."><input type="checkbox" id="edStation"> Space station directorship</label>
+<div class="mfld" id="edAllianceFld" style="margin:4px 0 8px 19px"><div class="lb">Alliance <span style="color:var(--text-faint)">(optional, as shown under the system name in game)</span></div><input type="text" id="edAllianceName" maxlength="60" placeholder="e.g. Planet Services Alliance" autocomplete="off"></div>
       <div id="edStationNameWrap" style="display:none;margin:4px 0 8px 19px">
         <div class="mfld" style="margin-bottom:6px"><div class="lb">Station name</div><input type="text" id="edStationName" maxlength="60" placeholder="e.g. The Wandering Star" autocomplete="off"></div>
         <!-- 2026-09-10: checked against the real Cosmos (Update 7.0) patch notes before
@@ -2564,7 +2565,7 @@ nearby procedural space within a radius.">Search</button>
              system its founder directs, and other travellers can join up to 3 alliances
              from any owned station. So this stays optional here, same treatment as
              stationName, not gated behind it. -->
-        <div class="mfld" style="margin-bottom:6px"><div class="lb">Alliance name <span style="color:var(--text-faint)">(optional -- only if this director founded one)</span></div><input type="text" id="edAllianceName" maxlength="60" placeholder="e.g. The Wandering Star Compact" autocomplete="off"></div>
+        
         <!-- Alliance badge (2026-09-10, Tony's own follow-up once Alliance
              name was live: "logic dictates they should be searchable... their
              system/systems should show" -- which is also what made Alliance
@@ -3101,7 +3102,7 @@ loadLetterMap('./nms-core/letter-map').then(function(lm){
 });
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="preview.min.js?v=20261114j"></script>
+<script src="preview.min.js?v=20261114k"></script>
 <script src="almanac.js?v=20261114e"></script>
 <script src="share-system.js?v=20261031"></script>
 <script src="charted.js?v=20261104"></script>

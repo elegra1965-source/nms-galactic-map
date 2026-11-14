@@ -5386,6 +5386,19 @@ function resolvePlanetCollisions(planetEntries,idxList){
     var dir=baseDir.clone().applyAxisAngle(yAxis,GOLDEN_ANGLE*(i-1));
     var newPos=a.mesh.position.clone().addScaledVector(dir,dist);
 
+    /* 2026-11-14: signal markers linked to b hang off b's OLD pivot (removed
+       from the scene above), so they were left orbiting alone or vanished
+       ("wandering" marker in Quad Collision). Carry them (and their stem/
+       anchor) over to A's pivot, keeping the same offset from b's planet. */
+    var bOld=b.mesh.position.clone(), bKids=b.pivot.children.slice(), bk;
+    for(bk=0;bk<bKids.length;bk++){
+      var kc=bKids[bk];
+      var isMark=(kc.userData&&(kc.userData.resourceIcon||kc.userData.signalAnchor))||(kc.isLine&&kc.material&&kc.material.color&&kc.material.color.getHex()===0xcfe9f2);
+      if(!isMark) continue;
+      a.pivot.add(kc);
+      if(kc.isLine) kc.position.copy(newPos).sub(bOld); /* stem points are absolute: shift the whole line */
+      else kc.position.add(newPos).sub(bOld);
+    }
     a.pivot.add(b.mesh);
     b.mesh.position.copy(newPos);
     if(b.atmo){ a.pivot.add(b.atmo); b.atmo.position.copy(newPos); }
@@ -6086,6 +6099,7 @@ function updatePanel(s){
   if(s.ruins) tags.push(["ruin","Ruins"]);
   if(s.blackHole) tags.push(["bh","Black hole","blackHole"]);
   if(s.atlas) tags.push(["hot","Atlas interface","atlas"]);
+  if(!s.hasStation&&s.allianceName) tags.push(["hot","Alliance: "+s.allianceName+allianceBadgeTagHtml(s.allianceName),"station"]);
   if(s.hasStation) tags.push(["hot",(s.stationName?("Station: "+s.stationName):"Space station")+(s.allianceName?(" (Alliance: "+s.allianceName+")"+allianceBadgeTagHtml(s.allianceName)):""),"station"]);
   if(s.signals&&s.signals.length) tags.push(["hot",s.signals.length+(s.signals.length===1?" signal marker":" signal markers"),"signals"]);
   if(!canReachColor(s.type)) tags.push(["noreach",driveNeededMsg(s.type)]);
@@ -12544,7 +12558,7 @@ document.getElementById("edSubmit").addEventListener("click",function(){
       : [],
     hasStation:document.getElementById("edStation").checked,
     stationName:document.getElementById("edStation").checked?document.getElementById("edStationName").value.trim():"",
-    allianceName:document.getElementById("edStation").checked?document.getElementById("edAllianceName").value.trim():"",
+    allianceName:document.getElementById("edAllianceName").value.trim(),
     allianceBadge:document.getElementById("edStation").checked?edAllianceBadgeCurrentValue():"",
     stationPhoto:document.getElementById("edStation").checked?edStationPhotoCurrentValue():"",
     econName:document.getElementById("edEcon").value.trim(),
