@@ -10671,7 +10671,8 @@ document.getElementById("bEdit").addEventListener("click",function(){ if(selecte
    ticked and the photo picker already open -- the picker has to be opened in
    this same tap, browsers refuse it from a timer. Nothing is saved until the
    traveller presses Save, same as any other edit. */
-document.getElementById("bStationPhoto").addEventListener("click",function(){
+var bStationPhotoEl=document.getElementById("bStationPhoto"); // button removed 2026-11-14; kept null-safe
+if(bStationPhotoEl) bStationPhotoEl.addEventListener("click",function(){
   if(!selected) return;
   openEditModal();
   edGoTo("features"); // the station photo lives on the Special Features step

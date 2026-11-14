@@ -1258,14 +1258,17 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 .bodyEdit .bx{cursor:pointer;color:var(--text-faint);font-size:14px;line-height:1;padding:2px 6px}
 .bodyEdit .bx:hover{color:#ff8080}
 .bodyEdit .brow2{display:flex;gap:6px;margin-bottom:6px}
-/* "use guess" bolt: flush against the right edge of the Name field (2026-11-14) */
-.bodyEdit .nameWrap{display:flex;align-items:stretch}
-.bodyEdit .nameWrap input{flex:1 1 auto;min-width:0}
-.bodyEdit .nameWrap:has(.useGuess:not([hidden])) input{border-top-right-radius:0;border-bottom-right-radius:0}
-.bodyEdit .useGuess{flex:none;padding:0;margin:0;border:0;background:none;cursor:pointer;display:flex;align-items:center;line-height:0}
+/* "use guess" bolt: sits inside the right end of the Name field, 3px in from the edge (2026-11-14) */
+.bodyEdit .nameWrap{position:relative;display:flex;align-items:stretch}
+.bodyEdit .nameWrap input{flex:1 1 auto;min-width:0;text-overflow:ellipsis}
+.bodyEdit .nameWrap:has(.useGuess:not([hidden])) input{padding-right:42px}
+.bodyEdit .useGuess{position:absolute;right:3px;top:3px;bottom:3px;aspect-ratio:1;padding:0;margin:0;border:0;background:none;cursor:pointer;line-height:0}
 .bodyEdit .useGuess[hidden]{display:none}
-.bodyEdit .useGuess img{height:100%;width:auto;aspect-ratio:1;max-height:34px;filter:saturate(.8) brightness(.88)}
-.bodyEdit .useGuess:focus-visible{outline:2px solid var(--gold);outline-offset:-2px}
+.bodyEdit .useGuess img{display:block;width:100%;height:100%;object-fit:contain;filter:saturate(.8) brightness(.88)}
+.bodyEdit .useGuess:focus-visible{outline:2px solid var(--gold);outline-offset:1px;border-radius:6px}
+/* icon beside a label that wraps onto two lines: centre the icon against the text instead of sitting on the first line */
+#bPrivCode{display:flex;align-items:center;justify-content:center;gap:6px;text-align:left}
+#bPrivCode .ci{margin:0}
 .bodyEdit .brow2>div{flex:1}
 /* Icon-type picker for signal markers (2026-09-09, Tony: "add the icons in
    front of names" -- a native <select><option> can't reliably show an image
@@ -2092,11 +2095,7 @@ nearby procedural space within a radius.">Search</button>
   </div>
   <div class="prow">
     <button class="btn" id="bEdit" title="Enter your real in-game data for this system -- name, race, economy, conflict, planets/moons and resources. Saved for every visitor to see.">Edit system</button>
-    <!-- 2026-10-17, Tony: players can customise their stations (Cosmos), so make
-         swapping the generic station icon for their own photo one tap away instead
-         of buried in Edit system. Hidden once the system already has a photo
-         (2026-10-18: moved beside Edit system to save a row). -->
-    <button class="btn" id="bStationPhoto" type="button" title="Swap the generic station icon for a photo of your own customised station. Opens Edit system with the photo picker ready; your photo shows for every visitor once you Save."><img class="ci" src="crystal/ci-camera.webp" alt="Camera icon" width="20" height="20"> Add station photo</button>
+    <!-- 2026-11-14, Tony: the "Add station photo" shortcut is gone (the photo picker is in Edit system > Special Features), so every system shows the same buttons -->
   </div>
   <div class="prow">
     <button class="btn" id="bReport" title="Flag this system's data as wrong or inappropriate so it can be reviewed.">Report</button>
@@ -3099,7 +3098,7 @@ loadLetterMap('./nms-core/letter-map').then(function(lm){
 });
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="preview.min.js?v=20261114b"></script>
+<script src="preview.min.js?v=20261114c"></script>
 <script src="almanac.js?v=20261114a"></script>
 <script src="share-system.js?v=20261031"></script>
 <script src="charted.js?v=20261104"></script>
