@@ -6,7 +6,7 @@
    - Busy (500/hour key used up) -> "please try again later".
    All Almanac text is set with textContent. */
 (function(){
-  var MEM = {}, LS = "nms-alm-cache3", busyToastAt = 0; // cache3 (2026-10-26): player-given names + station picture
+  var MEM = {}, LS = "nms-alm-cache4", busyToastAt = 0; // cache4 (2026-11-14: discoverer); cache3 (2026-10-26): player-given names + station picture
   function lsGet(){ try { return JSON.parse(localStorage.getItem(LS) || "{}"); } catch(e){ return {}; } }
   function lsPut(k, v){
     try {
@@ -170,6 +170,12 @@
     var y = d.system || {};
     row(body, "Name", y.name);
     if(y.gameName && y.name && y.gameName !== y.name) row(body, "Game name", y.gameName);
+    if(y.discoverer){ // 2026-11-14, Borjomi OK'd: shown as text only, from the Almanac
+      var PLAT = { steam:"Steam", gog:"GOG", xbox:"Xbox", playstation:"PlayStation", ps:"PlayStation", switch:"Switch", nintendo:"Switch", microsoft:"Xbox" };
+      var pl = y.platform ? (PLAT[String(y.platform).toLowerCase()] || null) : null, dt = "";
+      if(y.discovered){ var dd = new Date(y.discovered + "T12:00:00Z"); if(!isNaN(dd)) dt = (typeof NMS_DATE === "function") ? NMS_DATE(dd, { dateStyle:"medium" }) : dd.toLocaleDateString([], { dateStyle:"medium" }); }
+      row(body, "Discovered by", [y.discoverer, pl, dt].filter(Boolean).join(" · "));
+    }
     row(body, "Star", [y.star, y.spectral, y.suns > 1 ? y.suns + " suns" : null].filter(Boolean).join(" · "));
     row(body, "Race", y.race);
     row(body, "Economy", [y.economyType, y.economy, y.wealth].filter(Boolean).join(" · "));

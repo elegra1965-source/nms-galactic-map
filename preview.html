@@ -840,6 +840,8 @@ html.hc-on .btn{border-width:2px}
 .panelFoldHead{cursor:pointer;user-select:none;margin-top:10px;font-size:9px;
   letter-spacing:.12em;color:var(--text-faint);text-transform:uppercase}
 .panelFoldHead:hover{color:var(--cyan)}
+#pAlmHead{color:var(--cyan-dim)} /* 2026-11-14 (Tony): teal so the real game data fold stands out; brighter on hover */
+#pAlmHead:hover{color:var(--cyan)}
 .seqbox{border:1px solid var(--border-soft);border-radius:var(--r-sm);padding:7px;margin-top:6px;background:#04070c}
 .seqbox .lb{font-size:9px;letter-spacing:.16em;color:var(--gold);text-align:center;margin-bottom:5px}
 .seq{display:grid;grid-template-columns:repeat(12,1fr);gap:2px}
@@ -3099,7 +3101,7 @@ loadLetterMap('./nms-core/letter-map').then(function(lm){
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="preview.min.js?v=20261114c"></script>
-<script src="almanac.js?v=20261114a"></script>
+<script src="almanac.js?v=20261114d"></script>
 <script src="share-system.js?v=20261031"></script>
 <script src="charted.js?v=20261104"></script>
 <script src="phone-controls.js?v=20261113d"></script>

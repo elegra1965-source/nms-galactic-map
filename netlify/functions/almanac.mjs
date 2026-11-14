@@ -33,7 +33,7 @@ const TTL_MISS_MS = 24 * 3600 * 1000;
 const PER_IP_HOUR = 40;
 const PER_IP_HOUR_EXISTS = 80;   // 2026-10-26: Navigator's "Check route" (1 key lookup each, see exists=1)
 const TIMEOUT_MS = 8000;
-const CACHE_V = 3;   // 2026-10-24 v2: colours/ringed. 2026-10-26 v3: player-given names + station picture; older cached answers are refetched
+const CACHE_V = 4;   // 2026-10-24 v2: colours/ringed. 2026-10-26 v3: player-given names + station picture. 2026-11-14 v4: discoverer; older cached answers are refetched
 
 class Busy extends Error { constructor(ra){ super("busy"); this.retryAfter = ra; } }
 
@@ -137,6 +137,10 @@ function mapSystem(s, w){
     wealth: s.wealth ? phrase(w, "wealth", s.wealth.level, s.wealth.phrase) : null,
     conflict: s.conflict ? phrase(w, "conflict", s.conflict.level, s.conflict.phrase) : null,
     abandoned: !!s.abandoned,
+    // 2026-11-14 (Borjomi OK'd): who first discovered it, from the Almanac; absent where Hello Games has no record
+    discoverer: typeof s.discoverer === "string" && s.discoverer.trim() ? s.discoverer.trim().slice(0, 40) : null,
+    platform: typeof s.platform === "string" ? s.platform.slice(0, 20) : null,
+    discovered: typeof s.discovered === "string" && /^\d{4}-\d\d-\d\d/.test(s.discovered) ? s.discovered.slice(0, 10) : null,
     sell: typeof tr.sell_percent === "number" ? Math.round(tr.sell_percent * 10) / 10 : null,
     buy: typeof tr.buy_percent === "number" ? Math.round(tr.buy_percent * 10) / 10 : null,
     demand: tr.demand ? (function(){ try { var v = w.trade.demand[tr.demand]; if(typeof v === "string") return v; if(v && v.name) return v.name; } catch(e){} return pretty(tr.demand); })() : null,
