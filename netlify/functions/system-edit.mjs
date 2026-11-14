@@ -1104,6 +1104,8 @@ export default async (req, context) => {
     // submission that didn't win).
     ((sysRec.data.signals)||[]).forEach(function(sig){
       if(sig && sig.name) addCommunityTerms(current.data, "signalName", [sig.name]);
+      if(sig && sig.category) addCommunityTerms(current.data, "signalCat", [String(sig.category).replace(/\.$/,"")]);
+      if(sig && sig.signalType) addCommunityTerms(current.data, "signalType", [String(sig.signalType).replace(/\.$/,"")]);
     });
 
     sysRec.editedAt = new Date(now).toISOString();

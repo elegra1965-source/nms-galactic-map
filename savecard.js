@@ -42,10 +42,10 @@
     var by=o.editor?'<div class="nsc-by">'+esc(t[2])+' '+esc(o.editor)+'</div>':'';
     var nx='', pr=null;
     try{ if(o.wasNew&&window.NMSMedals&&NMSMedals.progress) pr=NMSMedals.progress({address:addr,galaxy:o.galaxy}); }catch(e){}
-    if(pr){ nx='<div class="nsc-nx"><img src="crystal/ci-star.webp" alt="" width="18" height="18"><span>'+esc((NX[l]||NX.en)(pr.left))+'</span></div>'; }
+    if(pr){ nx='<div class="nsc-nx"><img src="crystal/ci-star.webp" alt="Star icon" width="18" height="18"><span>'+esc((NX[l]||NX.en)(pr.left))+'</span></div>'; }
     var w=document.createElement('div'); w.id='nscWrap'; w.setAttribute('role','status');
     w.style.cssText='position:fixed;left:0;top:0;right:0;bottom:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:rgba(3,6,10,.62);cursor:pointer';
-    w.innerHTML='<div class="nsc-sc"><i class="nsc-c3"></i><i class="nsc-c4"></i><i class="nsc-ring"></i><i class="nsc-scan"></i><div class="nsc-body"><img class="nsc-ic" src="crystal-savecard-compass.webp" alt="" width="52" height="52"><div class="nsc-k">'+esc(o.wasNew?t[0]:t[1])+'</div><div class="nsc-rule"></div><div class="nsc-nm">'+esc(o.name||'')+'</div><div class="nsc-gl">'+gl+'</div><div class="nsc-hx">'+addr+'</div>'+by+nx+'</div></div>';
+    w.innerHTML='<div class="nsc-sc"><i class="nsc-c3"></i><i class="nsc-c4"></i><i class="nsc-ring"></i><i class="nsc-scan"></i><div class="nsc-body"><img class="nsc-ic" src="crystal-savecard-compass.webp" alt="Compass icon" width="52" height="52"><div class="nsc-k">'+esc(o.wasNew?t[0]:t[1])+'</div><div class="nsc-rule"></div><div class="nsc-nm">'+esc(o.name||'')+'</div><div class="nsc-gl">'+gl+'</div><div class="nsc-hx">'+addr+'</div>'+by+nx+'</div></div>';
     w.addEventListener('click',close);
     document.body.appendChild(w);
     timer=setTimeout(close,reduced?3500:8500);

@@ -1612,6 +1612,8 @@ function applyOverride(s){
   if(d.econName){ s.econName=d.econName; s.econVerified=true; }
   if(d.sell){ s.sell=d.sell; s.econVerified=true; }
   if(d.buy){ s.buy=d.buy; s.econVerified=true; }
+  // Sell is never negative and Buy never positive in the game: if a saved override has them the wrong way round, swap back
+  if(parseFloat(s.sell)<0 && parseFloat(s.buy)>0){ var _t=s.sell; s.sell=s.buy; s.buy=_t; }
   if(d.econDesc){ s.econDesc=d.econDesc; var et=tierFromWord(d.econDesc,ECON_S); if(et!==null) s.econTier=et; s.econVerified=true; }
   if(d.conflict){ s.conflict=d.conflict; var ct=tierFromWord(d.conflict,CONFLICT); if(ct!==null) s.conTier=ct; s.conflictVerified=true; }
   if(d.blackHole!==undefined) s.blackHole=!!d.blackHole;
@@ -2026,7 +2028,7 @@ var KNOWN_TERMS_K="nms-galmap-known-terms";
 // becomes a future suggestion, not just saved and forgotten. See
 // populateDatalists()'s dlSignalName entry and system-edit.mjs's matching
 // server-side addCommunityTerms("signalName",...) call.
-var KNOWN_TERMS_FIELDS=["resources","flora","fauna","minerals","salvage","fossils","descriptor","biome","subtype","signalName"];
+var KNOWN_TERMS_FIELDS=["resources","flora","fauna","minerals","salvage","fossils","descriptor","biome","subtype","signalName","signalCat","signalType"];
 var knownTerms={};
 function loadKnownTerms(){
   knownTerms={};
@@ -2074,6 +2076,10 @@ function rememberKnownTerms(payload){
   });
   var signalNames=(payload&&payload.signals||[]).map(function(g){ return g.name; }).filter(Boolean);
   if(signalNames.length) rememberTerms(knownTerms.signalName,signalNames);
+  var sigCats=(payload&&payload.signals||[]).map(function(g){ return g.category; }).filter(Boolean);
+  if(sigCats.length) rememberTerms(knownTerms.signalCat,sigCats);
+  var sigTypes=(payload&&payload.signals||[]).map(function(g){ return g.signalType; }).filter(Boolean);
+  if(sigTypes.length) rememberTerms(knownTerms.signalType,sigTypes);
   saveKnownTerms();
   populateDatalists();
 }
@@ -5261,6 +5267,22 @@ function buildManualSignalIcon(s,sig,parent,pos){
     route:(sig.route&&sig.route.trim())?sig.route:"No further details reported."};
   if(parent) parent.add(spr); else systemGroup.add(spr);
   resourceMeshes.push(spr);
+  /* 2026-11-14 (Tony, in-game Starmap reference): every marker hangs on a thin
+     stem from a small white anchor diamond sitting on the orbit plane, so
+     you can see exactly where in the system it is. Stem + anchor are plain
+     children of the same parent (not pickable, not in resourceMeshes). */
+  if(pos.y>0.4){
+    var stemGeo=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(pos.x,0,pos.z),new THREE.Vector3(pos.x,pos.y-0.55,pos.z)]);
+    var stem=new THREE.Line(stemGeo,new THREE.LineBasicMaterial({color:0xcfe9f2,transparent:true,opacity:0.6,depthWrite:false}));
+    var ac=document.createElement("canvas"); ac.width=ac.height=32;
+    var actx=ac.getContext("2d"); actx.translate(16,16);
+    actx.beginPath(); actx.moveTo(0,-11); actx.lineTo(8,0); actx.lineTo(0,11); actx.lineTo(-8,0); actx.closePath();
+    actx.fillStyle="#fff"; actx.shadowColor="#bfefff"; actx.shadowBlur=6; actx.fill();
+    var anchor=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(ac),transparent:true,depthWrite:false}));
+    anchor.scale.set(0.45,0.45,1); anchor.position.set(pos.x,0,pos.z);
+    anchor.userData.signalAnchor=true;
+    if(parent){ parent.add(stem); parent.add(anchor); } else { systemGroup.add(stem); systemGroup.add(anchor); }
+  }
   return spr;
 }
 /* Display-only fix for the "Colliding planets present" edit flag. Which
@@ -5804,9 +5826,15 @@ function buildSystemView(s){
         var localPos=new THREE.Vector3(basePos.x+bsz*2.4,basePos.y+bsz*1.7,basePos.z+bsz*1.1);
         buildManualSignalIcon(s,sig,bodyPivots[linkPos],localPos);
       } else {
-        var fAng=freeIdx*(Math.PI*2/6)+0.4;
-        var fR=featureR*0.45;
-        var worldPos=new THREE.Vector3(Math.cos(fAng)*fR,featureR*0.15*(freeIdx%2?1:-1),Math.sin(fAng)*fR);
+        /* 2026-11-14 (Tony): an unlinked marker must stay INSIDE the outermost
+           orbit ring actually drawn (or just outside it), never drift away.
+           outerRingR mirrors the ring radius formula above (8+idx*3.7, at
+           least MIN_ORBIT_RINGS rings); markers fan out on 2 lanes at
+           ~55% and ~85% of it, raised 2.6-3.8 above the orbit plane so they read clearly. */
+        var outerRingR=8+(Math.max(planetIdx,MIN_ORBIT_RINGS)-1)*3.7;
+        var fAng=freeIdx*(Math.PI*2/6)+0.4+Math.floor(freeIdx/6)*0.5;
+        var fR=outerRingR*(Math.floor(freeIdx/6)%2?0.85:0.55);
+        var worldPos=new THREE.Vector3(Math.cos(fAng)*fR,(2.6+(freeIdx%2)*1.2),Math.sin(fAng)*fR);
         buildManualSignalIcon(s,sig,null,worldPos);
         freeIdx++;
       }
@@ -9504,7 +9532,8 @@ function renderBodyEditList(){
       '</div>';
     if(b.open){
       html+='<div class="brow2">'+
-          '<div class="mfld" style="margin-bottom:0"><div class="lb">Name</div><input type="text" class="bfName" data-i="'+i+'" maxlength="30" placeholder="'+(b.nameGuess?escAttr("Guess: "+b.nameGuess):"")+'" value="'+escAttr(b.name)+'"></div>'+
+          '<div class="mfld" style="margin-bottom:0"><div class="lb">Name</div><div class="nameWrap"><input type="text" class="bfName" data-i="'+i+'" maxlength="30" placeholder="'+(b.nameGuess?escAttr("Guess: "+b.nameGuess+" \u00b7 tap the bolt to use"):"")+'" value="'+escAttr(b.name)+'">'+
+            (b.nameGuess?'<button type="button" class="useGuess" data-i="'+i+'" title="Use the guessed name" aria-label="Use the guessed name"'+(b.name?' hidden':'')+'><img src="crystal/ci-useguess.webp" alt="Use guess icon" width="34" height="34"></button>':"")+'</div></div>'+
           '<label class="chk2"><input type="checkbox" class="bfMoon" data-i="'+i+'"'+(b.moon?" checked":"")+'> Moon</label>'+
         '</div>'+
         '<div class="brow2">'+
@@ -10067,8 +10096,8 @@ function edBuildSwitchRow(){
     sw.className="edSwitch"; sw.dataset.key=key;
     sw.innerHTML=
       '<div class="edSwInner">'+
-        '<div class="edSwFace edSwFront"><img src="'+EDSEC_META[key].icon+'" alt="Section icon"><span>'+EDSEC_META[key].title+'</span></div>'+
-        '<div class="edSwFace edSwBack"><img src="icons-web/status-atlas.png" alt="Atlas status"></div>'+
+        '<div class="edSwFace edSwFront"><img src="'+EDSEC_META[key].icon+'" alt=""><span>'+EDSEC_META[key].title+'</span></div>'+
+        '<div class="edSwFace edSwBack"><img src="icons-web/status-atlas.png" alt="Atlas status icon"></div>'+
       '</div>';
     sw.addEventListener("click",function(){ edGoTo(key); });
     row.appendChild(sw);
@@ -10396,7 +10425,10 @@ function checkItemLenWarn(el){
 }
 document.getElementById("bodyEditList").addEventListener("input",function(e){
   var iAttr=e.target.getAttribute("data-i"); if(iAttr===null) return; var i=+iAttr;
-  if(e.target.classList.contains("bfName")) editBodies[i].name=e.target.value;
+  if(e.target.classList.contains("bfName")){
+    editBodies[i].name=e.target.value;
+    var ug=e.target.parentNode&&e.target.parentNode.querySelector(".useGuess"); if(ug) ug.hidden=!!e.target.value; // bolt only while the name is empty
+  }
   else if(e.target.classList.contains("bfRes")) editBodies[i].resources=e.target.value;
   // bfDesc's old "input"-event capture removed (2026-09-08) -- Conditions
   // is now an icombo (bfConditions), committed on "change" like Biome/
@@ -10437,6 +10469,16 @@ document.getElementById("bodyEditList").addEventListener("change",function(e){
   else if(e.target.classList.contains("bfOrbits")) editBodies[i].orbits=e.target.value;
 });
 document.getElementById("bodyEditList").addEventListener("click",function(e){
+  var ugb=e.target.closest?e.target.closest(".useGuess"):null;
+  if(ugb){ // one tap: accept the guessed planet name
+    var gi=+ugb.getAttribute("data-i");
+    if(editBodies[gi]&&editBodies[gi].nameGuess){
+      editBodies[gi].name=editBodies[gi].nameGuess;
+      var gin=ugb.parentNode.querySelector(".bfName"); if(gin) gin.value=editBodies[gi].name;
+      ugb.hidden=true;
+    }
+    return;
+  }
   var rm=e.target.getAttribute("data-remove");
   if(rm!==null){ editBodies.splice(+rm,1); renderBodyEditList(); return; }
   var row=e.target.closest?e.target.closest(".bodyEdit"):null;
@@ -10514,6 +10556,27 @@ function iconSwatchDataURL(cat){
   iconSwatchCache[cat]=url;
   return url;
 }
+/* Signal Category label + Signal type are shared across systems (Asteroid
+   Belt, Habitable Asteroid, Space Hulk...), unlike the Name which is unique
+   per system. Categories = the game's own Star System Map destinations
+   (nomanssky.fandom.com/wiki/Star_System_Map, Cosmos) + Anomalous Signal.
+   Signal types are per-object flavour text with no fixed list anywhere, so
+   that seed is the real values travellers saved (typos cleaned). Community
+   + own terms are merged in and de-duped. */
+var SIGNAL_CAT_CANON=["Anomalous Signal","Asteroid Belt","Deep-Space Outpost","Habitable Asteroid",
+  "Habitable Comet Fragment","Ice Field","Infested Outpost","Minor Wreckage","Space Hulk"];
+var SIGNAL_TYPE_CANON=["Anomalous Deep-Space Object","Deep-Space Trading Outpost","Extraterrestrial Ice",
+  "Extraterrestrial Rock","Former Deep-Space Outpost","Frozen Planetoid Debris","Large Spaceship Wreck",
+  "Planetoid Debris","Space Junk"];
+function signalComboGroups(knownKey,canon){
+  var community=(OVERRIDES.communityTerms&&OVERRIDES.communityTerms[knownKey])||[];
+  var learned=knownTerms[knownKey]||[], seen={}, arr=[];
+  canon.concat(community).concat(learned).forEach(function(v){
+    v=String(v||"").trim().replace(/\.$/,"");
+    var lo=v.toLowerCase(); if(v&&!seen[lo]){ seen[lo]=1; arr.push(v); }
+  });
+  return [{label:null,items:sortAlphaCI(arr),iconHtml:""}];
+}
 function renderSignalEditList(){
   var el=document.getElementById("signalEditList"), html="", i;
   for(i=0;i<editSignals.length;i++){
@@ -10527,7 +10590,7 @@ function renderSignalEditList(){
       '</div>';
     if(g.open){
       html+='<div class="brow2">'+
-          '<div class="mfld" style="margin-bottom:0"><div class="lb">Name</div><input type="text" class="sgName" list="dlSignalName" data-si="'+i+'" maxlength="40" placeholder="e.g. The Afaye Cluster" value="'+escAttr(g.name)+'"></div>'+
+          '<div class="mfld" style="margin-bottom:0"><div class="lb">Name</div><input type="text" class="sgName" autocomplete="off" data-si="'+i+'" maxlength="40" placeholder="e.g. The Afaye Cluster" value="'+escAttr(g.name)+'"></div>'+
           '<div class="mfld" style="margin-bottom:0"><div class="lb">Icon type</div>'+
             '<div class="iconPick" data-si="'+i+'">'+
               '<button type="button" class="iconPickBtn" data-si="'+i+'">'+
@@ -10569,8 +10632,8 @@ function renderSignalEditList(){
             '</select>'+
           '</div>'+
         '</div>'+
-        '<div class="mfld" style="margin-bottom:0"><div class="lb">Category label</div><input type="text" class="sgCat" data-si="'+i+'" maxlength="40" placeholder="e.g. Asteroid Belt" value="'+escAttr(g.category)+'"></div>'+
-        '<div class="mfld" style="margin-bottom:0"><div class="lb">Signal type</div><input type="text" class="sgType" data-si="'+i+'" maxlength="80" placeholder="e.g. Extraterrestrial ice." value="'+escAttr(g.signalType)+'"></div>'+
+        '<div class="mfld" style="margin-bottom:0"><div class="lb">Category label</div><div class="icombo"><input type="text" class="sgCat icomboInput" data-si="'+i+'" id="sgCat-'+i+'" maxlength="40" autocomplete="off" placeholder="e.g. Asteroid Belt" value="'+escAttr(g.category)+'"><div class="icomboList" id="sgCatList-'+i+'"></div></div></div>'+
+        '<div class="mfld" style="margin-bottom:0"><div class="lb">Signal type</div><div class="icombo"><input type="text" class="sgType icomboInput" data-si="'+i+'" id="sgType-'+i+'" maxlength="80" autocomplete="off" placeholder="e.g. Extraterrestrial Ice" value="'+escAttr(g.signalType)+'"><div class="icomboList" id="sgTypeList-'+i+'"></div></div></div>'+
         '<div class="mfld" style="margin-bottom:0"><div class="lb">Route recommendation</div><input type="text" class="sgRoute" data-si="'+i+'" maxlength="140" placeholder="e.g. Rich vein of comet fragments. Harvest opportunities detected." value="'+escAttr(g.route)+'"></div>'+
         '<div class="mfld" style="margin-bottom:0"><div class="lb">Near which planet/moon</div><select class="sgPlanet" data-si="'+i+'"><option value="">Not linked (floating)</option>';
       for(var pj=0;pj<editBodies.length;pj++){
@@ -10582,6 +10645,14 @@ function renderSignalEditList(){
     html+='</div>';
   }
   el.innerHTML=html;
+  // Category label + Signal type are pick-lists (seeded + shared + own terms),
+  // typing a new one is still allowed and is remembered. Inputs are rebuilt
+  // on every render, so wire them fresh each time.
+  for(i=0;i<editSignals.length;i++){
+    if(!editSignals[i].open) continue;
+    buildIconCombo("sgCat-"+i,"sgCatList-"+i,signalComboGroups("signalCat",SIGNAL_CAT_CANON),"\u2014 none \u2014",true);
+    buildIconCombo("sgType-"+i,"sgTypeList-"+i,signalComboGroups("signalType",SIGNAL_TYPE_CANON),"\u2014 none \u2014",true);
+  }
 }
 document.getElementById("signalEditList").addEventListener("input",function(e){
   var iAttr=e.target.getAttribute("data-si"); if(iAttr===null) return; var i=+iAttr;
@@ -10593,6 +10664,8 @@ document.getElementById("signalEditList").addEventListener("input",function(e){
 document.getElementById("signalEditList").addEventListener("change",function(e){
   var iAttr=e.target.getAttribute("data-si"); if(iAttr===null) return; var i=+iAttr;
   if(e.target.classList.contains("sgIcon")) editSignals[i].icon=e.target.value;
+  else if(e.target.classList.contains("sgCat")) editSignals[i].category=e.target.value;
+  else if(e.target.classList.contains("sgType")) editSignals[i].signalType=e.target.value;
   else if(e.target.classList.contains("sgPlanet")) editSignals[i].planetUid=e.target.value;
 });
 document.getElementById("signalEditList").addEventListener("click",function(e){
@@ -10656,7 +10729,8 @@ document.getElementById("bEdit").addEventListener("click",function(){ if(selecte
    ticked and the photo picker already open -- the picker has to be opened in
    this same tap, browsers refuse it from a timer. Nothing is saved until the
    traveller presses Save, same as any other edit. */
-document.getElementById("bStationPhoto").addEventListener("click",function(){
+var bStationPhotoEl=document.getElementById("bStationPhoto"); // button removed 2026-11-14; kept null-safe
+if(bStationPhotoEl) bStationPhotoEl.addEventListener("click",function(){
   if(!selected) return;
   openEditModal();
   edGoTo("features"); // the station photo lives on the Special Features step

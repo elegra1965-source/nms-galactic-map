@@ -6,7 +6,7 @@
    - Busy (500/hour key used up) -> "please try again later".
    All Almanac text is set with textContent. */
 (function(){
-  var MEM = {}, LS = "nms-alm-cache3", busyToastAt = 0; // cache3 (2026-10-26): player-given names + station picture
+  var MEM = {}, LS = "nms-alm-cache5", busyToastAt = 0; // cache5 (2026-11-14: discoverer); cache3 (2026-10-26): player-given names + station picture
   function lsGet(){ try { return JSON.parse(localStorage.getItem(LS) || "{}"); } catch(e){ return {}; } }
   function lsPut(k, v){
     try {
@@ -86,9 +86,10 @@
         s.econVerified = true;
       }
       if(y.wealth && s.econDesc !== y.wealth){ s.econDesc = y.wealth; var et = typeof tierFromWord === "function" ? tierFromWord(y.wealth, ECON_S) : null; if(et !== null) s.econTier = et; changed = true; }
-      // The Almanac writes trade from the station's side: its sell_percent is the game's "Buy" (negative)
-      // and its buy_percent the game's "Sell" (positive), so they swap into the map's Sell / Buy
-      if(y.sell != null && y.buy != null){ var sl = Number(y.buy).toFixed(1), by = Number(y.sell).toFixed(1); if(s.sell !== sl || s.buy !== by){ s.sell = sl; s.buy = by; changed = true; } s.econVerified = true; }
+      // In the game Sell is never negative (0 to +80%) and Buy is always negative (down to -30%), so the sign
+      // decides which number is which, whichever way round the Almanac sends them (gameTrade)
+      var gt = gameTrade(y);
+      if(gt){ if(s.sell !== gt.sell || s.buy !== gt.buy){ s.sell = gt.sell; s.buy = gt.buy; changed = true; } s.econVerified = true; }
       if(y.conflict && s.conflict !== y.conflict){ s.conflict = y.conflict; var ct = typeof tierFromWord === "function" ? tierFromWord(y.conflict, CONFLICT) : null; if(ct !== null) s.conTier = ct; s.conflictVerified = true; changed = true; }
     }
     (s.bodies || []).forEach(function(b){
@@ -147,6 +148,16 @@
 
   function el(tag, text, css){ var e = document.createElement(tag); if(text != null) e.textContent = text; if(css) e.style.cssText = css; return e; }
   function row(body, label, val){ if(val == null || val === "") return; var d = el("div"); d.appendChild(el("b", label + ": ")); d.appendChild(document.createTextNode(String(val))); body.appendChild(d); }
+  // Sell is the positive number, Buy the negative one. Only if the signs cannot tell (both 0, or same sign) fall back to the old swap
+  function gameTrade(y){
+    if(!y || y.sell == null || y.buy == null) return null;
+    var a = Number(y.sell), b = Number(y.buy);
+    if(isNaN(a) || isNaN(b)) return null;
+    var sell = b, buy = a; // signs cannot tell (same sign): old rule, Almanac sell_percent = game Buy
+    if(a >= 0 && b <= 0 && (a > 0 || b < 0)){ sell = a; buy = b; }       // already in game order
+    else if(a <= 0 && b >= 0 && (a < 0 || b > 0)){ sell = b; buy = a; } // station-side order: swap
+    return { sell: sell.toFixed(1), buy: buy.toFixed(1) };
+  }
   function pct(v){ return v == null ? null : (v > 0 ? "+" : "") + v + "%"; }
 
   function render(body, s, d){
@@ -159,11 +170,17 @@
     var y = d.system || {};
     row(body, "Name", y.name);
     if(y.gameName && y.name && y.gameName !== y.name) row(body, "Game name", y.gameName);
+    if(y.discoverer){ // 2026-11-14, Borjomi OK'd: shown as text only, from the Almanac
+      var PLAT = { steam:"Steam", gog:"GOG", xbox:"Xbox", playstation:"PlayStation", ps:"PlayStation", switch:"Switch", nintendo:"Switch", microsoft:"Xbox" };
+      var pl = y.platform ? (PLAT[String(y.platform).toLowerCase()] || null) : null, dt = "";
+      if(y.discovered){ var dd = new Date(y.discovered + "T12:00:00Z"); if(!isNaN(dd)) dt = (typeof NMS_DATE === "function") ? NMS_DATE(dd, { dateStyle:"medium" }) : dd.toLocaleDateString([], { dateStyle:"medium" }); }
+      row(body, "Discovered by", [y.discoverer, pl, dt].filter(Boolean).join(" · "));
+    }
     row(body, "Star", [y.star, y.spectral, y.suns > 1 ? y.suns + " suns" : null].filter(Boolean).join(" · "));
     row(body, "Race", y.race);
     row(body, "Economy", [y.economyType, y.economy, y.wealth].filter(Boolean).join(" · "));
     row(body, "Conflict", y.conflict);
-    if(y.sell != null || y.buy != null) row(body, "Trade", "Buy: " + (pct(y.sell) || "—") + " // Sell: " + (pct(y.buy) || "—")); // game's format; the Almanac's numbers are from the station's side, see apply()
+    if(y.sell != null || y.buy != null){ var gt = gameTrade(y); row(body, "Trade", gt ? "Sell: " + pct(Number(gt.sell)) + " // Buy: " + pct(Number(gt.buy)) : "Buy: " + (pct(y.sell) || "—") + " // Sell: " + (pct(y.buy) || "—")); } // game's order; sign decides which is which, see gameTrade()
     row(body, "In demand", y.demand);
     (d.bodies || []).forEach(function(a){
       var mb = mapBodyFor(s, d, a);
@@ -228,7 +245,7 @@
       if(["Gek","Vy'keen","Korvax"].indexOf(race) >= 0) set("edRace", race);
       if(y.abandoned){ var ab = document.getElementById("edAbandoned"); if(ab) ab.checked = true; }
       set("edEcon", y.economy); set("edEconStr", y.wealth); set("edConflict", y.conflict);
-      set("edSell", y.buy); set("edBuy", y.sell); // swapped: see apply()
+      var gt2 = gameTrade(y); if(gt2){ set("edSell", gt2.sell); set("edBuy", gt2.buy); } else { set("edSell", y.buy); set("edBuy", y.sell); } // see gameTrade()
     } else {
       n += setIfBlank("edRegion", y.region) + setIfBlank("edStarClass", y.spectral) + setIfBlank("edEcon", y.economy) + setIfBlank("edEconStr", y.wealth) + setIfBlank("edConflict", y.conflict);
     }

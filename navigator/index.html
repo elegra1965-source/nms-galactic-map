@@ -2207,7 +2207,7 @@ window.MOCK_JOURNEYS = [
     // they're independently rolled), so it keeps its own colour rather than
     // inheriting conflictLow/Med/High.
     var cls = j.outlaw ? "conflictOutlaw" : ["conflictLow", "conflictMed", "conflictHigh"][t];
-    var outlawIcon = j.outlaw ? '<img src="assets/icons/status-outlaw.png" alt="" class="outlawIcon" title="Pirate-controlled system">' : "";
+    var outlawIcon = j.outlaw ? '<img src="assets/icons/status-outlaw.png" alt="Outlaw status icon" class="outlawIcon" title="Pirate-controlled system">' : "";
     var label = j.outlaw ? "PIRATE" : (j.conflict || "—");
     return conflictIcon(t) + outlawIcon + '<span class="conflictBadge ' + cls + '" title="Conflict level: ' + (j.conflict || "—") + (j.outlaw ? " (pirate-controlled)" : "") + '">' + label + "</span>";
   }

@@ -46,6 +46,7 @@ button:hover,button:focus-visible{border-color:var(--cyan);outline:none}
 .who li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;align-items:center}
 .who .nm{font-weight:600;font-size:17px;overflow-wrap:anywhere}
 .who .ct{font-family:var(--disp);font-size:14px;letter-spacing:.1em;color:#fff;font-variant-numeric:tabular-nums}
+#privStats[hidden]{display:none}.who li .glyphs{grid-column:1/-1}
 .who .track{grid-column:1/-1;height:4px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden}
 .who .track i{display:block;height:100%;background:var(--cyan)}
 .who .new{font-size:11px;font-family:var(--disp);letter-spacing:.14em;color:var(--ok);margin-left:6px}
@@ -103,6 +104,25 @@ button:hover,button:focus-visible{border-color:var(--cyan);outline:none}
     <div class="stat"><span class="n" id="sWeek">—</span><span class="l">Edits · 7 days</span></div>
   </section>
 
+  <section id="privStats" hidden style="display:grid;gap:12px">
+    <h2 class="kicker" style="margin:0;font-size:12px">Private saves (owner only, from the private store)</h2>
+    <div class="stats" aria-label="Private saves">
+      <div class="stat hero"><span class="n" id="pToday">0</span><span class="l">Private saves today</span></div>
+      <div class="stat"><span class="n" id="pWeek">0</span><span class="l">Private saves · 7 days</span></div>
+      <div class="stat"><span class="n" id="pPeople">0</span><span class="l">Private codes active · 7 days</span></div>
+      <div class="stat"><span class="n" id="pTotal">0</span><span class="l">Private systems in all</span></div>
+    </div>
+    <details id="pDet" style="border:1px solid var(--line);border-radius:6px;background:var(--panel)">
+      <summary id="pSum" style="cursor:pointer;padding:12px 14px;font-family:var(--disp);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--text)">Latest private saves</summary>
+      <div style="padding:0 14px 14px;display:grid;gap:10px">
+        <input type="search" id="pFind" placeholder="Find by glyph hex, system, traveller or code" aria-label="Find a private save" style="background:transparent;color:var(--text);border:1px solid var(--line);border-radius:4px;padding:8px">
+        <ul class="who" id="pLatest"></ul>
+        <button type="button" id="pMore" hidden style="justify-self:start">Show more</button>
+      </div>
+    </details>
+    <p class="note" style="margin:0">Counted from each private system's last save, so a system saved twice counts once, on its latest day. Today = your local day.</p>
+  </section>
+
   <section class="two">
     <div class="box">
       <h2>Today by traveller</h2>
@@ -132,12 +152,10 @@ button:hover,button:focus-visible{border-color:var(--cyan);outline:none}
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
       <input type="password" id="privTok" placeholder="Admin token" style="flex:0 1 200px;background:transparent;color:var(--text);border:1px solid var(--line);border-radius:4px;padding:8px">
-      <button type="button" id="privLoadBtn">Show private systems</button>
-      <input type="search" id="privFind" placeholder="Find by glyph hex, system, traveller or code" style="flex:1 1 220px;background:transparent;color:var(--text);border:1px solid var(--line);border-radius:4px;padding:8px">
+      <button type="button" id="privLoadBtn">Refresh private saves</button>
     </div>
     <p class="sub" style="margin:0">Code requests from the map's "Lost your code?" form show first, with the matching code already found. Copy the reply and send it to them (Reddit chat or email), then press Done.</p>
     <div id="privReqs" style="display:grid;gap:10px"></div>
-    <div id="privList" style="display:grid;gap:10px"></div>
   </section>
 
   <p class="note">Private page: not linked from the map and hidden from search engines. Edits come from the map's save history; names are what each traveller typed in "Your name".</p>
@@ -359,10 +377,15 @@ button:hover,button:focus-visible{border-color:var(--cyan);outline:none}
   var owners = [], requests = [];
   try { $("privTok").value = localStorage.getItem("disc_admin_token") || ""; } catch(e){}
   function el(tag, cls, text){ var e = document.createElement(tag); if(cls) e.className = cls; if(text != null) e.textContent = text; return e; }
-  function glyphRow(addr){
+  function mapLink(addr, g){
+    var a = el("a","go","Open on the map \u2192"); a.href = (SITE || "") + "/?arrival=1&addr=" + addr + "&galaxy=" + g;
+    a.target = "_blank"; a.rel = "noopener"; a.style.cssText = "margin-left:auto;padding:5px 9px;font-size:10px"; return a;
+  }
+  function glyphRow(addr, g){
     var gl = el("div","glyphs"); gl.setAttribute("aria-label","Portal address " + addr);
     addr.split("").forEach(function(ch){ var im = el("img"); im.src = (SITE ? SITE + "/" : "") + "glyphs/glyph-mask-" + ch + ".png"; im.alt = ch; gl.appendChild(im); });
     gl.appendChild(el("span","hex", addr));
+    if(typeof g === "number" && !isNaN(g)) gl.appendChild(mapLink(addr, g));
     return gl;
   }
   function renderReqs(){
@@ -379,7 +402,7 @@ button:hover,button:focus-visible{border-color:var(--cyan);outline:none}
       m.appendChild(el("span", null, String(r.at).slice(0,16).replace("T"," ")));
       b.appendChild(m);
       var m2 = el("div","meta"); m2.appendChild(el("span", null, GAL[g] || ("Galaxy " + (g+1)))); b.appendChild(m2);
-      b.appendChild(glyphRow(addr));
+      b.appendChild(glyphRow(addr, g));
       var res = el("div","meta");
       if(r.matches && r.matches.length) r.matches.forEach(function(code){ res.appendChild(el("span","chip gold", code)); });
       else res.appendChild(el("span","chip","No private code holds this system -- ask them to check the address and galaxy"));
@@ -407,61 +430,77 @@ button:hover,button:focus-visible{border-color:var(--cyan);outline:none}
       c.appendChild(b); box.appendChild(c);
     });
   }
+  // 2026-11-14 (Tony): the code-grouped list under here was the same systems as the "Latest private saves" fold at the top, so it is gone; only the count stays
   function render(){
-    var q = $("privFind").value.trim().toUpperCase(), list = $("privList"); list.innerHTML = "";
-    var shown = 0;
+    $("privStatus").textContent = owners.length ? (owners.length + (owners.length === 1 ? " private code" : " private codes") + " · updated " + new Date().toLocaleTimeString([], { hour:"2-digit", minute:"2-digit", second:"2-digit" })) : "";
+  }
+  function renderPrivStats(){
+    var now = new Date(), day0 = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime(), wk0 = day0 - 6 * 86400000;
+    var all = [], today = 0, week = 0, people = {};
     owners.forEach(function(o){
-      var keys = Object.keys(o.systems || {});
-      var hit = !q || o.code.indexOf(q) >= 0 || String(o.name).toUpperCase().indexOf(q) >= 0 ||
-        keys.some(function(k){ return k.indexOf(q) >= 0 || String(o.systems[k].name).toUpperCase().indexOf(q) >= 0 || String(o.systems[k].editorName).toUpperCase().indexOf(q) >= 0; });
-      if(!hit) return;
-      shown++;
-      var c = el("article","card"); c.style.gridTemplateRows = "auto";
-      var b = el("div","cb");
-      var head = el("div","cn"); head.appendChild(el("span", null, o.code)); head.style.color = "var(--gold, #f0a500)"; head.style.letterSpacing = ".08em";
-      b.appendChild(head);
-      var meta = el("div","meta");
-      var who = o.name || "";
-      if(!who) keys.some(function(k){ who = (o.systems[k].editorName || "").trim(); return !!who; });
-      meta.appendChild(el("span", null, who ? "Traveller: " + who : "No name given"));
-      meta.appendChild(el("span", null, keys.length + (keys.length === 1 ? " system" : " systems")));
-      meta.appendChild(el("span", null, "Updated " + String(o.updatedAt || "").slice(0,16).replace("T"," ")));
-      b.appendChild(meta);
-      keys.forEach(function(k){
-        var s = o.systems[k], g = parseInt(k.split(":")[0],10), addr = k.split(":")[1];
-        var row = el("div"); row.style.cssText = "border-top:1px solid var(--line);padding-top:8px;margin-top:8px;display:grid;gap:4px";
-        var m2 = el("div","meta");
-        m2.appendChild(el("b", null, s.name || "Unnamed system"));
-        m2.appendChild(el("span", null, GAL[g] || ("Galaxy " + (g+1))));
-        if(s.editorName) m2.appendChild(el("span", null, "Documented by " + s.editorName));
-        if(s.savedAt) m2.appendChild(el("span", null, "Saved " + String(s.savedAt).slice(0,16).replace("T"," ")));
-        if(s.photos) m2.appendChild(el("span","chip gold", s.photos + (s.photos === 1 ? " photo" : " photos")));
-        row.appendChild(m2);
-        var gl = el("div","glyphs"); gl.setAttribute("aria-label","Portal address " + addr);
-        addr.split("").forEach(function(ch){ var im = el("img"); im.src = (SITE ? SITE + "/" : "") + "glyphs/glyph-mask-" + ch + ".png"; im.alt = ch; gl.appendChild(im); });
-        gl.appendChild(el("span","hex", addr));
-        row.appendChild(gl);
-        b.appendChild(row);
+      Object.keys(o.systems || {}).forEach(function(k){
+        var s = o.systems[k], t = Date.parse(s.savedAt || "");
+        all.push({ t: isNaN(t) ? 0 : t, k: k, s: s, code: o.code });
+        if(!isNaN(t)){ if(t >= day0) today++; if(t >= wk0){ week++; people[o.code] = 1; } }
       });
-      c.appendChild(b); list.appendChild(c);
     });
-    $("privStatus").textContent = owners.length ? (shown + " of " + owners.length + " private codes") : "";
+    $("pToday").textContent = String(today); $("pWeek").textContent = String(week);
+    $("pPeople").textContent = String(Object.keys(people).length); $("pTotal").textContent = String(all.length);
+    all.sort(function(a, b){ return b.t - a.t; });
+    var ul = $("pLatest"), more = $("pMore"); ul.textContent = "";
+    function row(x){
+      var li = el("li"), g = parseInt(x.k.split(":")[0], 10), addr = x.k.split(":")[1];
+      var nm = el("span", "nm", (x.s.name || "Unnamed system") + " · " + (GAL[g] || ("Galaxy " + (g + 1))));
+      li.appendChild(nm);
+      var who = x.s.editorName ? "by " + x.s.editorName + " · " : "";
+      li.appendChild(el("span", "ct", who + (x.t ? new Date(x.t).toLocaleString([], { dateStyle:"medium", timeStyle:"short" }) : "no date")));
+      if(x.s.flag){ var fl = el("span","ct","Check wording: " + x.s.flag); fl.style.color = "#ff6b6b"; li.appendChild(fl); nm.style.color = "#ff6b6b"; }
+      li.appendChild(glyphRow(addr, g));
+      var chips = el("div","meta"); chips.style.gridColumn = "1/-1";
+      chips.appendChild(el("span","chip gold", x.code));
+      if(x.s.photos) chips.appendChild(el("span","chip", x.s.photos + (x.s.photos === 1 ? " photo" : " photos")));
+      li.appendChild(chips);
+      return li;
+    }
+    if(!all.length){ ul.appendChild(el("li", "empty", "No private saves yet.")); more.hidden = true; }
+    else {
+      var shown = 5, find = $("pFind");
+      var draw = function(){
+        var q = find.value.trim().toUpperCase();
+        var view = !q ? all : all.filter(function(x){
+          return x.k.toUpperCase().indexOf(q) >= 0 || x.code.indexOf(q) >= 0 || String(x.s.name || "").toUpperCase().indexOf(q) >= 0 || String(x.s.editorName || "").toUpperCase().indexOf(q) >= 0;
+        });
+        ul.textContent = "";
+        if(!view.length){ ul.appendChild(el("li", "empty", "No private save matches.")); more.hidden = true; return; }
+        view.slice(0, q ? view.length : shown).forEach(function(x){ ul.appendChild(row(x)); });
+        more.hidden = !!q || view.length <= shown; more.textContent = "Show more (" + Math.min(10, view.length - shown) + ")";
+      };
+      more.onclick = function(){ shown += 10; draw(); };
+      find.oninput = function(){ shown = 5; draw(); };
+      draw();
+    }
+    var nFlag = all.filter(function(x){ return x.s.flag; }).length;
+    $("pSum").textContent = "Latest private saves (" + all.length + ")" + (nFlag ? " · " + nFlag + " to check" : "");
+    $("pSum").style.color = nFlag ? "#ff6b6b" : "";
+    if(nFlag) $("pDet").open = true;
+    $("privStats").hidden = false;
   }
   function load(){
     var tok = $("privTok").value.trim(); if(!tok){ $("privStatus").textContent = "Enter your admin token"; return; }
     try { localStorage.setItem("disc_admin_token", tok); } catch(e){}
     $("privStatus").textContent = "Loading…";
-    fetch(SITE + "/.netlify/functions/private-systems?admin=1&token=" + encodeURIComponent(tok), { cache:"no-store" })
+    var ctl = (typeof AbortController !== "undefined") ? new AbortController() : null, tmo = ctl ? setTimeout(function(){ ctl.abort(); }, 25000) : 0;
+    fetch(SITE + "/.netlify/functions/private-systems?admin=1&token=" + encodeURIComponent(tok), { cache:"no-store", signal: ctl ? ctl.signal : undefined })
       .then(function(r){ return r.json(); })
       .then(function(j){
         if(!j.ok){ $("privStatus").textContent = j.error === "forbidden" ? "Wrong admin token" : "Couldn't load"; return; }
-        owners = j.owners || []; requests = j.requests || []; renderReqs(); render();
+        owners = j.owners || []; requests = j.requests || []; renderReqs(); render(); renderPrivStats();
         if(!owners.length) $("privStatus").textContent = "No private systems yet";
       })
-      .catch(function(){ $("privStatus").textContent = "Couldn't reach the private store"; });
+      .catch(function(e){ $("privStatus").textContent = (e && e.name === "AbortError") ? "Took over 25 seconds, press Refresh private saves again" : "Couldn't reach the private store"; })
+      .then(function(){ clearTimeout(tmo); });
   }
   $("privLoadBtn").addEventListener("click", load);
-  $("privFind").addEventListener("input", render);
   if($("privTok").value) load();
 })();
 </script>

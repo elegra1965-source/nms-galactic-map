@@ -397,7 +397,7 @@ export async function invalidateGetCache(){
 // traveller's typed signal name becomes a future suggestion for every
 // other traveller. See system-edit.mjs's addCommunityTerms call for this
 // field, and preview.js's dlSignalName datalist that surfaces it.
-export const COMMUNITY_TERM_FIELDS = ["resources","flora","fauna","minerals","salvage","fossils","descriptor","biome","subtype","signalName"];
+export const COMMUNITY_TERM_FIELDS = ["resources","flora","fauna","minerals","salvage","fossils","descriptor","biome","subtype","signalName","signalCat","signalType"];
 var MAX_COMMUNITY_TERMS_PER_FIELD = 500;
 export function addCommunityTerms(data, field, values){
   if(COMMUNITY_TERM_FIELDS.indexOf(field) < 0) return;

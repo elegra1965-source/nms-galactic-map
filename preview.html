@@ -840,6 +840,8 @@ html.hc-on .btn{border-width:2px}
 .panelFoldHead{cursor:pointer;user-select:none;margin-top:10px;font-size:9px;
   letter-spacing:.12em;color:var(--text-faint);text-transform:uppercase}
 .panelFoldHead:hover{color:var(--cyan)}
+#pAlmHead{color:var(--cyan-dim)} /* 2026-11-14 (Tony): teal so the real game data fold stands out; brighter on hover */
+#pAlmHead:hover{color:var(--cyan)}
 .seqbox{border:1px solid var(--border-soft);border-radius:var(--r-sm);padding:7px;margin-top:6px;background:#04070c}
 .seqbox .lb{font-size:9px;letter-spacing:.16em;color:var(--gold);text-align:center;margin-bottom:5px}
 .seq{display:grid;grid-template-columns:repeat(12,1fr);gap:2px}
@@ -1258,6 +1260,17 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 .bodyEdit .bx{cursor:pointer;color:var(--text-faint);font-size:14px;line-height:1;padding:2px 6px}
 .bodyEdit .bx:hover{color:#ff8080}
 .bodyEdit .brow2{display:flex;gap:6px;margin-bottom:6px}
+/* "use guess" bolt: sits inside the right end of the Name field, 3px in from the edge (2026-11-14) */
+.bodyEdit .nameWrap{position:relative;display:flex;align-items:stretch}
+.bodyEdit .nameWrap input{flex:1 1 auto;min-width:0;text-overflow:ellipsis}
+.bodyEdit .nameWrap:has(.useGuess:not([hidden])) input{padding-right:42px}
+.bodyEdit .useGuess{position:absolute;right:3px;top:3px;bottom:3px;aspect-ratio:1;padding:0;margin:0;border:0;background:none;cursor:pointer;line-height:0}
+.bodyEdit .useGuess[hidden]{display:none}
+.bodyEdit .useGuess img{display:block;width:100%;height:100%;object-fit:contain;filter:saturate(.8) brightness(.88)}
+.bodyEdit .useGuess:focus-visible{outline:2px solid var(--gold);outline-offset:1px;border-radius:6px}
+/* icon beside a label that wraps onto two lines: centre the icon against the text instead of sitting on the first line */
+#bPrivCode{display:flex;align-items:center;justify-content:center;gap:6px;text-align:left}
+#bPrivCode .ci{margin:0}
 .bodyEdit .brow2>div{flex:1}
 /* Icon-type picker for signal markers (2026-09-09, Tony: "add the icons in
    front of names" -- a native <select><option> can't reliably show an image
@@ -1729,7 +1742,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 </style>
 </head>
 <body>
-<h1 style="position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0">NMS Galactic Map: free 3D No Man's Sky galaxy map and portal address decoder</h1>
+<h1 style="position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0">NMS Galactic Map: 3D No Man's Sky galaxy map and portal address decoder</h1>
 <noscript>
   <div style="position:fixed;inset:0;z-index:9999;background:#070b11;color:#cfe0f0;
     font-family:Rajdhani,system-ui,sans-serif;display:flex;align-items:center;
@@ -1818,7 +1831,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 </div>
 
 <div id="top">
-  <div id="title" aria-label="NMS Galactic Map"><img id="titleIcon" src="favicon/galaxy-spiral.png" alt="No Man's Sky Galactic Map logo" width="26" height="26"><span id="titleText" aria-hidden="true">NMS GALACTIC MAP</span><div id="annivBadge" title="10 years of No Man's Sky -- 2016-2026. Fan-made tribute, not an official Hello Games asset."><img src="icons-web/anniv-10th-badge.png" alt="No Man's Sky 10th Anniversary"></div></div>
+  <div id="title" aria-label="NMS Galactic Map"><img id="titleIcon" src="favicon/galaxy-spiral.png" alt="Galaxy spiral icon" width="26" height="26"><span id="titleText" aria-hidden="true">NMS GALACTIC MAP</span><div id="annivBadge" title="10 years of No Man's Sky -- 2016-2026. Fan-made tribute, not an official Hello Games asset."><img src="icons-web/anniv-10th-badge.png" alt="No Man's Sky 10th Anniversary"></div></div>
   <div id="toggleRow">
   <button type="button" id="chartedLine" hidden aria-haspopup="dialog" aria-expanded="false" title="Systems other travellers have charted this week">&#9672; charted</button>
   <button type="button" id="trendLine" hidden aria-haspopup="dialog" aria-expanded="false" title="The most-viewed charted systems this week"><i class="nmsfl" aria-hidden="true"></i>Trending &rsaquo;</button>
@@ -2085,11 +2098,7 @@ nearby procedural space within a radius.">Search</button>
   </div>
   <div class="prow">
     <button class="btn" id="bEdit" title="Enter your real in-game data for this system -- name, race, economy, conflict, planets/moons and resources. Saved for every visitor to see.">Edit system</button>
-    <!-- 2026-10-17, Tony: players can customise their stations (Cosmos), so make
-         swapping the generic station icon for their own photo one tap away instead
-         of buried in Edit system. Hidden once the system already has a photo
-         (2026-10-18: moved beside Edit system to save a row). -->
-    <button class="btn" id="bStationPhoto" type="button" title="Swap the generic station icon for a photo of your own customised station. Opens Edit system with the photo picker ready; your photo shows for every visitor once you Save."><img class="ci" src="crystal/ci-camera.webp?v=20261112" alt="Camera" width="20" height="20"> Add station photo</button>
+    <!-- 2026-11-14, Tony: the "Add station photo" shortcut is gone (the photo picker is in Edit system > Special Features), so every system shows the same buttons -->
   </div>
   <div class="prow">
     <button class="btn" id="bReport" title="Flag this system's data as wrong or inappropriate so it can be reviewed.">Report</button>
@@ -3092,8 +3101,8 @@ loadLetterMap('./nms-core/letter-map').then(function(lm){
 });
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="preview.min.js?v=20261113e"></script>
-<script src="almanac.js?v=20261026c"></script>
+<script src="preview.min.js?v=20261114j"></script>
+<script src="almanac.js?v=20261114e"></script>
 <script src="share-system.js?v=20261031"></script>
 <script src="charted.js?v=20261104"></script>
 <script src="phone-controls.js?v=20261113d"></script>

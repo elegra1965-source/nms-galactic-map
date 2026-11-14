@@ -27,6 +27,24 @@
 
 import { getStore } from "@netlify/blobs";
 import { json, ipKey } from "./lib/shared.mjs";
+import { BAD_WORDS } from "./filter.mjs";
+
+/* Owner review only (2026-11-13): private saves are not filtered, so the admin list flags
+   anything that looks like a blocked word. Looser than the public check on purpose (spaces and
+   punctuation removed, substring match) because only the owner sees the flag; a false flag is fine. */
+var LEET = { "0":"o", "1":"i", "3":"e", "4":"a", "5":"s", "7":"t", "@":"a", "$":"s" };
+function looseFlag(d){
+  var parts = [];
+  Object.keys(d || {}).forEach(function(k){
+    var v = d[k];
+    if(typeof v === "string" && v.length < 400 && !/^(data:|https?:)/i.test(v)) parts.push(v);
+    else if(Array.isArray(v)) v.forEach(function(x){ if(typeof x === "string" && x.length < 200) parts.push(x); });
+  });
+  var t = parts.join(" ").toLowerCase().replace(/[01345 7@$]/g, function(c){ return LEET[c] !== undefined ? LEET[c] : c; })
+    .replace(/[^a-z]/g, "").replace(/(.)\1{2,}/g, "$1");
+  for(var i = 0; i < BAD_WORDS.length; i++){ if(t.indexOf(BAD_WORDS[i]) >= 0) return BAD_WORDS[i]; }
+  return "";
+}
 
 const STORE = "nms-galmap-private";
 const HOUR = 60 * 60 * 1000;
@@ -105,7 +123,7 @@ export default async (req, context) => {
         for(var k in (rec.systems || {})){
           var e = rec.systems[k], d = (e && e.data) || {};
           sys[k] = { name: d.name || "", editorName: d.editorName || "", race: d.race || "",
-                     savedAt: e.savedAt || "", photos: (d.screenshot ? 1 : 0) + (d.stationPhoto ? 1 : 0) };
+                     savedAt: e.savedAt || "", flag: looseFlag(d), photos: (d.screenshot ? 1 : 0) + (d.stationPhoto ? 1 : 0) };
         }
         owners.push({ code: rec.code, name: rec.name || "", createdAt: rec.createdAt, updatedAt: rec.updatedAt, systems: sys });
       }
