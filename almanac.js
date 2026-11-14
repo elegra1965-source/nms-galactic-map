@@ -6,7 +6,7 @@
    - Busy (500/hour key used up) -> "please try again later".
    All Almanac text is set with textContent. */
 (function(){
-  var MEM = {}, LS = "nms-alm-cache4", busyToastAt = 0; // cache4 (2026-11-14: discoverer); cache3 (2026-10-26): player-given names + station picture
+  var MEM = {}, LS = "nms-alm-cache5", busyToastAt = 0; // cache5 (2026-11-14: discoverer); cache3 (2026-10-26): player-given names + station picture
   function lsGet(){ try { return JSON.parse(localStorage.getItem(LS) || "{}"); } catch(e){ return {}; } }
   function lsPut(k, v){
     try {
