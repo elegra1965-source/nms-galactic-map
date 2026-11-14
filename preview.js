@@ -2028,7 +2028,7 @@ var KNOWN_TERMS_K="nms-galmap-known-terms";
 // becomes a future suggestion, not just saved and forgotten. See
 // populateDatalists()'s dlSignalName entry and system-edit.mjs's matching
 // server-side addCommunityTerms("signalName",...) call.
-var KNOWN_TERMS_FIELDS=["resources","flora","fauna","minerals","salvage","fossils","descriptor","biome","subtype","signalName"];
+var KNOWN_TERMS_FIELDS=["resources","flora","fauna","minerals","salvage","fossils","descriptor","biome","subtype","signalName","signalCat","signalType"];
 var knownTerms={};
 function loadKnownTerms(){
   knownTerms={};
@@ -2076,6 +2076,10 @@ function rememberKnownTerms(payload){
   });
   var signalNames=(payload&&payload.signals||[]).map(function(g){ return g.name; }).filter(Boolean);
   if(signalNames.length) rememberTerms(knownTerms.signalName,signalNames);
+  var sigCats=(payload&&payload.signals||[]).map(function(g){ return g.category; }).filter(Boolean);
+  if(sigCats.length) rememberTerms(knownTerms.signalCat,sigCats);
+  var sigTypes=(payload&&payload.signals||[]).map(function(g){ return g.signalType; }).filter(Boolean);
+  if(sigTypes.length) rememberTerms(knownTerms.signalType,sigTypes);
   saveKnownTerms();
   populateDatalists();
 }
@@ -10529,6 +10533,27 @@ function iconSwatchDataURL(cat){
   iconSwatchCache[cat]=url;
   return url;
 }
+/* Signal Category label + Signal type are shared across systems (Asteroid
+   Belt, Habitable Asteroid, Space Hulk...), unlike the Name which is unique
+   per system. Categories = the game's own Star System Map destinations
+   (nomanssky.fandom.com/wiki/Star_System_Map, Cosmos) + Anomalous Signal.
+   Signal types are per-object flavour text with no fixed list anywhere, so
+   that seed is the real values travellers saved (typos cleaned). Community
+   + own terms are merged in and de-duped. */
+var SIGNAL_CAT_CANON=["Anomalous Signal","Asteroid Belt","Deep-Space Outpost","Habitable Asteroid",
+  "Habitable Comet Fragment","Ice Field","Infested Outpost","Minor Wreckage","Space Hulk"];
+var SIGNAL_TYPE_CANON=["Anomalous Deep-Space Object","Deep-Space Trading Outpost","Extraterrestrial Ice",
+  "Extraterrestrial Rock","Former Deep-Space Outpost","Frozen Planetoid Debris","Large Spaceship Wreck",
+  "Planetoid Debris","Space Junk"];
+function signalComboGroups(knownKey,canon){
+  var community=(OVERRIDES.communityTerms&&OVERRIDES.communityTerms[knownKey])||[];
+  var learned=knownTerms[knownKey]||[], seen={}, arr=[];
+  canon.concat(community).concat(learned).forEach(function(v){
+    v=String(v||"").trim().replace(/\.$/,"");
+    var lo=v.toLowerCase(); if(v&&!seen[lo]){ seen[lo]=1; arr.push(v); }
+  });
+  return [{label:null,items:sortAlphaCI(arr),iconHtml:""}];
+}
 function renderSignalEditList(){
   var el=document.getElementById("signalEditList"), html="", i;
   for(i=0;i<editSignals.length;i++){
@@ -10542,7 +10567,7 @@ function renderSignalEditList(){
       '</div>';
     if(g.open){
       html+='<div class="brow2">'+
-          '<div class="mfld" style="margin-bottom:0"><div class="lb">Name</div><input type="text" class="sgName" list="dlSignalName" data-si="'+i+'" maxlength="40" placeholder="e.g. The Afaye Cluster" value="'+escAttr(g.name)+'"></div>'+
+          '<div class="mfld" style="margin-bottom:0"><div class="lb">Name</div><input type="text" class="sgName" autocomplete="off" data-si="'+i+'" maxlength="40" placeholder="e.g. The Afaye Cluster" value="'+escAttr(g.name)+'"></div>'+
           '<div class="mfld" style="margin-bottom:0"><div class="lb">Icon type</div>'+
             '<div class="iconPick" data-si="'+i+'">'+
               '<button type="button" class="iconPickBtn" data-si="'+i+'">'+
@@ -10584,8 +10609,8 @@ function renderSignalEditList(){
             '</select>'+
           '</div>'+
         '</div>'+
-        '<div class="mfld" style="margin-bottom:0"><div class="lb">Category label</div><input type="text" class="sgCat" data-si="'+i+'" maxlength="40" placeholder="e.g. Asteroid Belt" value="'+escAttr(g.category)+'"></div>'+
-        '<div class="mfld" style="margin-bottom:0"><div class="lb">Signal type</div><input type="text" class="sgType" data-si="'+i+'" maxlength="80" placeholder="e.g. Extraterrestrial ice." value="'+escAttr(g.signalType)+'"></div>'+
+        '<div class="mfld" style="margin-bottom:0"><div class="lb">Category label</div><div class="icombo"><input type="text" class="sgCat icomboInput" data-si="'+i+'" id="sgCat-'+i+'" maxlength="40" autocomplete="off" placeholder="e.g. Asteroid Belt" value="'+escAttr(g.category)+'"><div class="icomboList" id="sgCatList-'+i+'"></div></div></div>'+
+        '<div class="mfld" style="margin-bottom:0"><div class="lb">Signal type</div><div class="icombo"><input type="text" class="sgType icomboInput" data-si="'+i+'" id="sgType-'+i+'" maxlength="80" autocomplete="off" placeholder="e.g. Extraterrestrial Ice" value="'+escAttr(g.signalType)+'"><div class="icomboList" id="sgTypeList-'+i+'"></div></div></div>'+
         '<div class="mfld" style="margin-bottom:0"><div class="lb">Route recommendation</div><input type="text" class="sgRoute" data-si="'+i+'" maxlength="140" placeholder="e.g. Rich vein of comet fragments. Harvest opportunities detected." value="'+escAttr(g.route)+'"></div>'+
         '<div class="mfld" style="margin-bottom:0"><div class="lb">Near which planet/moon</div><select class="sgPlanet" data-si="'+i+'"><option value="">Not linked (floating)</option>';
       for(var pj=0;pj<editBodies.length;pj++){
@@ -10597,6 +10622,14 @@ function renderSignalEditList(){
     html+='</div>';
   }
   el.innerHTML=html;
+  // Category label + Signal type are pick-lists (seeded + shared + own terms),
+  // typing a new one is still allowed and is remembered. Inputs are rebuilt
+  // on every render, so wire them fresh each time.
+  for(i=0;i<editSignals.length;i++){
+    if(!editSignals[i].open) continue;
+    buildIconCombo("sgCat-"+i,"sgCatList-"+i,signalComboGroups("signalCat",SIGNAL_CAT_CANON),"\u2014 none \u2014",true);
+    buildIconCombo("sgType-"+i,"sgTypeList-"+i,signalComboGroups("signalType",SIGNAL_TYPE_CANON),"\u2014 none \u2014",true);
+  }
 }
 document.getElementById("signalEditList").addEventListener("input",function(e){
   var iAttr=e.target.getAttribute("data-si"); if(iAttr===null) return; var i=+iAttr;
@@ -10608,6 +10641,8 @@ document.getElementById("signalEditList").addEventListener("input",function(e){
 document.getElementById("signalEditList").addEventListener("change",function(e){
   var iAttr=e.target.getAttribute("data-si"); if(iAttr===null) return; var i=+iAttr;
   if(e.target.classList.contains("sgIcon")) editSignals[i].icon=e.target.value;
+  else if(e.target.classList.contains("sgCat")) editSignals[i].category=e.target.value;
+  else if(e.target.classList.contains("sgType")) editSignals[i].signalType=e.target.value;
   else if(e.target.classList.contains("sgPlanet")) editSignals[i].planetUid=e.target.value;
 });
 document.getElementById("signalEditList").addEventListener("click",function(e){
