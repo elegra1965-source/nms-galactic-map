@@ -78,7 +78,7 @@ export async function queuePhotos(items, meta, extraRisk){
   q.items = q.items.filter(function(i){ return i.status==="new" ? (now - i.ts) < AGE_OFF_MS*3 : (now - i.ts) < AGE_OFF_MS; });
   await saveQueue(q);
   if(instant.length){
-    try { await sendEmail("[NMS Map] Photo to check ("+instant[0].risk.join(", ")+")", instant.map(function(i){return itemCard(i,true);}).join("")); } catch(e){}
+    try { await sendEmail("[NMS Map] Photo to check ("+instant[0].risk.join(", ")+")", instant.map(function(i){return itemCard(i,true);}).join("")+'<p><a href="'+reviewLink()+'">Open review page</a></p>'); } catch(e){}
   }
 }
 
