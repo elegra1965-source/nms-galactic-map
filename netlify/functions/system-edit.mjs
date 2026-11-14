@@ -225,6 +225,8 @@
    ============================================================ */
 
 import { filterSystemEdit, filterReport, filterBulkImport } from "./filter.mjs";
+import { BAD_WORDS } from "./filter.mjs";
+import { queuePhotos, flagEmail, looseFlag } from "./lib/photo-review.mjs";
 import {
   json, isValidAddress, githubGetFile, githubPutFile, pruneLog,
   editorHash, ipKey, getGetCache, setGetCache, invalidateGetCache,
@@ -1023,6 +1025,7 @@ export default async (req, context) => {
     // silently overwritten by whoever submits next -- see voteAndMaybeResolve()
     // and the module header comment above. Everything else behaves exactly
     // as it always has: direct overwrite.
+    var prevPhotos = { stationPhoto: sysRec.data.stationPhoto||"", screenshot: sysRec.data.screenshot||"" };
     var underReview = sysRec.flaggedFields.concat(sysRec.disputedFields);
     var resolvedAny=false;
     for(var ci=0; ci<underReview.length; ci++){
@@ -1135,6 +1138,25 @@ export default async (req, context) => {
   }
 
   await invalidateGetCache();
+
+  // Photo review + flagged-wording emails (2026-11-14). Publish first, review
+  // after: never blocks or fails the save.
+  if(action==="edit"){
+    try {
+      var rv = current.data.systems[editKey];
+      var cl = filtered.cleaned, meta = { galaxy:galaxy, address:address, key:editKey, editor:cl.editorName||"" };
+      var fresh = [];
+      ["stationPhoto","screenshot"].forEach(function(f){
+        var nv = rv && rv.data ? rv.data[f] : "";
+        if(nv && nv !== prevPhotos[f] && String(nv).indexOf("http")===0) fresh.push({ field:f, url:nv });
+      });
+      var txt = [cl.name, cl.notes, cl.stationName, cl.allianceName, cl.editorName].concat((cl.bodies||[]).map(function(b){return b&&b.name;})).concat((cl.signals||[]).map(function(g){return g&&g.name;})).join(" ");
+      var hit = looseFlag(txt, BAD_WORDS);
+      var risk = hit ? ["flagged wording"] : [];
+      if(hit) await flagEmail("public", meta, [hit]);
+      if(fresh.length) await queuePhotos(fresh, meta, risk);
+    } catch(e){ /* non-fatal */ }
+  }
 
   return json(200, {ok:true, address: address, action: action});
 };
