@@ -1816,7 +1816,7 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 </div>
 
 <div id="top">
-  <div id="title" aria-label="NMS Galactic Map"><img id="titleIcon" src="favicon/galaxy-spiral.png" alt="" width="26" height="26"><span id="titleText" aria-hidden="true">NMS GALACTIC MAP</span><div id="annivBadge" title="10 years of No Man's Sky -- 2016-2026. Fan-made tribute, not an official Hello Games asset."><img src="icons-web/anniv-10th-badge.png" alt="No Man's Sky 10th Anniversary"></div></div>
+  <div id="title" aria-label="NMS Galactic Map"><img id="titleIcon" src="favicon/galaxy-spiral.png" alt="Galaxy spiral icon" width="26" height="26"><span id="titleText" aria-hidden="true">NMS GALACTIC MAP</span><div id="annivBadge" title="10 years of No Man's Sky -- 2016-2026. Fan-made tribute, not an official Hello Games asset."><img src="icons-web/anniv-10th-badge.png" alt="No Man's Sky 10th Anniversary"></div></div>
   <div id="toggleRow">
   <button type="button" id="chartedLine" hidden aria-haspopup="dialog" aria-expanded="false" title="Systems other travellers have charted this week">&#9672; charted</button>
   <button type="button" id="trendLine" hidden aria-haspopup="dialog" aria-expanded="false" title="The most-viewed charted systems this week"><i class="nmsfl" aria-hidden="true"></i>Trending &rsaquo;</button>
@@ -1865,9 +1865,9 @@ nearby procedural space within a radius.">Search</button>
   <button class="btn beveled" id="bInstall" title="Install this map as an app on your device." style="display:none;animation-delay:-3.5s">&#9672; Install app</button>
   <button class="btn beveled" id="bTour" style="animation-delay:-4s" title="A quick guided tour of what this map can do.">&#9655; Tour</button>
   <button class="btn beveled" id="bAbout" style="animation-delay:-4.5s" title="Fan-made disclaimer and a note on procedural vs. real system data.">&#9432; About</button>
-  <button class="btn beveled nms-fb-btn" id="bFeedback" type="button" data-nms-feedback aria-haspopup="dialog" style="animation-delay:-4.75s" title="Reviews & feedback" aria-label="Reviews & feedback"><img class="nms-fb-ico" src="/nms-feedback/fb-ico-review.webp?v=20261111" srcset="/nms-feedback/fb-ico-review@2x.webp?v=20261111 2x" alt="" width="20" height="20"></button>
-  <button class="btn beveled" id="bLang" type="button" data-lang-btn style="animation-delay:-5.5s" title="Language" aria-label="Language"><img class="ci" src="crystal/ci-globe.webp" alt="" width="20" height="20"> <span data-lang-code translate="no">EN</span></button>
-  <button class="btn beveled" id="bAccess" style="animation-delay:-5s" title="Accessibility settings: font size, colour-blind filters, high contrast." aria-label="Accessibility settings" aria-haspopup="true" aria-expanded="false"><img class="ci" src="crystal/ci-gear.webp" alt="" width="20" height="20"></button>
+  <button class="btn beveled nms-fb-btn" id="bFeedback" type="button" data-nms-feedback aria-haspopup="dialog" style="animation-delay:-4.75s" title="Reviews & feedback" aria-label="Reviews & feedback"><img class="nms-fb-ico" src="/nms-feedback/fb-ico-review.webp?v=20261111" srcset="/nms-feedback/fb-ico-review@2x.webp?v=20261111 2x" alt="Reviews and feedback icon" width="20" height="20"></button>
+  <button class="btn beveled" id="bLang" type="button" data-lang-btn style="animation-delay:-5.5s" title="Language" aria-label="Language"><img class="ci" src="crystal/ci-globe.webp" alt="Language globe icon" width="20" height="20"> <span data-lang-code translate="no">EN</span></button>
+  <button class="btn beveled" id="bAccess" style="animation-delay:-5s" title="Accessibility settings: font size, colour-blind filters, high contrast." aria-label="Accessibility settings" aria-haspopup="true" aria-expanded="false"><img class="ci" src="crystal/ci-gear.webp" alt="Settings icon" width="20" height="20"></button>
   </div>
 </div>
 
@@ -2087,11 +2087,11 @@ nearby procedural space within a radius.">Search</button>
          swapping the generic station icon for their own photo one tap away instead
          of buried in Edit system. Hidden once the system already has a photo
          (2026-10-18: moved beside Edit system to save a row). -->
-    <button class="btn" id="bStationPhoto" type="button" title="Swap the generic station icon for a photo of your own customised station. Opens Edit system with the photo picker ready; your photo shows for every visitor once you Save."><img class="ci" src="crystal/ci-camera.webp" alt="" width="20" height="20"> Add station photo</button>
+    <button class="btn" id="bStationPhoto" type="button" title="Swap the generic station icon for a photo of your own customised station. Opens Edit system with the photo picker ready; your photo shows for every visitor once you Save."><img class="ci" src="crystal/ci-camera.webp" alt="Camera icon" width="20" height="20"> Add station photo</button>
   </div>
   <div class="prow">
     <button class="btn" id="bReport" title="Flag this system's data as wrong or inappropriate so it can be reviewed.">Report</button>
-    <button class="btn" id="bPrivCode" type="button" title="Your private code: load your private systems on another device, back them up, or ask for a lost code."><img class="ci" src="crystal/ci-lock.webp" alt="" width="20" height="20"> Private code</button>
+    <button class="btn" id="bPrivCode" type="button" title="Your private code: load your private systems on another device, back them up, or ask for a lost code."><img class="ci" src="crystal/ci-lock.webp" alt="Lock icon" width="20" height="20"> Private code</button>
   </div>
   <div id="pubNoteBox" style="display:none">
     <div class="lb" style="font-size:9px;letter-spacing:.12em;color:var(--text-faint);text-transform:uppercase;margin:8px 0 3px">Community notes</div>
@@ -2932,9 +2932,9 @@ nearby procedural space within a radius.">Search</button>
         <button class="btn" id="discShareBtn" type="button" onclick="return shareTo('app')" style="flex:1;text-align:center" title="Share this map with your phone's share menu, or copy its link">Share this map</button>
       </div>
       <div style="display:flex;gap:6px">
-        <button class="btn" onclick="return shareTo('x')" style="flex:1 1 0;text-align:center" aria-label="Share on X"><img class="ci" src="crystal/ci-x.webp" alt="" width="20" height="20"> X</button>
-        <button class="btn" onclick="return shareTo('reddit')" style="flex:1 1 0;text-align:center"><img class="ci" src="crystal/ci-reddit.webp" alt="" width="20" height="20"> Reddit</button>
-        <button class="btn" onclick="return shareTo('discord')" style="flex:1 1 0;text-align:center"><img class="ci" src="crystal/ci-discord.webp" alt="" width="20" height="20"> Discord</button>
+        <button class="btn" onclick="return shareTo('x')" style="flex:1 1 0;text-align:center" aria-label="Share on X"><img class="ci" src="crystal/ci-x.webp" alt="X logo" width="20" height="20"> X</button>
+        <button class="btn" onclick="return shareTo('reddit')" style="flex:1 1 0;text-align:center"><img class="ci" src="crystal/ci-reddit.webp" alt="Reddit logo" width="20" height="20"> Reddit</button>
+        <button class="btn" onclick="return shareTo('discord')" style="flex:1 1 0;text-align:center"><img class="ci" src="crystal/ci-discord.webp" alt="Discord logo" width="20" height="20"> Discord</button>
       </div>
     </div>
   </div>

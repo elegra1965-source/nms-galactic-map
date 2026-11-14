@@ -10067,7 +10067,7 @@ function edBuildSwitchRow(){
     sw.innerHTML=
       '<div class="edSwInner">'+
         '<div class="edSwFace edSwFront"><img src="'+EDSEC_META[key].icon+'" alt=""><span>'+EDSEC_META[key].title+'</span></div>'+
-        '<div class="edSwFace edSwBack"><img src="icons-web/status-atlas.png" alt=""></div>'+
+        '<div class="edSwFace edSwBack"><img src="icons-web/status-atlas.png" alt="Atlas status icon"></div>'+
       '</div>';
     sw.addEventListener("click",function(){ edGoTo(key); });
     row.appendChild(sw);

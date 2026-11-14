@@ -253,7 +253,7 @@ button:disabled{ cursor:default; opacity:.7; }
 <button type="button" part="button">
   <span class="stage">
     <span class="icon-slot"></span>
-    <img class="ship" alt="" src="Icons/send-feedback-ship.png">
+    <img class="ship" alt="Send feedback icon" src="Icons/send-feedback-ship.png">
     <span class="label">
       <span class="label-default"><slot></slot></span>
       <span class="label-sent"></span>
