@@ -2314,6 +2314,85 @@ function shareTo(t){
 var canvas=document.getElementById("c");
 var renderer=new THREE.WebGLRenderer({canvas:canvas,antialias:false,alpha:false});
 renderer.setClearColor(0x04060a,1);
+/* ============ adaptive performance (2026-11-18, Tony: low-end phones) ============
+   tier 0 low / 1 medium / 2 high. Chosen once from cheap device hints, then it
+   only ever steps DOWN if the frame rate stays poor (perfWatch, called from
+   animate). ?perf=low|med|high forces a tier (testing). Nothing is stored. */
+var PERF={tier:2,dpr:2,lbl:28,every:1,gridR:5,auto:true};
+var PERF_TIERS=[{dpr:1,lbl:12,every:3,gridR:2},{dpr:1.5,lbl:20,every:2,gridR:3},{dpr:2,lbl:28,every:1,gridR:5}];
+function perfSet(t,init){
+  t=Math.max(0,Math.min(2,t)); var o=PERF_TIERS[t], gridChanged=(o.gridR!==PERF.gridR);
+  PERF.tier=t; PERF.dpr=o.dpr; PERF.lbl=o.lbl; PERF.every=o.every; PERF.gridR=o.gridR;
+  if(init) return;
+  resize();
+  if(gridChanged&&typeof buildVoxelGrid==="function") buildVoxelGrid();
+}
+var PERF_KEY="nms-galmap-perf", PERF_NAMES=["low","med","high"], perfSaved=null;
+try{ perfSaved=JSON.parse(localStorage.getItem(PERF_KEY)||"null"); }catch(e){}
+PERF.asked=!!(perfSaved&&perfSaved.asked); PERF.hold=false; PERF.prev=2;
+/* Remembered on this device only (same localStorage pattern as the accessibility choices):
+   {m:"auto"|"low"|"med"|"high", t:last tier Auto settled on, asked:1 once the step-down question was answered} */
+function perfSave(){
+  try{ localStorage.setItem(PERF_KEY,JSON.stringify({m:PERF.auto?"auto":PERF_NAMES[PERF.tier],t:PERF.tier,asked:PERF.asked?1:0})); }catch(e){}
+}
+function perfDetect(){
+  var mem=navigator.deviceMemory||0, cores=navigator.hardwareConcurrency||0, gpu="";
+  try{
+    var gl=renderer.getContext(), ext=gl&&gl.getExtension("WEBGL_debug_renderer_info");
+    if(ext) gpu=String(gl.getParameter(ext.UNMASKED_RENDERER_WEBGL)||"");
+  }catch(e){}
+  if((mem&&mem<=3)||(cores&&cores<=4)||/Mali-[2-4]\d\d|Mali-T|Adreno[^0-9]*[23]\d\d\b|PowerVR|SwiftShader|llvmpipe/i.test(gpu)) return 0;
+  if((mem&&mem<=4)||(cores&&cores<=6)) return 1;
+  return 2;
+}
+(function(){
+  var q=(location.search.match(/[?&]perf=(low|med|high)/)||[])[1];
+  if(q){ PERF.auto=false; perfSet(q==="low"?0:(q==="med"?1:2),true); return; } /* testing override, never saved */
+  var m=perfSaved&&perfSaved.m, k=PERF_NAMES.indexOf(m);
+  if(k>=0){ PERF.auto=false; perfSet(k,true); return; }
+  var t=perfDetect();
+  if(m==="auto"&&typeof perfSaved.t==="number") t=Math.min(t,perfSaved.t);
+  perfSet(t,true);
+})();
+var _pw={bad:0,t0:performance.now()};
+function perfUI(){
+  var row=document.getElementById("perfRow"); if(!row) return;
+  var cur=PERF.auto?"auto":PERF_NAMES[PERF.tier];
+  row.querySelectorAll(".pill").forEach(function(b){ b.classList.toggle("on",b.dataset.perf===cur); });
+}
+function perfChoose(v){
+  if(v==="auto"){ PERF.auto=true; perfSet(perfDetect()); _pw.t0=performance.now(); _pw.bad=0; }
+  else { PERF.auto=false; perfSet(PERF_NAMES.indexOf(v)); }
+  PERF.asked=true; perfSave(); perfUI();
+}
+function perfAnswer(keep){
+  var pm=document.getElementById("perfModal");
+  PERF.hold=false; PERF.asked=true; _pw.bad=0; _pw.t0=performance.now()+2000;
+  if(!keep){ PERF.auto=false; perfSet(PERF.prev); }
+  perfSave(); perfUI();
+  if(pm&&pm.style.display!=="none") closeModal();
+}
+function perfAsk(){
+  var wrap=document.getElementById("modalWrap"), pm=document.getElementById("perfModal");
+  if(!pm||wrap.classList.contains("show")){ perfSave(); toast("Lighter mode on: fewer labels and a simpler grid.",4000); return; } /* never close another open box */
+  closeAllModalBoxes(); wrap.classList.add("show"); pm.style.display=""; PERF.hold=true;
+}
+function perfWatch(f,span){
+  if(PERF.hold){ /* question showing: if it was closed by tapping outside, that counts as Keep */
+    var w=document.getElementById("modalWrap"), pm=document.getElementById("perfModal");
+    if(!w.classList.contains("show")||pm.style.display==="none") perfAnswer(true);
+    return;
+  }
+  /* skip the first 4 s (data + textures loading), hidden tabs and odd-length samples */
+  if(!PERF.auto||PERF.tier===0||document.hidden||span>800||performance.now()-_pw.t0<4000){ _pw.bad=0; return; }
+  if(f<25){
+    if(++_pw.bad>=4){
+      _pw.bad=0; PERF.prev=PERF.tier; perfSet(PERF.tier-1); _pw.t0=performance.now()-2000; perfUI();
+      if(PERF.asked){ perfSave(); toast("Lighter mode on: fewer labels and a simpler grid.",4000); }
+      else perfAsk();
+    }
+  } else _pw.bad=0;
+}
 var scene=new THREE.Scene();
 var camera=new THREE.PerspectiveCamera(58,1,0.1,5000);
 var galaxyGroup=new THREE.Group(), localGroup=new THREE.Group(), systemGroup=new THREE.Group();
@@ -2775,7 +2854,7 @@ hoverRing.visible=false; localGroup.add(hoverRing);
 function buildVoxelGrid(){
   if(voxGrid){ localGroup.remove(voxGrid); voxGrid.geometry.dispose(); voxGrid.material.dispose(); voxGrid=null; }
   if(!gridOn) return;
-  var R=parseInt(document.getElementById("sR").value,10);
+  var R=Math.min(parseInt(document.getElementById("sR").value,10),PERF.gridR);
   var lo=-(R+0.5)*VOX_U, n=2*R+2, pts=[], i, j, a, b;
   for(i=0;i<n;i++) for(j=0;j<n;j++){
     a=lo+i*VOX_U; b=lo+j*VOX_U;
@@ -7067,7 +7146,8 @@ function initLabels(){
 }
 var lblLineSvg=null, lblLineEls=[];
 function hideLblLines(){ for(var i=0;i<lblLineEls.length;i++) lblLineEls[i].style.display="none"; }
-function hideLabels(){ for(var i=0;i<labelEls.length;i++) labelEls[i].style.display="none"; hideLblLines(); }
+var _lblN=0, _lblCache=null;
+function hideLabels(){ _lblCache=null; for(var i=0;i<labelEls.length;i++) labelEls[i].style.display="none"; hideLblLines(); }
 function toggleLabels(){
   labelsOn=!labelsOn;
   document.getElementById("bLbl").classList.toggle("on",labelsOn);
@@ -7203,9 +7283,12 @@ function updateLabels(){
   if(!labelsOn||mode==="galaxy"){ hideLabels(); updateEdgeArrows([]); return; }
   if(mode!=="local"){ updateEdgeArrows([]); updateSystemLabels(); return; }
   hideLblLines();
-  for(var r=0;r<labelEls.length;r++){ if(labelEls[r]._bx){ labelEls[r].className="lbl"; labelEls[r]._bx=false; labelEls[r]._key=""; } }
+  for(var r=0;r<labelEls.length;r++){ if(labelEls[r]._bx){ labelEls[r].className="lbl"; labelEls[r]._bx=false; labelEls[r]._key=""; labelEls[r]._t=null; } }
   var cands=[],i;
-  if(mode==="local"){
+  /* low/medium tier: rebuild the candidate list (the costly part: every system, sorted) only every 2nd/3rd frame; the cached picks are still re-projected every frame below */
+  var _lblSkip=(PERF.every>1&&_lblCache&&((_lblN++)%PERF.every)!==0);
+  if(_lblSkip) cands=_lblCache;
+  else if(mode==="local"){
     /* 2026-10-27 (Tony: following a route, which dot is the next stop?): every
        stop on a plotted course is always labelled first, numbered, ahead of the
        nearest-star labels, so the route reads stop by stop. */
@@ -7249,17 +7332,19 @@ function updateLabels(){
      behind it were then just hidden -- zoomed in, that was most of them. Now
      only stars actually on screen compete for the slots. Route stops that are
      off-screen are handed to updateEdgeArrows() instead. */
-  if(mode==="local"){
+  if(_lblSkip){ /* cached picks: arrows keep last frame's state */ }
+  else if(mode==="local"){
     var _vis=[], _off=[];
     for(var _ci=0;_ci<cands.length;_ci++){
       var _c=cands[_ci];
       _v.set(_c.x,_c.y,_c.z).project(camera);
       if(_v.z>1||_v.x<-1||_v.x>1||_v.y<-1||_v.y>1){ if(_c.d<-1e11) _off.push(_c); continue; }
-      _vis.push(_c); if(_vis.length>=LBL_MAX*2) break;
+      _vis.push(_c); if(_vis.length>=PERF.lbl*2) break;
     }
     cands=_vis;
     updateEdgeArrows(_off);
   } else updateEdgeArrows([]);
+  if(!_lblSkip) _lblCache=(mode==="local")?cands:null;
   /* A moon (or any two bodies close in-frame) projects to nearly the same
      screen point as its parent planet, so two independently-placed labels can
      land right on top of each other and read as one run-together mess (seen
@@ -7281,7 +7366,7 @@ function updateLabels(){
   var placed=[];
   for(i=0;i<LBL_MAX;i++){
     var el=labelEls[i];
-    if(i>=cands.length){ el.style.display="none"; continue; }
+    if(i>=cands.length||i>=PERF.lbl){ el.style.display="none"; continue; }
     var cd=cands[i];
     _v.set(cd.x,cd.y,cd.z).project(camera);
     if(_v.z>1||_v.x<-1||_v.x>1||_v.y<-1||_v.y>1){ el.style.display="none"; continue; }
@@ -7325,7 +7410,7 @@ function updateLabels(){
     placed.push({x:lx,y:ly});
     el.style.left=lx+"px";
     el.style.top=ly+"px";
-    el.textContent=cd.t;
+    if(el._t!==cd.t){ el.textContent=cd.t; el._t=cd.t; }
   }
 }
 
@@ -10110,7 +10195,7 @@ function edBuildSwitchRow(){
     sw.className="edSwitch"; sw.dataset.key=key;
     sw.innerHTML=
       '<div class="edSwInner">'+
-        '<div class="edSwFace edSwFront"><img src="'+EDSEC_META[key].icon+'" alt=""><span>'+EDSEC_META[key].title+'</span></div>'+
+        '<div class="edSwFace edSwFront"><img src="'+EDSEC_META[key].icon+'" alt="'+EDSEC_META[key].title+' icon"><span>'+EDSEC_META[key].title+'</span></div>'+
         '<div class="edSwFace edSwBack"><img src="icons-web/status-atlas.png" alt="Atlas status icon"></div>'+
       '</div>';
     sw.addEventListener("click",function(){ edGoTo(key); });
@@ -10332,6 +10417,7 @@ function closeAllModalBoxes(){
   document.getElementById("saveImportModal").style.display="none";
   document.getElementById("termConfirmModal").style.display="none";
   document.getElementById("privModal").style.display="none";
+  document.getElementById("perfModal").style.display="none";
 }
 function closeModal(){ document.getElementById("modalWrap").classList.remove("show"); }
 function clientPrecheck(){
@@ -11120,6 +11206,12 @@ function maybeShowHyperNotice(){
   openHyperNotice();
 }
 document.getElementById("hyperOk").addEventListener("click",closeModal);
+document.getElementById("perfRow").addEventListener("click",function(e){
+  var b=e.target.closest&&e.target.closest(".pill"); if(b&&b.dataset.perf) perfChoose(b.dataset.perf);
+});
+document.getElementById("perfKeep").addEventListener("click",function(){ perfAnswer(true); });
+document.getElementById("perfBack").addEventListener("click",function(){ perfAnswer(false); });
+perfUI();
 document.getElementById("hyperOpenFilters").addEventListener("click",function(){
   closeModal();
   var f=document.getElementById("filt");
@@ -13012,7 +13104,7 @@ var _lastW=0, _lastH=0;
 function resize(){
   var w=window.innerWidth,h=window.innerHeight;
   _lastW=w; _lastH=h;
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,PERF.dpr));
   /* true (not false) here is the actual fix: it makes three.js set canvas.style.width/height
      to real CSS pixels (w,h). With false, the canvas is a replaced element with no explicit
      CSS size, so the browser displays it at its raw drawing-buffer attribute size instead --
@@ -13272,6 +13364,7 @@ function animate(){
     frames++;
     if(now-fpsT>500){
       document.getElementById("fps").textContent=Math.round(frames*1000/(now-fpsT));
+      perfWatch(frames*1000/(now-fpsT),now-fpsT);
       frames=0; fpsT=now;
     }
     if(ctrl==="fly") flyStep(dt);

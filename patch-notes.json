@@ -42,6 +42,19 @@
         "pt-BR": "Os seletores de galáxia e tipo não cortam mais nomes longos no celular, e a janela de filtros ficou mais legível",
         "it": "I selettori di galassia e tipo non tagliano più i nomi lunghi sul telefono e la finestra dei filtri è più leggibile"
       }
+    },
+    {
+      "tag": "new",
+      "text": {
+        "en": "New Performance setting in Settings (the gear): Auto, Light, Balanced or Full. The map now picks a lighter mode on slower phones and asks before keeping it if it still runs slowly",
+        "es": "Nuevo ajuste de Rendimiento en Ajustes (el engranaje): Auto, Ligero, Equilibrado o Completo. El mapa elige un modo más ligero en móviles lentos y pregunta antes de mantenerlo si sigue yendo lento",
+        "de": "Neue Leistungs-Einstellung unter Einstellungen (Zahnrad): Auto, Leicht, Ausgewogen oder Voll. Auf langsameren Handys wählt die Karte einen leichteren Modus und fragt, ob er bleiben soll, wenn sie weiter ruckelt",
+        "nl": "Nieuwe instelling Prestaties bij Instellingen (het tandwiel): Auto, Licht, Gebalanceerd of Volledig. De kaart kiest op tragere telefoons een lichtere stand en vraagt of die moet blijven als het nog traag loopt",
+        "pl": "Nowe ustawienie Wydajność w Ustawieniach (koło zębate): Auto, Lekki, Zrównoważony lub Pełny. Na wolniejszych telefonach mapa wybiera lżejszy tryb i pyta, czy go zostawić, jeśli nadal działa wolno",
+        "fr": "Nouveau réglage Performance dans les Paramètres (l'engrenage) : Auto, Léger, Équilibré ou Complet. La carte choisit un mode plus léger sur les téléphones lents et demande si elle doit le garder si elle ralentit encore",
+        "pt-BR": "Nova configuração de Desempenho em Ajustes (a engrenagem): Auto, Leve, Equilibrado ou Completo. O mapa escolhe um modo mais leve em celulares lentos e pergunta se deve mantê-lo caso continue lento",
+        "it": "Nuova impostazione Prestazioni in Impostazioni (l'ingranaggio): Auto, Leggero, Bilanciato o Completo. La mappa sceglie una modalità più leggera sui telefoni lenti e chiede se mantenerla se resta lenta"
+      }
     }
   ]
 }

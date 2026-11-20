@@ -2154,7 +2154,7 @@ window.MOCK_JOURNEYS = [
     var r = race || "Uninhabited";
     var src = RACE_ICON_SRC[r];
     if (!src) return '<span class="raceBadge raceBadgeNone" title="Uninhabited">—</span>';
-    return '<span class="raceBadge"><img src="' + src + '" alt="" title="' + r + '"></span>';
+    return '<span class="raceBadge"><img src="' + src + '" alt="' + r + ' race badge" title="' + r + '"></span>';
   }
   // Economy category icon + tint colour, and the real 5-point star mark —
   // copied verbatim from preview.html's own IC_ECON/ECON_COL/STAR_PATH so
@@ -2180,7 +2180,7 @@ window.MOCK_JOURNEYS = [
     var src = IC_ECON_SRC[econType];
     if (!src) return "";
     var c = ECON_COL[econType] || "#00e5ff";
-    return '<img class="econIcon" style="filter:drop-shadow(0 0 4px ' + c + ')" src="' + src + '" alt="" title="' + econType + '">';
+    return '<img class="econIcon" style="filter:drop-shadow(0 0 4px ' + c + ')" src="' + src + '" alt="' + econType + ' economy icon" title="' + econType + '">';
   }
   var STAR_PATH = 'M12 3.6l2.2 4.6 5 .7-3.6 3.6.9 5-4.5-2.4-4.5 2.4.9-5-3.6-3.6 5-.7Z';
   function wealthStars(econTier) {

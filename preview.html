@@ -2335,6 +2335,13 @@ nearby procedural space within a radius.">Search</button>
        (calm.js mounts its button here instead of floating it over the map). On the map it
        stops the title/glow animations and skips the warp animation; the map stays. -->
   <div class="fld" style="margin-top:8px"><div class="lb">Calm mode <span style="color:var(--text-faint)">(fewer effects, same as the other Hub sites)</span></div><div id="nmsCalmSlot"></div></div>
+  <div class="fld" style="margin-top:8px"><div class="lb">Performance <span style="color:var(--text-faint)">(fewer labels and a lighter grid on slower devices)</span></div>
+    <div class="pillrow" id="perfRow">
+      <button class="pill on" type="button" data-perf="auto" title="Picks a mode for this device and lowers it if the map runs slowly.">Auto</button>
+      <button class="pill" type="button" data-perf="low" title="Fewest labels and a simple grid. Best for older phones.">Light</button>
+      <button class="pill" type="button" data-perf="med" title="Fewer labels and a lighter grid.">Balanced</button>
+      <button class="pill" type="button" data-perf="high" title="All labels and the full grid.">Full</button>
+    </div></div>
   <!-- Rendering tuning (formerly a standalone "Tweak" box docked in the
        bottom-left corner) relocated in here per Tony's own session note --
        these are power-user generation/performance sliders, not narrowly
@@ -2555,6 +2562,7 @@ nearby procedural space within a radius.">Search</button>
       <label class="chk"><input type="checkbox" id="edAtlas"> Atlas station present</label>
       <label class="chk" title="Added 2026-09-09 for the real &quot;Cosmos&quot; 10th-anniversary update (Update 7.0): players can now become director of a system's space station and personalise it. Manual-only, same as the other special features here -- only you can know this from actually seeing it in-game. This is a foundation pass, more station detail may be added later."><input type="checkbox" id="edStation"> Space station directorship</label>
 <div class="mfld" id="edAllianceFld" style="margin:4px 0 8px 19px"><div class="lb">Alliance <span style="color:var(--text-faint)">(optional, as shown under the system name in game)</span></div><input type="text" id="edAllianceName" maxlength="60" placeholder="e.g. Planet Services Alliance" autocomplete="off"></div>
+<div style="font-size:10.5px;color:var(--text-faint);margin:-4px 0 8px 19px">Photos and names may be reviewed and removed if they break the rules.</div>
       <div id="edStationNameWrap" style="display:none;margin:4px 0 8px 19px">
         <div class="mfld" style="margin-bottom:6px"><div class="lb">Station name</div><input type="text" id="edStationName" maxlength="60" placeholder="e.g. The Wandering Star" autocomplete="off"></div>
         <!-- 2026-09-10: checked against the real Cosmos (Update 7.0) patch notes before
@@ -2618,6 +2626,7 @@ nearby procedural space within a radius.">Search</button>
           </div>
           <div id="edStationPhotoHint" style="font-size:10.5px;color:var(--text-faint);margin-top:4px"></div>
           <div style="font-size:10.5px;color:var(--text-faint);margin-top:2px">One picture of your station from outside, not a collage. It replaces the generated station on the map. Anything else goes in Screenshot.</div>
+          <div style="font-size:10.5px;color:var(--text-faint);margin-top:2px">Photos and names may be reviewed and removed if they break the rules.</div>
           <!-- 2026-10-17, Tony: picking a photo must not feel like a finished save. Done keeps
                Edit system open with the photo held, so the traveller can fill in the rest and
                press Save ONCE (one upload, one commit, no "already edited" on a second save). -->
@@ -2679,6 +2688,7 @@ nearby procedural space within a radius.">Search</button>
         <button class="btn" id="edLogStationRemoveBtn" type="button" style="flex:1;padding:4px 10px;font-size:11px;text-align:center;display:none" title="Remove your station photo. The map goes back to the generated station.">Remove photo</button>
       </div>
       <div style="font-size:10.5px;color:var(--text-faint);margin-top:4px">One picture of your station from outside, not a collage. It replaces the generated station on the map. Anything else goes in Screenshot.</div>
+          <div style="font-size:10.5px;color:var(--text-faint);margin-top:2px">Photos and names may be reviewed and removed if they break the rules.</div>
     </div>
     <div class="mfld" style="display:flex;gap:8px">
       <div style="flex:1"><div class="lb">Your name <span style="color:var(--text-faint)">(optional)</span></div><input type="text" id="edEditorName" maxlength="30" placeholder="Shown as who documented this system"></div>
@@ -2825,6 +2835,16 @@ nearby procedural space within a radius.">Search</button>
     <div class="modalBtns">
       <button class="btn primary" id="termConfirmYes" type="button">Add them anyway</button>
       <button class="btn" id="termConfirmNo" type="button">Go back and check</button>
+    </div>
+  </div>
+
+  <div class="box modal" id="perfModal" style="max-width:360px;display:none">
+    <h3>Map running slowly</h3>
+    <div class="msub" style="margin-bottom:10px">The map slowed down on this device, so it has switched to a lighter mode with fewer labels and a simpler grid. Keep this setting?</div>
+    <div class="mfld"><div style="font-size:12px;color:var(--text-dim);line-height:1.55">You can change this any time in Settings (the gear button) under Performance.</div></div>
+    <div class="modalBtns">
+      <button class="btn primary" id="perfKeep" type="button">Keep</button>
+      <button class="btn" id="perfBack" type="button">Go back</button>
     </div>
   </div>
 
@@ -3102,7 +3122,7 @@ loadLetterMap('./nms-core/letter-map').then(function(lm){
 });
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="preview.min.js?v=20261114k"></script>
+<script src="preview.min.js?v=20261118a"></script>
 <script src="almanac.js?v=20261114e"></script>
 <script src="share-system.js?v=20261031"></script>
 <script src="charted.js?v=20261104"></script>

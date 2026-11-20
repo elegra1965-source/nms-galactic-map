@@ -54,6 +54,10 @@ portal address  ->  12 hex glyphs  ->  signed 3D voxel coordinate
                                           data/overrides.json (lives only on GitHub, see below)
 ```
 
+- **Performance setting.** In Settings (the gear), the Performance row has Auto, Light, Balanced and Full. Auto picks a mode from your device (memory, CPU cores, graphics chip). On a slower phone the map shows fewer labels, draws a lighter grid and renders at a lower resolution. If it still runs slowly it steps down once and asks "Keep this setting?". Your choice is remembered on this device only.
+
+  <img src="screenshots/39-performance-setting.jpg" alt="The Settings panel on a phone with the Performance row: Auto, Light, Balanced and Full" width="390">
+
 - **Pickers that fit.** The Galaxy and type pickers no longer cut off long names on phones (Sterrenstelsel, Dowolny typ), and the Filters window is easier to read.
 
 - **New crystal icons.** Every icon on the map has been redrawn in one faceted crystal style, so all six sites match, and every picture has a text description for screen readers. The icons are toned down a little so they don't shout over the content.
