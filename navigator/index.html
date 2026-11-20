@@ -101,7 +101,7 @@ header button:hover{border-color:var(--cyan);color:var(--cyan)}
 .hamburger span{display:block;width:16px;height:2px;background:var(--text);position:relative}
 .hamburger span::before,.hamburger span::after{content:"";position:absolute;left:0;width:16px;height:2px;background:var(--text)}
 .hamburger span::before{top:-5px}.hamburger span::after{top:5px}
-.title{text-align:center;font-family:'Orbitron',sans-serif;font-weight:700;letter-spacing:.16em;font-size:13px;color:var(--white)}
+.title{margin:0;text-align:center;font-family:'Orbitron',sans-serif;font-weight:700;letter-spacing:.16em;font-size:13px;color:var(--white)}
 .title small{display:block;color:var(--cyan-dim);font-size:8px;letter-spacing:.14em;margin-top:3px;font-family:'Rajdhani',sans-serif;font-weight:600}
 .status{font-size:9px;color:var(--text-faint);font-family:'Orbitron',sans-serif;letter-spacing:.06em;white-space:nowrap}
 .status.on:first-letter{color:var(--matrix)}
@@ -601,7 +601,7 @@ window.nmsCoreReady = new Promise(function (res) { window.__nmsCoreResolve = res
         <button class="hamburger" id="hamburger" aria-label="Menu"><span></span></button>
         <button id="backToMap">&larr; GALACTIC MAP</button>
       </div>
-      <div class="title">GALACTIC NAVIGATOR</div>
+      <h1 class="title">GALACTIC NAVIGATOR</h1>
       <div class="right">
         <span class="status on" id="dataStatus">&#9679; SAMPLE DATA LOADED</span>
         <button id="warpFxToggle" class="ambienceToggle on" type="button" title="Toggle the warp-jump animation on I AM HERE -- on by default, same as the live map. Turn off if it gets repetitive on a long route.">&#9889;<span class="ambToggleLabel"> WARP FX</span></button>
