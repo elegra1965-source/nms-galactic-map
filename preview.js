@@ -9632,7 +9632,7 @@ function renderBodyEditList(){
     if(b.open){
       html+='<div class="brow2">'+
           '<div class="mfld" style="margin-bottom:0"><div class="lb">Name</div><div class="nameWrap"><input type="text" class="bfName" data-i="'+i+'" maxlength="30" placeholder="'+(b.nameGuess?escAttr("Guess: "+b.nameGuess+" \u00b7 tap the bolt to use"):"")+'" value="'+escAttr(b.name)+'">'+
-            (b.nameGuess?'<button type="button" class="useGuess" data-i="'+i+'" title="Use the guessed name" aria-label="Use the guessed name"'+(b.name?' hidden':'')+'><img src="crystal/ci-useguess.webp" alt="Use guess icon" width="34" height="34"></button>':"")+'</div></div>'+
+            (b.nameGuess?'<button type="button" class="useGuess" data-i="'+i+'" title="Use the guessed name" aria-label="Use the guessed name"'+(b.name?' hidden':'')+'><img src="crystal/ci-useguess.webp?v=20261120" alt="Use guess icon" width="34" height="34"></button>':"")+'</div></div>'+
           '<label class="chk2"><input type="checkbox" class="bfMoon" data-i="'+i+'"'+(b.moon?" checked":"")+'> Moon</label>'+
         '</div>'+
         '<div class="brow2">'+
