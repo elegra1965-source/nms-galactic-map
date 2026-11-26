@@ -86219,13 +86219,61 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:105B0A556D2F": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB17-5B Lalauserg",
+        "race": "Gek",
+        "region": "Citlasta Cluster",
+        "starClass": "F6",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Construction",
+        "sell": "67.8",
+        "buy": "-15.7",
+        "econDesc": "★★★ (Flourishing)",
+        "conflict": "1 (Stable)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-11-26T14:00:09.509Z",
+      "editedByIp": "ip_3cf66fdeac6b9fec",
+      "history": [
+        {
+          "at": "2026-11-26T14:00:09.509Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
-    "ip_9279193ba1812f5c": [
-      1794688865485,
-      1794689499533
+    "ip_3cf66fdeac6b9fec": [
+      1795701609509
     ]
   },
   "flagLog": {},
