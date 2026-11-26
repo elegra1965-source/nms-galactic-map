@@ -86562,18 +86562,61 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "2:107DFA556C2F": {
+      "galaxy": 2,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB34-7D Levozy-Ahar",
+        "race": "",
+        "region": "Sea of Ebbegg",
+        "starClass": "",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "",
+        "sell": "",
+        "buy": "",
+        "econDesc": "",
+        "conflict": "",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-11-26T16:00:14.828Z",
+      "editedByIp": "ip_3cf66fdeac6b9fec",
+      "history": [
+        {
+          "at": "2026-11-26T16:00:14.828Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
   "ipLog": {
     "ip_3cf66fdeac6b9fec": [
-      1795701609509,
-      1795701621797,
-      1795701633319,
-      1795701644473,
-      1795701656187,
-      1795701667097,
-      1795701678268
+      1795708814828
     ]
   },
   "flagLog": {},
