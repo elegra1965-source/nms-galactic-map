@@ -86758,6 +86758,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "9:13FF09557D2F": {
+      "galaxy": 9,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB7-3FFUdagil",
+        "race": "Korvax",
+        "region": "Lugalus Fringe",
+        "starClass": "X9P",
+        "stars": [
+          "yellow"
+        ],
+        "water": true,
+        "dissonant": true,
+        "giant": false,
+        "econName": "Mining",
+        "sell": "79.4",
+        "buy": "-28.8",
+        "econDesc": "★★ (Comfortable)",
+        "conflict": "★★ (Intermittent)",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-11-26T16:01:00.927Z",
+      "editedByIp": "ip_3cf66fdeac6b9fec",
+      "history": [
+        {
+          "at": "2026-11-26T16:01:00.927Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -86766,7 +86815,8 @@
       1795708814828,
       1795708826366,
       1795708838017,
-      1795708849337
+      1795708849337,
+      1795708860927
     ]
   },
   "flagLog": {},
