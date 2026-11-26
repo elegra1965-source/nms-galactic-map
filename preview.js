@@ -13176,6 +13176,18 @@ function setSysBanner(s){
     '</svg><div class="sbTitle" aria-label="'+esc+'">'+esc.split(" ").map(function(wd){ return "\u0002"+wd+"\u0003"; }).join(" ").replace(/&[A-Z]+;|A/g,function(m){ return m!=="A"?m.toLowerCase():"\u0001"; }).replace(/\u0001/g,'<svg class="sbLam" viewBox="0 0 10 12" preserveAspectRatio="none" aria-hidden="true"><path d="M.8 12 5 .6 9.2 12" fill="none" stroke="currentColor" stroke-width="1.15"/></svg>').replace(/\u0002/g,'<span class="sbW">').replace(/\u0003/g,'</span>')+'</div><div class="sbRule"></div>'+
     '<div class="sbSub">'+sysLocLine(s).replace(/[&<>"]/g,function(ch){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch];})+'</div>';
 }
+/* right edge of the visible toolbar parts (desktop control card sits at the left) */
+function sysToolbarRight(){
+  var topEl=document.getElementById("top"), kids, i, kr, tr=0;
+  if(!topEl) return 0;
+  kids=topEl.children;
+  for(i=0;i<kids.length;i++){
+    if(kids[i].offsetParent===null) continue;
+    kr=kids[i].getBoundingClientRect();
+    if(kr.width>0 && kr.right>tr) tr=kr.right;
+  }
+  return tr;
+}
 function positionSysBanner(){
   var topEl=document.getElementById("top"), el=document.getElementById("sysBanner");
   if(!topEl||!el||el.style.display==="none") return;
@@ -13191,7 +13203,15 @@ function positionSysBanner(){
     kr=kids[i].getBoundingClientRect();
     if(kr.height>0 && kr.bottom>bottom) bottom=kr.bottom;
   }
-  el.style.top=Math.round(bottom+14)+"px";
+  /* 2026-11-26: the desktop control card is ~290px tall on the left, so a banner
+     centred over the system sat on top of the system. If the banner does not
+     horizontally overlap any visible toolbar part, keep it at the top instead. */
+  var top=bottom+14;
+  if(window.innerWidth>900){
+    var bl=(parseFloat(el.style.left)||window.innerWidth/2)-el.offsetWidth/2;
+    if(bl>sysToolbarRight()+12) top=14;
+  }
+  el.style.top=Math.round(top)+"px";
 }
 function positionAnnivBadge(){
   return; /* 2026-10-17: badge now lives inside #title (normal flex flow) */
@@ -13234,11 +13254,18 @@ function syncSysBannerX(){
   var x=(_sbV.z>1||_sbV.z<-1)?(cr.left+cr.width/2):(cr.left+(_sbV.x+1)/2*cr.width);
   var half=el.offsetWidth/2, pad=8, W=window.innerWidth;
   if(half*2+pad*2>=W) x=W/2;
-  else x=Math.max(half+pad,Math.min(W-half-pad,x));
+  else{
+    var minX=half+pad;
+    /* 2026-11-26: desktop: keep the title clear of the control card (it now sits at the very top) */
+    if(W>900) minX=Math.max(minX,sysToolbarRight()+16+half);
+    if(minX>W-half-pad) minX=half+pad;
+    x=Math.max(minX,Math.min(W-half-pad,x));
+  }
   x=Math.round(x);
   if(x===_sysBannerX) return;
   _sysBannerX=x;
   el.style.left=x+"px";
+  positionSysBanner();
 }
 function syncPanelOffset(){
   var panelEl=document.getElementById("panel");
