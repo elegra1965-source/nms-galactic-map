@@ -86464,6 +86464,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "2:105AFA556C2F": {
+      "galaxy": 2,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB34-5A Hiraetsk XII",
+        "race": "Korvax",
+        "region": "Sea of Ebbegg",
+        "starClass": "F6",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": false,
+        "giant": false,
+        "econName": "Advanced Materials",
+        "sell": "",
+        "buy": "",
+        "econDesc": "",
+        "conflict": "Unruly",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-11-26T14:01:07.097Z",
+      "editedByIp": "ip_3cf66fdeac6b9fec",
+      "history": [
+        {
+          "at": "2026-11-26T14:01:07.097Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -86473,7 +86522,8 @@
       1795701621797,
       1795701633319,
       1795701644473,
-      1795701656187
+      1795701656187,
+      1795701667097
     ]
   },
   "flagLog": {},
