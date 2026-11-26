@@ -86513,6 +86513,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "2:105DFA556C2F": {
+      "galaxy": 2,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB34-5D Tutayg",
+        "race": "Vy'keen",
+        "region": "Sea of Ebbegg",
+        "starClass": "G4f",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": true,
+        "giant": false,
+        "econName": "Advanced Materials",
+        "sell": "",
+        "buy": "",
+        "econDesc": "Comfortable",
+        "conflict": "Intermittent",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-11-26T14:01:18.268Z",
+      "editedByIp": "ip_3cf66fdeac6b9fec",
+      "history": [
+        {
+          "at": "2026-11-26T14:01:18.268Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -86523,7 +86572,8 @@
       1795701633319,
       1795701644473,
       1795701656187,
-      1795701667097
+      1795701667097,
+      1795701678268
     ]
   },
   "flagLog": {},
