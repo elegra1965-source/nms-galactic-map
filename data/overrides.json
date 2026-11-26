@@ -86415,6 +86415,55 @@
           "text": "edited by a traveller"
         }
       ]
+    },
+    "2:1032FA556C2F": {
+      "galaxy": 2,
+      "flaggedFields": [],
+      "disputedFields": [],
+      "data": {
+        "name": "HUB34-32 Alzama",
+        "race": "Korvax",
+        "region": "Sea of Ebbegg",
+        "starClass": "F8p",
+        "stars": [
+          "yellow"
+        ],
+        "water": false,
+        "dissonant": true,
+        "giant": false,
+        "econName": "Manufacturing",
+        "sell": "",
+        "buy": "",
+        "econDesc": "Medium Supply",
+        "conflict": "Perilous",
+        "blackHole": false,
+        "atlas": false,
+        "ruins": false,
+        "outlaw": false,
+        "abandoned": false,
+        "phantom": "",
+        "notes": "Cross-referenced from the Galactic Hub community wiki (",
+        "colliding": false,
+        "collidingSet": [],
+        "screenshot": "",
+        "hasStation": false,
+        "stationName": "",
+        "allianceName": "",
+        "stationPhoto": "",
+        "signals": [],
+        "editorName": "Galactic Hub Wiki (import)",
+        "editorFriendCode": "",
+        "genVersion": "",
+        "bodies": []
+      },
+      "editedAt": "2026-11-26T14:00:56.187Z",
+      "editedByIp": "ip_3cf66fdeac6b9fec",
+      "history": [
+        {
+          "at": "2026-11-26T14:00:56.187Z",
+          "text": "edited by a traveller"
+        }
+      ]
     }
   },
   "reports": [],
@@ -86423,7 +86472,8 @@
       1795701609509,
       1795701621797,
       1795701633319,
-      1795701644473
+      1795701644473,
+      1795701656187
     ]
   },
   "flagLog": {},
