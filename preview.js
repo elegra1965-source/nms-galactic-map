@@ -8521,10 +8521,16 @@ function makeDraggable(boxEl,handleEl){
        it structurally impossible to drag ANY of the 7 draggable boxes
        into that dead zone, not just Filters. */
     var topEl=document.getElementById("top");
-    var minTop=(topEl?topEl.getBoundingClientRect().bottom:0)+4;
     var wantL=ox+ddx, wantT=oy+ddy;
-    var maxL=Math.max(4,window.innerWidth-ow-4), maxT=Math.max(minTop,window.innerHeight-oh-4);
-    var L=Math.max(4,Math.min(maxL,wantL)), T=Math.max(minTop,Math.min(maxT,wantT));
+    var maxL=Math.max(4,window.innerWidth-ow-4);
+    var L=Math.max(4,Math.min(maxL,wantL));
+    /* 2026-11-26: on desktop #top is now a narrow card at the top-left, so only a box that
+       horizontally overlaps it has to stay below it; the right-hand info panel could not
+       be moved up or down at all (Tony on laptop: "like hit a wall"). */
+    var tr=topEl?topEl.getBoundingClientRect():null;
+    var minTop=(tr&&tr.width>0&&L<tr.right+4&&L+ow>tr.left-4)?tr.bottom+4:4;
+    var maxT=Math.max(minTop,window.innerHeight-oh-4);
+    var T=Math.max(minTop,Math.min(maxT,wantT));
     boxEl.style.left=(L/zf)+"px";
     boxEl.style.top=(T/zf)+"px";
     var g=[];
