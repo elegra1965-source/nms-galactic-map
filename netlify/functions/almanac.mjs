@@ -110,7 +110,8 @@ function mapPlanet(p, w){
     fauna: p.fauna ? p.fauna.species : null, faunaW: p.fauna ? lifeWord(w, p.fauna) : null,
     flora: p.flora ? p.flora.plants : null, floraW: p.flora ? lifeWord(w, p.flora) : null,
     water: p.water || null,
-    resources: (p.resources || []).slice(0, 40).map(function(k){ return item(w, k); }),
+    // 1.3.0: a planet no longer lists `resources`; its trio (rare, uncommon, common substance) stands in
+    resources: (p.resources || p.trio || []).slice(0, 40).map(function(k){ return item(w, k); }),
     disc: pic.disc ? BASE + pic.disc : null,
     discSmall: pic.disc_small ? BASE + pic.disc_small : null,
     card: pic.card ? BASE + pic.card : null,
@@ -121,8 +122,36 @@ function mapPlanet(p, w){
   };
 }
 
-function mapSystem(s, w){
-  var tr = s.trade || {}, dsc = s.discovery || {};   // the Almanac nests the discoverer under "discovery"
+/* 1.3.0 (Almanac, Nov 2026): the system answer keeps only the system. economy, wealth and
+   conflict became plain strings with one shared `phrase` draw (0-7), race is a string, the
+   station kind is `station` ("ordinary" | "abandoned" | "outlaw" | "none"), and everything
+   about the station (trade percentages, demand, pictures) lives in GET /systems/{portal}/station.
+   This reads BOTH shapes (old answers had economy/wealth/conflict as {type|level, phrase}
+   objects and trade/pictures.station on the system), so it works before and after the release. */
+function mapSystem(s, w, st){
+  var dsc = s.discovery || {};
+  var isNew = typeof s.economy === "string";   // 1.3.0 shape (old answers had an object)
+  var abandoned = isNew ? s.station === "abandoned" : !!s.abandoned;
+  var econT = null, econP = null, wealthL = null, wealthP = null, confL = null, confP = null;
+  if(isNew){
+    var ph = typeof s.phrase === "number" ? s.phrase : null;
+    if(s.economy && s.economy !== "none" && ph != null){ econT = s.economy; econP = ph >> 1; }
+    else if(s.economy && s.economy !== "none"){ econT = s.economy; }
+    if(s.wealth && s.wealth !== "none" && ph != null){ wealthL = s.wealth; wealthP = ph; }
+    if(s.conflict && s.conflict !== "none" && ph != null){ confL = s.conflict; confP = ph; }
+  } else {
+    if(s.economy){ econT = s.economy.type; econP = s.economy.phrase; }
+    if(s.wealth){ wealthL = s.wealth.level; wealthP = s.wealth.phrase; }
+    if(s.conflict){ confL = s.conflict.level; confP = s.conflict.phrase; }
+  }
+  var tr = (isNew ? st : s.trade) || {};
+  var demandCode = isNew ? (st && st.demand && st.demand !== "none" ? st.demand : null) : tr.demand;
+  var sp = isNew ? (st && st.pictures) || {} : s.pictures || {};
+  var stationPic = isNew ? sp.picture : sp.station, stationSmall = isNew ? sp.picture_small : sp.station_small;
+  function demandWord(){
+    try { var v = (isNew ? w.station.demand : w.trade.demand)[demandCode]; if(typeof v === "string") return v; if(v && v.name) return v.name; } catch(e){}
+    return pretty(demandCode);
+  }
   return {
     portal: s.portal,
     name: s.names && (s.names.given || s.names.game) ? String(s.names.given || s.names.game).slice(0, 80) : null,
@@ -131,23 +160,23 @@ function mapSystem(s, w){
     star: word(w, "star", s.star),
     spectral: s.spectral_class || null,
     suns: s.suns || null,
-    race: s.abandoned ? "Abandoned" : word(w, "race", s.race),
-    economy: s.economy ? phrase(w, "economy", s.economy.type, s.economy.phrase) : null,
-    economyType: s.economy ? (function(){ try { var v = w.economy.type[s.economy.type]; if(typeof v === "string") return v; } catch(e){} return pretty(s.economy.type); })() : null,
-    wealth: s.wealth ? phrase(w, "wealth", s.wealth.level, s.wealth.phrase) : null,
-    conflict: s.conflict ? phrase(w, "conflict", s.conflict.level, s.conflict.phrase) : null,
-    abandoned: !!s.abandoned,
+    race: abandoned ? "Abandoned" : word(w, "race", s.race),
+    economy: econT && econP != null ? phrase(w, "economy", econT, econP) : null,
+    economyType: econT ? (function(){ try { var v = w.economy.type[econT]; if(typeof v === "string") return v; } catch(e){} return pretty(econT); })() : null,
+    wealth: wealthL && wealthP != null ? phrase(w, "wealth", wealthL, wealthP) : null,
+    conflict: confL && confP != null ? phrase(w, "conflict", confL, confP) : null,
+    abandoned: abandoned,
     // 2026-11-14 (Borjomi OK'd): who first discovered it, from the Almanac; absent where Hello Games has no record
     discoverer: dsc.discoverer && typeof dsc.discoverer === "string" && dsc.discoverer.trim() ? dsc.discoverer.trim().slice(0, 40) : null,
     platform: typeof dsc.platform === "string" ? dsc.platform.slice(0, 20) : null,
     discovered: typeof dsc.discovered === "string" && /^\d{4}-\d\d-\d\d/.test(dsc.discovered) ? dsc.discovered.slice(0, 10) : null,
     sell: typeof tr.sell_percent === "number" ? Math.round(tr.sell_percent * 10) / 10 : null,
     buy: typeof tr.buy_percent === "number" ? Math.round(tr.buy_percent * 10) / 10 : null,
-    demand: tr.demand ? (function(){ try { var v = w.trade.demand[tr.demand]; if(typeof v === "string") return v; if(v && v.name) return v.name; } catch(e){} return pretty(tr.demand); })() : null,
+    demand: demandCode ? demandWord() : null,
     card: s.pictures && s.pictures.card ? BASE + s.pictures.card : null,
     // 2026-10-26: the system's own space station picture (512x512, transparent), absent where it has none
-    station: s.pictures && s.pictures.station ? BASE + s.pictures.station : null,
-    stationSmall: s.pictures && s.pictures.station_small ? BASE + s.pictures.station_small : null
+    station: stationPic ? BASE + stationPic : null,
+    stationSmall: stationSmall ? BASE + stationSmall : null
   };
 }
 
@@ -162,7 +191,7 @@ async function words(store, path){
 
 /* One system's Almanac lookup, stored in the cache. Also used by almanac-warm.mjs
    (2026-10-24, the pre-load of every charted system). Returns { body, cost } where
-   cost = key lookups used (1 + bodies). Throws Busy on a 429. */
+   cost = key lookups used (1 + station + bodies). Throws Busy on a 429. */
 export async function lookupAndCache(store, addr, g){
   var ck = "sys/" + g + "/0" + addr.slice(1);
   var cost = 1;
@@ -171,12 +200,15 @@ export async function lookupAndCache(store, addr, g){
   if(!s){ body = { ok:true, found:false, v:CACHE_V }; }
   else {
     var w = await words(store, s.words);
+    var st = null;
+    // 1.3.0: the station has its own call (404 = no station). Old answers carried it on the system.
+    if(typeof s.economy === "string" && s.station && s.station !== "none"){ st = await aGet("systems/" + addr + "/station?galaxy=" + (g + 1)); cost++; }
     var bodies = [];
     for(var i = 0; i < (s.bodies || []).length && i < 8; i++){
       var p = await aGet("planets/" + s.bodies[i].portal + "?galaxy=" + (g + 1)); cost++;
       if(p) bodies.push(mapPlanet(p, w));
     }
-    body = { ok:true, found:true, v:CACHE_V, galaxy:g, system: mapSystem(s, w), bodies: bodies,
+    body = { ok:true, found:true, v:CACHE_V, galaxy:g, system: mapSystem(s, w, st), bodies: bodies,
              attribution: "Data: NMS Almanac, https://nmsalmanac.com", link: "https://nmsalmanac.com" };
   }
   await store.setJSON(ck, { until: Date.now() + (body.found ? TTL_HIT_MS : TTL_MISS_MS), body: body }).catch(function(){});
