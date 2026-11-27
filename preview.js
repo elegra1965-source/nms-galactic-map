@@ -13600,7 +13600,7 @@ function readArrivalHandoff(){
     if(!addr||!parseAddress(addr)) return null;
     var g=parseInt(q.get("galaxy"),10);
     if(!(g>=0&&g<GALAXIES.length)) g=0;
-    return {galaxy:g, address:addr};
+    return {galaxy:g, address:addr, enter:q.get("enter")==="1"};
   }catch(e){ return null; }
 }
 var ARRIVAL=readArrivalHandoff();
@@ -13608,10 +13608,12 @@ var LAST_POS=ARRIVAL||loadLastPosition();
 /* 2026-10-10: a link from the Hub dialer / Translator glyph reader may carry a planet glyph other
    than 1. The map works per system (its addresses always use planet 1), so say so instead of
    leaving the traveller wondering why the first glyph changed. */
-if(ARRIVAL&&ARRIVAL.address.charAt(0).toUpperCase()!=="1"){
+if(ARRIVAL&&(ARRIVAL.address.charAt(0).toUpperCase()!=="1"||ARRIVAL.enter)){
   setTimeout(function(){
     var hx=ARRIVAL.address.toUpperCase().replace(/[^0-9A-F]/g,""), pi=parseInt(hx.charAt(0),16);
-    function generic(){ toast("The first glyph picks the planet. The map shows the whole system, so it starts at planet 1 -- dial "+hx+" in game to land on that planet.",9000); }
+    /* 2026-11-27: &enter=1 (Rare pets finder / Xenodex links) = open the system view and the planet itself */
+    function enterNow(){ var be=document.getElementById("bEnter"); if(ARRIVAL.enter&&selected&&mode!=="system"&&be) be.click(); }
+    function generic(){ enterNow(); if(ARRIVAL.enter&&pi===1) return; toast("The first glyph picks the planet. The map shows the whole system, so it starts at planet 1 -- dial "+hx+" in game to land on that planet.",9000); }
     /* 2026-10-26, Tony: now NMS Almanac knows each planet's position, name the planet the
        first glyph picks (a traveller's own name for it wins) and open it in the system view */
     var s=selected;
@@ -13624,11 +13626,12 @@ if(ARRIVAL&&ARRIVAL.address.charAt(0).toUpperCase()!=="1"){
       var nm=(mb&&mb.nameOverridden&&mb.name)?mb.name:(a.name||("planet "+pi));
       window.ARRIVAL_PLANET={galaxy:s.galaxy,sys:"0"+hx.slice(1),p:pi};
       // 2026-10-26, Tony: 9 s was too quick to read -- 20 s now, and a tap on it closes it
-      toast("This address lands on "+(a.moonOf?"moon ":"planet ")+pi+": "+acEsc(nm)+". Enter the system to see it -- dial "+hx+" in game to land there.",20000);
+      toast(ARRIVAL.enter?("Showing "+(a.moonOf?"moon ":"planet ")+pi+": "+acEsc(nm)+". Dial "+hx+" in game to land there."):("This address lands on "+(a.moonOf?"moon ":"planet ")+pi+": "+acEsc(nm)+". Enter the system to see it -- dial "+hx+" in game to land there."),20000);
+      enterNow();
       var tEl=document.getElementById("toast");
       if(tEl) tEl.onclick=function(){ tEl.style.display="none"; tEl.onclick=null; };
       if(selected===s&&mode!=="system"&&typeof updatePanel==="function") updatePanel(s); // real economy/trade in the panel too
-      if(mode==="system"&&mb&&typeof showBody==="function"){ window.ARRIVAL_PLANET=null; showBody(mb,s); }
+      if(!ARRIVAL.enter&&mode==="system"&&mb&&typeof showBody==="function"){ window.ARRIVAL_PLANET=null; showBody(mb,s); } // with &enter=1 almanac.js opens it once the system view is built
     },generic);
   },4500);
 }
