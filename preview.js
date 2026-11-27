@@ -5563,12 +5563,21 @@ function orbitRingMesh(orbitR,idx){
    default icon on every visit rather than a different one each time.
    Kept as the race-neutral pool below, used only for Uninhabited systems
    now that race-specific art exists (2026-09-15). */
+/* 2026-11-25: station pictures (~1.2 MB across 14 files) are only drawn in system view, so they no longer download during the first load.
+   Each Texture starts empty; its image is fetched when a system view picks it (buildDefaultStationIcon below), or quietly 8 s after the page has loaded. */
+var _stationTexQ=[];
+function LAZY_STATION_TEX(url){ var t=new THREE.Texture(); t._url=url; _stationTexQ.push(t); return t; }
+function loadStationTex(t){
+  if(!t||t._started||!t._url) return; t._started=true;
+  var im=new Image(); im.onload=function(){ t.image=im; t.needsUpdate=true; }; im.src=t._url;
+}
+window.addEventListener("load",function(){ setTimeout(function(){ _stationTexQ.forEach(loadStationTex); },8000); });
 var DEFAULT_STATION_TEX=[
-  {tex:TEX_LOADER.load("icons-web/feature-station-default1.webp"),aspect:160/316},
-  {tex:TEX_LOADER.load("icons-web/feature-station-default2.webp"),aspect:332/332},
-  {tex:TEX_LOADER.load("icons-web/feature-station-default3.webp"),aspect:640/607},
-  {tex:TEX_LOADER.load("icons-web/feature-station-default4.webp"),aspect:640/364},
-  {tex:TEX_LOADER.load("icons-web/feature-station-default5.webp"),aspect:438/482}
+  {tex:LAZY_STATION_TEX("icons-web/feature-station-default1.webp"),aspect:160/316},
+  {tex:LAZY_STATION_TEX("icons-web/feature-station-default2.webp"),aspect:332/332},
+  {tex:LAZY_STATION_TEX("icons-web/feature-station-default3.webp"),aspect:640/607},
+  {tex:LAZY_STATION_TEX("icons-web/feature-station-default4.webp"),aspect:640/364},
+  {tex:LAZY_STATION_TEX("icons-web/feature-station-default5.webp"),aspect:438/482}
 ];
 /* 2026-09-15, Tony: "I now have space stations for each race... to use in
    systems space station depending on which race the system belongs to".
@@ -5588,25 +5597,25 @@ var DEFAULT_STATION_TEX=[
    pool above rather than needing dedicated art of their own. */
 var RACE_STATION_TEX={
   "Gek":[
-    {tex:TEX_LOADER.load("icons-web/feature-station-gek1.webp"),aspect:700/387},
-    {tex:TEX_LOADER.load("icons-web/feature-station-gek2.webp"),aspect:387/700}
+    {tex:LAZY_STATION_TEX("icons-web/feature-station-gek1.webp"),aspect:700/387},
+    {tex:LAZY_STATION_TEX("icons-web/feature-station-gek2.webp"),aspect:387/700}
   ],
   "Vy'keen":[
-    {tex:TEX_LOADER.load("icons-web/feature-station-vykeen1.webp"),aspect:700/668}
+    {tex:LAZY_STATION_TEX("icons-web/feature-station-vykeen1.webp"),aspect:700/668}
   ],
   "Korvax":[
-    {tex:TEX_LOADER.load("icons-web/feature-station-korvax1.webp"),aspect:689/700},
-    {tex:TEX_LOADER.load("icons-web/feature-station-korvax2.webp"),aspect:700/387}
+    {tex:LAZY_STATION_TEX("icons-web/feature-station-korvax1.webp"),aspect:689/700},
+    {tex:LAZY_STATION_TEX("icons-web/feature-station-korvax2.webp"),aspect:700/387}
   ]
 };
 var OUTLAW_STATION_TEX=[
-  {tex:TEX_LOADER.load("icons-web/feature-station-outlaw1.webp"),aspect:637/700},
+  {tex:LAZY_STATION_TEX("icons-web/feature-station-outlaw1.webp"),aspect:637/700},
   /* 2026-09-15 correction: the image originally shipped here as "outlaw
      space station 2" wasn't actually a 2nd outlaw photo Tony had sent --
      replaced with the real one (feature-station-outlaw2.png re-exported
      from the correct source image, same filename/slot so nothing else
      needs to change). */
-  {tex:TEX_LOADER.load("icons-web/feature-station-outlaw2.webp"),aspect:700/412}
+  {tex:LAZY_STATION_TEX("icons-web/feature-station-outlaw2.webp"),aspect:700/412}
 ];
 /* 2026-09-15, Tony: "just got 2 abandoned space stations" -- same
    independent-boolean situation as Outlaw above: s.abandoned (see
@@ -5622,8 +5631,8 @@ var OUTLAW_STATION_TEX=[
    flat JPEG), which the near-white flood-fill mask still catches fine
    since the checker's light-grey squares are well within its threshold. */
 var ABANDONED_STATION_TEX=[
-  {tex:TEX_LOADER.load("icons-web/feature-station-abandoned1.webp"),aspect:563/535},
-  {tex:TEX_LOADER.load("icons-web/feature-station-abandoned2.webp"),aspect:700/639}
+  {tex:LAZY_STATION_TEX("icons-web/feature-station-abandoned1.webp"),aspect:563/535},
+  {tex:LAZY_STATION_TEX("icons-web/feature-station-abandoned2.webp"),aspect:700/639}
 ];
 /* Shared with setMode()'s camera-fit (2026-09-13, Tony live feedback: system
    view "needs to fill screen more, little small") -- both need the exact
@@ -5651,6 +5660,7 @@ function buildDefaultStationIcon(s){
   var pool=s.abandoned?ABANDONED_STATION_TEX:(s.outlaw?OUTLAW_STATION_TEX:(RACE_STATION_TEX[s.race]||DEFAULT_STATION_TEX));
   var seed=s.idx^(s.abandoned?0x41424e44:(s.outlaw?0x4f55544c:0x53544144));
   var pick=pool[Math.floor(mulberry32(seed)()*pool.length)];
+  loadStationTex(pick.tex);
   var mat=new THREE.SpriteMaterial({map:pick.tex,transparent:true,depthWrite:false});
   var spr=new THREE.Sprite(mat);
   /* 2026-09-17, Tony (real-device playtest, Luettir system): "space

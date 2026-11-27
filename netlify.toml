@@ -60,3 +60,9 @@
   for = "/nms-core/*"
   [headers.values]
     Access-Control-Allow-Origin = "*"
+
+# 2026-11-25: self-hosted fonts never change, so let browsers keep them for a year (no re-check on every visit).
+[[headers]]
+  for = "/fonts/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
