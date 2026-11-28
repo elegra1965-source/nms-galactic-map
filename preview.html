@@ -1135,9 +1135,9 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
 #hlLine line{stroke:#f2b84b;stroke-width:1.5;stroke-dasharray:4 3;opacity:.85}
 html.calm #hlRing{animation:none}
 @media (prefers-reduced-motion: reduce){#hlRing{animation:none}}
-#toast .tg{display:block;margin-top:5px}
-#toast .tg img{width:15px;height:15px;vertical-align:middle;margin-right:1px}
-#toast .tx{color:#8fb4bf;font-size:9px;letter-spacing:.1em;margin-left:6px;vertical-align:middle}
+#toast .tg{display:flex;flex-wrap:wrap;margin-top:5px;gap:0 1px}
+#toast .tg img{flex:1 1 0;min-width:0;max-width:15px;aspect-ratio:1;height:auto}
+#toast .tx{flex:0 0 100%;color:#8fb4bf;font-size:9px;letter-spacing:.1em;margin-top:3px}
 #toast{position:fixed;left:50%;top:calc(var(--top-h,60px) + 8px);transform:translateX(-50%);z-index:40;
   font-family:'Orbitron','Orbitron Fallback',sans-serif;font-size:10px;letter-spacing:.12em;color:var(--gold);
   background:rgba(11,17,25,.95);border:1px solid var(--gold);border-radius:var(--r-sm);
