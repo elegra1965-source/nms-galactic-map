@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="robots" content="max-image-preview:large">
 <script src="calm.js?v=2"></script>
-<script src="/lang.js?v=6"></script>
+<script src="/lang.js?v=7"></script>
 <script src="/nms-update.js?v=5" defer></script>
 <script src="/nms-events.js?v=20261123" defer></script>
 <title>NMS Galactic Map | 3D Galaxy Map &amp; Portal Address Decoder</title>
@@ -1126,6 +1126,18 @@ textarea{width:100%;background:#04070c;border:1px solid var(--border);color:var(
   border-top:1px solid var(--border);color:var(--cyan);font-family:'Orbitron','Orbitron Fallback',sans-serif;
   font-size:10px;letter-spacing:.1em;padding:9px;cursor:pointer;transition:background .15s}
 .resreport .rrMarker:hover{background:rgba(0,229,255,0.16)}
+/* 2026-11-28: arrival highlight (Xenodex links): gold ring on the planet, plain gold outline on its name card */
+.lbl.bx.hl{border-color:#f2b84b;box-shadow:0 0 0 1px #f2b84b}
+.lbl.bx.hl small{color:#f2b84b}
+@keyframes hlRingIn{0%{transform:translate(-50%,-50%) scale(1.5);opacity:0}35%{opacity:1}100%{transform:translate(-50%,-50%) scale(1);opacity:1}}
+#hlRing{position:fixed;z-index:12;pointer-events:none;display:none;border:2px solid #f2b84b;border-radius:50%;box-shadow:0 0 12px 1px rgba(242,184,75,.5),inset 0 0 8px rgba(242,184,75,.3);transform:translate(-50%,-50%);animation:hlRingIn 1.4s ease-out 1}
+#hlLine{position:fixed;left:0;top:0;width:100%;height:100%;z-index:11;pointer-events:none;display:none;overflow:visible}
+#hlLine line{stroke:#f2b84b;stroke-width:1.5;stroke-dasharray:4 3;opacity:.85}
+html.calm #hlRing{animation:none}
+@media (prefers-reduced-motion: reduce){#hlRing{animation:none}}
+#toast .tg{display:block;margin-top:5px}
+#toast .tg img{width:15px;height:15px;vertical-align:middle;margin-right:1px}
+#toast .tx{color:#8fb4bf;font-size:9px;letter-spacing:.1em;margin-left:6px;vertical-align:middle}
 #toast{position:fixed;left:50%;top:calc(var(--top-h,60px) + 8px);transform:translateX(-50%);z-index:40;
   font-family:'Orbitron','Orbitron Fallback',sans-serif;font-size:10px;letter-spacing:.12em;color:var(--gold);
   background:rgba(11,17,25,.95);border:1px solid var(--gold);border-radius:var(--r-sm);
@@ -3162,7 +3174,7 @@ loadLetterMap('./nms-core/letter-map').then(function(lm){
 });
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="preview.min.js?v=20261127b"></script>
+<script src="preview.min.js?v=20261128c"></script>
 <script src="almanac.js?v=20261114e"></script>
 <script src="share-system.js?v=20261031"></script>
 <script src="charted.js?v=20261104"></script>

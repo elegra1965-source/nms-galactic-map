@@ -2286,6 +2286,11 @@ function populateDatalists(){
     dl.innerHTML=html;
   });
 }
+function glyphStrip(hx){
+  var h="";
+  for(var i=0;i<hx.length;i++) h+='<img alt="'+hx.charAt(i)+'" src="'+glyphSrc(hx.charAt(i))+'">';
+  return '<span class="tg">'+h+'<span class="tx">'+hx+'</span></span>';
+}
 function toast(msg,ms){
   var t=document.getElementById("toast");
   t.innerHTML=msg; t.style.display="block";
@@ -6298,6 +6303,7 @@ function updatePanel(s){
   updateRings();
 }
 function showBody(b,s){
+  if(HLP&&!(b&&b.almanac&&b.almanac.p===HLP.p)) HLP=null; // 2026-11-28: another planet picked, arrival highlight ends
   document.getElementById("panel").classList.add("show");
   document.getElementById("pSys").style.display="none";
   document.getElementById("pBody").style.display="";
@@ -7289,7 +7295,57 @@ function updateEdgeArrows(off){
     el.style.left=px+"px"; el.style.top=py+"px";
   }
 }
+/* 2026-11-28: arrival highlight (Xenodex / Rare pets links with &enter=1): the planet the link names gets a
+   gold ring and a plain gold outline on its name card, until another planet is picked or the system is left */
+var HLP=null, hlRingEl=null, hlLineEl=null;
+function hlIs(b){
+  return !!(HLP&&selected&&b&&b.almanac&&b.almanac.p===HLP.p&&("0"+String(selected.address).toUpperCase().slice(1))===HLP.sys);
+}
+function updateHLRing(){
+  var on=false;
+  if(HLP){
+    if(mode==="system") HLP.seen=true; else if(HLP.seen) HLP=null;
+  }
+  if(HLP&&mode==="system"){
+    for(var i=0;i<bodyMeshes.length;i++){
+      var bm=bodyMeshes[i];
+      if(!hlIs(bm.userData.body)) continue;
+      bm.getWorldPosition(_w);
+      /* ease the view onto the named planet for about a second, so it is on screen on a phone too */
+      if(ctrl!=="fly"&&(HLP.cam||0)<60){ HLP.cam=(HLP.cam||0)+1; cam.target.lerp(_w,0.15); applyCam(); }
+      camera.updateMatrixWorld();
+      _camUp.set(0,1,0).applyQuaternion(camera.quaternion);
+      var w=window.innerWidth,h=window.innerHeight;
+      var rad=((bm.geometry&&bm.geometry.parameters&&bm.geometry.parameters.radius)||1)*(bm.scale.x||1);
+      var r=lblScreenR(_w,rad,w,h);
+      _v.copy(_w).project(camera);
+      if(_v.z>1) break;
+      if(!hlRingEl){ hlRingEl=document.createElement("div"); hlRingEl.id="hlRing"; hlRingEl.setAttribute("aria-hidden","true"); document.body.appendChild(hlRingEl); }
+      var d=Math.max(26,2*(r+9));
+      hlRingEl.style.width=d+"px"; hlRingEl.style.height=d+"px";
+      hlRingEl.style.left=((_v.x*0.5+0.5)*w)+"px"; hlRingEl.style.top=((-_v.y*0.5+0.5)*h)+"px";
+      on=true;
+      /* thin gold line from the toast down to the ring, while the toast is showing */
+      var te=document.getElementById("toast"), lineOn=false;
+      if(te&&te.style.display!=="none"&&te.offsetWidth>0){
+        var tr=te.getBoundingClientRect(), x1=tr.left+tr.width/2, y1=tr.bottom, px=(_v.x*0.5+0.5)*w, py=(-_v.y*0.5+0.5)*h;
+        var dx=px-x1, dy=py-y1, len=Math.sqrt(dx*dx+dy*dy), er=d/2+2;
+        if(len>er+10){
+          if(!hlLineEl){ hlLineEl=document.createElementNS("http://www.w3.org/2000/svg","svg"); hlLineEl.id="hlLine"; hlLineEl.setAttribute("aria-hidden","true"); hlLineEl.appendChild(document.createElementNS("http://www.w3.org/2000/svg","line")); document.body.appendChild(hlLineEl); }
+          var ln=hlLineEl.firstChild;
+          ln.setAttribute("x1",x1); ln.setAttribute("y1",y1); ln.setAttribute("x2",px-dx/len*er); ln.setAttribute("y2",py-dy/len*er);
+          lineOn=true;
+        }
+      }
+      if(hlLineEl) hlLineEl.style.display=lineOn?"block":"none";
+      break;
+    }
+  }
+  if(!on&&hlLineEl) hlLineEl.style.display="none";
+  if(hlRingEl) hlRingEl.style.display=on?"block":"none";
+}
 function updateLabels(){
+  updateHLRing();
   if(!labelsOn||mode==="galaxy"){ hideLabels(); updateEdgeArrows([]); return; }
   if(mode!=="local"){ updateEdgeArrows([]); updateSystemLabels(); return; }
   hideLblLines();
@@ -7445,10 +7501,10 @@ function lblScreenR(wp,worldR,w,h){
   return Math.hypot((_sv2.x-_sv1.x)*0.5*w,(_sv2.y-_sv1.y)*0.5*h);
 }
 function stIcon(){ var i=document.createElement("img"); i.className="ci stIc"; i.src="crystal/ci-fullscreen.webp?v=20261112"; i.alt="Space station"; i.width=14; i.height=14; return i; }
-function fillLblBox(el,key,kind,title,sub,top){
+function fillLblBox(el,key,kind,title,sub,top,hl){
   if(el._key===key) return;
   el._key=key; el._bx=true;
-  el.className="lbl bx bx-"+kind;
+  el.className="lbl bx bx-"+kind+(hl?" hl":"");
   el.textContent="";
   if(top){ var t=document.createElement("small"); if(top.indexOf("\u26f6 ")===0){ t.appendChild(stIcon()); t.appendChild(document.createTextNode(top.slice(2))); } else t.textContent=top; el.appendChild(t); }
   var n=document.createElement("span"); n.textContent=title; el.appendChild(n);
@@ -7500,7 +7556,7 @@ function updateSystemLabels(){
     rad*=bm.scale.x||1;
     var br=lblScreenR(_w,rad,w,h);
     cands.push({wp:_w.clone(),r:br,kind:b.moon?"mn":"pl",pri:b.moon?4:3,
-      title:b.name,top:b.moon?"↳ Moon":"Planet"});
+      title:b.name,top:b.moon?"↳ Moon":"Planet",hl:hlIs(b)});
     /* 2026-10-19 follow-up (Tony's live screenshot): boxes were landing on
        top of planet spheres -- every visible planet/moon disc is now a
        no-go area too, same as the station photo */
@@ -7530,7 +7586,7 @@ function updateSystemLabels(){
     if(_v.z>1||_v.x<-1.05||_v.x>1.05||_v.y<-1.05||_v.y>1.05) continue;
     var ax=(_v.x*0.5+0.5)*w, ay=(-_v.y*0.5+0.5)*h;
     var el=labelEls[used], ln=lblLineEls[used];
-    fillLblBox(el,cd.kind+"|"+(cd.top||"")+"|"+cd.title+"|"+(cd.sub||""),cd.kind,cd.title,cd.sub,cd.top);
+    fillLblBox(el,cd.kind+"|"+(cd.top||"")+"|"+cd.title+"|"+(cd.sub||"")+(cd.hl?"|hl":""),cd.kind,cd.title,cd.sub,cd.top,cd.hl);
     var bw=el._w, bh=el._h;
     var rx=(cd.rx!==undefined?cd.rx:cd.r)+gap, ry=(cd.ry!==undefined?cd.ry:cd.r)+gap;
     /* 8 spots around the object, nearest-reading first (above, below,
@@ -8206,7 +8262,7 @@ document.getElementById("kJump").addEventListener("click",function(){ if(jumpTo(
 document.getElementById("bEnter").addEventListener("click",function(){
   if(mode==="system"){ setMode("local"); if(selected) updatePanel(selected); return; }
   if(!selected) return;
-  if(!canReachColor(selected.type)){ toast(driveNeededMsg(selected.type)); return; }
+  if(!window.ARRIVAL_FORCE&&!canReachColor(selected.type)){ toast(driveNeededMsg(selected.type)); return; } // 2026-11-28: an &enter=1 arrival link skips the hyperdrive check (a portal needs no drive), so first-time visitors are not stopped
   buildSystemView(selected); setMode("system"); playWarpTransition("ship");
   if(window.almNames) window.almNames(selected); // 2026-10-23: real planet names from NMS Almanac
   if(selected.editorName||selected.editorFriendCode){
@@ -13612,8 +13668,8 @@ if(ARRIVAL&&(ARRIVAL.address.charAt(0).toUpperCase()!=="1"||ARRIVAL.enter)){
   setTimeout(function(){
     var hx=ARRIVAL.address.toUpperCase().replace(/[^0-9A-F]/g,""), pi=parseInt(hx.charAt(0),16);
     /* 2026-11-27: &enter=1 (Rare pets finder / Xenodex links) = open the system view and the planet itself */
-    function enterNow(){ var be=document.getElementById("bEnter"); if(ARRIVAL.enter&&selected&&mode!=="system"&&be) be.click(); }
-    function generic(){ enterNow(); if(ARRIVAL.enter&&pi===1) return; toast("The first glyph picks the planet. The map shows the whole system, so it starts at planet 1 -- dial "+hx+" in game to land on that planet.",9000); }
+    function enterNow(){ var be=document.getElementById("bEnter"); if(ARRIVAL.enter&&selected&&mode!=="system"&&be){ window.ARRIVAL_FORCE=true; try{ be.click(); }finally{ window.ARRIVAL_FORCE=false; } } }
+    function generic(){ enterNow(); if(ARRIVAL.enter&&pi===1) return; toast("The first glyph picks the planet. The map shows the whole system, so it starts at planet 1. Dial these glyphs in game to land on that planet."+glyphStrip(hx),9000); }
     /* 2026-10-26, Tony: now NMS Almanac knows each planet's position, name the planet the
        first glyph picks (a traveller's own name for it wins) and open it in the system view */
     var s=selected;
@@ -13626,7 +13682,8 @@ if(ARRIVAL&&(ARRIVAL.address.charAt(0).toUpperCase()!=="1"||ARRIVAL.enter)){
       var nm=(mb&&mb.nameOverridden&&mb.name)?mb.name:(a.name||("planet "+pi));
       window.ARRIVAL_PLANET={galaxy:s.galaxy,sys:"0"+hx.slice(1),p:pi};
       // 2026-10-26, Tony: 9 s was too quick to read -- 20 s now, and a tap on it closes it
-      toast(ARRIVAL.enter?("Showing "+(a.moonOf?"moon ":"planet ")+pi+": "+acEsc(nm)+". Dial "+hx+" in game to land there."):("This address lands on "+(a.moonOf?"moon ":"planet ")+pi+": "+acEsc(nm)+". Enter the system to see it -- dial "+hx+" in game to land there."),20000);
+      if(ARRIVAL.enter) HLP={sys:"0"+hx.slice(1),p:pi,seen:false};
+      toast(ARRIVAL.enter?("Showing "+(a.moonOf?"moon ":"planet ")+pi+": "+acEsc(nm)+". Dial these glyphs in game to land there."+glyphStrip(hx)):("This address lands on "+(a.moonOf?"moon ":"planet ")+pi+": "+acEsc(nm)+". Enter the system to see it. Dial these glyphs in game to land there."+glyphStrip(hx)),20000);
       enterNow();
       var tEl=document.getElementById("toast");
       if(tEl) tEl.onclick=function(){ tEl.style.display="none"; tEl.onclick=null; };
