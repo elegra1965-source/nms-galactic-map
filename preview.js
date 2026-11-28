@@ -7312,7 +7312,7 @@ function updateHLRing(){
       if(!hlIs(bm.userData.body)) continue;
       bm.getWorldPosition(_w);
       /* ease the view onto the named planet for about a second, so it is on screen on a phone too */
-      if(ctrl!=="fly"&&(HLP.cam||0)<60){ HLP.cam=(HLP.cam||0)+1; cam.target.lerp(_w,0.15); applyCam(); }
+      if(ctrl!=="fly"&&!HLP.camDone){ var _n=performance.now(); if(!HLP.t0){ HLP.t0=_n; HLP.from=cam.target.clone(); } var _k=Math.min(1,(_n-HLP.t0)/900); if(_k>=1) HLP.camDone=true; _k=1-Math.pow(1-_k,3); cam.target.copy(HLP.from).lerp(_w,_k); applyCam(); }
       camera.updateMatrixWorld();
       _camUp.set(0,1,0).applyQuaternion(camera.quaternion);
       var w=window.innerWidth,h=window.innerHeight;
