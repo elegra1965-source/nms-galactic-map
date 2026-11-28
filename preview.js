@@ -7297,7 +7297,7 @@ function updateEdgeArrows(off){
 }
 /* 2026-11-28: arrival highlight (Xenodex / Rare pets links with &enter=1): the planet the link names gets a
    gold ring and a plain gold outline on its name card, until another planet is picked or the system is left */
-var HLP=null, hlRingEl=null, hlLineEl=null;
+var HLP=null, hlRingEl=null, hlLineEl=null; var _w2=new THREE.Vector3(), _up=new THREE.Vector3();
 function hlIs(b){
   return !!(HLP&&selected&&b&&b.almanac&&b.almanac.p===HLP.p&&("0"+String(selected.address).toUpperCase().slice(1))===HLP.sys);
 }
@@ -7312,7 +7312,7 @@ function updateHLRing(){
       if(!hlIs(bm.userData.body)) continue;
       bm.getWorldPosition(_w);
       /* ease the view onto the named planet for about a second, so it is on screen on a phone too */
-      if(ctrl!=="fly"&&!HLP.camDone){ var _n=performance.now(); if(!HLP.t0){ HLP.t0=_n; HLP.from=cam.target.clone(); } var _k=Math.min(1,(_n-HLP.t0)/900); if(_k>=1) HLP.camDone=true; _k=1-Math.pow(1-_k,3); cam.target.copy(HLP.from).lerp(_w,_k); applyCam(); }
+      if(ctrl!=="fly"&&!HLP.camDone){ var _n=performance.now(); if(!HLP.t0){ HLP.t0=_n; HLP.from=cam.target.clone(); var _te=document.getElementById("toast"),_tb=(_te&&getComputedStyle(_te).display!=="none")?_te.getBoundingClientRect().bottom:0; HLP.dy=Math.max(0,Math.min(_tb+60,innerHeight*0.66)-innerHeight/2); } var _k=Math.min(1,(_n-HLP.t0)/900); if(_k>=1) HLP.camDone=true; _k=1-Math.pow(1-_k,3); _w2.copy(_w); if(HLP.dy>0){ _up.setFromMatrixColumn(camera.matrixWorld,1); _w2.addScaledVector(_up,HLP.dy*2*cam.dist*Math.tan(29*Math.PI/180)/innerHeight); } cam.target.copy(HLP.from).lerp(_w2,_k); applyCam(); }
       camera.updateMatrixWorld();
       _camUp.set(0,1,0).applyQuaternion(camera.quaternion);
       var w=window.innerWidth,h=window.innerHeight;
